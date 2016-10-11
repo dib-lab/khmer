@@ -124,12 +124,12 @@ std::string _revhash(HashIntoType hash, WordLength k)
 {
     std::string s = "";
 
-    unsigned int val = hash & 3;
+    HashIntoType val(hash & HashIntoType(3));
     s += revtwobit_repr(val);
 
     for (WordLength i = 1; i < k; i++) {
         hash = hash >> 2;
-        val = hash & 3;
+        val = (hash & HashIntoType(3));
         s += revtwobit_repr(val);
     }
 
@@ -206,7 +206,7 @@ KmerIterator::KmerIterator(const char * seq,
 {
     bitmask = 0;
     for (unsigned char i = 0; i < _ksize; i++) {
-        bitmask = (bitmask << 2) | 3;
+        bitmask = (bitmask << 2) | HashIntoType(3);
     }
     _nbits_sub_1 = (_ksize*2 - 2);
 

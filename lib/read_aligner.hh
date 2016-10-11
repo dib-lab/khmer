@@ -236,7 +236,8 @@ private:
     {
         HashIntoType ret;
         for (size_t i = 0; i < k; i++) {
-            ret = (ret << 2) | 3;
+            ret <<= 2;
+            ret |= 3;
         }
         return ret;
     }

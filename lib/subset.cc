@@ -547,7 +547,7 @@ void SubsetPartition::do_partition(
 
         // run callback, if specified
         if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-            cout << "...subset-part " << first_kmer.as_ull() << "-" << last_kmer.as_ull() << ": "
+            cout << "...subset-part " << first_kmer.to_ullong() << "-" << last_kmer.to_ullong() << ": "
                  << total_reads << " <- " << next_partition_id << "\n";
 #if 0 // @CTB
             try {
@@ -608,7 +608,7 @@ void SubsetPartition::do_partition_with_abundance(
 
         // run callback, if specified
         if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-            cout << "...subset-part " << first_kmer.as_ull() << "-" << last_kmer.as_ull() << ": "
+            cout << "...subset-part " << first_kmer.to_ullong() << "-" << last_kmer.to_ullong() << ": "
                  << total_reads << " <- " << next_partition_id << "\n";
 #if 0 // @CTB
             try {

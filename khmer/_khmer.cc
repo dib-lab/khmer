@@ -113,8 +113,7 @@ extern "C" {
 static bool convert_HashIntoType_to_PyObject(const HashIntoType &hashval,
         PyObject **value)
 {
-    *value = _PyLong_FromByteArray(hashval.bytes.data(), hashval.bytes.size(),
-                                   0, 0);
+    *value = PyLong_FromString(hashval.to_string().c_str(), NULL, 2);
     return true;
 }
 
@@ -124,17 +123,25 @@ static bool convert_PyLong_to_HashIntoType(PyObject * value,
         HashIntoType &hashval)
 {
     if (PyLong_Check(value)) {
-        _PyLong_AsByteArray((PyLongObject *)value,
-                            hashval.bytes.data(),
-                            hashval.bytes.size(), 0, 0);
+        PyObject* as_str = PyNumber_ToBase(value, 2);
+        PyObject* as_bytes = PyUnicode_AsLatin1String(as_str);
+        const char* s = PyBytes_AsString(as_bytes);
+        hashval = HashIntoType(s+2);
+
+        Py_DECREF(as_bytes);
+        Py_DECREF(as_str);
+
         return true;
     } else if (PyInt_Check(value)) {
         // XXX the need to distinguish int and long goes away once python2
         // XXX support ends
-        PyObject * long_val = PyLong_FromLong(PyInt_AsLong(value));
-        _PyLong_AsByteArray((PyLongObject *)long_val,
-                            hashval.bytes.data(),
-                            hashval.bytes.size(), 0, 0);
+        PyObject* as_str = PyNumber_ToBase(value, 2);
+        PyObject* as_bytes = PyUnicode_AsLatin1String(as_str);
+        const char* s = PyBytes_AsString(as_bytes);
+        hashval = HashIntoType(s+2);
+
+        Py_DECREF(as_bytes);
+        Py_DECREF(as_str);
 
         return true;
     } else {

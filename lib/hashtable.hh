@@ -125,7 +125,8 @@ protected:
     {
         bitmask = 0;
         for (unsigned int i = 0; i < _ksize; i++) {
-            bitmask = (bitmask << 2) | 3;
+            bitmask <<= 2;
+            bitmask |= 3;
         }
         _nbits_sub_1 = (_ksize*2 - 2);
     }
