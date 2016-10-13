@@ -168,6 +168,11 @@ SimpleLabeledAssembler::SimpleLabeledAssembler(const LabelHash * lh) :
     linear_asm = new LinearAssembler(graph);
 }
 
+SimpleLabeledAssembler::~SimpleLabeledAssembler()
+{
+    delete this->linear_asm;
+}
+
 
 // Starting from the given seed k-mer, assemble all maximal linear paths in
 // both directions, using labels to skip over tricky bits.
@@ -184,20 +189,20 @@ const
         node_filters.push_back(get_stop_bf_filter(stop_bf));
     }
 
-    SeenSet * visited = new SeenSet();
+    SeenSet visited;
 
 #if DEBUG_ASSEMBLY
     std::cout << "Assemble Labeled RIGHT: " << seed_kmer.repr(_ksize) << std::endl;
 #endif
     StringVector right_paths;
-    NonLoopingAT<RIGHT> rcursor(graph, seed_kmer, node_filters, visited);
+    NonLoopingAT<RIGHT> rcursor(graph, seed_kmer, node_filters, &visited);
     _assemble_directed<RIGHT>(rcursor, right_paths);
 
 #if DEBUG_ASSEMBLY
     std::cout << "Assemble Labeled LEFT: " << seed_kmer.repr(_ksize) << std::endl;
 #endif
     StringVector left_paths;
-    NonLoopingAT<LEFT> lcursor(graph, seed_kmer, node_filters, visited);
+    NonLoopingAT<LEFT> lcursor(graph, seed_kmer, node_filters, &visited);
     _assemble_directed<LEFT>(lcursor, left_paths);
 
     StringVector paths;
@@ -210,7 +215,7 @@ const
         }
     }
 
-    visited->clear();
+    visited.clear();
     return paths;
 }
 

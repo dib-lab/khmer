@@ -74,11 +74,11 @@ class LabelHash;
  */
 class LinearAssembler
 {
-    friend class Hashtable;
-    const Hashtable * graph;
-    WordLength _ksize;
 
 public:
+
+    WordLength _ksize;
+    const Hashtable * graph;
 
     explicit LinearAssembler(const Hashtable * ht);
 
@@ -133,6 +133,7 @@ class SimpleLabeledAssembler
 public:
 
     explicit SimpleLabeledAssembler(const LabelHash * lh);
+    ~SimpleLabeledAssembler();
 
     StringVector assemble(const Kmer seed_kmer,
                           const Hashtable * stop_bf=0) const;
