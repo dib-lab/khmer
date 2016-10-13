@@ -832,6 +832,8 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
     } catch (std::ifstream::failure &e) {
         std::string err = "Error reading stoptags from: " + infilename;
         throw khmer_file_exception(err);
+    } catch (khmer_file_exception &e) {
+        throw e;
     } catch (const std::exception &e) {
         // Catching std::exception is a stopgap for
         // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145

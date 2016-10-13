@@ -1,3 +1,8 @@
+2016-10-13  Camille Scott  <camille.scott.w@gmail.com>
+
+   * Wrap IO functions in with an extra catch to handle the gcc
+     basic_ios_failure bug.
+
 2016-10-03  Tim Head  <betatim@gmail.com>
 
    * .travis.yml: adjust setup for exclusive use of travis (jenkins is retiring)

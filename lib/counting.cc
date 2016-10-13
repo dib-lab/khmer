@@ -343,8 +343,7 @@ CountingHashFileReader::CountingHashFileReader(
         throw khmer_file_exception(err + " " + strerror(errno));
     } catch (const std::exception &e) {
         std::string err = "Unknown error opening file: " + infilename + " "
-                  + strerror(errno) + "; please poke the gcc devs at "
-                  "https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145";
+                  + strerror(errno);
         throw khmer_file_exception(err);
     }
 
