@@ -908,6 +908,12 @@ void SubsetPartition::merge_from_disk(string other_filename)
             err = "Unknown error in opening file: " + other_filename;
         }
         throw khmer_file_exception(err);
+    } catch (const std::exception &e) {
+        // Catching std::exception is a stopgap for
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
+        std::string err = "Unknown error opening file: " + other_filename + " "
+                  + strerror(errno);
+        throw khmer_file_exception(err);
     }
 
     try {
@@ -952,8 +958,25 @@ void SubsetPartition::merge_from_disk(string other_filename)
         std::string err;
         err = "Unknown error reading header info from: " + other_filename;
         throw khmer_file_exception(err);
+    /* Yes, this is boneheaded. Unfortunately, there is a bug in gcc > 5
+     * regarding the basic_ios::failure that makes it impossible to catch
+     * with more specificty. So, we catch *all* exceptions after trying to
+     * get the ifstream::failure, and assume it must have been the buggy one.
+     * Unfortunately, this would also cause us to catch the
+     * khmer_file_exceptions thrown above, so we catch them again first and 
+     * rethrow them :) If this is understandably irritating to you, please
+     * bother the gcc devs at: 
+     *     https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
+     *
+     * See also: http://media4.giphy.com/media/3o6UBpHgaXFDNAuttm/giphy.gif
+     */
+    } catch (khmer_file_exception &e) {
+        throw e;
+    } catch (const std::exception &e) {
+        std::string err = "Unknown error opening file: " + other_filename + " "
+                  + strerror(errno);
+        throw khmer_file_exception(err);
     }
-
     char * buf = new char[IO_BUF_SIZE];
 
     unsigned int loaded = 0;
@@ -977,7 +1000,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
 
         try {
             infile.read(buf + remainder, IO_BUF_SIZE - remainder);
-        } catch (std::ifstream::failure &e) {
+        } catch (std::exception &e) {
 
             // We may get an exception here if we fail to read all the
             // expected bytes due to EOF -- only pass it up if we read

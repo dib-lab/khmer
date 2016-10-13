@@ -108,6 +108,12 @@ void Hashbits::load(std::string infilename)
             err = "Unknown error in opening file: " + infilename;
         }
         throw khmer_file_exception(err);
+    } catch (const std::exception &e) {
+        // Catching std::exception is a stopgap for
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
+        std::string err = "Unknown error opening file: " + infilename + " "
+                  + strerror(errno);
+        throw khmer_file_exception(err);
     }
 
     if (_counts) {
@@ -188,6 +194,12 @@ void Hashbits::load(std::string infilename)
         } else {
             err = "Error reading from k-mer graph file: " + infilename;
         }
+        throw khmer_file_exception(err);
+    } catch (const std::exception &e) {
+        // Catching std::exception is a stopgap for
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
+        std::string err = "Unknown error opening file: " + infilename + " "
+                  + strerror(errno);
         throw khmer_file_exception(err);
     }
 }

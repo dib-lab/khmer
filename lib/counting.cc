@@ -341,6 +341,11 @@ CountingHashFileReader::CountingHashFileReader(
             err = "Unknown error in opening file: " + infilename;
         }
         throw khmer_file_exception(err + " " + strerror(errno));
+    } catch (const std::exception &e) {
+        std::string err = "Unknown error opening file: " + infilename + " "
+                  + strerror(errno) + "; please poke the gcc devs at "
+                  "https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145";
+        throw khmer_file_exception(err);
     }
 
     if (ht._counts) {
@@ -444,6 +449,10 @@ CountingHashFileReader::CountingHashFileReader(
             err = "Error reading from k-mer count file: " + infilename + " "
                   + strerror(errno);
         }
+        throw khmer_file_exception(err);
+    } catch (const std::exception &e) {
+        std::string err = "Error reading from k-mer count file: " + infilename + " "
+                  + strerror(errno);
         throw khmer_file_exception(err);
     }
 }

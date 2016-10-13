@@ -294,6 +294,12 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
             err = "Unknown error in opening file: " + infilename;
         }
         throw khmer_file_exception(err);
+    } catch (const std::exception &e) {
+        // Catching std::exception is a stopgap for
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
+        std::string err = "Unknown error opening file: " + infilename + " "
+                  + strerror(errno);
+        throw khmer_file_exception(err);
     }
 
     if (clear_tags) {
@@ -358,6 +364,24 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
         if (buf != NULL) {
             delete[] buf;
         }
+        throw khmer_file_exception(err);
+    /* Yes, this is boneheaded. Unfortunately, there is a bug in gcc > 5
+     * regarding the basic_ios::failure that makes it impossible to catch
+     * with more specificty. So, we catch *all* exceptions after trying to
+     * get the ifstream::failure, and assume it must have been the buggy one.
+     * Unfortunately, this would also cause us to catch the
+     * khmer_file_exceptions thrown above, so we catch them again first and 
+     * rethrow them :) If this is understandably irritating to you, please
+     * bother the gcc devs at: 
+     *     https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
+     *
+     * See also: http://media4.giphy.com/media/3o6UBpHgaXFDNAuttm/giphy.gif
+     */
+    } catch (khmer_file_exception &e) {
+        throw e;
+    } catch (const std::exception &e) {
+        std::string err = "Unknown error opening file: " + infilename + " "
+                  + strerror(errno);
         throw khmer_file_exception(err);
     }
 }
@@ -744,6 +768,12 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
             err = "Unknown error in opening file: " + infilename;
         }
         throw khmer_file_exception(err);
+    } catch (const std::exception &e) {
+        // Catching std::exception is a stopgap for
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
+        std::string err = "Unknown error opening file: " + infilename + " "
+                  + strerror(errno);
+        throw khmer_file_exception(err);
     }
 
     if (clear_tags) {
@@ -801,6 +831,12 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
         delete[] buf;
     } catch (std::ifstream::failure &e) {
         std::string err = "Error reading stoptags from: " + infilename;
+        throw khmer_file_exception(err);
+    } catch (const std::exception &e) {
+        // Catching std::exception is a stopgap for
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
+        std::string err = "Unknown error opening file: " + infilename + " "
+                  + strerror(errno);
         throw khmer_file_exception(err);
     }
 }
