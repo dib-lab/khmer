@@ -5168,6 +5168,171 @@ static PyObject * hllcounter_merge(khmer_KHLLCounter_Object * me,
     Py_RETURN_NONE;
 }
 
+/********************************
+ * Assembler classes
+ ********************************/
+
+
+typedef struct {
+    PyObject_HEAD
+    LinearAssembler * assembler;
+} khmer_KLinearAssembler_Object;
+
+#define is_linearassembler_obj(v)  (Py_TYPE(v) == &khmer_KLinearAssembler_Type)
+
+static void khmer_linearassembler_dealloc(khmer_KLinearAssembler_Object * obj)
+{
+    delete obj->assembler;
+    obj->assembler = NULL;
+
+    Py_TYPE(obj)->tp_free((PyObject*)obj);
+}
+
+static PyObject * khmer_linearassembler_new(PyTypeObject *type, PyObject *args,
+                                            PyObject *kwds)
+{
+    khmer_KLinearAssembler_Object *self;
+    self = (khmer_KLinearAssembler_Object*)type->tp_alloc(type, 0);
+
+    if (self != NULL) {
+        PyObject * hashtable_o;
+        khmer::Hashtable * hashtable = NULL;
+
+        if (!PyArg_ParseTuple(args, "O", &hashtable_o)) {
+            Py_DECREF(self);
+            return NULL;
+        }
+
+        if (PyObject_TypeCheck(hashtable_o, &khmer_KNodegraph_Type)) {
+            khmer_KHashbits_Object * kho = (khmer_KHashbits_Object *) hashtable_o;
+            hashtable = kho->hashbits;
+        } else if (PyObject_TypeCheck(hashtable_o, &khmer_KCountgraph_Type)) {
+            khmer_KCountingHash_Object * cho = (khmer_KCountingHash_Object *) hashtable_o;
+            hashtable = cho->counting;
+        } else {
+            PyErr_SetString(PyExc_ValueError,
+                            "graph object must be a NodeGraph or CountGraph");
+            Py_DECREF(self);
+            return NULL;
+        }
+
+        try {
+       std::cout << "New Assembler: " << hashtable << std::endl;
+            self->assembler = new LinearAssembler(hashtable);
+        } catch (std::bad_alloc &e) {
+            Py_DECREF(self);
+            return PyErr_NoMemory();
+        }
+
+    }
+
+    return (PyObject *) self;
+}
+
+
+static
+PyObject *
+linearassembler_assemble(khmer_KLinearAssembler_Object * me,
+                                PyObject * args, PyObject *kwargs)
+{
+    LinearAssembler * assembler= me->assembler;
+
+    PyObject * val_o;
+    khmer_KHashbits_Object * nodegraph_o = NULL;
+    Hashbits * stop_bf = NULL;
+    const char * dir_str = NULL;
+    char dir = NULL;
+
+    static char *kwnames[] = {"seed_kmer", "stop_filter", "direction", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|O!s",
+                                    kwnames, &val_o, &khmer_KNodegraph_Type, 
+                                    &nodegraph_o, &dir_str)) {
+        return NULL;
+    }
+    if (dir_str != NULL) {
+        dir = dir_str[0];
+    } else {
+        dir = 'B';
+    }
+
+    Kmer start_kmer;
+    if (!convert_PyObject_to_Kmer(val_o, start_kmer, assembler->graph->ksize())) {
+        return NULL;
+    }
+
+    if (nodegraph_o) {
+        stop_bf = nodegraph_o->hashbits;
+    }
+
+    std::string contig;
+    if (dir == 'B') { 
+        contig = assembler->assemble(start_kmer, stop_bf);
+    } else if (dir == 'L') {
+        contig = assembler->assemble_left(start_kmer, stop_bf);
+    } else if (dir == 'R') {
+        contig = assembler->assemble_right(start_kmer, stop_bf);
+    } else {
+        PyErr_SetString(PyExc_ValueError, "Direction must be B (both), L (left),"
+                " or R (right).");
+        return NULL;
+    }
+
+    PyObject * ret = Py_BuildValue("s", contig.c_str());
+    return ret;
+}
+
+
+static PyMethodDef khmer_linearassembler_methods[] = {
+    {
+        "assemble",
+        (PyCFunction)linearassembler_assemble, METH_VARARGS | METH_KEYWORDS,
+        "Assemble a path linearly until a branch is reached."
+    },
+    {NULL, NULL, 0, NULL}           /* sentinel */
+};
+
+static PyTypeObject khmer_KLinearAssembler_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)  /* init & ob_size */
+    "_khmer.LinearAssembler",            /* tp_name */
+    sizeof(khmer_KLinearAssembler_Object), /* tp_basicsize */
+    0,                       /* tp_itemsize */
+    (destructor)khmer_linearassembler_dealloc, /* tp_dealloc */
+    0,                       /* tp_print */
+    0,                       /* tp_getattr */
+    0,                       /* tp_setattr */
+    0,                       /* tp_compare */
+    0,                       /* tp_repr */
+    0,                       /* tp_as_number */
+    0,                       /* tp_as_sequence */
+    0,                       /* tp_as_mapping */
+    0,                       /* tp_hash */
+    0,                       /* tp_call */
+    0,                       /* tp_str */
+    0,                       /* tp_getattro */
+    0,                       /* tp_setattro */
+    0,                       /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,   /* tp_flags */
+    0,                       /* tp_doc */
+    0,                       /* tp_traverse */
+    0,                       /* tp_clear */
+    0,                       /* tp_richcompare */
+    0,                       /* tp_weaklistoffset */
+    0,                       /* tp_iter */
+    0,                       /* tp_iternext */
+    khmer_linearassembler_methods, /* tp_methods */
+    0,                       /* tp_members */
+    0,                       /* tp_getset */
+    0,                       /* tp_base */
+    0,                       /* tp_dict */
+    0,                       /* tp_descr_get */
+    0,                       /* tp_descr_set */
+    0,                       /* tp_dictoffset */
+    0,                       /* tp_init */
+    0,                       /* tp_alloc */
+    khmer_linearassembler_new,      /* tp_new */
+};
+
 //////////////////////////////
 // standalone functions
 
@@ -5384,6 +5549,10 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
+    if (PyType_Ready(&khmer_KLinearAssembler_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
     khmer_KGraphLabels_Type.tp_base = &khmer_KNodegraph_Type;
     khmer_KGraphLabels_Type.tp_methods = khmer_graphlabels_methods;
     khmer_KGraphLabels_Type.tp_new = khmer_graphlabels_new;
@@ -5441,6 +5610,12 @@ MOD_INIT(_khmer)
     Py_INCREF(&khmer_KGraphLabels_Type);
     if (PyModule_AddObject(m, "GraphLabels",
                            (PyObject *)&khmer_KGraphLabels_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    Py_INCREF(&khmer_KLinearAssembler_Type);
+    if (PyModule_AddObject(m, "LinearAssembler",
+                           (PyObject *)&khmer_KLinearAssembler_Type) < 0) {
         return MOD_ERROR_VAL;
     }
 
