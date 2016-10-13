@@ -912,7 +912,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
         // Catching std::exception is a stopgap for
         // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
         std::string err = "Unknown error opening file: " + other_filename + " "
-                  + strerror(errno);
+                          + strerror(errno);
         throw khmer_file_exception(err);
     }
 
@@ -962,7 +962,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
         throw e;
     } catch (const std::exception &e) {
         std::string err = "Unknown error opening file: " + other_filename + " "
-                  + strerror(errno);
+                          + strerror(errno);
         throw khmer_file_exception(err);
     }
     char * buf = new char[IO_BUF_SIZE];

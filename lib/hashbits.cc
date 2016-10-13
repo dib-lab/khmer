@@ -112,7 +112,7 @@ void Hashbits::load(std::string infilename)
         // Catching std::exception is a stopgap for
         // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
         std::string err = "Unknown error opening file: " + infilename + " "
-                  + strerror(errno);
+                          + strerror(errno);
         throw khmer_file_exception(err);
     }
 
@@ -199,7 +199,7 @@ void Hashbits::load(std::string infilename)
         // Catching std::exception is a stopgap for
         // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
         std::string err = "Unknown error opening file: " + infilename + " "
-                  + strerror(errno);
+                          + strerror(errno);
         throw khmer_file_exception(err);
     }
 }

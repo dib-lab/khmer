@@ -442,7 +442,7 @@ void LabelHash::load_labels_and_tags(std::string filename)
         // Catching std::exception is a stopgap for
         // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
         std::string err = "Unknown error opening file: " + filename + " "
-                  + strerror(errno);
+                          + strerror(errno);
         throw khmer_file_exception(err);
     }
 
@@ -493,7 +493,7 @@ void LabelHash::load_labels_and_tags(std::string filename)
         throw e;
     } catch (const std::exception &e) {
         std::string err = "Unknown error opening file: " + filename + " "
-                  + strerror(errno);
+                          + strerror(errno);
         throw khmer_file_exception(err);
     }
 
@@ -526,7 +526,7 @@ void LabelHash::load_labels_and_tags(std::string filename)
                 err = "Unknown error reading data from: " + filename;
                 throw khmer_file_exception(err);
             }
-        } 
+        }
 
         long n_bytes = infile.gcount() + remainder;
         remainder = n_bytes % (sizeof(Label) + sizeof(HashIntoType));

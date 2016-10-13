@@ -343,7 +343,7 @@ CountingHashFileReader::CountingHashFileReader(
         throw khmer_file_exception(err + " " + strerror(errno));
     } catch (const std::exception &e) {
         std::string err = "Unknown error opening file: " + infilename + " "
-                  + strerror(errno);
+                          + strerror(errno);
         throw khmer_file_exception(err);
     }
 
@@ -451,7 +451,7 @@ CountingHashFileReader::CountingHashFileReader(
         throw khmer_file_exception(err);
     } catch (const std::exception &e) {
         std::string err = "Error reading from k-mer count file: " + infilename + " "
-                  + strerror(errno);
+                          + strerror(errno);
         throw khmer_file_exception(err);
     }
 }

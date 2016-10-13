@@ -298,7 +298,7 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
         // Catching std::exception is a stopgap for
         // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
         std::string err = "Unknown error opening file: " + infilename + " "
-                  + strerror(errno);
+                          + strerror(errno);
         throw khmer_file_exception(err);
     }
 
@@ -365,23 +365,23 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
             delete[] buf;
         }
         throw khmer_file_exception(err);
-    /* Yes, this is boneheaded. Unfortunately, there is a bug in gcc > 5
-     * regarding the basic_ios::failure that makes it impossible to catch
-     * with more specificty. So, we catch *all* exceptions after trying to
-     * get the ifstream::failure, and assume it must have been the buggy one.
-     * Unfortunately, this would also cause us to catch the
-     * khmer_file_exceptions thrown above, so we catch them again first and 
-     * rethrow them :) If this is understandably irritating to you, please
-     * bother the gcc devs at: 
-     *     https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
-     *
-     * See also: http://media4.giphy.com/media/3o6UBpHgaXFDNAuttm/giphy.gif
-     */
+        /* Yes, this is boneheaded. Unfortunately, there is a bug in gcc > 5
+         * regarding the basic_ios::failure that makes it impossible to catch
+         * with more specificty. So, we catch *all* exceptions after trying to
+         * get the ifstream::failure, and assume it must have been the buggy one.
+         * Unfortunately, this would also cause us to catch the
+         * khmer_file_exceptions thrown above, so we catch them again first and
+         * rethrow them :) If this is understandably irritating to you, please
+         * bother the gcc devs at:
+         *     https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
+         *
+         * See also: http://media4.giphy.com/media/3o6UBpHgaXFDNAuttm/giphy.gif
+         */
     } catch (khmer_file_exception &e) {
         throw e;
     } catch (const std::exception &e) {
         std::string err = "Unknown error opening file: " + infilename + " "
-                  + strerror(errno);
+                          + strerror(errno);
         throw khmer_file_exception(err);
     }
 }
@@ -772,7 +772,7 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
         // Catching std::exception is a stopgap for
         // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
         std::string err = "Unknown error opening file: " + infilename + " "
-                  + strerror(errno);
+                          + strerror(errno);
         throw khmer_file_exception(err);
     }
 
@@ -838,7 +838,7 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
         // Catching std::exception is a stopgap for
         // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
         std::string err = "Unknown error opening file: " + infilename + " "
-                  + strerror(errno);
+                          + strerror(errno);
         throw khmer_file_exception(err);
     }
 }
@@ -1129,8 +1129,8 @@ const
 // results.
 
 std::string Hashtable::assemble_linear_path(const Kmer seed_kmer,
-                                            const Hashtable * stop_bf)
-    const
+        const Hashtable * stop_bf)
+const
 {
     std::string start_kmer = seed_kmer.get_string_rep(_ksize);
     std::string right = _assemble_right(start_kmer.c_str(), stop_bf);
@@ -1144,7 +1144,7 @@ std::string Hashtable::assemble_linear_path(const Kmer seed_kmer,
 
 std::string Hashtable::_assemble_right(const char * start_kmer,
                                        const Hashtable * stop_bf)
-    const
+const
 {
     const char bases[] = "ACGT";
     std::string kmer = start_kmer;
@@ -1168,7 +1168,7 @@ std::string Hashtable::_assemble_right(const char * start_kmer,
 
             // a hit!
             if (this->get_count(try_kmer.c_str()) &&
-                (!stop_bf || !stop_bf->get_count(try_kmer.c_str()))) {
+                    (!stop_bf || !stop_bf->get_count(try_kmer.c_str()))) {
                 if (found) {
                     found2 = true;
                     break;
