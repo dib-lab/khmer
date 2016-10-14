@@ -259,7 +259,7 @@ double ep_sum(double acc, int b)
 
 int get_rho(HashIntoType w, int max_width)
 {
-    return max_width - floor(log2(w));
+    return max_width - floor(log2(w.as_ull()));
 }
 
 HLLCounter::HLLCounter(double error_rate, WordLength ksize)
@@ -348,7 +348,7 @@ uint64_t HLLCounter::estimate_cardinality()
 void HLLCounter::add(const std::string &value)
 {
     HashIntoType x = khmer::_hash_murmur(value);
-    uint64_t j = x & (this->m - 1);
+    uint64_t j = x.as_ull() & (this->m - 1);
     this->M[j] = std::max(this->M[j], get_rho(x >> this->p, 64 - this->p));
 }
 

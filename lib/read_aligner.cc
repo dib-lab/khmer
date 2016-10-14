@@ -531,7 +531,7 @@ Alignment* ReadAligner::Align(const std::string& read)
         return _empty_alignment();
     }
 
-    HashIntoType fhash = 0, rhash = 0;
+    HashIntoType fhash, rhash;
     _hash(start.kmer, k, fhash, rhash);
 
 #if READ_ALIGNER_DEBUG
@@ -609,7 +609,7 @@ Alignment* ReadAligner::AlignForward(const std::string& read)
         return _empty_alignment();
     }
 
-    HashIntoType fhash = 0, rhash = 0;
+    HashIntoType fhash, rhash;
     _hash(start.kmer, k, fhash, rhash);
 
 #if READ_ALIGNER_DEBUG
