@@ -124,13 +124,13 @@ std::string LinearAssembler::_assemble_directed<RIGHT>(AssemblerTraverser<RIGHT>
  */
 class SimpleLabeledAssembler
 {
-    friend class Hashtable;
     const LinearAssembler * linear_asm;
+
+public:
+
     const Hashtable * graph;
     const LabelHash * lh;
     WordLength _ksize;
-
-public:
 
     explicit SimpleLabeledAssembler(const LabelHash * lh);
     ~SimpleLabeledAssembler();

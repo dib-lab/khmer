@@ -710,12 +710,13 @@ class TestLabeledAssembler:
         # assemble entire contig, ignoring branch point b/c of labels
         graph, contig, L, HDN, R, tip = right_tip_structure
         lh = khmer._GraphLabels(graph)
+        asm = khmer.SimpleLabeledAssembler(lh)
 
         hdn = graph.find_high_degree_nodes(contig)
         # L, HDN, and R will be labeled with 1
         lh.label_across_high_degree_nodes(contig, hdn, 1)
 
-        path = lh.assemble_labeled_path(contig[:K])
+        path = asm.assemble(contig[:K])
         assert len(path) == 1, "there should only be one path"
         path = path[0]  # @CTB
 
@@ -726,6 +727,7 @@ class TestLabeledAssembler:
         # assemble two contigs from a double forked structure
         graph, contig, L, HDN, R, branch = right_double_fork_structure
         lh = khmer._GraphLabels(graph)
+        asm = khmer.SimpleLabeledAssembler(lh)
 
         hdn = graph.find_high_degree_nodes(contig)
         hdn += graph.find_high_degree_nodes(branch)
@@ -734,7 +736,7 @@ class TestLabeledAssembler:
         lh.label_across_high_degree_nodes(branch, hdn, 2)
         print(lh.get_tag_labels(list(hdn)[0]))
 
-        paths = lh.assemble_labeled_path(contig[:K])
+        paths = asm.assemble(contig[:K])
         print('Path lengths', [len(x) for x in paths])
 
         assert len(paths) == 2
@@ -747,6 +749,7 @@ class TestLabeledAssembler:
         (graph, contig, L, HDN, R,
          top_sequence, bottom_sequence) = right_triple_fork_structure
         lh = khmer._GraphLabels(graph)
+        asm = khmer.SimpleLabeledAssembler(lh)
 
         hdn = graph.find_high_degree_nodes(contig)
         hdn += graph.find_high_degree_nodes(top_sequence)
@@ -757,7 +760,7 @@ class TestLabeledAssembler:
         lh.label_across_high_degree_nodes(bottom_sequence, hdn, 3)
         print(lh.get_tag_labels(list(hdn)[0]))
 
-        paths = lh.assemble_labeled_path(contig[:K])
+        paths = asm.assemble(contig[:K])
         print([len(x) for x in paths])
 
         assert len(paths) == 3
@@ -770,9 +773,10 @@ class TestLabeledAssembler:
         # assemble entire contig + branch points b/c of labels; start from end
         graph, contig, L, HDN, R, branch = left_double_fork_structure
         lh = khmer._GraphLabels(graph)
+        asm = khmer.SimpleLabeledAssembler(lh)
 
         # first try without the labels
-        paths = lh.assemble_labeled_path(contig[-K:])
+        paths = asm.assemble(contig[-K:])
         assert len(paths) == 1
         # without labels, should get the beginning of the HDN thru the end
         assert paths[0] == contig[HDN.pos:]
@@ -785,7 +789,7 @@ class TestLabeledAssembler:
         lh.label_across_high_degree_nodes(branch, hdn, 2)
         print(lh.get_tag_labels(list(hdn)[0]))
 
-        paths = lh.assemble_labeled_path(contig[-K:])
+        paths = asm.assemble(contig[-K:])
         assert len(paths) == 2
 
         assert any(utils._equals_rc(path, contig) for path in paths)
@@ -795,12 +799,13 @@ class TestLabeledAssembler:
         # assemble entire contig + one of two paths through a bubble
         graph, wildtype, mutant, HDN_L, HDN_R = snp_bubble_structure
         lh = khmer._GraphLabels(graph)
+        asm = khmer.SimpleLabeledAssembler(lh)
 
         hdn = graph.find_high_degree_nodes(wildtype)
         assert len(hdn) == 2
         lh.label_across_high_degree_nodes(wildtype, hdn, 1)
 
-        paths = lh.assemble_labeled_path(wildtype[:K])
+        paths = asm.assemble(wildtype[:K])
         assert len(paths) == 1
 
         assert utils._equals_rc(paths[0], wildtype)
@@ -809,6 +814,7 @@ class TestLabeledAssembler:
         # assemble entire contig + both paths
         graph, wildtype, mutant, HDN_L, HDN_R = snp_bubble_structure
         lh = khmer._GraphLabels(graph)
+        asm = khmer.SimpleLabeledAssembler(lh)
 
         hdn = graph.find_high_degree_nodes(wildtype)
         hdn += graph.find_high_degree_nodes(mutant)
@@ -816,7 +822,7 @@ class TestLabeledAssembler:
         lh.label_across_high_degree_nodes(wildtype, hdn, 1)
         lh.label_across_high_degree_nodes(mutant, hdn, 2)
 
-        paths = lh.assemble_labeled_path(wildtype[:K])
+        paths = asm.assemble(wildtype[:K])
         assert len(paths) == 2
 
         assert any(utils._contains_rc(wildtype, path) for path in paths)
@@ -833,6 +839,7 @@ class TestLabeledAssembler:
         graph, wildtype, mutant, HDN_L, HDN_R = snp_bubble_structure
         stop_bf = khmer.Nodegraph(K, 1e5, 4)
         lh = khmer._GraphLabels(graph)
+        asm = khmer.SimpleLabeledAssembler(lh)
 
         hdn = graph.find_high_degree_nodes(wildtype)
         hdn += graph.find_high_degree_nodes(mutant)
@@ -842,7 +849,7 @@ class TestLabeledAssembler:
 
         # do the labeling, but block the mutant with stop_bf
         stop_bf.count(mutant[HDN_L.pos+1:HDN_L.pos+K+1])
-        paths = lh.assemble_labeled_path(wildtype[:K], stop_bf)
+        paths = asm.assemble(wildtype[:K], stop_bf)
         assert len(paths) == 1
 
         assert any(utils._equals_rc(path, wildtype) for path in paths)
@@ -851,10 +858,10 @@ class TestLabeledAssembler:
     def test_assemble_tandem_repeats(self, tandem_repeat_structure):
         # assemble one copy of a tandem repeat
         graph, repeat, tandem_repeats = tandem_repeat_structure
-
         lh = khmer._GraphLabels(graph)
+        asm = khmer.SimpleLabeledAssembler(lh)
         
-        paths = lh.assemble_labeled_path(repeat[:K])
+        paths = asm.assemble(repeat[:K])
         assert len(paths) == 1
         # There are K-1 k-mers spanning the junction between
         # the beginning and end of the repeat
