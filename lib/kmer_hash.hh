@@ -38,11 +38,15 @@ Contact: khmer-project@idyll.org
 #ifndef KMER_HASH_HH
 #define KMER_HASH_HH
 
+#include <array>
+#include <iostream>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <string>
+#include <tuple>
+#include <functional>
 
 #include "khmer.hh"
 
@@ -59,20 +63,20 @@ Contact: khmer-project@idyll.org
 
 // bit representation of A/T/C/G.
 #ifdef KHMER_EXTRA_SANITY_CHECKS
-#   define twobit_repr(ch) ((toupper(ch)) == 'A' ? 0LL : \
-			    (toupper(ch)) == 'T' ? 1LL : \
-			    (toupper(ch)) == 'C' ? 2LL : 3LL)
+#   define twobit_repr(ch) ((toupper(ch)) == 'A' ? HashIntoType(0) : \
+			    (toupper(ch)) == 'T' ? HashIntoType(1) : \
+			    (toupper(ch)) == 'C' ? HashIntoType(2) : HashIntoType(3))
 #else
 // NOTE: Assumes data is already sanitized as it should be by parsers.
 //	     This assumption eliminates 4 function calls.
-#   define twobit_repr(ch) ((ch) == 'A' ? 0LL : \
-			    (ch) == 'T' ? 1LL : \
-			    (ch) == 'C' ? 2LL : 3LL)
+#   define twobit_repr(ch) ((ch) == 'A' ? HashIntoType(0) : \
+			    (ch) == 'T' ? HashIntoType(1) : \
+			    (ch) == 'C' ? HashIntoType(2) : HashIntoType(3))
 #endif
 
-#define revtwobit_repr(n) ((n) == 0 ? 'A' : \
-                           (n) == 1 ? 'T' : \
-                           (n) == 2 ? 'C' : 'G')
+#define revtwobit_repr(n) ((n) == HashIntoType(0) ? 'A' : \
+                           (n) == HashIntoType(1) ? 'T' : \
+                           (n) == HashIntoType(2) ? 'C' : 'G')
 
 #ifdef KHMER_EXTRA_SANITY_CHECKS
 #   define twobit_comp(ch) ((toupper(ch)) == 'A' ? 1LL : \
@@ -81,9 +85,9 @@ Contact: khmer-project@idyll.org
 #else
 // NOTE: Assumes data is already sanitized as it should be by parsers.
 //	     This assumption eliminates 4 function calls.
-#   define twobit_comp(ch) ((ch) == 'A' ? 1LL : \
-			    (ch) == 'T' ? 0LL : \
-			    (ch) == 'C' ? 3LL : 2LL)
+#   define twobit_comp(ch) ((ch) == 'A' ? HashIntoType(1) : \
+			    (ch) == 'T' ? HashIntoType(0) : \
+			    (ch) == 'C' ? HashIntoType(3) : HashIntoType(2))
 #endif
 
 // choose wisely between forward and rev comp.
@@ -92,6 +96,30 @@ Contact: khmer-project@idyll.org
 #else
 #define uniqify_rc(f,r)(f)
 #endif
+
+
+
+namespace std {
+template <size_t N>
+struct less<bitset<N>> : std::binary_function<bitset<N>, bitset<N>, bool> {
+  bool operator()(const std::bitset<N> &L, const std::bitset<N> &R) const {
+    for (int i = N - 1; i >= 0; i--) {
+      if (L[i] ^ R[i])
+        return R[i];
+    }
+    return false;
+  };
+};
+
+template <std::size_t N>
+bool operator<(const std::bitset<N> &x, const std::bitset<N> &y) {
+  for (int i = N - 1; i >= 0; i--) {
+    if (x[i] ^ y[i])
+      return y[i];
+  }
+  return false;
+}
+}
 
 
 namespace khmer
@@ -113,6 +141,135 @@ HashIntoType _hash_murmur(const std::string& kmer);
 HashIntoType _hash_murmur(const std::string& kmer,
                           HashIntoType& h, HashIntoType& r);
 HashIntoType _hash_murmur_forward(const std::string& kmer);
+
+
+template<std::size_t N>
+uint64_t operator%(const std::bitset<N>& x, const uint64_t y)
+{
+	return std::hash<std::bitset<N> >{}(x) % y;
+}
+
+
+class BigHashType {
+public:
+  std::array<uint64_t, 2> bytes{};
+  constexpr static std::size_t N{2};
+
+  BigHashType() = default;
+  BigHashType(const BigHashType &) = default;
+  BigHashType &operator=(const BigHashType &) = default;
+  BigHashType(BigHashType &&) = default;
+  BigHashType &operator=(BigHashType &&) = default;
+
+  BigHashType(const uint64_t value) {
+    bytes[0] = value;
+  }
+
+  uint64_t as_ull() const {
+    return bytes[0];
+  }
+
+  BigHashType &operator=(const uint64_t value) {
+		bytes[1] = 0LL;
+    bytes[0] = value;
+    return *this;
+  }
+
+  BigHashType operator>>(int shift) {
+    BigHashType shifted{*this};
+    int next_(0);
+    for (int s = 0; s < shift; s++) {
+      int carry(0);
+      for (unsigned int i = 0; i < N; i++) {
+        next_ = (shifted.bytes[i] & 1) ? 0x80 : 0;
+        shifted.bytes[i] = carry | (shifted.bytes[i] >> 1);
+        carry = next_;
+      }
+    }
+    return shifted;
+  }
+
+  BigHashType operator<<(int shift) {
+    BigHashType shifted{*this};
+    int next_(0);
+    for (int s = 0; s < shift; s++) {
+      int carry(0);
+      for (int i = N - 1; i >= 0; i--) {
+        next_ = (shifted.bytes[i] & 128) ? 1 : 0;
+        shifted.bytes[i] = carry | ((shifted.bytes[i] << 1) & 255);
+        carry = next_;
+      }
+    }
+    return shifted;
+  }
+
+  BigHashType &operator<<=(int rhs) {
+    *this = *this << rhs;
+    return *this;
+  }
+
+  BigHashType &operator>>=(int rhs) {
+    *this = *this >> rhs;
+    return *this;
+  }
+
+  BigHashType operator^(const BigHashType &rhs) {
+    BigHashType tmp;
+    for (unsigned int i = 0; i < N; i++) {
+      tmp.bytes[i] = bytes[i] ^ rhs.bytes[i];
+    }
+    return tmp;
+  }
+
+  BigHashType operator|(const uint64_t rhs) {
+    BigHashType tmp;
+    const BigHashType rhs_{rhs};
+
+    for (unsigned int i = 0; i < N; i++) {
+      tmp.bytes[i] = bytes[i] | rhs_.bytes[i];
+    }
+    return tmp;
+  }
+
+  BigHashType &operator|=(const uint64_t rhs) {
+    bytes[0] |= rhs;
+    return *this;
+  }
+
+  BigHashType &operator&=(const BigHashType &rhs) {
+    for (unsigned int i = 0; i < N; i++) {
+      bytes[i] &= rhs.bytes[i];
+    }
+    return *this;
+  }
+
+  BigHashType operator&(const BigHashType &rhs) {
+    BigHashType tmp;
+    for (unsigned int i = 0; i < N; i++) {
+      tmp.bytes[i] = bytes[i] & rhs.bytes[i];
+    }
+    return tmp;
+  }
+
+  uint8_t operator&(const uint8_t rhs) { return bytes[N - 1] & rhs; }
+
+  uint64_t operator%(const uint64_t mod) {
+    uint64_t ull(as_ull());
+    return ull % mod;
+  }
+
+  friend bool operator<(const BigHashType &lhs, const BigHashType &rhs) {
+    return std::tie(lhs.bytes) < std::tie(rhs.bytes);
+  }
+
+  friend bool operator==(const BigHashType &lhs, const BigHashType &rhs) {
+    return lhs.bytes == rhs.bytes;
+  }
+
+  friend bool operator!=(const BigHashType &lhs, const BigHashType &rhs) {
+    return lhs.bytes != rhs.bytes;
+  }
+};
 
 /**
  * \class Kmer

@@ -40,6 +40,7 @@ Contact: khmer-project@idyll.org
 #include <string.h>
 #include <algorithm>
 #include <string>
+#include <iostream>
 
 #include "MurmurHash3.h"
 #include "khmer.hh"
@@ -63,7 +64,7 @@ HashIntoType _hash(const char * kmer, const WordLength k,
         throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
     }
 
-    HashIntoType h = 0, r = 0;
+    HashIntoType h, r;
 
     h |= twobit_repr(kmer[0]);
     r |= twobit_comp(kmer[k-1]);
@@ -86,8 +87,8 @@ HashIntoType _hash(const char * kmer, const WordLength k,
 
 HashIntoType _hash(const char * kmer, const WordLength k)
 {
-    HashIntoType h = 0;
-    HashIntoType r = 0;
+    HashIntoType h;
+    HashIntoType r;
 
     return khmer::_hash(kmer, k, h, r);
 }
@@ -96,8 +97,8 @@ HashIntoType _hash(const char * kmer, const WordLength k)
 
 HashIntoType _hash_forward(const char * kmer, WordLength k)
 {
-    HashIntoType h = 0;
-    HashIntoType r = 0;
+    HashIntoType h;
+    HashIntoType r;
 
 
     khmer::_hash(kmer, k, h, r);
@@ -123,12 +124,12 @@ std::string _revhash(HashIntoType hash, WordLength k)
 {
     std::string s = "";
 
-    unsigned int val = hash & 3;
+    HashIntoType val(hash & HashIntoType(3));
     s += revtwobit_repr(val);
 
     for (WordLength i = 1; i < k; i++) {
         hash = hash >> 2;
-        val = hash & 3;
+        val = (hash & HashIntoType(3));
         s += revtwobit_repr(val);
     }
 
@@ -169,8 +170,8 @@ std::string _revcomp(const std::string& kmer)
 
 HashIntoType _hash_murmur(const std::string& kmer)
 {
-    HashIntoType h = 0;
-    HashIntoType r = 0;
+    HashIntoType h;
+    HashIntoType r;
 
     return khmer::_hash_murmur(kmer, h, r);
 }
@@ -192,8 +193,8 @@ HashIntoType _hash_murmur(const std::string& kmer,
 
 HashIntoType _hash_murmur_forward(const std::string& kmer)
 {
-    HashIntoType h = 0;
-    HashIntoType r = 0;
+    HashIntoType h;
+    HashIntoType r;
 
     khmer::_hash_murmur(kmer, h, r);
     return h;
@@ -205,7 +206,7 @@ KmerIterator::KmerIterator(const char * seq,
 {
     bitmask = 0;
     for (unsigned char i = 0; i < _ksize; i++) {
-        bitmask = (bitmask << 2) | 3;
+        bitmask = (bitmask << 2) | HashIntoType(3);
     }
     _nbits_sub_1 = (_ksize*2 - 2);
 

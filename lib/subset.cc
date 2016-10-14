@@ -132,7 +132,7 @@ size_t SubsetPartition::output_partitioned_file(
     Read read;
     string seq;
 
-    HashIntoType kmer = 0;
+    HashIntoType kmer;
 
     const unsigned int ksize = _ht->ksize();
 
@@ -515,17 +515,18 @@ void SubsetPartition::do_partition(
     CallbackFn		callback,
     void *		callback_data)
 {
+    HashIntoType empty;
     unsigned int total_reads = 0;
 
     SeenSet tagged_kmers;
     SeenSet::const_iterator si, end;
 
-    if (first_kmer) {
+    if (first_kmer != empty) {
         si = _ht->all_tags.find(first_kmer);
     } else {
         si = _ht->all_tags.begin();
     }
-    if (last_kmer) {
+    if (last_kmer != empty) {
         end = _ht->all_tags.find(last_kmer);
     } else {
         end = _ht->all_tags.end();
@@ -546,7 +547,7 @@ void SubsetPartition::do_partition(
 
         // run callback, if specified
         if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-            cout << "...subset-part " << first_kmer << "-" << last_kmer << ": "
+            cout << "...subset-part " << first_kmer.to_ullong() << "-" << last_kmer.to_ullong() << ": "
                  << total_reads << " <- " << next_partition_id << "\n";
 #if 0 // @CTB
             try {
@@ -574,16 +575,17 @@ void SubsetPartition::do_partition_with_abundance(
     void *		callback_data)
 {
     unsigned int total_reads = 0;
+    HashIntoType empty;
 
     SeenSet tagged_kmers;
     SeenSet::const_iterator si, end;
 
-    if (first_kmer) {
+    if (first_kmer != empty) {
         si = _ht->all_tags.find(first_kmer);
     } else {
         si = _ht->all_tags.begin();
     }
-    if (last_kmer) {
+    if (last_kmer != empty) {
         end = _ht->all_tags.find(last_kmer);
     } else {
         end = _ht->all_tags.end();
@@ -606,7 +608,7 @@ void SubsetPartition::do_partition_with_abundance(
 
         // run callback, if specified
         if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-            cout << "...subset-part " << first_kmer << "-" << last_kmer << ": "
+            cout << "...subset-part " << first_kmer.to_ullong() << "-" << last_kmer.to_ullong() << ": "
                  << total_reads << " <- " << next_partition_id << "\n";
 #if 0 // @CTB
             try {

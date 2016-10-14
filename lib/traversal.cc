@@ -45,7 +45,7 @@ Traverser::Traverser(const Hashtable * ht) :
 {
     bitmask = 0;
     for (unsigned int i = 0; i < _ksize; i++) {
-        bitmask = (bitmask << 2) | 3;
+        bitmask = (bitmask << 2) | HashIntoType(3);
     }
     rc_left_shift = _ksize * 2 - 2;
 }
