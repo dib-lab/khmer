@@ -46,6 +46,7 @@ Contact: khmer-project@idyll.org
 #include <string.h>
 #include <string>
 #include <tuple>
+#include <functional>
 
 #include "khmer.hh"
 
@@ -145,7 +146,7 @@ HashIntoType _hash_murmur_forward(const std::string& kmer);
 template<std::size_t N>
 uint64_t operator%(const std::bitset<N>& x, const uint64_t y)
 {
-	return x.to_ullong() % y;
+	return std::hash<std::bitset<N> >{}(x) % y;
 }
 
 
