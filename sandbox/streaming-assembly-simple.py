@@ -79,11 +79,9 @@ def main():
     args = p.parse_args()
 
     cg = create_countgraph(args)
+    asm = khmer.JunctionCountAssembler(cg)
 
     kept = 0
-    hdn = khmer.HashSet(args.ksize)
-    lh = khmer._GraphLabels(cg)
-    next_label = 1
     next_contig = 1
     next_orf = 1
     output = set()
@@ -100,22 +98,13 @@ def main():
                 continue
 
             cov, _, _ = cg.get_median_count(record.sequence)
-            if cov < 20:
+            if cov < 30:
                 kept += 1
-                cg.consume(record.sequence)
-                statswriter.writerow({'read_n': n, 'action': 'c', 'cov': cov,
-                                      'n_hdn': None, 'contig_n': None, 
-                                      'orf_n': None, 'new': None})
-            elif cov < 30:
-                #print('intermediate', next_label, file=sys.stderr)
                 seq, pos = cg.trim_on_abundance(record.sequence, 3)
                 if len(seq) < args.ksize:
                     continue
                 
-                cg.consume(seq)
-                hdn = cg.find_high_degree_nodes(seq)
-                lh.label_across_high_degree_nodes(seq, hdn, next_label)
-                next_label += 1
+                asm.consume(seq)
                 statswriter.writerow({'read_n': n, 'action': 'l', 'cov': cov,
                                       'n_hdn': len(hdn), 'contig_n': None, 
                                       'orf_n': None, 'new': None})
