@@ -43,7 +43,6 @@ Contact: khmer-project@idyll.org
 #include <string>
 
 #include "khmer.hh"
-#include "traversal.hh"
 
 namespace khmer
 {

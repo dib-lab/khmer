@@ -117,6 +117,22 @@ KmerFilter get_simple_label_intersect_filter(const LabelSet& src_labels,
 
     return filter;
 }
+
+
+KmerFilter get_junction_count_filter(const Kmer& src_node,
+                                     CountingHash * junctions,
+                                     const unsigned int min_cov)
+{
+    KmerFilter filter = [=] (const Kmer& dst_node) {
+        unsigned int jc = junctions->get_count(src_node.kmer_u ^ dst_node.kmer_u);
+#if DEBUG_FILTERS
+        std::cout << "Junction Count: " << jc << std::endl;
+#endif
+        return jc < min_cov;
+    };
+
+    return filter;
+}
                                       
 
 KmerFilter get_stop_bf_filter(const Hashtable * stop_bf)
@@ -135,10 +151,6 @@ KmerFilter get_visited_filter(const SeenSet * visited)
        " containing " << visited->size() << " nodes" << std::endl;
 #endif
     KmerFilter filter = [=] (const Kmer& node) {
-#if DEBUG_FILTERS
-        std::cout << "Check visited filter (" << visited->size() 
-            << " elems)" << std::endl;
-#endif
         return set_contains(*visited, node);
     };
     return filter;

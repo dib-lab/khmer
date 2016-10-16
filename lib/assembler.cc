@@ -321,78 +321,184 @@ const
     }
 }
 
+/***************************************
+ * Junction-counting assembler
+ ***************************************/
+
+JunctionCountAssembler::JunctionCountAssembler(Hashtable * ht) :
+    graph(ht), _ksize(ht->ksize()), traverser(ht), linear_asm(ht)
+{
+    std::vector<uint64_t> table_sizes = ht->get_tablesizes();
+    junctions = new CountingHash(_ksize, table_sizes);
+}
 
 
-/*
+JunctionCountAssembler::~JunctionCountAssembler()
+{
+    delete this->junctions;
+}
+
+void JunctionCountAssembler::consume(std::string sequence)
+{
+    // first we need to put the sequence in the graph
+    graph->consume_string(sequence);
+    // now we find its high degree nodes and count the
+    // branch junctions
+    KmerIterator kmers(sequence.c_str(), _ksize);
+    Kmer kmer = kmers.next();
+    if (kmers.done()) {
+        return;
+    }
+    Kmer next_kmer = kmers.next();
+    if (kmers.done()) {
+        return;
+    }
+    uint16_t d = this->traverser.degree(kmer);
+    uint16_t next_d = this->traverser.degree(next_kmer);
+
+    while(!kmers.done()) {
+        if (d > 2 || next_d > 2) {
+            count_junction(kmer, next_kmer);
+#if DEBUG_ASSEMBLY
+            std::cout << "Junction: " << kmer.repr(_ksize) << ", " << next_kmer.repr(_ksize) << std::endl;
+            std::cout << "Junction Count: " << get_junction_count(kmer, next_kmer) << std::endl;
+#endif
+        }
+        kmer = next_kmer;
+        d = next_d;
+        next_kmer = kmers.next();
+        next_d = this->traverser.degree(next_kmer);
+    }
+}
+
+void JunctionCountAssembler::count_junction(Kmer kmer_a, Kmer kmer_b)
+{
+    junctions->count(kmer_a.kmer_u ^ kmer_b.kmer_u);
+}
+
+BoundedCounterType JunctionCountAssembler::get_junction_count(Kmer kmer_a, Kmer kmer_b)
+const
+{
+    return junctions->get_count(kmer_a.kmer_u ^ kmer_b.kmer_u);
+}
+
+// Starting from the given seed k-mer, assemble all maximal linear paths in
+// both directions, using labels to skip over tricky bits.
+StringVector JunctionCountAssembler::assemble(const Kmer seed_kmer,
+        const Hashtable * stop_bf)
+const
+{
+#if DEBUG_ASSEMBLY
+    std::cout << "Assemble Junctions: " << seed_kmer.repr(_ksize) << std::endl;
+#endif
+
+    KmerFilterList node_filters;
+    if (stop_bf) {
+        node_filters.push_back(get_stop_bf_filter(stop_bf));
+    }
+
+    SeenSet visited;
+
+#if DEBUG_ASSEMBLY
+    std::cout << "Assemble Junctions RIGHT: " << seed_kmer.repr(_ksize) << std::endl;
+#endif
+    StringVector right_paths;
+    NonLoopingAT<RIGHT> rcursor(graph, seed_kmer, node_filters, &visited);
+    _assemble_directed<RIGHT>(rcursor, right_paths);
+
+#if DEBUG_ASSEMBLY
+    std::cout << "Assemble Junctions LEFT: " << seed_kmer.repr(_ksize) << std::endl;
+#endif
+    StringVector left_paths;
+    NonLoopingAT<LEFT> lcursor(graph, seed_kmer, node_filters, &visited);
+    _assemble_directed<LEFT>(lcursor, left_paths);
+
+    StringVector paths;
+    for (unsigned int i = 0; i < left_paths.size(); i++) {
+        for (unsigned int j = 0; j < right_paths.size(); j++) {
+            std::string right = right_paths[j];
+            right = right.substr(_ksize);
+            std::string contig = left_paths[i] + right;
+            paths.push_back(contig);
+        }
+    }
+
+    visited.clear();
+    return paths;
+}
+
 template <bool direction>
-void SimpleLabeledAssembler::_assemble_directed(NonLoopingAT<direction>&
+void JunctionCountAssembler::_assemble_directed(NonLoopingAT<direction>&
         start_cursor,
         StringVector& paths)
 const
 {
 #if DEBUG_ASSEMBLY
-    std::cout << "## assemble_labeled_directed_" << direction << " [start] at " << 
+    std::cout << "## assemble_junctions_directed_" << direction << " [start] at " << 
         start_cursor.cursor.repr(_ksize) << std::endl;
 #endif
-    std::string root_contig = linear_asm->_assemble_directed<direction>
-                              (start_cursor);
 
-    if (start_cursor.cursor_degree() > 1) {               // hit a HDN
+    // prime the traversal with the first linear segment
+    std::string root_contig = linear_asm._assemble_directed<direction>(start_cursor);
 #if DEBUG_ASSEMBLY
-        std::cout << "Root contig: " << root_contig << std::endl;
-        std::cout << "HDN: " << start_cursor.cursor.repr(_ksize) << "\n";
-        std::cout << start_cursor.cursor_degree() << std::endl;
-#endif // DEBUG_ASSEMBLY
+    std::cout << "Primed: " << root_contig << std::endl;
+    std::cout << "Cursor: " << start_cursor.cursor.repr(_ksize) << std::endl;
+#endif 
+    StringVector segments;
+    std::vector< NonLoopingAT<direction> > cursors;
 
-        LabelSet labels;
-        lh->get_tag_labels(start_cursor.cursor, labels);
+    segments.push_back(root_contig);
+    cursors.push_back(start_cursor);
 
-
-        if(labels.size() == 0) {
-            // if no labels are found there's nothing to be done, return
-
-            paths.push_back(root_contig);
-            return;
-        } else {
+    while(segments.size() != 0) {
+        
+        std::string segment = segments.back();
+        NonLoopingAT<direction> cursor = cursors.back();
 #if DEBUG_ASSEMBLY
-            std::cout << "Found " << labels.size() << " labels" << std::endl;
-#endif
+        std::cout << "Pop: " << segments.size() << " segments on stack." << std::endl;
+        std::cout << "Segment: " << segment << std::endl;
+        std::cout << "Cursor: " << cursor.cursor.repr(_ksize) << std::endl;
+        std::cout << "n_filters: " << cursor.n_filters() << std::endl;
+#endif 
+        segments.pop_back();
+        cursors.pop_back();
 
+        // check if the cursor has hit a HDN or reached a dead end
+        if (cursor.cursor_degree() > 1) { 
 
-
-            start_cursor.push_filter(get_simple_label_intersect_filter(labels, lh));
+            cursor.push_filter(get_junction_count_filter(cursor.cursor, this->junctions));
             KmerQueue branch_starts;
-            start_cursor.neighbors(branch_starts);
-            start_cursor.pop_filter();
-#if DEBUG_ASSEMBLY
-                std::cout << branch_starts.size() << " neighbors found" << std::endl;
-#endif
-            if (branch_starts.size() == 0) {
-                paths.push_back(root_contig);
-                return;
+            // now get neighbors that pass the filter
+            cursor.neighbors(branch_starts);
+            // remove the filter
+            cursor.pop_filter();
+
+            // no neighbors found; done with this path
+            if (branch_starts.empty()) {
+                paths.push_back(segment);
+                continue;
             }
             
-            StringVector branch_contigs;
-            while(!branch_starts.empty()) { // TODO: change from queue
-                NonLoopingAT<direction> branch_cursor(start_cursor);
+            // found some neighbors; extend them
+            while(!branch_starts.empty()) {
+                // spin off a cursor for the new branch
+                NonLoopingAT<direction> branch_cursor(cursor);
                 branch_cursor.cursor = branch_starts.front();
                 branch_starts.pop();
 
-                _assemble_directed<direction>(branch_cursor, branch_contigs);
-            }
+                // assemble linearly as far as possible
+                std::string branch = linear_asm._assemble_directed<direction>(branch_cursor);
+                // create a new segment with the branch
+                std::string new_segment = branch_cursor.join_contigs(segment, branch, 1);
 
-            for (auto branch_contig : branch_contigs) {
-                std::string full_contig = start_cursor.join_contigs(root_contig,
-                                                                   branch_contig,
-                                                                   1);
-                paths.push_back(full_contig);
+                segments.push_back(new_segment);
+                cursors.push_back(branch_cursor);
             }
+        } else {
+            // this segment is a dead-end; keep the contig
+            paths.push_back(segment);
+            continue;
         }
-    } else {
-        paths.push_back(root_contig);
     }
 }
-
-*/
-
 }

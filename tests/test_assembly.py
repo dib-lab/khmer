@@ -866,3 +866,24 @@ class TestLabeledAssembler:
         # There are K-1 k-mers spanning the junction between
         # the beginning and end of the repeat
         assert len(paths[0]) == len(repeat) + K - 1
+
+
+class TestJunctionCountAssembler:
+
+    def test_beginning_to_end_across_tip(self, right_tip_structure):
+        # assemble entire contig, ignoring branch point b/c of labels
+        graph, contig, L, HDN, R, tip = right_tip_structure
+        asm = khmer.JunctionCountAssembler(graph)
+        asm.consume(contig)
+        asm.consume(contig)
+        asm.consume(contig)
+
+        path = asm.assemble(contig[:K])
+        print('P:', path[0])
+        print('T:', tip)
+        print('C:', contig)
+        assert len(path) == 1, "there should only be one path"
+        path = path[0]  # @CTB
+
+        assert len(path) == len(contig)
+        assert utils._equals_rc(path, contig)
