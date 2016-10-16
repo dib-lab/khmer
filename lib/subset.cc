@@ -50,6 +50,7 @@ Contact: khmer-project@idyll.org
 #include "kmer_hash.hh"
 #include "read_parsers.hh"
 #include "subset.hh"
+#include "traversal.hh"
 
 #define IO_BUF_SIZE 250*1000*1000
 #define BIG_TRAVERSALS_ARE 200

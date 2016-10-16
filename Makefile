@@ -137,8 +137,8 @@ clean: FORCE
 
 debug: FORCE
 	export CFLAGS="-pg -fprofile-arcs -D_GLIBCXX_DEBUG_PEDANTIC \
-		-D_GLIBCXX_DEBUG"; python setup.py build_ext --debug \
-		--inplace
+		-D_GLIBCXX_DEBUG -DDEBUG_ASSEMBLY=1 -DDEBUG_FILTERS=1"; python setup.py build_ext --debug \
+		--inplace 
 
 ## doc         : render documentation in HTML
 doc: build/sphinx/html/index.html

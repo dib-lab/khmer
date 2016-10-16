@@ -41,10 +41,10 @@ Contact: khmer-project@idyll.org
 
 #include "khmer.hh"
 #include "kmer_hash.hh"
-
-#include "labelhash.hh"
-#include "traversal.hh"
+#include "counting.hh"
 #include "kmer_filters.hh"
+#include "traversal.hh"
+#include "labelhash.hh"
 
 
 namespace khmer
@@ -144,5 +144,33 @@ public:
 
 };
 
-}
+
+class JunctionCountAssembler
+{
+    LinearAssembler linear_asm;
+    CountingHash * junctions;
+    Traverser traverser;
+
+public:
+
+    Hashtable * graph;
+    WordLength _ksize;
+
+    explicit JunctionCountAssembler(Hashtable * ht);
+    ~JunctionCountAssembler();
+
+    StringVector assemble(const Kmer seed_kmer,
+                          const Hashtable * stop_bf=0) const;
+
+    void consume(std::string sequence);
+    void count_junction(Kmer kmer_a, Kmer kmer_b);
+    BoundedCounterType get_junction_count(Kmer kmer_a, Kmer kmer_b) const;
+
+    template <bool direction>
+    void _assemble_directed(NonLoopingAT<direction>& start_cursor,
+                            StringVector& paths) const;
+
+};
+
+} //namespace khmer
 #endif

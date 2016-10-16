@@ -46,15 +46,8 @@ Contact: khmer-project@idyll.org
 
 namespace khmer
 {
-namespace read_parsers
-{
-struct IParser;
-}  // namespace read_parsers
-}  // namespace khmer
 
-
-namespace khmer
-{
+using read_parsers::IParser;
 
 class HLLCounter
 {

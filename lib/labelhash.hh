@@ -52,14 +52,7 @@ namespace khmer
 {
 class Hashtable;
 
-namespace read_parsers
-{
-struct IParser;
-}  // namespace read_parsers
-}  // namespace khmer
-
-namespace khmer
-{
+using read_parsers::IParser;
 
 class LabelHash
 {
