@@ -72,8 +72,10 @@ def extract_orfs(pepseq, min_length=99):
 def main():
     p = build_counting_args(descr='Streaming assembly with tracking info')
     p.add_argument('fastq_files', nargs='+')
-    p.add_argument('-o', type=argparse.FileType('w'),
+    p.add_argument('-s', type=argparse.FileType('w'),
                    default='assembly-stats.csv')
+    p.add_argument('-o', type=argparse.FileType('w'),
+                   default='transcripts.fa')
     args = p.parse_args()
 
     cg = create_countgraph(args)
@@ -82,9 +84,10 @@ def main():
     hdn = khmer.HashSet(args.ksize)
     lh = khmer._GraphLabels(cg)
     next_label = 1
+    next_contig = 1
     next_orf = 1
     output = set()
-    statswriter = csv.DictWriter(args.o, delimiter=',',
+    statswriter = csv.DictWriter(args.s, delimiter=',',
                                  fieldnames=['read_n', 'action', 'cov', 'n_hdn',
                                              'contig_n', 'orf_n', 'new'])
 
@@ -122,12 +125,15 @@ def main():
                     statswriter.writerow({'read_n': n, 'action': 'a', 'cov': cov,
                                           'n_hdn': None, 'contig_n': contig_n, 
                                           'orf_n': None, 'new': None})
+                    args.o.write('>contig%d\n%s\n' % (next_contig, contig))
+                    next_contig += 1
+
                     for t in translate(contig):
                         for orf_n, o in enumerate(extract_orfs(t)):
                             if hash(o) not in output:
                                 new = True
                                 output.add(hash(o))
-                                print('>orf%d\n%s' % (next_orf, o))
+                                args.o.write('>orf%d\n%s\n' % (next_orf, o))
                                 next_orf += 1
                             else:
                                 new = False
