@@ -46,6 +46,7 @@ from khmer._khmer import Nodegraph as _Nodegraph
 from khmer._khmer import HLLCounter as _HLLCounter
 from khmer._khmer import ReadAligner as _ReadAligner
 from khmer._khmer import HashSet
+from khmer._khmer import Read
 from khmer._khmer import forward_hash
 # tests/test_{functions,countgraph,counting_single}.py
 

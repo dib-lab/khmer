@@ -278,6 +278,47 @@ typedef struct {
 
 
 static
+PyObject*
+khmer_Read_new(PyTypeObject * type, PyObject * args, PyObject * kwds)
+{
+    khmer_Read_Object * self;
+    self = (khmer_Read_Object *)type->tp_alloc(type, 0);
+    if (self != NULL) {
+        self->read = new Read;
+    }
+    return (PyObject *)self;
+}
+
+static
+int
+khmer_Read_init(khmer_Read_Object *self, PyObject *args, PyObject *kwds)
+{
+    const char * name{};
+    const char * annotations{};
+    const char * sequence{};
+    const char * quality{};
+    static char *kwlist[] = {"name", "annotations", "sequence", "quality", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|zzzz", kwlist,
+                                     &name, &sequence, &quality, &annotations)) {
+        return NULL;
+    }
+
+    if (name != NULL) {
+        self->read->name = name;
+    }
+    if (sequence != NULL) {
+        self->read->sequence = sequence;
+    }
+    if (quality != NULL) {
+        self->read->quality = quality;
+    }
+    if (annotations != NULL) {
+        self->read->annotations = annotations;
+    }
+    return 0;
+}
+
+static
 void
 khmer_Read_dealloc(khmer_Read_Object * obj)
 {
@@ -350,7 +391,7 @@ static PyGetSetDef khmer_Read_accessors [ ] = {
 
 static PyTypeObject khmer_Read_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)        /* init & ob_size */
-    "_khmer.Read",                        /* tp_name */
+    "khmer.Read",                         /* tp_name */
     sizeof(khmer_Read_Object),            /* tp_basicsize */
     0,                                    /* tp_itemsize */
     (destructor)khmer_Read_dealloc,       /* tp_dealloc */
@@ -379,7 +420,16 @@ static PyTypeObject khmer_Read_Type = {
     0,                                    /* tp_methods */
     0,                                    /* tp_members */
     (PyGetSetDef *)khmer_Read_accessors,  /* tp_getset */
+    0,                                    /* tp_base */
+    0,                                    /* tp_dict */
+    0,                                    /* tp_descr_get */
+    0,                                    /* tp_descr_set */
+    0,                                    /* tp_dictoffset */
+    (initproc)khmer_Read_init,            /* tp_init */
+    0,                                    /* tp_alloc */
+    khmer_Read_new,                       /* tp_new */
 };
+
 
 /***********************************************************************/
 
@@ -5464,6 +5514,12 @@ MOD_INIT(_khmer)
             KhmerMethods);
 
     if (m == NULL) {
+        return MOD_ERROR_VAL;
+    }
+
+    Py_INCREF(&khmer_Read_Type);
+    if (PyModule_AddObject( m, "Read",
+                            (PyObject *)&khmer_Read_Type ) < 0) {
         return MOD_ERROR_VAL;
     }
 
