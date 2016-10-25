@@ -34,6 +34,9 @@ for ctlfile in args.controls:
     print('Control countgraph loaded', file=sys.stderr)
 
 print('Iterating over case reads', args.case_fastq, '...', file=sys.stderr)
+intreadcount = 0
+intkmercount = 0
+lpaths = dict()
 for n, record in enumerate(screed.open(args.case_fastq)):
     if n > 0 and n % 1e6 == 0:
         print('    processed', n, 'reads...', file=sys.stderr)
@@ -48,10 +51,27 @@ for n, record in enumerate(screed.open(args.case_fastq)):
             continue
 
         novel_kmers[i] = [kmer, case_abund] + control_abunds
+        linear_path = case.assemble_linear_path(kmer)
+        if linear_path not in lpaths:
+            lpaths[linear_path] = []
+        lpaths[linear_path].append(record.name)
+        intkmercount += 1
     if len(novel_kmers) > 0:
+        intreadcount += 1
         print('@', record.name, '\n', record.sequence, '\n+\n', record.quality, sep='')
         for i in sorted(novel_kmers):
             kmer, case_abund, ctl1, ctl2 = novel_kmers[i]
             abundstr = ' '.join([str(abund) for abund in [case_abund, ctl1, ctl2]])
             print(' ' * i, kmer, ' ' * 10, abundstr, '#', sep='')
             sys.stdout.flush()
+
+message = 'Found {} novel kmers in {} reads'.format(intkmercount, intreadcount)
+message += ', {} linear paths'.format(len(lpaths))
+print(message, file=sys.stderr)
+for i, linear_path in enumerate(lpaths):
+    readnames = lpaths[linear_path]
+    lpathname = '##>lpath{} {} reads {}'.format(
+                    i+1, len(readnames),
+                    ' '.join(readnames)
+                )
+    print('##>', lpathname, '\n', '##', linear_path, sep='')
