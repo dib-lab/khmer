@@ -438,6 +438,12 @@ void LabelHash::load_labels_and_tags(std::string filename)
             err = "Unknown error in opening file: " + filename;
         }
         throw khmer_file_exception(err);
+    } catch (const std::exception &e) {
+        // Catching std::exception is a stopgap for
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
+        std::string err = "Unknown error opening file: " + filename + " "
+                          + strerror(errno);
+        throw khmer_file_exception(err);
     }
 
     unsigned long n_labeltags = 1;
@@ -483,6 +489,12 @@ void LabelHash::load_labels_and_tags(std::string filename)
         std::string err;
         err = "Unknown error reading header info from: " + filename;
         throw khmer_file_exception(err);
+    } catch (khmer_file_exception &e) {
+        throw e;
+    } catch (const std::exception &e) {
+        std::string err = "Unknown error opening file: " + filename + " "
+                          + strerror(errno);
+        throw khmer_file_exception(err);
     }
 
     char * buf = new char[IO_BUF_SIZE];
@@ -501,7 +513,7 @@ void LabelHash::load_labels_and_tags(std::string filename)
 
         try {
             infile.read(buf + remainder, IO_BUF_SIZE - remainder);
-        } catch (std::ifstream::failure &e) {
+        } catch (std::exception &e) {
 
             // We may get an exception here if we fail to read all the
             // expected bytes due to EOF -- only pass it up if we read

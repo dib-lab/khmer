@@ -187,3 +187,41 @@ with the function signature used later.
 
 "I" for unsigned int
 "K" for unsigned long long a.k.a khmer::HashIntoType.
+
+Read handling
+-------------
+
+Several bugs have gone unnoticed due to inconsistencies in read handling.
+On the C++ side, there are an abundance of ``consume`` functions for loading
+Fasta/Fastq sequences. On the Python side, read handling is sometimes delegated
+to the C++ library, and sometimes handled in Python using screed.
+
+In an attempt to normalize read handling in Python, the functions in
+``khmer/utils.py`` should be used whenever possible.  Here,
+``broken_paired_reader`` in ``khmer/utils.py`` should be used to do all
+paired-end sequence handling, and sequence loading should
+go through ``khmer.utils.clean_input_reads(iter)``; this is a
+generator that wraps the iterator produced by ``screed.open``, and it
+adds a ``cleaned_seq`` attribute to screed ``Record`` objects.  This
+attribute should be used for any k-mer or graph operations, while
+the normal ``sequence`` attribute is what should be written out.
+``write_record`` and ``write_record_pair`` should be used to output
+records.  All of these functions are aware of FASTA and FASTQ records,
+too.
+
+For applying operations to collections of reads, the ``ReadBundle`` class is
+available.  This is used to wrap a collection of reads for examination and
+processing in situations where (for example) something should be done to
+either both reads in a pair, or neither.
+
+Some basic rules of sequence handling in khmer are:
+
+* consume and produce "broken paired" format, such that pairs of sequences
+  always stay together; see ``khmer.utils.broken_paired_reader``.
+
+* when looking at the coverage of reads (for trimming or digital normalization)
+  always consider pairs; see ``khmer.utils.ReadBundle(...)``.
+
+* only apply graph or k-mer operations to sequences consisting only of ATCG;
+  typically this will be ``record.cleaned_seq``.  See
+  ``khmer.utils.clean_input_read(...)``.

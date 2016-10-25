@@ -294,6 +294,12 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
             err = "Unknown error in opening file: " + infilename;
         }
         throw khmer_file_exception(err);
+    } catch (const std::exception &e) {
+        // Catching std::exception is a stopgap for
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
+        std::string err = "Unknown error opening file: " + infilename + " "
+                          + strerror(errno);
+        throw khmer_file_exception(err);
     }
 
     if (clear_tags) {
@@ -358,6 +364,24 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
         if (buf != NULL) {
             delete[] buf;
         }
+        throw khmer_file_exception(err);
+        /* Yes, this is boneheaded. Unfortunately, there is a bug in gcc > 5
+         * regarding the basic_ios::failure that makes it impossible to catch
+         * with more specificty. So, we catch *all* exceptions after trying to
+         * get the ifstream::failure, and assume it must have been the buggy one.
+         * Unfortunately, this would also cause us to catch the
+         * khmer_file_exceptions thrown above, so we catch them again first and
+         * rethrow them :) If this is understandably irritating to you, please
+         * bother the gcc devs at:
+         *     https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
+         *
+         * See also: http://media4.giphy.com/media/3o6UBpHgaXFDNAuttm/giphy.gif
+         */
+    } catch (khmer_file_exception &e) {
+        throw e;
+    } catch (const std::exception &e) {
+        std::string err = "Unknown error opening file: " + infilename + " "
+                          + strerror(errno);
         throw khmer_file_exception(err);
     }
 }
@@ -744,6 +768,12 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
             err = "Unknown error in opening file: " + infilename;
         }
         throw khmer_file_exception(err);
+    } catch (const std::exception &e) {
+        // Catching std::exception is a stopgap for
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
+        std::string err = "Unknown error opening file: " + infilename + " "
+                          + strerror(errno);
+        throw khmer_file_exception(err);
     }
 
     if (clear_tags) {
@@ -801,6 +831,14 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
         delete[] buf;
     } catch (std::ifstream::failure &e) {
         std::string err = "Error reading stoptags from: " + infilename;
+        throw khmer_file_exception(err);
+    } catch (khmer_file_exception &e) {
+        throw e;
+    } catch (const std::exception &e) {
+        // Catching std::exception is a stopgap for
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
+        std::string err = "Unknown error opening file: " + infilename + " "
+                          + strerror(errno);
         throw khmer_file_exception(err);
     }
 }
@@ -1079,5 +1117,79 @@ const
     return size;
 }
 
-// vim: set sts=2 sw=2:
+// Starting from the given seed k-mer, assemble the maximal linear path in
+// both directions.
+//
+// No guarantees on direction, of course - this may return the reverse
+// complement of the input sequence.
+//
+// Note: as written, will ignore branches to the left and continue
+// past them; this probably needs to be fixed.  For now, this means
+// that assembling from two different directions may yield different
+// results.
 
+std::string Hashtable::assemble_linear_path(const Kmer seed_kmer,
+        const Hashtable * stop_bf)
+const
+{
+    std::string start_kmer = seed_kmer.get_string_rep(_ksize);
+    std::string right = _assemble_right(start_kmer.c_str(), stop_bf);
+
+    start_kmer = _revcomp(start_kmer);
+    std::string left = _assemble_right(start_kmer.c_str(), stop_bf);
+
+    left = left.substr(_ksize);
+    return _revcomp(left) + right;
+}
+
+std::string Hashtable::_assemble_right(const char * start_kmer,
+                                       const Hashtable * stop_bf)
+const
+{
+    const char bases[] = "ACGT";
+    std::string kmer = start_kmer;
+    std::string contig = kmer;
+
+    // This loop extends the starting k-mer to the right as long as it can
+    // do so unambiguously (or not at all).  This involves checking each
+    // possible nucleotide suffix for presence; extension is continued until
+    // either more than one such k-mer is present ('found2' is true), or no
+    // such k-mer is present ('found' is false).
+
+    while (1) {
+        const char * base = &bases[0];
+        bool found = false;
+        char found_base;
+        bool found2 = false;
+
+        // check all four suffixes for presence.
+        while(*base != 0) {
+            std::string try_kmer = kmer.substr(1) + (char) *base;
+
+            // a hit!
+            if (this->get_count(try_kmer.c_str()) &&
+                    (!stop_bf || !stop_bf->get_count(try_kmer.c_str()))) {
+                if (found) {
+                    found2 = true;
+                    break;
+                }
+                found_base = (char) *base;
+                found = true;
+            }
+            base++;
+        }
+
+        // exit condition: no suffix k-mer, or more than one.
+        if (!found or found2) {
+            break;
+        }
+
+        // extend assembly!
+        contig += found_base;
+        kmer = kmer.substr(1) + found_base;
+        found = true;
+    }
+    return contig;
+}
+
+// vim: set sts=2 sw=2:

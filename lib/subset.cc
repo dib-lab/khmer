@@ -908,6 +908,12 @@ void SubsetPartition::merge_from_disk(string other_filename)
             err = "Unknown error in opening file: " + other_filename;
         }
         throw khmer_file_exception(err);
+    } catch (const std::exception &e) {
+        // Catching std::exception is a stopgap for
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
+        std::string err = "Unknown error opening file: " + other_filename + " "
+                          + strerror(errno);
+        throw khmer_file_exception(err);
     }
 
     try {
@@ -952,8 +958,13 @@ void SubsetPartition::merge_from_disk(string other_filename)
         std::string err;
         err = "Unknown error reading header info from: " + other_filename;
         throw khmer_file_exception(err);
+    } catch (khmer_file_exception &e) {
+        throw e;
+    } catch (const std::exception &e) {
+        std::string err = "Unknown error opening file: " + other_filename + " "
+                          + strerror(errno);
+        throw khmer_file_exception(err);
     }
-
     char * buf = new char[IO_BUF_SIZE];
 
     unsigned int loaded = 0;
@@ -977,7 +988,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
 
         try {
             infile.read(buf + remainder, IO_BUF_SIZE - remainder);
-        } catch (std::ifstream::failure &e) {
+        } catch (std::exception &e) {
 
             // We may get an exception here if we fail to read all the
             // expected bytes due to EOF -- only pass it up if we read

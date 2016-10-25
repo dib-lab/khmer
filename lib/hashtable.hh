@@ -200,10 +200,10 @@ public:
                           float &stddev);
 
     // number of unique k-mers
-    virtual const HashIntoType n_unique_kmers() const = 0;
+    virtual const uint64_t n_unique_kmers() const = 0;
 
     // count number of occupied bins
-    virtual const HashIntoType n_occupied() const = 0;
+    virtual const uint64_t n_occupied() const = 0;
 
     // partitioning stuff
     void _validate_pmap()
@@ -287,7 +287,7 @@ public:
     virtual BoundedCounterType test_and_set_bits(const char * kmer) = 0;
     virtual BoundedCounterType test_and_set_bits(HashIntoType khash) = 0;
 
-    virtual std::vector<HashIntoType> get_tablesizes() const = 0;
+    virtual std::vector<uint64_t> get_tablesizes() const = 0;
     virtual const size_t n_tables() const = 0;
 
     size_t trim_on_stoptags(std::string sequence) const;
@@ -343,6 +343,11 @@ public:
                                       SeenSet &adjacencies,
                                       SeenSet &nodes, Hashtable& bf,
                                       SeenSet &high_degree_nodes) const;
+
+    std::string assemble_linear_path(const Kmer seed_kmer,
+                                     const Hashtable * stop_bf=0) const;
+    std::string _assemble_right(const char * start_kmer,
+                                const Hashtable * stop_bf=0) const;
 };
 }
 

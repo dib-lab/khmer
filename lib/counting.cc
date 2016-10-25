@@ -89,13 +89,13 @@ BoundedCounterType CountingHash::get_max_count(const std::string &s)
     return max_count;
 }
 
-HashIntoType *
+uint64_t *
 CountingHash::abundance_distribution(
     read_parsers::IParser * parser,
     Hashbits *          tracking)
 {
-    HashIntoType * dist = new HashIntoType[MAX_BIGCOUNT + 1];
-    HashIntoType i;
+    uint64_t * dist = new uint64_t[MAX_BIGCOUNT + 1];
+    uint64_t i;
 
     for (i = 0; i <= MAX_BIGCOUNT; i++) {
         dist[i] = 0;
@@ -142,13 +142,13 @@ CountingHash::abundance_distribution(
 }
 
 
-HashIntoType * CountingHash::abundance_distribution(
+uint64_t * CountingHash::abundance_distribution(
     std::string filename,
     Hashbits *  tracking)
 {
     IParser* parser = IParser::get_parser(filename.c_str());
 
-    HashIntoType * distribution = abundance_distribution(parser, tracking);
+    uint64_t * distribution = abundance_distribution(parser, tracking);
     delete parser;
     return distribution;
 }
@@ -341,6 +341,10 @@ CountingHashFileReader::CountingHashFileReader(
             err = "Unknown error in opening file: " + infilename;
         }
         throw khmer_file_exception(err + " " + strerror(errno));
+    } catch (const std::exception &e) {
+        std::string err = "Unknown error opening file: " + infilename + " "
+                          + strerror(errno);
+        throw khmer_file_exception(err);
     }
 
     if (ht._counts) {
@@ -403,11 +407,11 @@ CountingHashFileReader::CountingHashFileReader(
         }
 
         for (unsigned int i = 0; i < ht._n_tables; i++) {
-            HashIntoType tablesize;
+            uint64_t tablesize;
 
             infile.read((char *) &save_tablesize, sizeof(save_tablesize));
 
-            tablesize = (HashIntoType) save_tablesize;
+            tablesize = save_tablesize;
             ht._tablesizes.push_back(tablesize);
 
             ht._counts[i] = new Byte[tablesize];
@@ -419,7 +423,7 @@ CountingHashFileReader::CountingHashFileReader(
             }
         }
 
-        HashIntoType n_counts = 0;
+        uint64_t n_counts = 0;
         infile.read((char *) &n_counts, sizeof(n_counts));
 
         if (n_counts) {
@@ -428,7 +432,7 @@ CountingHashFileReader::CountingHashFileReader(
             HashIntoType kmer;
             BoundedCounterType count;
 
-            for (HashIntoType n = 0; n < n_counts; n++) {
+            for (uint64_t n = 0; n < n_counts; n++) {
                 infile.read((char *) &kmer, sizeof(kmer));
                 infile.read((char *) &count, sizeof(count));
                 ht._bigcounts[kmer] = count;
@@ -444,6 +448,10 @@ CountingHashFileReader::CountingHashFileReader(
             err = "Error reading from k-mer count file: " + infilename + " "
                   + strerror(errno);
         }
+        throw khmer_file_exception(err);
+    } catch (const std::exception &e) {
+        std::string err = "Error reading from k-mer count file: " + infilename + " "
+                          + strerror(errno);
         throw khmer_file_exception(err);
     }
 }
@@ -530,7 +538,7 @@ CountingHashGzFileReader::CountingHashGzFileReader(
 
     ht._counts = new Byte*[ht._n_tables];
     for (unsigned int i = 0; i < ht._n_tables; i++) {
-        HashIntoType tablesize;
+        uint64_t tablesize;
 
         read_b = gzread(infile, (char *) &save_tablesize,
                         sizeof(save_tablesize));
@@ -548,12 +556,12 @@ CountingHashGzFileReader::CountingHashGzFileReader(
             throw khmer_file_exception(err);
         }
 
-        tablesize = (HashIntoType) save_tablesize;
+        tablesize = save_tablesize;
         ht._tablesizes.push_back(tablesize);
 
         ht._counts[i] = new Byte[tablesize];
 
-        HashIntoType loaded = 0;
+        uint64_t loaded = 0;
         while (loaded != tablesize) {
             unsigned long long  to_read_ll = tablesize - loaded;
             unsigned int        to_read_int;
@@ -581,7 +589,7 @@ CountingHashGzFileReader::CountingHashGzFileReader(
         }
     }
 
-    HashIntoType n_counts = 0;
+    uint64_t n_counts = 0;
     read_b = gzread(infile, (char *) &n_counts, sizeof(n_counts));
     if (read_b <= 0) {
         std::string gzerr = gzerror(infile, &read_b);
@@ -601,7 +609,7 @@ CountingHashGzFileReader::CountingHashGzFileReader(
         HashIntoType kmer;
         BoundedCounterType count;
 
-        for (HashIntoType n = 0; n < n_counts; n++) {
+        for (uint64_t n = 0; n < n_counts; n++) {
             int read_k = gzread(infile, (char *) &kmer, sizeof(kmer));
             int read_c = gzread(infile, (char *) &count, sizeof(count));
 
@@ -664,7 +672,7 @@ CountingHashFileWriter::CountingHashFileWriter(
         outfile.write((const char *) ht._counts[i], save_tablesize);
     }
 
-    HashIntoType n_counts = ht._bigcounts.size();
+    uint64_t n_counts = ht._bigcounts.size();
     outfile.write((const char *) &n_counts, sizeof(n_counts));
 
     if (n_counts) {
@@ -765,7 +773,7 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(
         }
     }
 
-    HashIntoType n_counts = ht._bigcounts.size();
+    uint64_t n_counts = ht._bigcounts.size();
     gzwrite(outfile, (const char *) &n_counts, sizeof(n_counts));
 
     if (n_counts) {
