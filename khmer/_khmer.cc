@@ -297,10 +297,13 @@ khmer_Read_init(khmer_Read_Object *self, PyObject *args, PyObject *kwds)
     const char * annotations{};
     const char * sequence{};
     const char * quality{};
-    static char *kwlist[] = {"name", "annotations", "sequence", "quality", NULL};
+    char *kwlist[5] = {
+        const_cast<char *>("name"), const_cast<char *>("annotations"),
+        const_cast<char *>("sequence"), const_cast<char *>("quality"), NULL};
+
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "|zzzz", kwlist,
                                      &name, &sequence, &quality, &annotations)) {
-        return NULL;
+        return 0;
     }
 
     if (name != NULL) {
@@ -388,6 +391,24 @@ static PyGetSetDef khmer_Read_accessors [ ] = {
     { NULL, NULL, NULL, NULL, NULL } // sentinel
 };
 
+static
+PyObject *
+khmer_Read_getattr(PyObject *self, PyObject *attr_name)
+{
+  PyObject * ascii = PyUnicode_AsASCIIString(attr_name);
+  const char * c = PyBytes_AsString(ascii);
+  std::cout << c << std::endl;
+  if (!strncmp(c, "name", 4)) {
+    std::cout << "special" << std::endl;
+    PyErr_SetString(PyExc_AttributeError,
+                           "'Read' object has no attribute.");
+    return NULL;
+  }
+  Py_DECREF(ascii);
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 
 static PyTypeObject khmer_Read_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)        /* init & ob_size */
@@ -406,7 +427,7 @@ static PyTypeObject khmer_Read_Type = {
     0,                                    /* tp_hash */
     0,                                    /* tp_call */
     0,                                    /* tp_str */
-    0,                                    /* tp_getattro */
+    khmer_Read_getattr,                   /* tp_getattro */
     0,                                    /* tp_setattro */
     0,                                    /* tp_as_buffer */
     Py_TPFLAGS_DEFAULT,                   /* tp_flags */
