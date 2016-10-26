@@ -335,7 +335,14 @@ static
 PyObject *
 Read_get_name(khmer_Read_Object * obj, void * closure )
 {
-    return PyUnicode_FromString(obj->read->name.c_str()) ;
+    if (obj->read->name.size() > 0) {
+        return PyUnicode_FromString(obj->read->name.c_str());
+    }
+    else {
+        PyErr_SetString(PyExc_AttributeError,
+                        "'Read' object has no attribute 'name'.");
+        return NULL;
+    }
 }
 
 
@@ -343,7 +350,14 @@ static
 PyObject *
 Read_get_sequence(khmer_Read_Object * obj, void * closure)
 {
-    return PyUnicode_FromString(obj->read->sequence.c_str()) ;
+    if (obj->read->sequence.size() > 0) {
+        return PyUnicode_FromString(obj->read->sequence.c_str());
+    }
+    else {
+        PyErr_SetString(PyExc_AttributeError,
+                        "'Read' object has no attribute 'sequence'.");
+        return NULL;
+    }
 }
 
 
@@ -351,7 +365,14 @@ static
 PyObject *
 Read_get_quality(khmer_Read_Object * obj, void * closure)
 {
-    return PyUnicode_FromString(obj->read->quality.c_str()) ;
+    if (obj->read->quality.size() > 0) {
+        return PyUnicode_FromString(obj->read->quality.c_str());
+    }
+    else {
+        PyErr_SetString(PyExc_AttributeError,
+                        "'Read' object has no attribute 'quality'.");
+        return NULL;
+    }
 }
 
 
@@ -359,7 +380,14 @@ static
 PyObject *
 Read_get_annotations(khmer_Read_Object * obj, void * closure)
 {
-    return PyUnicode_FromString(obj->read->annotations.c_str()) ;
+    if (obj->read->annotations.size() > 0) {
+        return PyUnicode_FromString(obj->read->annotations.c_str());
+    }
+    else {
+        PyErr_SetString(PyExc_AttributeError,
+                        "'Read' object has no attribute 'annotations'.");
+        return NULL;
+    }
 }
 
 
@@ -392,63 +420,6 @@ static PyGetSetDef khmer_Read_accessors [ ] = {
 };
 
 
-static
-PyObject *
-khmer_Read_getattr(khmer_Read_Object *self, PyObject *attr_name)
-{
-    char *name{};
-    PyObject * rval = NULL;
-
-    if (PyUnicode_Check(attr_name))
-        name = _PyUnicode_AsString(attr_name);
-
-    if (strcmp(name, "name") == 0) {
-        if (self->read->name.size() > 0) {
-            rval = PyUnicode_FromString(self->read->name.c_str());
-        }
-        else {
-            PyErr_SetString(PyExc_AttributeError,
-                            "'Read' object has no attribute 'name'.");
-            rval = NULL;
-        }
-    }
-    else if (strcmp(name, "sequence") == 0) {
-        if (self->read->sequence.size() > 0) {
-            rval = PyUnicode_FromString(self->read->sequence.c_str());
-        }
-        else {
-            PyErr_SetString(PyExc_AttributeError,
-                            "'Read' object has no attribute 'sequence'.");
-            rval = NULL;
-        }
-    }
-    else if (strcmp(name, "quality") == 0) {
-        if (self->read->quality.size() > 0) {
-            rval = PyUnicode_FromString(self->read->quality.c_str());
-        }
-        else {
-            PyErr_SetString(PyExc_AttributeError,
-                            "'Read' object has no attribute 'quality'.");
-            rval = NULL;
-        }
-    }
-    else if (strcmp(name, "annotations") == 0) {
-        if (self->read->annotations.size() > 0) {
-            rval = PyUnicode_FromString(self->read->annotations.c_str());
-        }
-        else {
-            PyErr_SetString(PyExc_AttributeError,
-                            "'Read' object has no attribute 'annotations'.");
-            rval = NULL;
-        }
-    }
-    else {
-        rval = PyObject_GenericGetAttr((PyObject *)self, attr_name);
-    }
-    return rval;
-}
-
-
 static PyTypeObject khmer_Read_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)        /* init & ob_size */
     "khmer.Read",                         /* tp_name */
@@ -466,7 +437,7 @@ static PyTypeObject khmer_Read_Type = {
     0,                                    /* tp_hash */
     0,                                    /* tp_call */
     0,                                    /* tp_str */
-    (getattrofunc)khmer_Read_getattr,     /* tp_getattro */
+    0,                                    /* tp_getattro */
     0,                                    /* tp_setattro */
     0,                                    /* tp_as_buffer */
     Py_TPFLAGS_DEFAULT,                   /* tp_flags */

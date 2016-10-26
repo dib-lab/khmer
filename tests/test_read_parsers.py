@@ -39,16 +39,28 @@ from __future__ import print_function
 from __future__ import absolute_import
 from khmer import Read
 from khmer import ReadParser
+from screed import Record
 from . import khmer_tst_utils as utils
 import pytest
 from functools import reduce  # pylint: disable=redefined-builtin
 
 
 def test_read_type_basic():
-    # basic properties of khmer.Read
+    # test that basic properties of khmer.Read behave like screed.Record
     r = Read()
+    s = Record()
     for attr in ('sequence', 'name', 'quality', 'annotations'):
         assert hasattr(r, attr) == False, attr
+        assert hasattr(s, attr) == False, attr
+
+
+def test_read_type_attributes():
+    r = Read(sequence='ACGT', quality='good', name='1234', annotations='ann')
+    assert r.sequence == 'ACGT'
+    assert r.quality == 'good'
+    assert r.name == '1234'
+    assert r.annotations == 'ann'
+
 
 def test_read_properties():
 
