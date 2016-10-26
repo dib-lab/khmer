@@ -37,11 +37,18 @@
 # Tests for the ReadParser and Read classes.
 from __future__ import print_function
 from __future__ import absolute_import
+from khmer import Read
 from khmer import ReadParser
 from . import khmer_tst_utils as utils
 import pytest
 from functools import reduce  # pylint: disable=redefined-builtin
 
+
+def test_read_type_basic():
+    # basic properties of khmer.Read
+    r = Read()
+    for attr in ('sequence', 'name', 'quality', 'annotations'):
+        assert hasattr(r, attr) == False, attr
 
 def test_read_properties():
 

@@ -298,8 +298,8 @@ khmer_Read_init(khmer_Read_Object *self, PyObject *args, PyObject *kwds)
     const char * sequence{};
     const char * quality{};
     char *kwlist[5] = {
-        const_cast<char *>("name"), const_cast<char *>("annotations"),
-        const_cast<char *>("sequence"), const_cast<char *>("quality"), NULL};
+        const_cast<char *>("name"), const_cast<char *>("sequence"),
+        const_cast<char *>("quality"), const_cast<char *>("annotations"), NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "|zzzz", kwlist,
                                      &name, &sequence, &quality, &annotations)) {
@@ -391,22 +391,61 @@ static PyGetSetDef khmer_Read_accessors [ ] = {
     { NULL, NULL, NULL, NULL, NULL } // sentinel
 };
 
+
 static
 PyObject *
-khmer_Read_getattr(PyObject *self, PyObject *attr_name)
+khmer_Read_getattr(khmer_Read_Object *self, PyObject *attr_name)
 {
-  PyObject * ascii = PyUnicode_AsASCIIString(attr_name);
-  const char * c = PyBytes_AsString(ascii);
-  std::cout << c << std::endl;
-  if (!strncmp(c, "name", 4)) {
-    std::cout << "special" << std::endl;
-    PyErr_SetString(PyExc_AttributeError,
-                           "'Read' object has no attribute.");
-    return NULL;
-  }
-  Py_DECREF(ascii);
-  Py_INCREF(Py_None);
-  return Py_None;
+    char *name{};
+    PyObject * rval = NULL;
+
+    if (PyUnicode_Check(attr_name))
+        name = _PyUnicode_AsString(attr_name);
+
+    if (strcmp(name, "name") == 0) {
+        if (self->read->name.size() > 0) {
+            rval = PyUnicode_FromString(self->read->name.c_str());
+        }
+        else {
+            PyErr_SetString(PyExc_AttributeError,
+                            "'Read' object has no attribute 'name'.");
+            rval = NULL;
+        }
+    }
+    else if (strcmp(name, "sequence") == 0) {
+        if (self->read->sequence.size() > 0) {
+            rval = PyUnicode_FromString(self->read->sequence.c_str());
+        }
+        else {
+            PyErr_SetString(PyExc_AttributeError,
+                            "'Read' object has no attribute 'sequence'.");
+            rval = NULL;
+        }
+    }
+    else if (strcmp(name, "quality") == 0) {
+        if (self->read->quality.size() > 0) {
+            rval = PyUnicode_FromString(self->read->quality.c_str());
+        }
+        else {
+            PyErr_SetString(PyExc_AttributeError,
+                            "'Read' object has no attribute 'quality'.");
+            rval = NULL;
+        }
+    }
+    else if (strcmp(name, "annotations") == 0) {
+        if (self->read->annotations.size() > 0) {
+            rval = PyUnicode_FromString(self->read->annotations.c_str());
+        }
+        else {
+            PyErr_SetString(PyExc_AttributeError,
+                            "'Read' object has no attribute 'annotations'.");
+            rval = NULL;
+        }
+    }
+    else {
+        rval = PyObject_GenericGetAttr((PyObject *)self, attr_name);
+    }
+    return rval;
 }
 
 
@@ -427,7 +466,7 @@ static PyTypeObject khmer_Read_Type = {
     0,                                    /* tp_hash */
     0,                                    /* tp_call */
     0,                                    /* tp_str */
-    khmer_Read_getattr,                   /* tp_getattro */
+    (getattrofunc)khmer_Read_getattr,     /* tp_getattro */
     0,                                    /* tp_setattro */
     0,                                    /* tp_as_buffer */
     Py_TPFLAGS_DEFAULT,                   /* tp_flags */
