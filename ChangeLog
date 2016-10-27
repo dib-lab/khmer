@@ -1,3 +1,7 @@
+2016-11-04  Tim Head  <betatim@gmail.com>
+
+   * Make khmer's Read type accesible from the python API.
+
 2016-11-03  Titus Brown  <titus@idyll.org>
 
    * lib/{counting.cc,counting.hh,hashbits.cc,hashbits.hh,hashtable.cc,

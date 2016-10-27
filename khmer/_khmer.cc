@@ -299,7 +299,8 @@ khmer_Read_init(khmer_Read_Object *self, PyObject *args, PyObject *kwds)
     const char * quality{};
     char *kwlist[5] = {
         const_cast<char *>("name"), const_cast<char *>("sequence"),
-        const_cast<char *>("quality"), const_cast<char *>("annotations"), NULL};
+        const_cast<char *>("quality"), const_cast<char *>("annotations"), NULL
+    };
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "|zzzz", kwlist,
                                      &name, &sequence, &quality, &annotations)) {
@@ -337,8 +338,7 @@ Read_get_name(khmer_Read_Object * obj, void * closure )
 {
     if (obj->read->name.size() > 0) {
         return PyUnicode_FromString(obj->read->name.c_str());
-    }
-    else {
+    } else {
         PyErr_SetString(PyExc_AttributeError,
                         "'Read' object has no attribute 'name'.");
         return NULL;
@@ -352,8 +352,7 @@ Read_get_sequence(khmer_Read_Object * obj, void * closure)
 {
     if (obj->read->sequence.size() > 0) {
         return PyUnicode_FromString(obj->read->sequence.c_str());
-    }
-    else {
+    } else {
         PyErr_SetString(PyExc_AttributeError,
                         "'Read' object has no attribute 'sequence'.");
         return NULL;
@@ -367,8 +366,7 @@ Read_get_quality(khmer_Read_Object * obj, void * closure)
 {
     if (obj->read->quality.size() > 0) {
         return PyUnicode_FromString(obj->read->quality.c_str());
-    }
-    else {
+    } else {
         PyErr_SetString(PyExc_AttributeError,
                         "'Read' object has no attribute 'quality'.");
         return NULL;
@@ -382,8 +380,7 @@ Read_get_annotations(khmer_Read_Object * obj, void * closure)
 {
     if (obj->read->annotations.size() > 0) {
         return PyUnicode_FromString(obj->read->annotations.c_str());
-    }
-    else {
+    } else {
         PyErr_SetString(PyExc_AttributeError,
                         "'Read' object has no attribute 'annotations'.");
         return NULL;
