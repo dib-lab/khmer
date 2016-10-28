@@ -47,11 +47,16 @@ from functools import reduce  # pylint: disable=redefined-builtin
 
 def test_read_type_basic():
     # test that basic properties of khmer.Read behave like screed.Record
-    r = Read()
-    s = Record()
-    for attr in ('sequence', 'name', 'quality', 'annotations'):
-        assert not hasattr(r, attr), attr
-        assert not hasattr(s, attr), attr
+    name = "895:1:1:1246:14654 1:N:0:NNNNN"
+    sequence = "ACGT"
+    r = Read(name, sequence)
+    s = Record(dict(name=name, sequence=sequence))
+
+    for x in (r, s):
+        assert x.name == name
+        assert x.sequence == sequence
+        assert not hasattr(x, 'quality'), x
+        assert not hasattr(x, 'annotations'), x
 
 
 def test_read_type_attributes():

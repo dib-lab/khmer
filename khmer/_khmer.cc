@@ -302,7 +302,7 @@ khmer_Read_init(khmer_Read_Object *self, PyObject *args, PyObject *kwds)
         const_cast<char *>("quality"), const_cast<char *>("annotations"), NULL
     };
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|zzzz", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ss|zz", kwlist,
                                      &name, &sequence, &quality, &annotations)) {
         return 0;
     }
