@@ -48,36 +48,17 @@ import sys
 import khmer
 import os.path
 import screed
+from khmer import khmer_args
 from khmer.khmer_args import (build_nodegraph_args, DEFAULT_MAX_TABLESIZE)
 
 
 def main():
-    parser = build_construct_args()
+    parser = build_nodegraph_args()
+    parser.add_argument('-q', '--quiet')
     parser.add_argument('input_filename')
     parser.add_argument('read_filename')
 
     args = parser.parse_args()
-
-    if not args.quiet:
-        if args.min_hashsize == DEFAULT_MAX_TABLESIZE:
-            print("** WARNING: hashsize is default!  " \
-                "You absodefly want to increase this!\n** " \
-                "Please read the docs!", file=sys.stderr)
-
-        print('\nPARAMETERS:', file=sys.stderr)
-        print(' - kmer size =    %d \t\t(-k)' % args.ksize, file=sys.stderr)
-        print(' - n hashes =     %d \t\t(-N)' % args.n_hashes, file=sys.stderr)
-        print(' - min hashsize = %-5.2g \t(-x)' % \
-            args.min_hashsize, file=sys.stderr)
-        print('', file=sys.stderr)
-        print('Estimated memory usage is %.2g bytes ' \
-            '(n_hashes x min_hashsize / 8)' % (
-                args.n_hashes * args.min_hashsize / 8.), file=sys.stderr)
-        print('-' * 8, file=sys.stderr)
-
-    K = args.ksize
-    HT_SIZE = args.min_hashsize
-    N_HT = args.n_hashes
 
     inp = args.input_filename
     readsfile = args.read_filename
@@ -86,7 +67,7 @@ def main():
     outfp = open(outfile, 'w')
 
     # create a nodegraph data structure
-    ht = khmer.Nodegraph(K, HT_SIZE, N_HT)
+    ht = khmer_args.create_countgraph(args)
 
     # load contigs, connect into N partitions
     print('loading input reads from', inp)
@@ -96,6 +77,7 @@ def main():
 
     n = 0
     m = 0
+    K = ht.ksize()
     for record in screed.open(readsfile):
         if len(record.sequence) < K:
             continue
