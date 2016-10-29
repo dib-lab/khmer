@@ -138,6 +138,18 @@ public:
         }
     }
 
+    inline
+    HashIntoType
+    hash_dna(const char * kmer) const {
+        return _hash(kmer, _ksize);
+    }
+
+    inline
+    std::string
+    unhash_dna(HashIntoType hashval) const {
+        return _revhash(hashval, _ksize);
+    }
+
     // Writing to the tables outside of defined methods has undefined behavior!
     // As such, this should only be used to return read-only interfaces
     Byte ** get_raw_tables()
@@ -194,7 +206,7 @@ public:
 
     virtual void count(const char * kmer)
     {
-        HashIntoType hash = _hash(kmer, _ksize);
+        HashIntoType hash = hash_dna(kmer);
         count(hash);
     }
 
@@ -260,7 +272,7 @@ public:
     // get the count for the given k-mer.
     virtual const BoundedCounterType get_count(const char * kmer) const
     {
-        HashIntoType hash = _hash(kmer, _ksize);
+        HashIntoType hash = hash_dna(kmer);
         return get_count(hash);
     }
 

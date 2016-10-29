@@ -577,7 +577,7 @@ void Hashtable::consume_partitioned_fasta(const std::string &filename,
             n_consumed += consume_string(seq); // @CTB why are we doing this?
 
             // Next, compute the tag & set the partition, if nonzero
-            HashIntoType kmer = _hash(seq, _ksize);
+            HashIntoType kmer = hash_dna(seq.c_str());
             all_tags.insert(kmer);
             if (p > 0) {
                 partition->set_partition_id(kmer, p);

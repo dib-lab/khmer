@@ -47,7 +47,6 @@ Contact: khmer-project@idyll.org
 #include "counting.hh"
 #include "hashtable.hh"
 #include "khmer_exception.hh"
-#include "kmer_hash.hh"
 #include "read_parsers.hh"
 #include "subset.hh"
 
@@ -155,7 +154,7 @@ size_t SubsetPartition::output_partitioned_file(
 
             bool found_tag = false;
             for (unsigned int i = 0; i < seq.length() - ksize + 1; i++) {
-                kmer = _hash(kmer_s + i, ksize);
+                kmer = _ht->hash_dna(kmer_s + i);
 
                 // is this a known tag?
                 if (set_contains(partition_map, kmer)) {
@@ -632,7 +631,7 @@ void SubsetPartition::set_partition_id(
     if (!(kmer_s.length() >= _ht->ksize())) {
         throw khmer_exception();
     }
-    kmer = _hash(kmer_s, _ht->ksize());
+    kmer = _ht->hash_dna(kmer_s.c_str());
 
     set_partition_id(kmer, p);
 }
@@ -802,7 +801,7 @@ PartitionID SubsetPartition::get_partition_id(std::string kmer_s)
     if (!(kmer_s.length() >= _ht->ksize())) {
         throw khmer_exception();
     }
-    kmer = _hash(kmer_s, _ht->ksize());
+    kmer = _ht->hash_dna(kmer_s.c_str());
 
     return get_partition_id(kmer);
 }
@@ -1431,7 +1430,7 @@ void SubsetPartition::report_on_partitions()
 
     for (SeenSet::iterator ti = _ht->all_tags.begin();
             ti != _ht->all_tags.end(); ++ti) {
-        std::cout << "TAG: " << _revhash(*ti, _ht->ksize()) << "\n";
+        std::cout << "TAG: " << _ht->unhash_dna(*ti) << "\n";
         PartitionID *pid = partition_map[*ti];
         if (pid) {
             std::cout << "partition: " << *(partition_map[*ti]) << "\n";

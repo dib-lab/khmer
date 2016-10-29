@@ -1262,7 +1262,7 @@ hashtable_hash(khmer_KHashtable_Object * me, PyObject * args)
 
     try {
         PyObject * hash = nullptr;
-        const HashIntoType h(_hash(kmer, hashtable->ksize()));
+        const HashIntoType h(hashtable->hash_dna(kmer));
         convert_HashIntoType_to_PyObject(h, &hash);
         return hash;
     } catch (khmer_exception &e) {
@@ -1286,7 +1286,7 @@ hashtable_reverse_hash(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    return PyUnicode_FromString(_revhash(val, hashtable->ksize()).c_str());
+    return PyUnicode_FromString(hashtable->unhash_dna(val).c_str());
 }
 
 static
@@ -2263,7 +2263,7 @@ hashtable_add_tag(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    HashIntoType kmer = _hash(kmer_s, hashtable->ksize());
+    HashIntoType kmer = hashtable->hash_dna(kmer_s);
     hashtable->add_tag(kmer);
 
     Py_RETURN_NONE;
@@ -2280,7 +2280,7 @@ hashtable_add_stop_tag(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    HashIntoType kmer = _hash(kmer_s, hashtable->ksize());
+    HashIntoType kmer = hashtable->hash_dna(kmer_s);
     hashtable->add_stop_tag(kmer);
 
     Py_RETURN_NONE;
@@ -2303,7 +2303,7 @@ hashtable_get_stop_tags(khmer_KHashtable_Object * me, PyObject * args)
     unsigned long long i = 0;
     for (si = hashtable->stop_tags.begin(); si != hashtable->stop_tags.end();
             ++si) {
-        std::string s = _revhash(*si, k);
+        std::string s = hashtable->unhash_dna(*si);
         PyList_SET_ITEM(x, i, Py_BuildValue("s", s.c_str()));
         i++;
     }
@@ -2321,14 +2321,13 @@ hashtable_get_tagset(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    WordLength k = hashtable->ksize();
     SeenSet::const_iterator si;
 
     PyObject * x = PyList_New(hashtable->all_tags.size());
     unsigned long long i = 0;
     for (si = hashtable->all_tags.begin(); si != hashtable->all_tags.end();
             ++si) {
-        std::string s = _revhash(*si, k);
+        std::string s = hashtable->unhash_dna(*si);
         PyList_SET_ITEM(x, i, Py_BuildValue("s", s.c_str()));
         i++;
     }
@@ -4306,7 +4305,6 @@ labelhash_get_tag_labels(khmer_KGraphLabels_Object * me, PyObject * args)
     LabelSet::const_iterator si;
     unsigned long long i = 0;
     for (si = labels.begin(); si != labels.end(); ++si) {
-        //std::string kmer_s = _revhash(*si, labelhash->ksize());
         PyList_SET_ITEM(x, i, Py_BuildValue("K", *si));
         i++;
     }

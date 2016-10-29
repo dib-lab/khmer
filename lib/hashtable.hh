@@ -154,6 +154,9 @@ public:
         return _ksize;
     }
 
+    virtual HashIntoType hash_dna(const char * kmer) const = 0;
+    virtual std::string unhash_dna(HashIntoType hashval) const = 0;
+
     virtual void count(const char * kmer) = 0;
     virtual void count(HashIntoType khash) = 0;
 
