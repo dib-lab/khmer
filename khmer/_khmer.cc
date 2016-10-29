@@ -147,7 +147,7 @@ static bool convert_PyObject_to_Kmer(PyObject * value,
         if (!convert_PyLong_to_HashIntoType(value, h)) {
             return false;
         }
-        kmer.set_from_unique_hash(h, ksize);
+        kmer.set_from_unique_hash(h, ksize); // @@CTBhash
         return true;
     } else if (PyUnicode_Check(value))  {
         std::string s = PyBytes_AsString(PyUnicode_AsEncodedString(
@@ -199,7 +199,7 @@ static bool convert_PyObject_to_HashIntoType(PyObject * value,
                             "k-mer length must equal the k-mer size");
             return false;
         }
-        hashval = _hash(s, ksize);
+        hashval = _hash(s, ksize); // @@CTBhash
         return true;
 
     } else if (PyBytes_Check(value)) {
@@ -209,7 +209,7 @@ static bool convert_PyObject_to_HashIntoType(PyObject * value,
                             "k-mer length must equal the k-mer size");
             return false;
         }
-        hashval = _hash(s, ksize);
+        hashval = _hash(s, ksize); // @@CTBhash
         return true;
     } else {
         PyErr_SetString(PyExc_ValueError,

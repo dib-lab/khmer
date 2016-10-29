@@ -155,6 +155,8 @@ public:
     }
 
     virtual HashIntoType hash_dna(const char * kmer) const = 0;
+    virtual HashIntoType hash_dna_top_strand(const char * kmer) const = 0;
+    virtual HashIntoType hash_dna_bottom_strand(const char * kmer) const = 0;
     virtual std::string unhash_dna(HashIntoType hashval) const = 0;
 
     virtual void count(const char * kmer) = 0;

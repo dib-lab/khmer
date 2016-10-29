@@ -317,8 +317,8 @@ void ReadAligner::WriteNode(AlignmentNode* curr)
 {
     std::cerr << "curr: " << curr << " "
               << curr->prev << " " << " state=" << curr->state << " "
-              << _revhash(curr->fwd_hash, m_ch->ksize()) << " "
-              << _revhash(curr->rc_hash, m_ch->ksize())
+              << m_ch->unhash_dna(curr->fwd_hash) << " "
+              << m_ch->unhash_dna(curr->rc_hash)
               << " cov="
               << m_ch->get_count(uniqify_rc(curr->fwd_hash, curr->rc_hash))
               << " emission=" << curr->base
@@ -463,8 +463,8 @@ Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node,
                   << node->f_score << "\t" << node->length << "\t"
                   << node->state << "\t" << node->trusted << "\t"
                   << node->seq_idx << "\t"
-                  << _revhash(node->fwd_hash, m_ch->ksize()) << "\t"
-                  << _revhash(node->rc_hash, m_ch->ksize()) << std::endl;
+                  << m_ch->unhash_dna(node->fwd_hash) << "\t"
+                  << m_ch->unhash_dna(node->rc_hash) << std::endl;
 #endif
 
         if(forward) {
@@ -532,12 +532,13 @@ Alignment* ReadAligner::Align(const std::string& read)
     }
 
     HashIntoType fhash = 0, rhash = 0;
-    _hash(start.kmer, k, fhash, rhash);
+    fhash = m_ch->hash_dna_top_strand(start.kmer.c_str());
+    rhash = m_ch->hash_dna_bottom_strand(start.kmer.c_str());
 
 #if READ_ALIGNER_DEBUG
     std::cerr << "Starting kmer: " << start.kmer << " "
-              << _revhash(fhash, m_ch->ksize()) << " "
-              << _revhash(rhash, m_ch->ksize())
+              << m_ch->unhash_dna(fhash) << " "
+              << m_ch->unhash_dna(rhash)
               << " cov: " << start.k_cov << " idx: " << start.kmer_idx << ", "
               << start.kmer_idx + k - 1
               << " emission: " << start.kmer[k - 1] << std::endl;
@@ -610,12 +611,13 @@ Alignment* ReadAligner::AlignForward(const std::string& read)
     }
 
     HashIntoType fhash = 0, rhash = 0;
-    _hash(start.kmer, k, fhash, rhash);
+    fhash = m_ch->hash_dna_top_strand(start.kmer.c_str());
+    rhash = m_ch->hash_dna_bottom_strand(start.kmer.c_str());
 
 #if READ_ALIGNER_DEBUG
     std::cerr << "Starting kmer: " << start.kmer << " "
-              << _revhash(fhash, m_ch->ksize()) << " "
-              << _revhash(rhash, m_ch->ksize())
+              << m_ch->unhash_dna(fhash) << " "
+              << m_ch->unhash_dna(rhash)
               << " cov: " << start.k_cov << " idx: " << start.kmer_idx << ", "
               << start.kmer_idx + k - 1
               << " emission: " << start.kmer[k - 1] << std::endl;
