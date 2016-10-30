@@ -81,7 +81,7 @@ static void print_tag_set(SeenSet& p)
 
 #endif //0
 
-SubsetPartition::SubsetPartition(Hashtable * ht) :
+SubsetPartition::SubsetPartition(Hashgraph * ht) :
     next_partition_id(2), _ht(ht)
 {
 }

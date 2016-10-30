@@ -52,7 +52,7 @@ namespace khmer
 class CountingHash;
 class LabelHash;
 
-class Hashbits : public khmer::Hashtable
+class Hashbits : public khmer::Hashgraph
 {
 protected:
     std::vector<uint64_t> _tablesizes;
@@ -78,7 +78,7 @@ protected:
 
 public:
     Hashbits(WordLength ksize, std::vector<uint64_t>& tablesizes)
-        : khmer::Hashtable(ksize),
+        : khmer::Hashgraph(ksize),
           _tablesizes(tablesizes)
     {
         _occupied_bins = 0;

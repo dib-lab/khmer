@@ -71,7 +71,7 @@ class CountingHashGzFileReader;
 class CountingHashGzFileWriter;
 class CountingHashIntersect;
 
-class CountingHash : public khmer::Hashtable
+class CountingHash : public khmer::Hashgraph
 {
     friend class CountingHashIntersect;
     friend class CountingHashFile;
@@ -104,7 +104,7 @@ public:
     KmerCountMap _bigcounts;
 
     CountingHash( WordLength ksize, uint64_t single_tablesize ) :
-        khmer::Hashtable(ksize), _use_bigcount(false),
+        khmer::Hashgraph(ksize), _use_bigcount(false),
         _bigcount_spin_lock(false), _n_unique_kmers(0), _occupied_bins(0)
     {
         _tablesizes.push_back(single_tablesize);
@@ -113,7 +113,7 @@ public:
     }
 
     CountingHash( WordLength ksize, std::vector<uint64_t>& tablesizes ) :
-        khmer::Hashtable(ksize), _use_bigcount(false),
+        khmer::Hashgraph(ksize), _use_bigcount(false),
         _bigcount_spin_lock(false), _tablesizes(tablesizes),
         _n_unique_kmers(0), _occupied_bins(0)
     {

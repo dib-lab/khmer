@@ -88,13 +88,7 @@ namespace khmer
 class Hashtable: public
     KmerFactory  		// Base class implementation of a Bloom ht.
 {
-    friend class SubsetPartition;
-    friend class LabelHash;
-    friend class Traverser;
-
 protected:
-    unsigned int _tag_density;
-
     unsigned int    _max_count;
     unsigned int    _max_bigcount;
 
@@ -107,18 +101,12 @@ protected:
           _max_count( MAX_KCOUNT ),
           _max_bigcount( MAX_BIGCOUNT )
     {
-        _tag_density = DEFAULT_TAG_DENSITY;
-        if (!(_tag_density % 2 == 0)) {
-            throw khmer_exception();
-        }
         _init_bitstuff();
-        partition = new SubsetPartition(this);
-        _all_tags_spin_lock = 0;
     }
 
     virtual ~Hashtable( )
     {
-        delete partition;
+        ;
     }
 
     void _init_bitstuff()
@@ -130,24 +118,10 @@ protected:
         _nbits_sub_1 = (_ksize*2 - 2);
     }
 
-    void _clear_all_partitions()
-    {
-        if (partition != NULL) {
-            partition->_clear_all_partitions();
-        }
-    }
-
-    uint32_t _all_tags_spin_lock;
-
     explicit Hashtable(const Hashtable&);
     Hashtable& operator=(const Hashtable&);
 
 public:
-    SubsetPartition * partition;
-    SeenSet all_tags;
-    SeenSet stop_tags;
-    SeenSet repart_small_tags;
-
     // accessor to get 'k'
     const WordLength ksize() const
     {
@@ -210,6 +184,68 @@ public:
     // count number of occupied bins
     virtual const uint64_t n_occupied() const = 0;
 
+    virtual BoundedCounterType test_and_set_bits(const char * kmer) = 0;
+    virtual BoundedCounterType test_and_set_bits(HashIntoType khash) = 0;
+
+    virtual std::vector<uint64_t> get_tablesizes() const = 0;
+    virtual const size_t n_tables() const = 0;
+
+    // return all k-mer substrings, on the forward strand.
+    void get_kmers(const std::string &s, std::vector<std::string> &kmers)
+    const;
+
+    // return hash values for all k-mer substrings
+    void get_kmer_hashes(const std::string &s,
+                         std::vector<HashIntoType> &kmers) const;
+
+    // return hash values for all k-mer substrings in a SeenSet
+    void get_kmer_hashes_as_hashset(const std::string &s,
+                                    SeenSet& hashes) const;
+
+    // return counts of all k-mers in this string.
+    void get_kmer_counts(const std::string &s,
+                         std::vector<BoundedCounterType> &counts) const;
+
+};
+
+class Hashgraph: public
+   Hashtable
+{
+    friend class SubsetPartition;
+    friend class LabelHash;
+    friend class Traverser;
+protected:
+    unsigned int _tag_density;
+
+    explicit Hashgraph(WordLength ksize)
+        : Hashtable(ksize)
+    {
+        _tag_density = DEFAULT_TAG_DENSITY;
+        if (!(_tag_density % 2 == 0)) {
+            throw khmer_exception();
+        }
+        partition = new SubsetPartition(this);
+        _all_tags_spin_lock = 0;
+    }
+
+    virtual ~Hashgraph( )
+    {
+        delete partition;
+    }
+    void _clear_all_partitions()
+    {
+        if (partition != NULL) {
+            partition->_clear_all_partitions();
+        }
+    }
+
+    uint32_t _all_tags_spin_lock;
+public:
+    SubsetPartition * partition;
+    SeenSet all_tags;
+    SeenSet stop_tags;
+    SeenSet repart_small_tags;
+    
     // partitioning stuff
     void _validate_pmap()
     {
@@ -289,12 +325,6 @@ public:
                                    unsigned int &total_reads,
                                    unsigned long long &n_consumed);
 
-    virtual BoundedCounterType test_and_set_bits(const char * kmer) = 0;
-    virtual BoundedCounterType test_and_set_bits(HashIntoType khash) = 0;
-
-    virtual std::vector<uint64_t> get_tablesizes() const = 0;
-    virtual const size_t n_tables() const = 0;
-
     size_t trim_on_stoptags(std::string sequence) const;
 
     unsigned int traverse_from_kmer(Kmer start,
@@ -324,22 +354,6 @@ public:
 
     unsigned int kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r);
     unsigned int kmer_degree(const char * kmer_s);
-
-    // return all k-mer substrings, on the forward strand.
-    void get_kmers(const std::string &s, std::vector<std::string> &kmers)
-    const;
-
-    // return hash values for all k-mer substrings
-    void get_kmer_hashes(const std::string &s,
-                         std::vector<HashIntoType> &kmers) const;
-
-    // return hash values for all k-mer substrings in a SeenSet
-    void get_kmer_hashes_as_hashset(const std::string &s,
-                                    SeenSet& hashes) const;
-
-    // return counts of all k-mers in this string.
-    void get_kmer_counts(const std::string &s,
-                         std::vector<BoundedCounterType> &counts) const;
 
     //
     void find_high_degree_nodes(const char * sequence,
