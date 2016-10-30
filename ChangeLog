@@ -1,4 +1,4 @@
-2016-10-06  Camille Scott  <camille.scott.w@gmail.com>
+2016-10-30  Camille Scott  <camille.scott.w@gmail.com>
 
    * khmer/__init__.py, khmer/_khmer.cc, tests/test_functions.py: Expose
    reverse_complement to Python.
@@ -16,6 +16,11 @@
    * lib/kmer_hash.hh: Helper functions for the Kmer class.
    * lib/{alphabets.hh, alphabets.cc}: Global DNA alphabets.
    * tests/test_assembly.py: Tests for the assembler API.
+
+2016-10-13  Camille Scott  <camille.scott.w@gmail.com>
+
+   * Wrap IO functions in with an extra catch to handle the gcc
+     basic_ios_failure bug.
 
 2016-10-03  Tim Head  <betatim@gmail.com>
 
