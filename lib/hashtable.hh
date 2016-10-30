@@ -61,9 +61,6 @@ Contact: khmer-project@idyll.org
 
 namespace khmer
 {
-class CountingHash;
-class Hashtable;
-
 namespace read_parsers
 {
 struct IParser;
@@ -82,13 +79,16 @@ struct IParser;
 
 #define CALLBACK_PERIOD 100000
 
+#include "bitstorage.hh"
+#include "bytestorage.hh"
+
 namespace khmer
 {
-
 class Hashtable: public
     KmerFactory  		// Base class implementation of a Bloom ht.
 {
 protected:
+    Storage * store;
     unsigned int    _max_count;
     unsigned int    _max_bigcount;
 
@@ -96,8 +96,8 @@ protected:
     HashIntoType    bitmask;
     unsigned int    _nbits_sub_1;
 
-    explicit Hashtable( WordLength ksize )
-        : KmerFactory( ksize ),
+    explicit Hashtable( WordLength ksize, Storage * s)
+        : KmerFactory( ksize ), store(s),
           _max_count( MAX_KCOUNT ),
           _max_bigcount( MAX_BIGCOUNT )
     {
@@ -106,7 +106,7 @@ protected:
 
     virtual ~Hashtable( )
     {
-        ;
+        delete store;
     }
 
     void _init_bitstuff()
@@ -128,20 +128,53 @@ public:
         return _ksize;
     }
 
-    virtual HashIntoType hash_dna(const char * kmer) const = 0;
-    virtual HashIntoType hash_dna_top_strand(const char * kmer) const = 0;
-    virtual HashIntoType hash_dna_bottom_strand(const char * kmer) const = 0;
-    virtual std::string unhash_dna(HashIntoType hashval) const = 0;
+    inline
+    virtual
+    HashIntoType
+    hash_dna(const char * kmer) const {
+        return _hash(kmer, _ksize);
+    }
 
-    virtual void count(const char * kmer) = 0;
-    virtual void count(HashIntoType khash) = 0;
+    inline
+    HashIntoType
+    hash_dna_top_strand(const char * kmer) const {
+        HashIntoType f = 0, r = 0;
+        _hash(kmer, _ksize, f, r);
+        return f;
+    }
+
+    inline
+    HashIntoType
+    hash_dna_bottom_strand(const char * kmer) const {
+        HashIntoType f = 0, r = 0;
+        _hash(kmer, _ksize, f, r);
+        return r;
+    }
+
+    inline
+    virtual
+    std::string
+    unhash_dna(HashIntoType hashval) const {
+        return _revhash(hashval, _ksize);
+    }
+
+    void count(const char * kmer) {
+        store->count(hash_dna(kmer));
+    }
+    void count(HashIntoType khash) {
+        store->count(khash);
+    }
 
     // get the count for the given k-mer.
-    virtual const BoundedCounterType get_count(const char * kmer) const = 0;
-    virtual const BoundedCounterType get_count(HashIntoType khash) const = 0;
+    const BoundedCounterType get_count(const char * kmer) const {
+        return store->get_count(hash_dna(kmer));
+    }
+    const BoundedCounterType get_count(HashIntoType khash) const {
+        return store->get_count(khash);
+    }
 
-    virtual void save(std::string) = 0;
-    virtual void load(std::string) = 0;
+    void save(std::string filename) { store->save(filename); }
+    void load(std::string filename) { store->load(filename); }
 
     // count every k-mer in the string.
     unsigned int consume_string(const std::string &s);
@@ -179,16 +212,28 @@ public:
                           float &stddev);
 
     // number of unique k-mers
-    virtual const uint64_t n_unique_kmers() const = 0;
+    const uint64_t n_unique_kmers() const {
+        return store->n_unique_kmers();
+    }
 
     // count number of occupied bins
-    virtual const uint64_t n_occupied() const = 0;
+    const uint64_t n_occupied() const {
+        return store->n_occupied();
+    }
 
-    virtual BoundedCounterType test_and_set_bits(const char * kmer) = 0;
-    virtual BoundedCounterType test_and_set_bits(HashIntoType khash) = 0;
+    BoundedCounterType test_and_set_bits(const char * kmer) {
+        return store->test_and_set_bits(hash_dna(kmer));
+    }
+    BoundedCounterType test_and_set_bits(HashIntoType khash) {
+        return store->test_and_set_bits(khash);
+    }
 
-    virtual std::vector<uint64_t> get_tablesizes() const = 0;
-    virtual const size_t n_tables() const = 0;
+    std::vector<uint64_t> get_tablesizes() const {
+        return store->get_tablesizes();
+    }
+    const size_t n_tables() const {
+        return store->n_tables();
+    }
 
     // return all k-mer substrings, on the forward strand.
     void get_kmers(const std::string &s, std::vector<std::string> &kmers)
@@ -206,19 +251,19 @@ public:
     void get_kmer_counts(const std::string &s,
                          std::vector<BoundedCounterType> &counts) const;
 
+    Byte ** get_raw_tables() { return store->get_raw_tables(); }
 };
 
-class Hashgraph: public
-   Hashtable
-{
+class Hashgraph: public Hashtable {
+
     friend class SubsetPartition;
     friend class LabelHash;
     friend class Traverser;
 protected:
     unsigned int _tag_density;
 
-    explicit Hashgraph(WordLength ksize)
-        : Hashtable(ksize)
+    explicit Hashgraph(WordLength ksize, Storage * s)
+        : Hashtable(ksize, s)
     {
         _tag_density = DEFAULT_TAG_DENSITY;
         if (!(_tag_density % 2 == 0)) {
@@ -348,8 +393,6 @@ public:
                                    KmerSet& keeper,
                                    const unsigned long long threshold=0,
                                    bool break_on_circum=false) const;
-
-    typedef void (*kmer_cb)(const char * k, unsigned int n_reads, void *data);
 
 
     unsigned int kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r);

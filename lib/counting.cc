@@ -153,6 +153,8 @@ uint64_t * CountingHash::abundance_distribution(
     return distribution;
 }
 
+#if 0
+
 void CountingHash::save(std::string outfilename)
 {
     CountingHashFile::save(outfilename, *this);
@@ -162,6 +164,8 @@ void CountingHash::load(std::string infilename)
 {
     CountingHashFile::load(infilename, *this);
 }
+
+#endif // 0
 
 unsigned long CountingHash::trim_on_abundance(
     std::string     seq,
@@ -288,6 +292,8 @@ const
 
     return posns;
 }
+
+#if 0
 
 
 void CountingHashFile::load(
@@ -792,5 +798,7 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(
     }
     gzclose(outfile);
 }
+
+#endif // 0
 
 /* vim: set ft=cpp ts=8 sts=4 sw=4 et tw=79 */

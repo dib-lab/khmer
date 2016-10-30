@@ -47,6 +47,8 @@ using namespace std;
 using namespace khmer;
 using namespace khmer:: read_parsers;
 
+#if 0
+
 void Hashbits::save(std::string outfilename)
 {
     if (!_counts[0]) {
@@ -240,5 +242,7 @@ void Hashbits::update_from(const Hashbits &other)
         }
     }
 }
+
+#endif // 0
 
 // vim: set sts=2 sw=2:

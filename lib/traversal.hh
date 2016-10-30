@@ -50,11 +50,11 @@ Contact: khmer-project@idyll.org
 namespace khmer
 {
 
-class Hashtable;
+class Hashgraph;
 
 class Traverser: public KmerFactory
 {
-    friend class Hashtable;
+    friend class Hashgraph;
 
 protected:
 
@@ -63,9 +63,9 @@ protected:
 
 public:
 
-    const Hashtable * graph;
+    const Hashgraph * graph;
 
-    explicit Traverser(const Hashtable * ht);
+    explicit Traverser(const Hashgraph * ht);
 
     Kmer get_left(Kmer& node, const char ch);
     Kmer get_right(Kmer& node, const char ch);

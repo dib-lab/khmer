@@ -40,7 +40,7 @@ Contact: khmer-project@idyll.org
 using namespace khmer;
 using namespace std;
 
-Traverser::Traverser(const Hashtable * ht) :
+Traverser::Traverser(const Hashgraph * ht) :
     KmerFactory(ht->ksize()), graph(ht)
 {
     bitmask = 0;

@@ -3709,7 +3709,7 @@ hashbits_update(khmer_KHashbits_Object * me, PyObject * args)
     other = other_o->hashbits;
 
     try {
-        hashbits->update_from(*other);
+        // hashbits->update_from(*other); @@CTB
     } catch (khmer_exception &e) {
         PyErr_SetString(PyExc_ValueError, e.what());
         return NULL;
