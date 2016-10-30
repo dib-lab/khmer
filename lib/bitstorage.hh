@@ -18,20 +18,13 @@ public:
     virtual void load(std::string) = 0;
     virtual const uint64_t n_occupied() const = 0;
     virtual const uint64_t n_unique_kmers() const = 0;
-    virtual BoundedCounterType     test_and_set_bits( HashIntoType khash ) = 0;
+    virtual BoundedCounterType test_and_set_bits( HashIntoType khash ) = 0;
     virtual void count(HashIntoType khash) = 0;
     virtual const BoundedCounterType get_count(HashIntoType khash) const = 0;
     virtual Byte ** get_raw_tables() = 0;
 
-    void set_use_bigcount(bool b)
-    {
-        _use_bigcount = b;
-    }
-    bool get_use_bigcount()
-    {
-        return _use_bigcount;
-    }
-
+    void set_use_bigcount(bool b);
+    bool get_use_bigcount();
 };
 
 

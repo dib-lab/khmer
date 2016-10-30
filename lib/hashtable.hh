@@ -56,6 +56,9 @@ Contact: khmer-project@idyll.org
 #include "khmer_exception.hh"
 #include "kmer_hash.hh"
 #include "read_parsers.hh"
+#include "bitstorage.hh"
+#include "bytestorage.hh"
+
 #include "traversal.hh"
 #include "subset.hh"
 
@@ -78,9 +81,6 @@ struct IParser;
 #define set_contains(s, e) ((s).find(e) != (s).end())
 
 #define CALLBACK_PERIOD 100000
-
-#include "bitstorage.hh"
-#include "bytestorage.hh"
 
 namespace khmer
 {
