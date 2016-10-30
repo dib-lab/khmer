@@ -139,12 +139,14 @@ public:
     }
 
     inline
+    virtual
     HashIntoType
     hash_dna(const char * kmer) const {
         return _hash(kmer, _ksize);
     }
 
     inline
+    virtual
     HashIntoType
     hash_dna_top_strand(const char * kmer) const {
         HashIntoType f = 0, r = 0;
@@ -153,6 +155,7 @@ public:
     }
 
     inline
+    virtual
     HashIntoType
     hash_dna_bottom_strand(const char * kmer) const {
         HashIntoType f = 0, r = 0;
@@ -161,6 +164,7 @@ public:
     }
 
     inline
+    virtual
     std::string
     unhash_dna(HashIntoType hashval) const {
         return _revhash(hashval, _ksize);

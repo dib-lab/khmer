@@ -874,7 +874,7 @@ static PyObject* khmer_HashSet_new(PyTypeObject * type, PyObject * args,
             for (Py_ssize_t i = 0; i < size; i++) {
                 PyObject * item = PyList_GET_ITEM(list_o, i);
                 HashIntoType h;
-                // @CTBhash2
+
                 if (!convert_PyObject_to_HashIntoType(item, h, self->ksize)) {
                     return NULL;
                 }
@@ -1018,7 +1018,7 @@ static PyObject * khmer_HashSet_concat_inplace(khmer_HashSet_Object * o,
 static int khmer_HashSet_contains(khmer_HashSet_Object * o, PyObject * val)
 {
     HashIntoType v;
-    // @CTBhash2
+
     if (convert_PyObject_to_HashIntoType(val, v, 0)) {
         if (set_contains(*o->hashes, v)) {
             return 1;
@@ -1035,7 +1035,7 @@ hashset_add(khmer_HashSet_Object * me, PyObject * args)
     if (!PyArg_ParseTuple(args, "O", &hash_obj)) {
         return NULL;
     }
-    // @CTBhash2
+
     if (!convert_PyObject_to_HashIntoType(hash_obj, h, 0)) {
         return NULL;
     }
@@ -1053,7 +1053,7 @@ hashset_remove(khmer_HashSet_Object * me, PyObject * args)
     if (!PyArg_ParseTuple(args, "O", &hash_obj)) {
         return NULL;
     }
-    // @CTBhash2
+
     if (!convert_PyObject_to_HashIntoType(hash_obj, h, 0)) {
         return NULL;
     }
@@ -1083,7 +1083,7 @@ hashset_update(khmer_HashSet_Object * me, PyObject * args)
     PyObject * item = PyIter_Next(iterator);
     while(item) {
         HashIntoType h;
-        // @CTBhash2
+
         if (!convert_PyObject_to_HashIntoType(item, h, 0)) {
             PyErr_SetString(PyExc_ValueError, "unknown item type for update");
             Py_DECREF(item);
@@ -1374,7 +1374,7 @@ hashtable_count(khmer_KHashtable_Object * me, PyObject * args)
     }
 
     HashIntoType hashval;
-    // @CTBhash1
+
     if (!ht_convert_PyObject_to_HashIntoType(v, hashval, hashtable)) {
         return NULL;
     }
@@ -1496,7 +1496,7 @@ hashtable_get(khmer_KHashtable_Object * me, PyObject * args)
     }
 
     HashIntoType hashval;
-    // @CTBhash1
+
     if (!ht_convert_PyObject_to_HashIntoType(arg, hashval, hashtable)) {
         return NULL;
     }
