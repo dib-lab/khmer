@@ -138,11 +138,9 @@ static bool convert_PyLong_to_HashIntoType(PyObject * value,
 
 // Take a Python object and (try to) convert it to a HashIntoType.
 // Note: will set error condition and return false if cannot do.
-// Further note: the main difference between this and
-// convert_PyObject_to_Kmer is that this will not pass HashIntoType
-// numbers through the Kmer class, which means reverse complements
-// will not be calculated.  There is a test in test_nodegraph.py
-// that checks this.
+//
+// This method uses the _hash function directly, instead of taking a
+// Hashtable object and using its hash_dna method.
 
 static bool convert_PyObject_to_HashIntoType(PyObject * value,
         HashIntoType& hashval,
@@ -221,7 +219,7 @@ static bool ht_convert_PyObject_to_Kmer(PyObject * value,
 // Take a Python object and (try to) convert it to a HashIntoType.
 // Note: will set error condition and return false if cannot do.
 // Further note: the main difference between this and
-// convert_PyObject_to_Kmer is that this will not pass HashIntoType
+// ht_convert_PyObject_to_Kmer is that this will not pass HashIntoType
 // numbers through the Kmer class, which means reverse complements
 // will not be calculated.  There is a test in test_nodegraph.py
 // that checks this.
