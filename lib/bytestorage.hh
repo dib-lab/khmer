@@ -35,7 +35,7 @@ public:
     KmerCountMap _bigcounts;
 
     ByteStorage(uint64_t single_tablesize ) :
-        _use_bigcount(false),
+        _max_count(MAX_KCOUNT), _use_bigcount(false),
         _bigcount_spin_lock(false), _n_unique_kmers(0), _occupied_bins(0)
     {
         _tablesizes.push_back(single_tablesize);
@@ -44,7 +44,7 @@ public:
     }
 
     ByteStorage(std::vector<uint64_t>& tablesizes ) :
-        _use_bigcount(false),
+        _max_count(MAX_KCOUNT), _use_bigcount(false),
         _bigcount_spin_lock(false), _tablesizes(tablesizes),
         _n_unique_kmers(0), _occupied_bins(0)
     {

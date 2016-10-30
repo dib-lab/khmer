@@ -164,6 +164,12 @@ public:
     void count(HashIntoType khash) {
         store->count(khash);
     }
+    void add(const char * kmer) {
+        store->count(hash_dna(kmer));
+    }
+    void add(HashIntoType khash) {
+        store->count(khash);
+    }
 
     // get the count for the given k-mer.
     const BoundedCounterType get_count(const char * kmer) const {
