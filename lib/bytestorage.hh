@@ -71,7 +71,7 @@ public:
 
     // Writing to the tables outside of defined methods has undefined behavior!
     // As such, this should only be used to return read-only interfaces
-    virtual Byte ** get_raw_tables()
+    Byte ** get_raw_tables()
     {
         return _counts;
     }
@@ -107,13 +107,15 @@ public:
         return _occupied_bins;
     }
 
-     void count(HashIntoType khash)
+    void count(HashIntoType khash)
     {
+        std::cout << "XXX " << khash << std::endl;
         bool is_new_kmer = false;
         unsigned int  n_full	  = 0;
 
         for (unsigned int i = 0; i < _n_tables; i++) {
             const uint64_t bin = khash % _tablesizes[i];
+            std::cout << "XXX2 " << bin << std::endl;
             Byte current_count = _counts[ i ][ bin ];
             if (!is_new_kmer) {
                 if (current_count == 0) {
@@ -131,6 +133,7 @@ public:
             //	 that would help with stats.
             if ( _max_count > current_count ) {
                 __sync_add_and_fetch( *(_counts + i) + bin, 1 );
+                std::cout << "XXX3 " << (int) _counts[i][bin] << "\n";
             } else {
                 n_full++;
             }
@@ -154,19 +157,16 @@ public:
 
     } // count
 
-    // Alias for the `count function`
-    void add(HashIntoType khash)
-    {
-        count(khash);
-    }
-
     // get the count for the given k-mer hash.
-     const BoundedCounterType get_count(HashIntoType khash) const
+    const BoundedCounterType get_count(HashIntoType khash) const
     {
+        std::cout << "YYY " << khash << "\n";
         unsigned int	  max_count	= _max_count;
         BoundedCounterType  min_count	= max_count;
         for (unsigned int i = 0; i < _n_tables; i++) {
+            std::cout << "XXX2 " << khash % _tablesizes[i] << std::endl;
             BoundedCounterType the_count = _counts[i][khash % _tablesizes[i]];
+            std::cout << "XXX3 " << (int) the_count << std::endl;
             if (the_count < min_count) {
                 min_count = the_count;
             }

@@ -11,7 +11,7 @@ class Storage {
 public:
     bool _use_bigcount;
 
-    virtual ~Storage();
+    Storage() : _use_bigcount(false) { } ;
     virtual std::vector<uint64_t> get_tablesizes() const = 0;
     virtual const size_t n_tables() const = 0;
     virtual void save(std::string) = 0;
@@ -28,7 +28,7 @@ public:
 };
 
 
-class BitStorage : Storage
+class BitStorage : public Storage
 {
 friend class Hashbits;
 protected:
