@@ -5,6 +5,11 @@
    * khmer/_khmer.cc, lib/{hashtable.cc,read_aligner.cc,subset.cc}: update
    Hashtable code to use new hash_dna and unhash_dna methods.
 
+2016-10-28  Daniel Standage  <daniel.standage@gmail.com>
+
+   * lib/hashtable.cc,tests/test_nodegraph.py: fix bug in assemble_linear_path
+     that returns seed k-mer even if it is not present in the DBG.
+
 2016-10-13  Camille Scott  <camille.scott.w@gmail.com>
 
    * Wrap IO functions in with an extra catch to handle the gcc
