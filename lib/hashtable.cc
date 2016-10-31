@@ -1132,6 +1132,12 @@ std::string Hashgraph::assemble_linear_path(const Kmer seed_kmer,
         const Hashtable * stop_bf)
 const
 {
+    if (get_count(seed_kmer) == 0) {
+        // If the seed k-mer is not in the de Bruijn graph, stop trying to make
+        // something happen. It's not going to happen!
+        return "";
+    }
+
     std::string start_kmer = seed_kmer.get_string_rep(_ksize);
     std::string right = _assemble_right(start_kmer.c_str(), stop_bf);
 

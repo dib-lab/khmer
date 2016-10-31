@@ -1353,3 +1353,15 @@ def test_assemble_linear_path_single_node_interrupted():
     print('len path:', len_path)
 
     assert _equals_rc(path, contig)       # this is bad behavior...
+
+
+def test_assemble_linear_path_bad_seed():
+    # assemble single node.
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+
+    nodegraph = khmer.Nodegraph(21, 1e5, 4)
+    nodegraph.consume(contig)
+
+    path = nodegraph.assemble_linear_path('GATTACA' * 3)
+    assert path == ''

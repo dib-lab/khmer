@@ -128,6 +128,7 @@ public:
         return _ksize;
     }
 
+    // various hash functions.
     inline
     virtual
     HashIntoType
@@ -136,6 +137,7 @@ public:
     }
 
     inline
+    virtual
     HashIntoType
     hash_dna_top_strand(const char * kmer) const {
         HashIntoType f = 0, r = 0;
@@ -144,6 +146,7 @@ public:
     }
 
     inline
+    virtual
     HashIntoType
     hash_dna_bottom_strand(const char * kmer) const {
         HashIntoType f = 0, r = 0;
