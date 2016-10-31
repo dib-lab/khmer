@@ -132,10 +132,16 @@ consume_fasta(
     Read			  read;
 
     // Iterate through the reads and consume their k-mers.
+    unsigned long n = 0;
     while (!parser->is_complete( )) {
         bool is_valid;
         try {
             read = parser->get_next_read( );
+            n++;
+            if (n % 10000 == 0) {
+                std::cout << "... consume_fasta: " << n << std::endl;
+                std::cout << std::flush;
+            }
         } catch (NoMoreReadsAvailable) {
             break;
         }
@@ -1058,7 +1064,7 @@ const
     while(!kmers.done()) {
         n++;
         if (n % 10000 == 0) {
-            std::cout << "... find_high_degree_nodes: " << n << "\n";
+            std::cout << "... find_high_degree_nodes: " << n << std::endl;
             std::cout << std::flush;
         }
         Kmer kmer = kmers.next();
