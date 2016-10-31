@@ -175,47 +175,6 @@ static bool convert_PyObject_to_HashIntoType(PyObject * value,
     }
 }
 
-// Take a Python object and (try to) convert it to a khmer::Kmer.
-// Note: will set error condition and return false if cannot do.
-
-static bool ht_convert_PyObject_to_Kmer(PyObject * value,
-                                        Kmer& kmer, Hashtable * ht)
-{
-    if (PyInt_Check(value) || PyLong_Check(value)) {
-        HashIntoType h;
-        if (!convert_PyLong_to_HashIntoType(value, h)) {
-            return false;
-        }
-        kmer.set_from_unique_hash(h, ht->ksize());
-        return true;
-    } else if (PyUnicode_Check(value))  {
-        std::string s = PyBytes_AsString(PyUnicode_AsEncodedString(
-                                             value, "utf-8", "strict"));
-        if (strlen(s.c_str()) != ht->ksize()) {
-            PyErr_SetString(PyExc_ValueError,
-                            "k-mer length must equal the k-mer size");
-            return false;
-        }
-        kmer = Kmer(s, ht->ksize());
-        return true;
-
-    } else if (PyBytes_Check(value)) {
-        std::string s = PyBytes_AsString(value);
-        if (strlen(s.c_str()) != ht->ksize()) {
-            PyErr_SetString(PyExc_ValueError,
-                            "k-mer length must equal the k-mer size");
-            return false;
-        }
-        kmer = Kmer(s, ht->ksize());
-        return true;
-    } else {
-        PyErr_SetString(PyExc_ValueError,
-                        "k-mers must be either a hash or a string");
-        return false;
-    }
-}
-
-
 // Take a Python object and (try to) convert it to a HashIntoType.
 // Note: will set error condition and return false if cannot do.
 // Further note: the main difference between this and
@@ -256,6 +215,47 @@ static bool ht_convert_PyObject_to_HashIntoType(PyObject * value,
         return false;
     }
 }
+
+// Take a Python object and (try to) convert it to a khmer::Kmer.
+// Note: will set error condition and return false if cannot do.
+
+static bool ht_convert_PyObject_to_Kmer(PyObject * value,
+                                        Kmer& kmer, Hashtable * ht)
+{
+    if (PyInt_Check(value) || PyLong_Check(value)) {
+        HashIntoType h;
+        if (!convert_PyLong_to_HashIntoType(value, h)) {
+            return false;
+        }
+        kmer.set_from_unique_hash(h, ht->ksize());
+        return true;
+    } else if (PyUnicode_Check(value))  {
+        std::string s = PyBytes_AsString(PyUnicode_AsEncodedString(
+                                             value, "utf-8", "strict"));
+        if (strlen(s.c_str()) != ht->ksize()) {
+            PyErr_SetString(PyExc_ValueError,
+                            "k-mer length must equal the k-mer size");
+            return false;
+        }
+        kmer = Kmer(s, ht->ksize());
+        return true;
+
+    } else if (PyBytes_Check(value)) {
+        std::string s = PyBytes_AsString(value);
+        if (strlen(s.c_str()) != ht->ksize()) {
+            PyErr_SetString(PyExc_ValueError,
+                            "k-mer length must equal the k-mer size");
+            return false;
+        }
+        kmer = Kmer(s, ht->ksize());
+        return true;
+    } else {
+        PyErr_SetString(PyExc_ValueError,
+                        "k-mers must be either a hash or a string");
+        return false;
+    }
+}
+
 
 /***********************************************************************/
 
