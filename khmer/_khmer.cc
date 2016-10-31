@@ -4419,7 +4419,7 @@ labelhash_assemble_labeled_path(khmer_KGraphLabels_Object * me,
     }
 
     Kmer start_kmer;
-    if (!convert_PyObject_to_Kmer(val_o, start_kmer, labelhash->graph->ksize())) {
+    if (!ht_convert_PyObject_to_Kmer(val_o, start_kmer, labelhash->graph)) {
         return NULL;
     }
 
