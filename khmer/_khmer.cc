@@ -50,6 +50,7 @@ Contact: khmer-project@idyll.org
 #include "hashtable.hh"
 #include "hashbits.hh"
 #include "counting.hh"
+#include "assembler.hh"
 #include "read_aligner.hh"
 #include "labelhash.hh"
 #include "khmer_exception.hh"
@@ -1631,8 +1632,9 @@ hashtable_assemble_linear_path(khmer_KHashtable_Object * me, PyObject * args)
     if (nodegraph_o) {
         stop_bf = nodegraph_o->hashbits;
     }
+    LinearAssembler assembler(hashtable);
 
-    std::string contig = hashtable->assemble_linear_path(start_kmer, stop_bf);
+    std::string contig = assembler.assemble(start_kmer, stop_bf);
 
     PyObject * ret = Py_BuildValue("s", contig.c_str());
 
@@ -4347,8 +4349,7 @@ labelhash_get_tag_labels(khmer_KGraphLabels_Object * me, PyObject * args)
     }
 
     LabelSet labels;
-
-    labels = labelhash->get_tag_labels(tag);
+    labelhash->get_tag_labels(tag, labels);
 
     PyObject * x =  PyList_New(labels.size());
     LabelSet::const_iterator si;
@@ -4372,6 +4373,69 @@ labelhash_n_labels(khmer_KGraphLabels_Object * me, PyObject * args)
     }
 
     return PyLong_FromSize_t(labelhash->n_labels());
+}
+
+static
+PyObject *
+labelhash_label_across_high_degree_nodes(khmer_KGraphLabels_Object * me,
+        PyObject * args)
+{
+    LabelHash * labelhash = me->labelhash;
+
+    const char * long_str;
+    khmer_HashSet_Object * hdn_o = NULL;
+    Label label;
+
+    if (!PyArg_ParseTuple(args, "sO!K", &long_str,
+                          &khmer_HashSet_Type, &hdn_o, &label)) {
+        return NULL;
+    }
+
+    if (strlen(long_str) < labelhash->graph->ksize()) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+
+    labelhash->label_across_high_degree_nodes(long_str, *hdn_o->hashes, label);
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static
+PyObject *
+labelhash_assemble_labeled_path(khmer_KGraphLabels_Object * me,
+                                PyObject * args)
+{
+    LabelHash* labelhash = me->labelhash;
+
+    PyObject * val_o;
+    khmer_KHashbits_Object * nodegraph_o = NULL;
+    Hashbits * stop_bf = NULL;
+
+    if (!PyArg_ParseTuple(args, "O|O!", &val_o,
+                          &khmer_KNodegraph_Type, &nodegraph_o)) {
+        return NULL;
+    }
+
+    Kmer start_kmer;
+    if (!convert_PyObject_to_Kmer(val_o, start_kmer, labelhash->graph->ksize())) {
+        return NULL;
+    }
+
+    if (nodegraph_o) {
+        stop_bf = nodegraph_o->hashbits;
+    }
+
+    SimpleLabeledAssembler assembler(labelhash);
+    std::vector<std::string> contigs = assembler.assemble(start_kmer, stop_bf);
+
+    PyObject * ret = PyList_New(contigs.size());
+    for (unsigned int i = 0; i < contigs.size(); i++) {
+        PyList_SET_ITEM(ret, i, PyUnicode_FromString(contigs[i].c_str()));
+    }
+
+    return ret;
 }
 
 static
@@ -4425,6 +4489,16 @@ static PyMethodDef khmer_graphlabels_methods[] = {
     {"consume_sequence_and_tag_with_labels", (PyCFunction)labelhash_consume_sequence_and_tag_with_labels, METH_VARARGS, "" },
     {"n_labels", (PyCFunction)labelhash_n_labels, METH_VARARGS, ""},
     {"get_all_labels", (PyCFunction)labelhash_get_all_labels, METH_VARARGS, "" },
+    {
+        "label_across_high_degree_nodes",
+        (PyCFunction)labelhash_label_across_high_degree_nodes, METH_VARARGS,
+        "Connect graph across high degree nodes using labels.",
+    },
+    {
+        "assemble_labeled_path",
+        (PyCFunction)labelhash_assemble_labeled_path, METH_VARARGS,
+        "Assemble all paths, using labels to negotiate tricky bits."
+    },
     { "save_labels_and_tags", (PyCFunction)labelhash_save_labels_and_tags, METH_VARARGS, "" },
     { "load_labels_and_tags", (PyCFunction)labelhash_load_labels_and_tags, METH_VARARGS, "" },    {NULL, NULL, 0, NULL}           /* sentinel */
 };
@@ -5251,6 +5325,23 @@ static PyObject * murmur3_forward_hash_no_rc(PyObject * self, PyObject * args)
     return hash;
 }
 
+static PyObject * reverse_complement(PyObject * self, PyObject * args)
+{
+    const char * sequence;
+    if (!PyArg_ParseTuple(args, "s", &sequence)) {
+        return NULL;
+    }
+
+    std::string s(sequence);
+    try {
+        s = _revcomp(s);
+    } catch (khmer_exception &e) {
+        PyErr_SetString(PyExc_RuntimeError, e.what());
+        return NULL;
+    }
+    return PyUnicode_FromString(s.c_str());
+}
+
 //
 // technique for resolving literal below found here:
 // https://gcc.gnu.org/onlinedocs/gcc-4.9.1/cpp/Stringification.html
@@ -5297,6 +5388,13 @@ static PyMethodDef KhmerMethods[] = {
         METH_VARARGS,
         "Calculate the hash value of a k-mer using MurmurHash3 "
         "(no reverse complement)",
+    },
+    {
+        "reverse_complement",
+        reverse_complement,
+        METH_VARARGS,
+        "Calculate the reverse-complement of the DNA sequence "
+        "with alphabet ACGT",
     },
     {
         "get_version_cpp", get_version_cpp,

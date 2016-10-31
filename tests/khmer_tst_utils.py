@@ -47,12 +47,22 @@ import subprocess
 from io import open  # pylint: disable=redefined-builtin
 from hashlib import md5
 
+from khmer import reverse_complement as revcomp
+
 import pytest
 
 try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
+
+
+def _equals_rc(query, match):
+    return (query == match) or (revcomp(query) == match)
+
+
+def _contains_rc(match, query):
+    return (query in match) or (revcomp(query) in match)
 
 
 def _calc_md5(fp):

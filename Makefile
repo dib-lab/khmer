@@ -97,6 +97,7 @@ help: Makefile
 install-dep: install-dependencies
 
 install-dependencies:
+	pip install git+https://github.com/dib-lab/screed.git
 	pip install --upgrade $(DEVPKGS)
 	pip install --upgrade --requirement doc/requirements.txt
 
@@ -127,7 +128,7 @@ clean: FORCE
 	cd tests && rm -rf khmertest_* || true
 	rm -f $(EXTENSION_MODULE)
 	rm -f khmer/*.pyc lib/*.pyc scripts/*.pyc tests/*.pyc oxli/*.pyc \
-		sandbox/*.pyc
+		sandbox/*.pyc khmer/__pycache__/* sandbox/__pycache__/*
 	./setup.py clean --all || true
 	rm -f coverage-debug
 	rm -Rf .coverage
