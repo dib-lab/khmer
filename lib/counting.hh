@@ -138,38 +138,6 @@ public:
         }
     }
 
-    inline
-    virtual
-    HashIntoType
-    hash_dna(const char * kmer) const {
-        return _hash(kmer, _ksize);
-    }
-
-    inline
-    virtual
-    HashIntoType
-    hash_dna_top_strand(const char * kmer) const {
-        HashIntoType f = 0, r = 0;
-        _hash(kmer, _ksize, f, r);
-        return f;
-    }
-
-    inline
-    virtual
-    HashIntoType
-    hash_dna_bottom_strand(const char * kmer) const {
-        HashIntoType f = 0, r = 0;
-        _hash(kmer, _ksize, f, r);
-        return r;
-    }
-
-    inline
-    virtual
-    std::string
-    unhash_dna(HashIntoType hashval) const {
-        return _revhash(hashval, _ksize);
-    }
-
     // Writing to the tables outside of defined methods has undefined behavior!
     // As such, this should only be used to return read-only interfaces
     Byte ** get_raw_tables()
