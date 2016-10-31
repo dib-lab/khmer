@@ -47,7 +47,6 @@ Contact: khmer-project@idyll.org
 #include "counting.hh"
 #include "hashtable.hh"
 #include "khmer_exception.hh"
-#include "kmer_hash.hh"
 #include "read_parsers.hh"
 #include "subset.hh"
 
@@ -155,7 +154,7 @@ size_t SubsetPartition::output_partitioned_file(
 
             bool found_tag = false;
             for (unsigned int i = 0; i < seq.length() - ksize + 1; i++) {
-                kmer = _hash(kmer_s + i, ksize);
+                kmer = _ht->hash_dna(kmer_s + i);
 
                 // is this a known tag?
                 if (set_contains(partition_map, kmer)) {
@@ -236,12 +235,11 @@ void SubsetPartition::find_all_tags(
     unsigned int total = 0;
     unsigned int nfound = 0;
 
-    Traverser traverser(_ht);
     KmerSet keeper;		// keep track of traversed kmers
-
-    auto filter = [&] (Kmer& n) -> bool {
-        return !set_contains(keeper, n);
+    KmerFilter filter = [&] (const Kmer& n) -> bool {
+        return set_contains(keeper, n);
     };
+    Traverser traverser(_ht, filter);
 
     node_q.push(start_kmer);
     breadth_q.push(0);
@@ -293,12 +291,12 @@ void SubsetPartition::find_all_tags(
             continue;    // truncate search @CTB exit?
         }
 
-        nfound = traverser.traverse_right(node, node_q, filter);
+        nfound = traverser.traverse_right(node, node_q);
         for (unsigned int i = 0; i<nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
 
-        nfound = traverser.traverse_left(node, node_q, filter);
+        nfound = traverser.traverse_left(node, node_q);
         for (unsigned int i = 0; i<nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
@@ -320,7 +318,6 @@ unsigned int SubsetPartition::sweep_for_tags(
     bool		stop_big_traversals)
 {
 
-    Traverser traverser(_ht);
     KmerSet traversed_nodes;
     KmerQueue node_q;
     std::queue<unsigned int> breadth_q;
@@ -329,9 +326,10 @@ unsigned int SubsetPartition::sweep_for_tags(
     unsigned int total = 0;
     unsigned int nfound = 0;
 
-    auto filter = [&] (Kmer& n) -> bool {
-        return !set_contains(traversed_nodes, n);
+    KmerFilter filter = [&] (const Kmer& n) -> bool {
+        return set_contains(traversed_nodes, n);
     };
+    Traverser traverser(_ht, filter);
 
     // Queue up all the sequence's k-mers at breadth zero
     // We are searching around the perimeter of the known k-mers
@@ -388,12 +386,12 @@ unsigned int SubsetPartition::sweep_for_tags(
             return total;
         }
 
-        nfound = traverser.traverse_right(node, node_q, filter);
+        nfound = traverser.traverse_right(node, node_q);
         for (unsigned int i = 0; i<nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
 
-        nfound = traverser.traverse_left(node, node_q, filter);
+        nfound = traverser.traverse_left(node, node_q);
         for (unsigned int i = 0; i<nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
@@ -425,12 +423,12 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(
     unsigned int total = 0;
     unsigned int nfound = 0;
 
-    Traverser traverser(_ht);
     KmerSet keeper;		// keep track of traversed kmers
-
-    auto filter = [&] (Kmer& n) -> bool {
-        return !set_contains(keeper, n);
+    KmerFilter filter = [&] (const Kmer& n) -> bool {
+        return set_contains(keeper, n);
     };
+
+    Traverser traverser(_ht, filter);
 
     node_q.push(start_kmer);
     breadth_q.push(0);
@@ -491,12 +489,12 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(
             continue;    // truncate search @CTB exit?
         }
 
-        nfound = traverser.traverse_right(node, node_q, filter);
+        nfound = traverser.traverse_right(node, node_q);
         for (unsigned int i = 0; i<nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
 
-        nfound = traverser.traverse_left(node, node_q, filter);
+        nfound = traverser.traverse_left(node, node_q);
         for (unsigned int i = 0; i<nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
@@ -632,7 +630,7 @@ void SubsetPartition::set_partition_id(
     if (!(kmer_s.length() >= _ht->ksize())) {
         throw khmer_exception();
     }
-    kmer = _hash(kmer_s, _ht->ksize());
+    kmer = _ht->hash_dna(kmer_s.c_str());
 
     set_partition_id(kmer, p);
 }
@@ -802,7 +800,7 @@ PartitionID SubsetPartition::get_partition_id(std::string kmer_s)
     if (!(kmer_s.length() >= _ht->ksize())) {
         throw khmer_exception();
     }
-    kmer = _hash(kmer_s, _ht->ksize());
+    kmer = _ht->hash_dna(kmer_s.c_str());
 
     return get_partition_id(kmer);
 }
@@ -1431,7 +1429,7 @@ void SubsetPartition::report_on_partitions()
 
     for (SeenSet::iterator ti = _ht->all_tags.begin();
             ti != _ht->all_tags.end(); ++ti) {
-        std::cout << "TAG: " << _revhash(*ti, _ht->ksize()) << "\n";
+        std::cout << "TAG: " << _ht->unhash_dna(*ti) << "\n";
         PartitionID *pid = partition_map[*ti];
         if (pid) {
             std::cout << "partition: " << *(partition_map[*ti]) << "\n";

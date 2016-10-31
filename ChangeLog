@@ -1,3 +1,34 @@
+2016-10-31  Titus Brown  <titus@idyll.org>
+
+   * lib/{counting.hh,hashbits.hh,hashtable.hh}: factor out global functions
+   _hash and _revhash into Hashtable methods hash_dna and unhash_dna.
+   * khmer/_khmer.cc, lib/{hashtable.cc,read_aligner.cc,subset.cc}: update
+   Hashtable code to use new hash_dna and unhash_dna methods.
+
+2016-10-31  Camille Scott  <camille.scott.w@gmail.com>
+
+   * khmer/__init__.py, khmer/_khmer.cc, tests/test_functions.py: Expose
+   reverse_complement to Python.
+   * lib/{traversal.cc, traversal.hh}: Add two new Traverser classes,
+   AssemblerTraverser and NonloopingAT, to do the traversal portions of
+   assembly.
+   * lib/{assembler.cc, assembler.hh}, khmer/_khmer.cc: New code files
+   containing the LinearAssembler and LabeledLinearAssembler classes which wrap
+   AssemblerTraverser and NonloopingAT, respectively, and expose a contig
+   assembly interface.
+   * lib/{hashtable.cc, hashtable.hh, labelhash.cc, labelhash.hh}: Move
+   assembler API to the new assembler.hh.
+   * lib/{kmer_filters.hh, kmer_filters.cc}: Helper filter-functions for the
+   AssemblerTraversers.
+   * lib/kmer_hash.hh: Helper functions for the Kmer class.
+   * lib/{alphabets.hh, alphabets.cc}: Global DNA alphabets.
+   * tests/test_assembly.py: Tests for the assembler API.
+
+2016-10-28  Daniel Standage  <daniel.standage@gmail.com>
+
+   * lib/hashtable.cc,tests/test_nodegraph.py: fix bug in assemble_linear_path
+     that returns seed k-mer even if it is not present in the DBG.
+
 2016-10-13  Camille Scott  <camille.scott.w@gmail.com>
 
    * Wrap IO functions in with an extra catch to handle the gcc

@@ -57,6 +57,8 @@ from khmer._khmer import reverse_hash  # tests/test_functions.py
 from khmer._khmer import hash_murmur3        # tests/test_functions.py
 from khmer._khmer import hash_no_rc_murmur3  # tests/test_functions.py
 
+from khmer._khmer import reverse_complement
+
 from khmer._khmer import get_version_cpp as __version_cpp__
 # tests/test_version.py
 

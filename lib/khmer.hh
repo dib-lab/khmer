@@ -72,6 +72,8 @@ private:\
 #include <set>
 #include <map>
 #include <queue>
+#include <list>
+#include <functional>
 
 #include "khmer_exception.hh"
 
@@ -92,6 +94,9 @@ private:\
 #   define SAVED_SUBSET 5
 #   define SAVED_LABELSET 6
 
+#   define LEFT 0
+#   define RIGHT 1
+
 #   define VERBOSE_REPARTITION 0
 
 #   define MIN( a, b )	(((a) > (b)) ? (b) : (a))
@@ -99,6 +104,7 @@ private:\
 
 namespace khmer
 {
+
 // largest number we can count up to, exactly. (8 bytes)
 typedef unsigned long long int ExactCounterType;
 
@@ -142,6 +148,7 @@ typedef std::pair<Label, HashIntoType> LabelTagPair;
 typedef std::set<Label> LabelSet;
 typedef std::set<HashIntoType> TagSet;
 
+
 template <typename T>
 void deallocate_ptr_set(T& s)
 {
@@ -154,6 +161,11 @@ class Kmer;
 typedef std::queue<Kmer> KmerQueue;
 typedef std::set<Kmer> KmerSet;
 
+// A function which takes a Kmer and returns true if it
+// is to be filtered / ignored
+typedef std::function<bool (const Kmer&)> KmerFilter;
+typedef std::list<KmerFilter> KmerFilterList;
+typedef std::vector<std::string> StringVector;
 }
 
 #endif // KHMER_HH

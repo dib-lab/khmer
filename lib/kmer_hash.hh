@@ -189,7 +189,26 @@ public:
         return _revhash(kmer_u, K);
     }
 
+    char get_last_base() const
+    {
+        return revtwobit_repr(kmer_f & 3);
+    }
+
+    std::string repr(WordLength K) const
+    {
+        std::string s = "<Us=" + _revhash(kmer_u, K) + ", Fs=" +
+                        _revhash(kmer_f, K) + ", Rs=" + _revhash(kmer_r, K) + ">";
+        //", U=" + std::to_string(kmer_u) + ", F=" + std::to_string(kmer_f) +
+        //", R=" + std::to_string(kmer_r) + ">";
+        return s;
+    }
+
+    bool is_forward() const
+    {
+        return kmer_f == kmer_u;
+    }
 };
+
 
 /**
  * \class KmerFactory
@@ -224,6 +243,7 @@ public:
      *  @return A complete Kmer object.
      */
     Kmer build_kmer(HashIntoType kmer_u)
+    const
     {
         HashIntoType kmer_f, kmer_r;
         std:: string kmer_s = _revhash(kmer_u, _ksize);
@@ -238,6 +258,7 @@ public:
      *  @return A complete Kmer object.
      */
     Kmer build_kmer(HashIntoType kmer_f, HashIntoType kmer_r)
+    const
     {
         HashIntoType kmer_u = uniqify_rc(kmer_f, kmer_r);
         return Kmer(kmer_f, kmer_r, kmer_u);
@@ -249,7 +270,7 @@ public:
      *  @param[in]  kmer_s String representation of a k-mer.
      *  @return A complete Kmer object hashed from the given string.
      */
-    Kmer build_kmer(std::string kmer_s)
+    Kmer build_kmer(std::string kmer_s) const
     {
         HashIntoType kmer_f, kmer_r, kmer_u;
         kmer_u = _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
@@ -262,7 +283,7 @@ public:
      *  @param[in]  kmer_c The character array representation of a k-mer.
      *  @return A complete Kmer object hashed from the given char array.
      */
-    Kmer build_kmer(const char * kmer_c)
+    Kmer build_kmer(const char * kmer_c) const
     {
         HashIntoType kmer_f, kmer_r, kmer_u;
         kmer_u = _hash(kmer_c, _ksize, kmer_f, kmer_r);
