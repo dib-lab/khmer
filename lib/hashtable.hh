@@ -47,7 +47,6 @@ Contact: khmer-project@idyll.org
 #include <list>
 #include <map>
 #include <queue>
-#include <queue>
 #include <set>
 #include <string>
 #include <vector>
@@ -87,6 +86,9 @@ namespace khmer
 class Hashtable: public
     KmerFactory  		// Base class implementation of a Bloom ht.
 {
+    friend class SubsetPartition;
+    friend class LabelHash;
+
 protected:
     Storage * store;
     unsigned int    _max_count;
@@ -410,15 +412,11 @@ public:
     //
     void find_high_degree_nodes(const char * sequence,
                                 SeenSet& high_degree_nodes) const;
+
     unsigned int traverse_linear_path(const Kmer start_kmer,
                                       SeenSet &adjacencies,
                                       SeenSet &nodes, Hashtable& bf,
                                       SeenSet &high_degree_nodes) const;
-
-    std::string assemble_linear_path(const Kmer seed_kmer,
-                                     const Hashtable * stop_bf=0) const;
-    std::string _assemble_right(const char * start_kmer,
-                                const Hashtable * stop_bf=0) const;
 };
 }
 

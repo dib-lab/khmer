@@ -1,6 +1,5 @@
 /*
 This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-Copyright (C) 2010-2015, Michigan State University.
 Copyright (C) 2015-2016, The Regents of the University of California.
 
 Redistribution and use in source and binary forms, with or without
@@ -35,33 +34,35 @@ LICENSE (END)
 
 Contact: khmer-project@idyll.org
 */
-#ifndef HASHBITS_HH
-#define HASHBITS_HH
+#ifndef FILTER_HH
+#define FILTER_HH
 
-#include <stddef.h>
-#include <string.h>
-#include <string>
-#include <vector>
+#include <functional>
 
-#include "hashtable.hh"
 #include "khmer.hh"
 #include "kmer_hash.hh"
+#include "labelhash.hh"
+
 
 namespace khmer
 {
 
-class CountingHash;
+class Hashtable;
 class LabelHash;
 
-class Hashbits : public Hashgraph {
-public:
-    explicit Hashbits(WordLength ksize, std::vector<uint64_t> sizes)
-        : Hashgraph(ksize, new BitStorage(sizes)) { } ;
-};
+
+bool apply_kmer_filters(const Kmer& node, const KmerFilterList& filters);
+
+KmerFilter get_label_filter(const Label label, const LabelHash * lh);
+
+KmerFilter get_simple_label_intersect_filter(const LabelSet& src_labels,
+        const LabelHash * lh,
+        const unsigned int min_cov = 5);
+
+KmerFilter get_stop_bf_filter(const Hashtable * stop_bf);
+
+KmerFilter get_visited_filter(const SeenSet * visited);
+
+
 }
-
-#include "counting.hh"
-#include "labelhash.hh"
-#endif // HASHBITS_HH
-
-// vim: set sts=2 sw=2:
+#endif

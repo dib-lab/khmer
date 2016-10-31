@@ -607,15 +607,16 @@ const
         return;
     }
 
-    Traverser traverser(this);
     KmerQueue node_q;
     node_q.push(start);
 
     // Avoid high-circumference k-mers
-    auto filter = [&] (Kmer& n) {
-        return !(break_on_circum &&
-                 traverser.degree(n) > 4);
+    Traverser traverser(this);
+
+    KmerFilter filter = [&] (const Kmer& n) {
+        return break_on_circum && traverser.degree(n) > 4;
     };
+    traverser.push_filter(filter);
 
     while(!node_q.empty()) {
         Kmer node = node_q.front();
@@ -642,8 +643,7 @@ const
         }
 
         // otherwise, explore in all directions.
-        traverser.traverse_right(node, node_q, filter);
-        traverser.traverse_left(node, node_q, filter);
+        traverser.traverse(node, node_q);
     }
 }
 
@@ -688,16 +688,16 @@ unsigned int Hashgraph::traverse_from_kmer(Kmer start,
 const
 {
 
-    Traverser traverser(this);
     KmerQueue node_q;
     std::queue<unsigned int> breadth_q;
     unsigned int cur_breadth = 0;
     unsigned int total = 0;
     unsigned int nfound = 0;
 
-    auto filter = [&] (Kmer& n) {
-        return !set_contains(keeper, n);
+    KmerFilter filter = [&] (const Kmer& n) {
+        return set_contains(keeper, n);
     };
+    Traverser traverser(this, filter);
 
     node_q.push(start);
     breadth_q.push(0);
@@ -736,12 +736,12 @@ const
             cur_breadth = breadth;
         }
 
-        nfound = traverser.traverse_right(node, node_q, filter);
+        nfound = traverser.traverse_right(node, node_q);
         for (unsigned int i = 0; i<nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
 
-        nfound = traverser.traverse_left(node, node_q, filter);
+        nfound = traverser.traverse_left(node, node_q);
         for (unsigned int i = 0; i<nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
@@ -1117,6 +1117,7 @@ const
     return size;
 }
 
+<<<<<<< HEAD
 // Starting from the given seed k-mer, assemble the maximal linear path in
 // both directions.
 //
