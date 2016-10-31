@@ -406,7 +406,7 @@ void Hashgraph::consume_sequence_and_tag(const std::string& seq,
         // This is probably better than first testing and then setting the bits,
         // as a failed test essentially results in doing the same amount of work
         // twice.
-        if ((is_new_kmer = test_and_set_bits( kmer ))) {
+        if ((is_new_kmer = store->test_and_set_bits( kmer ))) {
             ++n_consumed;
         }
 

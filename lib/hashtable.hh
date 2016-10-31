@@ -162,18 +162,10 @@ public:
         return _revhash(hashval, _ksize);
     }
 
-    void count(const char * kmer) {
-        store->count(hash_dna(kmer));
-    }
-    void count(HashIntoType khash) {
-        store->count(khash);
-    }
-    void add(const char * kmer) {
-        store->count(hash_dna(kmer));
-    }
-    void add(HashIntoType khash) {
-        store->count(khash);
-    }
+    void count(const char * kmer) { store->add(hash_dna(kmer)); }
+    void count(HashIntoType khash) { store->add(khash); }
+    void add(const char * kmer) { store->add(hash_dna(kmer)); }
+    void add(HashIntoType khash) { store->add(khash); }
 
     // get the count for the given k-mer.
     const BoundedCounterType get_count(const char * kmer) const {
@@ -205,6 +197,7 @@ public:
         unsigned int	    &total_reads,
         unsigned long long  &n_consumed
     );
+
     // Count every k-mer from a stream of FASTA or FASTQ reads,
     // using the supplied parser.
     void consume_fasta(
@@ -222,28 +215,16 @@ public:
                           float &stddev);
 
     // number of unique k-mers
-    const uint64_t n_unique_kmers() const {
-        return store->n_unique_kmers();
-    }
-
+    const uint64_t n_unique_kmers() const { return store->n_unique_kmers(); }
+    
     // count number of occupied bins
-    const uint64_t n_occupied() const {
-        return store->n_occupied();
-    }
+    const uint64_t n_occupied() const { return store->n_occupied(); }
 
-    BoundedCounterType test_and_set_bits(const char * kmer) {
-        return store->test_and_set_bits(hash_dna(kmer));
-    }
-    BoundedCounterType test_and_set_bits(HashIntoType khash) {
-        return store->test_and_set_bits(khash);
-    }
-
+    // table information
     std::vector<uint64_t> get_tablesizes() const {
         return store->get_tablesizes();
     }
-    const size_t n_tables() const {
-        return store->n_tables();
-    }
+    const size_t n_tables() const { return store->n_tables(); }
 
     // return all k-mer substrings, on the forward strand.
     void get_kmers(const std::string &s, std::vector<std::string> &kmers)
@@ -261,14 +242,20 @@ public:
     void get_kmer_counts(const std::string &s,
                          std::vector<BoundedCounterType> &counts) const;
 
+    // get access to raw tables.
     Byte ** get_raw_tables() { return store->get_raw_tables(); }
 };
+
+//
+// Hashgraph: Extension of Hashtable to support graph operations.
+//
 
 class Hashgraph: public Hashtable {
 
     friend class SubsetPartition;
     friend class LabelHash;
     friend class Traverser;
+
 protected:
     unsigned int _tag_density;
 
@@ -287,6 +274,7 @@ protected:
     {
         delete partition;
     }
+    
     void _clear_all_partitions()
     {
         if (partition != NULL) {
@@ -301,21 +289,13 @@ public:
     SeenSet stop_tags;
     SeenSet repart_small_tags;
     
-    // partitioning stuff
-    void _validate_pmap()
-    {
-        if (partition) {
-            partition->_validate_pmap();
-        }
-    }
-
     virtual void save_tagset(std::string);
     virtual void load_tagset(std::string, bool clear_tags=true);
 
-    // for debugging/testing purposes only!
     void _set_tag_density(unsigned int d)
     {
-        if (!(d % 2 == 0) || !all_tags.empty()) { // must be even and tags must exist
+        // must be odd; can't be set if tags exist.
+        if (!(d % 2 == 0) || !all_tags.empty()) {
             throw khmer_exception();
         }
         _tag_density = d;
@@ -416,10 +396,21 @@ public:
                                       SeenSet &adjacencies,
                                       SeenSet &nodes, Hashtable& bf,
                                       SeenSet &high_degree_nodes) const;
+    
+    //
+    // for debugging/testing purposes only!
+    //
+    
+    // check partition map validity.
+    void _validate_pmap()
+    {
+        if (partition) {
+            partition->_validate_pmap();
+        }
+    }
+
 };
 }
-
-
 
 #define ACQUIRE_ALL_TAGS_SPIN_LOCK \
   while (!__sync_bool_compare_and_swap( &_all_tags_spin_lock, 0, 1 ));

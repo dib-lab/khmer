@@ -3,9 +3,13 @@
 
 namespace khmer
 {
-
 typedef std::map<HashIntoType, BoundedCounterType> KmerCountMap;
 class Hashbits;
+class CountingHash;
+
+//
+// base Storage class for hashtable-related storage of information in memory.
+//
 
 class Storage {
 public:
@@ -20,7 +24,7 @@ public:
     virtual const uint64_t n_occupied() const = 0;
     virtual const uint64_t n_unique_kmers() const = 0;
     virtual BoundedCounterType test_and_set_bits( HashIntoType khash ) = 0;
-    virtual void count(HashIntoType khash) = 0;
+    virtual void add(HashIntoType khash) = 0;
     virtual const BoundedCounterType get_count(HashIntoType khash) const = 0;
     virtual Byte ** get_raw_tables() = 0;
 
@@ -28,6 +32,10 @@ public:
     bool get_use_bigcount();
 };
 
+
+//
+// BitStorage: a Bloom filter implementation.
+//
 
 class BitStorage : public Storage
 {
@@ -134,7 +142,7 @@ protected:
         return 0; // kmer already seen
     } // test_and_set_bits
 
-    void count(HashIntoType khash)
+    void add(HashIntoType khash)
     {
         test_and_set_bits(khash);
     }
@@ -165,7 +173,9 @@ protected:
 };
 
 
-class CountingHash;
+//
+// ByteStorage: a CountMin sketch implementation.
+//
 
 class ByteStorage : public Storage {
 friend class CountingHash;
@@ -181,6 +191,7 @@ protected:
 
     Byte ** _counts;
 
+    // initialize counts with empty hashtables.
     void _allocate_counters()
     {
         _n_tables = _tablesizes.size();
@@ -194,15 +205,7 @@ protected:
 public:
     KmerCountMap _bigcounts;
 
-    ByteStorage(uint64_t single_tablesize ) :
-        _max_count(MAX_KCOUNT),
-        _bigcount_spin_lock(false), _n_unique_kmers(0), _occupied_bins(0)
-    {
-        _tablesizes.push_back(single_tablesize);
-
-        _allocate_counters();
-    }
-
+    // constructor: create an empty CountMin sketch.
     ByteStorage(std::vector<uint64_t>& tablesizes ) :
         _max_count(MAX_KCOUNT),
         _bigcount_spin_lock(false), _tablesizes(tablesizes),
@@ -212,6 +215,7 @@ public:
         _allocate_counters();
     }
 
+    // destructor: clear out the memory.
     ~ByteStorage()
     {
         if (_counts) {
@@ -229,55 +233,37 @@ public:
         }
     }
 
-    // Writing to the tables outside of defined methods has undefined behavior!
-    // As such, this should only be used to return read-only interfaces
-    Byte ** get_raw_tables()
-    {
-        return _counts;
-    }
+    std::vector<uint64_t> get_tablesizes() const { return _tablesizes; }
 
-    BoundedCounterType test_and_set_bits(HashIntoType khash)
-    {
-        BoundedCounterType x = get_count(khash);
-        count(khash);
-        return !x;
-    }
-
-    std::vector<uint64_t> get_tablesizes() const
-    {
-        return _tablesizes;
-    }
-
-    const uint64_t n_unique_kmers() const
-    {
-        return _n_unique_kmers;
-    }
+    const uint64_t n_unique_kmers() const { return _n_unique_kmers; }
+    const size_t n_tables() const { return _n_tables; }
+    const uint64_t n_occupied() const { return _occupied_bins; }
 
     void save(std::string) { ; }
     void load(std::string) { ; }
 
-    const size_t n_tables() const
+    BoundedCounterType test_and_set_bits(HashIntoType khash)
     {
-        return _n_tables;
+        BoundedCounterType x = get_count(khash);
+        add(khash);
+        return !x;
     }
 
-    // count number of occupied bins
-    const uint64_t n_occupied() const
-    {
-        return _occupied_bins;
-    }
-
-    void count(HashIntoType khash)
+    void add(HashIntoType khash)
     {
         bool is_new_kmer = false;
         unsigned int  n_full	  = 0;
 
+        // add one to each entry in each table.
         for (unsigned int i = 0; i < _n_tables; i++) {
             const uint64_t bin = khash % _tablesizes[i];
             Byte current_count = _counts[ i ][ bin ];
             if (!is_new_kmer) {
                 if (current_count == 0) {
                     is_new_kmer = true;
+
+                    // track occupied bins in the first table only, as proxy
+                    // for all.
                     if (i == 0) {
                         __sync_add_and_fetch(&_occupied_bins, 1);
                     }
@@ -289,6 +275,7 @@ public:
             //	 However, do we actually care if there is a little
             //	 bit of slop here? It can always be trimmed off later, if
             //	 that would help with stats.
+            
             if ( _max_count > current_count ) {
                 __sync_add_and_fetch( *(_counts + i) + bin, 1 );
             } else {
@@ -296,8 +283,9 @@ public:
             }
         } // for each table
 
+        // if all tables are full for this position, then add in bigcounts.
         if (n_full == _n_tables && _use_bigcount) {
-            while (!__sync_bool_compare_and_swap( &_bigcount_spin_lock, 0, 1 ));
+            while (!__sync_bool_compare_and_swap(&_bigcount_spin_lock, 0, 1));
             if (_bigcounts[khash] == 0) {
                 _bigcounts[khash] = _max_count + 1;
             } else {
@@ -312,19 +300,24 @@ public:
             __sync_add_and_fetch(&_n_unique_kmers, 1);
         }
 
-    } // count
+    }
 
     // get the count for the given k-mer hash.
     const BoundedCounterType get_count(HashIntoType khash) const
     {
         unsigned int	  max_count	= _max_count;
-        BoundedCounterType  min_count	= max_count;
+        BoundedCounterType  min_count	= max_count; // bound count by max.
+
+        // first, get the min count across all tables (standard CMS).
         for (unsigned int i = 0; i < _n_tables; i++) {
             BoundedCounterType the_count = _counts[i][khash % _tablesizes[i]];
             if (the_count < min_count) {
                 min_count = the_count;
             }
         }
+
+        // if the count is saturated, check in the bigcount structure to
+        // see if we've accumulated more counts.
         if (min_count == max_count && _use_bigcount) {
             KmerCountMap::const_iterator it = _bigcounts.find(khash);
             if (it != _bigcounts.end()) {
@@ -333,6 +326,16 @@ public:
         }
         return min_count;
     }
+    // Get direct access to the counts.
+    //
+    // Note:
+    // Writing to the tables outside of defined methods has undefined behavior!
+    // As such, this should only be used to return read-only interfaces
+    Byte ** get_raw_tables()
+    {
+        return _counts;
+    }
+
 };
 }
 
