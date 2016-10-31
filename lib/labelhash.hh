@@ -50,7 +50,7 @@ Contact: khmer-project@idyll.org
 
 namespace khmer
 {
-class Hashtable;
+class Hashgraph;
 
 namespace read_parsers
 {

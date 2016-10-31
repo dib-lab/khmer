@@ -49,7 +49,7 @@ namespace khmer
  * Simple Linear Assembly
  ********************************/
 
-LinearAssembler::LinearAssembler(const Hashtable * ht) :
+LinearAssembler::LinearAssembler(const Hashgraph * ht) :
     graph(ht), _ksize(ht->ksize())
 {
 
@@ -58,7 +58,7 @@ LinearAssembler::LinearAssembler(const Hashtable * ht) :
 // Starting from the given seed k-mer, assemble the maximal linear path in
 // both directions.
 std::string LinearAssembler::assemble(const Kmer seed_kmer,
-                                      const Hashtable * stop_bf)
+                                      const Hashgraph * stop_bf)
 const
 {
     if (graph->get_count(seed_kmer) == 0) {
@@ -80,7 +80,7 @@ const
 
 
 std::string LinearAssembler::assemble_right(const Kmer seed_kmer,
-        const Hashtable * stop_bf)
+        const Hashgraph * stop_bf)
 const
 {
     std::list<KmerFilter> node_filters;
@@ -94,7 +94,7 @@ const
 
 
 std::string LinearAssembler::assemble_left(const Kmer seed_kmer,
-        const Hashtable * stop_bf)
+        const Hashgraph * stop_bf)
 const
 {
     std::list<KmerFilter> node_filters;
@@ -178,7 +178,7 @@ SimpleLabeledAssembler::SimpleLabeledAssembler(const LabelHash * lh) :
 // Starting from the given seed k-mer, assemble all maximal linear paths in
 // both directions, using labels to skip over tricky bits.
 StringVector SimpleLabeledAssembler::assemble(const Kmer seed_kmer,
-        const Hashtable * stop_bf)
+        const Hashgraph * stop_bf)
 const
 {
 #if DEBUG_ASSEMBLY

@@ -50,7 +50,7 @@ Contact: khmer-project@idyll.org
 namespace khmer
 {
 
-class Hashtable;
+class Hashgraph;
 class LabelHash;
 
 /**
@@ -74,22 +74,22 @@ class LabelHash;
  */
 class LinearAssembler
 {
-    friend class Hashtable;
-    const Hashtable * graph;
+    friend class Hashgraph;
+    const Hashgraph * graph;
     WordLength _ksize;
 
 public:
 
-    explicit LinearAssembler(const Hashtable * ht);
+    explicit LinearAssembler(const Hashgraph * ht);
 
     std::string assemble(const Kmer seed_kmer,
-                         const Hashtable * stop_bf = 0) const;
+                         const Hashgraph * stop_bf = 0) const;
 
     std::string assemble_right(const Kmer seed_kmer,
-                               const Hashtable * stop_bf = 0) const;
+                               const Hashgraph * stop_bf = 0) const;
 
     std::string assemble_left(const Kmer seed_kmer,
-                              const Hashtable * stop_bf = 0) const;
+                              const Hashgraph * stop_bf = 0) const;
 
     template <bool direction>
     std::string _assemble_directed(AssemblerTraverser<direction>& cursor) const;
@@ -126,9 +126,9 @@ std::string LinearAssembler::_assemble_directed<RIGHT>(AssemblerTraverser<RIGHT>
  */
 class SimpleLabeledAssembler
 {
-    friend class Hashtable;
+    friend class Hashgraph;
     const LinearAssembler * linear_asm;
-    const Hashtable * graph;
+    const Hashgraph * graph;
     const LabelHash * lh;
     WordLength _ksize;
 
@@ -137,7 +137,7 @@ public:
     explicit SimpleLabeledAssembler(const LabelHash * lh);
 
     StringVector assemble(const Kmer seed_kmer,
-                          const Hashtable * stop_bf=0) const;
+                          const Hashgraph * stop_bf=0) const;
 
     template <bool direction>
     void _assemble_directed(NonLoopingAT<direction>& start_cursor,

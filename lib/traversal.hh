@@ -125,7 +125,6 @@ public:
      * @return The new Kmer.
      */
     Kmer get_neighbor(const Kmer& node, const char ch) const;
->>>>>>> origin/master
 
     /**
      * @brief Get all neighbors which are present in the graph and pass the filters.
