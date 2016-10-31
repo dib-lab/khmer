@@ -60,6 +60,7 @@ except ImportError:
 def _equals_rc(query, match):
     return (query == match) or (revcomp(query) == match)
 
+
 def _contains_rc(match, query):
     return (query in match) or (revcomp(query) in match)
 

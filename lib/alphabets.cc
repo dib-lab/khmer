@@ -42,10 +42,10 @@ namespace khmer
 namespace alphabets
 {
 
-    std::string DNA_SIMPLE = "ACGT";
-    std::string DNAN_SIMPLE = "ACGTN";
-    std::string IUPAC_NUCL = "ACGTURYSWKMBDHVN.-";
-    std::string IUPAC_AA = "ACDEFGHIKLMNPQRSTVWY";
+std::string DNA_SIMPLE = "ACGT";
+std::string DNAN_SIMPLE = "ACGTN";
+std::string IUPAC_NUCL = "ACGTURYSWKMBDHVN.-";
+std::string IUPAC_AA = "ACDEFGHIKLMNPQRSTVWY";
 
 }
 }

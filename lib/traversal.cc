@@ -51,7 +51,7 @@ namespace khmer
 
 template <bool direction>
 NodeGatherer<direction>::NodeGatherer(const Hashtable * ht,
-                                KmerFilterList filters) :
+                                      KmerFilterList filters) :
     KmerFactory(ht->ksize()), graph(ht), filters(filters)
 {
     bitmask = 0;
@@ -63,15 +63,15 @@ NodeGatherer<direction>::NodeGatherer(const Hashtable * ht,
 
 
 template <bool direction>
-NodeGatherer<direction>::NodeGatherer(const Hashtable * ht) : 
+NodeGatherer<direction>::NodeGatherer(const Hashtable * ht) :
     NodeGatherer(ht, KmerFilterList())
 {
 }
 
 
 template <bool direction>
-NodeGatherer<direction>::NodeGatherer(const Hashtable * ht, 
-                                      KmerFilter filter) : 
+NodeGatherer<direction>::NodeGatherer(const Hashtable * ht,
+                                      KmerFilter filter) :
     NodeGatherer(ht, KmerFilterList())
 {
     filters.push_back(filter);
@@ -107,7 +107,7 @@ const
 
 template<bool direction>
 unsigned int NodeGatherer<direction>::neighbors(const Kmer& node,
-                                                KmerQueue & node_q)
+        KmerQueue & node_q)
 const
 {
     unsigned int found = 0;
@@ -149,8 +149,8 @@ const
 
 template<bool direction>
 NodeCursor<direction>::NodeCursor(const Hashtable * ht,
-                                Kmer start_kmer,
-                                KmerFilterList filters) :
+                                  Kmer start_kmer,
+                                  KmerFilterList filters) :
     NodeGatherer<direction>(ht, filters)
 {
     cursor = start_kmer;
@@ -159,7 +159,7 @@ NodeCursor<direction>::NodeCursor(const Hashtable * ht,
 
 template<bool direction>
 NodeCursor<direction>::NodeCursor(const Hashtable * ht,
-                                Kmer start_kmer) :
+                                  Kmer start_kmer) :
     NodeCursor<direction>(ht, start_kmer, KmerFilterList())
 {
 }
@@ -190,17 +190,17 @@ const
 
 Traverser::Traverser(const Hashtable * ht,
                      KmerFilterList filters) :
-    KmerFactory(ht->ksize()), 
-    graph(ht), 
+    KmerFactory(ht->ksize()),
+    graph(ht),
     left_gatherer(ht, filters),
     right_gatherer(ht, filters)
 {
 }
 
-Traverser::Traverser(const Hashtable * ht, 
-                     KmerFilter filter) : 
-    KmerFactory(ht->ksize()), 
-    graph(ht), 
+Traverser::Traverser(const Hashtable * ht,
+                     KmerFilter filter) :
+    KmerFactory(ht->ksize()),
+    graph(ht),
     left_gatherer(ht, filter),
     right_gatherer(ht, filter)
 {
@@ -217,20 +217,20 @@ void Traverser::push_filter(KmerFilter filter)
 unsigned int Traverser::traverse(const Kmer& node,
                                  KmerQueue& node_q) const
 {
-    return left_gatherer.neighbors(node, node_q) + 
+    return left_gatherer.neighbors(node, node_q) +
            right_gatherer.neighbors(node, node_q);
 }
 
 
 unsigned int Traverser::traverse_left(const Kmer& node,
-                                 KmerQueue& node_q) const
+                                      KmerQueue& node_q) const
 {
     return left_gatherer.neighbors(node, node_q);
 }
 
 
 unsigned int Traverser::traverse_right(const Kmer& node,
-                                 KmerQueue& node_q) const
+                                       KmerQueue& node_q) const
 {
     return right_gatherer.neighbors(node, node_q);
 }

@@ -138,7 +138,8 @@ const
 }
 
 template<>
-std::string LinearAssembler::_assemble_directed<RIGHT>(AssemblerTraverser<RIGHT>& cursor)
+std::string LinearAssembler::_assemble_directed<RIGHT>
+(AssemblerTraverser<RIGHT>& cursor)
 const
 {
     std::string contig = cursor.cursor.get_string_rep(_ksize);
@@ -227,11 +228,12 @@ const
 {
 #if DEBUG_ASSEMBLY
     std::cout << "## assemble_labeled_directed_" << direction << " [start] at " <<
-        start_cursor.cursor.repr(_ksize) << std::endl;
+              start_cursor.cursor.repr(_ksize) << std::endl;
 #endif
 
     // prime the traversal with the first linear segment
-    std::string root_contig = linear_asm->_assemble_directed<direction>(start_cursor);
+    std::string root_contig = linear_asm->_assemble_directed<direction>
+                              (start_cursor);
 #if DEBUG_ASSEMBLY
     std::cout << "Primed: " << root_contig << std::endl;
     std::cout << "Cursor: " << start_cursor.cursor.repr(_ksize) << std::endl;
@@ -295,7 +297,8 @@ const
                     branch_starts.pop();
 
 #if DEBUG_ASSEMBLY
-                    std::cout << "Branch cursor: " << branch_cursor.cursor.repr(_ksize) << std::endl;
+                    std::cout << "Branch cursor: " << branch_cursor.cursor.repr(
+                                  _ksize) << std::endl;
 #endif
 
                     // assemble linearly as far as possible
