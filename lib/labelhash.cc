@@ -53,6 +53,8 @@ Contact: khmer-project@idyll.org
 #define LABEL_DBG 0
 #define printdbg(m) if(LABEL_DBG) std::cout << #m << std::endl;
 
+#define DEBUG 0
+
 using namespace std;
 using namespace khmer;
 using namespace khmer:: read_parsers;
@@ -207,6 +209,7 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
     printdbg(deleted parser and exiting)
 }
 
+// @cswelcher: double-check -- is it valid to pull the address from a reference?
 void LabelHash::link_tag_and_label(const HashIntoType kmer,
                                    const Label kmer_label)
 {
@@ -333,12 +336,20 @@ unsigned int LabelHash::sweep_label_neighborhood(const std::string& seq,
     return num_traversed;
 }
 
-LabelSet LabelHash::get_tag_labels(const HashIntoType tag)
+void LabelHash::get_tag_labels(const HashIntoType tag,
+                               LabelSet& labels) const
 {
-    LabelSet labels;
-    //unsigned int num_labels;
-    _get_tag_labels(tag, tag_labels, labels);
-    return labels;
+    if (set_contains(graph->all_tags, tag)) {
+        _get_tag_labels(tag, tag_labels, labels);
+    }
+}
+
+void LabelHash::get_tags_from_label(const Label label,
+                                    TagSet& tags) const
+{
+    if(set_contains(all_labels, label)) {
+        _get_tags_from_label(label, label_tag, tags);
+    }
 }
 
 void LabelHash::traverse_labels_and_resolve(const SeenSet tagged_kmers,
@@ -566,3 +577,46 @@ void LabelHash::load_labels_and_tags(std::string filename)
 
     delete[] buf;
 }
+
+// tag & label k-mers on either side of an HDN.
+
+void LabelHash::label_across_high_degree_nodes(const char * s,
+        SeenSet& high_degree_nodes,
+        const Label label)
+{
+    KmerIterator kmers(s, graph->_ksize);
+
+    unsigned long n = 0;
+
+    Kmer prev_kmer = kmers.next();
+    if (kmers.done()) {
+        return;
+    }
+    Kmer kmer = kmers.next();
+    if (kmers.done()) {
+        return;
+    }
+    Kmer next_kmer = kmers.next();
+
+    // ignore any situation where HDN is at beginning or end of sequence
+    // @CTB testme :)
+    while(!kmers.done()) {
+        n++;
+        if (n % 10000 == 0) {
+            std::cout << "... label_across_hdn: " << n << "\n";
+        }
+        if (set_contains(high_degree_nodes, kmer)) {
+            graph->add_tag(prev_kmer);
+            graph->add_tag(kmer);
+            graph->add_tag(next_kmer);
+            link_tag_and_label(prev_kmer, label);
+            link_tag_and_label(kmer, label);
+            link_tag_and_label(next_kmer, label);
+        }
+        prev_kmer = kmer;
+        kmer = next_kmer;
+        next_kmer = kmers.next();
+    }
+}
+
+// vim: set sts=2 sw=2:

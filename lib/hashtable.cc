@@ -607,15 +607,16 @@ const
         return;
     }
 
-    Traverser traverser(this);
     KmerQueue node_q;
     node_q.push(start);
 
     // Avoid high-circumference k-mers
-    auto filter = [&] (Kmer& n) {
-        return !(break_on_circum &&
-                 traverser.degree(n) > 4);
+    Traverser traverser(this);
+
+    KmerFilter filter = [&] (const Kmer& n) {
+        return break_on_circum && traverser.degree(n) > 4;
     };
+    traverser.push_filter(filter);
 
     while(!node_q.empty()) {
         Kmer node = node_q.front();
@@ -642,8 +643,7 @@ const
         }
 
         // otherwise, explore in all directions.
-        traverser.traverse_right(node, node_q, filter);
-        traverser.traverse_left(node, node_q, filter);
+        traverser.traverse(node, node_q);
     }
 }
 
@@ -688,16 +688,16 @@ unsigned int Hashtable::traverse_from_kmer(Kmer start,
 const
 {
 
-    Traverser traverser(this);
     KmerQueue node_q;
     std::queue<unsigned int> breadth_q;
     unsigned int cur_breadth = 0;
     unsigned int total = 0;
     unsigned int nfound = 0;
 
-    auto filter = [&] (Kmer& n) {
-        return !set_contains(keeper, n);
+    KmerFilter filter = [&] (const Kmer& n) {
+        return set_contains(keeper, n);
     };
+    Traverser traverser(this, filter);
 
     node_q.push(start);
     breadth_q.push(0);
@@ -736,12 +736,12 @@ const
             cur_breadth = breadth;
         }
 
-        nfound = traverser.traverse_right(node, node_q, filter);
+        nfound = traverser.traverse_right(node, node_q);
         for (unsigned int i = 0; i<nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
 
-        nfound = traverser.traverse_left(node, node_q, filter);
+        nfound = traverser.traverse_left(node, node_q);
         for (unsigned int i = 0; i<nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
@@ -1068,6 +1068,7 @@ const
     }
 }
 
+
 unsigned int Hashtable::traverse_linear_path(const Kmer seed_kmer,
         SeenSet &adjacencies,
         SeenSet &visited, Hashtable &bf,
@@ -1115,87 +1116,6 @@ const
         }
     }
     return size;
-}
-
-// Starting from the given seed k-mer, assemble the maximal linear path in
-// both directions.
-//
-// No guarantees on direction, of course - this may return the reverse
-// complement of the input sequence.
-//
-// Note: as written, will ignore branches to the left and continue
-// past them; this probably needs to be fixed.  For now, this means
-// that assembling from two different directions may yield different
-// results.
-
-std::string Hashtable::assemble_linear_path(const Kmer seed_kmer,
-        const Hashtable * stop_bf)
-const
-{
-    if (get_count(seed_kmer) == 0) {
-        // If the seed k-mer is not in the de Bruijn graph, stop trying to make
-        // something happen. It's not going to happen!
-        return "";
-    }
-
-    std::string start_kmer = seed_kmer.get_string_rep(_ksize);
-    std::string right = _assemble_right(start_kmer.c_str(), stop_bf);
-
-    start_kmer = _revcomp(start_kmer);
-    std::string left = _assemble_right(start_kmer.c_str(), stop_bf);
-
-    left = left.substr(_ksize);
-    return _revcomp(left) + right;
-}
-
-std::string Hashtable::_assemble_right(const char * start_kmer,
-                                       const Hashtable * stop_bf)
-const
-{
-    const char bases[] = "ACGT";
-    std::string kmer = start_kmer;
-    std::string contig = kmer;
-
-    // This loop extends the starting k-mer to the right as long as it can
-    // do so unambiguously (or not at all).  This involves checking each
-    // possible nucleotide suffix for presence; extension is continued until
-    // either more than one such k-mer is present ('found2' is true), or no
-    // such k-mer is present ('found' is false).
-
-    while (1) {
-        const char * base = &bases[0];
-        bool found = false;
-        char found_base;
-        bool found2 = false;
-
-        // check all four suffixes for presence.
-        while(*base != 0) {
-            std::string try_kmer = kmer.substr(1) + (char) *base;
-
-            // a hit!
-            if (this->get_count(try_kmer.c_str()) &&
-                    (!stop_bf || !stop_bf->get_count(try_kmer.c_str()))) {
-                if (found) {
-                    found2 = true;
-                    break;
-                }
-                found_base = (char) *base;
-                found = true;
-            }
-            base++;
-        }
-
-        // exit condition: no suffix k-mer, or more than one.
-        if (!found or found2) {
-            break;
-        }
-
-        // extend assembly!
-        contig += found_base;
-        kmer = kmer.substr(1) + found_base;
-        found = true;
-    }
-    return contig;
 }
 
 // vim: set sts=2 sw=2:
