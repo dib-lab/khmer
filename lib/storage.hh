@@ -142,13 +142,13 @@ protected:
         return 0; // kmer already seen
     } // test_and_set_bits
 
-    void add(HashIntoType khash)
+    inline void add(HashIntoType khash)
     {
         test_and_set_bits(khash);
     }
 
     // get the count for the given k-mer hash.
-    const BoundedCounterType get_count(HashIntoType khash) const
+    inline const BoundedCounterType get_count(HashIntoType khash) const
     {
         for (size_t i = 0; i < _n_tables; i++) {
             uint64_t bin = khash % _tablesizes[i];
@@ -242,14 +242,14 @@ public:
     void save(std::string) { ; }
     void load(std::string) { ; }
 
-    BoundedCounterType test_and_set_bits(HashIntoType khash)
+    inline BoundedCounterType test_and_set_bits(HashIntoType khash)
     {
         BoundedCounterType x = get_count(khash);
         add(khash);
         return !x;
     }
 
-    void add(HashIntoType khash)
+    inline void add(HashIntoType khash)
     {
         bool is_new_kmer = false;
         unsigned int  n_full	  = 0;
@@ -303,7 +303,7 @@ public:
     }
 
     // get the count for the given k-mer hash.
-    const BoundedCounterType get_count(HashIntoType khash) const
+    inline const BoundedCounterType get_count(HashIntoType khash) const
     {
         unsigned int	  max_count	= _max_count;
         BoundedCounterType  min_count	= max_count; // bound count by max.
