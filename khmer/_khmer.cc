@@ -137,54 +137,11 @@ static bool convert_PyLong_to_HashIntoType(PyObject * value,
 }
 
 
-// Take a Python object and (try to) convert it to a khmer::Kmer.
-// Note: will set error condition and return false if cannot do.
-
-static bool convert_PyObject_to_Kmer(PyObject * value,
-                                     Kmer& kmer, WordLength ksize)
-{
-    if (PyInt_Check(value) || PyLong_Check(value)) {
-        HashIntoType h;
-        if (!convert_PyLong_to_HashIntoType(value, h)) {
-            return false;
-        }
-        kmer.set_from_unique_hash(h, ksize);
-        return true;
-    } else if (PyUnicode_Check(value))  {
-        std::string s = PyBytes_AsString(PyUnicode_AsEncodedString(
-                                             value, "utf-8", "strict"));
-        if (strlen(s.c_str()) != ksize) {
-            PyErr_SetString(PyExc_ValueError,
-                            "k-mer length must equal the k-mer size");
-            return false;
-        }
-        kmer = Kmer(s, ksize);
-        return true;
-
-    } else if (PyBytes_Check(value)) {
-        std::string s = PyBytes_AsString(value);
-        if (strlen(s.c_str()) != ksize) {
-            PyErr_SetString(PyExc_ValueError,
-                            "k-mer length must equal the k-mer size");
-            return false;
-        }
-        kmer = Kmer(s, ksize);
-        return true;
-    } else {
-        PyErr_SetString(PyExc_ValueError,
-                        "k-mers must be either a hash or a string");
-        return false;
-    }
-}
-
-
 // Take a Python object and (try to) convert it to a HashIntoType.
 // Note: will set error condition and return false if cannot do.
-// Further note: the main difference between this and
-// convert_PyObject_to_Kmer is that this will not pass HashIntoType
-// numbers through the Kmer class, which means reverse complements
-// will not be calculated.  There is a test in test_nodegraph.py
-// that checks this.
+//
+// This method uses the _hash function directly, instead of taking a
+// Hashtable object and using its hash_dna method.
 
 static bool convert_PyObject_to_HashIntoType(PyObject * value,
         HashIntoType& hashval,
@@ -218,6 +175,88 @@ static bool convert_PyObject_to_HashIntoType(PyObject * value,
         return false;
     }
 }
+
+// Take a Python object and (try to) convert it to a HashIntoType.
+// Note: will set error condition and return false if cannot do.
+// Further note: the main difference between this and
+// ht_convert_PyObject_to_Kmer is that this will not pass HashIntoType
+// numbers through the Kmer class, which means reverse complements
+// will not be calculated.  There is a test in test_nodegraph.py
+// that checks this.
+
+static bool ht_convert_PyObject_to_HashIntoType(PyObject * value,
+                                                HashIntoType& hashval,
+                                                Hashtable * ht)
+{
+    if (PyInt_Check(value) || PyLong_Check(value)) {
+        return convert_PyLong_to_HashIntoType(value, hashval);
+    } else if (PyUnicode_Check(value))  {
+        std::string s = PyBytes_AsString(PyUnicode_AsEncodedString(
+                                             value, "utf-8", "strict"));
+        if (strlen(s.c_str()) != ht->ksize()) {
+            PyErr_SetString(PyExc_ValueError,
+                            "k-mer length must equal the k-mer size");
+            return false;
+        }
+        hashval = ht->hash_dna(s.c_str());
+        return true;
+
+    } else if (PyBytes_Check(value)) {
+        std::string s = PyBytes_AsString(value);
+        if (strlen(s.c_str()) != ht->ksize()) {
+            PyErr_SetString(PyExc_ValueError,
+                            "k-mer length must equal the k-mer size");
+            return false;
+        }
+        hashval = ht->hash_dna(s.c_str());
+        return true;
+    } else {
+        PyErr_SetString(PyExc_ValueError,
+                        "k-mers must be either a hash or a string");
+        return false;
+    }
+}
+
+// Take a Python object and (try to) convert it to a khmer::Kmer.
+// Note: will set error condition and return false if cannot do.
+
+static bool ht_convert_PyObject_to_Kmer(PyObject * value,
+                                        Kmer& kmer, Hashtable * ht)
+{
+    if (PyInt_Check(value) || PyLong_Check(value)) {
+        HashIntoType h;
+        if (!convert_PyLong_to_HashIntoType(value, h)) {
+            return false;
+        }
+        kmer.set_from_unique_hash(h, ht->ksize());
+        return true;
+    } else if (PyUnicode_Check(value))  {
+        std::string s = PyBytes_AsString(PyUnicode_AsEncodedString(
+                                             value, "utf-8", "strict"));
+        if (strlen(s.c_str()) != ht->ksize()) {
+            PyErr_SetString(PyExc_ValueError,
+                            "k-mer length must equal the k-mer size");
+            return false;
+        }
+        kmer = Kmer(s, ht->ksize());
+        return true;
+
+    } else if (PyBytes_Check(value)) {
+        std::string s = PyBytes_AsString(value);
+        if (strlen(s.c_str()) != ht->ksize()) {
+            PyErr_SetString(PyExc_ValueError,
+                            "k-mer length must equal the k-mer size");
+            return false;
+        }
+        kmer = Kmer(s, ht->ksize());
+        return true;
+    } else {
+        PyErr_SetString(PyExc_ValueError,
+                        "k-mers must be either a hash or a string");
+        return false;
+    }
+}
+
 
 /***********************************************************************/
 
@@ -834,6 +873,7 @@ static PyObject* khmer_HashSet_new(PyTypeObject * type, PyObject * args,
             for (Py_ssize_t i = 0; i < size; i++) {
                 PyObject * item = PyList_GET_ITEM(list_o, i);
                 HashIntoType h;
+
                 if (!convert_PyObject_to_HashIntoType(item, h, self->ksize)) {
                     return NULL;
                 }
@@ -977,6 +1017,7 @@ static PyObject * khmer_HashSet_concat_inplace(khmer_HashSet_Object * o,
 static int khmer_HashSet_contains(khmer_HashSet_Object * o, PyObject * val)
 {
     HashIntoType v;
+
     if (convert_PyObject_to_HashIntoType(val, v, 0)) {
         if (set_contains(*o->hashes, v)) {
             return 1;
@@ -993,6 +1034,7 @@ hashset_add(khmer_HashSet_Object * me, PyObject * args)
     if (!PyArg_ParseTuple(args, "O", &hash_obj)) {
         return NULL;
     }
+
     if (!convert_PyObject_to_HashIntoType(hash_obj, h, 0)) {
         return NULL;
     }
@@ -1010,6 +1052,7 @@ hashset_remove(khmer_HashSet_Object * me, PyObject * args)
     if (!PyArg_ParseTuple(args, "O", &hash_obj)) {
         return NULL;
     }
+
     if (!convert_PyObject_to_HashIntoType(hash_obj, h, 0)) {
         return NULL;
     }
@@ -1039,6 +1082,7 @@ hashset_update(khmer_HashSet_Object * me, PyObject * args)
     PyObject * item = PyIter_Next(iterator);
     while(item) {
         HashIntoType h;
+
         if (!convert_PyObject_to_HashIntoType(item, h, 0)) {
             PyErr_SetString(PyExc_ValueError, "unknown item type for update");
             Py_DECREF(item);
@@ -1263,7 +1307,7 @@ hashtable_hash(khmer_KHashtable_Object * me, PyObject * args)
 
     try {
         PyObject * hash = nullptr;
-        const HashIntoType h(_hash(kmer, hashtable->ksize()));
+        const HashIntoType h(hashtable->hash_dna(kmer));
         convert_HashIntoType_to_PyObject(h, &hash);
         return hash;
     } catch (khmer_exception &e) {
@@ -1283,11 +1327,12 @@ hashtable_reverse_hash(khmer_KHashtable_Object * me, PyObject * args)
     if (!PyArg_ParseTuple(args, "O", &val_o)) {
         return NULL;
     }
+
     if (!convert_PyObject_to_HashIntoType(val_o, val, 0)) {
         return NULL;
     }
 
-    return PyUnicode_FromString(_revhash(val, hashtable->ksize()).c_str());
+    return PyUnicode_FromString(hashtable->unhash_dna(val).c_str());
 }
 
 static
@@ -1328,7 +1373,8 @@ hashtable_count(khmer_KHashtable_Object * me, PyObject * args)
     }
 
     HashIntoType hashval;
-    if (!convert_PyObject_to_HashIntoType(v, hashval, hashtable->ksize())) {
+
+    if (!ht_convert_PyObject_to_HashIntoType(v, hashval, hashtable)) {
         return NULL;
     }
 
@@ -1449,7 +1495,8 @@ hashtable_get(khmer_KHashtable_Object * me, PyObject * args)
     }
 
     HashIntoType hashval;
-    if (!convert_PyObject_to_HashIntoType(arg, hashval, hashtable->ksize())) {
+
+    if (!ht_convert_PyObject_to_HashIntoType(arg, hashval, hashtable)) {
         return NULL;
     }
 
@@ -1496,7 +1543,7 @@ hashtable_neighbors(khmer_KHashtable_Object * me, PyObject * args)
     }
 
     Kmer start_kmer;
-    if (!convert_PyObject_to_Kmer(val_obj, start_kmer, hashtable->ksize())) {
+    if (!ht_convert_PyObject_to_Kmer(val_obj, start_kmer, hashtable)) {
         return NULL;
     }
 
@@ -1538,7 +1585,7 @@ hashtable_traverse_linear_path(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
     Kmer start_kmer;
-    if (!convert_PyObject_to_Kmer(val_o, start_kmer, hashtable->ksize())) {
+    if (!ht_convert_PyObject_to_Kmer(val_o, start_kmer, hashtable)) {
         return NULL;
     }
 
@@ -1578,7 +1625,7 @@ hashtable_assemble_linear_path(khmer_KHashtable_Object * me, PyObject * args)
     }
 
     Kmer start_kmer;
-    if (!convert_PyObject_to_Kmer(val_o, start_kmer, hashtable->ksize())) {
+    if (!ht_convert_PyObject_to_Kmer(val_o, start_kmer, hashtable)) {
         return NULL;
     }
 
@@ -2032,10 +2079,12 @@ hashtable_do_subset_partition(khmer_KHashtable_Object * me, PyObject * args)
                           &stop_big_traversals_o)) {
         return NULL;
     }
-    if (!convert_PyObject_to_HashIntoType(start_kmer_obj, start_kmer, 0)) {
+    if (!ht_convert_PyObject_to_HashIntoType(start_kmer_obj, start_kmer,
+                                             hashtable)) {
         return NULL;
     }
-    if (!convert_PyObject_to_HashIntoType(end_kmer_obj, end_kmer, 0)) {
+    if (!ht_convert_PyObject_to_HashIntoType(end_kmer_obj, end_kmer,
+                                             hashtable)) {
         return NULL;
     }
 
@@ -2265,7 +2314,7 @@ hashtable_add_tag(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    HashIntoType kmer = _hash(kmer_s, hashtable->ksize());
+    HashIntoType kmer = hashtable->hash_dna(kmer_s);
     hashtable->add_tag(kmer);
 
     Py_RETURN_NONE;
@@ -2282,7 +2331,7 @@ hashtable_add_stop_tag(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    HashIntoType kmer = _hash(kmer_s, hashtable->ksize());
+    HashIntoType kmer = hashtable->hash_dna(kmer_s);
     hashtable->add_stop_tag(kmer);
 
     Py_RETURN_NONE;
@@ -2298,14 +2347,13 @@ hashtable_get_stop_tags(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    WordLength k = hashtable->ksize();
     SeenSet::const_iterator si;
 
     PyObject * x = PyList_New(hashtable->stop_tags.size());
     unsigned long long i = 0;
     for (si = hashtable->stop_tags.begin(); si != hashtable->stop_tags.end();
             ++si) {
-        std::string s = _revhash(*si, k);
+        std::string s = hashtable->unhash_dna(*si);
         PyList_SET_ITEM(x, i, Py_BuildValue("s", s.c_str()));
         i++;
     }
@@ -2323,14 +2371,13 @@ hashtable_get_tagset(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    WordLength k = hashtable->ksize();
     SeenSet::const_iterator si;
 
     PyObject * x = PyList_New(hashtable->all_tags.size());
     unsigned long long i = 0;
     for (si = hashtable->all_tags.begin(); si != hashtable->all_tags.end();
             ++si) {
-        std::string s = _revhash(*si, k);
+        std::string s = hashtable->unhash_dna(*si);
         PyList_SET_ITEM(x, i, Py_BuildValue("s", s.c_str()));
         i++;
     }
@@ -4296,7 +4343,8 @@ labelhash_get_tag_labels(khmer_KGraphLabels_Object * me, PyObject * args)
     if (!PyArg_ParseTuple(args, "O", &tag_o)) {
         return NULL;
     }
-    if (!convert_PyObject_to_HashIntoType(tag_o, tag, 0)) {
+    if (!ht_convert_PyObject_to_HashIntoType(tag_o, tag,
+                                             labelhash->graph)) {
         return NULL;
     }
 
@@ -4307,7 +4355,6 @@ labelhash_get_tag_labels(khmer_KGraphLabels_Object * me, PyObject * args)
     LabelSet::const_iterator si;
     unsigned long long i = 0;
     for (si = labels.begin(); si != labels.end(); ++si) {
-        //std::string kmer_s = _revhash(*si, labelhash->ksize());
         PyList_SET_ITEM(x, i, Py_BuildValue("K", *si));
         i++;
     }
@@ -4372,7 +4419,7 @@ labelhash_assemble_labeled_path(khmer_KGraphLabels_Object * me,
     }
 
     Kmer start_kmer;
-    if (!convert_PyObject_to_Kmer(val_o, start_kmer, labelhash->graph->ksize())) {
+    if (!ht_convert_PyObject_to_Kmer(val_o, start_kmer, labelhash->graph)) {
         return NULL;
     }
 

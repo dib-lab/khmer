@@ -1,3 +1,10 @@
+2016-10-31  Titus Brown  <titus@idyll.org>
+
+   * lib/{counting.hh,hashbits.hh,hashtable.hh}: factor out global functions
+   _hash and _revhash into Hashtable methods hash_dna and unhash_dna.
+   * khmer/_khmer.cc, lib/{hashtable.cc,read_aligner.cc,subset.cc}: update
+   Hashtable code to use new hash_dna and unhash_dna methods.
+
 2016-10-31  Camille Scott  <camille.scott.w@gmail.com>
 
    * khmer/__init__.py, khmer/_khmer.cc, tests/test_functions.py: Expose

@@ -134,7 +134,7 @@ public:
     BoundedCounterType
     test_and_set_bits(const char * kmer)
     {
-        HashIntoType hash = _hash(kmer, _ksize);
+        HashIntoType hash = hash_dna(kmer);
         return test_and_set_bits(hash);
     }
 
@@ -175,7 +175,7 @@ public:
 
     virtual void count(const char * kmer)
     {
-        HashIntoType hash = _hash(kmer, _ksize);
+        HashIntoType hash = hash_dna(kmer);
         count(hash);
     }
 
@@ -187,7 +187,7 @@ public:
     // get the count for the given k-mer.
     virtual const BoundedCounterType get_count(const char * kmer) const
     {
-        HashIntoType hash = _hash(kmer, _ksize);
+        HashIntoType hash = hash_dna(kmer);
         return get_count(hash);
     }
 
