@@ -129,8 +129,7 @@ BUILD_DEPENDS = []
 BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
     "khmer", "kmer_hash", "hashtable", "counting", "hashbits", "labelhash",
     "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers",
-    "kmer_filters", "traversal", "assembler", "alphabets", "bitstorage",
-    "bytestorage"])
+    "kmer_filters", "traversal", "assembler", "alphabets", "storage"])
 
 SOURCES = ["khmer/_khmer.cc"]
 SOURCES.extend(path_join("lib", bn + ".cc") for bn in [

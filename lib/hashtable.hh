@@ -55,8 +55,7 @@ Contact: khmer-project@idyll.org
 #include "khmer_exception.hh"
 #include "kmer_hash.hh"
 #include "read_parsers.hh"
-#include "bitstorage.hh"
-#include "bytestorage.hh"
+#include "storage.hh"
 
 #include "traversal.hh"
 #include "subset.hh"
