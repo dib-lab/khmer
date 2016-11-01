@@ -14,6 +14,8 @@ def get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--seqid', metavar='SEQ',
                         help='dump reads not mapped to SEQ')
+    parser.add_argument('--out', type=argparse.FileType('w'),
+                        help='output file; default is terminal (stdout)')
     parser.add_argument('--dry-run', action='store_true',
                         help='do not execute, just print arguments')
     parser.add_argument('fasta')
@@ -47,7 +49,7 @@ def main(args):
         seq = seqs[bam.get_reference_name(record.tid)]
         refrseq = str(seq[record.pos:record.pos+record.rlen].seq)
         if refrseq.upper() != record.seq.upper():
-            print('@', record.qname, '\n', record.seq, '\n+\n', record.qual, sep='')
+            print('@', record.qname, '\n', record.seq, '\n+\n', record.qual, sep='', file=args.out)
 
 if __name__ == '__main__':
     main(get_parser().parse_args())
