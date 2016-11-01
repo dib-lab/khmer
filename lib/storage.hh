@@ -218,7 +218,7 @@ public:
 
     // constructor: create an empty CountMin sketch.
     ByteStorage(std::vector<uint64_t>& tablesizes ) :
-        _max_count(MAX_KCOUNT),
+        _max_count(MAX_KCOUNT), _max_bigcount(MAX_BIGCOUNT),
         _bigcount_spin_lock(false), _tablesizes(tablesizes),
         _n_unique_kmers(0), _occupied_bins(0)
     {

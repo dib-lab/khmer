@@ -211,6 +211,9 @@ public:
         unsigned long long  &n_consumed
     );
 
+    void set_use_bigcount(bool b) { store->set_use_bigcount(b); }
+    bool get_use_bigcount() { return store->get_use_bigcount(); }
+
     bool median_at_least(const std::string &s,
                          unsigned int cutoff);
 
