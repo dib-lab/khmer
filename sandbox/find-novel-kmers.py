@@ -8,7 +8,7 @@ import khmer
 import screed
 
 def revcommin(seq):
-    revcom = screed.dna.reverse_complement(seq)
+    revcom = screed.dna.reverse_complement(str(seq))
     minseq = sorted((seq, revcom))[0]
     return minseq
 
