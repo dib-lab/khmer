@@ -177,8 +177,19 @@ protected:
 // ByteStorage: a CountMin sketch implementation.
 //
 
+class CountingHashFile;
+class CountingHashFileReader;
+class CountingHashFileWriter;
+class CountingHashGzFileReader;
+class CountingHashGzFileWriter;
+
 class ByteStorage : public Storage {
-friend class CountingHash;
+    friend class CountingHashFile;
+    friend class CountingHashFileReader;
+    friend class CountingHashFileWriter;
+    friend class CountingHashGzFileReader;
+    friend class CountingHashGzFileWriter;
+    friend class CountingHash;
 protected:
     unsigned int    _max_count;
     unsigned int    _max_bigcount;
@@ -239,8 +250,8 @@ public:
     const size_t n_tables() const { return _n_tables; }
     const uint64_t n_occupied() const { return _occupied_bins; }
 
-    void save(std::string, WordLength) { ; }
-    void load(std::string, WordLength&) { ; }
+    void save(std::string, WordLength);
+    void load(std::string, WordLength&);
 
     inline BoundedCounterType test_and_set_bits(HashIntoType khash)
     {

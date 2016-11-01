@@ -67,11 +67,9 @@ class CountingHashFileReader;
 class CountingHashFileWriter;
 class CountingHashGzFileReader;
 class CountingHashGzFileWriter;
-class CountingHashIntersect;
 
 class CountingHash : public khmer::Hashgraph
 {
-    friend class CountingHashIntersect;
     friend class CountingHashFile;
     friend class CountingHashFileReader;
     friend class CountingHashFileWriter;
