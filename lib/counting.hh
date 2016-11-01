@@ -62,26 +62,11 @@ struct IParser;
 
 namespace khmer
 {
-class CountingHashFile;
-class CountingHashFileReader;
-class CountingHashFileWriter;
-class CountingHashGzFileReader;
-class CountingHashGzFileWriter;
-
 class CountingHash : public khmer::Hashgraph
 {
-    friend class CountingHashFile;
-    friend class CountingHashFileReader;
-    friend class CountingHashFileWriter;
-    friend class CountingHashGzFileReader;
-    friend class CountingHashGzFileWriter;
-
 public:
     explicit CountingHash(WordLength ksize, std::vector<uint64_t> sizes)
         : Hashgraph(ksize, new ByteStorage(sizes)) { } ;
-
-    void set_use_bigcount(bool b) { store->set_use_bigcount(b); }
-    bool get_use_bigcount() { return store->get_use_bigcount(); }
 
     BoundedCounterType get_min_count(const std::string &s);
 
