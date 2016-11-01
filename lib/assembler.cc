@@ -61,6 +61,11 @@ std::string LinearAssembler::assemble(const Kmer seed_kmer,
                                       const Hashtable * stop_bf)
 const
 {
+    if (graph->get_count(seed_kmer) == 0) {
+        // If the seed k-mer is not in the de Bruijn graph, stop trying to make
+        // something happen. It's not going to happen!
+        return "";
+    }
     std::string right_contig = assemble_right(seed_kmer, stop_bf);
     std::string left_contig = assemble_left(seed_kmer, stop_bf);
 
@@ -133,7 +138,8 @@ const
 }
 
 template<>
-std::string LinearAssembler::_assemble_directed<RIGHT>(AssemblerTraverser<RIGHT>& cursor)
+std::string LinearAssembler::_assemble_directed<RIGHT>
+(AssemblerTraverser<RIGHT>& cursor)
 const
 {
     std::string contig = cursor.cursor.get_string_rep(_ksize);
@@ -226,16 +232,17 @@ void SimpleLabeledAssembler::_assemble_directed(NonLoopingAT<direction>&
 const
 {
 #if DEBUG_ASSEMBLY
-    std::cout << "## assemble_labeled_directed_" << direction << " [start] at " << 
-        start_cursor.cursor.repr(_ksize) << std::endl;
+    std::cout << "## assemble_labeled_directed_" << direction << " [start] at " <<
+              start_cursor.cursor.repr(_ksize) << std::endl;
 #endif
 
     // prime the traversal with the first linear segment
-    std::string root_contig = linear_asm->_assemble_directed<direction>(start_cursor);
+    std::string root_contig = linear_asm->_assemble_directed<direction>
+                              (start_cursor);
 #if DEBUG_ASSEMBLY
     std::cout << "Primed: " << root_contig << std::endl;
     std::cout << "Cursor: " << start_cursor.cursor.repr(_ksize) << std::endl;
-#endif 
+#endif
     StringVector segments;
     std::vector< NonLoopingAT<direction> > cursors;
 
@@ -243,7 +250,7 @@ const
     cursors.push_back(start_cursor);
 
     while(segments.size() != 0) {
-        
+
         std::string segment = segments.back();
         NonLoopingAT<direction> cursor = cursors.back();
 #if DEBUG_ASSEMBLY
@@ -251,12 +258,12 @@ const
         std::cout << "Segment: " << segment << std::endl;
         std::cout << "Cursor: " << cursor.cursor.repr(_ksize) << std::endl;
         std::cout << "n_filters: " << cursor.n_filters() << std::endl;
-#endif 
+#endif
         segments.pop_back();
         cursors.pop_back();
 
         // check if the cursor has hit a HDN or reached a dead end
-        if (cursor.cursor_degree() > 1) { 
+        if (cursor.cursor_degree() > 1) {
 
             LabelSet labels;
             lh->get_tag_labels(cursor.cursor, labels);
@@ -286,7 +293,7 @@ const
                     paths.push_back(segment);
                     continue;
                 }
-                
+
                 // found some neighbors; extend them
                 while(!branch_starts.empty()) {
                     // spin off a cursor for the new branch
@@ -295,7 +302,8 @@ const
                     branch_starts.pop();
 
 #if DEBUG_ASSEMBLY
-                    std::cout << "Branch cursor: " << branch_cursor.cursor.repr(_ksize) << std::endl;
+                    std::cout << "Branch cursor: " << branch_cursor.cursor.repr(
+                                  _ksize) << std::endl;
 #endif
 
                     // assemble linearly as far as possible
@@ -487,6 +495,7 @@ const
             while(!branch_starts.empty()) {
                 // spin off a cursor for the new branch
                 NonLoopingAT<direction> branch_cursor(cursor);
+
                 branch_cursor.cursor = branch_starts.front();
                 branch_starts.pop();
 

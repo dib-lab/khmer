@@ -117,16 +117,16 @@ def get_random_sequence(length, exclude=None):
         seen.add(revcomp(kmer))
 
     if exclude is not None:
-        for pos in range(0, len(exclude)-K):
-            add_seen(exclude[pos:pos+K-1])
+        for pos in range(0, len(exclude) - K):
+            add_seen(exclude[pos:pos + K - 1])
 
-    seq = [random.choice('ACGT') for _ in range(K-1)]  # do first K-1 bases
+    seq = [random.choice('ACGT') for _ in range(K - 1)]  # do first K-1 bases
     add_seen(''.join(seq))
 
     while(len(seq) < length):
         next_base = random.choice('ACGT')
-        next_kmer = ''.join(seq[-K+2:] + [next_base])
-        assert len(next_kmer) == K-1
+        next_kmer = ''.join(seq[-K + 2:] + [next_base])
+        assert len(next_kmer) == K - 1
         if (next_kmer) not in seen:
             seq.append(next_base)
             add_seen(next_kmer)
@@ -139,12 +139,12 @@ def reads(sequence, L=100, N=100):
     positions = list(range(len(sequence) - L))
     for i in range(N):
         start = random.choice(positions)
-        yield sequence[start:start+L]
+        yield sequence[start:start + L]
 
 
 def kmers(sequence):
-    for i in range(len(sequence)-K+1):
-        yield sequence[i:i+K]
+    for i in range(len(sequence) - K + 1):
+        yield sequence[i:i + K]
 
 
 def test_mutate_sequence():
@@ -251,7 +251,7 @@ def linear_structure(request, graph, random_sequence):
     return graph, sequence
 
 
-@pytest.fixture(params=[K*2, -K*2],
+@pytest.fixture(params=[K * 2, -K * 2],
                 ids=['(Where={0})'.format(i) for i in ['Start', 'End']])
 def right_tip_structure(request, graph, random_sequence):
     '''
@@ -268,11 +268,11 @@ def right_tip_structure(request, graph, random_sequence):
     if S < 0:
         S = len(sequence) + S
     # the HDN
-    HDN = Kmer(sequence[S:S+K], pos=S)
+    HDN = Kmer(sequence[S:S + K], pos=S)
     # left of the HDN
-    L = Kmer(sequence[S-1:S-1+K], pos=S-1)
+    L = Kmer(sequence[S - 1:S - 1 + K], pos=S - 1)
     # right of the HDN
-    R = Kmer(sequence[S+1:S+1+K], pos=S+1)
+    R = Kmer(sequence[S + 1:S + 1 + K], pos=S + 1)
     # the branch kmer
     tip = Kmer(mutate_position(R, -1),
                pos=R.pos)
@@ -287,7 +287,7 @@ def right_tip_structure(request, graph, random_sequence):
     return graph, sequence, L, HDN, R, tip
 
 
-@pytest.fixture(params=[K*2, -K*2],
+@pytest.fixture(params=[K * 2, -K * 2],
                 ids=['(Where={0})'.format(i) for i in ['Start', 'End']])
 def right_double_fork_structure(request, linear_structure, random_sequence):
     '''
@@ -311,11 +311,11 @@ def right_double_fork_structure(request, linear_structure, random_sequence):
     if S < 0:
         S = len(core_sequence) + S
     # the HDN
-    HDN = Kmer(core_sequence[S:S+K], pos=S)
+    HDN = Kmer(core_sequence[S:S + K], pos=S)
     # left of the HDN
-    L = Kmer(core_sequence[S-1:S-1+K], pos=S-1)
+    L = Kmer(core_sequence[S - 1:S - 1 + K], pos=S - 1)
     # right of the HDN
-    R = Kmer(core_sequence[S+1:S+1+K], pos=S+1)
+    R = Kmer(core_sequence[S + 1:S + 1 + K], pos=S + 1)
     # the branch sequence, mutated at position S+1
     branch_start = core_sequence[:R.pos] + mutate_position(R, -1)
     branch_sequence = branch_start + branch_sequence
@@ -354,13 +354,13 @@ def right_triple_fork_structure(request, right_double_fork_structure,
     '''
 
     graph, core_sequence, L, HDN, R, top_sequence = right_double_fork_structure
-    bottom_branch = random_sequence(exclude=core_sequence+top_sequence)
+    bottom_branch = random_sequence(exclude=core_sequence + top_sequence)
     print(len(core_sequence), len(top_sequence), len(bottom_branch))
 
     # the branch sequence, mutated at position S+1
     # choose a base not already represented at that position
     bases = {'A', 'C', 'G', 'T'}
-    mutated = random.choice(list(bases - {R[-1], top_sequence[R.pos+K-1]}))
+    mutated = random.choice(list(bases - {R[-1], top_sequence[R.pos + K - 1]}))
 
     bottom_sequence = core_sequence[:HDN.pos + K] + mutated + bottom_branch
 
@@ -380,7 +380,7 @@ def right_triple_fork_structure(request, right_double_fork_structure,
     return graph, core_sequence, L, HDN, R, top_sequence, bottom_sequence
 
 
-@pytest.fixture(params=[K*2, -K*2],
+@pytest.fixture(params=[K * 2, -K * 2],
                 ids=['(Where={0})'.format(i) for i in ['Start', 'End']])
 def left_tip_structure(request, graph, random_sequence):
     '''
@@ -397,11 +397,11 @@ def left_tip_structure(request, graph, random_sequence):
     S = request.param
     if S < 0:
         S = len(sequence) + S
-    tip = Kmer(mutate_position(sequence[S-1:S-1+K], 0),
-               pos=S-1+K)
-    HDN = Kmer(sequence[S:S+K], pos=S)
-    L = Kmer(sequence[S-1:S-1+K], pos=S-1)
-    R = Kmer(sequence[S+1:S+1+K], pos=S+1)
+    tip = Kmer(mutate_position(sequence[S - 1:S - 1 + K], 0),
+               pos=S - 1 + K)
+    HDN = Kmer(sequence[S:S + K], pos=S)
+    L = Kmer(sequence[S - 1:S - 1 + K], pos=S - 1)
+    R = Kmer(sequence[S + 1:S + 1 + K], pos=S + 1)
 
     graph.consume(sequence)
     graph.count(tip)
@@ -413,7 +413,7 @@ def left_tip_structure(request, graph, random_sequence):
     return graph, sequence, L, HDN, R, tip
 
 
-@pytest.fixture(params=[K*2, -K*2],
+@pytest.fixture(params=[K * 2, -K * 2],
                 ids=['(Where={0})'.format(i) for i in ['Start', 'End']])
 def left_double_fork_structure(request, linear_structure, random_sequence):
     '''
@@ -434,15 +434,16 @@ def left_double_fork_structure(request, linear_structure, random_sequence):
     if S < 0:
         S = len(core_sequence) + S
     # the HDN
-    HDN = Kmer(core_sequence[S:S+K], pos=S)
+    HDN = Kmer(core_sequence[S:S + K], pos=S)
     # left of the HDN
-    L = Kmer(core_sequence[S-1:S-1+K], pos=S-1)
+    L = Kmer(core_sequence[S - 1:S - 1 + K], pos=S - 1)
     # right of the HDN
-    R = Kmer(core_sequence[S+1:S+1+K], pos=S+1)
+    R = Kmer(core_sequence[S + 1:S + 1 + K], pos=S + 1)
     # the branch sequence, mutated at position 0 in L,
     # whih is equivalent to the K-1 prefix of HDN prepended with a new base
     branch_start = mutate_position(L, 0)
-    branch_sequence = branch_sequence + branch_start + core_sequence[L.pos+K:]
+    branch_sequence = branch_sequence + \
+        branch_start + core_sequence[L.pos + K:]
 
     graph.consume(core_sequence)
     graph.consume(branch_sequence)
@@ -459,7 +460,7 @@ def left_double_fork_structure(request, linear_structure, random_sequence):
     return graph, core_sequence, L, HDN, R, branch_sequence
 
 
-@pytest.fixture(params=[K*2, (-K*2)-2],
+@pytest.fixture(params=[K * 2, (-K * 2) - 2],
                 ids=['(Where={0})'.format(i) for i in ['Start', 'End']])
 def snp_bubble_structure(request, linear_structure):
     '''
@@ -485,9 +486,9 @@ def snp_bubble_structure(request, linear_structure):
     S = request.param
     if S < 0:
         S = len(wildtype_sequence) + S
-    snp_sequence = mutate_position(wildtype_sequence, S+K)
-    HDN_L = Kmer(wildtype_sequence[S:S+K], pos=S)
-    HDN_R = Kmer(wildtype_sequence[S+K+1:S+2*K+1], pos=S+K+1)
+    snp_sequence = mutate_position(wildtype_sequence, S + K)
+    HDN_L = Kmer(wildtype_sequence[S:S + K], pos=S)
+    HDN_R = Kmer(wildtype_sequence[S + K + 1:S + 2 * K + 1], pos=S + K + 1)
 
     graph.consume(wildtype_sequence)
     graph.consume(snp_sequence)
@@ -498,14 +499,14 @@ def snp_bubble_structure(request, linear_structure):
     if not (w_hdns == snp_hdns == {3: 2}):
         print(w_hdns, snp_hdns)
         print(HDN_L, HDN_R)
-        print(wildtype_sequence[HDN_L.pos+K+1])
-        print(snp_sequence[HDN_L.pos+K+1])
+        print(wildtype_sequence[HDN_L.pos + K + 1])
+        print(snp_sequence[HDN_L.pos + K + 1])
         request.applymarker(pytest.mark.xfail)
 
     return graph, wildtype_sequence, snp_sequence, HDN_L, HDN_R
 
 
-@pytest.fixture(params=[2,3,4,5,6,7,8])
+@pytest.fixture(params=[2, 3, 4, 5, 6, 7, 8])
 def tandem_repeat_structure(request, linear_structure):
 
     graph, sequence = linear_structure
@@ -587,7 +588,7 @@ class TestLinearAssembler_RightBranching:
         path = asm.assemble(L)
 
 
-        assert len(path) == HDN.pos+K
+        assert len(path) == HDN.pos + K
         assert utils._equals_rc(path, contig[:len(path)])
 
     def test_left_of_branch_to_beginning_revcomp(self, right_tip_structure):
@@ -596,7 +597,7 @@ class TestLinearAssembler_RightBranching:
         asm = khmer.LinearAssembler(graph)
         path = asm.assemble(revcomp(L))
 
-        assert len(path) == HDN.pos+K
+        assert len(path) == HDN.pos + K
         assert utils._equals_rc(path, contig[:len(path)])
 
     def test_right_of_branch_outwards_to_ends(self, right_tip_structure):
@@ -688,7 +689,7 @@ class TestLinearAssembler_LeftBranching:
 
         # should be the tip k-kmer, plus the last base of the HDN thru
         # the end of the contig
-        assert utils._equals_rc(path, tip + contig[HDN.pos+K-1:])
+        assert utils._equals_rc(path, tip + contig[HDN.pos + K - 1:])
 
     def test_single_node_flanked_by_hdns(self, left_tip_structure):
         # assemble single node flanked by high-degree nodes
@@ -827,10 +828,10 @@ class TestLabeledAssembler:
 
         assert any(utils._contains_rc(wildtype, path) for path in paths)
         assert any(utils._contains_rc(mutant, path) for path in paths)
-        #assert all(path[:HDN_L.pos+K][-K:] == HDN_L for path in paths)
-        #assert all(path[HDN_R.pos:][:K] == HDN_R for path in paths)
-        #assert paths[0][:HDN_L.pos+K] == paths[1][:HDN_L.pos+K]
-        #assert paths[0][HDN_R.pos:] == paths[1][HDN_R.pos:]
+        # assert all(path[:HDN_L.pos+K][-K:] == HDN_L for path in paths)
+        # assert all(path[HDN_R.pos:][:K] == HDN_R for path in paths)
+        # assert paths[0][:HDN_L.pos+K] == paths[1][:HDN_L.pos+K]
+        # assert paths[0][HDN_R.pos:] == paths[1][HDN_R.pos:]
 
     def test_assemble_snp_bubble_stopbf(self, snp_bubble_structure):
         # assemble one side of bubble, blocked with stop_bf,
@@ -848,20 +849,21 @@ class TestLabeledAssembler:
         lh.label_across_high_degree_nodes(mutant, hdn, 2)
 
         # do the labeling, but block the mutant with stop_bf
-        stop_bf.count(mutant[HDN_L.pos+1:HDN_L.pos+K+1])
+        stop_bf.count(mutant[HDN_L.pos + 1:HDN_L.pos + K + 1])
         paths = asm.assemble(wildtype[:K], stop_bf)
+
         assert len(paths) == 1
 
         assert any(utils._equals_rc(path, wildtype) for path in paths)
 
-    #@pytest.mark.skip(reason='destroys your computer and then the world')
+    # @pytest.mark.skip(reason='destroys your computer and then the world')
     def test_assemble_tandem_repeats(self, tandem_repeat_structure):
         # assemble one copy of a tandem repeat
         graph, repeat, tandem_repeats = tandem_repeat_structure
         lh = khmer._GraphLabels(graph)
         asm = khmer.SimpleLabeledAssembler(lh)
-        
         paths = asm.assemble(repeat[:K])
+
         assert len(paths) == 1
         # There are K-1 k-mers spanning the junction between
         # the beginning and end of the repeat

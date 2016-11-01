@@ -81,12 +81,12 @@ protected:
 public:
 
     explicit NodeGatherer(const Hashtable * ht,
-                       KmerFilterList filters);
-    
+                          KmerFilterList filters);
+
     explicit NodeGatherer(const Hashtable * ht);
-    
+
     explicit NodeGatherer(const Hashtable * ht, KmerFilter filter);
-    
+
     /**
      * @brief Push a new filter on to the filter stack.
      */
@@ -166,11 +166,11 @@ public:
     explicit NodeCursor(const Hashtable * ht,
                         Kmer start_kmer,
                         KmerFilterList filters);
-    
+
     explicit NodeCursor(const Hashtable * ht,
                         Kmer start_kmer);
 
-    explicit NodeCursor(const Hashtable * ht, 
+    explicit NodeCursor(const Hashtable * ht,
                         Kmer start_kmer,
                         KmerFilter filter);
 
@@ -182,7 +182,8 @@ public:
      *
      * @return Number of neighbors found.
      */
-    unsigned int neighbors(KmerQueue& node_q) const {
+    unsigned int neighbors(KmerQueue& node_q) const
+    {
         return NodeGatherer<direction>::neighbors(cursor, node_q);
     }
 
@@ -201,7 +202,7 @@ class Traverser: public KmerFactory
 {
 
 protected:
-    
+
     const Hashtable * graph;
     NodeGatherer<LEFT> left_gatherer;
     NodeGatherer<RIGHT> right_gatherer;
@@ -213,7 +214,7 @@ public:
 
     explicit Traverser(const Hashtable * ht) : Traverser(ht, KmerFilterList()) {}
 
-    explicit Traverser(const Hashtable * ht, 
+    explicit Traverser(const Hashtable * ht,
                        KmerFilter filter);
 
     void push_filter(KmerFilter filter);
@@ -268,7 +269,7 @@ public:
      *
      * @return The joined contig.
      */
-    std::string join_contigs(std::string& contig_a, 
+    std::string join_contigs(std::string& contig_a,
                              std::string& contig_b,
                              WordLength offset = 0) const;
 };

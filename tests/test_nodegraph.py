@@ -1090,3 +1090,15 @@ def test_traverse_linear_path_3_stopgraph():
     assert size == 0
     assert len(visited) == 0
     assert len(conns) == 0
+
+
+def test_assemble_linear_path_bad_seed():
+    # assemble single node.
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+
+    nodegraph = khmer.Nodegraph(21, 1e5, 4)
+    nodegraph.consume(contig)
+
+    path = nodegraph.assemble_linear_path('GATTACA' * 3)
+    assert path == ''
