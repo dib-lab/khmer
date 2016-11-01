@@ -169,7 +169,7 @@ protected:
         return _counts;
     }
 
-    // void update_from(const Hashbits &other) { ; }
+    void update_from(const BitStorage&);
 };
 
 
