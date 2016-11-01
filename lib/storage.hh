@@ -348,6 +348,50 @@ public:
     }
 
 };
+
+class CountingHashFile
+{
+public:
+    static void load(const std::string &infilename,
+                     WordLength &ksize,
+                     ByteStorage &store);
+    static void save(const std::string &outfilename,
+                     const WordLength ksize,
+                     const ByteStorage &store);
+};
+
+class CountingHashFileReader : public CountingHashFile
+{
+public:
+    CountingHashFileReader(const std::string &infilename,
+                           WordLength &ksize,
+                           ByteStorage &store);
+};
+
+class CountingHashGzFileReader : public CountingHashFile
+{
+public:
+    CountingHashGzFileReader(const std::string &infilename,
+                             WordLength &ksize,
+                             ByteStorage &store);
+};
+
+
+class CountingHashFileWriter : public CountingHashFile
+{
+public:
+    CountingHashFileWriter(const std::string &outfilename,
+                           const WordLength ksize,
+                           const ByteStorage &store);
+};
+
+class CountingHashGzFileWriter : public CountingHashFile
+{
+public:
+    CountingHashGzFileWriter(const std::string &outfilename,
+                             const WordLength ksize,
+                             const ByteStorage &store);
+};
 }
 
 #endif // BITSTORAGE_HH

@@ -99,42 +99,7 @@ public:
     std::vector<unsigned int> find_spectral_error_positions(std::string seq,
             BoundedCounterType min_abund) const;
 };
-
-
-class CountingHashFile
-{
-public:
-    static void load(const std::string &infilename, CountingHash &ht);
-    static void save(const std::string &outfilename, const CountingHash &ht);
-};
-
-class CountingHashFileReader : public CountingHashFile
-{
-public:
-    CountingHashFileReader(const std::string &infilename, CountingHash &ht);
-};
-
-class CountingHashGzFileReader : public CountingHashFile
-{
-public:
-    CountingHashGzFileReader(const std::string &infilename, CountingHash &ht);
-};
-
-
-class CountingHashFileWriter : public CountingHashFile
-{
-public:
-    CountingHashFileWriter(const std::string &outfilename, const CountingHash &ht);
-};
-
-class CountingHashGzFileWriter : public CountingHashFile
-{
-public:
-    CountingHashGzFileWriter(const std::string &outfilename,
-                             const CountingHash &ht);
-};
 }
-
 #endif // COUNTING_HH
 
 // vim: set sts=2 sw=2:
