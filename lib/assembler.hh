@@ -162,7 +162,7 @@ public:
     StringVector assemble(const Kmer seed_kmer,
                           const Hashtable * stop_bf=0) const;
 
-    void consume(std::string sequence);
+    uint16_t consume(std::string sequence);
     void count_junction(Kmer kmer_a, Kmer kmer_b);
     BoundedCounterType get_junction_count(Kmer kmer_a, Kmer kmer_b) const;
 

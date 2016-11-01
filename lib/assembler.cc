@@ -328,7 +328,7 @@ const
 JunctionCountAssembler::JunctionCountAssembler(Hashtable * ht) :
     graph(ht), _ksize(ht->ksize()), traverser(ht), linear_asm(ht)
 {
-    std::vector<uint64_t> table_sizes = ht->get_tablesizes();
+    std::vector<uint64_t> table_sizes = graph->get_tablesizes();
     junctions = new CountingHash(_ksize, table_sizes);
 }
 
@@ -338,7 +338,7 @@ JunctionCountAssembler::~JunctionCountAssembler()
     delete this->junctions;
 }
 
-void JunctionCountAssembler::consume(std::string sequence)
+uint16_t JunctionCountAssembler::consume(std::string sequence)
 {
     // first we need to put the sequence in the graph
     graph->consume_string(sequence);
@@ -347,18 +347,20 @@ void JunctionCountAssembler::consume(std::string sequence)
     KmerIterator kmers(sequence.c_str(), _ksize);
     Kmer kmer = kmers.next();
     if (kmers.done()) {
-        return;
+        return 0;
     }
     Kmer next_kmer = kmers.next();
     if (kmers.done()) {
-        return;
+        return 0;
     }
     uint16_t d = this->traverser.degree(kmer);
     uint16_t next_d = this->traverser.degree(next_kmer);
+    uint16_t n_junctions = 0;
 
     while(!kmers.done()) {
         if (d > 2 || next_d > 2) {
             count_junction(kmer, next_kmer);
+            n_junctions++;
 #if DEBUG_ASSEMBLY
             std::cout << "Junction: " << kmer.repr(_ksize) << ", " << next_kmer.repr(_ksize) << std::endl;
             std::cout << "Junction Count: " << get_junction_count(kmer, next_kmer) << std::endl;
@@ -369,6 +371,8 @@ void JunctionCountAssembler::consume(std::string sequence)
         next_kmer = kmers.next();
         next_d = this->traverser.degree(next_kmer);
     }
+
+    return n_junctions / 2; 
 }
 
 void JunctionCountAssembler::count_junction(Kmer kmer_a, Kmer kmer_b)

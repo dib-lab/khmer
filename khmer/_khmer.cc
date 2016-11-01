@@ -5557,11 +5557,10 @@ junctioncountassembler_assemble(khmer_KJunctionCountAssembler_Object * me,
                                     kwnames, &val_o, &khmer_KNodegraph_Type, 
                                     &nodegraph_o)) {
         return NULL;
-    }
-
+    } 
 
     Kmer start_kmer;
-    if (!convert_PyObject_to_Kmer(val_o, start_kmer, assembler->graph->ksize())) {
+    if (!convert_PyObject_to_Kmer(val_o, start_kmer, assembler->_ksize)) {
         return NULL;
     }
 
@@ -5597,10 +5596,9 @@ junctioncountassembler_consume(khmer_KJunctionCountAssembler_Object * me, PyObje
         return NULL;
     }
 
-    unsigned int n_consumed;
-    assembler->consume(long_str);
+    uint16_t n_junctions = assembler->consume(long_str);
 
-    Py_RETURN_NONE;
+    return PyLong_FromLong((HashIntoType) n_junctions);
 }
 
 

@@ -72,63 +72,74 @@ def extract_orfs(pepseq, min_length=99):
 def main():
     p = build_counting_args(descr='Streaming assembly with tracking info')
     p.add_argument('fastq_files', nargs='+')
-    p.add_argument('-s', type=argparse.FileType('w'),
-                   default='assembly-stats.csv')
-    p.add_argument('-o', type=argparse.FileType('w'),
-                   default='transcripts.fa')
+    p.add_argument('--prefix', default='transcriptome')
     args = p.parse_args()
 
     cg = create_countgraph(args)
     asm = khmer.JunctionCountAssembler(cg)
 
-    kept = 0
-    next_contig = 1
-    next_orf = 1
-    output = set()
-    statswriter = csv.DictWriter(args.s, delimiter=',',
-                                 fieldnames=['read_n', 'action', 'cov', 'n_hdn',
-                                             'contig_n', 'orf_n', 'new'])
+    tr_fn = '{0}.transcripts.fa'.format(args.prefix)
+    orf_fn = '{0}.orfs.fa'.format(args.prefix)
+    stats_fn = '{0}.stats.fa'.format(args.prefix)
 
-    for filename in args.fastq_files:
-        for n, record in enumerate(screed.open(filename)):
-            if n and n % 10000 == 0:
-                print('...', n, file=sys.stderr)
+    with open(tr_fn, 'w') as tr_fp,\
+         open(orf_fn, 'w') as orf_fp,\
+         open(stats_fn, 'w') as stats_fp:
 
-            if len(record.sequence) < args.ksize:
-                continue
+        kept = 0
+        next_contig = 1
+        next_orf = 1
+        output = set()
+        statswriter = csv.DictWriter(stats_fp, delimiter=',',
+                                     fieldnames=['read_n', 'action', 'cov',
+                                                 'n_junctions', 'contig_n'])
 
-            cov, _, _ = cg.get_median_count(record.sequence)
-            if cov < 30:
-                kept += 1
-                seq, pos = cg.trim_on_abundance(record.sequence, 3)
-                if len(seq) < args.ksize:
+        for filename in args.fastq_files:
+            for n, record in enumerate(screed.open(filename)):
+                if n and n % 10000 == 0:
+                    print('...', n, file=sys.stderr)
+
+                if len(record.sequence) < args.ksize:
                     continue
-                
-                asm.consume(seq)
-                statswriter.writerow({'read_n': n, 'action': 'l', 'cov': cov,
-                                      'n_hdn': len(hdn), 'contig_n': None, 
-                                      'orf_n': None, 'new': None})
-            elif cov == 30:
-                contigs = lh.assemble_labeled_path(record.sequence[:args.ksize])
-                for contig_n, contig in enumerate(contigs):
-                    statswriter.writerow({'read_n': n, 'action': 'a', 'cov': cov,
-                                          'n_hdn': None, 'contig_n': contig_n, 
-                                          'orf_n': None, 'new': None})
-                    args.o.write('>contig%d\n%s\n' % (next_contig, contig))
-                    next_contig += 1
 
-                    for t in translate(contig):
-                        for orf_n, o in enumerate(extract_orfs(t)):
-                            if hash(o) not in output:
-                                new = True
-                                output.add(hash(o))
-                                args.o.write('>orf%d\n%s\n' % (next_orf, o))
-                                next_orf += 1
-                            else:
-                                new = False
-                            statswriter.writerow({'read_n': n, 'action': 'a', 'cov': cov,
-                                                  'n_hdn': None, 'contig_n': contig_n, 
-                                                  'orf_n': orf_n, 'new': new})
+                cov, _, _ = cg.get_median_count(record.sequence)
+                if cov < 20:
+                    kept += 1
+                    cg.consume(record.sequence)
+                    statswriter.writerow({'read_n': n, 'action': 'c', 'cov': cov,
+                                          'n_junctions': None, 
+                                          'contig_n': None})
+                elif cov < 30:
+                    seq, pos = cg.trim_on_abundance(record.sequence, 3)
+                    if len(seq) < args.ksize:
+                        continue
+                    
+                    n_junctions = asm.consume(seq)
+                    statswriter.writerow({'read_n': n, 'action': 't', 'cov': cov,
+                                          'n_junctions': n_junctions, 
+                                          'contig_n': None})
+                elif cov == 30:
+                    contigs = asm.assemble(record.sequence[:args.ksize])
+                    for contig_n, contig in enumerate(contigs):
+                        statswriter.writerow({'read_n': n, 'action': 'a', 'cov': cov,
+                                              'n_junctions': None, 
+                                              'contig_n': (next_contig, contig_n)})
+                        tr_fp.write('>contig%d\n%s\n' % (next_contig, contig))
+                        next_contig += 1
+
+                        for t in translate(contig):
+                            for orf_n, o in enumerate(extract_orfs(t)):
+                                if hash(o) not in output:
+                                    new = True
+                                    output.add(hash(o))
+                                    orf_fp.write('>orf%d\n%s\n' % (next_orf, o))
+                                    next_orf += 1
+                                else:
+                                    new = False
+                else:
+                    statswriter.writerow({'read_n': n, 'action': 's', 'cov': cov,
+                                          'n_junctions': None, 
+                                          'contig_n': None})
 
 if __name__ == '__main__':
     main()
