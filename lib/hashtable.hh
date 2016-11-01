@@ -175,8 +175,13 @@ public:
         return store->get_count(khash);
     }
 
-    void save(std::string filename) { store->save(filename); }
-    void load(std::string filename) { store->load(filename); }
+    void save(std::string filename) {
+        store->save(filename, _ksize);
+    }
+    void load(std::string filename) {
+        store->load(filename, _ksize);
+        _init_bitstuff();
+    }
 
     // count every k-mer in the string.
     unsigned int consume_string(const std::string &s);

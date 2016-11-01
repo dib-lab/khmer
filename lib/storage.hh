@@ -19,8 +19,8 @@ public:
     virtual ~Storage() { }
     virtual std::vector<uint64_t> get_tablesizes() const = 0;
     virtual const size_t n_tables() const = 0;
-    virtual void save(std::string) = 0;
-    virtual void load(std::string) = 0;
+    virtual void save(std::string, WordLength) = 0;
+    virtual void load(std::string, WordLength&) = 0;
     virtual const uint64_t n_occupied() const = 0;
     virtual const uint64_t n_unique_kmers() const = 0;
     virtual BoundedCounterType test_and_set_bits( HashIntoType khash ) = 0;
@@ -94,8 +94,8 @@ protected:
         return _n_tables;
     }
 
-    void save(std::string) { ; }
-    void load(std::string) { ; }
+    void save(std::string, WordLength ksize);
+    void load(std::string, WordLength& ksize);
 
     // count number of occupied bins
     const uint64_t n_occupied() const
@@ -239,8 +239,8 @@ public:
     const size_t n_tables() const { return _n_tables; }
     const uint64_t n_occupied() const { return _occupied_bins; }
 
-    void save(std::string) { ; }
-    void load(std::string) { ; }
+    void save(std::string, WordLength) { ; }
+    void load(std::string, WordLength&) { ; }
 
     inline BoundedCounterType test_and_set_bits(HashIntoType khash)
     {
