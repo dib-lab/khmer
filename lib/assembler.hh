@@ -161,6 +161,7 @@ public:
     explicit JunctionCountAssembler(Hashtable * ht);
     ~JunctionCountAssembler();
 
+
     StringVector assemble(const Kmer seed_kmer,
                           const Hashtable * stop_bf=0) const;
 
@@ -173,6 +174,5 @@ public:
                             StringVector& paths) const;
 
 };
-
 } //namespace khmer
 #endif

@@ -552,7 +552,6 @@ class TestNonBranching:
             assert utils._equals_rc(path, contig[start:]), start
 
 
-
 class TestLinearAssembler_RightBranching:
 
     def test_branch_point(self, right_tip_structure):
@@ -564,7 +563,6 @@ class TestLinearAssembler_RightBranching:
         # assemble from beginning of contig, up until branch point
         graph, contig, L, HDN, R, tip = right_tip_structure
         asm = khmer.LinearAssembler(graph)
-
         path = asm.assemble(contig[0:K])
 
         assert len(path) == HDN.pos + K
@@ -575,8 +573,8 @@ class TestLinearAssembler_RightBranching:
         # starting from rev comp
         graph, contig, L, HDN, R, tip = right_tip_structure
         asm = khmer.LinearAssembler(graph)
-
         path = asm.assemble(revcomp(contig[0:K]))
+
 
         assert len(path) == HDN.pos + K
         assert utils._equals_rc(path, contig[:len(path)])
@@ -586,7 +584,6 @@ class TestLinearAssembler_RightBranching:
         graph, contig, L, HDN, R, tip = right_tip_structure
         asm = khmer.LinearAssembler(graph)
         path = asm.assemble(L)
-
 
         assert len(path) == HDN.pos + K
         assert utils._equals_rc(path, contig[:len(path)])
@@ -643,7 +640,6 @@ class TestLinearAssembler_LeftBranching:
         # assemble from branch point until end
         graph, contig, L, HDN, R, tip = left_tip_structure
         asm = khmer.LinearAssembler(graph)
-
         path = asm.assemble(HDN)
 
         assert len(path) == len(contig) - HDN.pos
@@ -666,7 +662,6 @@ class TestLinearAssembler_LeftBranching:
         # block the tip with the stop_bf. should return a full length contig.
         graph, contig, L, HDN, R, tip = left_tip_structure
         asm = khmer.LinearAssembler(graph)
-
         stop_bf = khmer.Nodegraph(K, 1e5, 4)
         stop_bf.count(tip)
 
@@ -684,8 +679,8 @@ class TestLinearAssembler_LeftBranching:
         stop_bf = khmer.Nodegraph(K, 1e5, 4)
         stop_bf.count(L)          # ...and block original path
         path = asm.assemble(contig[-K:], stop_bf)
-
         assert len(path) == len(contig) - HDN.pos + 1
+
 
         # should be the tip k-kmer, plus the last base of the HDN thru
         # the end of the contig
@@ -712,12 +707,12 @@ class TestLabeledAssembler:
         graph, contig, L, HDN, R, tip = right_tip_structure
         lh = khmer._GraphLabels(graph)
         asm = khmer.SimpleLabeledAssembler(lh)
-
         hdn = graph.find_high_degree_nodes(contig)
         # L, HDN, and R will be labeled with 1
         lh.label_across_high_degree_nodes(contig, hdn, 1)
 
         path = asm.assemble(contig[:K])
+
         assert len(path) == 1, "there should only be one path"
         path = path[0]  # @CTB
 
@@ -778,6 +773,7 @@ class TestLabeledAssembler:
 
         # first try without the labels
         paths = asm.assemble(contig[-K:])
+
         assert len(paths) == 1
         # without labels, should get the beginning of the HDN thru the end
         assert paths[0] == contig[HDN.pos:]
@@ -791,6 +787,7 @@ class TestLabeledAssembler:
         print(lh.get_tag_labels(list(hdn)[0]))
 
         paths = asm.assemble(contig[-K:])
+
         assert len(paths) == 2
 
         assert any(utils._equals_rc(path, contig) for path in paths)
@@ -807,8 +804,8 @@ class TestLabeledAssembler:
         lh.label_across_high_degree_nodes(wildtype, hdn, 1)
 
         paths = asm.assemble(wildtype[:K])
-        assert len(paths) == 1
 
+        assert len(paths) == 1
         assert utils._equals_rc(paths[0], wildtype)
 
     def test_assemble_snp_bubble_both(self, snp_bubble_structure):
@@ -824,6 +821,7 @@ class TestLabeledAssembler:
         lh.label_across_high_degree_nodes(mutant, hdn, 2)
 
         paths = asm.assemble(wildtype[:K])
+
         assert len(paths) == 2
 
         assert any(utils._contains_rc(wildtype, path) for path in paths)
@@ -853,7 +851,6 @@ class TestLabeledAssembler:
         paths = asm.assemble(wildtype[:K], stop_bf)
 
         assert len(paths) == 1
-
         assert any(utils._equals_rc(path, wildtype) for path in paths)
 
     # @pytest.mark.skip(reason='destroys your computer and then the world')
