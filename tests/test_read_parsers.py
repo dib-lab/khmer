@@ -47,6 +47,10 @@ from functools import reduce  # pylint: disable=redefined-builtin
 
 def test_read_type_basic():
     # test that basic properties of khmer.Read behave like screed.Record
+    # Constructing without mandatory arguments should raise an exception
+    with pytest.raises(TypeError):
+        Read()
+
     name = "895:1:1:1246:14654 1:N:0:NNNNN"
     sequence = "ACGT"
     r = Read(name, sequence)

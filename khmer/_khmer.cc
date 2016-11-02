@@ -284,7 +284,12 @@ khmer_Read_new(PyTypeObject * type, PyObject * args, PyObject * kwds)
     khmer_Read_Object * self;
     self = (khmer_Read_Object *)type->tp_alloc(type, 0);
     if (self != NULL) {
-        self->read = new Read;
+        try {
+            self->read = new Read;
+        } catch (std::bad_alloc &exc) {
+            Py_DECREF(self);
+            return PyErr_NoMemory();
+        }
     }
     return (PyObject *)self;
 }
@@ -304,7 +309,7 @@ khmer_Read_init(khmer_Read_Object *self, PyObject *args, PyObject *kwds)
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "ss|zz", kwlist,
                                      &name, &sequence, &quality, &annotations)) {
-        return 0;
+        return -1;
     }
 
     if (name != NULL) {
