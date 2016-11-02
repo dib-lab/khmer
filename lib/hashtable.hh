@@ -83,6 +83,51 @@ struct IParser;
 namespace khmer
 {
 
+
+inline bool is_prime(uint64_t n)
+{
+    if (n < 2) {
+        return false;
+    }
+    if (n == 2) {
+        return true;
+    }
+    if (n % 2 == 0) {
+        return false;
+    }
+    for (unsigned long long i=3; i < sqrt(n); i += 2) {
+        if (n % i == 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+
+std::vector<uint64_t> get_n_primes_near_x(n, x)
+{
+    std::vector<uint64_t> primes;
+    if (x == 1 && n == 1) {
+        primes.push_back(1);
+        return primes;
+    }
+
+    i = x - 1;
+    if (i % 2 == 0) {
+        i--;
+    }
+    while (primes.size() != n && i > 0) {
+        if (is_prime(i)) {
+            primes.push_back(i);
+        }
+        i -= 2;
+    }
+
+    // might return < n primes if x is too small
+    return primes;
+}
+
+
 class Hashtable: public
     KmerFactory  		// Base class implementation of a Bloom ht.
 {
