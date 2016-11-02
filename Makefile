@@ -173,10 +173,10 @@ cppcheck-long: FORCE
 
 ## pep8        : check Python code style
 pep8: $(PYSOURCES) $(wildcard tests/*.py)
-	pep8 --ignore E309,E226 setup.py khmer/*.py scripts/*.py tests/*.py oxli/*.py
+	pep8 setup.py khmer/*.py scripts/*.py tests/*.py oxli/*.py
 
 pep8_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
-	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ oxli/ \
+	pep8 setup.py khmer/ scripts/ tests/ oxli/ \
 		> pep8_report.txt || true
 
 diff_pep8_report: pep8_report.txt
