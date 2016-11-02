@@ -1,6 +1,7 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2010-2015, Michigan State University.
 # Copyright (C) 2015-2016, The Regents of the University of California.
+# Copyright (C) 2016, Google, Inc
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -39,7 +40,6 @@ from __future__ import absolute_import, unicode_literals
 import gzip
 
 import os
-import shutil
 
 import khmer
 from . import khmer_tst_utils as utils
@@ -69,7 +69,7 @@ def teardown():
 def test_count_1():
     hi = khmer._Countgraph(12, PRIMES_1m)
 
-    kmer = 'G'*12
+    kmer = 'G' * 12
     hashval = hi.hash('G' * 12)
 
     assert hi.get(kmer) == 0
@@ -83,7 +83,7 @@ def test_count_1():
     assert hi.get(kmer) == 2
     assert hi.get(hashval) == 2
 
-    kmer = 'G'*11
+    kmer = 'G' * 11
     try:
         hi.hash(kmer)
         assert 0, "incorrect kmer size should fail"
@@ -93,7 +93,7 @@ def test_count_1():
 
 def test_count_2():
     hi = khmer._Countgraph(12, PRIMES_1m)
-    kmer = 'G'*12
+    kmer = 'G' * 12
     hashval = hi.hash('G' * 12)
 
     assert hi.get(kmer) == 0
@@ -110,7 +110,7 @@ def test_count_2():
 
 def test_revhash_1():
     hi = khmer._Countgraph(12, [1])
-    kmer = 'C'*12
+    kmer = 'C' * 12
     hashval = hi.hash('C' * 12)
 
     assert hi.reverse_hash(hashval) == kmer
@@ -1413,8 +1413,7 @@ def test_find_all_tags_list_error():
 
 
 def test_abund_dist_gz_bigcount():
-    infile = utils.get_temp_filename('test.fa')
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     script = 'load-into-counting.py'
     htfile = utils.get_temp_filename('test_ct')
     args = ['-x', str(1e7), '-N', str(2), '-k', str(2), htfile, infile]
@@ -1450,8 +1449,7 @@ def test_abund_dist_gz_bigcount():
 
 
 def test_abund_dist_gz_bigcount_compressed_first():
-    infile = utils.get_temp_filename('test.fa')
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    infile = utils.copy_test_data('test-abund-read-2.fa')
     script = 'load-into-counting.py'
     htfile = utils.get_temp_filename('test_ct.gz')
     args = ['-x', str(1e7), '-N', str(2), '-k', str(2), htfile, infile]

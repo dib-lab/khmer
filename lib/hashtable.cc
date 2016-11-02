@@ -294,6 +294,12 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
             err = "Unknown error in opening file: " + infilename;
         }
         throw khmer_file_exception(err);
+    } catch (const std::exception &e) {
+        // Catching std::exception is a stopgap for
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
+        std::string err = "Unknown error opening file: " + infilename + " "
+                          + strerror(errno);
+        throw khmer_file_exception(err);
     }
 
     if (clear_tags) {
@@ -358,6 +364,24 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
         if (buf != NULL) {
             delete[] buf;
         }
+        throw khmer_file_exception(err);
+        /* Yes, this is boneheaded. Unfortunately, there is a bug in gcc > 5
+         * regarding the basic_ios::failure that makes it impossible to catch
+         * with more specificty. So, we catch *all* exceptions after trying to
+         * get the ifstream::failure, and assume it must have been the buggy one.
+         * Unfortunately, this would also cause us to catch the
+         * khmer_file_exceptions thrown above, so we catch them again first and
+         * rethrow them :) If this is understandably irritating to you, please
+         * bother the gcc devs at:
+         *     https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
+         *
+         * See also: http://media4.giphy.com/media/3o6UBpHgaXFDNAuttm/giphy.gif
+         */
+    } catch (khmer_file_exception &e) {
+        throw e;
+    } catch (const std::exception &e) {
+        std::string err = "Unknown error opening file: " + infilename + " "
+                          + strerror(errno);
         throw khmer_file_exception(err);
     }
 }
@@ -553,7 +577,7 @@ void Hashtable::consume_partitioned_fasta(const std::string &filename,
             n_consumed += consume_string(seq); // @CTB why are we doing this?
 
             // Next, compute the tag & set the partition, if nonzero
-            HashIntoType kmer = _hash(seq, _ksize);
+            HashIntoType kmer = hash_dna(seq.c_str());
             all_tags.insert(kmer);
             if (p > 0) {
                 partition->set_partition_id(kmer, p);
@@ -583,15 +607,16 @@ const
         return;
     }
 
-    Traverser traverser(this);
     KmerQueue node_q;
     node_q.push(start);
 
     // Avoid high-circumference k-mers
-    auto filter = [&] (Kmer& n) {
-        return !(break_on_circum &&
-                 traverser.degree(n) > 4);
+    Traverser traverser(this);
+
+    KmerFilter filter = [&] (const Kmer& n) {
+        return break_on_circum && traverser.degree(n) > 4;
     };
+    traverser.push_filter(filter);
 
     while(!node_q.empty()) {
         Kmer node = node_q.front();
@@ -618,8 +643,7 @@ const
         }
 
         // otherwise, explore in all directions.
-        traverser.traverse_right(node, node_q, filter);
-        traverser.traverse_left(node, node_q, filter);
+        traverser.traverse(node, node_q);
     }
 }
 
@@ -664,16 +688,16 @@ unsigned int Hashtable::traverse_from_kmer(Kmer start,
 const
 {
 
-    Traverser traverser(this);
     KmerQueue node_q;
     std::queue<unsigned int> breadth_q;
     unsigned int cur_breadth = 0;
     unsigned int total = 0;
     unsigned int nfound = 0;
 
-    auto filter = [&] (Kmer& n) {
-        return !set_contains(keeper, n);
+    KmerFilter filter = [&] (const Kmer& n) {
+        return set_contains(keeper, n);
     };
+    Traverser traverser(this, filter);
 
     node_q.push(start);
     breadth_q.push(0);
@@ -712,12 +736,12 @@ const
             cur_breadth = breadth;
         }
 
-        nfound = traverser.traverse_right(node, node_q, filter);
+        nfound = traverser.traverse_right(node, node_q);
         for (unsigned int i = 0; i<nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
 
-        nfound = traverser.traverse_left(node, node_q, filter);
+        nfound = traverser.traverse_left(node, node_q);
         for (unsigned int i = 0; i<nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
@@ -743,6 +767,12 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
         } else {
             err = "Unknown error in opening file: " + infilename;
         }
+        throw khmer_file_exception(err);
+    } catch (const std::exception &e) {
+        // Catching std::exception is a stopgap for
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
+        std::string err = "Unknown error opening file: " + infilename + " "
+                          + strerror(errno);
         throw khmer_file_exception(err);
     }
 
@@ -801,6 +831,14 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
         delete[] buf;
     } catch (std::ifstream::failure &e) {
         std::string err = "Error reading stoptags from: " + infilename;
+        throw khmer_file_exception(err);
+    } catch (khmer_file_exception &e) {
+        throw e;
+    } catch (const std::exception &e) {
+        // Catching std::exception is a stopgap for
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
+        std::string err = "Unknown error opening file: " + infilename + " "
+                          + strerror(errno);
         throw khmer_file_exception(err);
     }
 }
@@ -986,7 +1024,7 @@ void Hashtable::get_kmer_hashes(const std::string &s,
 
 
 void Hashtable::get_kmer_hashes_as_hashset(const std::string &s,
-                                           SeenSet& hashes) const
+        SeenSet& hashes) const
 {
     KmerIterator kmers(s.c_str(), _ksize);
 
@@ -1011,7 +1049,7 @@ void Hashtable::get_kmer_counts(const std::string &s,
 
 void Hashtable::find_high_degree_nodes(const char * s,
                                        SeenSet& high_degree_nodes)
-    const
+const
 {
     Traverser traverser(this);
     KmerIterator kmers(s, _ksize);
@@ -1030,11 +1068,12 @@ void Hashtable::find_high_degree_nodes(const char * s,
     }
 }
 
+
 unsigned int Hashtable::traverse_linear_path(const Kmer seed_kmer,
-                                             SeenSet &adjacencies,
-                                             SeenSet &visited, Hashtable &bf,
-                                             SeenSet &high_degree_nodes)
-    const
+        SeenSet &adjacencies,
+        SeenSet &visited, Hashtable &bf,
+        SeenSet &high_degree_nodes)
+const
 {
     unsigned int size = 0;
 
@@ -1052,7 +1091,7 @@ unsigned int Hashtable::traverse_linear_path(const Kmer seed_kmer,
     while (to_be_visited.size()) {
         Kmer kmer = to_be_visited.back();
         to_be_visited.pop_back();
-        
+
         visited.insert(kmer);
         size += 1;
 
@@ -1080,4 +1119,3 @@ unsigned int Hashtable::traverse_linear_path(const Kmer seed_kmer,
 }
 
 // vim: set sts=2 sw=2:
-

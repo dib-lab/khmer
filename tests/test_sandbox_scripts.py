@@ -42,7 +42,6 @@ from __future__ import unicode_literals
 import sys
 import os
 import os.path
-import shutil
 from io import StringIO
 import traceback
 import glob
@@ -63,67 +62,52 @@ def teardown():
     utils.cleanup()
 
 
-def test_import_all():
+def _sandbox_scripts():
     sandbox_path = os.path.join(os.path.dirname(__file__), "../sandbox")
     if not os.path.exists(sandbox_path):
         pytest.skip("sandbox scripts are only tested in a repository")
 
     path = os.path.join(sandbox_path, "*.py")
-    scripts = glob.glob(path)
-    for s in scripts:
-        s = os.path.normpath(s)
-        yield _checkImportSucceeds('test_sandbox_scripts.py', s)
+    return [os.path.normpath(s) for s in glob.glob(path)]
 
 
-class _checkImportSucceeds(object):  # pylint: disable=too-few-public-methods
+@pytest.mark.parametrize("filename", _sandbox_scripts())
+def test_import_succeeds(filename):
+    try:
+        mod = imp.load_source('__zzz', filename)
+    except:
+        print(traceback.format_exc())
+        raise AssertionError("%s cannot be imported" % (filename,))
 
-    def __init__(self, tag, filename):
-        self.tag = tag
-        self.filename = filename
-        self.description = '%s: test import %s' % (self.tag,
-                                                   os.path.split(filename)[-1])
+    oldargs = sys.argv
+    sys.argv = [filename]
 
-    def __call__(self):
+    oldout, olderr = sys.stdout, sys.stderr
+    sys.stdout = StringIO()
+    sys.stderr = StringIO()
+
+    try:
         try:
-            mod = imp.load_source('__zzz', self.filename)
-        except:
-            print(traceback.format_exc())
-            raise AssertionError("%s cannot be imported" % (self.filename,))
-
-        #
-
-        oldargs = sys.argv
-        sys.argv = [self.filename]
-
-        oldout, olderr = sys.stdout, sys.stderr
-        sys.stdout = StringIO()
-        sys.stderr = StringIO()
-
-        try:
-            try:
-                global_dict = {'__name__': '__main__'}
-                exec(  # pylint: disable=exec-used
-                    compile(open(self.filename).read(), self.filename, 'exec'),
-                    global_dict)
-            except (ImportError, SyntaxError) as err:
-                print("{0}".format(err))
-                raise AssertionError("%s cannot be exec'd" % (self.filename),
-                                     "{0}".format(traceback))
-            except:  # pylint: disable=bare-except
-                pass                        # other failures are expected :)
-        finally:
-            sys.argv = oldargs
-            out, err = sys.stdout.getvalue(), sys.stderr.getvalue()
-            sys.stdout, sys.stderr = oldout, olderr
+            global_dict = {'__name__': '__main__'}
+            exec(  # pylint: disable=exec-used
+                compile(open(filename).read(), filename, 'exec'),
+                global_dict)
+        except (ImportError, SyntaxError) as err:
+            print("{0}".format(err))
+            raise AssertionError("%s cannot be exec'd" % (filename),
+                                 "{0}".format(traceback))
+        except:  # pylint: disable=bare-except
+            pass                        # other failures are expected :)
+    finally:
+        sys.argv = oldargs
+        out, err = sys.stdout.getvalue(), sys.stderr.getvalue()
+        sys.stdout, sys.stderr = oldout, olderr
 
 
 def test_sweep_reads():
-    readfile = utils.get_temp_filename('reads.fa')
-    contigfile = utils.get_temp_filename('contigs.fp')
+    readfile = utils.copy_test_data('test-sweep-reads.fa')
+    contigfile = utils.copy_test_data('test-sweep-contigs.fp')
     in_dir = os.path.dirname(contigfile)
-
-    shutil.copyfile(utils.get_test_data('test-sweep-reads.fa'), readfile)
-    shutil.copyfile(utils.get_test_data('test-sweep-contigs.fp'), contigfile)
 
     script = scriptpath('sweep-reads.py')
     args = ['-k', '25', '--prefix', 'test', '--label-by-pid',
@@ -164,12 +148,9 @@ def test_sweep_reads():
 
 
 def test_sweep_reads_fq():
-    readfile = utils.get_temp_filename('reads.fa')
-    contigfile = utils.get_temp_filename('contigs.fp')
+    readfile = utils.copy_test_data('test-sweep-reads.fq')
+    contigfile = utils.copy_test_data('test-sweep-contigs.fp')
     in_dir = os.path.dirname(contigfile)
-
-    shutil.copyfile(utils.get_test_data('test-sweep-reads.fq'), readfile)
-    shutil.copyfile(utils.get_test_data('test-sweep-contigs.fp'), contigfile)
 
     script = scriptpath('sweep-reads.py')
     args = ['-k', '25', '--prefix', 'test', '--label-by-pid',
@@ -218,10 +199,9 @@ def test_sweep_reads_fq():
 
 def test_sweep_reads_2():
 
-    infile = utils.get_temp_filename('seqs.fa')
-    inref = utils.get_temp_filename('ref.fa')
-    shutil.copyfile(utils.get_test_data('random-20-X2.fa'), infile)
-    shutil.copyfile(utils.get_test_data('random-20-a.fa'), inref)
+    infile = utils.copy_test_data('random-20-X2.fa')
+    inref = utils.copy_test_data('random-20-a.fa')
+
     wdir = os.path.dirname(inref)
     script = scriptpath('sweep-reads.py')
     args = ['-m', '50', '-k', '20', '-l', '9', '-b', '60', '--prefix',
@@ -240,8 +220,7 @@ def test_sweep_reads_2():
 
 def test_sweep_reads_3():
 
-    infile = utils.get_temp_filename('seqs.fa')
-    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+    infile = utils.copy_test_data('random-20-a.fa')
     wdir = os.path.dirname(infile)
     script = scriptpath('sweep-reads.py')
     args = ['-m', '75', '-k', '20', '-l', '1', '--prefix',
@@ -288,8 +267,7 @@ def test_saturate_by_median():
 
 
 def test_count_kmers_1():
-    infile = utils.get_temp_filename('input.fa')
-    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+    infile = utils.copy_test_data('random-20-a.fa')
     ctfile = _make_counting(infile)
 
     script = scriptpath('count-kmers.py')
@@ -303,8 +281,7 @@ def test_count_kmers_1():
 
 
 def test_count_kmers_2_single():
-    infile = utils.get_temp_filename('input.fa')
-    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+    infile = utils.copy_test_data('random-20-a.fa')
 
     script = scriptpath('count-kmers-single.py')
     args = ['-x', '1e7', '-k', '20', '-N', '2', infile]
@@ -317,11 +294,9 @@ def test_count_kmers_2_single():
 
 
 def test_multirename_fasta():
-    infile1 = utils.get_temp_filename('test-multi.fa')
+    infile1 = utils.copy_test_data('test-multi.fa')
     multioutfile = utils.get_temp_filename('out.fa')
-    infile2 = utils.get_temp_filename('out.fa')
-    shutil.copyfile(utils.get_test_data('test-multi.fa'), infile1)
-    shutil.copyfile(utils.get_test_data('multi-output.fa'), infile2)
+    infile2 = utils.copy_test_data('multi-output.fa')
     args = ['assembly', infile1]
     _, out, err = utils.runscript('multi-rename.py', args, sandbox=True)
     r = open(infile2).read()

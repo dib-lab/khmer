@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2011-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -56,12 +56,12 @@ from khmer import khmer_args
 from contextlib import contextmanager
 from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
                               report_on_config, info, calculate_graphsize,
-                              sanitize_help)
+                              sanitize_help, check_argument_range)
 import argparse
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
                          get_file_writer, is_block, describe_file_handle)
-from khmer.utils import write_record, broken_paired_reader
+from khmer.utils import (write_record, broken_paired_reader, ReadBundle)
 from khmer.khmer_logger import (configure_logging, log_info, log_error)
 
 
@@ -168,24 +168,13 @@ class Normalizer(object):
         * if any read's median k-mer count is below desired coverage, keep all;
         * consume and yield kept reads.
         """
+        batch = ReadBundle(read0, read1)
         desired_coverage = self.desired_coverage
 
-        passed_filter = False
-
-        batch = []
-        batch.append(read0)
-        if read1 is not None:
-            batch.append(read1)
-
-        for record in batch:
-            seq = record.sequence.replace('N', 'A')
-            if not self.countgraph.median_at_least(seq, desired_coverage):
-                passed_filter = True
-
-        if passed_filter:
-            for record in batch:
-                seq = record.sequence.replace('N', 'A')
-                self.countgraph.consume(seq)
+        # if any in batch have coverage below desired coverage, consume &yield
+        if not batch.coverages_at_least(self.countgraph, desired_coverage):
+            for record in batch.reads:
+                self.countgraph.consume(record.cleaned_seq)
                 yield record
 
 
@@ -267,9 +256,10 @@ def get_parser():
         epilog=textwrap.dedent(epilog))
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
-    parser.add_argument('-C', '--cutoff', type=int, help="when the median "
-                        "k-mer coverage level above is above this numer the "
+    parser.add_argument('-C', '--cutoff', help="when the median "
+                        "k-mer coverage level is above this number the "
                         "read is not kept.",
+                        type=check_argument_range(0, 256, "cutoff"),
                         default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-p', '--paired', action='store_true',
                         help='require that all sequences be properly paired')

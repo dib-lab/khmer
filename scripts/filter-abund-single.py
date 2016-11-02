@@ -48,22 +48,24 @@ Use '-h' for parameter help.
 from __future__ import print_function
 import os
 import sys
-import khmer
 import threading
 import textwrap
-from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
+import khmer
+import screed
+from khmer.utils import broken_paired_reader, write_record
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, report_on_config,
                               add_threading_args, info, calculate_graphsize,
-                              sanitize_help)
+                              sanitize_help, check_argument_range)
 from khmer.kfile import (check_input_files, check_space,
                          check_space_for_graph,
                          add_output_compression_type,
                          get_file_writer)
 from khmer.khmer_logger import (configure_logging, log_info, log_error,
                                 log_warn)
+from khmer.trimming import (trim_record)
 
-
+DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
 
 
@@ -86,8 +88,17 @@ def get_parser():
         "(in memory version).", epilog=textwrap.dedent(epilog))
     add_threading_args(parser)
 
-    parser.add_argument('--cutoff', '-C', default=DEFAULT_CUTOFF, type=int,
+    parser.add_argument('--cutoff', '-C', default=DEFAULT_CUTOFF,
+                        type=check_argument_range(0, 256, "cutoff"),
                         help="Trim at k-mers below this abundance.")
+    parser.add_argument('--variable-coverage', '-V', action='store_true',
+                        dest='variable_coverage', default=False,
+                        help='Only trim low-abundance k-mers from sequences '
+                        'that have high coverage.')
+    parser.add_argument('--normalize-to', '-Z', type=int, dest='normalize_to',
+                        help='Base the variable-coverage cutoff on this median'
+                        ' k-mer abundance.',
+                        default=DEFAULT_NORMALIZE_LIMIT)
     parser.add_argument('--savegraph', metavar="filename", default='',
                         help="If present, the name of the file to save the "
                         "k-mer countgraph to")
@@ -144,23 +155,6 @@ def main():
     fp_rate = khmer.calc_expected_collisions(graph, args.force)
     log_info('fp rate estimated to be {fpr:1.3f}', fpr=fp_rate)
 
-    # now, trim.
-
-    # the filtering function.
-    def process_fn(record):
-        name = record.name
-        seq = record.sequence
-        seqN = seq.replace('N', 'A')
-
-        _, trim_at = graph.trim_on_abundance(seqN, args.cutoff)
-
-        if trim_at >= args.ksize:
-            # be sure to not to change the 'N's in the trimmed sequence -
-            # so, return 'seq' and not 'seqN'.
-            return name, seq[:trim_at]
-
-        return None, None
-
     # the filtering loop
     log_info('filtering {datafile}', datafile=args.datafile)
     if args.outfile is None:
@@ -170,8 +164,20 @@ def main():
     outfp = open(outfile, 'wb')
     outfp = get_file_writer(outfp, args.gzip, args.bzip)
 
-    tsp = ThreadedSequenceProcessor(process_fn, verbose=not args.quiet)
-    tsp.start(verbose_loader(args.datafile), outfp)
+    screed_iter = screed.open(args.datafile)
+    paired_iter = broken_paired_reader(screed_iter, min_length=graph.ksize(),
+                                       force_single=True)
+
+    for n, is_pair, read1, read2 in paired_iter:
+        assert not is_pair
+        assert read2 is None
+
+        trimmed_record, _ = trim_record(graph, read1, args.cutoff,
+                                        args.variable_coverage,
+                                        args.normalize_to)
+        if trimmed_record:
+            print((trimmed_record,))
+            write_record(trimmed_record, outfp)
 
     log_info('output in {outfile}', outfile=outfile)
 

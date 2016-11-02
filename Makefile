@@ -97,6 +97,7 @@ help: Makefile
 install-dep: install-dependencies
 
 install-dependencies:
+	pip install git+https://github.com/dib-lab/screed.git
 	pip install --upgrade $(DEVPKGS)
 	pip install --upgrade --requirement doc/requirements.txt
 
@@ -127,7 +128,7 @@ clean: FORCE
 	cd tests && rm -rf khmertest_* || true
 	rm -f $(EXTENSION_MODULE)
 	rm -f khmer/*.pyc lib/*.pyc scripts/*.pyc tests/*.pyc oxli/*.pyc \
-		sandbox/*.pyc
+		sandbox/*.pyc khmer/__pycache__/* sandbox/__pycache__/*
 	./setup.py clean --all || true
 	rm -f coverage-debug
 	rm -Rf .coverage
@@ -172,7 +173,7 @@ cppcheck-long: FORCE
 
 ## pep8        : check Python code style
 pep8: $(PYSOURCES) $(wildcard tests/*.py)
-	pep8 --exclude=_version.py  --show-source --show-pep8 setup.py khmer/ \
+	pep8 --exclude=_version.py  --show-source setup.py khmer/ \
 		scripts/ tests/ oxli/ || true
 
 pep8_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
@@ -196,7 +197,7 @@ diff_pydocstyle_report: pydocstyle_report.txt
 
 ## astyle      : fix most C++ code indentation and formatting
 astyle: $(CPPSOURCES)
-	astyle -A10 --max-code-length=80 $(CPPSOURCES)
+	astyle -A10 --max-code-length=80 $(filter-out setup.py,$(CPPSOURCES))
 
 ## autopep8    : fix most Python code indentation and formatting
 autopep8: $(PYSOURCES) $(wildcard tests/*.py)
@@ -225,7 +226,7 @@ diff_pylint_report: pylint_report.txt
 .coverage: $(PYSOURCES) $(wildcard tests/*.py) $(EXTENSION_MODULE)
 	./setup.py develop
 	coverage run --branch --source=scripts,khmer,oxli \
-		--omit=khmer/_version.py -m pytest --junitxml=nosetests.xml \
+		--omit=khmer/_version.py -m pytest --junitxml=pytests.xml \
 		-m $(TESTATTR)
 
 coverage.xml: .coverage
@@ -252,7 +253,7 @@ diff-cover.html: coverage-gcovr.xml coverage.xml
 	diff-cover coverage-gcovr.xml coverage.xml \
 		--html-report diff-cover.html
 
-nosetests.xml: FORCE
+pytests.xml: FORCE
 	py.test --junitxml=$@ -m ${TESTATTR}
 
 ## doxygen     : generate documentation of the C++ and Python code

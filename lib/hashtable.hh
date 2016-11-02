@@ -47,7 +47,6 @@ Contact: khmer-project@idyll.org
 #include <list>
 #include <map>
 #include <queue>
-#include <queue>
 #include <set>
 #include <string>
 #include <vector>
@@ -90,7 +89,6 @@ class Hashtable: public
 {
     friend class SubsetPartition;
     friend class LabelHash;
-    friend class Traverser;
 
 protected:
     unsigned int _tag_density;
@@ -154,6 +152,39 @@ public:
         return _ksize;
     }
 
+    // various hash functions.
+    inline
+    virtual
+    HashIntoType
+    hash_dna(const char * kmer) const {
+        return _hash(kmer, _ksize);
+    }
+
+    inline
+    virtual
+    HashIntoType
+    hash_dna_top_strand(const char * kmer) const {
+        HashIntoType f = 0, r = 0;
+        _hash(kmer, _ksize, f, r);
+        return f;
+    }
+
+    inline
+    virtual
+    HashIntoType
+    hash_dna_bottom_strand(const char * kmer) const {
+        HashIntoType f = 0, r = 0;
+        _hash(kmer, _ksize, f, r);
+        return r;
+    }
+
+    inline
+    virtual
+    std::string
+    unhash_dna(HashIntoType hashval) const {
+        return _revhash(hashval, _ksize);
+    }
+
     virtual void count(const char * kmer) = 0;
     virtual void count(HashIntoType khash) = 0;
 
@@ -200,10 +231,10 @@ public:
                           float &stddev);
 
     // number of unique k-mers
-    virtual const HashIntoType n_unique_kmers() const = 0;
+    virtual const uint64_t n_unique_kmers() const = 0;
 
     // count number of occupied bins
-    virtual const HashIntoType n_occupied() const = 0;
+    virtual const uint64_t n_occupied() const = 0;
 
     // partitioning stuff
     void _validate_pmap()
@@ -287,7 +318,7 @@ public:
     virtual BoundedCounterType test_and_set_bits(const char * kmer) = 0;
     virtual BoundedCounterType test_and_set_bits(HashIntoType khash) = 0;
 
-    virtual std::vector<HashIntoType> get_tablesizes() const = 0;
+    virtual std::vector<uint64_t> get_tablesizes() const = 0;
     virtual const size_t n_tables() const = 0;
 
     size_t trim_on_stoptags(std::string sequence) const;
@@ -339,6 +370,7 @@ public:
     //
     void find_high_degree_nodes(const char * sequence,
                                 SeenSet& high_degree_nodes) const;
+
     unsigned int traverse_linear_path(const Kmer start_kmer,
                                       SeenSet &adjacencies,
                                       SeenSet &nodes, Hashtable& bf,

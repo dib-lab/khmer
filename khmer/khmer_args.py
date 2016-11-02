@@ -70,7 +70,7 @@ ALGORITHMS = {
                 'http://dx.doi.org/10.1371/journal.pone.0101271',
     'sweep': 'C Scott, MR Crusoe, and CT Brown, unpublished',
     'SeqAn': 'A. Döring et al. http://dx.doi.org:80/10.1186/1471-2105-9-11',
-    'hll': 'Irber and Brown, unpublished'
+    'hll': 'Irber and Brown. http://dx.doi.org/10.1101/056846'
 }
 
 
@@ -191,6 +191,21 @@ def check_conflicting_args(args, hashtype):
             args.ksize = ksize
             args.n_tables = n_tables
             args.max_tablesize = max_tablesize
+
+
+def check_argument_range(low, high, parameter_name):
+    """Check if parameter value is in the range `low` to `high`."""
+    def _in_range(value):
+        value = int(value)
+        if not low <= value < high:
+            print_error("\n** ERROR: khmer only supports "
+                        "%i <= %s < %i.\n" % (low, parameter_name, high))
+            sys.exit(1)
+
+        else:
+            return value
+
+    return _in_range
 
 
 # pylint: disable=invalid-name
@@ -418,6 +433,18 @@ def calculate_graphsize(args, graphtype, multiplier=1.0, _sysmem=None):
 def create_nodegraph(args, ksize=None, multiplier=1.0, fp_rate=0.01):
     """Create and return a nodegraph."""
     args = _check_fp_rate(args, fp_rate)
+
+    if hasattr(args, 'force'):
+        if args.n_tables > 20:
+            if not args.force:
+                print_error(
+                    "\n** ERROR: khmer only supports number "
+                    "of tables <= 20.\n")
+                sys.exit(1)
+            else:
+                log_warn("\n*** Warning: Maximum recommended number of "
+                         "tables is 20, discarded by force nonetheless!\n")
+
     if ksize is None:
         ksize = args.ksize
     if ksize > 32:
@@ -431,6 +458,19 @@ def create_nodegraph(args, ksize=None, multiplier=1.0, fp_rate=0.01):
 def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
     """Create and return a countgraph."""
     args = _check_fp_rate(args, fp_rate)
+
+    if hasattr(args, 'force'):
+        if args.n_tables > 20:
+            if not args.force:
+                print_error(
+                    "\n** ERROR: khmer only supports number "
+                    "of tables <= 20.\n")
+                sys.exit(1)
+            else:
+                if args.n_tables > 20:
+                    log_warn("\n*** Warning: Maximum recommended number of "
+                             "tables is 20, discarded by force nonetheless!\n")
+
     if ksize is None:
         ksize = args.ksize
     if ksize > 32:

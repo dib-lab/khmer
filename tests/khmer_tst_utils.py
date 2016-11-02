@@ -1,6 +1,7 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2010-2015, Michigan State University.
 # Copyright (C) 2015-2016, The Regents of the University of California.
+# Copyright (C) 2016, Google, Inc
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -46,12 +47,22 @@ import subprocess
 from io import open  # pylint: disable=redefined-builtin
 from hashlib import md5
 
+from khmer import reverse_complement as revcomp
+
 import pytest
 
 try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
+
+
+def _equals_rc(query, match):
+    return (query == match) or (revcomp(query) == match)
+
+
+def _contains_rc(match, query):
+    return (query in match) or (revcomp(query) in match)
 
 
 def _calc_md5(fp):
@@ -119,20 +130,21 @@ def _runscript(scriptname, sandbox=False):
             scriptname, namespace)
         return 0
     except pkg_resources.ResolutionError:
-        if sandbox:
-            path = os.path.join(os.path.dirname(__file__), "../sandbox")
-        else:
-            path = scriptpath()
+        pass
 
-        scriptfile = os.path.join(path, scriptname)
+    if sandbox:
+        path = os.path.join(os.path.dirname(__file__), "../sandbox")
+    else:
+        path = scriptpath()
+
+    scriptfile = os.path.join(path, scriptname)
+    if os.path.isfile(scriptfile):
         if os.path.isfile(scriptfile):
-            if os.path.isfile(scriptfile):
-                exec(  # pylint: disable=exec-used
-                    compile(open(scriptfile).read(), scriptfile, 'exec'),
-                    namespace)
-                return 0
-        elif sandbox:
-            pytest.skip("sandbox tests are only run in a repository.")
+            exec(compile(open(scriptfile).read(), scriptfile, 'exec'),
+                 namespace)
+            return 0
+    elif sandbox:
+        pytest.skip("sandbox tests are only run in a repository.")
 
     return -1
 
@@ -226,3 +238,9 @@ def longify(listofints):
     if sys.version_info.major < 3:
         return map(long, listofints)  # pylint: disable=bad-builtin
     return listofints
+
+
+def copy_test_data(testfile):
+    infile = get_temp_filename(os.path.basename(testfile))
+    shutil.copyfile(get_test_data(testfile), infile)
+    return infile

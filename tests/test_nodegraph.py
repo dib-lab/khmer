@@ -39,6 +39,7 @@ from __future__ import absolute_import
 
 import khmer
 from khmer import ReadParser
+from khmer import reverse_complement as revcomp
 
 import screed
 
@@ -1079,7 +1080,7 @@ def test_traverse_linear_path_3_stopgraph():
     assert len(degree_nodes) == 1
     assert nodegraph.hash(contig[100:121]) in degree_nodes
 
-    stopgraph.count(contig[101:122])      # stop traversal - only adj to start
+    stopgraph.count(contig[101:122])       # stop traversal - only adj to start
 
     size, conns, visited = nodegraph.traverse_linear_path(contig[101:122],
                                                           degree_nodes,
@@ -1089,3 +1090,15 @@ def test_traverse_linear_path_3_stopgraph():
     assert size == 0
     assert len(visited) == 0
     assert len(conns) == 0
+
+
+def test_assemble_linear_path_bad_seed():
+    # assemble single node.
+    contigfile = utils.get_test_data('simple-genome.fa')
+    contig = list(screed.open(contigfile))[0].sequence
+
+    nodegraph = khmer.Nodegraph(21, 1e5, 4)
+    nodegraph.consume(contig)
+
+    path = nodegraph.assemble_linear_path('GATTACA' * 3)
+    assert path == ''

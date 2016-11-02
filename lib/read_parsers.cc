@@ -1,7 +1,7 @@
 /*
 This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 Copyright (C) 2012-2015, Michigan State University.
-Copyright (C) 2015, The Regents of the University of California.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -65,14 +65,14 @@ Read::write_to(std::ostream& output)
 }
 
 
-struct SeqAnParser::Handle {
+struct FastxParser::Handle {
     seqan::SequenceStream stream;
     uint32_t seqan_spin_lock;
 };
 
-SeqAnParser::SeqAnParser( char const * filename ) : IParser( )
+FastxParser::FastxParser( char const * filename ) : IParser( )
 {
-    _private = new SeqAnParser::Handle();
+    _private = new FastxParser::Handle();
     seqan::open(_private->stream, filename);
     if (!seqan::isGood(_private->stream)) {
         std::string message = "Could not open ";
@@ -87,12 +87,12 @@ SeqAnParser::SeqAnParser( char const * filename ) : IParser( )
     _private->seqan_spin_lock = 0;
 }
 
-bool SeqAnParser::is_complete()
+bool FastxParser::is_complete()
 {
     return !seqan::isGood(_private->stream) || seqan::atEnd(_private->stream);
 }
 
-void SeqAnParser::imprint_next_read(Read &the_read)
+void FastxParser::imprint_next_read(Read &the_read)
 {
     the_read.reset();
     int ret = -1;
@@ -137,7 +137,7 @@ void SeqAnParser::imprint_next_read(Read &the_read)
     }
 }
 
-SeqAnParser::~SeqAnParser()
+FastxParser::~FastxParser()
 {
     seqan::close(_private->stream);
     delete _private;
@@ -150,7 +150,7 @@ get_parser(
 )
 {
 
-    return new SeqAnParser(ifile_name.c_str());
+    return new FastxParser(ifile_name.c_str());
 }
 
 
