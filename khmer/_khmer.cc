@@ -1641,6 +1641,308 @@ hashtable_assemble_linear_path(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
+hashtable_set_use_bigcount(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    PyObject * x;
+    if (!PyArg_ParseTuple(args, "O", &x)) {
+        return NULL;
+    }
+    int setme = PyObject_IsTrue(x);
+    if (setme < 0) {
+        return NULL;
+    }
+    hashtable->set_use_bigcount((bool)setme);
+
+    Py_RETURN_NONE;
+}
+
+static
+PyObject *
+hashtable_get_use_bigcount(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    if (!PyArg_ParseTuple(args, "")) {
+        return NULL;
+    }
+
+    bool val = hashtable->get_use_bigcount();
+
+    return PyBool_FromLong((int)val);
+}
+
+static
+PyObject *
+hashtable_get_min_count(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    const char * long_str;
+
+    if (!PyArg_ParseTuple(args, "s", &long_str)) {
+        return NULL;
+    }
+
+    if (strlen(long_str) < hashtable->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "string length must >= the hashtable k-mer size");
+        return NULL;
+    }
+
+    BoundedCounterType c = hashtable->get_min_count(long_str);
+    unsigned int N = c;
+
+    return PyLong_FromLong(N);
+}
+
+static
+PyObject *
+hashtable_get_max_count(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    const char * long_str;
+
+    if (!PyArg_ParseTuple(args, "s", &long_str)) {
+        return NULL;
+    }
+
+    if (strlen(long_str) < hashtable->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "string length must >= the hashtable k-mer size");
+        return NULL;
+    }
+
+    BoundedCounterType c = hashtable->get_max_count(long_str);
+    unsigned int N = c;
+
+    return PyLong_FromLong(N);
+}
+
+static
+PyObject *
+hashtable_abundance_distribution_with_reads_parser(khmer_KHashtable_Object * me,
+        PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    khmer :: python :: khmer_ReadParser_Object * rparser_obj = NULL;
+    khmer_KHashbits_Object *tracking_obj = NULL;
+
+    if (!PyArg_ParseTuple(args, "O!O!", &python::khmer_ReadParser_Type,
+                          &rparser_obj, &khmer_KNodegraph_Type, &tracking_obj)) {
+        return NULL;
+    }
+
+    read_parsers::IParser *rparser      = rparser_obj->parser;
+    Hashbits           *hashbits        = tracking_obj->hashbits;
+    uint64_t           *dist            = NULL;
+    const char         *value_exception = NULL;
+    const char         *file_exception  = NULL;
+    std::string exc_string;
+
+    Py_BEGIN_ALLOW_THREADS
+    try {
+        dist = hashtable->abundance_distribution(rparser, hashbits);
+    } catch (khmer_file_exception &exc) {
+        exc_string = exc.what();
+        file_exception = exc_string.c_str();
+    } catch (khmer_value_exception &exc) {
+        exc_string = exc.what();
+        value_exception = exc_string.c_str();
+    }
+    Py_END_ALLOW_THREADS
+
+    if (file_exception != NULL) {
+        PyErr_SetString(PyExc_OSError, file_exception);
+        return NULL;
+    }
+    if (value_exception != NULL) {
+        PyErr_SetString(PyExc_ValueError, value_exception);
+        return NULL;
+    }
+
+    PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
+    if (x == NULL) {
+        delete[] dist;
+        return NULL;
+    }
+    for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
+        PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(dist[i]));
+    }
+
+    delete[] dist;
+    return x;
+}
+
+static
+PyObject *
+hashtable_trim_on_abundance(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    const char * seq = NULL;
+    unsigned int min_count_i = 0;
+
+    if (!PyArg_ParseTuple(args, "sI", &seq, &min_count_i)) {
+        return NULL;
+    }
+
+    unsigned long trim_at;
+    Py_BEGIN_ALLOW_THREADS
+
+    BoundedCounterType min_count = min_count_i;
+
+    trim_at = hashtable->trim_on_abundance(seq, min_count);
+
+    Py_END_ALLOW_THREADS;
+
+    PyObject * trim_seq = PyUnicode_FromStringAndSize(seq, trim_at);
+    if (trim_seq == NULL) {
+        return NULL;
+    }
+    PyObject * ret = Py_BuildValue("Ok", trim_seq, trim_at);
+    Py_DECREF(trim_seq);
+
+    return ret;
+}
+
+static
+PyObject *
+hashtable_trim_below_abundance(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    const char * seq = NULL;
+    BoundedCounterType max_count_i = 0;
+
+    if (!PyArg_ParseTuple(args, "sH", &seq, &max_count_i)) {
+        return NULL;
+    }
+
+    unsigned long trim_at;
+    Py_BEGIN_ALLOW_THREADS
+
+    BoundedCounterType max_count = max_count_i;
+
+    trim_at = hashtable->trim_below_abundance(seq, max_count);
+
+    Py_END_ALLOW_THREADS;
+
+    PyObject * trim_seq = PyUnicode_FromStringAndSize(seq, trim_at);
+    if (trim_seq == NULL) {
+        return NULL;
+    }
+    PyObject * ret = Py_BuildValue("Ok", trim_seq, trim_at);
+    Py_DECREF(trim_seq);
+
+    return ret;
+}
+
+static
+PyObject *
+hashtable_find_spectral_error_positions(khmer_KHashtable_Object * me,
+                                        PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    const char * seq = NULL;
+    BoundedCounterType max_count = 0; // unsigned short int
+
+    if (!PyArg_ParseTuple(args, "sH", &seq, &max_count)) {
+        return NULL;
+    }
+
+    std::vector<unsigned int> posns;
+
+    try {
+        posns = hashtable->find_spectral_error_positions(seq, max_count);
+    } catch (khmer_exception &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return NULL;
+    }
+
+    Py_ssize_t posns_size = posns.size();
+
+    PyObject * x = PyList_New(posns_size);
+    if (x == NULL) {
+        return NULL;
+    }
+    for (Py_ssize_t i = 0; i < posns_size; i++) {
+        PyList_SET_ITEM(x, i, PyLong_FromLong(posns[i]));
+    }
+
+    return x;
+}
+
+static
+PyObject *
+hashtable_abundance_distribution(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    const char * filename = NULL;
+    khmer_KHashbits_Object * tracking_obj = NULL;
+    if (!PyArg_ParseTuple(args, "sO!", &filename, &khmer_KNodegraph_Type,
+                          &tracking_obj)) {
+        return NULL;
+    }
+
+    Hashbits           *hashbits        = tracking_obj->hashbits;
+    uint64_t           *dist            = NULL;
+    const char         *value_exception = NULL;
+    const char         *file_exception  = NULL;
+    std::string exc_string;
+
+    Py_BEGIN_ALLOW_THREADS
+    try {
+        dist = hashtable->abundance_distribution(filename, hashbits);
+    } catch (khmer_file_exception &exc) {
+        exc_string = exc.what();
+        file_exception = exc_string.c_str();
+    } catch (khmer_value_exception &exc) {
+        exc_string = exc.what();
+        value_exception = exc_string.c_str();
+    }
+    Py_END_ALLOW_THREADS
+
+    if (file_exception != NULL) {
+        PyErr_SetString(PyExc_OSError, file_exception);
+        if (dist != NULL) {
+            delete []dist;
+        }
+        return NULL;
+    }
+    if (value_exception != NULL) {
+        PyErr_SetString(PyExc_ValueError, value_exception);
+        if (dist != NULL) {
+            delete []dist;
+        }
+        return NULL;
+    }
+
+    PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
+    if (x == NULL) {
+        if (dist != NULL) {
+            delete []dist;
+        }
+        return NULL;
+    }
+    for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
+        PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(dist[i]));
+    }
+
+    if (dist != NULL) {
+        delete []dist;
+    }
+
+    return x;
+}
+
+static
+PyObject *
 hashtable_load(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashgraph * hashtable = me->hashtable;
@@ -3111,6 +3413,53 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "nodes.",
     },
 
+    {
+        "set_use_bigcount",
+        (PyCFunction)hashtable_set_use_bigcount, METH_VARARGS,
+        "Count past maximum binsize of hashtable (set to T/F)"
+    },
+    {
+        "get_use_bigcount",
+        (PyCFunction)hashtable_get_use_bigcount, METH_VARARGS,
+        "Get value of bigcount flag (T/F)"
+    },
+    {
+        "get_min_count",
+        (PyCFunction)hashtable_get_min_count, METH_VARARGS,
+        "Get the smallest count of all the k-mers in the string"
+    },
+    {
+        "get_max_count",
+        (PyCFunction)hashtable_get_max_count, METH_VARARGS,
+        "Get the largest count of all the k-mers in the string"
+    },
+    {
+        "trim_on_abundance",
+        (PyCFunction)hashtable_trim_on_abundance, METH_VARARGS,
+        "Trim string at first k-mer below the given abundance"
+    },
+    {
+        "trim_below_abundance",
+        (PyCFunction)hashtable_trim_below_abundance, METH_VARARGS,
+        "Trim string at first k-mer above the given abundance"
+    },
+    {
+        "find_spectral_error_positions",
+        (PyCFunction)hashtable_find_spectral_error_positions, METH_VARARGS,
+        "Identify positions of low-abundance k-mers"
+    },
+    {
+        "abundance_distribution",
+        (PyCFunction)hashtable_abundance_distribution, METH_VARARGS,
+        "Calculate the k-mer abundance distribution of the given file"
+    },
+    {
+        "abundance_distribution_with_reads_parser",
+        (PyCFunction)hashtable_abundance_distribution_with_reads_parser,
+        METH_VARARGS,
+        "Calculate the k-mer abundance distribution for a reads parser handle"
+    },
+
     //
     // tagging / sparse graph functionality
     //
@@ -3231,106 +3580,6 @@ static void khmer_counting_dealloc(khmer_KCountingHash_Object * obj);
 
 static
 PyObject *
-count_trim_on_abundance(khmer_KCountingHash_Object * me, PyObject * args)
-{
-    CountingHash * counting = me->counting;
-
-    const char * seq = NULL;
-    unsigned int min_count_i = 0;
-
-    if (!PyArg_ParseTuple(args, "sI", &seq, &min_count_i)) {
-        return NULL;
-    }
-
-    unsigned long trim_at;
-    Py_BEGIN_ALLOW_THREADS
-
-    BoundedCounterType min_count = min_count_i;
-
-    trim_at = counting->trim_on_abundance(seq, min_count);
-
-    Py_END_ALLOW_THREADS;
-
-    PyObject * trim_seq = PyUnicode_FromStringAndSize(seq, trim_at);
-    if (trim_seq == NULL) {
-        return NULL;
-    }
-    PyObject * ret = Py_BuildValue("Ok", trim_seq, trim_at);
-    Py_DECREF(trim_seq);
-
-    return ret;
-}
-
-static
-PyObject *
-count_trim_below_abundance(khmer_KCountingHash_Object * me, PyObject * args)
-{
-    CountingHash * counting = me->counting;
-
-    const char * seq = NULL;
-    BoundedCounterType max_count_i = 0;
-
-    if (!PyArg_ParseTuple(args, "sH", &seq, &max_count_i)) {
-        return NULL;
-    }
-
-    unsigned long trim_at;
-    Py_BEGIN_ALLOW_THREADS
-
-    BoundedCounterType max_count = max_count_i;
-
-    trim_at = counting->trim_below_abundance(seq, max_count);
-
-    Py_END_ALLOW_THREADS;
-
-    PyObject * trim_seq = PyUnicode_FromStringAndSize(seq, trim_at);
-    if (trim_seq == NULL) {
-        return NULL;
-    }
-    PyObject * ret = Py_BuildValue("Ok", trim_seq, trim_at);
-    Py_DECREF(trim_seq);
-
-    return ret;
-}
-
-static
-PyObject *
-count_find_spectral_error_positions(khmer_KCountingHash_Object * me,
-                                    PyObject * args)
-{
-    khmer::CountingHash * counting = me->counting;
-
-    const char * seq = NULL;
-    khmer::BoundedCounterType max_count = 0; // unsigned short int
-
-    if (!PyArg_ParseTuple(args, "sH", &seq, &max_count)) {
-        return NULL;
-    }
-
-    std::vector<unsigned int> posns;
-
-    try {
-        posns = counting->find_spectral_error_positions(seq, max_count);
-    } catch (khmer_exception &e) {
-        PyErr_SetString(PyExc_ValueError, e.what());
-        return NULL;
-    }
-
-    Py_ssize_t posns_size = posns.size();
-
-    PyObject * x = PyList_New(posns_size);
-    if (x == NULL) {
-        return NULL;
-    }
-    for (Py_ssize_t i = 0; i < posns_size; i++) {
-        PyList_SET_ITEM(x, i, PyLong_FromLong(posns[i]));
-    }
-
-    return x;
-}
-
-static
-PyObject *
 count_get_raw_tables(khmer_KCountingHash_Object * self, PyObject * args)
 {
     CountingHash * counting = self->counting;
@@ -3354,208 +3603,6 @@ count_get_raw_tables(khmer_KCountingHash_Object * self, PyObject * args)
     }
 
     return raw_tables;
-}
-
-static
-PyObject *
-count_set_use_bigcount(khmer_KCountingHash_Object * me, PyObject * args)
-{
-    CountingHash * counting = me->counting;
-
-    PyObject * x;
-    if (!PyArg_ParseTuple(args, "O", &x)) {
-        return NULL;
-    }
-    int setme = PyObject_IsTrue(x);
-    if (setme < 0) {
-        return NULL;
-    }
-    counting->set_use_bigcount((bool)setme);
-
-    Py_RETURN_NONE;
-}
-
-static
-PyObject *
-count_get_use_bigcount(khmer_KCountingHash_Object * me, PyObject * args)
-{
-    CountingHash * counting = me->counting;
-
-    if (!PyArg_ParseTuple(args, "")) {
-        return NULL;
-    }
-
-    bool val = counting->get_use_bigcount();
-
-    return PyBool_FromLong((int)val);
-}
-
-static
-PyObject *
-count_get_min_count(khmer_KCountingHash_Object * me, PyObject * args)
-{
-    CountingHash * counting = me->counting;
-
-    const char * long_str;
-
-    if (!PyArg_ParseTuple(args, "s", &long_str)) {
-        return NULL;
-    }
-
-    if (strlen(long_str) < counting->ksize()) {
-        PyErr_SetString(PyExc_ValueError,
-                        "string length must >= the hashtable k-mer size");
-        return NULL;
-    }
-
-    BoundedCounterType c = counting->get_min_count(long_str);
-    unsigned int N = c;
-
-    return PyLong_FromLong(N);
-}
-
-static
-PyObject *
-count_get_max_count(khmer_KCountingHash_Object * me, PyObject * args)
-{
-    CountingHash * counting = me->counting;
-
-    const char * long_str;
-
-    if (!PyArg_ParseTuple(args, "s", &long_str)) {
-        return NULL;
-    }
-
-    if (strlen(long_str) < counting->ksize()) {
-        PyErr_SetString(PyExc_ValueError,
-                        "string length must >= the hashtable k-mer size");
-        return NULL;
-    }
-
-    BoundedCounterType c = counting->get_max_count(long_str);
-    unsigned int N = c;
-
-    return PyLong_FromLong(N);
-}
-
-static
-PyObject *
-count_abundance_distribution_with_reads_parser(khmer_KCountingHash_Object * me,
-        PyObject * args)
-{
-    CountingHash * counting = me->counting;
-
-    khmer :: python :: khmer_ReadParser_Object * rparser_obj = NULL;
-    khmer_KHashbits_Object *tracking_obj = NULL;
-
-    if (!PyArg_ParseTuple(args, "O!O!", &python::khmer_ReadParser_Type,
-                          &rparser_obj, &khmer_KNodegraph_Type, &tracking_obj)) {
-        return NULL;
-    }
-
-    read_parsers::IParser *rparser      = rparser_obj->parser;
-    Hashbits           *hashbits        = tracking_obj->hashbits;
-    uint64_t           *dist            = NULL;
-    const char         *value_exception = NULL;
-    const char         *file_exception  = NULL;
-    std::string exc_string;
-
-    Py_BEGIN_ALLOW_THREADS
-    try {
-        dist = counting->abundance_distribution(rparser, hashbits);
-    } catch (khmer_file_exception &exc) {
-        exc_string = exc.what();
-        file_exception = exc_string.c_str();
-    } catch (khmer_value_exception &exc) {
-        exc_string = exc.what();
-        value_exception = exc_string.c_str();
-    }
-    Py_END_ALLOW_THREADS
-
-    if (file_exception != NULL) {
-        PyErr_SetString(PyExc_OSError, file_exception);
-        return NULL;
-    }
-    if (value_exception != NULL) {
-        PyErr_SetString(PyExc_ValueError, value_exception);
-        return NULL;
-    }
-
-    PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
-    if (x == NULL) {
-        delete[] dist;
-        return NULL;
-    }
-    for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
-        PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(dist[i]));
-    }
-
-    delete[] dist;
-    return x;
-}
-
-static
-PyObject *
-count_abundance_distribution(khmer_KCountingHash_Object * me, PyObject * args)
-{
-    CountingHash * counting = me->counting;
-
-    const char * filename = NULL;
-    khmer_KHashbits_Object * tracking_obj = NULL;
-    if (!PyArg_ParseTuple(args, "sO!", &filename, &khmer_KNodegraph_Type,
-                          &tracking_obj)) {
-        return NULL;
-    }
-
-    Hashbits           *hashbits        = tracking_obj->hashbits;
-    uint64_t           *dist            = NULL;
-    const char         *value_exception = NULL;
-    const char         *file_exception  = NULL;
-    std::string exc_string;
-
-    Py_BEGIN_ALLOW_THREADS
-    try {
-        dist = counting->abundance_distribution(filename, hashbits);
-    } catch (khmer_file_exception &exc) {
-        exc_string = exc.what();
-        file_exception = exc_string.c_str();
-    } catch (khmer_value_exception &exc) {
-        exc_string = exc.what();
-        value_exception = exc_string.c_str();
-    }
-    Py_END_ALLOW_THREADS
-
-    if (file_exception != NULL) {
-        PyErr_SetString(PyExc_OSError, file_exception);
-        if (dist != NULL) {
-            delete []dist;
-        }
-        return NULL;
-    }
-    if (value_exception != NULL) {
-        PyErr_SetString(PyExc_ValueError, value_exception);
-        if (dist != NULL) {
-            delete []dist;
-        }
-        return NULL;
-    }
-
-    PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
-    if (x == NULL) {
-        if (dist != NULL) {
-            delete []dist;
-        }
-        return NULL;
-    }
-    for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
-        PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(dist[i]));
-    }
-
-    if (dist != NULL) {
-        delete []dist;
-    }
-
-    return x;
 }
 
 static
@@ -3614,18 +3661,10 @@ count_do_subset_partition_with_abundance(khmer_KCountingHash_Object * me,
 }
 
 static PyMethodDef khmer_counting_methods[] = {
-    { "set_use_bigcount", (PyCFunction)count_set_use_bigcount, METH_VARARGS, "" },
-    { "get_use_bigcount", (PyCFunction)count_get_use_bigcount, METH_VARARGS, "" },
-    { "get_min_count", (PyCFunction)count_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
-    { "get_max_count", (PyCFunction)count_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
-    { "trim_on_abundance", (PyCFunction)count_trim_on_abundance, METH_VARARGS, "Trim on >= abundance" },
-    { "trim_below_abundance", (PyCFunction)count_trim_below_abundance, METH_VARARGS, "Trim on >= abundance" },
-    { "find_spectral_error_positions", (PyCFunction)count_find_spectral_error_positions, METH_VARARGS, "Identify positions of low-abundance k-mers" },
-    { "abundance_distribution", (PyCFunction)count_abundance_distribution, METH_VARARGS, "" },
-    { "abundance_distribution_with_reads_parser", (PyCFunction)count_abundance_distribution_with_reads_parser, METH_VARARGS, "" },
     {
-        "get_raw_tables", (PyCFunction)count_get_raw_tables,
-        METH_VARARGS, "Get a list of the raw tables as memoryview objects"
+        "get_raw_tables",
+        (PyCFunction)count_get_raw_tables, METH_VARARGS,
+        "Get a list of the raw storage tables as memoryview objects."
     },
     { "do_subset_partition_with_abundance", (PyCFunction)count_do_subset_partition_with_abundance, METH_VARARGS, "" },
     {NULL, NULL, 0, NULL}           /* sentinel */
