@@ -6,7 +6,7 @@
    * khmer/_khmer.cc,lib/{assembler.cc,assembler.hh,subset.cc,
    subset.hh,labelhash.cc,labelhash.hh,traversal.cc,traversal.hh}: renamed
    Hashtable to Hashgraph.
-   * setup.py: added storage.{cc,hh} to build.
+   * setup.py,lib/Makefile: added storage.{cc,hh} to build.
 
 2016-10-31  Titus Brown  <titus@idyll.org>
 
