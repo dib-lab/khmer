@@ -222,7 +222,6 @@ BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 #### oxli proper below here ####
 
 LIBKHMER_OBJS= \
-	hashbits.o \
 	hashtable.o \
 	hllcounter.o \
 	kmer_hash.o \
@@ -253,7 +252,6 @@ PRECLEAN_TARGS += libbz2clean
 endif
 
 KHMER_HEADERS= \
-	hashbits.hh \
 	hashtable.hh \
 	khmer_exception.hh \
 	khmer.hh \

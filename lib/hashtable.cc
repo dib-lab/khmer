@@ -1342,4 +1342,21 @@ const
     return posns;
 }
 
+void Hashbits::update_from(const Hashbits &otherBASE)
+{
+    if (_ksize != otherBASE._ksize) {
+        throw khmer_exception("both nodegraphs must have same k size");
+    }
+    BitStorage * myself = dynamic_cast<BitStorage *>(this->store);
+    const BitStorage * other;
+    other = dynamic_cast<const BitStorage*>(otherBASE.store);
+
+    // if dynamic_cast worked, then the pointers will be not null.
+    if (myself && other) {
+        myself->update_from(*other);
+    } else {
+        throw khmer_exception("update_from failed with incompatible objects");
+    }
+}
+
 // vim: set sts=2 sw=2:

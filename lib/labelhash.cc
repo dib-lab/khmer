@@ -41,7 +41,6 @@ Contact: khmer-project@idyll.org
 #include <sstream> // IWYU pragma: keep
 #include <set>
 
-#include "hashbits.hh"
 #include "hashtable.hh"
 #include "khmer_exception.hh"
 #include "labelhash.hh"
