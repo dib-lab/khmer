@@ -93,19 +93,34 @@ class Component {
     private:
         
         static unsigned long long n_created;
-        std::set<HashIntoType> tags;
-        // some container of k-mers
 
     public:
 
         const unsigned long long component_id;
+        std::set<HashIntoType> tags;
 
         explicit Component(): component_id(n_created) {
             n_created++;
         }
 
-        void merge(Component& other) {
+        void merge(std::set<Component*> other_comps) {
+            for (auto other : other_comps) {
+                if (other == this) {
+                    continue;
+                }
+                this->add_tag(other->tags);
+                delete other;
+            }
+        }
 
+        void add_tag(HashIntoType tag) {
+            tags.insert(tag);
+        }
+
+        void add_tag(std::set<HashIntoType> new_tags) {
+            for (auto tag: new_tags) {
+                add_tag(tag);
+            }
         }
 };
 Component::n_created = 0;
@@ -119,6 +134,9 @@ class StreamingPartitioner {
         GuardedKmerMap<Component*> tag_component_map;
 
         void consume_sequence(const std::string& seq);
+        void map_tags_to_component(std::set<HashIntoType> tags, Component * comp);
+        void find_connected_tags(std::set<HashIntoType> start_kmers,
+                                 SeenSet& found_tags)
 
 };
 
