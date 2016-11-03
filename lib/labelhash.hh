@@ -50,7 +50,7 @@ Contact: khmer-project@idyll.org
 
 namespace khmer
 {
-class Hashtable;
+class Hashgraph;
 
 namespace read_parsers
 {
@@ -125,9 +125,9 @@ protected:
     uint32_t _tag_labels_spin_lock;
 
 public:
-    khmer::Hashtable * graph;
+    khmer::Hashgraph * graph;
 
-    explicit LabelHash(Hashtable * ht) : graph(ht)
+    explicit LabelHash(Hashgraph * ht) : graph(ht)
     {
         _tag_labels_spin_lock = 0;
 

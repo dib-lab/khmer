@@ -235,7 +235,8 @@ LIBKHMER_OBJS= \
 	kmer_filters.o \
 	assembler.o \
 	alphabets.o \
-	murmur3.o
+	murmur3.o \
+	storage.o
 
 PRECOMILE_OBJS ?=
 PRECLEAN_TARGS ?=
@@ -266,7 +267,8 @@ KHMER_HEADERS= \
 	subset.hh \
 	kmer_filters.hh \
 	assembler.hh \
-	alphabets.hh
+	alphabets.hh \
+	storage.hh
 
 # START OF RULES #
 

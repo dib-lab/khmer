@@ -49,7 +49,7 @@ namespace khmer
 {
 class CountingHash;
 class Hashbits;
-class Hashtable;
+class Hashgraph;
 
 struct pre_partition_info {
     HashIntoType kmer;
@@ -60,10 +60,10 @@ struct pre_partition_info {
 
 class SubsetPartition
 {
-    friend class Hashtable;
+    friend class Hashgraph;
 protected:
     unsigned int next_partition_id;
-    Hashtable * _ht;
+    Hashgraph * _ht;
     PartitionMap partition_map;
     ReversePartitionMap reverse_pmap;
 
@@ -75,7 +75,7 @@ protected:
                                            const HashIntoType kmer);
 
 public:
-    explicit SubsetPartition(Hashtable * ht);
+    explicit SubsetPartition(Hashgraph * ht);
 
     ~SubsetPartition()
     {

@@ -1192,7 +1192,7 @@ static khmer_HashSet_Object * create_HashSet_Object(SeenSet * h, WordLength k)
 
 typedef struct {
     PyObject_HEAD
-    Hashtable * hashtable;
+    Hashgraph * hashtable;
 } khmer_KHashtable_Object;
 
 typedef struct {
@@ -1283,7 +1283,7 @@ static
 PyObject *
 hashtable_ksize(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     if (!PyArg_ParseTuple(args, "")) {
         return NULL;
@@ -1298,7 +1298,7 @@ static
 PyObject *
 hashtable_hash(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     char * kmer;
     if (!PyArg_ParseTuple(args, "s", &kmer)) {
@@ -1320,7 +1320,7 @@ static
 PyObject *
 hashtable_reverse_hash(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     PyObject * val_o;
     HashIntoType val;
@@ -1339,7 +1339,7 @@ static
 PyObject *
 hashtable_n_occupied(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     if (!PyArg_ParseTuple(args, "")) {
         return NULL;
@@ -1354,7 +1354,7 @@ static
 PyObject *
 hashtable_n_unique_kmers(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     uint64_t n = hashtable->n_unique_kmers();
 
@@ -1365,7 +1365,7 @@ static
 PyObject *
 hashtable_count(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     PyObject * v;
     if (!PyArg_ParseTuple(args, "O", &v)) {
@@ -1387,7 +1387,7 @@ static
 PyObject *
 hashtable_consume_fasta(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable  = me->hashtable;
+    Hashgraph * hashtable  = me->hashtable;
 
     const char * filename;
 
@@ -1416,7 +1416,7 @@ PyObject *
 hashtable_consume_fasta_with_reads_parser(khmer_KHashtable_Object * me,
         PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     PyObject * rparser_obj = NULL;
 
@@ -1462,7 +1462,7 @@ static
 PyObject *
 hashtable_consume(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * long_str;
 
@@ -1486,7 +1486,7 @@ static
 PyObject *
 hashtable_get(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     PyObject * arg;
 
@@ -1508,7 +1508,7 @@ static
 PyObject *
 hashtable_find_high_degree_nodes(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * long_str;
 
@@ -1535,7 +1535,7 @@ static
 PyObject *
 hashtable_neighbors(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
     PyObject * val_obj;
 
     if (!PyArg_ParseTuple(args, "O", &val_obj)) {
@@ -1573,7 +1573,7 @@ static
 PyObject *
 hashtable_traverse_linear_path(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     PyObject * val_o;
     khmer_KHashbits_Object * nodegraph_o = NULL;
@@ -1613,7 +1613,7 @@ static
 PyObject *
 hashtable_assemble_linear_path(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     PyObject * val_o;
     khmer_KHashbits_Object * nodegraph_o = NULL;
@@ -1645,7 +1645,7 @@ static
 PyObject *
 hashtable_load(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * filename = NULL;
 
@@ -1667,7 +1667,7 @@ static
 PyObject *
 hashtable_save(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * filename = NULL;
 
@@ -1689,7 +1689,7 @@ static
 PyObject *
 hashtable_get_hashsizes(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
 
     if (!PyArg_ParseTuple(args, "")) {
@@ -1710,7 +1710,7 @@ static
 PyObject *
 hashtable_consume_and_tag(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * seq;
 
@@ -1732,7 +1732,7 @@ static
 PyObject *
 hashtable_get_tags_and_positions(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * seq;
 
@@ -1772,7 +1772,7 @@ static
 PyObject *
 hashtable_find_all_tags_list(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * kmer_s = NULL;
 
@@ -1806,7 +1806,7 @@ static
 PyObject *
 hashtable_consume_fasta_and_tag(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * filename;
 
@@ -1836,7 +1836,7 @@ static
 PyObject *
 hashtable_get_median_count(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * long_str;
 
@@ -1862,7 +1862,7 @@ static
 PyObject *
 hashtable_median_at_least(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * long_str;
     unsigned int cutoff;
@@ -1888,7 +1888,7 @@ static
 PyObject *
 hashtable_n_tags(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     if (!PyArg_ParseTuple(args, "")) {
         return NULL;
@@ -1901,7 +1901,7 @@ static
 PyObject *
 hashtable_print_stop_tags(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * filename = NULL;
 
@@ -1918,7 +1918,7 @@ static
 PyObject *
 hashtable_print_tagset(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * filename = NULL;
 
@@ -1935,7 +1935,7 @@ static
 PyObject *
 hashtable_load_stop_tags(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * filename = NULL;
     PyObject * clear_tags_o = NULL;
@@ -1965,7 +1965,7 @@ static
 PyObject *
 hashtable_save_stop_tags(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * filename = NULL;
 
@@ -1992,7 +1992,7 @@ PyObject *
 hashtable_calc_connected_graph_size(khmer_KHashtable_Object * me,
                                     PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * _kmer;
     unsigned int max_size = 0;
@@ -2022,7 +2022,7 @@ static
 PyObject *
 hashtable_kmer_degree(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * kmer_s = NULL;
 
@@ -2037,7 +2037,7 @@ static
 PyObject *
 hashtable_trim_on_stoptags(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * seq = NULL;
 
@@ -2066,7 +2066,7 @@ static
 PyObject *
 hashtable_do_subset_partition(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     PyObject * start_kmer_obj;
     PyObject * end_kmer_obj;
@@ -2126,7 +2126,7 @@ static
 PyObject *
 hashtable_merge_subset(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     khmer_KSubsetPartition_Object * subset_obj = NULL;
     if (!PyArg_ParseTuple(args, "O!", &khmer_KSubsetPartition_Type,
@@ -2145,7 +2145,7 @@ static
 PyObject *
 hashtable_merge_from_disk(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * filename = NULL;
     if (!PyArg_ParseTuple(args, "s", &filename)) {
@@ -2167,7 +2167,7 @@ PyObject *
 hashtable_consume_fasta_and_tag_with_reads_parser(khmer_KHashtable_Object * me,
         PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     python::khmer_ReadParser_Object * rparser_obj = NULL;
 
@@ -2213,7 +2213,7 @@ PyObject *
 hashtable_consume_partitioned_fasta(khmer_KHashtable_Object * me,
                                     PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * filename;
 
@@ -2243,7 +2243,7 @@ static
 PyObject *
 hashtable_find_all_tags(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * kmer_s = NULL;
 
@@ -2286,7 +2286,7 @@ static
 PyObject *
 hashtable_assign_partition_id(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     khmer_PrePartitionInfo_Object * ppi_obj;
     if (!PyArg_ParseTuple(args, "O!", &khmer_PrePartitionInfo_Type, &ppi_obj)) {
@@ -2307,7 +2307,7 @@ static
 PyObject *
 hashtable_add_tag(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * kmer_s = NULL;
     if (!PyArg_ParseTuple(args, "s", &kmer_s)) {
@@ -2324,7 +2324,7 @@ static
 PyObject *
 hashtable_add_stop_tag(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * kmer_s = NULL;
     if (!PyArg_ParseTuple(args, "s", &kmer_s)) {
@@ -2341,7 +2341,7 @@ static
 PyObject *
 hashtable_get_stop_tags(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     if (!PyArg_ParseTuple(args, "")) {
         return NULL;
@@ -2365,7 +2365,7 @@ static
 PyObject *
 hashtable_get_tagset(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     if (!PyArg_ParseTuple(args, "")) {
         return NULL;
@@ -2389,7 +2389,7 @@ static
 PyObject *
 hashtable_output_partitions(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * filename = NULL;
     const char * output = NULL;
@@ -2427,7 +2427,7 @@ static
 PyObject *
 hashtable_save_partitionmap(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * filename = NULL;
 
@@ -2449,7 +2449,7 @@ static
 PyObject *
 hashtable_load_partitionmap(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * filename = NULL;
 
@@ -2471,7 +2471,7 @@ static
 PyObject *
 hashtable__validate_partitionmap(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     if (!PyArg_ParseTuple(args, "")) {
         return NULL;
@@ -2486,7 +2486,7 @@ static
 PyObject *
 hashtable_count_partitions(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     if (!PyArg_ParseTuple(args, "")) {
         return NULL;
@@ -2567,7 +2567,7 @@ static
 PyObject *
 hashtable_load_tagset(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * filename = NULL;
     PyObject * clear_tags_o = NULL;
@@ -2595,7 +2595,7 @@ static
 PyObject *
 hashtable_save_tagset(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * filename = NULL;
 
@@ -2647,7 +2647,7 @@ PyObject *
 hashtable_load_subset_partitionmap(khmer_KHashtable_Object * me,
                                    PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * filename = NULL;
 
@@ -2697,7 +2697,7 @@ static
 PyObject *
 hashtable__set_tag_density(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     unsigned int d;
     if (!PyArg_ParseTuple(args, "I", &d)) {
@@ -2713,7 +2713,7 @@ static
 PyObject *
 hashtable__get_tag_density(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     if (!PyArg_ParseTuple(args, "")) {
         return NULL;
@@ -2747,7 +2747,7 @@ static
 PyObject *
 hashtable_set_partition_id(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * kmer = NULL;
     PartitionID p = 0;
@@ -2765,7 +2765,7 @@ static
 PyObject *
 hashtable_join_partitions(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     PartitionID p1 = 0, p2 = 0;
 
@@ -2782,7 +2782,7 @@ static
 PyObject *
 hashtable_get_partition_id(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * kmer = NULL;
 
@@ -2801,7 +2801,7 @@ PyObject *
 hashtable_divide_tags_into_subsets(khmer_KHashtable_Object * me,
                                    PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     unsigned int subset_size = 0;
 
@@ -2822,7 +2822,7 @@ PyObject *
 hashtable_count_kmers_within_radius(khmer_KHashtable_Object * me,
                                     PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * kmer = NULL;
     unsigned int radius = 0;
@@ -2849,7 +2849,7 @@ static
 PyObject *
 hashtable_extract_unique_paths(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
 
     const char * sequence = NULL;
     unsigned int min_length = 0;
@@ -2878,7 +2878,7 @@ static
 PyObject *
 hashtable_get_kmers(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
     const char * sequence;
 
     if (!PyArg_ParseTuple(args, "s", &sequence)) {
@@ -2902,7 +2902,7 @@ static
 PyObject *
 hashtable_get_kmer_counts(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
     const char * sequence;
 
     if (!PyArg_ParseTuple(args, "s", &sequence)) {
@@ -2926,7 +2926,7 @@ static
 PyObject *
 hashtable_get_kmer_hashes(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
     const char * sequence;
 
     if (!PyArg_ParseTuple(args, "s", &sequence)) {
@@ -2952,7 +2952,7 @@ PyObject *
 hashtable_get_kmer_hashes_as_hashset(khmer_KHashtable_Object * me,
                                      PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
     const char * sequence;
 
     if (!PyArg_ParseTuple(args, "s", &sequence)) {
@@ -3730,7 +3730,7 @@ static PyObject* _new_counting_hash(PyTypeObject * type, PyObject * args,
             Py_DECREF(self);
             return PyErr_NoMemory();
         }
-        self->khashtable.hashtable = dynamic_cast<Hashtable*>(self->counting);
+        self->khashtable.hashtable = dynamic_cast<Hashgraph*>(self->counting);
     }
 
     return (PyObject *) self;
@@ -4065,7 +4065,7 @@ static PyObject * khmer_graphlabels_new(PyTypeObject *type, PyObject *args,
 
     if (self != NULL) {
         PyObject * hashtable_o;
-        khmer::Hashtable * hashtable = NULL;
+        khmer::Hashgraph * hashtable = NULL;
 
         if (!PyArg_ParseTuple(args, "O", &hashtable_o)) {
             Py_DECREF(self);
@@ -4549,7 +4549,7 @@ PyObject *
 hashtable_repartition_largest_partition(khmer_KHashtable_Object * me,
                                         PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
+    Hashgraph * hashtable = me->hashtable;
     khmer_KCountingHash_Object * counting_o = NULL;
     PyObject * subset_o = NULL;
     SubsetPartition * subset_p;
