@@ -4,7 +4,7 @@
 #include <vector>
 #include <cmath>
 #include "khmer.hh"
-#include "counting.hh"
+#include "hashtable.hh"
 
 using namespace khmer;
 

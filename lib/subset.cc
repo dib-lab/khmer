@@ -44,7 +44,6 @@ Contact: khmer-project@idyll.org
 #include <set>
 #include <utility>
 
-#include "counting.hh"
 #include "hashtable.hh"
 #include "khmer_exception.hh"
 #include "read_parsers.hh"

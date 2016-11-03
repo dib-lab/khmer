@@ -48,8 +48,8 @@ Contact: khmer-project@idyll.org
 #include <string>
 #include <vector>
 
-#include "counting.hh"
 #include "khmer.hh"
+#include "hashtable.hh"
 #include "kmer_hash.hh"
 
 #define READ_ALIGNER_DEBUG 0

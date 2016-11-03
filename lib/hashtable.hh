@@ -252,6 +252,32 @@ public:
 
     // get access to raw tables.
     Byte ** get_raw_tables() { return store->get_raw_tables(); }
+
+    // find the minimum k-mer count in the given sequence
+    BoundedCounterType get_min_count(const std::string &s);
+
+    // find the maximum k-mer count in the given sequence
+    BoundedCounterType get_max_count(const std::string &s);
+
+    // calculate the abundance distribution of kmers in the given file.
+    uint64_t * abundance_distribution(read_parsers::IParser * parser,
+                                      Hashtable * tracking);
+    uint64_t * abundance_distribution(std::string filename,
+                                      Hashtable * tracking);
+
+    // return the index of the first position in the sequence with k-mer
+    // abundance below min_abund.
+    unsigned long trim_on_abundance(std::string seq,
+                                    BoundedCounterType min_abund) const;
+
+    // return the index of the first position in the sequence with k-mer
+    // abundance above max_abund.
+    unsigned long trim_below_abundance(std::string seq,
+                                       BoundedCounterType max_abund) const;
+
+    // detect likely positions of errors
+    std::vector<unsigned int> find_spectral_error_positions(std::string seq,
+            BoundedCounterType min_abund) const;
 };
 
 //
@@ -417,6 +443,13 @@ public:
         }
     }
 
+};
+
+class CountingHash : public khmer::Hashgraph
+{
+public:
+    explicit CountingHash(WordLength ksize, std::vector<uint64_t> sizes)
+        : Hashgraph(ksize, new ByteStorage(sizes)) { } ;
 };
 }
 

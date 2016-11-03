@@ -62,7 +62,6 @@ public:
 };
 }
 
-#include "counting.hh"
 #include "labelhash.hh"
 #endif // HASHBITS_HH
 

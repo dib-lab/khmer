@@ -45,7 +45,6 @@ Contact: khmer-project@idyll.org
 #include <queue>
 #include <set>
 
-#include "counting.hh"
 #include "hashtable.hh"
 #include "khmer.hh"
 #include "read_parsers.hh"
@@ -1115,6 +1114,232 @@ const
         }
     }
     return size;
+}
+
+BoundedCounterType Hashtable::get_min_count(const std::string &s)
+{
+    KmerIterator kmers(s.c_str(), _ksize);
+
+    BoundedCounterType min_count = MAX_KCOUNT;
+
+    while(!kmers.done()) {
+        HashIntoType kmer = kmers.next();
+
+        BoundedCounterType count = this->get_count(kmer);
+
+        if (this->get_count(kmer) < min_count) {
+            min_count = count;
+        }
+    }
+    return min_count;
+}
+
+BoundedCounterType Hashtable::get_max_count(const std::string &s)
+{
+    KmerIterator kmers(s.c_str(), _ksize);
+
+    BoundedCounterType max_count = 0;
+
+    while(!kmers.done()) {
+        HashIntoType kmer = kmers.next();
+
+        BoundedCounterType count = this->get_count(kmer);
+
+        if (count > max_count) {
+            max_count = count;
+        }
+    }
+    return max_count;
+}
+
+uint64_t *
+Hashtable::abundance_distribution(
+    read_parsers::IParser * parser,
+    Hashtable *          tracking)
+{
+    uint64_t * dist = new uint64_t[MAX_BIGCOUNT + 1];
+    uint64_t i;
+
+    for (i = 0; i <= MAX_BIGCOUNT; i++) {
+        dist[i] = 0;
+    }
+
+    Read read;
+
+    string name;
+    string seq;
+
+    // if not, could lead to overflow.
+    if (sizeof(BoundedCounterType) != 2) {
+        delete[] dist;
+        throw khmer_exception();
+    }
+
+    while(!parser->is_complete()) {
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
+        seq = read.sequence;
+
+        if (check_and_normalize_read(seq)) {
+            KmerIterator kmers(seq.c_str(), _ksize);
+
+            while(!kmers.done()) {
+                HashIntoType kmer = kmers.next();
+
+                if (!tracking->get_count(kmer)) {
+                    tracking->count(kmer);
+
+                    BoundedCounterType n = get_count(kmer);
+                    dist[n]++;
+                }
+            }
+
+            name.clear();
+            seq.clear();
+        }
+    }
+    return dist;
+}
+
+
+uint64_t * Hashtable::abundance_distribution(
+    std::string filename,
+    Hashtable *  tracking)
+{
+    IParser* parser = IParser::get_parser(filename.c_str());
+
+    uint64_t * distribution = abundance_distribution(parser, tracking);
+    delete parser;
+    return distribution;
+}
+
+unsigned long Hashtable::trim_on_abundance(
+    std::string     seq,
+    BoundedCounterType  min_abund)
+const
+{
+    if (!check_and_normalize_read(seq)) {
+        return 0;
+    }
+
+    KmerIterator kmers(seq.c_str(), _ksize);
+
+    HashIntoType kmer;
+
+    if (kmers.done()) {
+        return 0;
+    }
+    kmer = kmers.next();
+
+    if (kmers.done() || get_count(kmer) < min_abund) {
+        return 0;
+    }
+
+    unsigned long i = _ksize;
+    while (!kmers.done()) {
+        kmer = kmers.next();
+
+        if (get_count(kmer) < min_abund) {
+            return i;
+        }
+        i++;
+    }
+
+    return seq.length();
+}
+
+unsigned long Hashtable::trim_below_abundance(
+    std::string     seq,
+    BoundedCounterType  max_abund)
+const
+{
+    if (!check_and_normalize_read(seq)) {
+        return 0;
+    }
+
+    KmerIterator kmers(seq.c_str(), _ksize);
+
+    HashIntoType kmer;
+
+    if (kmers.done()) {
+        return 0;
+    }
+    kmer = kmers.next();
+
+    if (kmers.done() || get_count(kmer) > max_abund) {
+        return 0;
+    }
+
+    unsigned long i = _ksize;
+    while (!kmers.done()) {
+        kmer = kmers.next();
+
+        if (get_count(kmer) > max_abund) {
+            return i;
+        }
+        i++;
+    }
+
+    return seq.length();
+}
+
+std::vector<unsigned int> Hashtable::find_spectral_error_positions(
+    std::string seq,
+    BoundedCounterType max_abund)
+const
+{
+    std::vector<unsigned int> posns;
+    if (!check_and_normalize_read(seq)) {
+        throw khmer_exception("invalid read");
+    }
+
+    KmerIterator kmers(seq.c_str(), _ksize);
+
+    HashIntoType kmer = kmers.next();
+    if (kmers.done()) {
+        return posns;
+    }
+
+    // find the first trusted k-mer
+    while (!kmers.done()) {
+        if (get_count(kmer) > max_abund) {
+            break;
+        }
+        kmer = kmers.next();
+    }
+
+    if (kmers.done()) {
+        return posns;
+    }
+
+    // did we bypass some erroneous k-mers? call the last one.
+    if (kmers.get_start_pos() > 0) {
+        // if we are well past the first k, forget the whole thing (!? @CTB)
+        if (kmers.get_start_pos() >= _ksize && 0) {
+            return posns;
+        }
+        posns.push_back(kmers.get_start_pos() - 1);
+    }
+
+    while (!kmers.done()) {
+        kmer = kmers.next();
+        if (get_count(kmer) <= max_abund) { // error!
+            posns.push_back(kmers.get_end_pos() - 1);
+
+            // find next good
+            while (!kmers.done()) {
+                kmer = kmers.next();
+                if (get_count(kmer) > max_abund) { // a good stretch again.
+                    break;
+                }
+            }
+        }
+    }
+
+    return posns;
 }
 
 // vim: set sts=2 sw=2:
