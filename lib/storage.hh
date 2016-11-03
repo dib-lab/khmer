@@ -35,8 +35,8 @@ LICENSE (END)
 Contact: khmer-project@idyll.org
 */
 
-#ifndef BITSTORAGE_HH
-#define BITSTORAGE_HH
+#ifndef STORAGE_HH
+#define STORAGE_HH
 
 namespace khmer
 {
@@ -70,9 +70,19 @@ public:
 };
 
 
-//
-// BitStorage: a Bloom filter implementation.
-//
+/*
+ * \class BitStorage
+ *
+ * \brief A Bloom filter implementation.
+ *
+ * BitStorage is used to track presence/absence of k-mers by Hashtable
+ * and derived classes.  It contains 'n_tables' different tables of
+ * bitsizes specified in 'tablesizes' (so 1/8 for bytesizes).
+ *
+ * Like other Storage classes, BitStorage manages setting the bits and
+ * tracking statistics, as well as save/load, and not much else.
+ *
+ */
 
 class BitStorage : public Storage
 {
@@ -210,9 +220,19 @@ protected:
 };
 
 
-//
-// ByteStorage: a CountMin sketch implementation.
-//
+/*
+ * \class ByteStorage
+ *
+ * \brief A CountMin sketch implementation.
+ *
+ * ByteStorage is used to track counts of k-mers by Hashtable
+ * and derived classes.  It contains 'n_tables' different tables of
+ * bytesizes specified in 'tablesizes'.
+ *
+ * Like other Storage classes, ByteStorage manages setting the bits and
+ * tracking statistics, as well as save/load, and not much else.
+ *
+ */
 
 class CountingHashFile;
 class CountingHashFileReader;
@@ -386,6 +406,8 @@ public:
 
 };
 
+// Helper classes for saving ByteStorage objs to disk & loading them.
+
 class CountingHashFile
 {
 public:
@@ -431,4 +453,4 @@ public:
 };
 }
 
-#endif // BITSTORAGE_HH
+#endif // STORAGE_HH
