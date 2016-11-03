@@ -249,7 +249,7 @@ void BitStorage::load(std::string infilename, WordLength &ksize)
     }
 }
 
-void CountingHashFile::save(
+void ByteStorageFile::save(
     const std::string   &outfilename,
     WordLength ksize,
     const ByteStorage &store)
@@ -259,14 +259,14 @@ void CountingHashFile::save(
     std::string type = filename.substr(found + 1);
 
     if (type == "gz") {
-        CountingHashGzFileWriter(filename, ksize, store);
+        ByteStorageGzFileWriter(filename, ksize, store);
     } else {
-        CountingHashFileWriter(filename, ksize, store);
+        ByteStorageFileWriter(filename, ksize, store);
     }
 }
 
 
-CountingHashFileReader::CountingHashFileReader(
+ByteStorageFileReader::ByteStorageFileReader(
     const std::string   &infilename,
     WordLength& ksize,
     ByteStorage &store)
@@ -400,7 +400,7 @@ CountingHashFileReader::CountingHashFileReader(
     }
 }
 
-CountingHashGzFileReader::CountingHashGzFileReader(
+ByteStorageGzFileReader::ByteStorageGzFileReader(
     const std::string   &infilename,
     WordLength &ksize,
     ByteStorage    &store)
@@ -576,7 +576,7 @@ CountingHashGzFileReader::CountingHashGzFileReader(
     gzclose(infile);
 }
 
-CountingHashFileWriter::CountingHashFileWriter(
+ByteStorageFileWriter::ByteStorageFileWriter(
     const std::string   &outfilename,
     const WordLength ksize,
     const ByteStorage& store)
@@ -634,7 +634,7 @@ CountingHashFileWriter::CountingHashFileWriter(
     outfile.close();
 }
 
-CountingHashGzFileWriter::CountingHashGzFileWriter(
+ByteStorageGzFileWriter::ByteStorageGzFileWriter(
     const std::string   &outfilename,
     const WordLength ksize,
     const ByteStorage &store)
@@ -739,7 +739,7 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(
     gzclose(outfile);
 }
 
-void CountingHashFile::load(
+void ByteStorageFile::load(
     const std::string   &infilename,
     WordLength &ksize,
     ByteStorage &store)
@@ -749,19 +749,19 @@ void CountingHashFile::load(
     std::string type = filename.substr(found + 1);
 
     if (type == "gz") {
-        CountingHashGzFileReader(filename, ksize, store);
+        ByteStorageGzFileReader(filename, ksize, store);
     } else {
-        CountingHashFileReader(filename, ksize, store);
+        ByteStorageFileReader(filename, ksize, store);
     }
 }
 
 void ByteStorage::save(std::string outfilename, WordLength ksize)
 {
-    CountingHashFile::save(outfilename, ksize, *this);
+    ByteStorageFile::save(outfilename, ksize, *this);
 }
 
 void ByteStorage::load(std::string infilename, WordLength& ksize)
 {
-    CountingHashFile::load(infilename, ksize, *this);
+    ByteStorageFile::load(infilename, ksize, *this);
 }
 

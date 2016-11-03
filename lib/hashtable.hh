@@ -346,7 +346,6 @@ public:
 
     void add_tag(HashIntoType tag) { all_tags.insert(tag); }
     void add_stop_tag(HashIntoType tag) { stop_tags.insert(tag); }
-    }
 
     size_t n_tags() const { return all_tags.size(); }
 

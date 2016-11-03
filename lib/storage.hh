@@ -234,18 +234,18 @@ protected:
  *
  */
 
-class CountingHashFile;
-class CountingHashFileReader;
-class CountingHashFileWriter;
-class CountingHashGzFileReader;
-class CountingHashGzFileWriter;
+class ByteStorageFile;
+class ByteStorageFileReader;
+class ByteStorageFileWriter;
+class ByteStorageGzFileReader;
+class ByteStorageGzFileWriter;
 
 class ByteStorage : public Storage {
-    friend class CountingHashFile;
-    friend class CountingHashFileReader;
-    friend class CountingHashFileWriter;
-    friend class CountingHashGzFileReader;
-    friend class CountingHashGzFileWriter;
+    friend class ByteStorageFile;
+    friend class ByteStorageFileReader;
+    friend class ByteStorageFileWriter;
+    friend class ByteStorageGzFileReader;
+    friend class ByteStorageGzFileWriter;
     friend class CountingHash;
 protected:
     unsigned int    _max_count;
@@ -408,7 +408,7 @@ public:
 
 // Helper classes for saving ByteStorage objs to disk & loading them.
 
-class CountingHashFile
+class ByteStorageFile
 {
 public:
     static void load(const std::string &infilename,
@@ -419,35 +419,35 @@ public:
                      const ByteStorage &store);
 };
 
-class CountingHashFileReader : public CountingHashFile
+class ByteStorageFileReader : public ByteStorageFile
 {
 public:
-    CountingHashFileReader(const std::string &infilename,
+    ByteStorageFileReader(const std::string &infilename,
                            WordLength &ksize,
                            ByteStorage &store);
 };
 
-class CountingHashGzFileReader : public CountingHashFile
+class ByteStorageGzFileReader : public ByteStorageFile
 {
 public:
-    CountingHashGzFileReader(const std::string &infilename,
+    ByteStorageGzFileReader(const std::string &infilename,
                              WordLength &ksize,
                              ByteStorage &store);
 };
 
 
-class CountingHashFileWriter : public CountingHashFile
+class ByteStorageFileWriter : public ByteStorageFile
 {
 public:
-    CountingHashFileWriter(const std::string &outfilename,
+    ByteStorageFileWriter(const std::string &outfilename,
                            const WordLength ksize,
                            const ByteStorage &store);
 };
 
-class CountingHashGzFileWriter : public CountingHashFile
+class ByteStorageGzFileWriter : public ByteStorageFile
 {
 public:
-    CountingHashGzFileWriter(const std::string &outfilename,
+    ByteStorageGzFileWriter(const std::string &outfilename,
                              const WordLength ksize,
                              const ByteStorage &store);
 };
