@@ -13,13 +13,13 @@ using namespace khmer;
 
 uint64_t Component::n_created = 0;
 
-StreamingPartitioner::StreamingPartitioner(std::weak_ptr<Hashtable>& graph)  : 
+StreamingPartitioner::StreamingPartitioner(Hashtable * graph)  : 
     graph(graph), _tag_density(DEFAULT_TAG_DENSITY), n_components(0)
 {
-    this->graph = graph;
 
-    if (auto graphptr = graph.lock()) {
-        std::vector<uint64_t> graph_table_sizes = graphptr->get_tablesizes(); 
+    //if (auto graphptr = graph.lock()) {
+    if (graph != NULL) {
+        std::vector<uint64_t> graph_table_sizes = graph->get_tablesizes(); 
         uint64_t graph_max_table_size = *std::max_element(graph_table_sizes.begin(),
                                                           graph_table_sizes.end());
 
@@ -29,8 +29,8 @@ StreamingPartitioner::StreamingPartitioner(std::weak_ptr<Hashtable>& graph)  :
         // sizes proportional by the number of tags. Here, we use _tag_density-2
         // because we always tag the first and last k-mers in a read.
         tag_component_map = std::unique_ptr<GuardedKmerCompMap>(
-                                new GuardedKmerCompMap(graphptr->ksize(), 
-                                                       graphptr->n_tables(),
+                                new GuardedKmerCompMap(graph->ksize(), 
+                                                       graph->n_tables(),
                                                        graph_max_table_size / (_tag_density-2)));
     } else {
         throw khmer_ptr_exception("Hashtable has been deleted.");
@@ -54,8 +54,9 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
      * &seq, with / as the difference, + as the union, and &
      * as the intersect operator.
      */
-    if (auto graphptr = graph.lock()) {
-        KmerIterator kmers(seq.c_str(), graphptr->ksize());
+    //if (auto graphptr = graph.lock()) {
+    if(graph != NULL) {
+        KmerIterator kmers(seq.c_str(), graph->ksize());
         unsigned int since = 1;
 
         std::set<HashIntoType> tags;
@@ -69,7 +70,7 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
         // First check if we overlap any tags
         Kmer kmer = kmers.next();
         tags.insert(kmer); //always tag the first k-mer
-        bool is_new_kmer = graphptr->test_and_set_bits(kmer);
+        bool is_new_kmer = graph->test_and_set_bits(kmer);
 
         while(!kmers.done()) {
             bool kmer_tagged = false;
@@ -109,7 +110,7 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
                 since = 1;
             }
 
-            is_new_kmer = graphptr->test_and_set_bits(kmer);
+            is_new_kmer = graph->test_and_set_bits(kmer);
             kmer = kmers.next();
         }
         tags.insert(kmer);	// always tag the last k-mer
@@ -159,7 +160,8 @@ void StreamingPartitioner::find_connected_tags(KmerQueue& node_q,
                                                std::set<HashIntoType>& seen)
 {
     
-    if (auto graphptr = graph.lock()) {
+    //if (auto graphptr = graph.lock()) {
+    if (graph != NULL) {
 
         // put a 0 on the breadth queue for each element in the starting node queue
         std::queue<unsigned int> breadth_q(std::deque<unsigned int>(node_q.size(), 0));
@@ -173,7 +175,7 @@ void StreamingPartitioner::find_connected_tags(KmerQueue& node_q,
         KmerFilter filter = [&] (const Kmer& n) -> bool {
             return set_contains(seen, n);
         };
-        Traverser traverser(graphptr.get(), filter);
+        Traverser traverser(graph, filter);
 
         while(!node_q.empty()) {
 

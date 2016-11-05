@@ -151,14 +151,17 @@ class StreamingPartitioner {
         uint32_t _tag_density;
 
         // We're not graph's owner, simply an observer.
-        std::weak_ptr<Hashtable> graph;
+        // Unforunately our ownership policies elsewhere are a mess
+        Hashtable * graph;
+        //std::weak_ptr<Hashtable> graph;
         // We should exlusively own tag_component_map.
         std::unique_ptr<GuardedKmerCompMap> tag_component_map;
+        std::unique_ptr<ComponentPtr> components;
         uint64_t n_components;
 
     public:
 
-        explicit StreamingPartitioner(std::weak_ptr<Hashtable>& graph);
+        explicit StreamingPartitioner(Hashtable * graph);
 
         void consume_sequence(const std::string& seq);
         void map_tags_to_component(std::set<HashIntoType> tags, ComponentPtr& comp);

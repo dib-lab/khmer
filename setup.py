@@ -42,8 +42,11 @@ import os
 import sys
 from os import listdir as os_listdir
 from os.path import join as path_join
+from os.path import splitext
 import shutil
 import subprocess
+import sys
+import sysconfig
 import tempfile
 
 from setuptools import setup
@@ -120,6 +123,16 @@ def check_for_openmp():
 
     return exit_code == 0
 
+def distutils_dir_name(dname):
+    """Returns the name of a distutils build directory"""
+    f = "{dirname}.{platform}-{version[0]}.{version[1]}"
+    return f.format(dirname=dname,
+                    platform=sysconfig.get_platform(),
+                    version=sys.version_info)
+
+def build_dir():
+    return path_join("build", distutils_dir_name("temp"))
+
 # We bundle tested versions of zlib & bzip2. To use the system zlib and bzip2
 # change setup.cfg or use the `--libraries z,bz2` parameter which will make our
 # custom build_ext command strip out the bundled versions.
@@ -127,18 +140,18 @@ def check_for_openmp():
 ZLIBDIR = 'third-party/zlib'
 BZIP2DIR = 'third-party/bzip2'
 
-BUILD_DEPENDS = []
+BUILD_DEPENDS = ["khmer/_khmer.hh"]
 BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
     "khmer", "kmer_hash", "hashtable", "counting", "hashbits", "labelhash",
     "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers",
-    "kmer_filters", "traversal", "assembler", "alphabets"])
+    "kmer_filters", "traversal", "assembler", "alphabets", "partitioning"])
 
-#CP_SOURCES = ["khmer/_khmer.cc"]
-SOURCES = []
+SOURCES = ["khmer/_khmer.cc"]
 SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
     "read_parsers", "kmer_hash", "hashtable",
     "hashbits", "labelhash", "counting", "subset", "read_aligner",
-    "hllcounter", "traversal", "kmer_filters", "assembler", "alphabets"])
+    "hllcounter", "traversal", "kmer_filters", "assembler", "alphabets",
+    "partitioning"])
 
 SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
@@ -156,7 +169,7 @@ if check_for_openmp():
     EXTRA_COMPILE_ARGS.extend(['-fopenmp'])
     EXTRA_LINK_ARGS.extend(['-fopenmp'])
 
-EXTENSION_MOD_DICT = \
+CP_EXTENSION_MOD_DICT = \
     {
         "sources": SOURCES,
         "extra_compile_args": EXTRA_COMPILE_ARGS,
@@ -166,15 +179,27 @@ EXTENSION_MOD_DICT = \
         "define_macros": [("VERSION", versioneer.get_version()), ],
     }
 
-CP_EXT_MOD_DICT = dict(EXTENSION_MOD_DICT)
-CP_EXT_MOD_DICT['sources'].insert(0, "khmer/_khmer.cc")
-EXTENSION_MODS = [Extension("khmer._khmer", ** CP_EXT_MOD_DICT)]
+EXTENSION_MODS = [Extension("khmer._khmer", ** CP_EXTENSION_MOD_DICT)]
 
+CY_EXTENSION_MOD_DICT = \
+    {
+        "sources": ["khmer/_oxli.pyx"],
+        "extra_compile_args": EXTRA_COMPILE_ARGS,
+        "extra_link_args": EXTRA_LINK_ARGS,
+        "extra_objects": [path_join(build_dir(), splitext(p)[0]+'.o')  for p in SOURCES],
+        "depends": [],
+        "language": "c++",
+        "define_macros": [("VERSION", versioneer.get_version()), ],
+    }
+
+'''
 CY_EXT_MOD_DICT = dict(EXTENSION_MOD_DICT)
 CY_EXT_MOD_DICT['sources'].insert(0, "khmer/_oxli.pyx")
+CY_EXT_MOD_DICT['sources'].insert(1, "khmer/_khmer.cc")
 CY_EXT_MOD_DICT['sources'].append(path_join("lib", "partitioning.cc"))
 CY_EXT_MOD_DICT['depends'].append(path_join("lib", "partitioning.hh"))
-CY_EXTENSION_MOD = Extension("khmer._oxli", ** CY_EXT_MOD_DICT)
+'''
+CY_EXTENSION_MOD = Extension("khmer._oxli", ** CY_EXTENSION_MOD_DICT)
 EXTENSION_MODS.extend(cythonize([CY_EXTENSION_MOD]))
 
 

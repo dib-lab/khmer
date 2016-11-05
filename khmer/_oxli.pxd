@@ -20,6 +20,11 @@ cdef extern from "hashtable.hh" namespace "khmer":
         CyHashtable(WordLength)
 
 
+cdef extern from "_khmer.hh":
+    ctypedef struct CyCpHashtable_Object "khmer::khmer_KHashtable_Object":
+        CyHashtable* hashtable
+
+
 cdef extern from "kmer_hash.hh" namespace "khmer":
     cdef cppclass Kmer:
         HashIntoType kmer_f
@@ -49,7 +54,7 @@ cdef extern from "partitioning.hh" namespace "khmer":
 
 cdef extern from "partitioning.hh" namespace "khmer":
     cdef cppclass CyStreamingPartitioner "khmer::StreamingPartitioner":
-        StreamingPartitioner(weak_ptr[CyHashtable] graph) except +MemoryError
+        CyStreamingPartitioner(CyHashtable * ) except +MemoryError
 
         void consume_sequence(string&) except +MemoryError
         void map_tags_to_component(set[HashIntoType], ComponentPtr)

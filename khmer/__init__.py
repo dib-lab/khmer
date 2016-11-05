@@ -69,6 +69,8 @@ from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 # tests/test_read_parsers.py,scripts/{filter-abund-single,load-graph}.py
 # scripts/{abundance-dist-single,load-into-counting}.py
 
+from khmer import _oxli
+
 import sys
 
 from struct import pack, unpack
