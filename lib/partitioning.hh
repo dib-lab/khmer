@@ -140,7 +140,7 @@ class Component {
             return n_merges;
         }
 };
-static uint64_t Component::n_created = 0;
+
 typedef std::shared_ptr<Component> ComponentPtr;
 typedef GuardedKmerMap<ComponentPtr> GuardedKmerCompMap;
 

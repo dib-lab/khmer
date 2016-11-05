@@ -11,6 +11,8 @@
 
 using namespace khmer;
 
+uint64_t Component::n_created = 0;
+
 StreamingPartitioner::StreamingPartitioner(std::weak_ptr<Hashtable>& graph)  : 
     graph(graph), _tag_density(DEFAULT_TAG_DENSITY), n_components(0)
 {
