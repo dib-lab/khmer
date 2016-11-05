@@ -54,6 +54,8 @@ from distutils.sysconfig import get_config_vars
 from distutils.dist import Distribution
 from distutils.errors import DistutilsPlatformError
 
+from Cython.Build import cythonize
+
 import versioneer
 ez_setup.use_setuptools(version="3.4.1")
 
@@ -131,7 +133,8 @@ BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
     "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers",
     "kmer_filters", "traversal", "assembler", "alphabets"])
 
-SOURCES = ["khmer/_khmer.cc"]
+#CP_SOURCES = ["khmer/_khmer.cc"]
+SOURCES = []
 SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
     "read_parsers", "kmer_hash", "hashtable",
     "hashbits", "labelhash", "counting", "subset", "read_aligner",
@@ -163,7 +166,18 @@ EXTENSION_MOD_DICT = \
         "define_macros": [("VERSION", versioneer.get_version()), ],
     }
 
-EXTENSION_MOD = Extension("khmer._khmer", ** EXTENSION_MOD_DICT)
+CP_EXT_MOD_DICT = dict(EXTENSION_MOD_DICT)
+CP_EXT_MOD_DICT['sources'].insert(0, "khmer/_khmer.cc")
+EXTENSION_MODS = [Extension("khmer._khmer", ** CP_EXT_MOD_DICT)]
+
+CY_EXT_MOD_DICT = dict(EXTENSION_MOD_DICT)
+CY_EXT_MOD_DICT['sources'].insert(0, "khmer/_oxli.pyx")
+CY_EXT_MOD_DICT['sources'].append(path_join("lib", "partitioning.cc"))
+CY_EXT_MOD_DICT['depends'].append(path_join("lib", "partitioning.hh"))
+CY_EXTENSION_MOD = Extension("khmer._oxli", ** CY_EXT_MOD_DICT)
+EXTENSION_MODS.extend(cythonize([CY_EXTENSION_MOD]))
+
+
 SCRIPTS = []
 SCRIPTS.extend([path_join("scripts", script)
                 for script in os_listdir("scripts")
@@ -234,7 +248,7 @@ SETUP_METADATA = \
         #        "oxli = oxli:main"
         #    ]
         # },
-        "ext_modules": [EXTENSION_MOD, ],
+        "ext_modules": EXTENSION_MODS,
         # "platforms": '', # empty as is conveyed by the classifiers below
         # "license": '', # empty as is conveyed by the classifier below
         "include_package_data": True,

@@ -86,6 +86,14 @@ public:
         : khmer_exception(msg) { }
 };
 
+
+class khmer_ptr_exception : public khmer_exception
+{
+public:
+    explicit khmer_ptr_exception(const std::string& msg)
+        : khmer_exception(msg) { }
+};
+
 /////// Specialised Exceptions /////
 
 class InvalidStream : public khmer_file_exception

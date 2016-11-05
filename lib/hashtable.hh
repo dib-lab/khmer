@@ -104,7 +104,7 @@ inline bool is_prime(uint64_t n)
 }
 
 
-std::vector<uint64_t> get_n_primes_near_x(n, x)
+inline std::vector<uint64_t> get_n_primes_near_x(uint32_t n, uint64_t x)
 {
     std::vector<uint64_t> primes;
     if (x == 1 && n == 1) {
@@ -112,7 +112,7 @@ std::vector<uint64_t> get_n_primes_near_x(n, x)
         return primes;
     }
 
-    i = x - 1;
+    uint64_t i = x - 1;
     if (i % 2 == 0) {
         i--;
     }

@@ -38,14 +38,15 @@ Contact: khmer-project@idyll.org
 #define PARTITIONING_HH
 
 #include <functional>
+#include <memory>
 
 #include "khmer.hh"
 #include "kmer_hash.hh"
 #include "hashtable.hh"
+#include "hashbits.hh"
 #include "counting.hh"
 #include "kmer_filters.hh"
 #include "traversal.hh"
-#include "labelhash.hh"
 
 
 namespace khmer
@@ -56,20 +57,23 @@ class GuardedKmerMap {
 
     public:
 
-        const Hashbits * filter;
+        // Filter should be owned exclusively by GuardedKmerMap
+        std::unique_ptr<Hashbits> filter;
         std::map<HashIntoType, T> data;
         
         explicit GuardedKmerMap(WordLength ksize,
                                 unsigned short n_tables,
-                                uint64_t max_table_size) {
-            filter = new Hashbits(ksize, get_n_primes_near_x(n_tables, max_table_size));
+                                uint64_t max_table_size)
+        {
+            std::vector<uint64_t> table_sizes = get_n_primes_near_x(n_tables, max_table_size);
+            filter = std::unique_ptr<Hashbits>(new Hashbits(ksize, table_sizes));
         }
 
         T get(HashIntoType kmer) {
             if (filter->get_count(kmer)) {
                 auto search = data.find(kmer);
                 if (search != data.end()) {
-                    return search->first;
+                    return search->second;
                 }
             }
             
@@ -92,24 +96,29 @@ class Component {
 
     private:
         
-        static unsigned long long n_created;
+        static uint64_t n_created;
+        uint64_t n_merges;
 
     public:
 
-        const unsigned long long component_id;
+        const uint64_t component_id;
         std::set<HashIntoType> tags;
 
-        explicit Component(): component_id(n_created) {
+        explicit Component(): component_id(n_created), n_merges(0) {
             n_created++;
         }
 
-        void merge(std::set<Component*> other_comps) {
+        ~Component() {
+            tags.clear(); // maybe not necessary?
+        }
+
+        void merge(std::set<std::shared_ptr<Component>> other_comps) {
             for (auto other : other_comps) {
-                if (other == this) {
+                if (other.get() == this) {
                     continue;
                 }
                 this->add_tag(other->tags);
-                delete other;
+                this->n_merges = other->get_n_merges() + 1;
             }
         }
 
@@ -122,22 +131,43 @@ class Component {
                 add_tag(tag);
             }
         }
-};
-Component::n_created = 0;
 
+        uint64_t get_n_tags() {
+            return tags.size();
+        }
+
+        uint64_t get_n_merges() {
+            return n_merges;
+        }
+};
+static uint64_t Component::n_created = 0;
+typedef std::shared_ptr<Component> ComponentPtr;
+typedef GuardedKmerMap<ComponentPtr> GuardedKmerCompMap;
 
 class StreamingPartitioner {
 
     private:
     
-        const Hashtable * graph;
-        GuardedKmerMap<Component*> tag_component_map;
+        uint32_t _tag_density;
+
+        // We're not graph's owner, simply an observer.
+        std::weak_ptr<Hashtable> graph;
+        // We should exlusively own tag_component_map.
+        std::unique_ptr<GuardedKmerCompMap> tag_component_map;
+        uint64_t n_components;
+
+    public:
+
+        explicit StreamingPartitioner(std::weak_ptr<Hashtable>& graph);
 
         void consume_sequence(const std::string& seq);
-        void map_tags_to_component(std::set<HashIntoType> tags, Component * comp);
-        void find_connected_tags(std::set<HashIntoType> start_kmers,
-                                 SeenSet& found_tags)
-
+        void map_tags_to_component(std::set<HashIntoType> tags, ComponentPtr& comp);
+        void find_connected_tags(KmerQueue& node_q,
+                                 std::set<HashIntoType>& found_tags,
+                                 std::set<HashIntoType>& seen);
+        uint64_t get_n_components() {
+            return n_components;
+        }
 };
 
 
