@@ -39,6 +39,7 @@ cdef extern from "kmer_hash.hh" namespace "khmer":
 
 
 cdef extern from "partitioning.hh" namespace "khmer":
+
     cdef cppclass CyComponent "khmer::Component":
         const uint64_t component_id
         set[HashIntoType] tags
@@ -50,9 +51,15 @@ cdef extern from "partitioning.hh" namespace "khmer":
         uint64_t get_n_merges()
 
     ctypedef shared_ptr[CyComponent] ComponentPtr
+    ctypedef set[ComponentPtr] ComponentPtrSet
 
+    cdef cppclass GuardedKmerCompMap "khmer::GuardedKmerCompMap":
+        map[HashIntoType, ComponentPtr] data
 
-cdef extern from "partitioning.hh" namespace "khmer":
+        ComponentPtr get(HashIntoType)
+        void set(HashIntoType, ComponentPtr)
+        bool contains(HashIntoType)
+
     cdef cppclass CyStreamingPartitioner "khmer::StreamingPartitioner":
         CyStreamingPartitioner(CyHashtable * ) except +MemoryError
 
@@ -62,3 +69,9 @@ cdef extern from "partitioning.hh" namespace "khmer":
                                  set[HashIntoType]&,
                                  set[HashIntoType]&) except +MemoryError
         uint64_t get_n_components()
+
+        ComponentPtr get_tag_component(string&) const
+        ComponentPtr get_nearest_component(string&) const
+
+        weak_ptr[ComponentPtrSet] get_component_set()
+        weak_ptr[GuardedKmerCompMap] get_tag_component_map()

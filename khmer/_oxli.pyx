@@ -15,7 +15,7 @@ cdef class Component:
             self._this.reset(other._this.get())
         else:
             self._this.reset(new CyComponent())
-        
+
     property component_id:
         def __get__(self):
             return deref(self._this).component_id
@@ -34,9 +34,18 @@ cdef class Component:
             inc(it)
 
 
+cdef Component build_component(ComponentPtr ptr):
+    cdef Component comp = Component()
+    comp._this.reset(ptr.get())
+    return comp
+
+
 cdef class StreamingPartitioner:
 
     cdef unique_ptr[CyStreamingPartitioner] _this
+    cdef weak_ptr[ComponentPtrSet] _components
+    cdef weak_ptr[GuardedKmerCompMap] _tag_component_map
+
     cdef CyHashtable * _graph_ptr
 
     def __cinit__(self, graph):
@@ -51,6 +60,22 @@ cdef class StreamingPartitioner:
 
     def consume_sequence(self, sequence):
         deref(self._this).consume_sequence(sequence.encode('utf-8'))
+
+    def get_tag_component(self, kmer):
+        cdef ComponentPtr comp
+        comp = deref(self._this).get_tag_component(kmer.encode('utf-8'))
+        if comp == NULL:
+            return None
+        else:
+            return build_component(comp)
+
+    def get_nearest_component(self, kmer):
+        cdef ComponentPtr comp
+        comp = deref(self._this).get_nearest_component(kmer.encode('utf-8'))
+        if comp == NULL:
+            return None
+        else:
+            return build_component(comp)
 
     property n_components:
         def __get__(self):

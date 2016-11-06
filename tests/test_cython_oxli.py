@@ -41,3 +41,16 @@ class TestStreamingPartitionerBasic:
         
         sp.consume_sequence(comp2)
         assert sp.n_components == 2
+
+    def test_get_nearest_component(self, random_sequence):
+        comp1 =  random_sequence()
+        comp2 = random_sequence(exclude=comp1)
+
+        cg = khmer.Nodegraph(K, 1e5, 4)
+        sp = _oxli.StreamingPartitioner(cg)
+        assert False
+        sp.consume_sequence(comp1)
+        sp.consume_sequence(comp2)
+
+        c = sp.get_nearest_component(comp1[:K])
+        assert c.component_id == 0

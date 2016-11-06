@@ -142,6 +142,7 @@ class Component {
 };
 
 typedef std::shared_ptr<Component> ComponentPtr;
+typedef std::set<ComponentPtr> ComponentPtrSet;
 typedef GuardedKmerMap<ComponentPtr> GuardedKmerCompMap;
 
 class StreamingPartitioner {
@@ -154,9 +155,9 @@ class StreamingPartitioner {
         // Unforunately our ownership policies elsewhere are a mess
         Hashtable * graph;
         //std::weak_ptr<Hashtable> graph;
-        // We should exlusively own tag_component_map.
-        std::unique_ptr<GuardedKmerCompMap> tag_component_map;
-        std::unique_ptr<ComponentPtr> components;
+        // We should exclusively own tag_component_map.
+        std::shared_ptr<GuardedKmerCompMap> tag_component_map;
+        std::shared_ptr<ComponentPtrSet> components;
         uint64_t n_components;
 
     public:
@@ -167,9 +168,26 @@ class StreamingPartitioner {
         void map_tags_to_component(std::set<HashIntoType> tags, ComponentPtr& comp);
         void find_connected_tags(KmerQueue& node_q,
                                  std::set<HashIntoType>& found_tags,
-                                 std::set<HashIntoType>& seen);
-        uint64_t get_n_components() {
+                                 std::set<HashIntoType>& seen,
+                                 bool truncate=false) const;
+        uint64_t get_n_components() const {
             return n_components;
+        }
+
+        void merge_components(ComponentPtr root, ComponentPtrSet comps);
+
+        ComponentPtr get_tag_component(HashIntoType tag) const;
+        ComponentPtr get_tag_component(std::string& tag) const;
+        
+        ComponentPtr get_nearest_component(Kmer kmer) const;
+        ComponentPtr get_nearest_component(std::string& kmer) const;
+
+        std::weak_ptr<ComponentPtrSet> get_component_set() {
+            return std::weak_ptr<ComponentPtrSet>(components);
+        }
+
+        std::weak_ptr<GuardedKmerCompMap> get_tag_component_map() {
+            return std::weak_ptr<GuardedKmerCompMap>(tag_component_map);
         }
 };
 

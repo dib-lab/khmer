@@ -123,7 +123,7 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
         find_connected_tags(search_from, tags, seen);
 
         // Now resolve components. First, get components from existing tags.
-        std::set<ComponentPtr> comps;
+        ComponentPtrSet comps;
         ComponentPtr comp;
         for (auto tag: tags) {
             if ((comp = tag_component_map->get(tag)) != NULL) {
@@ -133,6 +133,7 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
 
         if (comps.size() == 0) {
             comp = std::make_shared<Component>();
+            components->insert(comp);
             n_components++;
         } else {
             // get the first component
@@ -142,9 +143,7 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
                 comp->add_tag(tags);
                 map_tags_to_component(tags, comp);
             } else {
-                // merge the components
-                comp->merge(comps);
-                n_components -= comps.size() - 1;
+                merge_components(comp, comps);
             }
         }
         // (re)map all the tags to the component
@@ -155,9 +154,61 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
 }
 
 
+void StreamingPartitioner::merge_components(ComponentPtr root, 
+                                            std::set<ComponentPtr> comps)
+{
+    root->merge(comps);
+    n_components = comps.size() - 1;
+    for (auto other : comps) {
+        if (other == root) {
+            continue;
+        }
+        components->erase(other);
+    }
+}
+
+
+ComponentPtr StreamingPartitioner::get_tag_component(HashIntoType tag) const
+{
+    return tag_component_map->get(tag);
+}
+
+
+ComponentPtr StreamingPartitioner::get_tag_component(std::string& kmer) const
+{
+    HashIntoType h = graph->hash_dna(kmer.c_str());
+    return get_tag_component(h);
+}
+
+
+ComponentPtr StreamingPartitioner::get_nearest_component(std::string& kmer) const
+{
+    Kmer hashed = graph->build_kmer(kmer);
+    return get_nearest_component(hashed);
+}
+
+
+ComponentPtr StreamingPartitioner::get_nearest_component(Kmer kmer) const
+{
+    std::set<HashIntoType> tags;
+    std::set<HashIntoType> seen;
+    KmerQueue node_q;
+    node_q.push(kmer);
+
+    find_connected_tags(node_q, tags, seen, true);
+    if (tags.size() > 0) {
+        HashIntoType tag = *(tags.begin());
+        return tag_component_map->get(tag);
+    } else {
+        return NULL;
+    }
+}
+
+
 void StreamingPartitioner::find_connected_tags(KmerQueue& node_q,
                                                std::set<HashIntoType>& found_tags,
-                                               std::set<HashIntoType>& seen)
+                                               std::set<HashIntoType>& seen,
+                                               bool truncate) const
 {
     
     //if (auto graphptr = graph.lock()) {
@@ -192,6 +243,9 @@ void StreamingPartitioner::find_connected_tags(KmerQueue& node_q,
             // Found a tag!
             if (tag_component_map->contains(node)) {
                 found_tags.insert(node);
+                if (truncate) {
+                    return;
+                }
                 continue;
             }
 
