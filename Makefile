@@ -43,7 +43,7 @@ PYSOURCES=$(filter-out khmer/_version.py, \
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
 
 DEVPKGS=pep8==1.6.2 diff_cover autopep8 pylint coverage gcovr pytest \
-	pydocstyle screed pyenchant
+	pydocstyle screed pyenchant cython
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 
 VERSION=$(shell ./setup.py version | grep Version | awk '{print $$4}' \
