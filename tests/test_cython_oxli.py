@@ -57,6 +57,17 @@ class TestStreamingPartitionerBasic:
         comps = list(sp.components())
         assert len(comps) == 2
 
+    def test_component_n_tags(self, random_sequence):
+        seq = random_sequence()
+
+        cg = khmer.Nodegraph(K, 1e5, 4)
+        sp = _oxli.StreamingPartitioner(cg)
+        sp.consume_sequence(seq)
+
+        tags = [t for t,c in sp.tag_components()]
+        comp = sp.get_nearest_component(seq[:K])
+        assert len(tags) == len(comp)
+
     def test_tag_components_iter(self, random_sequence):
         comp1 = random_sequence()
         comp2 = random_sequence(exclude=comp1)
@@ -77,23 +88,6 @@ class TestStreamingPartitionerBasic:
         assert sum([len([tag for tag in comp]) for comp in comps]) == len(tags)
         assert len(comps) == 2
         assert len(tags) == sum([len(c) for c in comps])
-
-    def test_merge_components(self, random_sequence):
-        comp1 = random_sequence()
-        comp2 = random_sequence(exclude=comp1)
-
-        cg = khmer.Nodegraph(K, 1e5, 4)
-        sp = _oxli.StreamingPartitioner(cg)
-        
-        sp.consume_sequence(comp1)
-        sp.consume_sequence(comp2)
-        assert sp.n_components == 2
-
-        sp.consume_sequence(comp1 + comp2)
-        assert sp.n_components == 1
-
-        comps = list(sp.components())
-        assert len(comps) == 1
 
     def test_get_nearest_component(self, random_sequence):
         seq1 =  random_sequence()
@@ -116,3 +110,52 @@ class TestStreamingPartitionerBasic:
         for tag in c2:
             assert utils._contains_rc(seq2, revhash(tag, K))
             assert not utils._contains_rc(seq1, revhash(tag, K))
+
+    def test_merge_components(self, random_sequence):
+        seq1 = random_sequence()
+        seq2 = random_sequence(exclude=seq1)
+
+        cg = khmer.Nodegraph(K, 1e5, 4)
+        sp = _oxli.StreamingPartitioner(cg)
+        
+        sp.consume_sequence(seq1)
+        sp.consume_sequence(seq2)
+        assert sp.n_components == 2
+
+        sp.consume_sequence(seq1 + seq2)
+        assert sp.n_components == 1
+
+        comps = list(sp.components())
+        assert len(comps) == 1
+
+        assert comps[0].n_merges == 1
+
+    def test_multi_merge_components(self, random_sequence):
+        seq1 = random_sequence()
+        seq2 = random_sequence(exclude=seq1)
+        seq3 = random_sequence(exclude=seq1+seq2)
+
+        cg = khmer.Nodegraph(K, 1e5, 4)
+        sp = _oxli.StreamingPartitioner(cg)
+        
+        sp.consume_sequence(seq1)
+        sp.consume_sequence(seq2)
+        assert sp.n_components == 2
+
+        sp.consume_sequence(seq1 + seq2)
+        assert sp.n_components == 1
+
+        sp.consume_sequence(seq3)
+        assert sp.n_components == 2
+
+        sp.consume_sequence(seq2 + seq3)
+        assert sp.n_components == 1
+
+        comps = list(sp.components())
+        assert len(comps) == 1
+
+        assert comps[0].n_merges == 2
+
+
+
+
