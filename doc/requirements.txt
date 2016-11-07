@@ -1,2 +1,2 @@
 sphinxcontrib-autoprogram>=0.1.2
-setuptools==3.4.1
+setuptools>=3.4.1
