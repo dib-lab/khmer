@@ -48,6 +48,9 @@ Contact: khmer-project@idyll.org
 #include "kmer_filters.hh"
 #include "traversal.hh"
 
+#ifndef DEBUG_SP
+#define DEBUG_SP 0
+#endif
 
 namespace khmer
 {
@@ -69,7 +72,7 @@ class GuardedKmerMap {
             filter = std::unique_ptr<Hashbits>(new Hashbits(ksize, table_sizes));
         }
 
-        T get(HashIntoType kmer) {
+        T get(HashIntoType kmer) const {
             if (filter->get_count(kmer)) {
                 auto search = data.find(kmer);
                 if (search != data.end()) {
@@ -85,7 +88,7 @@ class GuardedKmerMap {
             data[kmer] = item;
         }
 
-        bool contains(HashIntoType kmer) {
+        bool contains(HashIntoType kmer) const {
             return get(kmer) != NULL;
         }
 
@@ -126,20 +129,24 @@ class Component {
             tags.insert(tag);
         }
 
-        void add_tag(std::set<HashIntoType> new_tags) {
+        void add_tag(std::set<HashIntoType>& new_tags) {
             for (auto tag: new_tags) {
                 add_tag(tag);
             }
         }
 
-        uint64_t get_n_tags() {
+        uint64_t get_n_tags() const {
             return tags.size();
         }
 
-        uint64_t get_n_merges() {
+        uint64_t get_n_merges() const {
             return n_merges;
         }
+
+        friend std::ostream& operator<< (std::ostream& stream, const Component& comp) ;
 };
+
+
 
 typedef std::shared_ptr<Component> ComponentPtr;
 typedef std::set<ComponentPtr> ComponentPtrSet;
@@ -158,7 +165,6 @@ class StreamingPartitioner {
         // We should exclusively own tag_component_map.
         std::shared_ptr<GuardedKmerCompMap> tag_component_map;
         std::shared_ptr<ComponentPtrSet> components;
-        uint64_t n_components;
 
     public:
 
@@ -170,8 +176,9 @@ class StreamingPartitioner {
                                  std::set<HashIntoType>& found_tags,
                                  std::set<HashIntoType>& seen,
                                  bool truncate=false) const;
+
         uint64_t get_n_components() const {
-            return n_components;
+            return components->size();
         }
 
         void merge_components(ComponentPtr root, ComponentPtrSet comps);
@@ -182,11 +189,11 @@ class StreamingPartitioner {
         ComponentPtr get_nearest_component(Kmer kmer) const;
         ComponentPtr get_nearest_component(std::string& kmer) const;
 
-        std::weak_ptr<ComponentPtrSet> get_component_set() {
+        std::weak_ptr<ComponentPtrSet> get_component_set() const {
             return std::weak_ptr<ComponentPtrSet>(components);
         }
 
-        std::weak_ptr<GuardedKmerCompMap> get_tag_component_map() {
+        std::weak_ptr<GuardedKmerCompMap> get_tag_component_map() const {
             return std::weak_ptr<GuardedKmerCompMap>(tag_component_map);
         }
 };
