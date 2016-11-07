@@ -2,6 +2,7 @@ import cython
 from cython.operator cimport dereference as deref, preincrement as inc
 from libc.limits cimport UINT_MAX
 from libcpp.memory cimport unique_ptr, weak_ptr
+from libc.stdint cimport uintptr_t
 
 from khmer._khmer import Countgraph
 from khmer._khmer import Nodegraph
@@ -13,8 +14,6 @@ cdef class Component:
     def __cinit__(self, Component other=None):
         if other is not None:
             self._this.reset(other._this.get())
-        else:
-            self._this.reset(new CyComponent())
 
     property component_id:
         def __get__(self):
@@ -33,11 +32,20 @@ cdef class Component:
             yield deref(it)
             inc(it)
 
+    def __hash__(self):
+        return <uintptr_t>self._this.get()
 
-cdef Component build_component(ComponentPtr ptr):
-    cdef Component comp = Component()
-    comp._this.reset(ptr.get())
-    return comp
+    def __richcmp__(x, y, op):
+        if op == 2:
+            return x.component_id == y.component_id
+        else:
+            raise NotImplementedError('Operator not available.')
+
+    @staticmethod
+    cdef Component create(ComponentPtr ptr):
+        cdef Component comp = Component()
+        comp._this = ptr
+        return comp
 
 
 cdef class StreamingPartitioner:
@@ -45,7 +53,6 @@ cdef class StreamingPartitioner:
     cdef unique_ptr[CyStreamingPartitioner] _this
     cdef weak_ptr[ComponentPtrSet] _components
     cdef weak_ptr[GuardedKmerCompMap] _tag_component_map
-
     cdef CyHashtable * _graph_ptr
 
     def __cinit__(self, graph):
@@ -58,24 +65,51 @@ cdef class StreamingPartitioner:
         
         self._this.reset(new CyStreamingPartitioner(self._graph_ptr))
 
+        self._tag_component_map = deref(self._this).get_tag_component_map()
+        self._components = deref(self._this).get_component_set()
+
     def consume_sequence(self, sequence):
         deref(self._this).consume_sequence(sequence.encode('utf-8'))
 
     def get_tag_component(self, kmer):
-        cdef ComponentPtr comp
-        comp = deref(self._this).get_tag_component(kmer.encode('utf-8'))
-        if comp == NULL:
+        cdef ComponentPtr compptr
+        compptr = deref(self._this).get_tag_component(kmer.encode('utf-8'))
+        if compptr == NULL:
             return None
         else:
-            return build_component(comp)
+            return Component.create(compptr)
 
     def get_nearest_component(self, kmer):
-        cdef ComponentPtr comp
-        comp = deref(self._this).get_nearest_component(kmer.encode('utf-8'))
-        if comp == NULL:
+        cdef ComponentPtr compptr
+        compptr = deref(self._this).get_nearest_component(kmer.encode('utf-8'))
+        if compptr == NULL:
             return None
         else:
-            return build_component(comp)
+            return Component.create(compptr)
+
+    def components(self):
+        cdef shared_ptr[ComponentPtrSet] locked
+        lockedptr = self._components.lock()
+        if lockedptr:
+            it = deref(lockedptr).begin()
+            while it != deref(lockedptr).end():
+                yield Component.create(deref(it))
+                inc(it)
+        else:
+            raise MemoryError("Can't locked underlying Component set")
+
+    def tag_components(self):
+        cdef shared_ptr[GuardedKmerCompMap] locked
+        lockedptr = self._tag_component_map.lock()
+        if lockedptr:
+            it = deref(lockedptr).data.begin()
+            while it != deref(lockedptr).data.end():
+                yield deref(it).first, Component.create(deref(it).second)
+                inc(it)
+        else:
+            raise MemoryError("Can't locked underlying Component set")
+
+
 
     property n_components:
         def __get__(self):
