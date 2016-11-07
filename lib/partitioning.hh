@@ -121,7 +121,7 @@ class Component {
                     continue;
                 }
                 this->add_tag(other->tags);
-                this->n_merges = other->get_n_merges() + 1;
+                this->n_merges += other->get_n_merges() + 1;
             }
         }
 
