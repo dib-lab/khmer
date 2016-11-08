@@ -4196,6 +4196,16 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
+    khmer_KCounttable_Type.tp_base = &khmer_KHashtable_Type;
+    if (PyType_Ready(&khmer_KCounttable_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    khmer_KNodetable_Type.tp_base = &khmer_KHashtable_Type;
+    if (PyType_Ready(&khmer_KNodetable_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
     khmer_KHashgraph_Type.tp_base = &khmer_KHashtable_Type;
     khmer_KHashgraph_Type.tp_methods = khmer_hashgraph_methods;
     if (PyType_Ready(&khmer_KHashgraph_Type) < 0) {
@@ -4266,6 +4276,18 @@ MOD_INIT(_khmer)
     Py_INCREF(&khmer_ReadParser_Type);
     if (PyModule_AddObject( m, "ReadParser",
                             (PyObject *)&khmer_ReadParser_Type ) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    Py_INCREF(&khmer_KCounttable_Type);
+    if (PyModule_AddObject( m, "Counttable",
+                            (PyObject *)&khmer_KCounttable_Type ) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    Py_INCREF(&khmer_KNodetable_Type);
+    if (PyModule_AddObject( m, "Nodetable",
+                            (PyObject *)&khmer_KNodetable_Type ) < 0) {
         return MOD_ERROR_VAL;
     }
 

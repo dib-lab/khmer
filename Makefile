@@ -37,7 +37,7 @@
 
 # `SHELL=bash` Will break Titus's laptop, so don't use BASH-isms like
 # `[[` conditional expressions.
-CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc) setup.py
+CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc khmer/*.hh) setup.py
 PYSOURCES=$(filter-out khmer/_version.py, \
 	  $(wildcard khmer/*.py scripts/*.py oxli/*.py) )
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py

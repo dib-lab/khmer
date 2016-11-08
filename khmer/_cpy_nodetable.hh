@@ -7,7 +7,10 @@ static PyMethodDef khmer_nodetable_methods[] = {
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
-static PyTypeObject khmer_Nodetable_Type
+static PyObject* khmer_nodetable_new(PyTypeObject * type, PyObject * args,
+                                     PyObject * kwds);
+
+static PyTypeObject khmer_KNodetable_Type
 CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KNodetable_Object")
 = {
     PyVarObject_HEAD_INIT(NULL, 0) /* init & ob_size */
@@ -47,5 +50,44 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KNodetable_Object")
     0,                       /* tp_dictoffset */
     0,                       /* tp_init */
     0,                       /* tp_alloc */
-    0,                       /* tp_new */
+    khmer_nodetable_new,     /* tp_new */
 };
+
+//
+// khmer_nodetable_new
+//
+
+static PyObject* khmer_nodetable_new(PyTypeObject * type, PyObject * args,
+                                     PyObject * kwds)
+{
+    khmer_KNodetable_Object * self;
+
+    self = (khmer_KNodetable_Object *)type->tp_alloc(type, 0);
+
+    if (self != NULL) {
+        WordLength k = 0;
+        PyListObject * sizes_list_o = NULL;
+
+        if (!PyArg_ParseTuple(args, "bO!", &k, &PyList_Type, &sizes_list_o)) {
+            Py_DECREF(self);
+            return NULL;
+        }
+
+        std::vector<uint64_t> sizes;
+        if (!convert_Pytablesizes_to_vector(sizes_list_o, sizes)) {
+            Py_DECREF(self);
+            return NULL;
+        }
+
+        try {
+            self->nodetable = new Nodetable(k, sizes);
+        } catch (std::bad_alloc &e) {
+            Py_DECREF(self);
+            return PyErr_NoMemory();
+        }
+        self->khashtable.hashtable =
+            dynamic_cast<Hashtable*>(self->nodetable);
+    }
+
+    return (PyObject *) self;
+}
