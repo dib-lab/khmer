@@ -119,12 +119,12 @@ hashgraph_traverse_linear_path(khmer_KHashgraph_Object * me, PyObject * args)
     Hashgraph * hashgraph = me->hashgraph;
 
     PyObject * val_o;
-    khmer_KHashbits_Object * nodegraph_o = NULL;
+    khmer_KNodegraph_Object * nodegraph_o = NULL;
     khmer_HashSet_Object * hdn_o = NULL;
 
     if (!PyArg_ParseTuple(args, "OO!O!", &val_o,
                           &khmer_HashSet_Type, &hdn_o,
-                          &khmer_KHashbits_Type, &nodegraph_o)) {
+                          &khmer_KNodegraph_Type, &nodegraph_o)) {
         return NULL;
     }
     Kmer start_kmer;
@@ -159,11 +159,11 @@ hashgraph_assemble_linear_path(khmer_KHashgraph_Object * me, PyObject * args)
     Hashgraph * hashgraph = me->hashgraph;
 
     PyObject * val_o;
-    khmer_KHashbits_Object * nodegraph_o = NULL;
-    Hashbits * stop_bf = NULL;
+    khmer_KNodegraph_Object * nodegraph_o = NULL;
+    Nodegraph * stop_bf = NULL;
 
     if (!PyArg_ParseTuple(args, "O|O!", &val_o,
-                          &khmer_KHashbits_Type, &nodegraph_o)) {
+                          &khmer_KNodegraph_Type, &nodegraph_o)) {
         return NULL;
     }
 

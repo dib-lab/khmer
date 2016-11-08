@@ -452,10 +452,10 @@ public:
 };
 
 // Hashgraph-derived class with ByteStorage.
-class CountingHash : public khmer::Hashgraph
+class Countgraph : public khmer::Hashgraph
 {
 public:
-    explicit CountingHash(WordLength ksize, std::vector<uint64_t> sizes)
+    explicit Countgraph(WordLength ksize, std::vector<uint64_t> sizes)
         : Hashgraph(ksize, new ByteStorage(sizes)) { } ;
 };
 
@@ -467,13 +467,14 @@ public:
 };
 
 // Hashgraph-derived class with BitStorage.
-class Hashbits : public Hashgraph {
+class Nodegraph : public Hashgraph {
 public:
-    explicit Hashbits(WordLength ksize, std::vector<uint64_t> sizes)
+    explicit Nodegraph(WordLength ksize, std::vector<uint64_t> sizes)
         : Hashgraph(ksize, new BitStorage(sizes)) { } ;
 
-    void update_from(const Hashbits &other);
+    void update_from(const Nodegraph &other);
 };
+
 }
 
 #define ACQUIRE_ALL_TAGS_SPIN_LOCK \

@@ -43,6 +43,6 @@ Contact: khmer-project@idyll.org
 
 int main()
 {
-    khmer::CountingHash test(1,1);
+    khmer::Countgraph test(1,1);
     return 0;
 }

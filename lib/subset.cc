@@ -1191,7 +1191,7 @@ const
 
 void SubsetPartition::partition_average_coverages(
     PartitionCountMap	&cm,
-    CountingHash *	ht) const
+    Countgraph * ht) const
 {
     PartitionCountMap csum;
     PartitionCountMap cN;
@@ -1216,7 +1216,7 @@ unsigned long long SubsetPartition::repartition_largest_partition(
     unsigned int distance,
     unsigned int threshold,
     unsigned int frequency,
-    CountingHash &counting)
+    Countgraph &counting)
 {
     PartitionCountMap cm;
     unsigned int n_unassigned = 0;
