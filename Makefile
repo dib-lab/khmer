@@ -98,7 +98,7 @@ install-dep: install-dependencies
 
 install-dependencies:
 	pip install git+https://github.com/dib-lab/screed.git
-	pip install --upgrade $(DEVPKGS)
+	pip install --upgrade --ignore-installed $(DEVPKGS)
 	pip install --upgrade --requirement doc/requirements.txt
 
 ## sharedobj   : build khmer shared object file
