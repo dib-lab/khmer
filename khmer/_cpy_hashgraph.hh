@@ -1,8 +1,3 @@
-typedef struct {
-    khmer_KHashtable_Object khashtable;
-    Hashgraph * hashgraph;
-} khmer_KHashgraph_Object;
-
 static PyTypeObject khmer_KHashgraph_Type
 CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashgraph_Object")
 = {

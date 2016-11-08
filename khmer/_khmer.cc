@@ -1277,6 +1277,11 @@ typedef struct {
 } khmer_KHashtable_Object;
 
 typedef struct {
+    khmer_KHashtable_Object khashtable;
+    Hashgraph * hashgraph;
+} khmer_KHashgraph_Object;
+
+typedef struct {
     PyObject_HEAD
     SubsetPartition * subset;
 } khmer_KSubsetPartition_Object;
@@ -1308,7 +1313,7 @@ static PyTypeObject khmer_KSubsetPartition_Type = {
 };
 
 typedef struct {
-    khmer_KHashtable_Object khashtable;
+    khmer_KHashgraph_Object khashgraph;
     Hashbits * hashbits;
 } khmer_KHashbits_Object;
 
@@ -2306,7 +2311,7 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashtable_Object")
 //
 
 typedef struct {
-    khmer_KHashtable_Object khashtable;
+    khmer_KHashgraph_Object khashgraph;
     CountingHash * counting;
 } khmer_KCountingHash_Object;
 
@@ -2506,7 +2511,9 @@ static PyObject* khmer_countgraph_new(PyTypeObject * type, PyObject * args,
             Py_DECREF(self);
             return PyErr_NoMemory();
         }
-        self->khashtable.hashtable = dynamic_cast<Hashgraph*>(self->counting);
+        self->khashgraph.khashtable.hashtable =
+            dynamic_cast<Hashtable*>(self->counting);
+        self->khashgraph.hashgraph = dynamic_cast<Hashgraph*>(self->counting);
     }
 
     return (PyObject *) self;
@@ -2620,7 +2627,9 @@ static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args,
             Py_DECREF(self);
             return PyErr_NoMemory();
         }
-        self->khashtable.hashtable = self->hashbits;
+        self->khashgraph.khashtable.hashtable =
+            dynamic_cast<Hashtable*>(self->hashbits);
+        self->khashgraph.hashgraph = dynamic_cast<Hashgraph*>(self->hashbits);
     }
     return (PyObject *) self;
 }
