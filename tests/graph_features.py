@@ -131,8 +131,17 @@ def get_random_sequence(length, exclude=None):
     return ''.join(seq)
 
 
-def reads(sequence, L=100, N=100):
+def reads(sequence, L=100, N=100, dbg_cover=False):
     positions = list(range(len(sequence) - L))
+    if dbg_cover is True:
+        for start in range(0, len(sequence), K):
+            read = sequence[start:start+L]
+            if len(read) < K:
+                read = sequence[-L:]
+            yield read
+            N -= 1
+    if N < 0:
+        return
     for i in range(N):
         start = random.choice(positions)
         yield sequence[start:start + L]
