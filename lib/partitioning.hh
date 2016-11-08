@@ -116,19 +116,19 @@ class Component {
     private:
         
         static uint64_t n_created;
-        uint64_t n_merges;
+        static uint64_t n_destroyed;
 
     public:
 
         const uint64_t component_id;
         std::set<HashIntoType> tags;
 
-        explicit Component(): component_id(n_created), n_merges(0) {
+        explicit Component(): component_id(n_created) {
             n_created++;
         }
 
         ~Component() {
-            tags.clear(); // maybe not necessary?
+            n_destroyed++;
         }
 
         void merge(ComponentPtrSet other_comps) {
@@ -137,8 +137,15 @@ class Component {
                     continue;
                 }
                 this->add_tag(other->tags);
-                this->n_merges += other->get_n_merges() + 1;
             }
+        }
+
+        uint64_t get_n_created() const {
+            return n_created;
+        }
+
+        uint64_t get_n_destroyed() const {
+            return n_destroyed;
         }
 
         void add_tag(HashIntoType tag) {
@@ -153,10 +160,6 @@ class Component {
 
         uint64_t get_n_tags() const {
             return tags.size();
-        }
-
-        uint64_t get_n_merges() const {
-            return n_merges;
         }
 
         friend bool operator==(const Component& lhs, const Component& rhs) {

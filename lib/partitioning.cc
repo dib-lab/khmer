@@ -12,6 +12,8 @@
 using namespace khmer;
 
 uint64_t Component::n_created = 0;
+uint64_t Component::n_destroyed = 0;
+
 bool ComponentPtrCompare::operator() (const ComponentPtr& lhs, 
                                       const ComponentPtr& rhs) const {
     return *lhs < *rhs;
@@ -142,8 +144,7 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
         find_connected_tags(search_from, tags, seen, false);
 
         // Now resolve components. First, get components from existing tags.
-        ComponentPtrSet comps;
-        ComponentPtr comp;
+        ComponentPtrSet found_comps;
 #if(DEBUG_SP)
         std::cout << "Get found comps: " << std::endl;
 #endif
@@ -151,11 +152,12 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
 #if(DEBUG_SP)
             std::cout << "Tag: " <<  tag;
 #endif
+            ComponentPtr comp;
             if ((comp = tag_component_map->get(tag)) != NULL) {
 #if(DEBUG_SP)
                 std::cout << "->" << *comp;
 #endif
-                comps.insert(comp);
+                found_comps.insert(comp);
             }
 #if(DEBUG_SP)
             std::cout << std::endl;
@@ -163,37 +165,30 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
         }
 
 #if(DEBUG_SP)
-        std::cout << comps.size() << " unique components." << std::endl;
+        std::cout << found_comps.size() << " unique components." << std::endl;
 #endif
 
-        if (comps.size() == 0) {
-            comp = std::make_shared<Component>();
+        if (found_comps.size() == 0) {
+            ComponentPtr new_comp = std::make_shared<Component>();
 #if(DEBUG_SP)
-            std::cout << "Build new comp: " << *comp << std::endl;
+            std::cout << "Build new comp: " << *new_comp << std::endl;
 #endif
-            components->insert(comp);
+            components->insert(new_comp);
+            map_tags_to_component(tags, new_comp);
         } else {
             // get the first component
-            comp = *(comps.begin());
+            ComponentPtr root_comp = *(found_comps.begin());
 #if(DEBUG_SP)
-            std::cout << "Merge into: " << *comp << std::endl;
+            std::cout << "Merge into: " << *root_comp << std::endl;
 #endif
             // map the new tags to this component
-            comp->add_tag(tags);
-            merge_components(comp, comps);
+            root_comp->add_tag(tags);
+            map_tags_to_component(tags, root_comp);
+            if (found_comps.size() > 1) {
+                merge_components(root_comp, found_comps);
+            }
         }
-        // (re)map all the tags to the component
-        map_tags_to_component(tags, comp);
-        map_tags_to_component(comp->tags, comp);
 
-#if(DEBUG_SP)
-        for (auto tag: tags) {
-            std::cout << tag << " -> " << *(tag_component_map->get(tag)) << std::endl;
-        }
-        for (auto c : *components) {
-            std::cout << *c << std::endl;
-        }
-#endif
     } else {
         throw khmer_ptr_exception("Hashtable has been deleted.");
     }
@@ -203,19 +198,17 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
 void StreamingPartitioner::merge_components(ComponentPtr& root, 
                                             ComponentPtrSet& comps)
 {
-#if(DEBUG_SP)
-    std::cout << "Merge components." << std::endl;
-#endif
-    root->merge(comps);
     for (auto other : comps) {
         if (*other == *root) {
             continue;
         }
-#if(DEBUG_SP)
-        std::cout << "Erase " << *other << std::endl;
-#endif
-        components->erase(other);
+        root->add_tag(other->tags); // transfer the tags from the other comp
+        map_tags_to_component(other->tags, root); // set the other's tags to point to root
+        components->erase(other); // remove other component entirely
+
     }
+    comps.clear(); // should call destructor on all the merged comps, unless they have
+                   // and active Python wrapper; this leaves them as sole owners
 }
 
 
