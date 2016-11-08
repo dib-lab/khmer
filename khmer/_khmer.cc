@@ -3645,6 +3645,8 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashtable_Object")
 
 #define is_hashtable_obj(v)  (Py_TYPE(v) == &khmer_KHashtable_Type)
 
+#include "_cpy_hashgraph.hh"
+
 //
 // KCountingHash object
 //
@@ -3970,8 +3972,6 @@ static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args,
 }
 
 #define is_hashbits_obj(v)  (Py_TYPE(v) == &khmer_KHashbits_Type)
-
-#include "_cpy_nodegraph.hh"
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -5533,7 +5533,13 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
-    khmer_KCountgraph_Type.tp_base = &khmer_KHashtable_Type;
+    khmer_KHashgraph_Type.tp_base = &khmer_KHashtable_Type;
+    khmer_KHashgraph_Type.tp_methods = khmer_hashgraph_methods;
+    if (PyType_Ready(&khmer_KHashgraph_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    khmer_KCountgraph_Type.tp_base = &khmer_KHashgraph_Type;
     if (PyType_Ready(&khmer_KCountgraph_Type) < 0) {
         return MOD_ERROR_VAL;
     }
@@ -5547,19 +5553,12 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
-    khmer_KHashbits_Type.tp_base = &khmer_KHashtable_Type;
+    khmer_KHashbits_Type.tp_base = &khmer_KHashgraph_Type;
     khmer_KHashbits_Type.tp_methods = khmer_hashbits_methods;
     if (PyType_Ready(&khmer_KHashbits_Type) < 0) {
         return MOD_ERROR_VAL;
     }
 
-    khmer_KNodegraph_Type.tp_base = &khmer_KHashbits_Type;
-    khmer_KNodegraph_Type.tp_methods = khmer_nodegraph_methods;
-    if (PyType_Ready(&khmer_KNodegraph_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    khmer_KGraphLabels_Type.tp_base = &khmer_KHashbits_Type;
     khmer_KGraphLabels_Type.tp_methods = khmer_graphlabels_methods;
     khmer_KGraphLabels_Type.tp_new = khmer_graphlabels_new;
     if (PyType_Ready(&khmer_KGraphLabels_Type) < 0) {
@@ -5616,12 +5615,6 @@ MOD_INIT(_khmer)
     Py_INCREF(&khmer_KHashbits_Type);
     if (PyModule_AddObject(m, "Nodegraph",
                            (PyObject *)&khmer_KHashbits_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    Py_INCREF(&khmer_KNodegraph_Type);
-    if (PyModule_AddObject(m, "Nodegraph2",
-                           (PyObject *)&khmer_KNodegraph_Type) < 0) {
         return MOD_ERROR_VAL;
     }
 
