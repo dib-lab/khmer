@@ -55,6 +55,7 @@ Contact: khmer-project@idyll.org
 namespace khmer
 {
 
+
 template <typename T>
 class GuardedKmerMap {
 
@@ -95,6 +96,21 @@ class GuardedKmerMap {
 };
 
 
+class Component;
+typedef std::shared_ptr<Component> ComponentPtr;
+
+
+class ComponentPtrCompare {
+    public:
+        bool operator() (const ComponentPtr& lhs, const ComponentPtr& rhs) const;
+};
+
+
+class ComponentPtrCompare;
+typedef std::set<ComponentPtr, ComponentPtrCompare> ComponentPtrSet;
+typedef GuardedKmerMap<ComponentPtr> GuardedKmerCompMap;
+
+
 class Component {
 
     private:
@@ -115,9 +131,9 @@ class Component {
             tags.clear(); // maybe not necessary?
         }
 
-        void merge(std::set<std::shared_ptr<Component>> other_comps) {
+        void merge(ComponentPtrSet other_comps) {
             for (auto other : other_comps) {
-                if (other.get() == this) {
+                if (*other == *this) {
                     continue;
                 }
                 this->add_tag(other->tags);
@@ -143,14 +159,17 @@ class Component {
             return n_merges;
         }
 
-        friend std::ostream& operator<< (std::ostream& stream, const Component& comp) ;
+        friend bool operator==(const Component& lhs, const Component& rhs) {
+            return lhs.component_id == rhs.component_id;
+        }
+
+        friend bool operator<(const Component& lhs, const Component& rhs) {
+            return lhs.component_id < rhs.component_id;
+        }
+
+        friend std::ostream& operator<< (std::ostream& stream, const Component& comp);
 };
 
-
-
-typedef std::shared_ptr<Component> ComponentPtr;
-typedef std::set<ComponentPtr> ComponentPtrSet;
-typedef GuardedKmerMap<ComponentPtr> GuardedKmerCompMap;
 
 class StreamingPartitioner {
 

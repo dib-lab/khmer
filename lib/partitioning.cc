@@ -12,12 +12,17 @@
 using namespace khmer;
 
 uint64_t Component::n_created = 0;
+bool ComponentPtrCompare::operator() (const ComponentPtr& lhs, 
+                                      const ComponentPtr& rhs) const {
+    return *lhs < *rhs;
+}
 
-std::ostream& operator<< (std::ostream& stream, Component& comp) {
+inline std::ostream& operator<< (std::ostream& stream, Component& comp) {
     stream << "<Component (id=" << comp.component_id << ", n_tags=" 
            << comp.get_n_tags() << ")>";
     return stream;
 }
+
 
 StreamingPartitioner::StreamingPartitioner(Hashtable * graph)  : 
     graph(graph), _tag_density(DEFAULT_TAG_DENSITY)
@@ -63,6 +68,9 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
      * as the intersect operator.
      */
     //if (auto graphptr = graph.lock()) {
+#if(SP_DEBUG)
+    std::cout << "Consume sequence." << std::endl;
+#endif
     if(graph != NULL) {
         KmerIterator kmers(seq.c_str(), graph->ksize());
         unsigned int since = 1;
@@ -79,6 +87,7 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
         Kmer kmer = kmers.next();
         tags.insert(kmer); //always tag the first k-mer
         bool is_new_kmer = graph->test_and_set_bits(kmer);
+        search_from.push(kmer);
 
         while(!kmers.done()) {
             bool kmer_tagged = false;
@@ -118,20 +127,19 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
                 since = 1;
             }
 
-            is_new_kmer = graph->test_and_set_bits(kmer);
             kmer = kmers.next();
+            is_new_kmer = graph->test_and_set_bits(kmer);
         }
         tags.insert(kmer);	// always tag the last k-mer
-        if (is_new_kmer || !found_tag_in_territory) {
-            search_from.push(kmer);
-        }
+        search_from.push(kmer);
         intersection.clear();
 
 #if(DEBUG_SP)
         std::cout << "Done iterating k-mers" << std::endl;
+        std::cout << tags.size() << " tags in sequence" << std::endl;
 #endif
         // Now search for tagged nodes connected to U.
-        find_connected_tags(search_from, tags, seen);
+        find_connected_tags(search_from, tags, seen, false);
 
         // Now resolve components. First, get components from existing tags.
         ComponentPtrSet comps;
@@ -154,6 +162,10 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
 #endif
         }
 
+#if(DEBUG_SP)
+        std::cout << comps.size() << " unique components." << std::endl;
+#endif
+
         if (comps.size() == 0) {
             comp = std::make_shared<Component>();
 #if(DEBUG_SP)
@@ -166,16 +178,21 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
 #if(DEBUG_SP)
             std::cout << "Merge into: " << *comp << std::endl;
 #endif
-            if (comps.size() == 1) {
                 // map the new tags to this component
-                comp->add_tag(tags);
-                map_tags_to_component(tags, comp);
-            } else {
-                merge_components(comp, comps);
-            }
+            comp->add_tag(tags);
+            merge_components(comp, comps);
         }
         // (re)map all the tags to the component
         map_tags_to_component(tags, comp);
+
+#if(DEBUG_SP)
+        for (auto tag: tags) {
+            std::cout << tag << " -> " << *(tag_component_map->get(tag)) << std::endl;
+        }
+        for (auto c : *components) {
+            std::cout << *c << std::endl;
+        }
+#endif
     } else {
         throw khmer_ptr_exception("Hashtable has been deleted.");
     }
@@ -183,14 +200,14 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
 
 
 void StreamingPartitioner::merge_components(ComponentPtr root, 
-                                            std::set<ComponentPtr> comps)
+                                            ComponentPtrSet comps)
 {
 #if(DEBUG_SP)
     std::cout << "Merge components." << std::endl;
 #endif
     root->merge(comps);
     for (auto other : comps) {
-        if (other == root) {
+        if (*other == *root) {
             continue;
         }
 #if(DEBUG_SP)
@@ -299,6 +316,7 @@ void StreamingPartitioner::find_connected_tags(KmerQueue& node_q,
             for (unsigned int i = 0; i<nfound; ++i) {
                 breadth_q.push(breadth + 1);
             }
+            total += nfound;
         }
     } else {
         throw khmer_ptr_exception("Hashtable has been deleted.");
