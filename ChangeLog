@@ -1,20 +1,20 @@
 2016-11-08  Titus Brown  <titus@idyll.org
 
- * lib/Makefile: eliminated lib/counting.{cc,hh} and lib/hashbits.{cc,hh}.
- khmer/{_cpy_counttable,_cpy_hashgraph.hh,cpy_nodetable}.hh,_khmer.cc,
- khmer/__init__.py: new Counttable and Nodetable CPython types, plus renaming
- of CountingHash to CountGraph and Hashbits to Nodegraph; refactoring
- of CPython hierarchy to separate graph methods from table methods.
- * lib/hashtable.{cc,hh}: pull some more CountingHash/Counttable methods
- back to base class; renaming.
- * Makefile,  setup.py: updated dependencies for added and removed files.
- * lib/{labelhash.cc,read_aligner.hh,storage.cc,storage.hh,subset.cc,
- subset.hh,test-Colors.cc,test-compile.cc},
- examples/c++-api/count-demo.cc - renaming.
- * tests/test_cpython_hierarchy.py - some preliminary tests for new CPython
- inheritance hierarchy.
- * tests/{test_nodegraph,test_countgraph}.py - added creation tests on
- 'tablesizes' list.
+   * lib/Makefile: eliminated lib/counting.{cc,hh} and lib/hashbits.{cc,hh}.
+   khmer/{_cpy_counttable,_cpy_hashgraph.hh,cpy_nodetable}.hh,_khmer.cc,
+   khmer/__init__.py: new Counttable and Nodetable CPython types, plus renaming
+   of CountingHash to CountGraph and Hashbits to Nodegraph; refactoring
+   of CPython hierarchy to separate graph methods from table methods.
+   * lib/hashtable.{cc,hh}: pull some more CountingHash/Counttable methods
+   back to base class; renaming.
+   * Makefile,  setup.py: updated dependencies for added and removed files.
+   * lib/{labelhash.cc,read_aligner.hh,storage.cc,storage.hh,subset.cc,
+   subset.hh,test-Colors.cc,test-compile.cc},
+   examples/c++-api/count-demo.cc - renaming.
+   * tests/test_cpython_hierarchy.py - some preliminary tests for new CPython
+   inheritance hierarchy.
+   * tests/{test_nodegraph,test_countgraph}.py - added creation tests on
+   'tablesizes' list.
 
 2016-11-07  Luiz Irber  <khmer@luizirber.org>
 
