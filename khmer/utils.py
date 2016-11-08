@@ -250,7 +250,7 @@ def write_record_pair(read1, read2, fileobj):
 
 def clean_input_reads(screed_iter):
     for record in screed_iter:
-        record.cleaned_seq = record.sequence.upper().replace('N', 'A')
+        #record.cleaned_seq = record.sequence.upper().replace('N', 'A')
         yield record
 
 

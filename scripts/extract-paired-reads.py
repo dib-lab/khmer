@@ -52,6 +52,7 @@ import textwrap
 import argparse
 
 from khmer import __version__
+from khmer import ReadParser
 from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
                               _VersionStdErrAction)
@@ -156,7 +157,8 @@ def main():
     n_pe = 0
     n_se = 0
 
-    screed_iter = screed.open(infile)
+    #screed_iter = screed.open(infile)
+    screed_iter = ReadParser(infile)
     for index, is_pair, read1, read2 in broken_paired_reader(screed_iter):
         if index % 100000 == 0 and index > 0:
             print('...', index, file=sys.stderr)
