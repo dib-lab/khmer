@@ -48,7 +48,8 @@ cdef extern from "partitioning.hh" namespace "khmer":
         void add_tag(HashIntoType)
         void add_tag(set[HashIntoType])
         uint64_t get_n_tags() const
-        uint64_t get_n_merges() const
+        uint64_t get_n_created() const
+        uint64_t get_n_destroyed() const
 
     ctypedef shared_ptr[CyComponent] ComponentPtr
     ctypedef set[ComponentPtr] ComponentPtrSet

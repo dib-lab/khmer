@@ -19,9 +19,13 @@ cdef class Component:
         def __get__(self):
             return deref(self._this).component_id
 
-    property n_merges:
+    property _n_created:
         def __get__(self):
-            return deref(self._this).get_n_merges()
+            return deref(self._this).get_n_created()
+
+    property _n_destroyed:
+        def __get__(self):
+            return deref(self._this).get_n_destroyed()
 
     def __len__(self):
         return deref(self._this).get_n_tags()
@@ -108,8 +112,6 @@ cdef class StreamingPartitioner:
                 inc(it)
         else:
             raise MemoryError("Can't locked underlying Component set")
-
-
 
     property n_components:
         def __get__(self):
