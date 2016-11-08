@@ -2331,6 +2331,8 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashtable_Object")
 
 #define is_hashtable_obj(v)  (Py_TYPE(v) == &khmer_KHashtable_Type)
 
+#include "_cpy_nodetable.hh"
+#include "_cpy_counttable.hh"
 #include "_cpy_hashgraph.hh"
 
 //

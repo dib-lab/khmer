@@ -86,14 +86,7 @@ public:
 
 class BitStorage : public Storage
 {
-friend class Hashbits;
-protected:
-    std::vector<uint64_t> _tablesizes;
-    size_t _n_tables;
-    uint64_t _occupied_bins;
-    uint64_t _n_unique_kmers;
-    Byte ** _counts;
-
+public:
     BitStorage(std::vector<uint64_t>& tablesizes) :
         _tablesizes(tablesizes) 
     {
@@ -217,6 +210,12 @@ protected:
     }
 
     void update_from(const BitStorage&);
+protected:
+    std::vector<uint64_t> _tablesizes;
+    size_t _n_tables;
+    uint64_t _occupied_bins;
+    uint64_t _n_unique_kmers;
+    Byte ** _counts;
 };
 
 

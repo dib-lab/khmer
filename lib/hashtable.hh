@@ -443,6 +443,15 @@ public:
 
 };
 
+// Hashtable-derived class with ByteStorage.
+class Counttable : public khmer::Hashtable
+{
+public:
+    explicit Counttable(WordLength ksize, std::vector<uint64_t> sizes)
+        : Hashtable(ksize, new ByteStorage(sizes)) { } ;
+};
+
+// Hashgraph-derived class with ByteStorage.
 class CountingHash : public khmer::Hashgraph
 {
 public:
@@ -450,6 +459,14 @@ public:
         : Hashgraph(ksize, new ByteStorage(sizes)) { } ;
 };
 
+// Hashtable-derived class with BitStorage.
+class Nodetable : public Hashtable {
+public:
+    explicit Nodetable(WordLength ksize, std::vector<uint64_t> sizes)
+        : Hashtable(ksize, new BitStorage(sizes)) { } ;
+};
+
+// Hashgraph-derived class with BitStorage.
 class Hashbits : public Hashgraph {
 public:
     explicit Hashbits(WordLength ksize, std::vector<uint64_t> sizes)
