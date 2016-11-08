@@ -1273,7 +1273,7 @@ static khmer_HashSet_Object * create_HashSet_Object(SeenSet * h, WordLength k)
 
 typedef struct {
     PyObject_HEAD
-    Hashgraph * hashtable;
+    Hashtable * hashtable;
 } khmer_KHashtable_Object;
 
 typedef struct {
@@ -1364,7 +1364,7 @@ static
 PyObject *
 hashtable_ksize(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashgraph * hashtable = me->hashtable;
+    Hashtable * hashtable = me->hashtable;
 
     if (!PyArg_ParseTuple(args, "")) {
         return NULL;
@@ -1379,7 +1379,7 @@ static
 PyObject *
 hashtable_hash(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashgraph * hashtable = me->hashtable;
+    Hashtable * hashtable = me->hashtable;
 
     char * kmer;
     if (!PyArg_ParseTuple(args, "s", &kmer)) {
@@ -1401,7 +1401,7 @@ static
 PyObject *
 hashtable_reverse_hash(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashgraph * hashtable = me->hashtable;
+    Hashtable * hashtable = me->hashtable;
 
     PyObject * val_o;
     HashIntoType val;
@@ -1420,7 +1420,7 @@ static
 PyObject *
 hashtable_n_occupied(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashgraph * hashtable = me->hashtable;
+    Hashtable * hashtable = me->hashtable;
 
     if (!PyArg_ParseTuple(args, "")) {
         return NULL;
@@ -1435,7 +1435,7 @@ static
 PyObject *
 hashtable_n_unique_kmers(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashgraph * hashtable = me->hashtable;
+    Hashtable * hashtable = me->hashtable;
 
     uint64_t n = hashtable->n_unique_kmers();
 
@@ -1446,7 +1446,7 @@ static
 PyObject *
 hashtable_count(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashgraph * hashtable = me->hashtable;
+    Hashtable * hashtable = me->hashtable;
 
     PyObject * v;
     if (!PyArg_ParseTuple(args, "O", &v)) {
@@ -1468,7 +1468,7 @@ static
 PyObject *
 hashtable_consume_fasta(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashgraph * hashtable  = me->hashtable;
+    Hashtable * hashtable  = me->hashtable;
 
     const char * filename;
 
@@ -1497,7 +1497,7 @@ PyObject *
 hashtable_consume_fasta_with_reads_parser(khmer_KHashtable_Object * me,
         PyObject * args)
 {
-    Hashgraph * hashtable = me->hashtable;
+    Hashtable * hashtable = me->hashtable;
 
     PyObject * rparser_obj = NULL;
 
@@ -1543,7 +1543,7 @@ static
 PyObject *
 hashtable_consume(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashgraph * hashtable = me->hashtable;
+    Hashtable * hashtable = me->hashtable;
 
     const char * long_str;
 
@@ -1567,7 +1567,7 @@ static
 PyObject *
 hashtable_get(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashgraph * hashtable = me->hashtable;
+    Hashtable * hashtable = me->hashtable;
 
     PyObject * arg;
 
@@ -1891,7 +1891,7 @@ static
 PyObject *
 hashtable_load(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashgraph * hashtable = me->hashtable;
+    Hashtable * hashtable = me->hashtable;
 
     const char * filename = NULL;
 
@@ -1913,7 +1913,7 @@ static
 PyObject *
 hashtable_save(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashgraph * hashtable = me->hashtable;
+    Hashtable * hashtable = me->hashtable;
 
     const char * filename = NULL;
 
@@ -1935,7 +1935,7 @@ static
 PyObject *
 hashtable_get_hashsizes(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashgraph * hashtable = me->hashtable;
+    Hashtable * hashtable = me->hashtable;
 
 
     if (!PyArg_ParseTuple(args, "")) {
@@ -1956,7 +1956,7 @@ static
 PyObject *
 hashtable_get_median_count(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashgraph * hashtable = me->hashtable;
+    Hashtable * hashtable = me->hashtable;
 
     const char * long_str;
 
@@ -1982,7 +1982,7 @@ static
 PyObject *
 hashtable_median_at_least(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashgraph * hashtable = me->hashtable;
+    Hashtable * hashtable = me->hashtable;
 
     const char * long_str;
     unsigned int cutoff;
@@ -2008,7 +2008,7 @@ static
 PyObject *
 hashtable_get_kmers(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashgraph * hashtable = me->hashtable;
+    Hashtable * hashtable = me->hashtable;
     const char * sequence;
 
     if (!PyArg_ParseTuple(args, "s", &sequence)) {
@@ -2032,7 +2032,7 @@ static
 PyObject *
 hashtable_get_kmer_counts(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashgraph * hashtable = me->hashtable;
+    Hashtable * hashtable = me->hashtable;
     const char * sequence;
 
     if (!PyArg_ParseTuple(args, "s", &sequence)) {
@@ -2056,7 +2056,7 @@ static
 PyObject *
 hashtable_get_kmer_hashes(khmer_KHashtable_Object * me, PyObject * args)
 {
-    Hashgraph * hashtable = me->hashtable;
+    Hashtable * hashtable = me->hashtable;
     const char * sequence;
 
     if (!PyArg_ParseTuple(args, "s", &sequence)) {
@@ -2082,7 +2082,7 @@ PyObject *
 hashtable_get_kmer_hashes_as_hashset(khmer_KHashtable_Object * me,
                                      PyObject * args)
 {
-    Hashgraph * hashtable = me->hashtable;
+    Hashtable * hashtable = me->hashtable;
     const char * sequence;
 
     if (!PyArg_ParseTuple(args, "s", &sequence)) {
@@ -2409,8 +2409,8 @@ static PyMethodDef khmer_counting_methods[] = {
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
-static PyObject* _new_counting_hash(PyTypeObject * type, PyObject * args,
-                                    PyObject * kwds);
+static PyObject* khmer_countgraph_new(PyTypeObject * type, PyObject * args,
+                                      PyObject * kwds);
 
 static PyTypeObject khmer_KCountgraph_Type
 CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KCountingHash_Object")
@@ -2452,17 +2452,17 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KCountingHash_Object")
     0,                                   /* tp_dictoffset */
     0,                                   /* tp_init */
     0,                                   /* tp_alloc */
-    _new_counting_hash,                  /* tp_new */
+    khmer_countgraph_new,                /* tp_new */
 };
 
 #define is_counting_obj(v)  (Py_TYPE(v) == &khmer_KCountgraph_Type)
 
 //
-// _new_counting_hash
+// khmer_countgraph_new
 //
 
-static PyObject* _new_counting_hash(PyTypeObject * type, PyObject * args,
-                                    PyObject * kwds)
+static PyObject* khmer_countgraph_new(PyTypeObject * type, PyObject * args,
+                                      PyObject * kwds)
 {
     khmer_KCountingHash_Object * self;
 
