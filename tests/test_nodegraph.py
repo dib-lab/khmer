@@ -61,6 +61,13 @@ def test_toobig():
         print(str(err))
 
 
+def test_bad_create():
+    try:
+        nodegraph = khmer._Nodegraph(5, [])
+    except ValueError as err:
+        assert 'tablesizes needs to be one or more numbers' in str(err)
+
+
 def test__get_set_tag_density():
     nodegraph = khmer._Nodegraph(32, [1])
 

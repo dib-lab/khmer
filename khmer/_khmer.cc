@@ -256,6 +256,33 @@ static bool ht_convert_PyObject_to_Kmer(PyObject * value,
 }
 
 
+static bool convert_Pytablesizes_to_vector(PyListObject * sizes_list_o,
+                                           std::vector<uint64_t>& sizes)
+{
+    Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
+    if (sizes_list_o_length < 1) {
+        PyErr_SetString(PyExc_ValueError,
+                        "tablesizes needs to be one or more numbers");
+        return false;
+    }
+    for (Py_ssize_t i = 0; i < sizes_list_o_length; i++) {
+        PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
+        if (PyLong_Check(size_o)) {
+            sizes.push_back(PyLong_AsUnsignedLongLong(size_o));
+        } else if (PyInt_Check(size_o)) {
+            sizes.push_back(PyInt_AsLong(size_o));
+        } else if (PyFloat_Check(size_o)) {
+            sizes.push_back(PyFloat_AS_DOUBLE(size_o));
+        } else {
+            PyErr_SetString(PyExc_TypeError,
+                            "2nd argument must be a list of ints, longs, or floats");
+            return false;
+        }
+    }
+    return true;
+}
+
+
 /***********************************************************************/
 
 //
@@ -2483,26 +2510,9 @@ static PyObject* khmer_countgraph_new(PyTypeObject * type, PyObject * args,
         }
 
         std::vector<uint64_t> sizes;
-        Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
-        if (sizes_list_o_length == -1) {
+        if (!convert_Pytablesizes_to_vector(sizes_list_o, sizes)) {
             Py_DECREF(self);
-            PyErr_SetString(PyExc_ValueError, "error with hashtable primes!");
             return NULL;
-        }
-        for (Py_ssize_t i = 0; i < sizes_list_o_length; i++) {
-            PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
-            if (PyLong_Check(size_o)) {
-                sizes.push_back(PyLong_AsUnsignedLongLong(size_o));
-            } else if (PyInt_Check(size_o)) {
-                sizes.push_back(PyInt_AsLong(size_o));
-            } else if (PyFloat_Check(size_o)) {
-                sizes.push_back(PyFloat_AS_DOUBLE(size_o));
-            } else {
-                Py_DECREF(self);
-                PyErr_SetString(PyExc_TypeError,
-                                "2nd argument must be a list of ints, longs, or floats");
-                return NULL;
-            }
         }
 
         try {
@@ -2604,21 +2614,9 @@ static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args,
         }
 
         std::vector<uint64_t> sizes;
-        Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
-        for (Py_ssize_t i = 0; i < sizes_list_o_length; i++) {
-            PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
-            if (PyLong_Check(size_o)) {
-                sizes.push_back(PyLong_AsUnsignedLongLong(size_o));
-            } else if (PyInt_Check(size_o)) {
-                sizes.push_back(PyInt_AsLong(size_o));
-            } else if (PyFloat_Check(size_o)) {
-                sizes.push_back(PyFloat_AS_DOUBLE(size_o));
-            } else {
-                Py_DECREF(self);
-                PyErr_SetString(PyExc_TypeError,
-                                "2nd argument must be a list of ints, longs, or floats");
-                return NULL;
-            }
+        if (!convert_Pytablesizes_to_vector(sizes_list_o, sizes)) {
+            Py_DECREF(self);
+            return NULL;
         }
 
         try {
