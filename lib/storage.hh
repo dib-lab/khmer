@@ -41,8 +41,6 @@ Contact: khmer-project@idyll.org
 namespace khmer
 {
 typedef std::map<HashIntoType, BoundedCounterType> KmerCountMap;
-class Hashbits;
-class CountingGraph;
 
 //
 // base Storage class for hashtable-related storage of information in memory.

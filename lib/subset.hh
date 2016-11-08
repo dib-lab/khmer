@@ -48,7 +48,6 @@ Contact: khmer-project@idyll.org
 namespace khmer
 {
 class Countgraph;
-class Hashbits;
 class Hashgraph;
 
 struct pre_partition_info {

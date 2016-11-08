@@ -467,15 +467,14 @@ public:
 };
 
 // Hashgraph-derived class with BitStorage.
-class Hashbits : public Hashgraph {
+class Nodegraph : public Hashgraph {
 public:
-    explicit Hashbits(WordLength ksize, std::vector<uint64_t> sizes)
+    explicit Nodegraph(WordLength ksize, std::vector<uint64_t> sizes)
         : Hashgraph(ksize, new BitStorage(sizes)) { } ;
 
-    void update_from(const Hashbits &other);
+    void update_from(const Nodegraph &other);
 };
 
-typedef Hashbits Nodegraph;
 }
 
 #define ACQUIRE_ALL_TAGS_SPIN_LOCK \

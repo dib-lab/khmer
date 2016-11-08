@@ -133,7 +133,7 @@ void BitStorage::save(std::string outfilename, WordLength ksize)
 }
 
 /**
- * Loads @param infilename into Hashbits, with error checking on
+ * Loads @param infilename into BitStorage, with error checking on
  * file type and file version.  Populates _counts internally.
  */
 void BitStorage::load(std::string infilename, WordLength &ksize)

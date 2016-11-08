@@ -1341,19 +1341,19 @@ static PyTypeObject khmer_KSubsetPartition_Type = {
 
 typedef struct {
     khmer_KHashgraph_Object khashgraph;
-    Hashbits * hashbits;
-} khmer_KHashbits_Object;
+    Nodegraph * hashbits;
+} khmer_KNodegraph_Object;
 
-static void khmer_hashbits_dealloc(khmer_KHashbits_Object * obj);
+static void khmer_hashbits_dealloc(khmer_KNodegraph_Object * obj);
 static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args,
                                     PyObject * kwds);
 
-static PyTypeObject khmer_KHashbits_Type
-CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashbits_Object")
+static PyTypeObject khmer_KNodegraph_Type
+CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KNodegraph_Object")
 = {
     PyVarObject_HEAD_INIT(NULL, 0) /* init & ob_size */
     "_khmer.Nodegraph",             /* tp_name */
-    sizeof(khmer_KHashbits_Object), /* tp_basicsize */
+    sizeof(khmer_KNodegraph_Object), /* tp_basicsize */
     0,                             /* tp_itemsize */
     (destructor)khmer_hashbits_dealloc, /*tp_dealloc*/
     0,              /*tp_print*/
@@ -1707,15 +1707,15 @@ hashtable_abundance_distribution_with_reads_parser(khmer_KHashtable_Object * me,
     Hashtable * hashtable = me->hashtable;
 
     khmer :: python :: khmer_ReadParser_Object * rparser_obj = NULL;
-    khmer_KHashbits_Object *tracking_obj = NULL;
+    khmer_KNodegraph_Object *tracking_obj = NULL;
 
     if (!PyArg_ParseTuple(args, "O!O!", &python::khmer_ReadParser_Type,
-                          &rparser_obj, &khmer_KHashbits_Type, &tracking_obj)) {
+                          &rparser_obj, &khmer_KNodegraph_Type, &tracking_obj)) {
         return NULL;
     }
 
     read_parsers::IParser *rparser      = rparser_obj->parser;
-    Hashbits           *hashbits        = tracking_obj->hashbits;
+    Nodegraph           *hashbits        = tracking_obj->hashbits;
     uint64_t           *dist            = NULL;
     const char         *value_exception = NULL;
     const char         *file_exception  = NULL;
@@ -1862,13 +1862,13 @@ hashtable_abundance_distribution(khmer_KHashtable_Object * me, PyObject * args)
     Hashtable * hashtable = me->hashtable;
 
     const char * filename = NULL;
-    khmer_KHashbits_Object * tracking_obj = NULL;
-    if (!PyArg_ParseTuple(args, "sO!", &filename, &khmer_KHashbits_Type,
+    khmer_KNodegraph_Object * tracking_obj = NULL;
+    if (!PyArg_ParseTuple(args, "sO!", &filename, &khmer_KNodegraph_Type,
                           &tracking_obj)) {
         return NULL;
     }
 
-    Hashbits           *hashbits        = tracking_obj->hashbits;
+    Nodegraph           *hashbits        = tracking_obj->hashbits;
     uint64_t           *dist            = NULL;
     const char         *value_exception = NULL;
     const char         *file_exception  = NULL;
@@ -2533,13 +2533,13 @@ static PyObject* khmer_countgraph_new(PyTypeObject * type, PyObject * args,
 
 static
 PyObject *
-hashbits_update(khmer_KHashbits_Object * me, PyObject * args)
+hashbits_update(khmer_KNodegraph_Object * me, PyObject * args)
 {
-    Hashbits * hashbits = me->hashbits;
-    Hashbits * other;
-    khmer_KHashbits_Object * other_o;
+    Nodegraph * hashbits = me->hashbits;
+    Nodegraph * other;
+    khmer_KNodegraph_Object * other_o;
 
-    if (!PyArg_ParseTuple(args, "O!", &khmer_KHashbits_Type, &other_o)) {
+    if (!PyArg_ParseTuple(args, "O!", &khmer_KNodegraph_Type, &other_o)) {
         return NULL;
     }
 
@@ -2557,9 +2557,9 @@ hashbits_update(khmer_KHashbits_Object * me, PyObject * args)
 
 static
 PyObject *
-hashbits_get_raw_tables(khmer_KHashbits_Object * self, PyObject * args)
+hashbits_get_raw_tables(khmer_KNodegraph_Object * self, PyObject * args)
 {
-    Hashbits * counting = self->hashbits;
+    Nodegraph * counting = self->hashbits;
 
     khmer::Byte ** table_ptrs = counting->get_raw_tables();
     std::vector<uint64_t> sizes = counting->get_tablesizes();
@@ -2603,8 +2603,8 @@ static PyMethodDef khmer_hashbits_methods[] = {
 static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args,
                                     PyObject * kwds)
 {
-    khmer_KHashbits_Object * self;
-    self = (khmer_KHashbits_Object *)type->tp_alloc(type, 0);
+    khmer_KNodegraph_Object * self;
+    self = (khmer_KNodegraph_Object *)type->tp_alloc(type, 0);
 
     if (self != NULL) {
         WordLength k = 0;
@@ -2622,7 +2622,7 @@ static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args,
         }
 
         try {
-            self->hashbits = new Hashbits(k, sizes);
+            self->hashbits = new Nodegraph(k, sizes);
         } catch (std::bad_alloc &e) {
             Py_DECREF(self);
             return PyErr_NoMemory();
@@ -2634,7 +2634,7 @@ static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args,
     return (PyObject *) self;
 }
 
-#define is_hashbits_obj(v)  (Py_TYPE(v) == &khmer_KHashbits_Type)
+#define is_hashbits_obj(v)  (Py_TYPE(v) == &khmer_KNodegraph_Type)
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -2857,8 +2857,8 @@ static PyObject * khmer_graphlabels_new(PyTypeObject *type, PyObject *args,
             return NULL;
         }
 
-        if (PyObject_TypeCheck(hashtable_o, &khmer_KHashbits_Type)) {
-            khmer_KHashbits_Object * kho = (khmer_KHashbits_Object *) hashtable_o;
+        if (PyObject_TypeCheck(hashtable_o, &khmer_KNodegraph_Type)) {
+            khmer_KNodegraph_Object * kho = (khmer_KNodegraph_Object *) hashtable_o;
             hashtable = kho->hashbits;
         } else if (PyObject_TypeCheck(hashtable_o, &khmer_KCountgraph_Type)) {
             khmer_KCountgraph_Object * cho = (khmer_KCountgraph_Object *) hashtable_o;
@@ -3195,11 +3195,11 @@ labelhash_assemble_labeled_path(khmer_KGraphLabels_Object * me,
     LabelHash* labelhash = me->labelhash;
 
     PyObject * val_o;
-    khmer_KHashbits_Object * nodegraph_o = NULL;
-    Hashbits * stop_bf = NULL;
+    khmer_KNodegraph_Object * nodegraph_o = NULL;
+    Nodegraph * stop_bf = NULL;
 
     if (!PyArg_ParseTuple(args, "O|O!", &val_o,
-                          &khmer_KHashbits_Type, &nodegraph_o)) {
+                          &khmer_KNodegraph_Type, &nodegraph_o)) {
         return NULL;
     }
 
@@ -3610,7 +3610,7 @@ static void khmer_counting_dealloc(khmer_KCountgraph_Object * obj)
 //
 // khmer_hashbits_dealloc -- clean up a hashbits object.
 //
-static void khmer_hashbits_dealloc(khmer_KHashbits_Object * obj)
+static void khmer_hashbits_dealloc(khmer_KNodegraph_Object * obj)
 {
     delete obj->hashbits;
     obj->hashbits = NULL;
@@ -4226,9 +4226,9 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
-    khmer_KHashbits_Type.tp_base = &khmer_KHashgraph_Type;
-    khmer_KHashbits_Type.tp_methods = khmer_hashbits_methods;
-    if (PyType_Ready(&khmer_KHashbits_Type) < 0) {
+    khmer_KNodegraph_Type.tp_base = &khmer_KHashgraph_Type;
+    khmer_KNodegraph_Type.tp_methods = khmer_hashbits_methods;
+    if (PyType_Ready(&khmer_KNodegraph_Type) < 0) {
         return MOD_ERROR_VAL;
     }
 
@@ -4297,9 +4297,9 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
-    Py_INCREF(&khmer_KHashbits_Type);
+    Py_INCREF(&khmer_KNodegraph_Type);
     if (PyModule_AddObject(m, "Nodegraph",
-                           (PyObject *)&khmer_KHashbits_Type) < 0) {
+                           (PyObject *)&khmer_KNodegraph_Type) < 0) {
         return MOD_ERROR_VAL;
     }
 
