@@ -2336,26 +2336,26 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashtable_Object")
 #include "_cpy_hashgraph.hh"
 
 //
-// KCountingHash object
+// KCountgraph object
 //
 
 typedef struct {
     khmer_KHashgraph_Object khashgraph;
-    CountingHash * counting;
-} khmer_KCountingHash_Object;
+    Countgraph * counting;
+} khmer_KCountgraph_Object;
 
 typedef struct {
     PyObject_HEAD
     ReadAligner * aligner;
 } khmer_ReadAligner_Object;
 
-static void khmer_counting_dealloc(khmer_KCountingHash_Object * obj);
+static void khmer_counting_dealloc(khmer_KCountgraph_Object * obj);
 
 static
 PyObject *
-count_get_raw_tables(khmer_KCountingHash_Object * self, PyObject * args)
+count_get_raw_tables(khmer_KCountgraph_Object * self, PyObject * args)
 {
-    CountingHash * counting = self->counting;
+    Countgraph * counting = self->counting;
 
     khmer::Byte ** table_ptrs = counting->get_raw_tables();
     std::vector<uint64_t> sizes = counting->get_tablesizes();
@@ -2380,10 +2380,10 @@ count_get_raw_tables(khmer_KCountingHash_Object * self, PyObject * args)
 
 static
 PyObject *
-count_do_subset_partition_with_abundance(khmer_KCountingHash_Object * me,
+count_do_subset_partition_with_abundance(khmer_KCountgraph_Object * me,
         PyObject * args)
 {
-    CountingHash * counting = me->counting;
+    Countgraph * counting = me->counting;
 
     HashIntoType start_kmer = 0, end_kmer = 0;
     PyObject * break_on_stop_tags_o = NULL;
@@ -2447,11 +2447,11 @@ static PyObject* khmer_countgraph_new(PyTypeObject * type, PyObject * args,
                                       PyObject * kwds);
 
 static PyTypeObject khmer_KCountgraph_Type
-CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KCountingHash_Object")
+CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KCountgraph_Object")
 = {
     PyVarObject_HEAD_INIT(NULL, 0)       /* init & ob_size */
     "_khmer.Countgraph",                 /*tp_name*/
-    sizeof(khmer_KCountingHash_Object),  /*tp_basicsize*/
+    sizeof(khmer_KCountgraph_Object),  /*tp_basicsize*/
     0,                                   /*tp_itemsize*/
     (destructor)khmer_counting_dealloc,  /*tp_dealloc*/
     0,                                   /*tp_print*/
@@ -2498,9 +2498,9 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KCountingHash_Object")
 static PyObject* khmer_countgraph_new(PyTypeObject * type, PyObject * args,
                                       PyObject * kwds)
 {
-    khmer_KCountingHash_Object * self;
+    khmer_KCountgraph_Object * self;
 
-    self = (khmer_KCountingHash_Object *)type->tp_alloc(type, 0);
+    self = (khmer_KCountgraph_Object *)type->tp_alloc(type, 0);
 
     if (self != NULL) {
         WordLength k = 0;
@@ -2518,7 +2518,7 @@ static PyObject* khmer_countgraph_new(PyTypeObject * type, PyObject * args,
         }
 
         try {
-            self->counting = new CountingHash(k, sizes);
+            self->counting = new Countgraph(k, sizes);
         } catch (std::bad_alloc &e) {
             Py_DECREF(self);
             return PyErr_NoMemory();
@@ -2762,7 +2762,7 @@ subset_partition_average_coverages(khmer_KSubsetPartition_Object * me,
 {
     SubsetPartition * subset_p = me->subset;
 
-    khmer_KCountingHash_Object * counting_o;
+    khmer_KCountgraph_Object * counting_o;
 
     if (!PyArg_ParseTuple(args, "O!", &khmer_KCountgraph_Type, &counting_o)) {
         return NULL;
@@ -2861,7 +2861,7 @@ static PyObject * khmer_graphlabels_new(PyTypeObject *type, PyObject *args,
             khmer_KHashbits_Object * kho = (khmer_KHashbits_Object *) hashtable_o;
             hashtable = kho->hashbits;
         } else if (PyObject_TypeCheck(hashtable_o, &khmer_KCountgraph_Type)) {
-            khmer_KCountingHash_Object * cho = (khmer_KCountingHash_Object *) hashtable_o;
+            khmer_KCountgraph_Object * cho = (khmer_KCountgraph_Object *) hashtable_o;
             hashtable = cho->counting;
         } else {
             PyErr_SetString(PyExc_ValueError,
@@ -3335,7 +3335,7 @@ hashgraph_repartition_largest_partition(khmer_KHashgraph_Object * me,
                                         PyObject * args)
 {
     Hashgraph * hashgraph = me->hashgraph;
-    khmer_KCountingHash_Object * counting_o = NULL;
+    khmer_KCountgraph_Object * counting_o = NULL;
     PyObject * subset_o = NULL;
     SubsetPartition * subset_p;
     unsigned int distance, threshold, frequency;
@@ -3353,7 +3353,7 @@ hashgraph_repartition_largest_partition(khmer_KHashgraph_Object * me,
         subset_p = hashgraph->partition;
     }
 
-    CountingHash * counting = counting_o->counting;
+    Countgraph * counting = counting_o->counting;
 
     unsigned long next_largest;
     try {
@@ -3522,7 +3522,7 @@ static PyObject* khmer_ReadAligner_new(PyTypeObject *type, PyObject * args,
     self = (khmer_ReadAligner_Object *)type->tp_alloc(type, 0);
 
     if (self != NULL) {
-        khmer_KCountingHash_Object * ch = NULL;
+        khmer_KCountgraph_Object * ch = NULL;
         unsigned short int trusted_cov_cutoff = 2;
         double bits_theta = 1;
         double scoring_matrix[] = { 0, 0, 0, 0 };
@@ -3600,7 +3600,7 @@ static PyTypeObject khmer_ReadAlignerType = {
 // khmer_counting_dealloc -- clean up a counting hash object.
 //
 
-static void khmer_counting_dealloc(khmer_KCountingHash_Object * obj)
+static void khmer_counting_dealloc(khmer_KCountgraph_Object * obj)
 {
     delete obj->counting;
     obj->counting = NULL;

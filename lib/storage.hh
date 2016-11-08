@@ -42,7 +42,7 @@ namespace khmer
 {
 typedef std::map<HashIntoType, BoundedCounterType> KmerCountMap;
 class Hashbits;
-class CountingHash;
+class CountingGraph;
 
 //
 // base Storage class for hashtable-related storage of information in memory.
@@ -245,7 +245,7 @@ class ByteStorage : public Storage {
     friend class ByteStorageFileWriter;
     friend class ByteStorageGzFileReader;
     friend class ByteStorageGzFileWriter;
-    friend class CountingHash;
+    friend class CountGraph;
 protected:
     unsigned int    _max_count;
     unsigned int    _max_bigcount;

@@ -47,7 +47,7 @@ Contact: khmer-project@idyll.org
 
 namespace khmer
 {
-class CountingHash;
+class Countgraph;
 class Hashbits;
 class Hashgraph;
 
@@ -158,10 +158,10 @@ public:
                                      unsigned int& n_unassigned) const;
 
     void partition_average_coverages(PartitionCountMap &cm,
-                                     CountingHash * ht) const;
+                                     Countgraph * ht) const;
 
     unsigned long long repartition_largest_partition(unsigned int, unsigned int,
-            unsigned int, CountingHash&);
+            unsigned int, Countgraph&);
 
     void repartition_a_partition(const SeenSet& partition_tags);
     void _clear_partition(PartitionID, SeenSet& partition_tags);

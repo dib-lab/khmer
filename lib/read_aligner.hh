@@ -226,7 +226,7 @@ private:
     const HashIntoType bitmask;
     const size_t rc_left_shift;
 
-    khmer::CountingHash* m_ch;
+    khmer::Countgraph* m_ch;
     ScoringMatrix m_sm;
 
     size_t m_trusted_cutoff;
@@ -244,7 +244,7 @@ public:
     Alignment* Align(const std::string&);
     Alignment* AlignForward(const std::string&);
 
-    ReadAligner(khmer::CountingHash* ch,
+    ReadAligner(khmer::Countgraph* ch,
                 BoundedCounterType trusted_cutoff, double bits_theta)
         : bitmask(comp_bitmask(ch->ksize())),
           rc_left_shift(ch->ksize() * 2 - 2),
@@ -265,7 +265,7 @@ public:
 #endif
     }
 
-    ReadAligner(khmer::CountingHash* ch,
+    ReadAligner(khmer::Countgraph* ch,
                 BoundedCounterType trusted_cutoff, double bits_theta,
                 double* scoring_matrix, double* transitions)
         : bitmask(comp_bitmask(ch->ksize())),
