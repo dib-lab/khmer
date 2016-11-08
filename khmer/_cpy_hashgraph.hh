@@ -136,7 +136,7 @@ hashgraph_traverse_linear_path(khmer_KHashgraph_Object * me, PyObject * args)
     SeenSet * visited = new SeenSet;
     unsigned int size = hashgraph->traverse_linear_path(start_kmer,
                         *adj, *visited,
-                        *nodegraph_o->hashbits,
+                        *nodegraph_o->nodegraph,
                         *hdn_o->hashes);
 
     khmer_HashSet_Object * adj_o = create_HashSet_Object(adj,
@@ -173,7 +173,7 @@ hashgraph_assemble_linear_path(khmer_KHashgraph_Object * me, PyObject * args)
     }
 
     if (nodegraph_o) {
-        stop_bf = nodegraph_o->hashbits;
+        stop_bf = nodegraph_o->nodegraph;
     }
     LinearAssembler assembler(hashgraph);
 
