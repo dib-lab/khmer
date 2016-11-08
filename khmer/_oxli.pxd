@@ -64,7 +64,7 @@ cdef extern from "partitioning.hh" namespace "khmer":
         CyStreamingPartitioner(CyHashtable * ) except +MemoryError
 
         void consume_sequence(string&) except +MemoryError
-        void map_tags_to_component(set[HashIntoType], ComponentPtr)
+        void map_tags_to_component(set[HashIntoType]&, ComponentPtr&)
         void find_connected_tags(queue[Kmer]&, 
                                  set[HashIntoType]&,
                                  set[HashIntoType]&) except +MemoryError

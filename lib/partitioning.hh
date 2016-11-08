@@ -190,7 +190,7 @@ class StreamingPartitioner {
         explicit StreamingPartitioner(Hashtable * graph);
 
         void consume_sequence(const std::string& seq);
-        void map_tags_to_component(std::set<HashIntoType> tags, ComponentPtr& comp);
+        void map_tags_to_component(std::set<HashIntoType>& tags, ComponentPtr& comp);
         void find_connected_tags(KmerQueue& node_q,
                                  std::set<HashIntoType>& found_tags,
                                  std::set<HashIntoType>& seen,
@@ -200,7 +200,7 @@ class StreamingPartitioner {
             return components->size();
         }
 
-        void merge_components(ComponentPtr root, ComponentPtrSet comps);
+        void merge_components(ComponentPtr& root, ComponentPtrSet& comps);
 
         ComponentPtr get_tag_component(HashIntoType tag) const;
         ComponentPtr get_tag_component(std::string& tag) const;

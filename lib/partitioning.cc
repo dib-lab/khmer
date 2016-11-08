@@ -50,7 +50,7 @@ StreamingPartitioner::StreamingPartitioner(Hashtable * graph)  :
 }
 
 
-void StreamingPartitioner::map_tags_to_component(std::set<HashIntoType> tags,
+void StreamingPartitioner::map_tags_to_component(std::set<HashIntoType>& tags,
                                                  ComponentPtr& comp)
 {
     for (auto tag: tags) {
@@ -178,12 +178,13 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
 #if(DEBUG_SP)
             std::cout << "Merge into: " << *comp << std::endl;
 #endif
-                // map the new tags to this component
+            // map the new tags to this component
             comp->add_tag(tags);
             merge_components(comp, comps);
         }
         // (re)map all the tags to the component
         map_tags_to_component(tags, comp);
+        map_tags_to_component(comp->tags, comp);
 
 #if(DEBUG_SP)
         for (auto tag: tags) {
@@ -199,8 +200,8 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
 }
 
 
-void StreamingPartitioner::merge_components(ComponentPtr root, 
-                                            ComponentPtrSet comps)
+void StreamingPartitioner::merge_components(ComponentPtr& root, 
+                                            ComponentPtrSet& comps)
 {
 #if(DEBUG_SP)
     std::cout << "Merge components." << std::endl;
