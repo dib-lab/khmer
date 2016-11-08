@@ -6,7 +6,7 @@
         "define_macros": [
             [
                 "VERSION",
-                "2.0+522.g1967b74.dirty"
+                "2.0+531.gb18d20d.dirty"
             ]
         ],
         "depends": [
@@ -716,7 +716,7 @@ struct __pyx_obj_5khmer_5_oxli_Component {
 };
 
 
-/* "khmer/_oxli.pyx":51
+/* "khmer/_oxli.pyx":55
  * 
  * 
  * cdef class StreamingPartitioner:             # <<<<<<<<<<<<<<
@@ -732,7 +732,7 @@ struct __pyx_obj_5khmer_5_oxli_StreamingPartitioner {
 };
 
 
-/* "khmer/_oxli.pyx":29
+/* "khmer/_oxli.pyx":33
  *         return deref(self._this).get_n_tags()
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -746,7 +746,7 @@ struct __pyx_obj_5khmer_5_oxli___pyx_scope_struct____iter__ {
 };
 
 
-/* "khmer/_oxli.pyx":90
+/* "khmer/_oxli.pyx":94
  *             return Component.create(compptr)
  * 
  *     def components(self):             # <<<<<<<<<<<<<<
@@ -762,7 +762,7 @@ struct __pyx_obj_5khmer_5_oxli___pyx_scope_struct_1_components {
 };
 
 
-/* "khmer/_oxli.pyx":101
+/* "khmer/_oxli.pyx":105
  *             raise MemoryError("Can't locked underlying Component set")
  * 
  *     def tag_components(self):             # <<<<<<<<<<<<<<
@@ -1177,7 +1177,8 @@ static PyObject *__pyx_n_s_throw;
 static PyObject *__pyx_kp_s_utf_8;
 static int __pyx_pf_5khmer_5_oxli_9Component___cinit__(struct __pyx_obj_5khmer_5_oxli_Component *__pyx_v_self, struct __pyx_obj_5khmer_5_oxli_Component *__pyx_v_other); /* proto */
 static PyObject *__pyx_pf_5khmer_5_oxli_9Component_12component_id___get__(struct __pyx_obj_5khmer_5_oxli_Component *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5khmer_5_oxli_9Component_8n_merges___get__(struct __pyx_obj_5khmer_5_oxli_Component *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5khmer_5_oxli_9Component_10_n_created___get__(struct __pyx_obj_5khmer_5_oxli_Component *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5khmer_5_oxli_9Component_12_n_destroyed___get__(struct __pyx_obj_5khmer_5_oxli_Component *__pyx_v_self); /* proto */
 static Py_ssize_t __pyx_pf_5khmer_5_oxli_9Component_2__len__(struct __pyx_obj_5khmer_5_oxli_Component *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5khmer_5_oxli_9Component_4__iter__(struct __pyx_obj_5khmer_5_oxli_Component *__pyx_v_self); /* proto */
 static Py_hash_t __pyx_pf_5khmer_5_oxli_9Component_7__hash__(struct __pyx_obj_5khmer_5_oxli_Component *__pyx_v_self); /* proto */
@@ -1352,7 +1353,7 @@ static PyObject *__pyx_pf_5khmer_5_oxli_9Component_12component_id___get__(struct
  *         def __get__(self):
  *             return deref(self._this).component_id             # <<<<<<<<<<<<<<
  * 
- *     property n_merges:
+ *     property _n_created:
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_1 = __Pyx_PyInt_From_uint64_t((*__pyx_v_self->_this).component_id); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 20, __pyx_L1_error)
@@ -1382,40 +1383,40 @@ static PyObject *__pyx_pf_5khmer_5_oxli_9Component_12component_id___get__(struct
 
 /* "khmer/_oxli.pyx":23
  * 
- *     property n_merges:
+ *     property _n_created:
  *         def __get__(self):             # <<<<<<<<<<<<<<
- *             return deref(self._this).get_n_merges()
+ *             return deref(self._this).get_n_created()
  * 
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5khmer_5_oxli_9Component_8n_merges_1__get__(PyObject *__pyx_v_self); /*proto*/
-static PyObject *__pyx_pw_5khmer_5_oxli_9Component_8n_merges_1__get__(PyObject *__pyx_v_self) {
+static PyObject *__pyx_pw_5khmer_5_oxli_9Component_10_n_created_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_5khmer_5_oxli_9Component_10_n_created_1__get__(PyObject *__pyx_v_self) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_5khmer_5_oxli_9Component_8n_merges___get__(((struct __pyx_obj_5khmer_5_oxli_Component *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5khmer_5_oxli_9Component_10_n_created___get__(((struct __pyx_obj_5khmer_5_oxli_Component *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5khmer_5_oxli_9Component_8n_merges___get__(struct __pyx_obj_5khmer_5_oxli_Component *__pyx_v_self) {
+static PyObject *__pyx_pf_5khmer_5_oxli_9Component_10_n_created___get__(struct __pyx_obj_5khmer_5_oxli_Component *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
   /* "khmer/_oxli.pyx":24
- *     property n_merges:
+ *     property _n_created:
  *         def __get__(self):
- *             return deref(self._this).get_n_merges()             # <<<<<<<<<<<<<<
+ *             return deref(self._this).get_n_created()             # <<<<<<<<<<<<<<
  * 
- *     def __len__(self):
+ *     property _n_destroyed:
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_uint64_t((*__pyx_v_self->_this).get_n_merges()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 24, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_uint64_t((*__pyx_v_self->_this).get_n_created()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 24, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -1423,16 +1424,16 @@ static PyObject *__pyx_pf_5khmer_5_oxli_9Component_8n_merges___get__(struct __py
 
   /* "khmer/_oxli.pyx":23
  * 
- *     property n_merges:
+ *     property _n_created:
  *         def __get__(self):             # <<<<<<<<<<<<<<
- *             return deref(self._this).get_n_merges()
+ *             return deref(self._this).get_n_created()
  * 
  */
 
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("khmer._oxli.Component.n_merges.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("khmer._oxli.Component._n_created.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -1440,8 +1441,68 @@ static PyObject *__pyx_pf_5khmer_5_oxli_9Component_8n_merges___get__(struct __py
   return __pyx_r;
 }
 
-/* "khmer/_oxli.pyx":26
- *             return deref(self._this).get_n_merges()
+/* "khmer/_oxli.pyx":27
+ * 
+ *     property _n_destroyed:
+ *         def __get__(self):             # <<<<<<<<<<<<<<
+ *             return deref(self._this).get_n_destroyed()
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5khmer_5_oxli_9Component_12_n_destroyed_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_5khmer_5_oxli_9Component_12_n_destroyed_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5khmer_5_oxli_9Component_12_n_destroyed___get__(((struct __pyx_obj_5khmer_5_oxli_Component *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5khmer_5_oxli_9Component_12_n_destroyed___get__(struct __pyx_obj_5khmer_5_oxli_Component *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  __Pyx_RefNannySetupContext("__get__", 0);
+
+  /* "khmer/_oxli.pyx":28
+ *     property _n_destroyed:
+ *         def __get__(self):
+ *             return deref(self._this).get_n_destroyed()             # <<<<<<<<<<<<<<
+ * 
+ *     def __len__(self):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyInt_From_uint64_t((*__pyx_v_self->_this).get_n_destroyed()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 28, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "khmer/_oxli.pyx":27
+ * 
+ *     property _n_destroyed:
+ *         def __get__(self):             # <<<<<<<<<<<<<<
+ *             return deref(self._this).get_n_destroyed()
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("khmer._oxli.Component._n_destroyed.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "khmer/_oxli.pyx":30
+ *             return deref(self._this).get_n_destroyed()
  * 
  *     def __len__(self):             # <<<<<<<<<<<<<<
  *         return deref(self._this).get_n_tags()
@@ -1466,7 +1527,7 @@ static Py_ssize_t __pyx_pf_5khmer_5_oxli_9Component_2__len__(struct __pyx_obj_5k
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__len__", 0);
 
-  /* "khmer/_oxli.pyx":27
+  /* "khmer/_oxli.pyx":31
  * 
  *     def __len__(self):
  *         return deref(self._this).get_n_tags()             # <<<<<<<<<<<<<<
@@ -1476,8 +1537,8 @@ static Py_ssize_t __pyx_pf_5khmer_5_oxli_9Component_2__len__(struct __pyx_obj_5k
   __pyx_r = (*__pyx_v_self->_this).get_n_tags();
   goto __pyx_L0;
 
-  /* "khmer/_oxli.pyx":26
- *             return deref(self._this).get_n_merges()
+  /* "khmer/_oxli.pyx":30
+ *             return deref(self._this).get_n_destroyed()
  * 
  *     def __len__(self):             # <<<<<<<<<<<<<<
  *         return deref(self._this).get_n_tags()
@@ -1491,7 +1552,7 @@ static Py_ssize_t __pyx_pf_5khmer_5_oxli_9Component_2__len__(struct __pyx_obj_5k
 }
 static PyObject *__pyx_gb_5khmer_5_oxli_9Component_6generator(__pyx_CoroutineObject *__pyx_generator, PyObject *__pyx_sent_value); /* proto */
 
-/* "khmer/_oxli.pyx":29
+/* "khmer/_oxli.pyx":33
  *         return deref(self._this).get_n_tags()
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -1521,7 +1582,7 @@ static PyObject *__pyx_pf_5khmer_5_oxli_9Component_4__iter__(struct __pyx_obj_5k
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_5khmer_5_oxli___pyx_scope_struct____iter__ *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(1, 29, __pyx_L1_error)
+    __PYX_ERR(1, 33, __pyx_L1_error)
   } else {
     __Pyx_GOTREF(__pyx_cur_scope);
   }
@@ -1529,7 +1590,7 @@ static PyObject *__pyx_pf_5khmer_5_oxli_9Component_4__iter__(struct __pyx_obj_5k
   __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5khmer_5_oxli_9Component_6generator, (PyObject *) __pyx_cur_scope, __pyx_n_s_iter, __pyx_n_s_Component___iter, __pyx_n_s_khmer__oxli); if (unlikely(!gen)) __PYX_ERR(1, 29, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5khmer_5_oxli_9Component_6generator, (PyObject *) __pyx_cur_scope, __pyx_n_s_iter, __pyx_n_s_Component___iter, __pyx_n_s_khmer__oxli); if (unlikely(!gen)) __PYX_ERR(1, 33, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -1561,9 +1622,9 @@ static PyObject *__pyx_gb_5khmer_5_oxli_9Component_6generator(__pyx_CoroutineObj
     return NULL;
   }
   __pyx_L3_first_run:;
-  if (unlikely(!__pyx_sent_value)) __PYX_ERR(1, 29, __pyx_L1_error)
+  if (unlikely(!__pyx_sent_value)) __PYX_ERR(1, 33, __pyx_L1_error)
 
-  /* "khmer/_oxli.pyx":30
+  /* "khmer/_oxli.pyx":34
  * 
  *     def __iter__(self):
  *         it = deref(self._this).tags.begin()             # <<<<<<<<<<<<<<
@@ -1572,7 +1633,7 @@ static PyObject *__pyx_gb_5khmer_5_oxli_9Component_6generator(__pyx_CoroutineObj
  */
   __pyx_cur_scope->__pyx_v_it = (*__pyx_cur_scope->__pyx_v_self->_this).tags.begin();
 
-  /* "khmer/_oxli.pyx":31
+  /* "khmer/_oxli.pyx":35
  *     def __iter__(self):
  *         it = deref(self._this).tags.begin()
  *         while it != deref(self._this).tags.end():             # <<<<<<<<<<<<<<
@@ -1583,14 +1644,14 @@ static PyObject *__pyx_gb_5khmer_5_oxli_9Component_6generator(__pyx_CoroutineObj
     __pyx_t_1 = ((__pyx_cur_scope->__pyx_v_it != (*__pyx_cur_scope->__pyx_v_self->_this).tags.end()) != 0);
     if (!__pyx_t_1) break;
 
-    /* "khmer/_oxli.pyx":32
+    /* "khmer/_oxli.pyx":36
  *         it = deref(self._this).tags.begin()
  *         while it != deref(self._this).tags.end():
  *             yield deref(it)             # <<<<<<<<<<<<<<
  *             inc(it)
  * 
  */
-    __pyx_t_2 = __Pyx_PyInt_From_khmer_3a__3a_HashIntoType((*__pyx_cur_scope->__pyx_v_it)); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 32, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_khmer_3a__3a_HashIntoType((*__pyx_cur_scope->__pyx_v_it)); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 36, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_r = __pyx_t_2;
     __pyx_t_2 = 0;
@@ -1600,9 +1661,9 @@ static PyObject *__pyx_gb_5khmer_5_oxli_9Component_6generator(__pyx_CoroutineObj
     __pyx_generator->resume_label = 1;
     return __pyx_r;
     __pyx_L6_resume_from_yield:;
-    if (unlikely(!__pyx_sent_value)) __PYX_ERR(1, 32, __pyx_L1_error)
+    if (unlikely(!__pyx_sent_value)) __PYX_ERR(1, 36, __pyx_L1_error)
 
-    /* "khmer/_oxli.pyx":33
+    /* "khmer/_oxli.pyx":37
  *         while it != deref(self._this).tags.end():
  *             yield deref(it)
  *             inc(it)             # <<<<<<<<<<<<<<
@@ -1613,7 +1674,7 @@ static PyObject *__pyx_gb_5khmer_5_oxli_9Component_6generator(__pyx_CoroutineObj
   }
   if (1); else __pyx_cur_scope = __pyx_cur_scope;
 
-  /* "khmer/_oxli.pyx":29
+  /* "khmer/_oxli.pyx":33
  *         return deref(self._this).get_n_tags()
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -1635,7 +1696,7 @@ static PyObject *__pyx_gb_5khmer_5_oxli_9Component_6generator(__pyx_CoroutineObj
   return __pyx_r;
 }
 
-/* "khmer/_oxli.pyx":35
+/* "khmer/_oxli.pyx":39
  *             inc(it)
  * 
  *     def __hash__(self):             # <<<<<<<<<<<<<<
@@ -1661,7 +1722,7 @@ static Py_hash_t __pyx_pf_5khmer_5_oxli_9Component_7__hash__(struct __pyx_obj_5k
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__hash__", 0);
 
-  /* "khmer/_oxli.pyx":36
+  /* "khmer/_oxli.pyx":40
  * 
  *     def __hash__(self):
  *         return <uintptr_t>self._this.get()             # <<<<<<<<<<<<<<
@@ -1671,7 +1732,7 @@ static Py_hash_t __pyx_pf_5khmer_5_oxli_9Component_7__hash__(struct __pyx_obj_5k
   __pyx_r = ((uintptr_t)__pyx_v_self->_this.get());
   goto __pyx_L0;
 
-  /* "khmer/_oxli.pyx":35
+  /* "khmer/_oxli.pyx":39
  *             inc(it)
  * 
  *     def __hash__(self):             # <<<<<<<<<<<<<<
@@ -1686,7 +1747,7 @@ static Py_hash_t __pyx_pf_5khmer_5_oxli_9Component_7__hash__(struct __pyx_obj_5k
   return __pyx_r;
 }
 
-/* "khmer/_oxli.pyx":38
+/* "khmer/_oxli.pyx":42
  *         return <uintptr_t>self._this.get()
  * 
  *     def __richcmp__(x, y, op):             # <<<<<<<<<<<<<<
@@ -1701,7 +1762,7 @@ static PyObject *__pyx_pw_5khmer_5_oxli_9Component_10__richcmp__(PyObject *__pyx
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__richcmp__ (wrapper)", 0);
-  __pyx_v_op = __Pyx_PyInt_From_int(__pyx_arg_op); if (unlikely(!__pyx_v_op)) __PYX_ERR(1, 38, __pyx_L3_error)
+  __pyx_v_op = __Pyx_PyInt_From_int(__pyx_arg_op); if (unlikely(!__pyx_v_op)) __PYX_ERR(1, 42, __pyx_L3_error)
   __Pyx_GOTREF(__pyx_v_op);
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -1726,20 +1787,20 @@ static PyObject *__pyx_pf_5khmer_5_oxli_9Component_9__richcmp__(PyObject *__pyx_
   PyObject *__pyx_t_4 = NULL;
   __Pyx_RefNannySetupContext("__richcmp__", 0);
 
-  /* "khmer/_oxli.pyx":39
+  /* "khmer/_oxli.pyx":43
  * 
  *     def __richcmp__(x, y, op):
  *         if op == 2:             # <<<<<<<<<<<<<<
  *             return x.component_id == y.component_id
  *         else:
  */
-  __pyx_t_1 = __Pyx_PyInt_EqObjC(__pyx_v_op, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 39, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_EqObjC(__pyx_v_op, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 43, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(1, 39, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(1, 43, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "khmer/_oxli.pyx":40
+    /* "khmer/_oxli.pyx":44
  *     def __richcmp__(x, y, op):
  *         if op == 2:
  *             return x.component_id == y.component_id             # <<<<<<<<<<<<<<
@@ -1747,18 +1808,18 @@ static PyObject *__pyx_pf_5khmer_5_oxli_9Component_9__richcmp__(PyObject *__pyx_
  *             raise NotImplementedError('Operator not available.')
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_x, __pyx_n_s_component_id); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 40, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_x, __pyx_n_s_component_id); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 44, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_y, __pyx_n_s_component_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 40, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_y, __pyx_n_s_component_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 44, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_t_3, Py_EQ); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 40, __pyx_L1_error)
+    __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_t_3, Py_EQ); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 44, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_r = __pyx_t_4;
     __pyx_t_4 = 0;
     goto __pyx_L0;
 
-    /* "khmer/_oxli.pyx":39
+    /* "khmer/_oxli.pyx":43
  * 
  *     def __richcmp__(x, y, op):
  *         if op == 2:             # <<<<<<<<<<<<<<
@@ -1767,7 +1828,7 @@ static PyObject *__pyx_pf_5khmer_5_oxli_9Component_9__richcmp__(PyObject *__pyx_
  */
   }
 
-  /* "khmer/_oxli.pyx":42
+  /* "khmer/_oxli.pyx":46
  *             return x.component_id == y.component_id
  *         else:
  *             raise NotImplementedError('Operator not available.')             # <<<<<<<<<<<<<<
@@ -1775,14 +1836,14 @@ static PyObject *__pyx_pf_5khmer_5_oxli_9Component_9__richcmp__(PyObject *__pyx_
  *     @staticmethod
  */
   /*else*/ {
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_NotImplementedError, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 42, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_NotImplementedError, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 46, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_Raise(__pyx_t_4, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __PYX_ERR(1, 42, __pyx_L1_error)
+    __PYX_ERR(1, 46, __pyx_L1_error)
   }
 
-  /* "khmer/_oxli.pyx":38
+  /* "khmer/_oxli.pyx":42
  *         return <uintptr_t>self._this.get()
  * 
  *     def __richcmp__(x, y, op):             # <<<<<<<<<<<<<<
@@ -1803,7 +1864,7 @@ static PyObject *__pyx_pf_5khmer_5_oxli_9Component_9__richcmp__(PyObject *__pyx_
   return __pyx_r;
 }
 
-/* "khmer/_oxli.pyx":45
+/* "khmer/_oxli.pyx":49
  * 
  *     @staticmethod
  *     cdef Component create(ComponentPtr ptr):             # <<<<<<<<<<<<<<
@@ -1818,19 +1879,19 @@ static struct __pyx_obj_5khmer_5_oxli_Component *__pyx_f_5khmer_5_oxli_9Componen
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("create", 0);
 
-  /* "khmer/_oxli.pyx":46
+  /* "khmer/_oxli.pyx":50
  *     @staticmethod
  *     cdef Component create(ComponentPtr ptr):
  *         cdef Component comp = Component()             # <<<<<<<<<<<<<<
  *         comp._this = ptr
  *         return comp
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_5khmer_5_oxli_Component), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 46, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_5khmer_5_oxli_Component), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 50, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_comp = ((struct __pyx_obj_5khmer_5_oxli_Component *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "khmer/_oxli.pyx":47
+  /* "khmer/_oxli.pyx":51
  *     cdef Component create(ComponentPtr ptr):
  *         cdef Component comp = Component()
  *         comp._this = ptr             # <<<<<<<<<<<<<<
@@ -1839,7 +1900,7 @@ static struct __pyx_obj_5khmer_5_oxli_Component *__pyx_f_5khmer_5_oxli_9Componen
  */
   __pyx_v_comp->_this = __pyx_v_ptr;
 
-  /* "khmer/_oxli.pyx":48
+  /* "khmer/_oxli.pyx":52
  *         cdef Component comp = Component()
  *         comp._this = ptr
  *         return comp             # <<<<<<<<<<<<<<
@@ -1851,7 +1912,7 @@ static struct __pyx_obj_5khmer_5_oxli_Component *__pyx_f_5khmer_5_oxli_9Componen
   __pyx_r = __pyx_v_comp;
   goto __pyx_L0;
 
-  /* "khmer/_oxli.pyx":45
+  /* "khmer/_oxli.pyx":49
  * 
  *     @staticmethod
  *     cdef Component create(ComponentPtr ptr):             # <<<<<<<<<<<<<<
@@ -1871,7 +1932,7 @@ static struct __pyx_obj_5khmer_5_oxli_Component *__pyx_f_5khmer_5_oxli_9Componen
   return __pyx_r;
 }
 
-/* "khmer/_oxli.pyx":58
+/* "khmer/_oxli.pyx":62
  *     cdef CyHashtable * _graph_ptr
  * 
  *     def __cinit__(self, graph):             # <<<<<<<<<<<<<<
@@ -1904,7 +1965,7 @@ static int __pyx_pw_5khmer_5_oxli_20StreamingPartitioner_1__cinit__(PyObject *__
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(1, 58, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(1, 62, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
@@ -1915,7 +1976,7 @@ static int __pyx_pw_5khmer_5_oxli_20StreamingPartitioner_1__cinit__(PyObject *__
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 58, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 62, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("khmer._oxli.StreamingPartitioner.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -1940,16 +2001,16 @@ static int __pyx_pf_5khmer_5_oxli_20StreamingPartitioner___cinit__(struct __pyx_
   khmer::StreamingPartitioner *__pyx_t_6;
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "khmer/_oxli.pyx":59
+  /* "khmer/_oxli.pyx":63
  * 
  *     def __cinit__(self, graph):
  *         if not (isinstance(graph, Countgraph) or isinstance(graph, Nodegraph)):             # <<<<<<<<<<<<<<
  *             raise ValueError('Must take an object with Hashtable *')
  * 
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_Countgraph); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 59, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_Countgraph); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 63, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyObject_IsInstance(__pyx_v_graph, __pyx_t_2); if (unlikely(__pyx_t_3 == -1)) __PYX_ERR(1, 59, __pyx_L1_error)
+  __pyx_t_3 = PyObject_IsInstance(__pyx_v_graph, __pyx_t_2); if (unlikely(__pyx_t_3 == -1)) __PYX_ERR(1, 63, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_4 = (__pyx_t_3 != 0);
   if (!__pyx_t_4) {
@@ -1957,9 +2018,9 @@ static int __pyx_pf_5khmer_5_oxli_20StreamingPartitioner___cinit__(struct __pyx_
     __pyx_t_1 = __pyx_t_4;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_Nodegraph); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 59, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_Nodegraph); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 63, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = PyObject_IsInstance(__pyx_v_graph, __pyx_t_2); if (unlikely(__pyx_t_4 == -1)) __PYX_ERR(1, 59, __pyx_L1_error)
+  __pyx_t_4 = PyObject_IsInstance(__pyx_v_graph, __pyx_t_2); if (unlikely(__pyx_t_4 == -1)) __PYX_ERR(1, 63, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_3 = (__pyx_t_4 != 0);
   __pyx_t_1 = __pyx_t_3;
@@ -1967,20 +2028,20 @@ static int __pyx_pf_5khmer_5_oxli_20StreamingPartitioner___cinit__(struct __pyx_
   __pyx_t_3 = ((!__pyx_t_1) != 0);
   if (__pyx_t_3) {
 
-    /* "khmer/_oxli.pyx":60
+    /* "khmer/_oxli.pyx":64
  *     def __cinit__(self, graph):
  *         if not (isinstance(graph, Countgraph) or isinstance(graph, Nodegraph)):
  *             raise ValueError('Must take an object with Hashtable *')             # <<<<<<<<<<<<<<
  * 
  * 
  */
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 60, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 64, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(1, 60, __pyx_L1_error)
+    __PYX_ERR(1, 64, __pyx_L1_error)
 
-    /* "khmer/_oxli.pyx":59
+    /* "khmer/_oxli.pyx":63
  * 
  *     def __cinit__(self, graph):
  *         if not (isinstance(graph, Countgraph) or isinstance(graph, Nodegraph)):             # <<<<<<<<<<<<<<
@@ -1989,7 +2050,7 @@ static int __pyx_pf_5khmer_5_oxli_20StreamingPartitioner___cinit__(struct __pyx_
  */
   }
 
-  /* "khmer/_oxli.pyx":63
+  /* "khmer/_oxli.pyx":67
  * 
  * 
  *         cdef CyCpHashtable_Object* ptr = <CyCpHashtable_Object*> graph             # <<<<<<<<<<<<<<
@@ -1998,7 +2059,7 @@ static int __pyx_pf_5khmer_5_oxli_20StreamingPartitioner___cinit__(struct __pyx_
  */
   __pyx_v_ptr = ((khmer::khmer_KHashtable_Object *)__pyx_v_graph);
 
-  /* "khmer/_oxli.pyx":64
+  /* "khmer/_oxli.pyx":68
  * 
  *         cdef CyCpHashtable_Object* ptr = <CyCpHashtable_Object*> graph
  *         self._graph_ptr = deref(ptr).hashtable             # <<<<<<<<<<<<<<
@@ -2008,7 +2069,7 @@ static int __pyx_pf_5khmer_5_oxli_20StreamingPartitioner___cinit__(struct __pyx_
   __pyx_t_5 = (*__pyx_v_ptr).hashtable;
   __pyx_v_self->_graph_ptr = __pyx_t_5;
 
-  /* "khmer/_oxli.pyx":66
+  /* "khmer/_oxli.pyx":70
  *         self._graph_ptr = deref(ptr).hashtable
  * 
  *         self._this.reset(new CyStreamingPartitioner(self._graph_ptr))             # <<<<<<<<<<<<<<
@@ -2019,11 +2080,11 @@ static int __pyx_pf_5khmer_5_oxli_20StreamingPartitioner___cinit__(struct __pyx_
     __pyx_t_6 = new khmer::StreamingPartitioner(__pyx_v_self->_graph_ptr);
   } catch(...) {
     try { throw; } catch(const std::exception& exn) { PyErr_SetString(__pyx_builtin_MemoryError, exn.what()); } catch(...) { PyErr_SetNone(__pyx_builtin_MemoryError); }
-    __PYX_ERR(1, 66, __pyx_L1_error)
+    __PYX_ERR(1, 70, __pyx_L1_error)
   }
   __pyx_v_self->_this.reset(__pyx_t_6);
 
-  /* "khmer/_oxli.pyx":68
+  /* "khmer/_oxli.pyx":72
  *         self._this.reset(new CyStreamingPartitioner(self._graph_ptr))
  * 
  *         self._tag_component_map = deref(self._this).get_tag_component_map()             # <<<<<<<<<<<<<<
@@ -2032,7 +2093,7 @@ static int __pyx_pf_5khmer_5_oxli_20StreamingPartitioner___cinit__(struct __pyx_
  */
   __pyx_v_self->_tag_component_map = (*__pyx_v_self->_this).get_tag_component_map();
 
-  /* "khmer/_oxli.pyx":69
+  /* "khmer/_oxli.pyx":73
  * 
  *         self._tag_component_map = deref(self._this).get_tag_component_map()
  *         self._components = deref(self._this).get_component_set()             # <<<<<<<<<<<<<<
@@ -2041,7 +2102,7 @@ static int __pyx_pf_5khmer_5_oxli_20StreamingPartitioner___cinit__(struct __pyx_
  */
   __pyx_v_self->_components = (*__pyx_v_self->_this).get_component_set();
 
-  /* "khmer/_oxli.pyx":58
+  /* "khmer/_oxli.pyx":62
  *     cdef CyHashtable * _graph_ptr
  * 
  *     def __cinit__(self, graph):             # <<<<<<<<<<<<<<
@@ -2061,7 +2122,7 @@ static int __pyx_pf_5khmer_5_oxli_20StreamingPartitioner___cinit__(struct __pyx_
   return __pyx_r;
 }
 
-/* "khmer/_oxli.pyx":71
+/* "khmer/_oxli.pyx":75
  *         self._components = deref(self._this).get_component_set()
  * 
  *     def consume_sequence(self, sequence):             # <<<<<<<<<<<<<<
@@ -2090,28 +2151,28 @@ static PyObject *__pyx_pf_5khmer_5_oxli_20StreamingPartitioner_2consume_sequence
   std::string __pyx_t_3;
   __Pyx_RefNannySetupContext("consume_sequence", 0);
 
-  /* "khmer/_oxli.pyx":72
+  /* "khmer/_oxli.pyx":76
  * 
  *     def consume_sequence(self, sequence):
  *         deref(self._this).consume_sequence(sequence.encode('utf-8'))             # <<<<<<<<<<<<<<
  * 
  *     def get_tag_component(self, kmer):
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_sequence, __pyx_n_s_encode); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 72, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_sequence, __pyx_n_s_encode); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 76, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 72, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 76, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_3 = __pyx_convert_string_from_py_std__in_string(__pyx_t_2); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 72, __pyx_L1_error)
+  __pyx_t_3 = __pyx_convert_string_from_py_std__in_string(__pyx_t_2); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 76, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   try {
     (*__pyx_v_self->_this).consume_sequence(__pyx_t_3);
   } catch(...) {
     try { throw; } catch(const std::exception& exn) { PyErr_SetString(__pyx_builtin_MemoryError, exn.what()); } catch(...) { PyErr_SetNone(__pyx_builtin_MemoryError); }
-    __PYX_ERR(1, 72, __pyx_L1_error)
+    __PYX_ERR(1, 76, __pyx_L1_error)
   }
 
-  /* "khmer/_oxli.pyx":71
+  /* "khmer/_oxli.pyx":75
  *         self._components = deref(self._this).get_component_set()
  * 
  *     def consume_sequence(self, sequence):             # <<<<<<<<<<<<<<
@@ -2133,7 +2194,7 @@ static PyObject *__pyx_pf_5khmer_5_oxli_20StreamingPartitioner_2consume_sequence
   return __pyx_r;
 }
 
-/* "khmer/_oxli.pyx":74
+/* "khmer/_oxli.pyx":78
  *         deref(self._this).consume_sequence(sequence.encode('utf-8'))
  * 
  *     def get_tag_component(self, kmer):             # <<<<<<<<<<<<<<
@@ -2164,23 +2225,23 @@ static PyObject *__pyx_pf_5khmer_5_oxli_20StreamingPartitioner_4get_tag_componen
   int __pyx_t_4;
   __Pyx_RefNannySetupContext("get_tag_component", 0);
 
-  /* "khmer/_oxli.pyx":76
+  /* "khmer/_oxli.pyx":80
  *     def get_tag_component(self, kmer):
  *         cdef ComponentPtr compptr
  *         compptr = deref(self._this).get_tag_component(kmer.encode('utf-8'))             # <<<<<<<<<<<<<<
  *         if compptr == NULL:
  *             return None
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_kmer, __pyx_n_s_encode); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 76, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_kmer, __pyx_n_s_encode); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 80, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 76, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 80, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_3 = __pyx_convert_string_from_py_std__in_string(__pyx_t_2); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 76, __pyx_L1_error)
+  __pyx_t_3 = __pyx_convert_string_from_py_std__in_string(__pyx_t_2); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 80, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_compptr = (*__pyx_v_self->_this).get_tag_component(__pyx_t_3);
 
-  /* "khmer/_oxli.pyx":77
+  /* "khmer/_oxli.pyx":81
  *         cdef ComponentPtr compptr
  *         compptr = deref(self._this).get_tag_component(kmer.encode('utf-8'))
  *         if compptr == NULL:             # <<<<<<<<<<<<<<
@@ -2190,7 +2251,7 @@ static PyObject *__pyx_pf_5khmer_5_oxli_20StreamingPartitioner_4get_tag_componen
   __pyx_t_4 = ((__pyx_v_compptr == NULL) != 0);
   if (__pyx_t_4) {
 
-    /* "khmer/_oxli.pyx":78
+    /* "khmer/_oxli.pyx":82
  *         compptr = deref(self._this).get_tag_component(kmer.encode('utf-8'))
  *         if compptr == NULL:
  *             return None             # <<<<<<<<<<<<<<
@@ -2202,7 +2263,7 @@ static PyObject *__pyx_pf_5khmer_5_oxli_20StreamingPartitioner_4get_tag_componen
     __pyx_r = Py_None;
     goto __pyx_L0;
 
-    /* "khmer/_oxli.pyx":77
+    /* "khmer/_oxli.pyx":81
  *         cdef ComponentPtr compptr
  *         compptr = deref(self._this).get_tag_component(kmer.encode('utf-8'))
  *         if compptr == NULL:             # <<<<<<<<<<<<<<
@@ -2211,7 +2272,7 @@ static PyObject *__pyx_pf_5khmer_5_oxli_20StreamingPartitioner_4get_tag_componen
  */
   }
 
-  /* "khmer/_oxli.pyx":80
+  /* "khmer/_oxli.pyx":84
  *             return None
  *         else:
  *             return Component.create(compptr)             # <<<<<<<<<<<<<<
@@ -2220,14 +2281,14 @@ static PyObject *__pyx_pf_5khmer_5_oxli_20StreamingPartitioner_4get_tag_componen
  */
   /*else*/ {
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_2 = ((PyObject *)__pyx_f_5khmer_5_oxli_9Component_create(__pyx_v_compptr)); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 80, __pyx_L1_error)
+    __pyx_t_2 = ((PyObject *)__pyx_f_5khmer_5_oxli_9Component_create(__pyx_v_compptr)); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 84, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_r = __pyx_t_2;
     __pyx_t_2 = 0;
     goto __pyx_L0;
   }
 
-  /* "khmer/_oxli.pyx":74
+  /* "khmer/_oxli.pyx":78
  *         deref(self._this).consume_sequence(sequence.encode('utf-8'))
  * 
  *     def get_tag_component(self, kmer):             # <<<<<<<<<<<<<<
@@ -2247,7 +2308,7 @@ static PyObject *__pyx_pf_5khmer_5_oxli_20StreamingPartitioner_4get_tag_componen
   return __pyx_r;
 }
 
-/* "khmer/_oxli.pyx":82
+/* "khmer/_oxli.pyx":86
  *             return Component.create(compptr)
  * 
  *     def get_nearest_component(self, kmer):             # <<<<<<<<<<<<<<
@@ -2278,23 +2339,23 @@ static PyObject *__pyx_pf_5khmer_5_oxli_20StreamingPartitioner_6get_nearest_comp
   int __pyx_t_4;
   __Pyx_RefNannySetupContext("get_nearest_component", 0);
 
-  /* "khmer/_oxli.pyx":84
+  /* "khmer/_oxli.pyx":88
  *     def get_nearest_component(self, kmer):
  *         cdef ComponentPtr compptr
  *         compptr = deref(self._this).get_nearest_component(kmer.encode('utf-8'))             # <<<<<<<<<<<<<<
  *         if compptr == NULL:
  *             return None
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_kmer, __pyx_n_s_encode); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 84, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_kmer, __pyx_n_s_encode); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 88, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 84, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 88, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_3 = __pyx_convert_string_from_py_std__in_string(__pyx_t_2); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 84, __pyx_L1_error)
+  __pyx_t_3 = __pyx_convert_string_from_py_std__in_string(__pyx_t_2); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 88, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_compptr = (*__pyx_v_self->_this).get_nearest_component(__pyx_t_3);
 
-  /* "khmer/_oxli.pyx":85
+  /* "khmer/_oxli.pyx":89
  *         cdef ComponentPtr compptr
  *         compptr = deref(self._this).get_nearest_component(kmer.encode('utf-8'))
  *         if compptr == NULL:             # <<<<<<<<<<<<<<
@@ -2304,7 +2365,7 @@ static PyObject *__pyx_pf_5khmer_5_oxli_20StreamingPartitioner_6get_nearest_comp
   __pyx_t_4 = ((__pyx_v_compptr == NULL) != 0);
   if (__pyx_t_4) {
 
-    /* "khmer/_oxli.pyx":86
+    /* "khmer/_oxli.pyx":90
  *         compptr = deref(self._this).get_nearest_component(kmer.encode('utf-8'))
  *         if compptr == NULL:
  *             return None             # <<<<<<<<<<<<<<
@@ -2316,7 +2377,7 @@ static PyObject *__pyx_pf_5khmer_5_oxli_20StreamingPartitioner_6get_nearest_comp
     __pyx_r = Py_None;
     goto __pyx_L0;
 
-    /* "khmer/_oxli.pyx":85
+    /* "khmer/_oxli.pyx":89
  *         cdef ComponentPtr compptr
  *         compptr = deref(self._this).get_nearest_component(kmer.encode('utf-8'))
  *         if compptr == NULL:             # <<<<<<<<<<<<<<
@@ -2325,7 +2386,7 @@ static PyObject *__pyx_pf_5khmer_5_oxli_20StreamingPartitioner_6get_nearest_comp
  */
   }
 
-  /* "khmer/_oxli.pyx":88
+  /* "khmer/_oxli.pyx":92
  *             return None
  *         else:
  *             return Component.create(compptr)             # <<<<<<<<<<<<<<
@@ -2334,14 +2395,14 @@ static PyObject *__pyx_pf_5khmer_5_oxli_20StreamingPartitioner_6get_nearest_comp
  */
   /*else*/ {
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_2 = ((PyObject *)__pyx_f_5khmer_5_oxli_9Component_create(__pyx_v_compptr)); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 88, __pyx_L1_error)
+    __pyx_t_2 = ((PyObject *)__pyx_f_5khmer_5_oxli_9Component_create(__pyx_v_compptr)); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 92, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_r = __pyx_t_2;
     __pyx_t_2 = 0;
     goto __pyx_L0;
   }
 
-  /* "khmer/_oxli.pyx":82
+  /* "khmer/_oxli.pyx":86
  *             return Component.create(compptr)
  * 
  *     def get_nearest_component(self, kmer):             # <<<<<<<<<<<<<<
@@ -2362,7 +2423,7 @@ static PyObject *__pyx_pf_5khmer_5_oxli_20StreamingPartitioner_6get_nearest_comp
 }
 static PyObject *__pyx_gb_5khmer_5_oxli_20StreamingPartitioner_10generator1(__pyx_CoroutineObject *__pyx_generator, PyObject *__pyx_sent_value); /* proto */
 
-/* "khmer/_oxli.pyx":90
+/* "khmer/_oxli.pyx":94
  *             return Component.create(compptr)
  * 
  *     def components(self):             # <<<<<<<<<<<<<<
@@ -2392,7 +2453,7 @@ static PyObject *__pyx_pf_5khmer_5_oxli_20StreamingPartitioner_8components(struc
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_5khmer_5_oxli___pyx_scope_struct_1_components *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(1, 90, __pyx_L1_error)
+    __PYX_ERR(1, 94, __pyx_L1_error)
   } else {
     __Pyx_GOTREF(__pyx_cur_scope);
   }
@@ -2400,7 +2461,7 @@ static PyObject *__pyx_pf_5khmer_5_oxli_20StreamingPartitioner_8components(struc
   __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5khmer_5_oxli_20StreamingPartitioner_10generator1, (PyObject *) __pyx_cur_scope, __pyx_n_s_components, __pyx_n_s_StreamingPartitioner_components, __pyx_n_s_khmer__oxli); if (unlikely(!gen)) __PYX_ERR(1, 90, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5khmer_5_oxli_20StreamingPartitioner_10generator1, (PyObject *) __pyx_cur_scope, __pyx_n_s_components, __pyx_n_s_StreamingPartitioner_components, __pyx_n_s_khmer__oxli); if (unlikely(!gen)) __PYX_ERR(1, 94, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -2433,9 +2494,9 @@ static PyObject *__pyx_gb_5khmer_5_oxli_20StreamingPartitioner_10generator1(__py
     return NULL;
   }
   __pyx_L3_first_run:;
-  if (unlikely(!__pyx_sent_value)) __PYX_ERR(1, 90, __pyx_L1_error)
+  if (unlikely(!__pyx_sent_value)) __PYX_ERR(1, 94, __pyx_L1_error)
 
-  /* "khmer/_oxli.pyx":92
+  /* "khmer/_oxli.pyx":96
  *     def components(self):
  *         cdef shared_ptr[ComponentPtrSet] locked
  *         lockedptr = self._components.lock()             # <<<<<<<<<<<<<<
@@ -2444,7 +2505,7 @@ static PyObject *__pyx_gb_5khmer_5_oxli_20StreamingPartitioner_10generator1(__py
  */
   __pyx_cur_scope->__pyx_v_lockedptr = __pyx_cur_scope->__pyx_v_self->_components.lock();
 
-  /* "khmer/_oxli.pyx":93
+  /* "khmer/_oxli.pyx":97
  *         cdef shared_ptr[ComponentPtrSet] locked
  *         lockedptr = self._components.lock()
  *         if lockedptr:             # <<<<<<<<<<<<<<
@@ -2454,7 +2515,7 @@ static PyObject *__pyx_gb_5khmer_5_oxli_20StreamingPartitioner_10generator1(__py
   __pyx_t_1 = __pyx_cur_scope->__pyx_v_lockedptr.operator bool();
   if (__pyx_t_1) {
 
-    /* "khmer/_oxli.pyx":94
+    /* "khmer/_oxli.pyx":98
  *         lockedptr = self._components.lock()
  *         if lockedptr:
  *             it = deref(lockedptr).begin()             # <<<<<<<<<<<<<<
@@ -2463,7 +2524,7 @@ static PyObject *__pyx_gb_5khmer_5_oxli_20StreamingPartitioner_10generator1(__py
  */
     __pyx_cur_scope->__pyx_v_it = (*__pyx_cur_scope->__pyx_v_lockedptr).begin();
 
-    /* "khmer/_oxli.pyx":95
+    /* "khmer/_oxli.pyx":99
  *         if lockedptr:
  *             it = deref(lockedptr).begin()
  *             while it != deref(lockedptr).end():             # <<<<<<<<<<<<<<
@@ -2474,14 +2535,14 @@ static PyObject *__pyx_gb_5khmer_5_oxli_20StreamingPartitioner_10generator1(__py
       __pyx_t_2 = ((__pyx_cur_scope->__pyx_v_it != (*__pyx_cur_scope->__pyx_v_lockedptr).end()) != 0);
       if (!__pyx_t_2) break;
 
-      /* "khmer/_oxli.pyx":96
+      /* "khmer/_oxli.pyx":100
  *             it = deref(lockedptr).begin()
  *             while it != deref(lockedptr).end():
  *                 yield Component.create(deref(it))             # <<<<<<<<<<<<<<
  *                 inc(it)
  *         else:
  */
-      __pyx_t_3 = ((PyObject *)__pyx_f_5khmer_5_oxli_9Component_create((*__pyx_cur_scope->__pyx_v_it))); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 96, __pyx_L1_error)
+      __pyx_t_3 = ((PyObject *)__pyx_f_5khmer_5_oxli_9Component_create((*__pyx_cur_scope->__pyx_v_it))); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 100, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __pyx_r = __pyx_t_3;
       __pyx_t_3 = 0;
@@ -2491,9 +2552,9 @@ static PyObject *__pyx_gb_5khmer_5_oxli_20StreamingPartitioner_10generator1(__py
       __pyx_generator->resume_label = 1;
       return __pyx_r;
       __pyx_L7_resume_from_yield:;
-      if (unlikely(!__pyx_sent_value)) __PYX_ERR(1, 96, __pyx_L1_error)
+      if (unlikely(!__pyx_sent_value)) __PYX_ERR(1, 100, __pyx_L1_error)
 
-      /* "khmer/_oxli.pyx":97
+      /* "khmer/_oxli.pyx":101
  *             while it != deref(lockedptr).end():
  *                 yield Component.create(deref(it))
  *                 inc(it)             # <<<<<<<<<<<<<<
@@ -2503,7 +2564,7 @@ static PyObject *__pyx_gb_5khmer_5_oxli_20StreamingPartitioner_10generator1(__py
       (++__pyx_cur_scope->__pyx_v_it);
     }
 
-    /* "khmer/_oxli.pyx":93
+    /* "khmer/_oxli.pyx":97
  *         cdef shared_ptr[ComponentPtrSet] locked
  *         lockedptr = self._components.lock()
  *         if lockedptr:             # <<<<<<<<<<<<<<
@@ -2513,7 +2574,7 @@ static PyObject *__pyx_gb_5khmer_5_oxli_20StreamingPartitioner_10generator1(__py
     goto __pyx_L4;
   }
 
-  /* "khmer/_oxli.pyx":99
+  /* "khmer/_oxli.pyx":103
  *                 inc(it)
  *         else:
  *             raise MemoryError("Can't locked underlying Component set")             # <<<<<<<<<<<<<<
@@ -2521,16 +2582,16 @@ static PyObject *__pyx_gb_5khmer_5_oxli_20StreamingPartitioner_10generator1(__py
  *     def tag_components(self):
  */
   /*else*/ {
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_MemoryError, __pyx_tuple__6, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 99, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_MemoryError, __pyx_tuple__6, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 103, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __PYX_ERR(1, 99, __pyx_L1_error)
+    __PYX_ERR(1, 103, __pyx_L1_error)
   }
   __pyx_L4:;
   if (1); else __pyx_cur_scope = __pyx_cur_scope;
 
-  /* "khmer/_oxli.pyx":90
+  /* "khmer/_oxli.pyx":94
  *             return Component.create(compptr)
  * 
  *     def components(self):             # <<<<<<<<<<<<<<
@@ -2553,7 +2614,7 @@ static PyObject *__pyx_gb_5khmer_5_oxli_20StreamingPartitioner_10generator1(__py
 }
 static PyObject *__pyx_gb_5khmer_5_oxli_20StreamingPartitioner_13generator2(__pyx_CoroutineObject *__pyx_generator, PyObject *__pyx_sent_value); /* proto */
 
-/* "khmer/_oxli.pyx":101
+/* "khmer/_oxli.pyx":105
  *             raise MemoryError("Can't locked underlying Component set")
  * 
  *     def tag_components(self):             # <<<<<<<<<<<<<<
@@ -2583,7 +2644,7 @@ static PyObject *__pyx_pf_5khmer_5_oxli_20StreamingPartitioner_11tag_components(
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_5khmer_5_oxli___pyx_scope_struct_2_tag_components *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(1, 101, __pyx_L1_error)
+    __PYX_ERR(1, 105, __pyx_L1_error)
   } else {
     __Pyx_GOTREF(__pyx_cur_scope);
   }
@@ -2591,7 +2652,7 @@ static PyObject *__pyx_pf_5khmer_5_oxli_20StreamingPartitioner_11tag_components(
   __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5khmer_5_oxli_20StreamingPartitioner_13generator2, (PyObject *) __pyx_cur_scope, __pyx_n_s_tag_components, __pyx_n_s_StreamingPartitioner_tag_compone, __pyx_n_s_khmer__oxli); if (unlikely(!gen)) __PYX_ERR(1, 101, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_5khmer_5_oxli_20StreamingPartitioner_13generator2, (PyObject *) __pyx_cur_scope, __pyx_n_s_tag_components, __pyx_n_s_StreamingPartitioner_tag_compone, __pyx_n_s_khmer__oxli); if (unlikely(!gen)) __PYX_ERR(1, 105, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -2626,9 +2687,9 @@ static PyObject *__pyx_gb_5khmer_5_oxli_20StreamingPartitioner_13generator2(__py
     return NULL;
   }
   __pyx_L3_first_run:;
-  if (unlikely(!__pyx_sent_value)) __PYX_ERR(1, 101, __pyx_L1_error)
+  if (unlikely(!__pyx_sent_value)) __PYX_ERR(1, 105, __pyx_L1_error)
 
-  /* "khmer/_oxli.pyx":103
+  /* "khmer/_oxli.pyx":107
  *     def tag_components(self):
  *         cdef shared_ptr[GuardedKmerCompMap] locked
  *         lockedptr = self._tag_component_map.lock()             # <<<<<<<<<<<<<<
@@ -2637,7 +2698,7 @@ static PyObject *__pyx_gb_5khmer_5_oxli_20StreamingPartitioner_13generator2(__py
  */
   __pyx_cur_scope->__pyx_v_lockedptr = __pyx_cur_scope->__pyx_v_self->_tag_component_map.lock();
 
-  /* "khmer/_oxli.pyx":104
+  /* "khmer/_oxli.pyx":108
  *         cdef shared_ptr[GuardedKmerCompMap] locked
  *         lockedptr = self._tag_component_map.lock()
  *         if lockedptr:             # <<<<<<<<<<<<<<
@@ -2647,7 +2708,7 @@ static PyObject *__pyx_gb_5khmer_5_oxli_20StreamingPartitioner_13generator2(__py
   __pyx_t_1 = __pyx_cur_scope->__pyx_v_lockedptr.operator bool();
   if (__pyx_t_1) {
 
-    /* "khmer/_oxli.pyx":105
+    /* "khmer/_oxli.pyx":109
  *         lockedptr = self._tag_component_map.lock()
  *         if lockedptr:
  *             it = deref(lockedptr).data.begin()             # <<<<<<<<<<<<<<
@@ -2656,7 +2717,7 @@ static PyObject *__pyx_gb_5khmer_5_oxli_20StreamingPartitioner_13generator2(__py
  */
     __pyx_cur_scope->__pyx_v_it = (*__pyx_cur_scope->__pyx_v_lockedptr).data.begin();
 
-    /* "khmer/_oxli.pyx":106
+    /* "khmer/_oxli.pyx":110
  *         if lockedptr:
  *             it = deref(lockedptr).data.begin()
  *             while it != deref(lockedptr).data.end():             # <<<<<<<<<<<<<<
@@ -2667,18 +2728,18 @@ static PyObject *__pyx_gb_5khmer_5_oxli_20StreamingPartitioner_13generator2(__py
       __pyx_t_2 = ((__pyx_cur_scope->__pyx_v_it != (*__pyx_cur_scope->__pyx_v_lockedptr).data.end()) != 0);
       if (!__pyx_t_2) break;
 
-      /* "khmer/_oxli.pyx":107
+      /* "khmer/_oxli.pyx":111
  *             it = deref(lockedptr).data.begin()
  *             while it != deref(lockedptr).data.end():
  *                 yield deref(it).first, Component.create(deref(it).second)             # <<<<<<<<<<<<<<
  *                 inc(it)
  *         else:
  */
-      __pyx_t_3 = __Pyx_PyInt_From_khmer_3a__3a_HashIntoType((*__pyx_cur_scope->__pyx_v_it).first); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 107, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyInt_From_khmer_3a__3a_HashIntoType((*__pyx_cur_scope->__pyx_v_it).first); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 111, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_4 = ((PyObject *)__pyx_f_5khmer_5_oxli_9Component_create((*__pyx_cur_scope->__pyx_v_it).second)); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 107, __pyx_L1_error)
+      __pyx_t_4 = ((PyObject *)__pyx_f_5khmer_5_oxli_9Component_create((*__pyx_cur_scope->__pyx_v_it).second)); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 111, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 107, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 111, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3);
@@ -2694,9 +2755,9 @@ static PyObject *__pyx_gb_5khmer_5_oxli_20StreamingPartitioner_13generator2(__py
       __pyx_generator->resume_label = 1;
       return __pyx_r;
       __pyx_L7_resume_from_yield:;
-      if (unlikely(!__pyx_sent_value)) __PYX_ERR(1, 107, __pyx_L1_error)
+      if (unlikely(!__pyx_sent_value)) __PYX_ERR(1, 111, __pyx_L1_error)
 
-      /* "khmer/_oxli.pyx":108
+      /* "khmer/_oxli.pyx":112
  *             while it != deref(lockedptr).data.end():
  *                 yield deref(it).first, Component.create(deref(it).second)
  *                 inc(it)             # <<<<<<<<<<<<<<
@@ -2706,7 +2767,7 @@ static PyObject *__pyx_gb_5khmer_5_oxli_20StreamingPartitioner_13generator2(__py
       (++__pyx_cur_scope->__pyx_v_it);
     }
 
-    /* "khmer/_oxli.pyx":104
+    /* "khmer/_oxli.pyx":108
  *         cdef shared_ptr[GuardedKmerCompMap] locked
  *         lockedptr = self._tag_component_map.lock()
  *         if lockedptr:             # <<<<<<<<<<<<<<
@@ -2716,24 +2777,24 @@ static PyObject *__pyx_gb_5khmer_5_oxli_20StreamingPartitioner_13generator2(__py
     goto __pyx_L4;
   }
 
-  /* "khmer/_oxli.pyx":110
+  /* "khmer/_oxli.pyx":114
  *                 inc(it)
  *         else:
  *             raise MemoryError("Can't locked underlying Component set")             # <<<<<<<<<<<<<<
  * 
- * 
+ *     property n_components:
  */
   /*else*/ {
-    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_MemoryError, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 110, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_MemoryError, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 114, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_Raise(__pyx_t_5, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __PYX_ERR(1, 110, __pyx_L1_error)
+    __PYX_ERR(1, 114, __pyx_L1_error)
   }
   __pyx_L4:;
   if (1); else __pyx_cur_scope = __pyx_cur_scope;
 
-  /* "khmer/_oxli.pyx":101
+  /* "khmer/_oxli.pyx":105
  *             raise MemoryError("Can't locked underlying Component set")
  * 
  *     def tag_components(self):             # <<<<<<<<<<<<<<
@@ -2757,7 +2818,7 @@ static PyObject *__pyx_gb_5khmer_5_oxli_20StreamingPartitioner_13generator2(__py
   return __pyx_r;
 }
 
-/* "khmer/_oxli.pyx":115
+/* "khmer/_oxli.pyx":117
  * 
  *     property n_components:
  *         def __get__(self):             # <<<<<<<<<<<<<<
@@ -2784,20 +2845,20 @@ static PyObject *__pyx_pf_5khmer_5_oxli_20StreamingPartitioner_12n_components___
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "khmer/_oxli.pyx":116
+  /* "khmer/_oxli.pyx":118
  *     property n_components:
  *         def __get__(self):
  *             return deref(self._this).get_n_components()             # <<<<<<<<<<<<<<
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_uint64_t((*__pyx_v_self->_this).get_n_components()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 116, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_uint64_t((*__pyx_v_self->_this).get_n_components()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 118, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "khmer/_oxli.pyx":115
+  /* "khmer/_oxli.pyx":117
  * 
  *     property n_components:
  *         def __get__(self):             # <<<<<<<<<<<<<<
@@ -2903,8 +2964,12 @@ static PyObject *__pyx_getprop_5khmer_5_oxli_9Component_component_id(PyObject *o
   return __pyx_pw_5khmer_5_oxli_9Component_12component_id_1__get__(o);
 }
 
-static PyObject *__pyx_getprop_5khmer_5_oxli_9Component_n_merges(PyObject *o, CYTHON_UNUSED void *x) {
-  return __pyx_pw_5khmer_5_oxli_9Component_8n_merges_1__get__(o);
+static PyObject *__pyx_getprop_5khmer_5_oxli_9Component__n_created(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_5khmer_5_oxli_9Component_10_n_created_1__get__(o);
+}
+
+static PyObject *__pyx_getprop_5khmer_5_oxli_9Component__n_destroyed(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_5khmer_5_oxli_9Component_12_n_destroyed_1__get__(o);
 }
 
 static PyMethodDef __pyx_methods_5khmer_5_oxli_Component[] = {
@@ -2913,7 +2978,8 @@ static PyMethodDef __pyx_methods_5khmer_5_oxli_Component[] = {
 
 static struct PyGetSetDef __pyx_getsets_5khmer_5_oxli_Component[] = {
   {(char *)"component_id", __pyx_getprop_5khmer_5_oxli_9Component_component_id, 0, (char *)0, 0},
-  {(char *)"n_merges", __pyx_getprop_5khmer_5_oxli_9Component_n_merges, 0, (char *)0, 0},
+  {(char *)"_n_created", __pyx_getprop_5khmer_5_oxli_9Component__n_created, 0, (char *)0, 0},
+  {(char *)"_n_destroyed", __pyx_getprop_5khmer_5_oxli_9Component__n_destroyed, 0, (char *)0, 0},
   {0, 0, 0, 0, 0}
 };
 
@@ -3490,9 +3556,9 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(0, 64, __pyx_L1_error)
-  __pyx_builtin_NotImplementedError = __Pyx_GetBuiltinName(__pyx_n_s_NotImplementedError); if (!__pyx_builtin_NotImplementedError) __PYX_ERR(1, 42, __pyx_L1_error)
-  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(1, 60, __pyx_L1_error)
+  __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(0, 65, __pyx_L1_error)
+  __pyx_builtin_NotImplementedError = __Pyx_GetBuiltinName(__pyx_n_s_NotImplementedError); if (!__pyx_builtin_NotImplementedError) __PYX_ERR(1, 46, __pyx_L1_error)
+  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(1, 64, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -3502,80 +3568,80 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "khmer/_oxli.pyx":42
+  /* "khmer/_oxli.pyx":46
  *             return x.component_id == y.component_id
  *         else:
  *             raise NotImplementedError('Operator not available.')             # <<<<<<<<<<<<<<
  * 
  *     @staticmethod
  */
-  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_s_Operator_not_available); if (unlikely(!__pyx_tuple_)) __PYX_ERR(1, 42, __pyx_L1_error)
+  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_s_Operator_not_available); if (unlikely(!__pyx_tuple_)) __PYX_ERR(1, 46, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
 
-  /* "khmer/_oxli.pyx":60
+  /* "khmer/_oxli.pyx":64
  *     def __cinit__(self, graph):
  *         if not (isinstance(graph, Countgraph) or isinstance(graph, Nodegraph)):
  *             raise ValueError('Must take an object with Hashtable *')             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_s_Must_take_an_object_with_Hashtab); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(1, 60, __pyx_L1_error)
+  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_s_Must_take_an_object_with_Hashtab); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(1, 64, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__2);
   __Pyx_GIVEREF(__pyx_tuple__2);
 
-  /* "khmer/_oxli.pyx":72
+  /* "khmer/_oxli.pyx":76
  * 
  *     def consume_sequence(self, sequence):
  *         deref(self._this).consume_sequence(sequence.encode('utf-8'))             # <<<<<<<<<<<<<<
  * 
  *     def get_tag_component(self, kmer):
  */
-  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_s_utf_8); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(1, 72, __pyx_L1_error)
+  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_s_utf_8); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(1, 76, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
 
-  /* "khmer/_oxli.pyx":76
+  /* "khmer/_oxli.pyx":80
  *     def get_tag_component(self, kmer):
  *         cdef ComponentPtr compptr
  *         compptr = deref(self._this).get_tag_component(kmer.encode('utf-8'))             # <<<<<<<<<<<<<<
  *         if compptr == NULL:
  *             return None
  */
-  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_kp_s_utf_8); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(1, 76, __pyx_L1_error)
+  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_kp_s_utf_8); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(1, 80, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__4);
   __Pyx_GIVEREF(__pyx_tuple__4);
 
-  /* "khmer/_oxli.pyx":84
+  /* "khmer/_oxli.pyx":88
  *     def get_nearest_component(self, kmer):
  *         cdef ComponentPtr compptr
  *         compptr = deref(self._this).get_nearest_component(kmer.encode('utf-8'))             # <<<<<<<<<<<<<<
  *         if compptr == NULL:
  *             return None
  */
-  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_kp_s_utf_8); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(1, 84, __pyx_L1_error)
+  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_kp_s_utf_8); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(1, 88, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__5);
   __Pyx_GIVEREF(__pyx_tuple__5);
 
-  /* "khmer/_oxli.pyx":99
+  /* "khmer/_oxli.pyx":103
  *                 inc(it)
  *         else:
  *             raise MemoryError("Can't locked underlying Component set")             # <<<<<<<<<<<<<<
  * 
  *     def tag_components(self):
  */
-  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_kp_s_Can_t_locked_underlying_Componen); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(1, 99, __pyx_L1_error)
+  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_kp_s_Can_t_locked_underlying_Componen); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(1, 103, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__6);
   __Pyx_GIVEREF(__pyx_tuple__6);
 
-  /* "khmer/_oxli.pyx":110
+  /* "khmer/_oxli.pyx":114
  *                 inc(it)
  *         else:
  *             raise MemoryError("Can't locked underlying Component set")             # <<<<<<<<<<<<<<
  * 
- * 
+ *     property n_components:
  */
-  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_s_Can_t_locked_underlying_Componen); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(1, 110, __pyx_L1_error)
+  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_s_Can_t_locked_underlying_Componen); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(1, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__7);
   __Pyx_GIVEREF(__pyx_tuple__7);
   __Pyx_RefNannyFinishContext();
@@ -3685,17 +3751,17 @@ PyMODINIT_FUNC PyInit__oxli(void)
   if (__Pyx_SetVtable(__pyx_type_5khmer_5_oxli_Component.tp_dict, __pyx_vtabptr_5khmer_5_oxli_Component) < 0) __PYX_ERR(1, 10, __pyx_L1_error)
   if (PyObject_SetAttrString(__pyx_m, "Component", (PyObject *)&__pyx_type_5khmer_5_oxli_Component) < 0) __PYX_ERR(1, 10, __pyx_L1_error)
   __pyx_ptype_5khmer_5_oxli_Component = &__pyx_type_5khmer_5_oxli_Component;
-  if (PyType_Ready(&__pyx_type_5khmer_5_oxli_StreamingPartitioner) < 0) __PYX_ERR(1, 51, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_5khmer_5_oxli_StreamingPartitioner) < 0) __PYX_ERR(1, 55, __pyx_L1_error)
   __pyx_type_5khmer_5_oxli_StreamingPartitioner.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "StreamingPartitioner", (PyObject *)&__pyx_type_5khmer_5_oxli_StreamingPartitioner) < 0) __PYX_ERR(1, 51, __pyx_L1_error)
+  if (PyObject_SetAttrString(__pyx_m, "StreamingPartitioner", (PyObject *)&__pyx_type_5khmer_5_oxli_StreamingPartitioner) < 0) __PYX_ERR(1, 55, __pyx_L1_error)
   __pyx_ptype_5khmer_5_oxli_StreamingPartitioner = &__pyx_type_5khmer_5_oxli_StreamingPartitioner;
-  if (PyType_Ready(&__pyx_type_5khmer_5_oxli___pyx_scope_struct____iter__) < 0) __PYX_ERR(1, 29, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_5khmer_5_oxli___pyx_scope_struct____iter__) < 0) __PYX_ERR(1, 33, __pyx_L1_error)
   __pyx_type_5khmer_5_oxli___pyx_scope_struct____iter__.tp_print = 0;
   __pyx_ptype_5khmer_5_oxli___pyx_scope_struct____iter__ = &__pyx_type_5khmer_5_oxli___pyx_scope_struct____iter__;
-  if (PyType_Ready(&__pyx_type_5khmer_5_oxli___pyx_scope_struct_1_components) < 0) __PYX_ERR(1, 90, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_5khmer_5_oxli___pyx_scope_struct_1_components) < 0) __PYX_ERR(1, 94, __pyx_L1_error)
   __pyx_type_5khmer_5_oxli___pyx_scope_struct_1_components.tp_print = 0;
   __pyx_ptype_5khmer_5_oxli___pyx_scope_struct_1_components = &__pyx_type_5khmer_5_oxli___pyx_scope_struct_1_components;
-  if (PyType_Ready(&__pyx_type_5khmer_5_oxli___pyx_scope_struct_2_tag_components) < 0) __PYX_ERR(1, 101, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_5khmer_5_oxli___pyx_scope_struct_2_tag_components) < 0) __PYX_ERR(1, 105, __pyx_L1_error)
   __pyx_type_5khmer_5_oxli___pyx_scope_struct_2_tag_components.tp_print = 0;
   __pyx_ptype_5khmer_5_oxli___pyx_scope_struct_2_tag_components = &__pyx_type_5khmer_5_oxli___pyx_scope_struct_2_tag_components;
   /*--- Type import code ---*/

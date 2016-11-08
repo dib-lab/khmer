@@ -1,6 +1,7 @@
 from __future__ import print_function
 from __future__ import absolute_import
 
+import gc
 import itertools
 import random
 
@@ -35,6 +36,15 @@ def single_component(partitioner, random_sequence):
 
 
 class TestStreamingPartitionerBasic:
+
+    def teardown_method(self, method):
+        # Force garbage to collect. When Python component objects exist and
+        # their underlying c++ Component objects are destroyed, the Python
+        # wrapper becomes the sole owner of the pointer. By manually collecting
+        # garbage between tests we assure that these objects are freed, and we
+        # can properly test the _n_destroyed property to make sure there are no
+        # real memory leaks.
+        gc.collect()
 
     def test_one_component(self, known_sequence):
         inpath = utils.get_test_data('random-20-a.fa')
@@ -143,7 +153,6 @@ class TestStreamingPartitionerBasic:
         comps = list(sp.components())
         assert len(comps) == 1
 
-        assert comps[0].n_merges == 1
 
     def test_multi_merge_components(self, random_sequence):
         seq1 = random_sequence()
@@ -160,19 +169,6 @@ class TestStreamingPartitionerBasic:
 
         sp.consume_sequence(seq1 + seq2 + seq3)
         assert sp.n_components == 1
-
-        '''
-        sp.consume_sequence(seq3)
-        assert sp.n_components == 2
-
-        sp.consume_sequence(seq2 + seq3)
-        assert sp.n_components == 1
-
-        comps = list(sp.components())
-        assert len(comps) == 1
-
-        assert comps[0].n_merges == 2
-        '''
 
     def test_nomerge_k_minus_2_overlap(self, single_component, random_sequence):
         '''Test that components are not merged when they have a length K-2 overlap.
@@ -234,7 +230,7 @@ class TestStreamingPartitionerBasic:
 
     @pytest.mark.parametrize("n_components", list(range(1, 10)))
     def test_streaming_multicomponents(self, random_sequence, n_components):
-        # get n_components disconnected sequences
+        '''Test with many components from reads, and check for memory leaks.'''
         seqs = []
         for _ in range(n_components):
             seqs.append(random_sequence(exclude=''.join(seqs)))
@@ -252,5 +248,11 @@ class TestStreamingPartitionerBasic:
             sp.consume_sequence(read)
 
         for seq in seqs:
+            # make sure we got the complete component
             assert G.assemble_linear_path(seq[:K]) == seq
         assert sp.n_components == n_components
+
+        comps = list(sp.components())
+        comp = comps[0]
+        assert len(comps) == n_components
+        assert sp.n_components == (comp._n_created - comp._n_destroyed)
