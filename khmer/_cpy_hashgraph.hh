@@ -1324,7 +1324,6 @@ static PyMethodDef khmer_hashgraph_methods[] = {
         (PyCFunction)hashgraph_count_kmers_within_radius, METH_VARARGS,
         "Calculate the number of neighbors with given radius in the graph."
     },
-
     {
         "find_high_degree_nodes",
         (PyCFunction)hashgraph_find_high_degree_nodes, METH_VARARGS,
@@ -1350,53 +1349,220 @@ static PyMethodDef khmer_hashgraph_methods[] = {
     // tagging / sparse graph functionality
     //
 
-    { "consume_and_tag", (PyCFunction)hashgraph_consume_and_tag, METH_VARARGS, "Consume a sequence and tag it" },
-    { "get_tags_and_positions", (PyCFunction)hashgraph_get_tags_and_positions, METH_VARARGS, "Retrieve tags and their positions in a sequence." },
-    { "find_all_tags_list", (PyCFunction)hashgraph_find_all_tags_list, METH_VARARGS, "Find all tags within range of the given k-mer, return as list" },
-    { "consume_fasta_and_tag", (PyCFunction)hashgraph_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
-    { "extract_unique_paths", (PyCFunction)hashgraph_extract_unique_paths, METH_VARARGS, "" },
-    { "print_tagset", (PyCFunction)hashgraph_print_tagset, METH_VARARGS, "" },
-    { "add_tag", (PyCFunction)hashgraph_add_tag, METH_VARARGS, "" },
-    { "get_tagset", (PyCFunction)hashgraph_get_tagset, METH_VARARGS, "" },
-    { "load_tagset", (PyCFunction)hashgraph_load_tagset, METH_VARARGS, "" },
-    { "save_tagset", (PyCFunction)hashgraph_save_tagset, METH_VARARGS, "" },
-    { "n_tags", (PyCFunction)hashgraph_n_tags, METH_VARARGS, "" },
-    { "divide_tags_into_subsets", (PyCFunction)hashgraph_divide_tags_into_subsets, METH_VARARGS, "" },
-    { "_get_tag_density", (PyCFunction)hashgraph__get_tag_density, METH_VARARGS, "" },
-    { "_set_tag_density", (PyCFunction)hashgraph__set_tag_density, METH_VARARGS, "" },
-
-    // partitioning
-    { "do_subset_partition", (PyCFunction)hashgraph_do_subset_partition, METH_VARARGS, "" },
-    { "find_all_tags", (PyCFunction)hashgraph_find_all_tags, METH_VARARGS, "" },
-    { "assign_partition_id", (PyCFunction)hashgraph_assign_partition_id, METH_VARARGS, "" },
-    { "output_partitions", (PyCFunction)hashgraph_output_partitions, METH_VARARGS, "" },
-    { "load_partitionmap", (PyCFunction)hashgraph_load_partitionmap, METH_VARARGS, "" },
-    { "save_partitionmap", (PyCFunction)hashgraph_save_partitionmap, METH_VARARGS, "" },
-    { "_validate_partitionmap", (PyCFunction)hashgraph__validate_partitionmap, METH_VARARGS, "" },
     {
-        "consume_fasta_and_tag_with_reads_parser", (PyCFunction)hashgraph_consume_fasta_and_tag_with_reads_parser,
-        METH_VARARGS, "Count all k-mers using a given reads parser"
+        "consume_and_tag",
+        (PyCFunction)hashgraph_consume_and_tag, METH_VARARGS,
+        "Consume a sequence and tag it."
     },
-    { "consume_partitioned_fasta", (PyCFunction)hashgraph_consume_partitioned_fasta, METH_VARARGS, "Count all k-mers in a given file" },
-    { "merge_subset", (PyCFunction)hashgraph_merge_subset, METH_VARARGS, "" },
-    { "merge_subset_from_disk", (PyCFunction)hashgraph_merge_from_disk, METH_VARARGS, "" },
-    { "count_partitions", (PyCFunction)hashgraph_count_partitions, METH_VARARGS, "" },
-    { "subset_count_partitions", (PyCFunction)hashgraph_subset_count_partitions, METH_VARARGS, "" },
-    { "subset_partition_size_distribution", (PyCFunction)hashgraph_subset_partition_size_distribution, METH_VARARGS, "" },
-    { "save_subset_partitionmap", (PyCFunction)hashgraph_save_subset_partitionmap, METH_VARARGS },
-    { "load_subset_partitionmap", (PyCFunction)hashgraph_load_subset_partitionmap, METH_VARARGS },
-    { "_validate_subset_partitionmap", (PyCFunction)hashgraph__validate_subset_partitionmap, METH_VARARGS, "" },
-    { "set_partition_id", (PyCFunction)hashgraph_set_partition_id, METH_VARARGS, "" },
-    { "join_partitions", (PyCFunction)hashgraph_join_partitions, METH_VARARGS, "" },
-    { "get_partition_id", (PyCFunction)hashgraph_get_partition_id, METH_VARARGS, "" },
-    { "repartition_largest_partition", (PyCFunction)hashgraph_repartition_largest_partition, METH_VARARGS, "" },
+    {
+        "get_tags_and_positions",
+        (PyCFunction)hashgraph_get_tags_and_positions, METH_VARARGS,
+        "Retrieve tags and their positions in a sequence."
+    },
+    {
+        "find_all_tags_list",
+        (PyCFunction)hashgraph_find_all_tags_list, METH_VARARGS,
+        "Find all tags within range of the given k-mer, return as list"
+    },
+    {
+        "consume_fasta_and_tag",
+        (PyCFunction)hashgraph_consume_fasta_and_tag, METH_VARARGS,
+        "Consume all sequences in a FASTA/FASTQ file and tag the resulting "
+        "graph."
+    },
+    {
+        "extract_unique_paths",
+        (PyCFunction)hashgraph_extract_unique_paths, METH_VARARGS,
+        "@CTB remove."
+    },
+    {
+        "print_tagset",
+        (PyCFunction)hashgraph_print_tagset, METH_VARARGS,
+        "Print out all of the tags."
+    },
+    {
+        "add_tag",
+        (PyCFunction)hashgraph_add_tag, METH_VARARGS,
+        "Add a k-mer to the tagset."
+    },
+    {
+        "get_tagset",
+        (PyCFunction)hashgraph_get_tagset, METH_VARARGS,
+        "Get all tagged k-mers as DNA strings."
+    },
+    {
+        "load_tagset",
+        (PyCFunction)hashgraph_load_tagset, METH_VARARGS,
+        "Load tags from a file."
+    },
+    {
+        "save_tagset",
+        (PyCFunction)hashgraph_save_tagset, METH_VARARGS,
+        "Save tags to a file."
+    },
+    {
+        "n_tags",
+        (PyCFunction)hashgraph_n_tags, METH_VARARGS,
+        "Return the count of all tags."
+    },
+    {
+        "divide_tags_into_subsets",
+        (PyCFunction)hashgraph_divide_tags_into_subsets, METH_VARARGS,
+        "Divide tags equally up into subsets of given size."
+    },
+    {
+        "_get_tag_density",
+        (PyCFunction)hashgraph__get_tag_density, METH_VARARGS,
+        "Get the tagging density."
+    },
+    {
+        "_set_tag_density",
+        (PyCFunction)hashgraph__set_tag_density, METH_VARARGS,
+        "Set the tagging density."
+    },
+
+    //
+    // partitioning
+    //
+    {
+        "do_subset_partition",
+        (PyCFunction)hashgraph_do_subset_partition, METH_VARARGS,
+        "Partition the graph starting from a given subset of tags."
+    },
+    {
+        "find_all_tags",
+        (PyCFunction)hashgraph_find_all_tags, METH_VARARGS,
+        "Starting from the given k-mer, find all closely connected tags."
+    },
+    {
+        "assign_partition_id",
+        (PyCFunction)hashgraph_assign_partition_id, METH_VARARGS,
+        "Assign a partition ID to a given tag."
+    },
+    {
+        "output_partitions",
+        (PyCFunction)hashgraph_output_partitions, METH_VARARGS,
+        "Write out sequences in given filename to another file, annotating "
+        "with partition IDs."
+    },
+    {
+        "load_partitionmap",
+        (PyCFunction)hashgraph_load_partitionmap, METH_VARARGS,
+        "Load a partitionmap for a given subset."
+    },
+    {
+        "save_partitionmap",
+        (PyCFunction)hashgraph_save_partitionmap, METH_VARARGS,
+        "Save a partitionmap for the given subset."
+    },
+    {
+        "_validate_partitionmap",
+        (PyCFunction)hashgraph__validate_partitionmap, METH_VARARGS,
+        "Run internal validation checks."
+    },
+    {
+        "consume_fasta_and_tag_with_reads_parser",
+        (PyCFunction)hashgraph_consume_fasta_and_tag_with_reads_parser,
+        METH_VARARGS,
+        "Count all k-mers using the given reads parser"
+    },
+    {
+        "consume_partitioned_fasta",
+        (PyCFunction)hashgraph_consume_partitioned_fasta, METH_VARARGS,
+        "Count all k-mers in a given file"
+    },
+    {
+        "merge_subset",
+        (PyCFunction)hashgraph_merge_subset, METH_VARARGS,
+        "Merge the given subset into this one."
+    },
+    {
+        "merge_subset_from_disk",
+        (PyCFunction)hashgraph_merge_from_disk, METH_VARARGS,
+        "Merge the given subset (filename) into this one."
+    },
+    {
+        "count_partitions",
+        (PyCFunction)hashgraph_count_partitions, METH_VARARGS,
+        "Count the number of partitions in the master partitionmap."
+    },
+    {
+        "subset_count_partitions",
+        (PyCFunction)hashgraph_subset_count_partitions, METH_VARARGS,
+        "Count the number of partitions in this subset partitionmap."
+    },
+    {
+        "subset_partition_size_distribution",
+        (PyCFunction)hashgraph_subset_partition_size_distribution,
+        METH_VARARGS,
+        "Get the size distribution of partitions in this subset."
+    },
+    {
+        "save_subset_partitionmap",
+        (PyCFunction)hashgraph_save_subset_partitionmap, METH_VARARGS,
+        "Save the partition map for this subset."
+    },
+    {
+        "load_subset_partitionmap",
+        (PyCFunction)hashgraph_load_subset_partitionmap, METH_VARARGS,
+        "Save the partition map for this subset."
+    },
+    {
+        "_validate_subset_partitionmap",
+        (PyCFunction)hashgraph__validate_subset_partitionmap, METH_VARARGS,
+        "Run internal validation checks on this subset."
+    },
+    {
+        "set_partition_id",
+        (PyCFunction)hashgraph_set_partition_id, METH_VARARGS,
+        "Set the partition ID for this tag."
+    },
+    {
+        "join_partitions",
+        (PyCFunction)hashgraph_join_partitions, METH_VARARGS,
+        "Join the partitions of these two tags."
+    },
+    {
+        "get_partition_id",
+        (PyCFunction)hashgraph_get_partition_id, METH_VARARGS,
+        "Get the partition ID of this tag."
+    },
+    {
+        "repartition_largest_partition",
+        (PyCFunction)hashgraph_repartition_largest_partition, METH_VARARGS,
+        "Repartition the largest partition (in the face of stop tags)."
+    },
 
     // stop tags
-    { "load_stop_tags", (PyCFunction)hashgraph_load_stop_tags, METH_VARARGS, "" },
-    { "save_stop_tags", (PyCFunction)hashgraph_save_stop_tags, METH_VARARGS, "" },
-    { "print_stop_tags", (PyCFunction)hashgraph_print_stop_tags, METH_VARARGS, "" },
-    { "trim_on_stoptags", (PyCFunction)hashgraph_trim_on_stoptags, METH_VARARGS, "" },
-    { "add_stop_tag", (PyCFunction)hashgraph_add_stop_tag, METH_VARARGS, "" },
-    { "get_stop_tags", (PyCFunction)hashgraph_get_stop_tags, METH_VARARGS, "" },
+    {
+        "load_stop_tags",
+        (PyCFunction)hashgraph_load_stop_tags, METH_VARARGS,
+        "Load the set of stop tags."
+    },
+    {
+        "save_stop_tags",
+        (PyCFunction)hashgraph_save_stop_tags, METH_VARARGS,
+        "Save the set of stop tags."
+    },
+    {
+        "print_stop_tags",
+        (PyCFunction)hashgraph_print_stop_tags, METH_VARARGS,
+        "Print out the set of stop tags."
+    },
+    {
+        "trim_on_stoptags",
+        (PyCFunction)hashgraph_trim_on_stoptags, METH_VARARGS,
+        "Trim the reads on the given stop tags."
+    },
+    {
+        "add_stop_tag",
+        (PyCFunction)hashgraph_add_stop_tag, METH_VARARGS,
+        "Add this k-mer as a stop tag."
+    },
+    {
+        "get_stop_tags",
+        (PyCFunction)hashgraph_get_stop_tags, METH_VARARGS,
+        "Return a DNA list of all of the stop tags."
+    },
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
