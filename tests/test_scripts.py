@@ -1603,12 +1603,15 @@ def execute_extract_paired_streaming(ifilename):
 
     # make a fifo to simulate streaming
     os.mkfifo(fifo)
+    dummy_fd = os.open(fifo, os.O_RDONLY | os.O_NONBLOCK)
 
+    #import pdb; pdb.set_trace()
     thread = threading.Thread(target=utils.runscript,
                               args=(script, args, in_dir))
-    thread.start()
+
     ifile = open(ifilename, 'r')
     fifofile = open(fifo, 'w')
+    thread.start()
     chunk = ifile.read(4)
     while len(chunk) > 0:
         fifofile.write(chunk)

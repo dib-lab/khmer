@@ -395,6 +395,48 @@ Read_get_annotations(khmer_Read_Object * obj, void * closure)
 }
 
 
+static
+PyObject *
+Read_get_cleaned_seq(khmer_Read_Object * obj, void * closure)
+{
+    if (obj->read->cleaned_seq.size() > 0) {
+        return PyUnicode_FromString(obj->read->cleaned_seq.c_str());
+    } else {
+        PyErr_SetString(PyExc_AttributeError,
+                        "'Read' object has no attribute 'cleaned_seq'.");
+        return NULL;
+    }
+}
+
+
+static int
+Read_set_cleaned_seq(khmer_Read_Object *obj, PyObject *value, void *closure)
+{
+    if (value == NULL) {
+        obj->read->cleaned_seq = "";
+        return 0;
+    }
+
+    if (! PyUnicode_Check(value)) {
+        PyErr_SetString(PyExc_TypeError,
+                        "The 'cleaned_seq' attribute value must be a string");
+        return -1;
+    }
+
+    PyObject* temp = PyUnicode_AsASCIIString(value);
+    if (temp == NULL) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Could not encode 'cleaned_seq' as ASCII.");
+        return -1;
+    }
+
+    obj->read->cleaned_seq = std::string(PyBytes_AS_STRING(temp));
+    Py_DECREF(temp);
+
+    return 0;
+}
+
+
 // TODO? Implement setters.
 
 
@@ -418,6 +460,11 @@ static PyGetSetDef khmer_Read_accessors [ ] = {
         (char *)"annotations",
         (getter)Read_get_annotations, (setter)NULL,
         (char *)"Annotations.", NULL
+    },
+    {
+        (char *)"cleaned_seq",
+        (getter)Read_get_cleaned_seq, (setter)Read_set_cleaned_seq,
+        (char *)"Cleaned sequence.", NULL
     },
 
     { NULL, NULL, NULL, NULL, NULL } // sentinel
@@ -490,6 +537,7 @@ khmer_ReadBundle_init(khmer_ReadBundle_Object *self, PyObject *args,
         PyObject* pystr = PyMapping_GetItemString(pyread, key);
         PyObject* temp = PyUnicode_AsASCIIString(pystr);
         read.sequence = std::string(PyByteArray_AsString(temp));
+        Py_DECREF(temp);
         self->reads.push_back(read);
     }
 
