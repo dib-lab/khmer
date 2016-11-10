@@ -1442,7 +1442,7 @@ hashtable_reverse_hash(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    if (!convert_PyObject_to_HashIntoType(val_o, val, 0)) {
+    if (!ht_convert_PyObject_to_HashIntoType(val_o, val, hashtable)) {
         return NULL;
     }
 
