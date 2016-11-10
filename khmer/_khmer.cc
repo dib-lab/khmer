@@ -3296,8 +3296,6 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashtable_Object")
     0,                                   /* tp_new */
 };
 
-#define is_hashtable_obj(v)  (Py_TYPE(v) == &khmer_KHashtable_Type)
-
 //
 // KCountingHash object
 //
@@ -3762,8 +3760,6 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KCountingHash_Object")
     _new_counting_hash,                  /* tp_new */
 };
 
-#define is_counting_obj(v)  (Py_TYPE(v) == &khmer_KCountgraph_Type)
-
 //
 // _new_counting_hash
 //
@@ -3931,8 +3927,6 @@ static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args,
     }
     return (PyObject *) self;
 }
-
-#define is_hashbits_obj(v)  (Py_TYPE(v) == &khmer_KNodegraph_Type)
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -4129,8 +4123,6 @@ typedef struct {
 
 static PyObject * khmer_graphlabels_new(PyTypeObject * type, PyObject *args,
                                         PyObject *kwds);
-
-#define is_graphlabels_obj(v)  (Py_TYPE(v) == &khmer_KGraphLabels_Type)
 
 static void khmer_graphlabels_dealloc(khmer_KGraphLabels_Object * obj)
 {
@@ -5277,8 +5269,6 @@ static PyTypeObject khmer_KHLLCounter_Type = {
     khmer_hllcounter_new,                      /* tp_new */
 };
 
-#define is_hllcounter_obj(v)  (Py_TYPE(v) == &khmer_KHLLCounter_Type)
-
 static PyObject * hllcounter_merge(khmer_KHLLCounter_Object * me,
                                    PyObject * args)
 {
@@ -5307,8 +5297,6 @@ typedef struct {
     PyObject_HEAD
     LinearAssembler * assembler;
 } khmer_KLinearAssembler_Object;
-
-#define is_linearassembler_obj(v)  (Py_TYPE(v) == &khmer_KLinearAssembler_Type)
 
 static void khmer_linearassembler_dealloc(khmer_KLinearAssembler_Object * obj)
 {
@@ -5347,7 +5335,6 @@ static PyObject * khmer_linearassembler_new(PyTypeObject *type, PyObject *args,
         }
 
         try {
-       std::cout << "New Assembler: " << hashtable << std::endl;
             self->assembler = new LinearAssembler(hashtable);
         } catch (std::bad_alloc &e) {
             Py_DECREF(self);
@@ -5621,8 +5608,6 @@ typedef struct {
     JunctionCountAssembler * assembler;
 } khmer_KJunctionCountAssembler_Object;
 
-#define is_junctioncountassembler_obj(v)  (Py_TYPE(v) == &khmer_KJunctionCountAssembler_Type)
-
 static void khmer_junctioncountassembler_dealloc(khmer_KJunctionCountAssembler_Object * obj)
 {
     delete obj->assembler;
@@ -5739,7 +5724,7 @@ static PyMethodDef khmer_junctioncountassembler_methods[] = {
     {
         "assemble",
         (PyCFunction)junctioncountassembler_assemble, METH_VARARGS | METH_KEYWORDS,
-        "Assemble a path linearly until a branch is reached."
+        "Assemble paths, using recorded junctions to jump branches."
     },
     {
         "consume",
