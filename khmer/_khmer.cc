@@ -339,6 +339,17 @@ khmer_Read_dealloc(khmer_Read_Object * obj)
 }
 
 
+static Py_ssize_t
+khmer_Read_len(khmer_Read_Object* obj)
+{
+    return obj->read->sequence.size();
+}
+
+static PySequenceMethods khmer_Read_sequence_methods = {
+    (lenfunc)khmer_Read_len,                  /* sq_length */
+};
+
+
 static
 PyObject *
 Read_get_name(khmer_Read_Object * obj, void * closure )
@@ -483,7 +494,7 @@ static PyTypeObject khmer_Read_Type = {
     0,                                    /* tp_compare */
     0,                                    /* tp_repr */
     0,                                    /* tp_as_number */
-    0,                                    /* tp_as_sequence */
+    &khmer_Read_sequence_methods,         /* tp_as_sequence */
     0,                                    /* tp_as_mapping */
     0,                                    /* tp_hash */
     0,                                    /* tp_call */

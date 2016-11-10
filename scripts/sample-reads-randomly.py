@@ -48,13 +48,13 @@ Reads FASTQ and FASTA input, retains format for output.
 from __future__ import print_function
 
 import argparse
-import screed
 import os.path
 import random
 import textwrap
 import sys
 
 from khmer import __version__
+from khmer import ReadParser
 from khmer.kfile import (check_input_files, add_output_compression_type,
                          get_file_writer)
 from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
@@ -148,6 +148,11 @@ def main():
             sys.exit(1)
         output_filename = os.path.basename(filename) + '.subset'
 
+    filename = args.filenames[0]
+    if filename in ('/dev/stdin', '-'):
+        # seqan only treats '-' as "read from stdin"
+        filename = '-'
+
     if num_samples == 1:
         print('Subsampling %d reads using reservoir sampling.' %
               args.num_reads, file=sys.stderr)
@@ -169,10 +174,9 @@ def main():
     # read through all the sequences and load/resample the reservoir
     for filename in args.filenames:
         print('opening', filename, 'for reading', file=sys.stderr)
-        screed_iter = screed.open(filename)
 
         for count, (_, _, rcrd1, rcrd2) in enumerate(broken_paired_reader(
-                screed_iter, force_single=args.force_single)):
+                ReadParser(filename), force_single=args.force_single)):
             if count % 10000 == 0:
                 print('...', count, 'reads scanned', file=sys.stderr)
                 if count >= args.max_reads:
