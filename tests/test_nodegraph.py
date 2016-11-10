@@ -62,7 +62,7 @@ def test_toobig():
 
 
 def test__get_set_tag_density():
-    nodegraph = khmer._Nodegraph(32, [1])
+    nodegraph = khmer._Nodegraph(32, [1]) 
 
     orig = nodegraph._get_tag_density()
     assert orig != 2
@@ -605,9 +605,8 @@ def test_badget():
 def test_load_notexist_should_fail():
     savepath = utils.get_temp_filename('tempnodegraphsave0.htable')
 
-    hi = khmer._Countgraph(12, [1])
     try:
-        hi.load(savepath)
+        hi = khmer.load_countgraph(savepath)
         assert 0, "load should fail"
     except OSError:
         pass
@@ -630,9 +629,8 @@ def test_load_truncated_should_fail():
     fp.write(data[:1000])
     fp.close()
 
-    hi = khmer._Countgraph(12, [1])
     try:
-        hi.load(savepath)
+        hi = khmer.load_countgraph(savepath)
         assert 0, "load should fail"
     except OSError as e:
         print(str(e))
@@ -727,12 +725,11 @@ def _build_testfiles():
 
 
 def test_hashbits_file_version_check():
-    nodegraph = khmer._Nodegraph(12, [1])
 
     inpath = utils.get_test_data('badversion-k12.htable')
 
     try:
-        nodegraph.load(inpath)
+        nodegraph = khmer.load_nodegraph(inpath)
         assert 0, "this should fail"
     except OSError as e:
         print(str(e))
@@ -743,10 +740,9 @@ def test_nodegraph_file_type_check():
     savepath = utils.get_temp_filename('tempcountingsave0.ct')
     kh.save(savepath)
 
-    nodegraph = khmer._Nodegraph(12, [1])
 
     try:
-        nodegraph.load(savepath)
+        nodegraph = khmer.load_nodegraph(savepath)
         assert 0, "this should fail"
     except OSError as e:
         print(str(e))
