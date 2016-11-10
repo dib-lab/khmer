@@ -48,6 +48,7 @@ Contact: khmer-project@idyll.org
 #include "khmer.hh"
 #include "kmer_hash.hh"
 #include "hashtable.hh"
+#include "hashgraph.hh"
 #include "assembler.hh"
 #include "read_aligner.hh"
 #include "labelhash.hh"

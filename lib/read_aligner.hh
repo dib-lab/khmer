@@ -49,7 +49,7 @@ Contact: khmer-project@idyll.org
 #include <vector>
 
 #include "khmer.hh"
-#include "hashtable.hh"
+#include "hashgraph.hh"
 #include "kmer_hash.hh"
 
 #define READ_ALIGNER_DEBUG 0

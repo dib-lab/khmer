@@ -6,7 +6,9 @@
    refactoring of CPython hierarchy to separate graph methods from table
    methods.
    * lib/hashtable.{cc,hh}: pull some more CountingHash/Counttable methods
-   back to base class; renaming.
+   back to base class; rename.
+   * lib/hashgraph.{cc,hh}: create new files containing the Countgraph
+   and Nodegraph classes.
    * Makefile,  setup.py: updated dependencies for added and removed files.
    * lib/Makefile: eliminated lib/counting.{cc,hh} and lib/hashbits.{cc,hh}.
    * lib/{labelhash.cc,read_aligner.hh,storage.cc,storage.hh,subset.cc,

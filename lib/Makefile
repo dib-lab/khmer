@@ -223,6 +223,7 @@ BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 
 LIBKHMER_OBJS= \
 	hashtable.o \
+	hashgraph.o \
 	hllcounter.o \
 	kmer_hash.o \
 	labelhash.o \
