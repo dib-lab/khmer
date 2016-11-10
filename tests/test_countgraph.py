@@ -645,9 +645,8 @@ def test_save_load():
     hi.consume_fasta(inpath)
     hi.save(savepath)
 
-    ht = khmer._Countgraph(12, sizes)
     try:
-        ht.load(savepath)
+        ht = khmer.load_countgraph(savepath)
     except OSError as err:
         assert 0, 'Should not produce an OSError: ' + str(err)
 
@@ -707,9 +706,9 @@ def test_load_gz():
     in_file.close()
 
     # load compressed hashtable.
-    ht = khmer._Countgraph(12, sizes)
+    
     try:
-        ht.load(loadpath)
+        ht = khmer.load_countgraph(loadpath)
     except OSError as err:
         assert 0, "Should not produce an OSError: " + str(err)
 
@@ -734,9 +733,8 @@ def test_save_load_gz():
     hi.consume_fasta(inpath)
     hi.save(savepath)
 
-    ht = khmer._Countgraph(12, sizes)
     try:
-        ht.load(savepath)
+        ht = khmer.load_countgraph(savepath)
     except OSError as err:
         assert 0, 'Should not produce an OSError: ' + str(err)
 
@@ -917,9 +915,8 @@ def test_maxcount_with_bigcount_save():
     savepath = utils.get_temp_filename('tempcountingsave.ht')
     kh.save(savepath)
 
-    kh = khmer.Countgraph(1, 1, 1)
     try:
-        kh.load(savepath)
+        kh = khmer.load_countgraph(savepath)
     except OSError as err:
         assert 0, "Should not produce an OSError: " + str(err)
 
@@ -936,9 +933,8 @@ def test_bigcount_save():
     savepath = utils.get_temp_filename('tempcountingsave.ht')
     kh.save(savepath)
 
-    kh = khmer.Countgraph(1, 1, 1)
     try:
-        kh.load(savepath)
+        kh = khmer.load_countgraph(savepath)
     except OSError as err:
         assert 0, "Should not produce an OSError: " + str(err)
 
@@ -960,9 +956,8 @@ def test_nobigcount_save():
     savepath = utils.get_temp_filename('tempcountingsave.ht')
     kh.save(savepath)
 
-    kh = khmer.Countgraph(1, 1, 1)
     try:
-        kh.load(savepath)
+        kh = khmer.load_countgraph(savepath)
     except OSError as err:
         assert 0, 'Should not produce an OSError: ' + str(err)
 
@@ -1037,9 +1032,8 @@ def test_get_hashsizes():
 def test_load_notexist_should_fail():
     savepath = utils.get_temp_filename('tempcountingsave0.ht')
 
-    hi = khmer.Countgraph(12, 1000, 2)
     try:
-        hi.load(savepath)
+        hi = khmer.load_countgraph(savepath)
         assert 0, "load should fail"
     except OSError as e:
         print(str(e))
@@ -1061,9 +1055,8 @@ def test_load_truncated_should_fail():
     fp.write(data[:1000])
     fp.close()
 
-    hi = khmer._Countgraph(12, [1])
     try:
-        hi.load(savepath)
+        hi = khmer.load_countgraph(savepath)
         assert 0, "load should fail"
     except OSError as e:
         print(str(e))
@@ -1072,9 +1065,8 @@ def test_load_truncated_should_fail():
 def test_load_gz_notexist_should_fail():
     savepath = utils.get_temp_filename('tempcountingsave0.ht.gz')
 
-    hi = khmer.Countgraph(12, 1000, 2)
     try:
-        hi.load(savepath)
+        hi = khmer.load_countgraph(savepath)
         assert 0, "load should fail"
     except OSError as e:
         print(str(e))
@@ -1096,9 +1088,8 @@ def test_load_gz_truncated_should_fail():
     fp.write(data[:1000])
     fp.close()
 
-    hi = khmer._Countgraph(12, [1])
     try:
-        hi.load(savepath)
+        hi = khmer.load_countgraph(savepath)
         assert 0, "load should fail"
     except OSError as e:
         print(str(e))
@@ -1117,12 +1108,11 @@ def test_counting_file_version_check():
 
 
 def test_counting_gz_file_version_check():
-    ht = khmer.Countgraph(12, 1, 1)
 
     inpath = utils.get_test_data('badversion-k12.ct.gz')
 
     try:
-        ht.load(inpath)
+        ht = khmer.load_countgraph(inpath)
         assert 0, "this should fail"
     except OSError as e:
         print(str(e))
@@ -1131,10 +1121,9 @@ def test_counting_gz_file_version_check():
 def test_counting_file_type_check():
     inpath = utils.get_test_data('goodversion-k12.ht')
 
-    kh = khmer.Countgraph(12, 1, 1)
 
     try:
-        kh.load(inpath)
+        kh = khmer.load_countgraph(inpath)
         assert 0, "this should fail"
     except OSError as e:
         print(str(e))
@@ -1143,10 +1132,9 @@ def test_counting_file_type_check():
 def test_counting_gz_file_type_check():
     inpath = utils.get_test_data('goodversion-k12.ht.gz')
 
-    kh = khmer.Countgraph(12, 1, 1)
 
     try:
-        kh.load(inpath)
+        kh = khmer.load_countgraph(inpath)
         assert 0, "this should fail"
     except OSError as e:
         print(str(e))
@@ -1291,9 +1279,9 @@ def test_badtrim():
 
 
 def test_badload():
-    countgraph = khmer.Countgraph(4, 4 ** 4, 4)
+
     try:
-        countgraph.load()
+        countgraph = khmer.load_countgraph()
         assert 0, "this should fail"
     except TypeError as err:
         print(str(err))
