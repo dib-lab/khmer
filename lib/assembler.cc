@@ -337,7 +337,7 @@ JunctionCountAssembler::JunctionCountAssembler(Hashgraph * ht) :
     graph(ht), _ksize(ht->ksize()), traverser(ht), linear_asm(ht)
 {
     std::vector<uint64_t> table_sizes = graph->get_tablesizes();
-    junctions = new CountingHash(_ksize, table_sizes);
+    junctions = new Countgraph(_ksize, table_sizes);
 }
 
 

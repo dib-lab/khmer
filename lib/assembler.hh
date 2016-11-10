@@ -41,7 +41,7 @@ Contact: khmer-project@idyll.org
 
 #include "khmer.hh"
 #include "kmer_hash.hh"
-#include "counting.hh"
+#include "hashgraph.hh"
 #include "kmer_filters.hh"
 #include "traversal.hh"
 #include "labelhash.hh"
@@ -149,7 +149,7 @@ public:
 class JunctionCountAssembler
 {
     LinearAssembler linear_asm;
-    CountingHash * junctions;
+    Countgraph * junctions;
     Traverser traverser;
 
 public:

@@ -1491,3 +1491,10 @@ def test_counting_load_bigcount():
         print(i, count_table.count('ATATATATAT'))
     count = count_table.get('ATATATATAT')
     assert count == 500
+
+
+def test_bad_create():
+    try:
+        countgraph = khmer._Countgraph(5, [])
+    except ValueError as err:
+        assert 'tablesizes needs to be one or more numbers' in str(err)

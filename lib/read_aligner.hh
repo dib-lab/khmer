@@ -48,8 +48,8 @@ Contact: khmer-project@idyll.org
 #include <string>
 #include <vector>
 
-#include "counting.hh"
 #include "khmer.hh"
+#include "hashgraph.hh"
 #include "kmer_hash.hh"
 
 #define READ_ALIGNER_DEBUG 0
@@ -226,7 +226,7 @@ private:
     const HashIntoType bitmask;
     const size_t rc_left_shift;
 
-    CountingHash* m_ch;
+    khmer::Countgraph* m_ch;
     ScoringMatrix m_sm;
 
     size_t m_trusted_cutoff;
@@ -244,7 +244,7 @@ public:
     Alignment* Align(const std::string&);
     Alignment* AlignForward(const std::string&);
 
-    ReadAligner(CountingHash* ch,
+    ReadAligner(khmer::Countgraph* ch,
                 BoundedCounterType trusted_cutoff, double bits_theta)
         : bitmask(comp_bitmask(ch->ksize())),
           rc_left_shift(ch->ksize() * 2 - 2),
@@ -265,7 +265,7 @@ public:
 #endif
     }
 
-    ReadAligner(CountingHash* ch,
+    ReadAligner(khmer::Countgraph* ch,
                 BoundedCounterType trusted_cutoff, double bits_theta,
                 double* scoring_matrix, double* transitions)
         : bitmask(comp_bitmask(ch->ksize())),

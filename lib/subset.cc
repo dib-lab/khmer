@@ -44,8 +44,7 @@ Contact: khmer-project@idyll.org
 #include <set>
 #include <utility>
 
-#include "counting.hh"
-#include "hashtable.hh"
+#include "hashgraph.hh"
 #include "khmer_exception.hh"
 #include "read_parsers.hh"
 #include "subset.hh"
@@ -1193,7 +1192,7 @@ const
 
 void SubsetPartition::partition_average_coverages(
     PartitionCountMap	&cm,
-    CountingHash *	ht) const
+    Countgraph * ht) const
 {
     PartitionCountMap csum;
     PartitionCountMap cN;
@@ -1218,7 +1217,7 @@ unsigned long long SubsetPartition::repartition_largest_partition(
     unsigned int distance,
     unsigned int threshold,
     unsigned int frequency,
-    CountingHash &counting)
+    Countgraph &counting)
 {
     PartitionCountMap cm;
     unsigned int n_unassigned = 0;
