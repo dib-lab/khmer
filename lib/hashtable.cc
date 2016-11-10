@@ -242,7 +242,7 @@ bool Hashtable::median_at_least(const std::string &s,
     return false;
 }
 
-void Hashtable::save_tagset(std::string outfilename)
+void Hashgraph::save_tagset(std::string outfilename)
 {
     ofstream outfile(outfilename.c_str(), ios::binary);
     const size_t tagset_size = n_tags();
@@ -277,7 +277,7 @@ void Hashtable::save_tagset(std::string outfilename)
     delete[] buf;
 }
 
-void Hashtable::load_tagset(std::string infilename, bool clear_tags)
+void Hashgraph::load_tagset(std::string infilename, bool clear_tags)
 {
     ifstream infile;
 
@@ -387,7 +387,7 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
     }
 }
 
-void Hashtable::consume_sequence_and_tag(const std::string& seq,
+void Hashgraph::consume_sequence_and_tag(const std::string& seq,
         unsigned long long& n_consumed,
         SeenSet * found_tags)
 {
@@ -407,7 +407,7 @@ void Hashtable::consume_sequence_and_tag(const std::string& seq,
         // This is probably better than first testing and then setting the bits,
         // as a failed test essentially results in doing the same amount of work
         // twice.
-        if ((is_new_kmer = test_and_set_bits( kmer ))) {
+        if ((is_new_kmer = store->test_and_set_bits( kmer ))) {
             ++n_consumed;
         }
 
@@ -467,7 +467,7 @@ void Hashtable::consume_sequence_and_tag(const std::string& seq,
 
 // TODO? Inline in header.
 void
-Hashtable::
+Hashgraph::
 consume_fasta_and_tag(
     std:: string const  &filename,
     unsigned int	      &total_reads, unsigned long long	&n_consumed
@@ -485,7 +485,7 @@ consume_fasta_and_tag(
 }
 
 void
-Hashtable::
+Hashgraph::
 consume_fasta_and_tag(
     read_parsers:: IParser *  parser,
     unsigned int		    &total_reads,   unsigned long long	&n_consumed
@@ -523,7 +523,7 @@ consume_fasta_and_tag(
 //   divide them into subsets (based on starting tag) of <= given size.
 //
 
-void Hashtable::divide_tags_into_subsets(unsigned int subset_size,
+void Hashgraph::divide_tags_into_subsets(unsigned int subset_size,
         SeenSet& divvy)
 {
     unsigned int i = 0;
@@ -542,7 +542,7 @@ void Hashtable::divide_tags_into_subsets(unsigned int subset_size,
 // consume_partitioned_fasta: consume a FASTA file of reads
 //
 
-void Hashtable::consume_partitioned_fasta(const std::string &filename,
+void Hashgraph::consume_partitioned_fasta(const std::string &filename,
         unsigned int &total_reads,
         unsigned long long &n_consumed)
 {
@@ -595,7 +595,7 @@ void Hashtable::consume_partitioned_fasta(const std::string &filename,
 //////////////////////////////////////////////////////////////////////
 // graph stuff
 
-void Hashtable::calc_connected_graph_size(Kmer start,
+void Hashgraph::calc_connected_graph_size(Kmer start,
         unsigned long long& count,
         KmerSet& keeper,
         const unsigned long long threshold,
@@ -648,21 +648,21 @@ const
     }
 }
 
-unsigned int Hashtable::kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r)
+unsigned int Hashgraph::kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r)
 {
     Traverser traverser(this);
     Kmer node = build_kmer(kmer_f, kmer_r);
     return traverser.degree(node);
 }
 
-unsigned int Hashtable::kmer_degree(const char * kmer_s)
+unsigned int Hashgraph::kmer_degree(const char * kmer_s)
 {
     Traverser traverser(this);
     Kmer node = build_kmer(kmer_s);
     return traverser.degree(node);
 }
 
-size_t Hashtable::trim_on_stoptags(std::string seq) const
+size_t Hashgraph::trim_on_stoptags(std::string seq) const
 {
     if (!check_and_normalize_read(seq)) {
         return 0;
@@ -682,7 +682,7 @@ size_t Hashtable::trim_on_stoptags(std::string seq) const
     return seq.length();
 }
 
-unsigned int Hashtable::traverse_from_kmer(Kmer start,
+unsigned int Hashgraph::traverse_from_kmer(Kmer start,
         unsigned int radius,
         KmerSet &keeper,
         unsigned int max_count)
@@ -751,7 +751,7 @@ const
     return total;
 }
 
-void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
+void Hashgraph::load_stop_tags(std::string infilename, bool clear_tags)
 {
     ifstream infile;
 
@@ -844,7 +844,7 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
     }
 }
 
-void Hashtable::save_stop_tags(std::string outfilename)
+void Hashgraph::save_stop_tags(std::string outfilename)
 {
     ofstream outfile(outfilename.c_str(), ios::binary);
     size_t tagset_size = stop_tags.size();
@@ -874,7 +874,7 @@ void Hashtable::save_stop_tags(std::string outfilename)
     delete[] buf;
 }
 
-void Hashtable::print_stop_tags(std::string infilename)
+void Hashgraph::print_stop_tags(std::string infilename)
 {
     ofstream printfile(infilename.c_str());
 
@@ -888,7 +888,7 @@ void Hashtable::print_stop_tags(std::string infilename)
     printfile.close();
 }
 
-void Hashtable::print_tagset(std::string infilename)
+void Hashgraph::print_tagset(std::string infilename)
 {
     ofstream printfile(infilename.c_str());
 
@@ -902,7 +902,7 @@ void Hashtable::print_tagset(std::string infilename)
     printfile.close();
 }
 
-void Hashtable::extract_unique_paths(std::string seq,
+void Hashgraph::extract_unique_paths(std::string seq,
                                      unsigned int min_length,
                                      float min_unique_f,
                                      std::vector<std::string> &results)
@@ -1048,7 +1048,7 @@ void Hashtable::get_kmer_counts(const std::string &s,
     }
 }
 
-void Hashtable::find_high_degree_nodes(const char * s,
+void Hashgraph::find_high_degree_nodes(const char * s,
                                        SeenSet& high_degree_nodes)
 const
 {
@@ -1069,8 +1069,7 @@ const
     }
 }
 
-
-unsigned int Hashtable::traverse_linear_path(const Kmer seed_kmer,
+unsigned int Hashgraph::traverse_linear_path(const Kmer seed_kmer,
         SeenSet &adjacencies,
         SeenSet &visited, Hashtable &bf,
         SeenSet &high_degree_nodes)

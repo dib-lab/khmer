@@ -50,7 +50,7 @@ Contact: khmer-project@idyll.org
 namespace khmer
 {
 
-class Hashtable;
+class Hashgraph;
 class LabelHash;
 
 /**
@@ -74,22 +74,21 @@ class LabelHash;
  */
 class LinearAssembler
 {
-
 public:
 
     WordLength _ksize;
-    const Hashtable * graph;
+    const Hashgraph * graph;
 
-    explicit LinearAssembler(const Hashtable * ht);
+    explicit LinearAssembler(const Hashgraph * ht);
 
     std::string assemble(const Kmer seed_kmer,
-                         const Hashtable * stop_bf = 0) const;
+                         const Hashgraph * stop_bf = 0) const;
 
     std::string assemble_right(const Kmer seed_kmer,
-                               const Hashtable * stop_bf = 0) const;
+                               const Hashgraph * stop_bf = 0) const;
 
     std::string assemble_left(const Kmer seed_kmer,
-                              const Hashtable * stop_bf = 0) const;
+                              const Hashgraph * stop_bf = 0) const;
 
     template <bool direction>
     std::string _assemble_directed(AssemblerTraverser<direction>& cursor) const;
@@ -130,7 +129,7 @@ class SimpleLabeledAssembler
 
 public:
 
-    const Hashtable * graph;
+    const Hashgraph * graph;
     const LabelHash * lh;
     WordLength _ksize;
 
@@ -138,7 +137,7 @@ public:
     ~SimpleLabeledAssembler();
 
     StringVector assemble(const Kmer seed_kmer,
-                          const Hashtable * stop_bf=0) const;
+                          const Hashgraph * stop_bf=0) const;
 
     template <bool direction>
     void _assemble_directed(NonLoopingAT<direction>& start_cursor,
@@ -155,10 +154,10 @@ class JunctionCountAssembler
 
 public:
 
-    Hashtable * graph;
+    Hashgraph * graph;
     WordLength _ksize;
 
-    explicit JunctionCountAssembler(Hashtable * ht);
+    explicit JunctionCountAssembler(Hashgraph * ht);
     ~JunctionCountAssembler();
 
 
