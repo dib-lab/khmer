@@ -72,36 +72,37 @@ def _sandbox_scripts():
 
 
 @pytest.mark.parametrize("filename", _sandbox_scripts())
-def test_import_succeeds(filename):
+def test_import_succeeds(filename, tmpdir):
     try:
         mod = imp.load_source('__zzz', filename)
     except:
         print(traceback.format_exc())
         raise AssertionError("%s cannot be imported" % (filename,))
 
-    oldargs = sys.argv
-    sys.argv = [filename]
+    with tmpdir.as_cwd():
+        oldargs = sys.argv
+        sys.argv = [filename]
 
-    oldout, olderr = sys.stdout, sys.stderr
-    sys.stdout = StringIO()
-    sys.stderr = StringIO()
+        oldout, olderr = sys.stdout, sys.stderr
+        sys.stdout = StringIO()
+        sys.stderr = StringIO()
 
-    try:
         try:
-            global_dict = {'__name__': '__main__'}
-            exec(  # pylint: disable=exec-used
-                compile(open(filename).read(), filename, 'exec'),
-                global_dict)
-        except (ImportError, SyntaxError) as err:
-            print("{0}".format(err))
-            raise AssertionError("%s cannot be exec'd" % (filename),
-                                 "{0}".format(traceback))
-        except:  # pylint: disable=bare-except
-            pass                        # other failures are expected :)
-    finally:
-        sys.argv = oldargs
-        out, err = sys.stdout.getvalue(), sys.stderr.getvalue()
-        sys.stdout, sys.stderr = oldout, olderr
+            try:
+                global_dict = {'__name__': '__main__'}
+                exec(  # pylint: disable=exec-used
+                    compile(open(filename).read(), filename, 'exec'),
+                    global_dict)
+            except (ImportError, SyntaxError) as err:
+                print("{0}".format(err))
+                raise AssertionError("%s cannot be exec'd" % (filename),
+                                     "{0}".format(traceback))
+            except:  # pylint: disable=bare-except
+                pass                        # other failures are expected :)
+        finally:
+            sys.argv = oldargs
+            out, err = sys.stdout.getvalue(), sys.stderr.getvalue()
+            sys.stdout, sys.stderr = oldout, olderr
 
 
 def test_sweep_reads():

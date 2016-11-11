@@ -185,7 +185,7 @@ static bool convert_PyObject_to_HashIntoType(PyObject * value,
 
 static bool ht_convert_PyObject_to_HashIntoType(PyObject * value,
                                                 HashIntoType& hashval,
-                                                Hashtable * ht)
+                                                const Hashtable * ht)
 {
     if (PyInt_Check(value) || PyLong_Check(value)) {
         return convert_PyLong_to_HashIntoType(value, hashval);
@@ -220,7 +220,7 @@ static bool ht_convert_PyObject_to_HashIntoType(PyObject * value,
 // Note: will set error condition and return false if cannot do.
 
 static bool ht_convert_PyObject_to_Kmer(PyObject * value,
-                                        Kmer& kmer, Hashtable * ht)
+                                        Kmer& kmer, const Hashtable * ht)
 {
     if (PyInt_Check(value) || PyLong_Check(value)) {
         HashIntoType h;
@@ -2330,8 +2330,6 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashtable_Object")
     0,                                   /* tp_new */
 };
 
-#define is_hashtable_obj(v)  (Py_TYPE(v) == &khmer_KHashtable_Type)
-
 #include "_cpy_nodetable.hh"
 #include "_cpy_counttable.hh"
 #include "_cpy_hashgraph.hh"
@@ -2490,8 +2488,6 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KCountgraph_Object")
     khmer_countgraph_new,                /* tp_new */
 };
 
-#define is_countgraph_obj(v)  (Py_TYPE(v) == &khmer_KCountgraph_Type)
-
 //
 // khmer_countgraph_new
 //
@@ -2634,8 +2630,6 @@ static PyObject* khmer_nodegraph_new(PyTypeObject * type, PyObject * args,
     }
     return (PyObject *) self;
 }
-
-#define is_nodegraph_obj(v)  (Py_TYPE(v) == &khmer_KNodegraph_Type)
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -2833,8 +2827,6 @@ typedef struct {
 static PyObject * khmer_graphlabels_new(PyTypeObject * type, PyObject *args,
                                         PyObject *kwds);
 
-#define is_graphlabels_obj(v)  (Py_TYPE(v) == &khmer_KGraphLabels_Type)
-
 static void khmer_graphlabels_dealloc(khmer_KGraphLabels_Object * obj)
 {
     delete obj->labelhash;
@@ -2851,7 +2843,7 @@ static PyObject * khmer_graphlabels_new(PyTypeObject *type, PyObject *args,
 
     if (self != NULL) {
         PyObject * hashgraph_o;
-        khmer::Hashgraph * hashgraph = NULL;
+        khmer::Hashgraph * hashgraph = NULL; // @CTB
 
         if (!PyArg_ParseTuple(args, "O", &hashgraph_o)) {
             Py_DECREF(self);
@@ -3640,7 +3632,7 @@ static void khmer_subset_dealloc(khmer_KSubsetPartition_Object * obj)
 
 typedef struct {
     PyObject_HEAD
-    khmer::HLLCounter * hllcounter;
+    HLLCounter * hllcounter;
 } khmer_KHLLCounter_Object;
 
 static PyObject* khmer_hllcounter_new(PyTypeObject * type, PyObject * args,
@@ -3980,8 +3972,6 @@ static PyTypeObject khmer_KHLLCounter_Type = {
     khmer_hllcounter_new,                      /* tp_new */
 };
 
-#define is_hllcounter_obj(v)  (Py_TYPE(v) == &khmer_KHLLCounter_Type)
-
 static PyObject * hllcounter_merge(khmer_KHLLCounter_Object * me,
                                    PyObject * args)
 {
@@ -4000,6 +3990,494 @@ static PyObject * hllcounter_merge(khmer_KHLLCounter_Object * me,
 
     Py_RETURN_NONE;
 }
+
+/********************************
+ * Assembler classes
+ ********************************/
+
+
+typedef struct {
+    PyObject_HEAD
+    LinearAssembler * assembler;
+} khmer_KLinearAssembler_Object;
+
+static void khmer_linearassembler_dealloc(khmer_KLinearAssembler_Object * obj)
+{
+    delete obj->assembler;
+    obj->assembler = NULL;
+
+    Py_TYPE(obj)->tp_free((PyObject*)obj);
+}
+
+static PyObject * khmer_linearassembler_new(PyTypeObject *type, PyObject *args,
+                                            PyObject *kwds)
+{
+    khmer_KLinearAssembler_Object *self;
+    self = (khmer_KLinearAssembler_Object*)type->tp_alloc(type, 0);
+
+    if (self != NULL) {
+        PyObject * hashgraph_o;
+        Hashgraph * hashgraph = NULL;
+
+        if (!PyArg_ParseTuple(args, "O", &hashgraph_o)) {
+            Py_DECREF(self);
+            return NULL;
+        }
+
+        if (PyObject_TypeCheck(hashgraph_o, &khmer_KNodegraph_Type)) {
+            khmer_KNodegraph_Object * kho = (khmer_KNodegraph_Object *) hashgraph_o;
+            hashgraph = kho->nodegraph;
+        } else if (PyObject_TypeCheck(hashgraph_o, &khmer_KCountgraph_Type)) {
+            khmer_KCountgraph_Object * cho = (khmer_KCountgraph_Object *) hashgraph_o;
+            hashgraph = cho->countgraph;
+        } else {
+            PyErr_SetString(PyExc_ValueError,
+                            "graph object must be a NodeGraph or CountGraph");
+            Py_DECREF(self);
+            return NULL;
+        }
+
+        try {
+            self->assembler = new LinearAssembler(hashgraph);
+        } catch (std::bad_alloc &e) {
+            Py_DECREF(self);
+            return PyErr_NoMemory();
+        }
+
+    }
+
+    return (PyObject *) self;
+}
+
+
+static
+PyObject *
+linearassembler_assemble(khmer_KLinearAssembler_Object * me,
+                                PyObject * args, PyObject *kwargs)
+{
+    LinearAssembler * assembler= me->assembler;
+
+    PyObject * val_o;
+    khmer_KNodegraph_Object * nodegraph_o = NULL;
+    Nodegraph * stop_bf = NULL;
+    const char * dir_str = NULL;
+    char dir = NULL;
+
+    const char *kwnames[] = {"seed_kmer", "stop_filter", "direction", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|O!s",
+                                     const_cast<char **>(kwnames), 
+                                     &val_o, &khmer_KNodegraph_Type, 
+                                     &nodegraph_o, &dir_str)) {
+        return NULL;
+    }
+    if (dir_str != NULL) {
+        dir = dir_str[0];
+    } else {
+        dir = 'B';
+    }
+
+    Kmer start_kmer;
+    if (!ht_convert_PyObject_to_Kmer(val_o, start_kmer, assembler->graph)) {
+        return NULL;
+    }
+
+    if (nodegraph_o) {
+        stop_bf = nodegraph_o->nodegraph;
+    }
+
+    std::string contig;
+    if (dir == 'B') { 
+        contig = assembler->assemble(start_kmer, stop_bf);
+    } else if (dir == 'L') {
+        contig = assembler->assemble_left(start_kmer, stop_bf);
+    } else if (dir == 'R') {
+        contig = assembler->assemble_right(start_kmer, stop_bf);
+    } else {
+        PyErr_SetString(PyExc_ValueError, "Direction must be B (both), L (left),"
+                " or R (right).");
+        return NULL;
+    }
+
+    PyObject * ret = Py_BuildValue("s", contig.c_str());
+    return ret;
+}
+
+
+static PyMethodDef khmer_linearassembler_methods[] = {
+    {
+        "assemble",
+        (PyCFunction)linearassembler_assemble, METH_VARARGS | METH_KEYWORDS,
+        "Assemble a path linearly until a branch is reached."
+    },
+    {NULL, NULL, 0, NULL}           /* sentinel */
+};
+
+static PyTypeObject khmer_KLinearAssembler_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)  /* init & ob_size */
+    "_khmer.LinearAssembler",            /* tp_name */
+    sizeof(khmer_KLinearAssembler_Object), /* tp_basicsize */
+    0,                       /* tp_itemsize */
+    (destructor)khmer_linearassembler_dealloc, /* tp_dealloc */
+    0,                       /* tp_print */
+    0,                       /* tp_getattr */
+    0,                       /* tp_setattr */
+    0,                       /* tp_compare */
+    0,                       /* tp_repr */
+    0,                       /* tp_as_number */
+    0,                       /* tp_as_sequence */
+    0,                       /* tp_as_mapping */
+    0,                       /* tp_hash */
+    0,                       /* tp_call */
+    0,                       /* tp_str */
+    0,                       /* tp_getattro */
+    0,                       /* tp_setattro */
+    0,                       /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,   /* tp_flags */
+    0,                       /* tp_doc */
+    0,                       /* tp_traverse */
+    0,                       /* tp_clear */
+    0,                       /* tp_richcompare */
+    0,                       /* tp_weaklistoffset */
+    0,                       /* tp_iter */
+    0,                       /* tp_iternext */
+    khmer_linearassembler_methods, /* tp_methods */
+    0,                       /* tp_members */
+    0,                       /* tp_getset */
+    0,                       /* tp_base */
+    0,                       /* tp_dict */
+    0,                       /* tp_descr_get */
+    0,                       /* tp_descr_set */
+    0,                       /* tp_dictoffset */
+    0,                       /* tp_init */
+    0,                       /* tp_alloc */
+    khmer_linearassembler_new,      /* tp_new */
+};
+
+
+
+typedef struct {
+    PyObject_HEAD
+    SimpleLabeledAssembler * assembler;
+} khmer_KSimpleLabeledAssembler_Object;
+
+
+static void khmer_simplelabeledassembler_dealloc(khmer_KLinearAssembler_Object * obj)
+{
+    delete obj->assembler;
+    obj->assembler = NULL;
+
+    Py_TYPE(obj)->tp_free((PyObject*)obj);
+}
+
+static PyObject * khmer_simplelabeledassembler_new(PyTypeObject *type, PyObject *args,
+                                            PyObject *kwds)
+{
+    khmer_KSimpleLabeledAssembler_Object *self;
+    self = (khmer_KSimpleLabeledAssembler_Object*)type->tp_alloc(type, 0);
+
+    if (self != NULL) {
+        PyObject * labelhash_o;
+        LabelHash * labelhash = NULL;
+
+        if (!PyArg_ParseTuple(args, "O", &labelhash_o)) {
+            Py_DECREF(self);
+            return NULL;
+        }
+
+        if (PyObject_TypeCheck(labelhash_o, &khmer_KGraphLabels_Type)) {
+            khmer_KGraphLabels_Object * klo = (khmer_KGraphLabels_Object *) labelhash_o;
+            labelhash = klo->labelhash;
+        } else {
+            PyErr_SetString(PyExc_ValueError,
+                            "SimpleLabeledAssembler needs a GraphLabels object.");
+            Py_DECREF(self);
+            return NULL;
+        }
+
+        try {
+            self->assembler = new SimpleLabeledAssembler(labelhash);
+        } catch (std::bad_alloc &e) {
+            Py_DECREF(self);
+            return PyErr_NoMemory();
+        }
+
+    }
+
+    return (PyObject *) self;
+}
+
+
+static
+PyObject *
+simplelabeledassembler_assemble(khmer_KSimpleLabeledAssembler_Object * me,
+                                PyObject * args, PyObject *kwargs)
+{
+    SimpleLabeledAssembler * assembler = me->assembler;
+
+    PyObject * val_o;
+    khmer_KNodegraph_Object * nodegraph_o = NULL;
+    Nodegraph * stop_bf = NULL;
+
+    const char *kwnames[] = {"seed_kmer", "stop_filter", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|O!",
+                                     const_cast<char **>(kwnames), 
+                                     &val_o, &khmer_KNodegraph_Type, 
+                                     &nodegraph_o)) {
+        return NULL;
+    }
+
+
+    Kmer start_kmer;
+    if (!ht_convert_PyObject_to_Kmer(val_o, start_kmer, assembler->graph)) {
+        return NULL;
+    }
+
+    if (nodegraph_o) {
+        stop_bf = nodegraph_o->nodegraph;
+    }
+
+    std::vector<std::string> contigs = assembler->assemble(start_kmer, stop_bf);
+  
+    PyObject * ret = PyList_New(contigs.size());
+    for (unsigned int i = 0; i < contigs.size(); i++) {
+        PyList_SET_ITEM(ret, i, PyUnicode_FromString(contigs[i].c_str()));
+    }
+
+    return ret;
+}
+
+
+static PyMethodDef khmer_simplelabeledassembler_methods[] = {
+    {
+        "assemble",
+        (PyCFunction)simplelabeledassembler_assemble, METH_VARARGS | METH_KEYWORDS,
+        "Assemble paths, using labels to jump branches."
+    },
+    {NULL, NULL, 0, NULL}           /* sentinel */
+};
+
+static PyTypeObject khmer_KSimpleLabeledAssembler_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)  /* init & ob_size */
+    "_khmer.SimpleLabeledAssembler",            /* tp_name */
+    sizeof(khmer_KSimpleLabeledAssembler_Object), /* tp_basicsize */
+    0,                       /* tp_itemsize */
+    (destructor)khmer_simplelabeledassembler_dealloc, /* tp_dealloc */
+    0,                       /* tp_print */
+    0,                       /* tp_getattr */
+    0,                       /* tp_setattr */
+    0,                       /* tp_compare */
+    0,                       /* tp_repr */
+    0,                       /* tp_as_number */
+    0,                       /* tp_as_sequence */
+    0,                       /* tp_as_mapping */
+    0,                       /* tp_hash */
+    0,                       /* tp_call */
+    0,                       /* tp_str */
+    0,                       /* tp_getattro */
+    0,                       /* tp_setattro */
+    0,                       /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,   /* tp_flags */
+    0,                       /* tp_doc */
+    0,                       /* tp_traverse */
+    0,                       /* tp_clear */
+    0,                       /* tp_richcompare */
+    0,                       /* tp_weaklistoffset */
+    0,                       /* tp_iter */
+    0,                       /* tp_iternext */
+    khmer_simplelabeledassembler_methods, /* tp_methods */
+    0,                       /* tp_members */
+    0,                       /* tp_getset */
+    0,                       /* tp_base */
+    0,                       /* tp_dict */
+    0,                       /* tp_descr_get */
+    0,                       /* tp_descr_set */
+    0,                       /* tp_dictoffset */
+    0,                       /* tp_init */
+    0,                       /* tp_alloc */
+    khmer_simplelabeledassembler_new,      /* tp_new */
+};
+
+
+
+/********************************
+ * JunctionCountAssembler
+ ********************************/
+
+
+typedef struct {
+    PyObject_HEAD
+    JunctionCountAssembler * assembler;
+} khmer_KJunctionCountAssembler_Object;
+
+static void khmer_junctioncountassembler_dealloc(khmer_KJunctionCountAssembler_Object * obj)
+{
+    delete obj->assembler;
+    obj->assembler = NULL;
+
+    Py_TYPE(obj)->tp_free((PyObject*)obj);
+}
+
+static PyObject * khmer_junctioncountassembler_new(PyTypeObject *type, PyObject *args,
+                                            PyObject *kwds)
+{
+    khmer_KJunctionCountAssembler_Object *self;
+    self = (khmer_KJunctionCountAssembler_Object*)type->tp_alloc(type, 0);
+
+    if (self != NULL) {
+        PyObject * hashgraph_o;
+        Hashgraph * hashgraph = NULL;
+
+        if (!PyArg_ParseTuple(args, "O", &hashgraph_o)) {
+            Py_DECREF(self);
+            return NULL;
+        }
+
+        if (PyObject_TypeCheck(hashgraph_o, &khmer_KNodegraph_Type)) {
+            khmer_KNodegraph_Object * kho = (khmer_KNodegraph_Object *) hashgraph_o;
+            hashgraph = kho->nodegraph;
+        } else if (PyObject_TypeCheck(hashgraph_o, &khmer_KCountgraph_Type)) {
+            khmer_KCountgraph_Object * cho = (khmer_KCountgraph_Object *) hashgraph_o;
+            hashgraph = cho->countgraph;
+        } else {
+            PyErr_SetString(PyExc_ValueError,
+                            "graph object must be a NodeGraph or CountGraph");
+            Py_DECREF(self);
+            return NULL;
+        }
+
+        try {
+            self->assembler = new JunctionCountAssembler(hashgraph);
+        } catch (std::bad_alloc &e) {
+            Py_DECREF(self);
+            return PyErr_NoMemory();
+        }
+
+    }
+
+    return (PyObject *) self;
+}
+
+
+static
+PyObject *
+junctioncountassembler_assemble(khmer_KJunctionCountAssembler_Object * me,
+                                PyObject * args, PyObject *kwargs)
+{
+    JunctionCountAssembler * assembler = me->assembler;
+
+    PyObject * val_o;
+    khmer_KNodegraph_Object * nodegraph_o = NULL;
+    Nodegraph * stop_bf = NULL;
+
+    const char *kwnames[] = {"seed_kmer", "stop_filter", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|O!",
+                                     const_cast<char **>(kwnames),
+                                     &val_o, &khmer_KNodegraph_Type, 
+                                     &nodegraph_o)) {
+        return NULL;
+    } 
+
+    Kmer start_kmer;
+    if (!ht_convert_PyObject_to_Kmer(val_o, start_kmer, assembler->graph)) {
+        return NULL;
+    }
+
+    if (nodegraph_o) {
+        stop_bf = nodegraph_o->nodegraph;
+    }
+
+    std::vector<std::string> contigs = assembler->assemble(start_kmer, stop_bf);
+  
+    PyObject * ret = PyList_New(contigs.size());
+    for (unsigned int i = 0; i < contigs.size(); i++) {
+        PyList_SET_ITEM(ret, i, PyUnicode_FromString(contigs[i].c_str()));
+    }
+
+    return ret;
+}
+
+
+static
+PyObject *
+junctioncountassembler_consume(khmer_KJunctionCountAssembler_Object * me, PyObject * args)
+{
+    JunctionCountAssembler * assembler = me->assembler;
+    const char * long_str;
+
+    if (!PyArg_ParseTuple(args, "s", &long_str)) {
+        return NULL;
+    }
+
+    if (strlen(long_str) < assembler->_ksize) {
+        PyErr_SetString(PyExc_ValueError,
+                        "string length must >= the hashgraph k-mer size");
+        return NULL;
+    }
+
+    uint16_t n_junctions = assembler->consume(long_str);
+
+    return PyLong_FromLong((HashIntoType) n_junctions);
+}
+
+
+static PyMethodDef khmer_junctioncountassembler_methods[] = {
+    {
+        "assemble",
+        (PyCFunction)junctioncountassembler_assemble, METH_VARARGS | METH_KEYWORDS,
+        "Assemble paths, using recorded junctions to jump branches."
+    },
+    {
+        "consume",
+        (PyCFunction)junctioncountassembler_consume, METH_VARARGS,
+        "Consume a string and count its branch junctions."
+    },
+    {NULL, NULL, 0, NULL}           /* sentinel */
+};
+
+static PyTypeObject khmer_KJunctionCountAssembler_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)  /* init & ob_size */
+    "_khmer.JunctionCountAssembler",            /* tp_name */
+    sizeof(khmer_KJunctionCountAssembler_Object), /* tp_basicsize */
+    0,                       /* tp_itemsize */
+    (destructor)khmer_junctioncountassembler_dealloc, /* tp_dealloc */
+    0,                       /* tp_print */
+    0,                       /* tp_getattr */
+    0,                       /* tp_setattr */
+    0,                       /* tp_compare */
+    0,                       /* tp_repr */
+    0,                       /* tp_as_number */
+    0,                       /* tp_as_sequence */
+    0,                       /* tp_as_mapping */
+    0,                       /* tp_hash */
+    0,                       /* tp_call */
+    0,                       /* tp_str */
+    0,                       /* tp_getattro */
+    0,                       /* tp_setattro */
+    0,                       /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,   /* tp_flags */
+    0,                       /* tp_doc */
+    0,                       /* tp_traverse */
+    0,                       /* tp_clear */
+    0,                       /* tp_richcompare */
+    0,                       /* tp_weaklistoffset */
+    0,                       /* tp_iter */
+    0,                       /* tp_iternext */
+    khmer_junctioncountassembler_methods, /* tp_methods */
+    0,                       /* tp_members */
+    0,                       /* tp_getset */
+    0,                       /* tp_base */
+    0,                       /* tp_dict */
+    0,                       /* tp_descr_get */
+    0,                       /* tp_descr_set */
+    0,                       /* tp_dictoffset */
+    0,                       /* tp_init */
+    0,                       /* tp_alloc */
+    khmer_junctioncountassembler_new,      /* tp_new */
+};
+
 
 //////////////////////////////
 // standalone functions
@@ -4233,6 +4711,17 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
+    if (PyType_Ready(&khmer_KLinearAssembler_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+    if (PyType_Ready(&khmer_KSimpleLabeledAssembler_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+    if (PyType_Ready(&khmer_KJunctionCountAssembler_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    khmer_KGraphLabels_Type.tp_base = &khmer_KNodegraph_Type;
     khmer_KGraphLabels_Type.tp_methods = khmer_graphlabels_methods;
     khmer_KGraphLabels_Type.tp_new = khmer_graphlabels_new;
     if (PyType_Ready(&khmer_KGraphLabels_Type) < 0) {
@@ -4307,6 +4796,24 @@ MOD_INIT(_khmer)
     Py_INCREF(&khmer_KGraphLabels_Type);
     if (PyModule_AddObject(m, "GraphLabels",
                            (PyObject *)&khmer_KGraphLabels_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    Py_INCREF(&khmer_KLinearAssembler_Type);
+    if (PyModule_AddObject(m, "LinearAssembler",
+                           (PyObject *)&khmer_KLinearAssembler_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    Py_INCREF(&khmer_KSimpleLabeledAssembler_Type);
+    if (PyModule_AddObject(m, "SimpleLabeledAssembler",
+                           (PyObject *)&khmer_KSimpleLabeledAssembler_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    Py_INCREF(&khmer_KJunctionCountAssembler_Type);
+    if (PyModule_AddObject(m, "JunctionCountAssembler",
+                           (PyObject *)&khmer_KJunctionCountAssembler_Type) < 0) {
         return MOD_ERROR_VAL;
     }
 
