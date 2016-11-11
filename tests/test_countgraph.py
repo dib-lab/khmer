@@ -706,7 +706,6 @@ def test_load_gz():
     in_file.close()
 
     # load compressed hashtable.
-    
     try:
         ht = khmer.load_countgraph(loadpath)
     except OSError as err:
