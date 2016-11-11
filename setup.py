@@ -51,18 +51,23 @@ import tempfile
 
 from setuptools import setup
 from setuptools import Extension
-from setuptools.command.build_ext import build_ext as _build_ext
 from distutils.spawn import spawn
 from distutils.sysconfig import get_config_vars
 from distutils.dist import Distribution
 from distutils.errors import DistutilsPlatformError
 
-from Cython.Build import cythonize
-
 import versioneer
 ez_setup.use_setuptools(version="3.4.1")
 
 CMDCLASS = versioneer.get_cmdclass()
+
+from Cython.Build import cythonize
+
+try:
+    from Cython.Distutils import build_ext as _build_ext
+except ImportError:
+    print('Cython not found.', file=sys.stderr)
+    from setuptools.command.build_ext import build_ext as _build_ext
 
 # strip out -Wstrict-prototypes; a hack suggested by
 # http://stackoverflow.com/a/9740721
@@ -200,7 +205,8 @@ CY_EXT_MOD_DICT['sources'].append(path_join("lib", "partitioning.cc"))
 CY_EXT_MOD_DICT['depends'].append(path_join("lib", "partitioning.hh"))
 '''
 CY_EXTENSION_MOD = Extension("khmer._oxli", ** CY_EXTENSION_MOD_DICT)
-EXTENSION_MODS.extend(cythonize([CY_EXTENSION_MOD]))
+#EXTENSION_MODS.extend(cythonize([CY_EXTENSION_MOD]))
+EXTENSION_MODS.append(CY_EXTENSION_MOD)
 
 
 SCRIPTS = []
@@ -305,7 +311,9 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
                     ' configure || bash ./configure --static ) && make -f '
                     'Makefile.pic PIC']
             spawn(cmd=zcmd, dry_run=self.dry_run)
-            self.extensions[0].extra_objects.extend(
+            #self.extensions[0].extra_objects.extend(
+            for ext in self.extensions:
+                ext.extra_objects.extend(
                 path_join("third-party", "zlib", bn + ".lo") for bn in [
                     "adler32", "compress", "crc32", "deflate", "gzclose",
                     "gzlib", "gzread", "gzwrite", "infback", "inffast",
@@ -314,7 +322,9 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
             bz2cmd = ['bash', '-c', 'cd ' + BZIP2DIR + ' && make -f '
                       'Makefile-libbz2_so all']
             spawn(cmd=bz2cmd, dry_run=self.dry_run)
-            self.extensions[0].extra_objects.extend(
+            #self.extensions[0].extra_objects.extend(
+            for ext in self.extensions:
+                ext.extra_objects.extend(
                 path_join("third-party", "bzip2", bn + ".o") for bn in [
                     "blocksort", "huffman", "crctable", "randtable",
                     "compress", "decompress", "bzlib"])

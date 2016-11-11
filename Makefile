@@ -83,6 +83,7 @@ endif
 MODEXT=$(shell python -c \
        "import sysconfig;print(sysconfig.get_config_var('SO'))")
 EXTENSION_MODULE = khmer/_khmer$(MODEXT)
+CYTHON_MODULE = khmer/_oxli$(MODEXT)
 
 PYLINT_TEMPLATE="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"
 
@@ -107,6 +108,9 @@ sharedobj: $(EXTENSION_MODULE)
 $(EXTENSION_MODULE): $(CPPSOURCES)
 	./setup.py build_ext --inplace
 
+$(CYTHON_MODULE): $(CPPSOURCES)
+	./setup.py build_ext --inplace
+
 coverage-debug: $(CPPSOURCES)
 	export CFLAGS="-pg -fprofile-arcs -ftest-coverage -O0"; ./setup.py \
 		build_ext --debug --inplace --libraries gcov
@@ -127,8 +131,9 @@ clean: FORCE
 	cd lib && $(MAKE) clean || true
 	cd tests && rm -rf khmertest_* || true
 	rm -f $(EXTENSION_MODULE)
+	rm -f $(CYTHON_MODULE)
 	rm -f khmer/*.pyc lib/*.pyc scripts/*.pyc tests/*.pyc oxli/*.pyc \
-		sandbox/*.pyc khmer/__pycache__/* sandbox/__pycache__/*
+		sandbox/*.pyc khmer/__pycache__/* sandbox/__pycache__/* khmer/_oxli.cpp
 	./setup.py clean --all || true
 	rm -f coverage-debug
 	rm -Rf .coverage
