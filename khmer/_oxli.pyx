@@ -32,10 +32,9 @@ cdef class Component:
         return deref(self._this).get_n_tags()
 
     def __iter__(self):
-        it = deref(self._this).tags.begin()
-        while it != deref(self._this).tags.end():
-            yield deref(it)
-            inc(it)
+        cdef HashIntoType tag
+        for tag in deref(self._this).tags:
+            yield tag
 
     def __hash__(self):
         return <uintptr_t>self._this.get()
@@ -117,23 +116,21 @@ cdef class StreamingPartitioner:
 
     def components(self):
         cdef shared_ptr[ComponentPtrSet] locked
+        cdef ComponentPtr cmpptr
         lockedptr = self._components.lock()
         if lockedptr:
-            it = deref(lockedptr).begin()
-            while it != deref(lockedptr).end():
-                yield Component.create(deref(it))
-                inc(it)
+            for cmpptr in deref(lockedptr):
+                yield Component.create(cmpptr)
         else:
             raise MemoryError("Can't locked underlying Component set")
 
     def tag_components(self):
         cdef shared_ptr[GuardedKmerCompMap] locked
+        cdef pair[HashIntoType,ComponentPtr] cpair
         lockedptr = self._tag_component_map.lock()
         if lockedptr:
-            it = deref(lockedptr).data.begin()
-            while it != deref(lockedptr).data.end():
-                yield deref(it).first, Component.create(deref(it).second)
-                inc(it)
+            for cpair in deref(lockedptr).data:
+                yield cpair.first, Component.create(cpair.second)
         else:
             raise MemoryError("Can't locked underlying Component set")
 
@@ -144,19 +141,15 @@ cdef class StreamingPartitioner:
             raise IOError("Can't open file.")
         
         cdef ComponentPtr cmpptr
-        cdef shared_ptr[ComponentPtrSet] locked
+        cdef shared_ptr[ComponentPtrSet] lockedptr
         lockedptr = self._components.lock()
 
         if lockedptr:      
-            it = deref(lockedptr).begin()
-            while it != deref(lockedptr).end():
-                cmpptr = deref(it)
-
-                fprintf(fp, "%u,%u,%f\n", 
+            for cmpptr in deref(lockedptr):
+                fprintf(fp, "%llu,%llu,%f\n", 
                         deref(cmpptr).component_id,
                         deref(cmpptr).get_n_tags(),
                         Component._mean_tag_count(cmpptr, self._graph_ptr))
-                inc(it)
         fclose(fp)
 
     property n_components:

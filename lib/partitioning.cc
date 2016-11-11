@@ -3,6 +3,7 @@
 #include <deque>
 #include <memory>
 #include <functional>
+#include <algorithm>
 
 #include "hashtable.hh"
 #include "hashbits.hh"
