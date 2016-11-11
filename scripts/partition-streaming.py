@@ -40,7 +40,7 @@ def main():
     for sample in args.samples:
         print('== Starting {0} =='.format(sample))
         for n, read in enumerate(screed.open(sample)):
-            if n % 100 == 0:
+            if n % 500 == 0:
                 print (n, '...', sep='')
             if n > 0 and n % 10000 == 0:
                 write_stats(partitioner, args.stats_dir, n, sample)
