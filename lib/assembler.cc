@@ -395,7 +395,7 @@ const
 }
 
 // Starting from the given seed k-mer, assemble all maximal linear paths in
-// both directions, using labels to skip over tricky bits.
+// both directions, using junction counts to skip over tricky bits.
 StringVector JunctionCountAssembler::assemble(const Kmer seed_kmer,
         const Hashtable * stop_bf)
 const
