@@ -575,7 +575,6 @@ class TestLinearAssembler_RightBranching:
         asm = khmer.LinearAssembler(graph)
         path = asm.assemble(revcomp(contig[0:K]))
 
-
         assert len(path) == HDN.pos + K
         assert utils._equals_rc(path, contig[:len(path)])
 
@@ -680,7 +679,6 @@ class TestLinearAssembler_LeftBranching:
         stop_bf.count(L)          # ...and block original path
         path = asm.assemble(contig[-K:], stop_bf)
         assert len(path) == len(contig) - HDN.pos + 1
-
 
         # should be the tip k-kmer, plus the last base of the HDN thru
         # the end of the contig
