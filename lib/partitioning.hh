@@ -93,6 +93,10 @@ class GuardedKmerMap {
             return get(kmer) != NULL;
         }
 
+        uint64_t size() const {
+            return data.size();
+        }
+
 };
 
 
@@ -201,6 +205,10 @@ class StreamingPartitioner {
 
         uint64_t get_n_components() const {
             return components->size();
+        }
+
+        uint64_t get_n_tags() const {
+            return tag_component_map->size();
         }
 
         void merge_components(ComponentPtr& root, ComponentPtrSet& comps);

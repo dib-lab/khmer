@@ -75,7 +75,7 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
 #endif
     if(graph != NULL) {
         KmerIterator kmers(seq.c_str(), graph->ksize());
-        unsigned int since = 1;
+        unsigned int since = _tag_density / 2 + 1;
 
         std::set<HashIntoType> tags;
         std::set<HashIntoType> seen;
@@ -86,12 +86,14 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
         bool found_tag_in_territory = false;
 
         // First check if we overlap any tags
-        Kmer kmer = kmers.next();
-        tags.insert(kmer); //always tag the first k-mer
-        bool is_new_kmer = graph->test_and_set_bits(kmer);
-        search_from.push(kmer);
+        //Kmer kmer = kmers.next();
+        //tags.insert(kmer); //always tag the first k-mer
+        //bool is_new_kmer = graph->test_and_set_bits(kmer);
+        //search_from.push(kmer);
 
-        while(!kmers.done()) {
+        do {
+            Kmer kmer = kmers.next();
+            bool is_new_kmer = graph->test_and_set_bits(kmer);
             bool kmer_tagged = false;
 
             if (is_new_kmer) {
@@ -128,13 +130,18 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
                 tags.insert(kmer);
                 since = 1;
             }
+        } while (!kmers.done());
 
-            kmer = kmers.next();
-            is_new_kmer = graph->test_and_set_bits(kmer);
+        if (tags.size() == 0) {
+            // if no tags are found or seeded, add the middle k-mer
+            uint32_t start = (seq.length() - graph->ksize()) / 2;
+            std::string kmer = seq.substr(start, graph->ksize());
+            tags.insert(graph->hash_dna(kmer.c_str()));
         }
-        tags.insert(kmer);	// always tag the last k-mer
-        search_from.push(kmer);
-        intersection.clear();
+
+        //tags.insert(kmer);	// always tag the last k-mer
+        //search_from.push(kmer);
+        //intersection.clear();
 
 #if(DEBUG_SP)
         std::cout << "Done iterating k-mers" << std::endl;
