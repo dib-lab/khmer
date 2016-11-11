@@ -41,10 +41,10 @@ Contact: khmer-project@idyll.org
 
 #include "khmer.hh"
 #include "kmer_hash.hh"
-
-#include "labelhash.hh"
-#include "traversal.hh"
+#include "counting.hh"
 #include "kmer_filters.hh"
+#include "traversal.hh"
+#include "labelhash.hh"
 
 
 namespace khmer
@@ -74,11 +74,10 @@ class LabelHash;
  */
 class LinearAssembler
 {
-    friend class Hashgraph;
-    const Hashgraph * graph;
-    WordLength _ksize;
-
 public:
+
+    WordLength _ksize;
+    const Hashgraph * graph;
 
     explicit LinearAssembler(const Hashgraph * ht);
 
@@ -126,15 +125,16 @@ std::string LinearAssembler::_assemble_directed<RIGHT>(AssemblerTraverser<RIGHT>
  */
 class SimpleLabeledAssembler
 {
-    friend class Hashgraph;
     const LinearAssembler * linear_asm;
+
+public:
+
     const Hashgraph * graph;
     const LabelHash * lh;
     WordLength _ksize;
 
-public:
-
     explicit SimpleLabeledAssembler(const LabelHash * lh);
+    ~SimpleLabeledAssembler();
 
     StringVector assemble(const Kmer seed_kmer,
                           const Hashgraph * stop_bf=0) const;
@@ -145,5 +145,33 @@ public:
 
 };
 
-}
+
+class JunctionCountAssembler
+{
+    LinearAssembler linear_asm;
+    CountingHash * junctions;
+    Traverser traverser;
+
+public:
+
+    Hashgraph * graph;
+    WordLength _ksize;
+
+    explicit JunctionCountAssembler(Hashgraph * ht);
+    ~JunctionCountAssembler();
+
+
+    StringVector assemble(const Kmer seed_kmer,
+                          const Hashtable * stop_bf=0) const;
+
+    uint16_t consume(std::string sequence);
+    void count_junction(Kmer kmer_a, Kmer kmer_b);
+    BoundedCounterType get_junction_count(Kmer kmer_a, Kmer kmer_b) const;
+
+    template <bool direction>
+    void _assemble_directed(NonLoopingAT<direction>& start_cursor,
+                            StringVector& paths) const;
+
+};
+} //namespace khmer
 #endif
