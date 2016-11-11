@@ -246,13 +246,34 @@ class TestStreamingPartitionerBasic:
         for read in seq_reads:
             assert len(read) >= K
             sp.consume_sequence(read)
-
-        for seq in seqs:
-            # make sure we got the complete component
-            assert G.assemble_linear_path(seq[:K]) == seq
         assert sp.n_components == n_components
 
         comps = list(sp.components())
         comp = comps[0]
         assert len(comps) == n_components
         assert sp.n_components == (comp._n_created - comp._n_destroyed)
+        assert sp.n_consumed == len(seq_reads)
+
+    @pytest.mark.parametrize("n_components", list(range(1,101, 20)))
+    @pytest.mark.parametrize("cov", [1,10,20])
+    def test_write_components(self, random_sequence, cov, n_components, tmpdir):
+        outfn = tmpdir.join('counts.csv')
+        seqs = []
+        for _ in range(n_components):
+            seqs.append(random_sequence(exclude=''.join(seqs)))
+        G = khmer.Countgraph(K, 1e6, 4)
+        sp = _oxli.StreamingPartitioner(G)
+
+        for seq in seqs:
+            for _ in range(cov):
+                sp.consume_sequence(seq)
+        for seq in seqs:
+            (med, _, _) = G.get_median_count(seq)
+            assert med == cov
+        assert sp.n_components == n_components
+
+        sp.write_components(str(outfn))
+        results = [line.strip().split(',') for line in outfn.open()]
+        assert len(results) == n_components
+        for row in results:
+            assert abs(float(row[2])-float(cov)) < 2

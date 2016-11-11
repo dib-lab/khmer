@@ -3,6 +3,7 @@ from cython.operator cimport dereference as deref, preincrement as inc
 from libc.limits cimport UINT_MAX
 from libcpp.memory cimport unique_ptr, weak_ptr
 from libc.stdint cimport uintptr_t
+from libc.stdio cimport FILE, fopen, fwrite, fclose, stdout, stderr, fprintf
 
 from khmer._khmer import Countgraph
 from khmer._khmer import Nodegraph
@@ -51,6 +52,26 @@ cdef class Component:
         comp._this = ptr
         return comp
 
+    @staticmethod
+    cdef vector[BoundedCounterType] _tag_counts(ComponentPtr comp, CyHashtable * graph):
+        cdef uint64_t n_tags = deref(comp).get_n_tags()
+        cdef vector[BoundedCounterType] counts
+        counts = vector[BoundedCounterType](n_tags)
+        cdef int idx
+        cdef uint64_t tag
+        for idx, tag in deref(comp).tags:
+            counts[idx] = deref(graph).get_count(tag)
+        return counts
+
+    @staticmethod
+    cdef float _mean_tag_count(ComponentPtr comp, CyHashtable * graph):
+        cdef uint64_t n_tags = deref(comp).get_n_tags()
+        cdef float acc = 0
+        cdef uint64_t tag
+        for tag in deref(comp).tags:
+            acc += <float>deref(graph).get_count(tag)
+        return acc / <float>n_tags
+
 
 cdef class StreamingPartitioner:
 
@@ -58,6 +79,7 @@ cdef class StreamingPartitioner:
     cdef weak_ptr[ComponentPtrSet] _components
     cdef weak_ptr[GuardedKmerCompMap] _tag_component_map
     cdef CyHashtable * _graph_ptr
+    cdef readonly uint64_t n_consumed
 
     def __cinit__(self, graph):
         if not (isinstance(graph, Countgraph) or isinstance(graph, Nodegraph)):
@@ -71,9 +93,11 @@ cdef class StreamingPartitioner:
 
         self._tag_component_map = deref(self._this).get_tag_component_map()
         self._components = deref(self._this).get_component_set()
+        self.n_consumed = 0
 
     def consume_sequence(self, sequence):
         deref(self._this).consume_sequence(sequence.encode('utf-8'))
+        self.n_consumed += 1
 
     def get_tag_component(self, kmer):
         cdef ComponentPtr compptr
@@ -113,7 +137,32 @@ cdef class StreamingPartitioner:
         else:
             raise MemoryError("Can't locked underlying Component set")
 
+    def write_components(self, filename):
+        cdef FILE* fp
+        fp = fopen(filename.encode('utf-8'), 'wb')
+        if fp == NULL:
+            raise IOError("Can't open file.")
+        
+        cdef ComponentPtr cmpptr
+        cdef shared_ptr[ComponentPtrSet] locked
+        lockedptr = self._components.lock()
+
+        if lockedptr:      
+            it = deref(lockedptr).begin()
+            while it != deref(lockedptr).end():
+                cmpptr = deref(it)
+
+                fprintf(fp, "%u,%u,%f\n", 
+                        deref(cmpptr).component_id,
+                        deref(cmpptr).get_n_tags(),
+                        Component._mean_tag_count(cmpptr, self._graph_ptr))
+                inc(it)
+        fclose(fp)
+
     property n_components:
         def __get__(self):
             return deref(self._this).get_n_components()
         
+    property n_tags:
+        def __get__(self):
+            return deref(self._this).get_n_tags()

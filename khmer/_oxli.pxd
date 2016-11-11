@@ -18,6 +18,8 @@ cdef extern from "khmer.hh" namespace "khmer":
 cdef extern from "hashtable.hh" namespace "khmer":
     cdef cppclass CyHashtable "khmer::Hashtable":
         CyHashtable(WordLength)
+        const BoundedCounterType get_count(const char *) const
+        const BoundedCounterType get_count(HashIntoType) const
 
 
 cdef extern from "_khmer.hh":
@@ -69,7 +71,8 @@ cdef extern from "partitioning.hh" namespace "khmer":
         void find_connected_tags(queue[Kmer]&, 
                                  set[HashIntoType]&,
                                  set[HashIntoType]&) except +MemoryError
-        uint64_t get_n_components()
+        uint64_t get_n_components() const
+        uint64_t get_n_tags() const
 
         ComponentPtr get_tag_component(string&) const
         ComponentPtr get_nearest_component(string&) const
