@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 2016-11-10  Shannon EK Joslin	<sejoslin@ucdavis.edu>
    *khmer/tests/test_countgraph.py: Refactor test code to use load_countgraph #1474
    *khmer/tests/test_nodegraph.py: Refactor test code to use load_nodegraph and load_countgraph #1474
+=======
+2016-11-04  Tim Head  <betatim@gmail.com>
+
+   * Make khmer's Read type accessible from the python API.
+>>>>>>> 490bbb4da86def999e6f143936b5ee88729dacee
 
 2016-11-03  Titus Brown  <titus@idyll.org>
 
