@@ -47,6 +47,7 @@ Contact: khmer-project@idyll.org
 
 #include "hashtable.hh"
 #include "khmer.hh"
+#include "traversal.hh"
 #include "read_parsers.hh"
 
 using namespace std;
