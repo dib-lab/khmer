@@ -537,4 +537,45 @@ const
     return posns;
 }
 
+class MurmurKmerHashIterator : public KmerHashIterator
+{
+    const char * _seq;
+    const char _ksize;
+    unsigned int index;
+    unsigned int length;
+public:
+    MurmurKmerHashIterator(const char * seq, unsigned char k) :
+        _seq(seq), _ksize(k) {
+        index = 0;
+        length = strlen(_seq);
+    };
+
+    HashIntoType first() { return next(); }
+
+    HashIntoType next() {
+        if (done()) {
+            throw khmer_exception("past end of iterator");
+        }
+        uint64_t out[2];
+        uint32_t seed = 0;
+        MurmurHash3_x64_128((void *)(_seq + index), _ksize, seed, &out);
+
+        index += 1;
+
+        return out[0];
+    }
+
+    bool done() const {
+        return (index + _ksize >= length);
+    }
+
+    unsigned int get_start_pos() const { return index; }
+    unsigned int get_end_pos() const { return index + _ksize; }
+};
+
+KmerHashIterator * Counttable::new_kmer_iterator(const char * sp) const {
+    KmerHashIterator * ki = new MurmurKmerHashIterator(sp, _ksize);
+    return ki;
+}
+
 // vim: set sts=2 sw=2:

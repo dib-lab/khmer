@@ -38,7 +38,6 @@ Contact: khmer-project@idyll.org
 #ifndef HASHTABLE_HH
 #define HASHTABLE_HH
 
-
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -50,6 +49,7 @@ Contact: khmer-project@idyll.org
 #include <set>
 #include <string>
 #include <vector>
+#include "MurmurHash3.h"
 
 #include "khmer.hh"
 #include "khmer_exception.hh"
@@ -287,7 +287,11 @@ public:
     virtual
     HashIntoType
     hash_dna(const char * kmer) const {
-        return _hash(kmer, _ksize);
+        uint64_t out[2];
+        uint32_t seed = 0;
+        MurmurHash3_x64_128((void *)kmer, _ksize, seed, &out);
+
+        return out[0];
     }
 
     inline virtual HashIntoType
@@ -305,7 +309,7 @@ public:
         throw khmer_exception("not implemented");
     }
 
-    // virtual KmerIterator * new_kmer_iterator(const char * sp) const;
+    virtual KmerHashIterator * new_kmer_iterator(const char * sp) const;
 };
 
 // Hashtable-derived class with BitStorage.

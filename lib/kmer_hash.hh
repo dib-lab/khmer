@@ -364,6 +364,12 @@ public:
     }
 }; // class KmerIterator
 
+//
+// KmerHashIterator - analogous to KmerIterator classes, but returns only
+// only HashIntoType hashes, not full Kmer objects.  This supports irreversible
+// hashing.
+//
+
 class KmerHashIterator {
 public:
     virtual HashIntoType first() = 0;
@@ -371,7 +377,10 @@ public:
     virtual bool done() const = 0;
     virtual unsigned int get_start_pos() const = 0;
     virtual unsigned int get_end_pos() const = 0;
+    virtual ~KmerHashIterator() { };
 };
+
+// TwoBitKmerHashIterator -- just wrap KmerIterator.
 
 class TwoBitKmerHashIterator : public KmerHashIterator {
 protected:
