@@ -148,29 +148,9 @@ static bool convert_PyObject_to_HashIntoType(PyObject * value,
 {
     if (PyInt_Check(value) || PyLong_Check(value)) {
         return convert_PyLong_to_HashIntoType(value, hashval);
-    } else if (PyUnicode_Check(value))  {
-        std::string s = PyBytes_AsString(PyUnicode_AsEncodedString(
-                                             value, "utf-8", "strict"));
-        if (strlen(s.c_str()) != ksize) {
-            PyErr_SetString(PyExc_ValueError,
-                            "k-mer length must equal the k-mer size");
-            return false;
-        }
-        hashval = _hash(s, ksize);
-        return true;
-
-    } else if (PyBytes_Check(value)) {
-        std::string s = PyBytes_AsString(value);
-        if (strlen(s.c_str()) != ksize) {
-            PyErr_SetString(PyExc_ValueError,
-                            "k-mer length must equal the k-mer size");
-            return false;
-        }
-        hashval = _hash(s, ksize);
-        return true;
     } else {
         PyErr_SetString(PyExc_ValueError,
-                        "k-mers must be either a hash or a string");
+                        "must use a hash");
         return false;
     }
 }
