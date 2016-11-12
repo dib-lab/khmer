@@ -110,6 +110,14 @@ protected:
     explicit Hashtable(const Hashtable&);
     Hashtable& operator=(const Hashtable&);
 
+    virtual KmerIterator * new_kmer_iterator(const char * sp) const {
+        KmerIterator * ki = new KmerIterator(sp, _ksize);
+        return ki;
+    }
+    virtual KmerIterator * new_kmer_iterator(const std::string& s) const {
+        return new_kmer_iterator(s.c_str());
+    }
+
 public:
     // accessor to get 'k'
     const WordLength ksize() const
@@ -274,6 +282,28 @@ class Counttable : public khmer::Hashtable
 public:
     explicit Counttable(WordLength ksize, std::vector<uint64_t> sizes)
         : Hashtable(ksize, new ByteStorage(sizes)) { } ;
+
+    inline
+    virtual
+    HashIntoType
+    hash_dna(const char * kmer) const {
+        return _hash(kmer, _ksize);
+    }
+
+    inline virtual HashIntoType
+    hash_dna_top_strand(const char * kmer) const {
+        throw khmer_exception("not implemented");
+    }
+
+    inline virtual HashIntoType
+    hash_dna_bottom_strand(const char * kmer) const {
+        throw khmer_exception("not implemented");
+    }
+
+    inline virtual std::string
+    unhash_dna(HashIntoType hashval) const {
+        throw khmer_exception("not implemented");
+    }
 };
 
 // Hashtable-derived class with BitStorage.
