@@ -158,7 +158,7 @@ unsigned int Hashtable::consume_string(const std::string &s)
 {
     unsigned int n_consumed = 0;
 
-    KmerIterator * kmers = new_kmer_iterator(s);
+    KmerHashIterator * kmers = new_kmer_iterator(s);
 
     while(!kmers->done()) {
         HashIntoType kmer = kmers->next();
@@ -211,7 +211,7 @@ void Hashtable::get_median_count(const std::string &s,
 bool Hashtable::median_at_least(const std::string &s,
                                 unsigned int cutoff)
 {
-    KmerIterator * kmers = new_kmer_iterator(s);
+    KmerHashIterator * kmers = new_kmer_iterator(s);
     unsigned int min_req = 0.5 + float(s.size() - _ksize + 1) / 2;
     unsigned int num_cutoff_kmers = 0;
 
@@ -260,7 +260,7 @@ void Hashtable::get_kmers(const std::string &s,
 void Hashtable::get_kmer_hashes(const std::string &s,
                                 std::vector<HashIntoType> &kmers_vec) const
 {
-    KmerIterator * kmers = new_kmer_iterator(s);
+    KmerHashIterator * kmers = new_kmer_iterator(s);
 
     while(!kmers->done()) {
         HashIntoType kmer = kmers->next();
@@ -273,7 +273,7 @@ void Hashtable::get_kmer_hashes(const std::string &s,
 void Hashtable::get_kmer_hashes_as_hashset(const std::string &s,
         SeenSet& hashes) const
 {
-    KmerIterator * kmers = new_kmer_iterator(s);
+    KmerHashIterator * kmers = new_kmer_iterator(s);
 
     while(!kmers->done()) {
         HashIntoType kmer = kmers->next();
@@ -286,7 +286,7 @@ void Hashtable::get_kmer_hashes_as_hashset(const std::string &s,
 void Hashtable::get_kmer_counts(const std::string &s,
                                 std::vector<BoundedCounterType> &counts) const
 {
-    KmerIterator * kmers = new_kmer_iterator(s);
+    KmerHashIterator * kmers = new_kmer_iterator(s);
 
     while(!kmers->done()) {
         HashIntoType kmer = kmers->next();
@@ -298,7 +298,7 @@ void Hashtable::get_kmer_counts(const std::string &s,
 
 BoundedCounterType Hashtable::get_min_count(const std::string &s)
 {
-    KmerIterator * kmers = new_kmer_iterator(s);
+    KmerHashIterator * kmers = new_kmer_iterator(s);
 
     BoundedCounterType min_count = MAX_KCOUNT;
 
@@ -317,7 +317,7 @@ BoundedCounterType Hashtable::get_min_count(const std::string &s)
 
 BoundedCounterType Hashtable::get_max_count(const std::string &s)
 {
-    KmerIterator * kmers = new_kmer_iterator(s);
+    KmerHashIterator * kmers = new_kmer_iterator(s);
 
     BoundedCounterType max_count = 0;
 
@@ -366,7 +366,7 @@ Hashtable::abundance_distribution(
         seq = read.sequence;
 
         if (check_and_normalize_read(seq)) {
-            KmerIterator * kmers = new_kmer_iterator(seq);
+            KmerHashIterator * kmers = new_kmer_iterator(seq);
 
             while(!kmers->done()) {
                 HashIntoType kmer = kmers->next();
@@ -409,7 +409,7 @@ const
         return 0;
     }
 
-    KmerIterator * kmers = new_kmer_iterator(seq);
+    KmerHashIterator * kmers = new_kmer_iterator(seq);
 
     HashIntoType kmer;
 
@@ -448,7 +448,7 @@ const
         return 0;
     }
 
-    KmerIterator * kmers = new_kmer_iterator(seq);
+    KmerHashIterator * kmers = new_kmer_iterator(seq);
 
     HashIntoType kmer;
 
@@ -488,7 +488,7 @@ const
         throw khmer_exception("invalid read");
     }
 
-    KmerIterator * kmers = new_kmer_iterator(seq);
+    KmerHashIterator * kmers = new_kmer_iterator(seq);
 
     HashIntoType kmer = kmers->next();
     if (kmers->done()) {

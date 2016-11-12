@@ -110,11 +110,11 @@ protected:
     explicit Hashtable(const Hashtable&);
     Hashtable& operator=(const Hashtable&);
 
-    virtual KmerIterator * new_kmer_iterator(const char * sp) const {
-        KmerIterator * ki = new KmerIterator(sp, _ksize);
+    virtual KmerHashIterator * new_kmer_iterator(const char * sp) const {
+        KmerHashIterator * ki = new TwoBitKmerHashIterator(sp, _ksize);
         return ki;
     }
-    virtual KmerIterator * new_kmer_iterator(const std::string& s) const {
+    virtual KmerHashIterator * new_kmer_iterator(const std::string& s) const {
         return new_kmer_iterator(s.c_str());
     }
 
@@ -304,6 +304,8 @@ public:
     unhash_dna(HashIntoType hashval) const {
         throw khmer_exception("not implemented");
     }
+
+    // virtual KmerIterator * new_kmer_iterator(const char * sp) const;
 };
 
 // Hashtable-derived class with BitStorage.
