@@ -287,6 +287,9 @@ public:
     virtual
     HashIntoType
     hash_dna(const char * kmer) const {
+        if (!(strlen(kmer) >= _ksize)) {
+            throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
+        }
         uint64_t out[2];
         uint32_t seed = 0;
         MurmurHash3_x64_128((void *)kmer, _ksize, seed, &out);
