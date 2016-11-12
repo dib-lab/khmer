@@ -1,3 +1,8 @@
+2016-11-11  Titus Brown  <titus@idyll.org>
+
+  * doc/requirements.txt: set autoprogram version requirements to something
+  that works on python 2.7, in order to fix ReadTheDocs builds.
+
 2016-11-10  Camille Scott  <camille.scott.w@gmail.com>
 
   * lib/assembler.{hh,cc}: add JunctionCountAssembler implementation.
