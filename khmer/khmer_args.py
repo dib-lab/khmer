@@ -42,6 +42,7 @@ import sys
 import argparse
 import math
 import textwrap
+import psutil
 from argparse import _VersionAction
 from collections import namedtuple
 
@@ -375,12 +376,15 @@ def build_graph_args(descr=None, epilog=None, parser=None):
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--max-tablesize', '-x', type=float,
                        default=DEFAULT_MAX_TABLESIZE,
-                       help='upper bound on tablesize to use; overrides ' +
+                       help='upper bound on tablesize to use; overrides '
                        '--max-memory-usage/-M')
-    group.add_argument('-M', '--max-memory-usage', type=memory_setting,
-                       help='maximum amount of memory to use for data ' +
+    group.add_argument('-M', '--max-memory-usage', type=float,
+                       help='maximum amount of memory to use for data '
                        'structure')
-
+    group.add_argument('-a', '--auto-mem', action='store_true',
+                       help='automagically allocate memory for data structure;'
+                       ' use 80%% of available memory or 16GB, whichever is '
+                       'smaller')
     return parser
 
 
@@ -404,18 +408,22 @@ def add_loadgraph_args(parser):
                         help='load a precomputed k-mer graph from disk')
 
 
-def calculate_graphsize(args, graphtype, multiplier=1.0):
+def calculate_graphsize(args, graphtype, multiplier=1.0, _sysmem=None):
     """Transform the table parameters into a size."""
     if graphtype not in ('countgraph', 'nodegraph'):
         raise ValueError("unknown graph type: %s" % (graphtype,))
 
     if args.max_memory_usage:
-        if graphtype == 'countgraph':
-            tablesize = args.max_memory_usage / args.n_tables / \
-                float(multiplier)
-        elif graphtype == 'nodegraph':
-            tablesize = 8. * args.max_memory_usage / args.n_tables / \
-                float(multiplier)
+        tablesize = args.max_memory_usage / args.n_tables / float(multiplier)
+        if graphtype == 'nodegraph':
+            tablesize *= 8.0
+    elif args.auto_mem:
+        if _sysmem is None:
+            _sysmem = psutil.virtual_memory().available
+        avail = min(_sysmem * 0.8, 16 * (1000 ** 3))
+        tablesize = avail / args.n_tables / float(multiplier)
+        if graphtype == 'nodegraph':
+            tablesize *= 8.0
     else:
         tablesize = args.max_tablesize
 
@@ -443,7 +451,7 @@ def create_nodegraph(args, ksize=None, multiplier=1.0, fp_rate=0.01):
         print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
         sys.exit(1)
 
-    tablesize = calculate_graphsize(args, 'nodegraph', multiplier)
+    tablesize = calculate_graphsize(args, 'nodegraph', multiplier=multiplier)
     return khmer.Nodegraph(ksize, tablesize, args.n_tables)
 
 
