@@ -432,15 +432,21 @@ Read_set_cleaned_seq(khmer_Read_Object *obj, PyObject *value, void *closure)
         return -1;
     }
 
-    PyObject* temp = PyUnicode_AsASCIIString(value);
-    if (temp == NULL) {
-        PyErr_SetString(PyExc_TypeError,
-                        "Could not encode 'cleaned_seq' as ASCII.");
-        return -1;
-    }
+    if (PyUnicode_Check(value)) {
+        PyObject* temp = PyUnicode_AsASCIIString(value);
+        if (temp == NULL) {
+            PyErr_SetString(PyExc_TypeError,
+                            "Could not encode 'cleaned_seq' as ASCII.");
+            return -1;
+        }
 
-    obj->read->cleaned_seq = std::string(PyBytes_AS_STRING(temp));
-    Py_DECREF(temp);
+        obj->read->cleaned_seq = std::string(PyBytes_AS_STRING(temp));
+        Py_DECREF(temp);
+    }
+    // in python2 not everything is a unicode object
+    else {
+        obj->read->cleaned_seq = std::string(PyBytes_AS_STRING(value));
+    }
 
     return 0;
 }
