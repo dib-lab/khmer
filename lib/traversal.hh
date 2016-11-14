@@ -218,6 +218,7 @@ public:
                        KmerFilter filter);
 
     void push_filter(KmerFilter filter);
+    KmerFilter pop_filter();
 
     unsigned int traverse(const Kmer& node,
                           KmerQueue& node_q) const;

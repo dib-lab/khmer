@@ -213,6 +213,12 @@ void Traverser::push_filter(KmerFilter filter)
     right_gatherer.push_filter(filter);
 }
 
+KmerFilter Traverser::pop_filter()
+{
+    left_gatherer.pop_filter();
+    return right_gatherer.pop_filter();
+}
+
 
 unsigned int Traverser::traverse(const Kmer& node,
                                  KmerQueue& node_q) const
