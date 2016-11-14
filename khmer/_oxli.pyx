@@ -63,6 +63,11 @@ cdef class Component:
         return counts
 
     @staticmethod
+    def tag_counts(Component component, graph):
+        cdef CyCpHashtable_Object* graph_ptr = <CyCpHashtable_Object*> graph
+        return Component._tag_counts(component._this, deref(graph_ptr).hashtable)
+
+    @staticmethod
     cdef float _mean_tag_count(ComponentPtr comp, CyHashtable * graph):
         cdef uint64_t n_tags = deref(comp).get_n_tags()
         cdef float acc = 0
@@ -97,6 +102,9 @@ cdef class StreamingPartitioner:
     def consume_sequence(self, sequence):
         deref(self._this).consume_sequence(sequence.encode('utf-8'))
         self.n_consumed += 1
+
+    def consume_fasta(self, filename):
+        return deref(self._this).consume_fasta(filename.encode('utf-8'))
 
     def get_tag_component(self, kmer):
         cdef ComponentPtr compptr
