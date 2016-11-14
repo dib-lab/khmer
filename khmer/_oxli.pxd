@@ -14,6 +14,7 @@ cdef extern from "khmer.hh" namespace "khmer":
     ctypedef unsigned char WordLength
     ctypedef unsigned short int BoundedCounterType
     ctypedef queue[Kmer] KmerQueue
+    ctypedef bool (*KmerFilter) (Kmer kmer)
 
 
 cdef extern from "hashtable.hh" namespace "khmer":
@@ -41,12 +42,20 @@ cdef extern from "kmer_hash.hh" namespace "khmer":
         bool is_forward() const
 
 
-
-
 cdef extern from "traversal.hh":
-    cdef cppclass CyLeftNodeGatherer "khmer::NodeGatherer<0>":
+    cdef cppclass CyTraverser "khmer::Traverser":
         CyLeftNodeGatherer(CyHashtable *)
-        void push_filter()
+
+        void push_filter(KmerFilter)
+        KmerFilter pop_filter()
+    
+        uint32_t traverse(const Kmer&, KmerQueue&) const
+        uint32_t traverse_left(const Kmer&, KmerQueue&) const     
+        uint32_t traverse_right(const Kmer&, KmerQueue&) const
+
+        uint32_t degree(const Kmer&) const
+        uint32_t degree_left(const Kmer&) const
+        uint32_t degree_right(const Kmer&) const
 
 
 cdef extern from "partitioning.hh" namespace "khmer":

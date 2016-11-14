@@ -428,6 +428,7 @@ static CYTHON_INLINE float __PYX_NAN() {
 #include "hashtable.hh"
 #include "_khmer.hh"
 #include "kmer_hash.hh"
+#include "traversal.hh"
 #include "partitioning.hh"
 #include <limits.h>
 #include <stdio.h>
@@ -1210,8 +1211,8 @@ static const char __pyx_k_Can_t_open_file[] = "Can't open file.";
 static const char __pyx_k_Component___iter[] = "Component.__iter__";
 static const char __pyx_k_NotImplementedError[] = "NotImplementedError";
 static const char __pyx_k_Operator_not_available[] = "Operator not available.";
-static const char __pyx_k_work_khmer_khmer__oxli_pyx[] = "/work/khmer/khmer/_oxli.pyx";
 static const char __pyx_k_StreamingPartitioner_components[] = "StreamingPartitioner.components";
+static const char __pyx_k_Users_camille_w_khmer_khmer__ox[] = "/Users/camille/w/khmer/khmer/_oxli.pyx";
 static const char __pyx_k_Can_t_locked_underlying_Componen[] = "Can't locked underlying Component set";
 static const char __pyx_k_Must_take_an_object_with_Hashtab[] = "Must take an object with Hashtable *";
 static const char __pyx_k_StreamingPartitioner_tag_compone[] = "StreamingPartitioner.tag_components";
@@ -1227,6 +1228,7 @@ static PyObject *__pyx_n_s_NotImplementedError;
 static PyObject *__pyx_kp_s_Operator_not_available;
 static PyObject *__pyx_n_s_StreamingPartitioner_components;
 static PyObject *__pyx_n_s_StreamingPartitioner_tag_compone;
+static PyObject *__pyx_kp_s_Users_camille_w_khmer_khmer__ox;
 static PyObject *__pyx_n_s_ValueError;
 static PyObject *__pyx_n_s_args;
 static PyObject *__pyx_n_s_close;
@@ -1251,7 +1253,6 @@ static PyObject *__pyx_n_s_tag_counts;
 static PyObject *__pyx_n_s_test;
 static PyObject *__pyx_n_s_throw;
 static PyObject *__pyx_kp_s_utf_8;
-static PyObject *__pyx_kp_s_work_khmer_khmer__oxli_pyx;
 static int __pyx_pf_5khmer_5_oxli_9Component___cinit__(struct __pyx_obj_5khmer_5_oxli_Component *__pyx_v_self, struct __pyx_obj_5khmer_5_oxli_Component *__pyx_v_other); /* proto */
 static PyObject *__pyx_pf_5khmer_5_oxli_9Component_12component_id___get__(struct __pyx_obj_5khmer_5_oxli_Component *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5khmer_5_oxli_9Component_10_n_created___get__(struct __pyx_obj_5khmer_5_oxli_Component *__pyx_v_self); /* proto */
@@ -4467,6 +4468,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_Operator_not_available, __pyx_k_Operator_not_available, sizeof(__pyx_k_Operator_not_available), 0, 0, 1, 0},
   {&__pyx_n_s_StreamingPartitioner_components, __pyx_k_StreamingPartitioner_components, sizeof(__pyx_k_StreamingPartitioner_components), 0, 0, 1, 1},
   {&__pyx_n_s_StreamingPartitioner_tag_compone, __pyx_k_StreamingPartitioner_tag_compone, sizeof(__pyx_k_StreamingPartitioner_tag_compone), 0, 0, 1, 1},
+  {&__pyx_kp_s_Users_camille_w_khmer_khmer__ox, __pyx_k_Users_camille_w_khmer_khmer__ox, sizeof(__pyx_k_Users_camille_w_khmer_khmer__ox), 0, 0, 1, 0},
   {&__pyx_n_s_ValueError, __pyx_k_ValueError, sizeof(__pyx_k_ValueError), 0, 0, 1, 1},
   {&__pyx_n_s_args, __pyx_k_args, sizeof(__pyx_k_args), 0, 0, 1, 1},
   {&__pyx_n_s_close, __pyx_k_close, sizeof(__pyx_k_close), 0, 0, 1, 1},
@@ -4491,11 +4493,10 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
   {&__pyx_n_s_throw, __pyx_k_throw, sizeof(__pyx_k_throw), 0, 0, 1, 1},
   {&__pyx_kp_s_utf_8, __pyx_k_utf_8, sizeof(__pyx_k_utf_8), 0, 0, 1, 0},
-  {&__pyx_kp_s_work_khmer_khmer__oxli_pyx, __pyx_k_work_khmer_khmer__oxli_pyx, sizeof(__pyx_k_work_khmer_khmer__oxli_pyx), 0, 0, 1, 0},
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(0, 68, __pyx_L1_error)
+  __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(0, 85, __pyx_L1_error)
   __pyx_builtin_staticmethod = __Pyx_GetBuiltinName(__pyx_n_s_staticmethod); if (!__pyx_builtin_staticmethod) __PYX_ERR(1, 65, __pyx_L1_error)
   __pyx_builtin_NotImplementedError = __Pyx_GetBuiltinName(__pyx_n_s_NotImplementedError); if (!__pyx_builtin_NotImplementedError) __PYX_ERR(1, 46, __pyx_L1_error)
   __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(1, 90, __pyx_L1_error)
@@ -4630,7 +4631,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__11 = PyTuple_Pack(3, __pyx_n_s_component, __pyx_n_s_graph, __pyx_n_s_graph_ptr); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(1, 66, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__11);
   __Pyx_GIVEREF(__pyx_tuple__11);
-  __pyx_codeobj__12 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__11, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_work_khmer_khmer__oxli_pyx, __pyx_n_s_tag_counts, 66, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__12)) __PYX_ERR(1, 66, __pyx_L1_error)
+  __pyx_codeobj__12 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__11, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_camille_w_khmer_khmer__ox, __pyx_n_s_tag_counts, 66, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__12)) __PYX_ERR(1, 66, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
