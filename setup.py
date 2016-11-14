@@ -188,7 +188,6 @@ CP_EXTENSION_MOD_DICT = \
 EXTENSION_MODS = [Extension("khmer._khmer", ** CP_EXTENSION_MOD_DICT)]
 
 for cython_ext in glob.glob(os.path.join("khmer", "_oxli", "*.pyx")):
-    print('ext for', cython_ext)
     CY_EXTENSION_MOD_DICT = \
         {
             "sources": [cython_ext],
@@ -202,7 +201,6 @@ for cython_ext in glob.glob(os.path.join("khmer", "_oxli", "*.pyx")):
         }
     
     ext_name = "khmer._oxli.{0}".format(splitext(os.path.basename(cython_ext))[0])
-    print('Extension name:', ext_name)
     CY_EXTENSION_MOD = Extension(ext_name, ** CY_EXTENSION_MOD_DICT)
     EXTENSION_MODS.append(CY_EXTENSION_MOD)
 

@@ -38,9 +38,10 @@
 # `SHELL=bash` Will break Titus's laptop, so don't use BASH-isms like
 # `[[` conditional expressions.
 CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc) setup.py
+CYSOURCES=$(wildcard khmer/_oxli/*.pyx khmer/_oxli/*.pxd)
 PYSOURCES=$(filter-out khmer/_version.py, \
 	  $(wildcard khmer/*.py scripts/*.py oxli/*.py) )
-SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
+SOURCES=$(PYSOURCES) $(CPPSOURCES) $(CYSOURCES) setup.py
 
 DEVPKGS=pep8==1.6.2 diff_cover autopep8 pylint coverage gcovr pytest \
 	pydocstyle screed pyenchant cython
@@ -83,7 +84,7 @@ endif
 MODEXT=$(shell python -c \
        "import sysconfig;print(sysconfig.get_config_var('SO'))")
 EXTENSION_MODULE = khmer/_khmer$(MODEXT)
-CYTHON_MODULE = khmer/_oxli$(MODEXT)
+CYTHON_MODULE = khmer/_oxli/_oxli$(MODEXT)
 
 PYLINT_TEMPLATE="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"
 
@@ -103,12 +104,12 @@ install-dependencies:
 	pip install --upgrade --requirement doc/requirements.txt
 
 ## sharedobj   : build khmer shared object file
-sharedobj: $(EXTENSION_MODULE)
+sharedobj: $(EXTENSION_MODULE) $(CYTHON_MODULE)
 
 $(EXTENSION_MODULE): $(CPPSOURCES)
 	./setup.py build_ext --inplace
 
-$(CYTHON_MODULE): $(CPPSOURCES)
+$(CYTHON_MODULE): $(CPPSOURCES) $(CYSOURCES)
 	./setup.py build_ext --inplace
 
 coverage-debug: $(CPPSOURCES)
