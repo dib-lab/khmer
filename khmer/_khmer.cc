@@ -42,10 +42,8 @@ Contact: khmer-project@idyll.org
 
 // Must be first.
 #include <Python.h>
-#include "structmember.h"
 
 #include <iostream>
-#include <vector>
 
 #include "khmer.hh"
 #include "kmer_hash.hh"
