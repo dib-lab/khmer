@@ -88,7 +88,11 @@ def main():
         count = ht.get_median_count(record.sequence)[0]
         if count:
             m += 1
-            outfp.write('>%s\n%s\n' % (record.name, record.sequence))
+            if hasattr(record, 'quality'):
+                outfp.write('@%s\n%s\n+\n%s\n' % (record.name, record.sequence,
+                                                  record.quality))
+            else:
+                outfp.write('>%s\n%s\n' % (record.name, record.sequence))
         n += 1
 
 if __name__ == '__main__':
