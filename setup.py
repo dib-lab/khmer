@@ -38,6 +38,7 @@
 
 import ez_setup
 
+import glob
 import os
 import sys
 from os import listdir as os_listdir
@@ -165,7 +166,7 @@ SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
 EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11', '-pedantic']
 EXTRA_LINK_ARGS = []
 
-if sys.platform == 'darwin':
+if sys.platform == 'darwin' and 'clang' in os.getenv('CC', 'cc'):
     # force 64bit only builds
     EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64', '-mmacosx-version-min=10.7',
                                '-stdlib=libc++'])
@@ -186,27 +187,24 @@ CP_EXTENSION_MOD_DICT = \
 
 EXTENSION_MODS = [Extension("khmer._khmer", ** CP_EXTENSION_MOD_DICT)]
 
-CY_EXTENSION_MOD_DICT = \
-    {
-        "sources": ["khmer/_oxli.pyx"],
-        "extra_compile_args": EXTRA_COMPILE_ARGS,
-        "extra_link_args": EXTRA_LINK_ARGS,
-        "extra_objects": [path_join(build_dir(), splitext(p)[0]+'.o')  for p in SOURCES],
-        "depends": [],
-        "language": "c++",
-        "define_macros": [("VERSION", versioneer.get_version()), ],
-    }
-
-'''
-CY_EXT_MOD_DICT = dict(EXTENSION_MOD_DICT)
-CY_EXT_MOD_DICT['sources'].insert(0, "khmer/_oxli.pyx")
-CY_EXT_MOD_DICT['sources'].insert(1, "khmer/_khmer.cc")
-CY_EXT_MOD_DICT['sources'].append(path_join("lib", "partitioning.cc"))
-CY_EXT_MOD_DICT['depends'].append(path_join("lib", "partitioning.hh"))
-'''
-CY_EXTENSION_MOD = Extension("khmer._oxli", ** CY_EXTENSION_MOD_DICT)
-#EXTENSION_MODS.extend(cythonize([CY_EXTENSION_MOD]))
-EXTENSION_MODS.append(CY_EXTENSION_MOD)
+for cython_ext in glob.glob(os.path.join("khmer", "_oxli", "*.pyx")):
+    print('ext for', cython_ext)
+    CY_EXTENSION_MOD_DICT = \
+        {
+            "sources": [cython_ext],
+            "extra_compile_args": EXTRA_COMPILE_ARGS,
+            "extra_link_args": EXTRA_LINK_ARGS,
+            "extra_objects": [path_join(build_dir(), splitext(p)[0]+'.o')  for p in SOURCES],
+            "depends": [],
+            "include_dirs": ["khmer", "lib"],
+            "language": "c++",
+            "define_macros": [("VERSION", versioneer.get_version()), ],
+        }
+    
+    ext_name = "khmer._oxli.{0}".format(splitext(os.path.basename(cython_ext))[0])
+    print('Extension name:', ext_name)
+    CY_EXTENSION_MOD = Extension(ext_name, ** CY_EXTENSION_MOD_DICT)
+    EXTENSION_MODS.append(CY_EXTENSION_MOD)
 
 
 SCRIPTS = []
