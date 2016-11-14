@@ -197,6 +197,7 @@ class StreamingPartitioner {
         explicit StreamingPartitioner(Hashtable * graph);
 
         void consume_sequence(const std::string& seq);
+        uint64_t consume_fasta(std::string const &filename);
         void map_tags_to_component(std::set<HashIntoType>& tags, ComponentPtr& comp);
         void find_connected_tags(KmerQueue& node_q,
                                  std::set<HashIntoType>& found_tags,

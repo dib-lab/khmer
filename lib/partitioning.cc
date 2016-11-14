@@ -11,6 +11,7 @@
 #include "partitioning.hh"
 
 using namespace khmer;
+using namespace khmer::read_parsers;
 
 uint64_t Component::n_created = 0;
 uint64_t Component::n_destroyed = 0;
@@ -60,6 +61,36 @@ void StreamingPartitioner::map_tags_to_component(std::set<HashIntoType>& tags,
         tag_component_map->set(tag, comp);
         comp->add_tag(tag);
     }
+}
+
+
+uint64_t StreamingPartitioner::consume_fasta(const std::string& filename)
+{
+    std::unique_ptr<IParser> parser = std::unique_ptr<IParser>(IParser::get_parser(filename));
+    Read read;
+    uint64_t n_invalid = 0;
+    uint64_t n_consumed = 0;
+
+    while (!parser->is_complete()) {
+        if (n_consumed && (n_consumed % 10000 == 0)) {
+            std::cout << "consumed " << n_consumed << "..." << std::endl;
+        }
+        try {
+            read = parser->get_next_read( );
+        } catch (NoMoreReadsAvailable) {
+            break;
+        }
+
+        bool is_valid = graph->check_and_normalize_read(read.sequence);
+        if (is_valid) {
+            consume_sequence(read.sequence);
+        } else {
+            n_invalid++;
+        }
+        n_consumed++;
+    }
+
+    return n_invalid;
 }
 
 
