@@ -54,14 +54,8 @@ namespace khmer
 {
 class Hashbits;
 
-namespace read_parsers
-{
-struct IParser;
-}  // namespace read_parsers
-}  // namespace khmer
+using read_parsers::IParser;
 
-namespace khmer
-{
 class CountingHash : public khmer::Hashgraph
 {
 public:

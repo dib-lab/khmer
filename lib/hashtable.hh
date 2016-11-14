@@ -56,8 +56,6 @@ Contact: khmer-project@idyll.org
 #include "kmer_hash.hh"
 #include "read_parsers.hh"
 #include "storage.hh"
-
-#include "traversal.hh"
 #include "subset.hh"
 
 namespace khmer

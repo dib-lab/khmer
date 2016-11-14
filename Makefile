@@ -98,7 +98,7 @@ install-dep: install-dependencies
 
 install-dependencies:
 	pip install git+https://github.com/dib-lab/screed.git
-	pip install --upgrade $(DEVPKGS)
+	pip install --upgrade --ignore-installed $(DEVPKGS)
 	pip install --upgrade --requirement doc/requirements.txt
 
 ## sharedobj   : build khmer shared object file
@@ -137,8 +137,8 @@ clean: FORCE
 
 debug: FORCE
 	export CFLAGS="-pg -fprofile-arcs -D_GLIBCXX_DEBUG_PEDANTIC \
-		-D_GLIBCXX_DEBUG"; python setup.py build_ext --debug \
-		--inplace
+		-D_GLIBCXX_DEBUG -DDEBUG_ASSEMBLY=1 -DDEBUG_FILTERS=1"; python setup.py build_ext --debug \
+		--inplace 
 
 ## doc         : render documentation in HTML
 doc: build/sphinx/html/index.html

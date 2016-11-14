@@ -1,7 +1,38 @@
-
-2016-11-10  Shannon EK Joslin	<sejoslin@ucdavis.edu>
+2016-11-14  Shannon EK Joslin	<sejoslin@ucdavis.edu>
    *khmer/tests/test_countgraph.py: Refactor test code to use load_countgraph #1474
    *khmer/tests/test_nodegraph.py: Refactor test code to use load_nodegraph and load_countgraph #1474
+
+2016-11-14  Tim Head  <betatim@gmail.com>
+
+  * .travis.yml: whitelist `master` branch to allow build-on-push without
+  building every push for a PR twice.
+
+2016-11-11  Titus Brown  <titus@idyll.org>
+
+  * doc/requirements.txt: set autoprogram version requirements to something
+  that works on python 2.7, in order to fix ReadTheDocs builds.
+
+2016-11-10  Camille Scott  <camille.scott.w@gmail.com>
+
+  * lib/assembler.{hh,cc}: add JunctionCountAssembler implementation.
+  * lib/kmer_filters.{hh,cc}: add get junction_count_filter function.
+  * khmer/{__init__.py,_khmer.cc}: add LinearAssembler,
+  SimpleLabeledAssembler, and JunctionCountAssembler to CPython interface.
+  * tests/test_assembly.py: minor refactoring, & tests for
+  JunctionCountAssembler and newly exposed C++ functions.
+  * sandbox/streaming-assembly-simple.py: demo script for streaming assembly.
+  * Makefile: update debug flags.
+  * lib/{counting.hh,hashtable.{hh,cc},hllcounter.hh,labelhash.hh,
+  read_aligner.hh,subset.{hh,cc}}: minor cleanup.
+  * tests/test_sandbox_scripts.py: minor cleanup.
+
+2016-11-07  Luiz Irber  <khmer@luizirber.org>
+
+   * Makefile: add --ignore-installed flag to pip install (fix installation
+   on conda environments.
+   * doc/requirements.txt: change hard requirement to 'newer than', avoid
+   installing a quite old setuptools version.
+>>>>>>> d71dc20016b80fc16d4103abdc56b9dd7d82003c
 
 2016-11-04  Tim Head  <betatim@gmail.com>
 
