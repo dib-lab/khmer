@@ -48,5 +48,66 @@ cdef extern from "hashtable.hh" namespace "khmer":
         const BoundedCounterType get_count(const char *) const
         const BoundedCounterType get_count(HashIntoType) const
 
+
+cdef extern from "traversal.hh":
+    cdef cppclass Traverser "khmer::Traverser":
+        Traverser(Hashtable *)
+
+        void push_filter(KmerFilter)
+        KmerFilter pop_filter()
+    
+        uint32_t traverse(const Kmer&, KmerQueue&) const
+        uint32_t traverse_left(const Kmer&, KmerQueue&) const     
+        uint32_t traverse_right(const Kmer&, KmerQueue&) const
+
+        uint32_t degree(const Kmer&) const
+        uint32_t degree_left(const Kmer&) const
+        uint32_t degree_right(const Kmer&) const
+
+
+
+
+
+cdef extern from "partitioning.hh" namespace "khmer":
+
+    cdef cppclass Component "khmer::Component":
+        const uint64_t component_id
+        set[HashIntoType] tags
+
+        void merge(set[shared_ptr[Component]])
+        void add_tag(HashIntoType)
+        void add_tag(set[HashIntoType])
+        uint64_t get_n_tags() const
+        uint64_t get_n_created() const
+        uint64_t get_n_destroyed() const
+
+    ctypedef shared_ptr[Component] ComponentPtr
+    ctypedef set[ComponentPtr] ComponentPtrSet
+
+    cdef cppclass GuardedKmerCompMap "khmer::GuardedKmerCompMap":
+        map[HashIntoType, ComponentPtr] data
+
+        ComponentPtr get(HashIntoType)
+        void set(HashIntoType, ComponentPtr)
+        bool contains(HashIntoType)
+
+    cdef cppclass StreamingPartitioner "khmer::StreamingPartitioner":
+        StreamingPartitioner(Hashtable * ) except +MemoryError
+
+        void consume_sequence(string&) except +MemoryError
+        uint64_t consume_fasta(string&) except +MemoryError
+        void map_tags_to_component(set[HashIntoType]&, ComponentPtr&)
+        void find_connected_tags(queue[Kmer]&, 
+                                 set[HashIntoType]&,
+                                 set[HashIntoType]&) except +MemoryError
+        uint64_t get_n_components() const
+        uint64_t get_n_tags() const
+
+        ComponentPtr get_tag_component(string&) const
+        ComponentPtr get_nearest_component(string&) const
+
+        weak_ptr[ComponentPtrSet] get_component_set()
+        weak_ptr[GuardedKmerCompMap] get_tag_component_map()
+
 ####
 
