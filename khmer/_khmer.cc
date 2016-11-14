@@ -426,7 +426,7 @@ Read_set_cleaned_seq(khmer_Read_Object *obj, PyObject *value, void *closure)
         return 0;
     }
 
-    if (! PyUnicode_Check(value)) {
+    if (! (PyUnicode_Check(value) | PyBytes_Check(value))) {
         PyErr_SetString(PyExc_TypeError,
                         "The 'cleaned_seq' attribute value must be a string");
         return -1;
