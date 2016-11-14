@@ -54,6 +54,8 @@ from khmer.khmer_args import (build_nodegraph_args, DEFAULT_MAX_TABLESIZE)
 
 def main():
     parser = build_nodegraph_args()
+    parser.add_argument('-o', '--outfile',
+                        help='output file; default is "infile".sweep2')
     parser.add_argument('-q', '--quiet')
     parser.add_argument('input_filename')
     parser.add_argument('read_filename')
@@ -64,6 +66,8 @@ def main():
     readsfile = args.read_filename
 
     outfile = os.path.basename(readsfile) + '.sweep2'
+    if args.outfile:
+        outfile = args.outfile
     outfp = open(outfile, 'w')
 
     # create a nodegraph data structure
