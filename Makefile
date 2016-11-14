@@ -133,7 +133,7 @@ clean: FORCE
 	rm -f $(EXTENSION_MODULE)
 	rm -f $(CYTHON_MODULE)
 	rm -f khmer/*.pyc lib/*.pyc scripts/*.pyc tests/*.pyc oxli/*.pyc \
-		sandbox/*.pyc khmer/__pycache__/* sandbox/__pycache__/* khmer/_oxli.cpp
+		sandbox/*.pyc khmer/__pycache__/* sandbox/__pycache__/* khmer/_oxli/*.cpp
 	./setup.py clean --all || true
 	rm -f coverage-debug
 	rm -Rf .coverage
