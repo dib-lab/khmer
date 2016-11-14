@@ -526,78 +526,6 @@ static PyTypeObject khmer_Read_Type = {
 
 /***********************************************************************/
 
-typedef struct {
-    PyObject_HEAD
-    std::vector<read_parsers::Read> reads;
-} khmer_ReadBundle_Object;
-
-static
-int
-khmer_ReadBundle_init(khmer_ReadBundle_Object *self, PyObject *args,
-                      PyObject *kwds)
-{
-    PyObject* pyread;
-    Py_ssize_t length = PyTuple_Size(args);
-    for (Py_ssize_t i(0); i < length; i++) {
-        pyread = PyTuple_GetItem(args, i);
-        if (pyread == NULL || !PyMapping_Check(pyread)) {
-            return NULL;
-        }
-        read_parsers::Read read;
-        const char* key{"sequence"};
-        PyObject* pystr = PyMapping_GetItemString(pyread, key);
-        PyObject* temp = PyUnicode_AsASCIIString(pystr);
-        read.sequence = std::string(PyByteArray_AsString(temp));
-        Py_DECREF(temp);
-        self->reads.push_back(read);
-    }
-
-    return 0;
-}
-
-static PyTypeObject khmer_ReadBundle_Type = {
-    PyVarObject_HEAD_INIT(NULL, 0)        /* init & ob_size */
-    "_khmer.ReadBundle",                        /* tp_name */
-    sizeof(khmer_ReadBundle_Object),            /* tp_basicsize */
-    0,                                    /* tp_itemsize */
-    0,       /* tp_dealloc */
-    0,                                    /* tp_print */
-    0,                                    /* tp_getattr */
-    0,                                    /* tp_setattr */
-    0,                                    /* tp_compare */
-    0,                                    /* tp_repr */
-    0,                                    /* tp_as_number */
-    0,                                    /* tp_as_sequence */
-    0,                                    /* tp_as_mapping */
-    0,                                    /* tp_hash */
-    0,                                    /* tp_call */
-    0,                                    /* tp_str */
-    0,                                    /* tp_getattro */
-    0,                                    /* tp_setattro */
-    0,                                    /* tp_as_buffer */
-    Py_TPFLAGS_DEFAULT,                   /* tp_flags */
-    "A FASTQ record plus some metadata.", /* tp_doc */
-    0,                                    /* tp_traverse */
-    0,                                    /* tp_clear */
-    0,                                    /* tp_richcompare */
-    0,                                    /* tp_weaklistoffset */
-    0,                                    /* tp_iter */
-    0,                                    /* tp_iternext */
-    0,                                    /* tp_methods */
-    0,                                    /* tp_members */
-    0,                                    /* tp_getset */
-    0,                                    /* tp_base */
-    0,                                    /* tp_dict */
-    0,                                    /* tp_descr_get */
-    0,                                    /* tp_descr_set */
-    0,                                    /* tp_dictoffset */
-    (initproc)khmer_ReadBundle_init,      /* tp_init */
-    //0,                                    /* tp_alloc */
-    //khmer_Read_new,                       /* tp_new */
-};
-
-/***********************************************************************/
-
 //
 // ReadParser object -- parse reads directly from streams
 // ReadPairIterator -- return pairs of Read objects
@@ -6100,11 +6028,6 @@ MOD_INIT(_khmer)
 {
     using namespace python;
 
-    khmer_ReadBundle_Type.tp_new = PyType_GenericNew;
-    if (PyType_Ready(&khmer_ReadBundle_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
     if (PyType_Ready(&khmer_KHashtable_Type) < 0) {
         return MOD_ERROR_VAL;
     }
@@ -6178,12 +6101,6 @@ MOD_INIT(_khmer)
     Py_INCREF(&khmer_Read_Type);
     if (PyModule_AddObject( m, "Read",
                             (PyObject *)&khmer_Read_Type ) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    Py_INCREF(&khmer_ReadBundle_Type);
-    if (PyModule_AddObject( m, "ReadBundle",
-                            (PyObject *)&khmer_ReadBundle_Type ) < 0) {
         return MOD_ERROR_VAL;
     }
 
