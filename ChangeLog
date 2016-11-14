@@ -1,3 +1,8 @@
+2016-11-14  Tim Head  <betatim@gmail.com>
+
+  * .travis.yml: whitelist `master` branch to allow build-on-push without
+  building every push for a PR twice.
+
 2016-11-11  Titus Brown  <titus@idyll.org>
 
   * doc/requirements.txt: set autoprogram version requirements to something
