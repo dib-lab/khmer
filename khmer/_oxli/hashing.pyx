@@ -1,21 +1,27 @@
 from libcpp.string cimport string
-from libcpp.memory cimport shared_ptr
+from libcpp.memory cimport make_shared
 from libc.stdint cimport uint64_t
 from cython.operator cimport dereference as deref
 
-cimport ._oxli as _ox
+from _oxli cimport _revhash
 
 cdef class Kmer:
 
-    cdef shared_ptr[_ox.Kmer] _this
-    cdef readonly str kmer
-
-    def __cinit__(self, kmer=None):
+    def __cinit__(self, str kmer=None):
         self.kmer = kmer
         if self.kmer is not None:
-            self._this.reset(new _ox.Kmer(kmer, len(kmer)))
+            self._this.reset(new CpKmer(kmer.encode('utf-8'), len(kmer)))
         else:
-            self._this.reset(new _ox.Kmer())
+            self._this.reset(new CpKmer())
+
+    def __len__(self):
+        return len(self.kmer)
+
+    def __str__(self):
+        return self.kmer
+
+    def __hash__(self):
+        return self.kmer_u
 
     @property
     def kmer_f(self):
@@ -30,13 +36,15 @@ cdef class Kmer:
         return deref(self._this).kmer_u
 
     @staticmethod
-    cdef Kmer create(_ox.Kmer& cpkmer):
+    cdef Kmer wrap(CpKmer * cpkmer, WordLength K):
         cdef Kmer kmer = Kmer()
-        kmer._this.reset(&cpkmer)
+        kmer._this.reset(cpkmer)
+        kmer.kmer = _revhash(kmer.kmer_u, K).decode('utf-8')
         return kmer
 
     @staticmethod
-    cdef Kmer create(_ox.HashIntoType tag, _ox.WordLength K):
+    cdef Kmer create(HashIntoType tag, WordLength K):
         cdef Kmer kmer = Kmer()
         deref(kmer._this).set_from_unique_hash(tag, K)
+        kmer.kmer = _revhash(kmer.kmer_u, K).decode('utf-8')
         return kmer
