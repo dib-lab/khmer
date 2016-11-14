@@ -131,14 +131,16 @@ public:
     inline
     virtual
     HashIntoType
-    hash_dna(const char * kmer) const {
+    hash_dna(const char * kmer) const
+    {
         return _hash(kmer, _ksize);
     }
 
     inline
     virtual
     HashIntoType
-    hash_dna_top_strand(const char * kmer) const {
+    hash_dna_top_strand(const char * kmer) const
+    {
         HashIntoType f = 0, r = 0;
         _hash(kmer, _ksize, f, r);
         return f;
@@ -147,7 +149,8 @@ public:
     inline
     virtual
     HashIntoType
-    hash_dna_bottom_strand(const char * kmer) const {
+    hash_dna_bottom_strand(const char * kmer) const
+    {
         HashIntoType f = 0, r = 0;
         _hash(kmer, _ksize, f, r);
         return r;
@@ -156,27 +159,44 @@ public:
     inline
     virtual
     std::string
-    unhash_dna(HashIntoType hashval) const {
+    unhash_dna(HashIntoType hashval) const
+    {
         return _revhash(hashval, _ksize);
     }
 
-    void count(const char * kmer) { store->add(hash_dna(kmer)); }
-    void count(HashIntoType khash) { store->add(khash); }
-    void add(const char * kmer) { store->add(hash_dna(kmer)); }
-    void add(HashIntoType khash) { store->add(khash); }
+    void count(const char * kmer)
+    {
+        store->add(hash_dna(kmer));
+    }
+    void count(HashIntoType khash)
+    {
+        store->add(khash);
+    }
+    void add(const char * kmer)
+    {
+        store->add(hash_dna(kmer));
+    }
+    void add(HashIntoType khash)
+    {
+        store->add(khash);
+    }
 
     // get the count for the given k-mer.
-    const BoundedCounterType get_count(const char * kmer) const {
+    const BoundedCounterType get_count(const char * kmer) const
+    {
         return store->get_count(hash_dna(kmer));
     }
-    const BoundedCounterType get_count(HashIntoType khash) const {
+    const BoundedCounterType get_count(HashIntoType khash) const
+    {
         return store->get_count(khash);
     }
 
-    void save(std::string filename) {
+    void save(std::string filename)
+    {
         store->save(filename, _ksize);
     }
-    void load(std::string filename) {
+    void load(std::string filename)
+    {
         store->load(filename, _ksize);
         _init_bitstuff();
     }
@@ -209,8 +229,14 @@ public:
         unsigned long long  &n_consumed
     );
 
-    void set_use_bigcount(bool b) { store->set_use_bigcount(b); }
-    bool get_use_bigcount() { return store->get_use_bigcount(); }
+    void set_use_bigcount(bool b)
+    {
+        store->set_use_bigcount(b);
+    }
+    bool get_use_bigcount()
+    {
+        return store->get_use_bigcount();
+    }
 
     bool median_at_least(const std::string &s,
                          unsigned int cutoff);
@@ -221,16 +247,26 @@ public:
                           float &stddev);
 
     // number of unique k-mers
-    const uint64_t n_unique_kmers() const { return store->n_unique_kmers(); }
-    
+    const uint64_t n_unique_kmers() const
+    {
+        return store->n_unique_kmers();
+    }
+
     // count number of occupied bins
-    const uint64_t n_occupied() const { return store->n_occupied(); }
+    const uint64_t n_occupied() const
+    {
+        return store->n_occupied();
+    }
 
     // table information
-    std::vector<uint64_t> get_tablesizes() const {
+    std::vector<uint64_t> get_tablesizes() const
+    {
         return store->get_tablesizes();
     }
-    const size_t n_tables() const { return store->n_tables(); }
+    const size_t n_tables() const
+    {
+        return store->n_tables();
+    }
 
     // return all k-mer substrings, on the forward strand.
     void get_kmers(const std::string &s, std::vector<std::string> &kmers)
@@ -249,14 +285,18 @@ public:
                          std::vector<BoundedCounterType> &counts) const;
 
     // get access to raw tables.
-    Byte ** get_raw_tables() { return store->get_raw_tables(); }
+    Byte ** get_raw_tables()
+    {
+        return store->get_raw_tables();
+    }
 };
 
 //
 // Hashgraph: Extension of Hashtable to support graph operations.
 //
 
-class Hashgraph: public Hashtable {
+class Hashgraph: public Hashtable
+{
 
     friend class SubsetPartition;
     friend class LabelHash;
@@ -280,7 +320,7 @@ protected:
     {
         delete partition;
     }
-    
+
     void _clear_all_partitions()
     {
         if (partition != NULL) {
@@ -294,7 +334,7 @@ public:
     SeenSet all_tags;
     SeenSet stop_tags;
     SeenSet repart_small_tags;
-    
+
     virtual void save_tagset(std::string);
     virtual void load_tagset(std::string, bool clear_tags=true);
 
@@ -402,11 +442,11 @@ public:
                                       SeenSet &adjacencies,
                                       SeenSet &nodes, Hashtable& bf,
                                       SeenSet &high_degree_nodes) const;
-    
+
     //
     // for debugging/testing purposes only!
     //
-    
+
     // check partition map validity.
     void _validate_pmap()
     {

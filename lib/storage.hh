@@ -48,7 +48,8 @@ class CountingHash;
 // base Storage class for hashtable-related storage of information in memory.
 //
 
-class Storage {
+class Storage
+{
 public:
     bool _use_bigcount;
 
@@ -86,7 +87,7 @@ public:
 
 class BitStorage : public Storage
 {
-friend class Hashbits;
+    friend class Hashbits;
 protected:
     std::vector<uint64_t> _tablesizes;
     size_t _n_tables;
@@ -95,14 +96,15 @@ protected:
     Byte ** _counts;
 
     BitStorage(std::vector<uint64_t>& tablesizes) :
-        _tablesizes(tablesizes) 
+        _tablesizes(tablesizes)
     {
         _occupied_bins = 0;
         _n_unique_kmers = 0;
 
         _allocate_counters();
     }
-    ~BitStorage() {
+    ~BitStorage()
+    {
         if (_counts) {
             for (size_t i = 0; i < _n_tables; i++) {
                 delete[] _counts[i];
@@ -114,7 +116,7 @@ protected:
             _n_tables = 0;
         }
     }
-    
+
     void _allocate_counters()
     {
         _n_tables = _tablesizes.size();
@@ -240,7 +242,8 @@ class CountingHashFileWriter;
 class CountingHashGzFileReader;
 class CountingHashGzFileWriter;
 
-class ByteStorage : public Storage {
+class ByteStorage : public Storage
+{
     friend class CountingHashFile;
     friend class CountingHashFileReader;
     friend class CountingHashFileWriter;
@@ -301,11 +304,23 @@ public:
         }
     }
 
-    std::vector<uint64_t> get_tablesizes() const { return _tablesizes; }
+    std::vector<uint64_t> get_tablesizes() const
+    {
+        return _tablesizes;
+    }
 
-    const uint64_t n_unique_kmers() const { return _n_unique_kmers; }
-    const size_t n_tables() const { return _n_tables; }
-    const uint64_t n_occupied() const { return _occupied_bins; }
+    const uint64_t n_unique_kmers() const
+    {
+        return _n_unique_kmers;
+    }
+    const size_t n_tables() const
+    {
+        return _n_tables;
+    }
+    const uint64_t n_occupied() const
+    {
+        return _occupied_bins;
+    }
 
     void save(std::string, WordLength);
     void load(std::string, WordLength&);
@@ -343,7 +358,7 @@ public:
             //	 However, do we actually care if there is a little
             //	 bit of slop here? It can always be trimmed off later, if
             //	 that would help with stats.
-            
+
             if ( _max_count > current_count ) {
                 __sync_add_and_fetch( *(_counts + i) + bin, 1 );
             } else {

@@ -70,6 +70,10 @@ def test_read_type_attributes():
     assert r.name == '1234'
     assert r.annotations == 'ann'
     # test setting and deleting of cleaned_seq
+
+    with pytest.raises(TypeError):
+        r.cleaned_seq = 12
+
     assert not hasattr(r, 'cleaned_seq')
     r.cleaned_seq = "ACGT"
     r.cleaned_seq = u"ACGT"
@@ -77,9 +81,6 @@ def test_read_type_attributes():
     assert hasattr(r, 'cleaned_seq')
     del r.cleaned_seq
     assert not hasattr(r, 'cleaned_seq')
-
-    with pytest.raises(TypeError):
-        r.cleaned_seq = 12
 
     with pytest.raises(TypeError):
         r.cleaned_seq = u"some weird unicode \u2588"
