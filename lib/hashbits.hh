@@ -53,7 +53,8 @@ namespace khmer
 class CountingHash;
 class LabelHash;
 
-class Hashbits : public Hashgraph {
+class Hashbits : public Hashgraph
+{
 public:
     explicit Hashbits(WordLength ksize, std::vector<uint64_t> sizes)
         : Hashgraph(ksize, new BitStorage(sizes)) { } ;

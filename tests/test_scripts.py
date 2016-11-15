@@ -1593,37 +1593,6 @@ def test_make_initial_stoptags_load_stoptags():
     assert os.path.exists(outfile1), outfile1
 
 
-def execute_extract_paired_streaming(ifilename):
-    fifo = utils.get_temp_filename('fifo')
-    in_dir = os.path.dirname(fifo)
-    outfile1 = utils.get_temp_filename('paired.pe')
-    outfile2 = utils.get_temp_filename('paired.se')
-    script = 'extract-paired-reads.py'
-    args = [fifo, '-p', outfile1, '-s', outfile2]
-
-    # make a fifo to simulate streaming
-    os.mkfifo(fifo)
-
-    thread = threading.Thread(target=utils.runscript,
-                              args=(script, args, in_dir))
-    thread.start()
-    ifile = open(ifilename, 'r')
-    fifofile = open(fifo, 'w')
-    chunk = ifile.read(4)
-    while len(chunk) > 0:
-        fifofile.write(chunk)
-        chunk = ifile.read(4)
-    fifofile.close()
-    thread.join()
-    assert os.path.exists(outfile1), outfile1
-    assert os.path.exists(outfile2), outfile2
-
-
-def test_extract_paired_streaming():
-    testinput = utils.get_test_data('paired-mixed.fa')
-    o = execute_extract_paired_streaming(testinput)
-
-
 def test_sample_reads_randomly():
     infile = utils.copy_test_data('test-reads.fa')
     in_dir = os.path.dirname(infile)
