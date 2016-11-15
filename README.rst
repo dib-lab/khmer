@@ -62,8 +62,7 @@ them, please visit the following URLs:
 
 -  Announcements: http://lists.idyll.org/listinfo/khmer-announce
 
-We have a slack chat that [you can join](LINK/EMAIL/JOIN) and the maintainers
-can be contacted at khmer-project@idyll.org.
+The maintainers can be contacted at khmer-project@idyll.org.
 
 For getting help please see this guide: http://khmer.readthedocs.io/en/stable/user/getting-help.html
 
