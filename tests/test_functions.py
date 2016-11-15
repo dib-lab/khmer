@@ -177,6 +177,11 @@ def test_get_primes():
 
     assert primes == [19, 17, 13, 11, 7, 5, 3]
 
+    primes_not_float = khmer.get_n_primes_near_x(7, 20.)
+
+    assert primes_not_float == [19, 17, 13, 11, 7, 5, 3]
+    assert all(isinstance(p, int) for p in primes_not_float)
+
 
 def test_get_primes_fal():
     try:
