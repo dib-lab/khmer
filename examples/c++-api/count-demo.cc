@@ -4,7 +4,7 @@
 #include <vector>
 #include <cmath>
 #include "khmer.hh"
-#include "counting.hh"
+#include "hashtable.hh"
 
 using namespace khmer;
 
@@ -22,7 +22,7 @@ int main()
     std::vector<HashIntoType> tablesize;
     tablesize.push_back(pow(4, ksize));
 
-    CountingHash ktable(ksize, tablesize);
+    Counttable ktable(ksize, tablesize);
 
     ktable.consume_string("ATGGCGATGGCAAGTAGGACCCAGATGGACCAAAG");
 
