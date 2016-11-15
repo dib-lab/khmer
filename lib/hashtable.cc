@@ -44,6 +44,7 @@ Contact: khmer-project@idyll.org
 #include <sstream> // IWYU pragma: keep
 #include <queue>
 #include <set>
+#include <memory>
 
 #include "hashtable.hh"
 #include "khmer.hh"
