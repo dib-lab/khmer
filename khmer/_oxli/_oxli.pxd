@@ -47,6 +47,31 @@ cdef extern from "kmer_hash.hh" namespace "khmer":
     string _revhash(HashIntoType, WordLength)
 
 
+########################################################################
+#
+# ReadParser: read parsing stuff, Read object
+#
+########################################################################
+
+
+cdef extern from  "read_parsers.hh":
+    cdef cppclass CpSequence "khmer::read_parsers::Read":
+        string name
+        string annotations
+        string sequence
+        string quality
+
+        void reset()
+
+    ctypedef pair[CpSequence,CpSequence] CpSequencePair "khmer::read_parsers::ReadPair"
+
+    cdef cppclass CpFastxParser "khmer::read_parsers::FastxParser":
+        CpFastxParser(const char *)
+        bool is_complete()
+        void imprint_next_read(CpSequence&) except +
+        void imprint_next_read_pair(CpSequencePair&, uint8_t) except +
+
+
 
 ########################################################################
 #
