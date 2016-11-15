@@ -539,7 +539,7 @@ class TestNonBranching:
         for start in range(0, len(contig), 150):
             path = asm.assemble(contig[start:start + K], direction='L')
             print(path, ', ', contig[:start])
-            assert utils._equals_rc(path, contig[:start+K]), start
+            assert utils._equals_rc(path, contig[:start + K]), start
 
     def test_all_right_to_end(self, linear_structure):
         # assemble directed right

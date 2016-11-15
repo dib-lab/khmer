@@ -181,8 +181,8 @@ static bool convert_PyObject_to_HashIntoType(PyObject * value,
 // that checks this.
 
 static bool ht_convert_PyObject_to_HashIntoType(PyObject * value,
-                                                HashIntoType& hashval,
-                                                const Hashtable * ht)
+        HashIntoType& hashval,
+        const Hashtable * ht)
 {
     if (PyInt_Check(value) || PyLong_Check(value)) {
         return convert_PyLong_to_HashIntoType(value, hashval);
@@ -360,6 +360,17 @@ khmer_Read_dealloc(khmer_Read_Object * obj)
 }
 
 
+static Py_ssize_t
+khmer_Read_len(khmer_Read_Object* obj)
+{
+    return obj->read->sequence.size();
+}
+
+static PySequenceMethods khmer_Read_sequence_methods = {
+    (lenfunc)khmer_Read_len,                  /* sq_length */
+};
+
+
 static
 PyObject *
 Read_get_name(khmer_Read_Object * obj, void * closure )
@@ -416,6 +427,54 @@ Read_get_annotations(khmer_Read_Object * obj, void * closure)
 }
 
 
+static
+PyObject *
+Read_get_cleaned_seq(khmer_Read_Object * obj, void * closure)
+{
+    if (obj->read->cleaned_seq.size() > 0) {
+        return PyUnicode_FromString(obj->read->cleaned_seq.c_str());
+    } else {
+        PyErr_SetString(PyExc_AttributeError,
+                        "'Read' object has no attribute 'cleaned_seq'.");
+        return NULL;
+    }
+}
+
+
+static int
+Read_set_cleaned_seq(khmer_Read_Object *obj, PyObject *value, void *closure)
+{
+    if (value == NULL) {
+        obj->read->cleaned_seq = "";
+        return 0;
+    }
+
+    if (! (PyUnicode_Check(value) | PyBytes_Check(value))) {
+        PyErr_SetString(PyExc_TypeError,
+                        "The 'cleaned_seq' attribute value must be a string");
+        return -1;
+    }
+
+    if (PyUnicode_Check(value)) {
+        PyObject* temp = PyUnicode_AsASCIIString(value);
+        if (temp == NULL) {
+            PyErr_SetString(PyExc_TypeError,
+                            "Could not encode 'cleaned_seq' as ASCII.");
+            return -1;
+        }
+
+        obj->read->cleaned_seq = std::string(PyBytes_AS_STRING(temp));
+        Py_DECREF(temp);
+    }
+    // in python2 not everything is a unicode object
+    else {
+        obj->read->cleaned_seq = std::string(PyBytes_AS_STRING(value));
+    }
+
+    return 0;
+}
+
+
 // TODO? Implement setters.
 
 
@@ -440,6 +499,11 @@ static PyGetSetDef khmer_Read_accessors [ ] = {
         (getter)Read_get_annotations, (setter)NULL,
         (char *)"Annotations.", NULL
     },
+    {
+        (char *)"cleaned_seq",
+        (getter)Read_get_cleaned_seq, (setter)Read_set_cleaned_seq,
+        (char *)"Cleaned sequence.", NULL
+    },
 
     { NULL, NULL, NULL, NULL, NULL } // sentinel
 };
@@ -457,7 +521,7 @@ static PyTypeObject khmer_Read_Type = {
     0,                                    /* tp_compare */
     0,                                    /* tp_repr */
     0,                                    /* tp_as_number */
-    0,                                    /* tp_as_sequence */
+    &khmer_Read_sequence_methods,         /* tp_as_sequence */
     0,                                    /* tp_as_mapping */
     0,                                    /* tp_hash */
     0,                                    /* tp_call */
@@ -3119,7 +3183,7 @@ labelhash_get_tag_labels(khmer_KGraphLabels_Object * me, PyObject * args)
         return NULL;
     }
     if (!ht_convert_PyObject_to_HashIntoType(tag_o, tag,
-                                             labelhash->graph)) {
+            labelhash->graph)) {
         return NULL;
     }
 
@@ -4007,7 +4071,7 @@ static void khmer_linearassembler_dealloc(khmer_KLinearAssembler_Object * obj)
 }
 
 static PyObject * khmer_linearassembler_new(PyTypeObject *type, PyObject *args,
-                                            PyObject *kwds)
+        PyObject *kwds)
 {
     khmer_KLinearAssembler_Object *self;
     self = (khmer_KLinearAssembler_Object*)type->tp_alloc(type, 0);
@@ -4050,7 +4114,7 @@ static PyObject * khmer_linearassembler_new(PyTypeObject *type, PyObject *args,
 static
 PyObject *
 linearassembler_assemble(khmer_KLinearAssembler_Object * me,
-                                PyObject * args, PyObject *kwargs)
+                         PyObject * args, PyObject *kwargs)
 {
     LinearAssembler * assembler= me->assembler;
 
@@ -4063,8 +4127,8 @@ linearassembler_assemble(khmer_KLinearAssembler_Object * me,
     const char *kwnames[] = {"seed_kmer", "stop_filter", "direction", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|O!s",
-                                     const_cast<char **>(kwnames), 
-                                     &val_o, &khmer_KNodegraph_Type, 
+                                     const_cast<char **>(kwnames),
+                                     &val_o, &khmer_KNodegraph_Type,
                                      &nodegraph_o, &dir_str)) {
         return NULL;
     }
@@ -4084,7 +4148,7 @@ linearassembler_assemble(khmer_KLinearAssembler_Object * me,
     }
 
     std::string contig;
-    if (dir == 'B') { 
+    if (dir == 'B') {
         contig = assembler->assemble(start_kmer, stop_bf);
     } else if (dir == 'L') {
         contig = assembler->assemble_left(start_kmer, stop_bf);
@@ -4092,7 +4156,7 @@ linearassembler_assemble(khmer_KLinearAssembler_Object * me,
         contig = assembler->assemble_right(start_kmer, stop_bf);
     } else {
         PyErr_SetString(PyExc_ValueError, "Direction must be B (both), L (left),"
-                " or R (right).");
+                        " or R (right).");
         return NULL;
     }
 
@@ -4159,7 +4223,8 @@ typedef struct {
 } khmer_KSimpleLabeledAssembler_Object;
 
 
-static void khmer_simplelabeledassembler_dealloc(khmer_KLinearAssembler_Object * obj)
+static void khmer_simplelabeledassembler_dealloc(khmer_KLinearAssembler_Object *
+        obj)
 {
     delete obj->assembler;
     obj->assembler = NULL;
@@ -4167,8 +4232,9 @@ static void khmer_simplelabeledassembler_dealloc(khmer_KLinearAssembler_Object *
     Py_TYPE(obj)->tp_free((PyObject*)obj);
 }
 
-static PyObject * khmer_simplelabeledassembler_new(PyTypeObject *type, PyObject *args,
-                                            PyObject *kwds)
+static PyObject * khmer_simplelabeledassembler_new(PyTypeObject *type,
+        PyObject *args,
+        PyObject *kwds)
 {
     khmer_KSimpleLabeledAssembler_Object *self;
     self = (khmer_KSimpleLabeledAssembler_Object*)type->tp_alloc(type, 0);
@@ -4219,8 +4285,8 @@ simplelabeledassembler_assemble(khmer_KSimpleLabeledAssembler_Object * me,
     const char *kwnames[] = {"seed_kmer", "stop_filter", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|O!",
-                                     const_cast<char **>(kwnames), 
-                                     &val_o, &khmer_KNodegraph_Type, 
+                                     const_cast<char **>(kwnames),
+                                     &val_o, &khmer_KNodegraph_Type,
                                      &nodegraph_o)) {
         return NULL;
     }
@@ -4236,7 +4302,7 @@ simplelabeledassembler_assemble(khmer_KSimpleLabeledAssembler_Object * me,
     }
 
     std::vector<std::string> contigs = assembler->assemble(start_kmer, stop_bf);
-  
+
     PyObject * ret = PyList_New(contigs.size());
     for (unsigned int i = 0; i < contigs.size(); i++) {
         PyList_SET_ITEM(ret, i, PyUnicode_FromString(contigs[i].c_str()));
@@ -4308,7 +4374,8 @@ typedef struct {
     JunctionCountAssembler * assembler;
 } khmer_KJunctionCountAssembler_Object;
 
-static void khmer_junctioncountassembler_dealloc(khmer_KJunctionCountAssembler_Object * obj)
+static void khmer_junctioncountassembler_dealloc(
+    khmer_KJunctionCountAssembler_Object * obj)
 {
     delete obj->assembler;
     obj->assembler = NULL;
@@ -4316,8 +4383,9 @@ static void khmer_junctioncountassembler_dealloc(khmer_KJunctionCountAssembler_O
     Py_TYPE(obj)->tp_free((PyObject*)obj);
 }
 
-static PyObject * khmer_junctioncountassembler_new(PyTypeObject *type, PyObject *args,
-                                            PyObject *kwds)
+static PyObject * khmer_junctioncountassembler_new(PyTypeObject *type,
+        PyObject *args,
+        PyObject *kwds)
 {
     khmer_KJunctionCountAssembler_Object *self;
     self = (khmer_KJunctionCountAssembler_Object*)type->tp_alloc(type, 0);
@@ -4372,10 +4440,10 @@ junctioncountassembler_assemble(khmer_KJunctionCountAssembler_Object * me,
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|O!",
                                      const_cast<char **>(kwnames),
-                                     &val_o, &khmer_KNodegraph_Type, 
+                                     &val_o, &khmer_KNodegraph_Type,
                                      &nodegraph_o)) {
         return NULL;
-    } 
+    }
 
     Kmer start_kmer;
     if (!ht_convert_PyObject_to_Kmer(val_o, start_kmer, assembler->graph)) {
@@ -4387,7 +4455,7 @@ junctioncountassembler_assemble(khmer_KJunctionCountAssembler_Object * me,
     }
 
     std::vector<std::string> contigs = assembler->assemble(start_kmer, stop_bf);
-  
+
     PyObject * ret = PyList_New(contigs.size());
     for (unsigned int i = 0; i < contigs.size(); i++) {
         PyList_SET_ITEM(ret, i, PyUnicode_FromString(contigs[i].c_str()));
@@ -4399,7 +4467,8 @@ junctioncountassembler_assemble(khmer_KJunctionCountAssembler_Object * me,
 
 static
 PyObject *
-junctioncountassembler_consume(khmer_KJunctionCountAssembler_Object * me, PyObject * args)
+junctioncountassembler_consume(khmer_KJunctionCountAssembler_Object * me,
+                               PyObject * args)
 {
     JunctionCountAssembler * assembler = me->assembler;
     const char * long_str;

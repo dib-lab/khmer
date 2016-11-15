@@ -53,8 +53,8 @@ import shutil
 import textwrap
 import argparse
 
-from screed import Record
 from khmer import khmer_args
+from khmer import ReadParser
 
 from khmer.khmer_args import (build_counting_args, info, add_loadgraph_args,
                               report_on_config, calculate_graphsize,
@@ -365,8 +365,7 @@ def main():
         pass2list.append((filename, pass2filename, trimfp))
 
         # input file stuff: get a broken_paired reader.
-        screed_iter = screed.open(filename)
-        paired_iter = broken_paired_reader(screed_iter, min_length=K,
+        paired_iter = broken_paired_reader(ReadParser(filename), min_length=K,
                                            force_single=args.ignore_pairs)
 
         # main loop through the file.
@@ -420,8 +419,8 @@ def main():
         # so pairs will stay together if not orphaned.  This is in contrast
         # to the first loop.  Hence, force_single=True below.
 
-        screed_iter = screed.open(pass2filename, parse_description=False)
-        paired_iter = broken_paired_reader(screed_iter, min_length=K,
+        paired_iter = broken_paired_reader(ReadParser(pass2filename),
+                                           min_length=K,
                                            force_single=True)
 
         watermark = REPORT_EVERY_N_READS
