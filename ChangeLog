@@ -1,3 +1,8 @@
+2016-11-15  Luiz Irber  <khmer@luizirber.org>
+
+   * khmer/__init__.py,tests/test_functions.py: Fix get_n_primes_near_x to
+   always return integers.
+
 2016-11-14  Tim Head  <betatim@gmail.com>
 
    * khmer/_khmer.cc,lib/read_parsers.hh: Expose khmer's Read type fully to
