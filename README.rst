@@ -62,12 +62,13 @@ them, please visit the following URLs:
 
 -  Announcements: http://lists.idyll.org/listinfo/khmer-announce
 
-We chat at https://gitter.im/dib-lab/khmer and the maintainers can be
-contacted at khmer-project@idyll.org.
+We have a slack chat that [you can join](LINK/EMAIL/JOIN) and the maintainers
+can be contacted at khmer-project@idyll.org.
 
 For getting help please see this guide: http://khmer.readthedocs.io/en/stable/user/getting-help.html
 
-IMPORTANT NOTE: CITE US!
+
+Important note: cite us!
 ------------------------
 
 khmer is *research software*, so you should cite us when you use it
@@ -75,25 +76,33 @@ in scientific publications!  Please see the `CITATION
 <http://khmer.readthedocs.io/en/stable/citations.html>`__ file for
 citation information.
 
-INSTALL INSTRUCTIONS:
----------------------
 
-khmer requires a 64-bit operating system and Python version 2.7.x, 3.3.x, or
-3.4.x. Linux users will need the Python development libraries and gcc. OS X
-users may need XCode installed to build from source.
+Install
+-------
 
-In short:
+khmer works with Python version 2.7 or 3.5. Create a
+`virtual environemnt <http://docs.python-guide.org/en/latest/dev/virtualenvs/>`_
+and install khmer with:
 
-``pip install khmer`` to download, build, and install the latest stable
-version.
+```
+pip install khmer
+```
 
-For more details see `doc/install.rst <https://khmer.readthedocs.io/en/stable/user/install.html>`_
+You are ready to go. For more details see `doc/install.rst
+<https://khmer.readthedocs.io/en/stable/user/install.html>`_
 
-The use of a virtualenv is recommended, see
-https://virtualenv.readthedocs.io/en/latest/installation.html
 
-khmer is under the BSD license; see doc/LICENSE.txt. Distribution,
+Contributing
+------------
+
+If you want to modify khmer or contribute to its development read the
+`developer instructions
+<https://khmer.readthedocs.io/en/stable/dev/getting-started.html>`_
+
+
+License
+-------
+
+khmer is distributed under the BSD license; see doc/LICENSE.txt. Distribution,
 modification and redistribution, incorporation into other software, and
 pretty much everything else is allowed.
-
-MRC 2015-09-07
