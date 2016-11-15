@@ -521,7 +521,7 @@ def test_normalize_by_median_no_bigcount():
     hashfile = utils.get_temp_filename('test-out.ct')
     in_dir = os.path.dirname(infile)
 
- iter_out = screed.open(outfile)
+    iter_out = screed.open(outfile)
 
     script = 'normalize-by-median.py'
     # 256 is outside the range of valid values for C
