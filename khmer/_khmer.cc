@@ -138,9 +138,6 @@ static bool convert_PyLong_to_HashIntoType(PyObject * value,
 
 // Take a Python object and (try to) convert it to a HashIntoType.
 // Note: will set error condition and return false if cannot do.
-//
-// This method uses the _hash function directly, instead of taking a
-// Hashtable object and using its hash_dna method.
 
 static bool convert_PyObject_to_HashIntoType(PyObject * value,
         HashIntoType& hashval,

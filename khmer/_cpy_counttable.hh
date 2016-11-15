@@ -41,10 +41,6 @@ typedef struct {
     Counttable * counttable;
 } khmer_KCounttable_Object;
 
-static PyMethodDef khmer_counttable_methods[] = {
-    {NULL, NULL, 0, NULL}           /* sentinel */
-};
-
 static PyObject* khmer_counttable_new(PyTypeObject * type, PyObject * args,
                                       PyObject * kwds);
 
@@ -78,7 +74,7 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KCounttable_Object")
     0,                       /* tp_weaklistoffset */
     0,                       /* tp_iter */
     0,                       /* tp_iternext */
-    khmer_counttable_methods,   /* tp_methods */
+    0,                       /* tp_methods */
     0,                       /* tp_members */
     0,                       /* tp_getset */
     0,                       /* tp_base */
