@@ -1120,7 +1120,6 @@ def test_counting_gz_file_version_check():
 def test_counting_file_type_check():
     inpath = utils.get_test_data('goodversion-k12.ht')
 
-
     try:
         kh = khmer.load_countgraph(inpath)
         assert 0, "this should fail"
@@ -1130,7 +1129,6 @@ def test_counting_file_type_check():
 
 def test_counting_gz_file_type_check():
     inpath = utils.get_test_data('goodversion-k12.ht.gz')
-
 
     try:
         kh = khmer.load_countgraph(inpath)
