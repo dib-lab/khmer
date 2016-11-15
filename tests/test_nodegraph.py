@@ -60,9 +60,9 @@ def test_toobig():
     except MemoryError as err:
         print(str(err))
 
-def test__get_set_tag_density():
-    nodegraph = khmer._Nodegraph(32, [1]) 
 
+def test__get_set_tag_density():
+    nodegraph = khmer._Nodegraph(32, [1])
     orig = nodegraph._get_tag_density()
     assert orig != 2
     nodegraph._set_tag_density(2)
