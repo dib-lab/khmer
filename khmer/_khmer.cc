@@ -48,8 +48,7 @@ Contact: khmer-project@idyll.org
 #include "khmer.hh"
 #include "kmer_hash.hh"
 #include "hashtable.hh"
-#include "hashbits.hh"
-#include "counting.hh"
+#include "hashgraph.hh"
 #include "assembler.hh"
 #include "read_aligner.hh"
 #include "labelhash.hh"
@@ -139,9 +138,6 @@ static bool convert_PyLong_to_HashIntoType(PyObject * value,
 
 // Take a Python object and (try to) convert it to a HashIntoType.
 // Note: will set error condition and return false if cannot do.
-//
-// This method uses the _hash function directly, instead of taking a
-// Hashtable object and using its hash_dna method.
 
 static bool convert_PyObject_to_HashIntoType(PyObject * value,
         HashIntoType& hashval,
@@ -185,8 +181,8 @@ static bool convert_PyObject_to_HashIntoType(PyObject * value,
 // that checks this.
 
 static bool ht_convert_PyObject_to_HashIntoType(PyObject * value,
-                                                HashIntoType& hashval,
-                                                Hashtable * ht)
+        HashIntoType& hashval,
+        const Hashtable * ht)
 {
     if (PyInt_Check(value) || PyLong_Check(value)) {
         return convert_PyLong_to_HashIntoType(value, hashval);
@@ -221,7 +217,7 @@ static bool ht_convert_PyObject_to_HashIntoType(PyObject * value,
 // Note: will set error condition and return false if cannot do.
 
 static bool ht_convert_PyObject_to_Kmer(PyObject * value,
-                                        Kmer& kmer, Hashtable * ht)
+                                        Kmer& kmer, const Hashtable * ht)
 {
     if (PyInt_Check(value) || PyLong_Check(value)) {
         HashIntoType h;
@@ -258,6 +254,33 @@ static bool ht_convert_PyObject_to_Kmer(PyObject * value,
 }
 
 
+static bool convert_Pytablesizes_to_vector(PyListObject * sizes_list_o,
+                                           std::vector<uint64_t>& sizes)
+{
+    Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
+    if (sizes_list_o_length < 1) {
+        PyErr_SetString(PyExc_ValueError,
+                        "tablesizes needs to be one or more numbers");
+        return false;
+    }
+    for (Py_ssize_t i = 0; i < sizes_list_o_length; i++) {
+        PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
+        if (PyLong_Check(size_o)) {
+            sizes.push_back(PyLong_AsUnsignedLongLong(size_o));
+        } else if (PyInt_Check(size_o)) {
+            sizes.push_back(PyInt_AsLong(size_o));
+        } else if (PyFloat_Check(size_o)) {
+            sizes.push_back(PyFloat_AS_DOUBLE(size_o));
+        } else {
+            PyErr_SetString(PyExc_TypeError,
+                            "2nd argument must be a list of ints, longs, or floats");
+            return false;
+        }
+    }
+    return true;
+}
+
+
 /***********************************************************************/
 
 //
@@ -278,6 +301,56 @@ typedef struct {
 
 
 static
+PyObject*
+khmer_Read_new(PyTypeObject * type, PyObject * args, PyObject * kwds)
+{
+    khmer_Read_Object * self;
+    self = (khmer_Read_Object *)type->tp_alloc(type, 0);
+    if (self != NULL) {
+        try {
+            self->read = new Read;
+        } catch (std::bad_alloc &exc) {
+            Py_DECREF(self);
+            return PyErr_NoMemory();
+        }
+    }
+    return (PyObject *)self;
+}
+
+static
+int
+khmer_Read_init(khmer_Read_Object *self, PyObject *args, PyObject *kwds)
+{
+    const char * name{};
+    const char * annotations{};
+    const char * sequence{};
+    const char * quality{};
+    char *kwlist[5] = {
+        const_cast<char *>("name"), const_cast<char *>("sequence"),
+        const_cast<char *>("quality"), const_cast<char *>("annotations"), NULL
+    };
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ss|zz", kwlist,
+                                     &name, &sequence, &quality, &annotations)) {
+        return -1;
+    }
+
+    if (name != NULL) {
+        self->read->name = name;
+    }
+    if (sequence != NULL) {
+        self->read->sequence = sequence;
+    }
+    if (quality != NULL) {
+        self->read->quality = quality;
+    }
+    if (annotations != NULL) {
+        self->read->annotations = annotations;
+    }
+    return 0;
+}
+
+static
 void
 khmer_Read_dealloc(khmer_Read_Object * obj)
 {
@@ -287,11 +360,28 @@ khmer_Read_dealloc(khmer_Read_Object * obj)
 }
 
 
+static Py_ssize_t
+khmer_Read_len(khmer_Read_Object* obj)
+{
+    return obj->read->sequence.size();
+}
+
+static PySequenceMethods khmer_Read_sequence_methods = {
+    (lenfunc)khmer_Read_len,                  /* sq_length */
+};
+
+
 static
 PyObject *
 Read_get_name(khmer_Read_Object * obj, void * closure )
 {
-    return PyUnicode_FromString(obj->read->name.c_str()) ;
+    if (obj->read->name.size() > 0) {
+        return PyUnicode_FromString(obj->read->name.c_str());
+    } else {
+        PyErr_SetString(PyExc_AttributeError,
+                        "'Read' object has no attribute 'name'.");
+        return NULL;
+    }
 }
 
 
@@ -299,7 +389,13 @@ static
 PyObject *
 Read_get_sequence(khmer_Read_Object * obj, void * closure)
 {
-    return PyUnicode_FromString(obj->read->sequence.c_str()) ;
+    if (obj->read->sequence.size() > 0) {
+        return PyUnicode_FromString(obj->read->sequence.c_str());
+    } else {
+        PyErr_SetString(PyExc_AttributeError,
+                        "'Read' object has no attribute 'sequence'.");
+        return NULL;
+    }
 }
 
 
@@ -307,7 +403,13 @@ static
 PyObject *
 Read_get_quality(khmer_Read_Object * obj, void * closure)
 {
-    return PyUnicode_FromString(obj->read->quality.c_str()) ;
+    if (obj->read->quality.size() > 0) {
+        return PyUnicode_FromString(obj->read->quality.c_str());
+    } else {
+        PyErr_SetString(PyExc_AttributeError,
+                        "'Read' object has no attribute 'quality'.");
+        return NULL;
+    }
 }
 
 
@@ -315,7 +417,61 @@ static
 PyObject *
 Read_get_annotations(khmer_Read_Object * obj, void * closure)
 {
-    return PyUnicode_FromString(obj->read->annotations.c_str()) ;
+    if (obj->read->annotations.size() > 0) {
+        return PyUnicode_FromString(obj->read->annotations.c_str());
+    } else {
+        PyErr_SetString(PyExc_AttributeError,
+                        "'Read' object has no attribute 'annotations'.");
+        return NULL;
+    }
+}
+
+
+static
+PyObject *
+Read_get_cleaned_seq(khmer_Read_Object * obj, void * closure)
+{
+    if (obj->read->cleaned_seq.size() > 0) {
+        return PyUnicode_FromString(obj->read->cleaned_seq.c_str());
+    } else {
+        PyErr_SetString(PyExc_AttributeError,
+                        "'Read' object has no attribute 'cleaned_seq'.");
+        return NULL;
+    }
+}
+
+
+static int
+Read_set_cleaned_seq(khmer_Read_Object *obj, PyObject *value, void *closure)
+{
+    if (value == NULL) {
+        obj->read->cleaned_seq = "";
+        return 0;
+    }
+
+    if (! (PyUnicode_Check(value) | PyBytes_Check(value))) {
+        PyErr_SetString(PyExc_TypeError,
+                        "The 'cleaned_seq' attribute value must be a string");
+        return -1;
+    }
+
+    if (PyUnicode_Check(value)) {
+        PyObject* temp = PyUnicode_AsASCIIString(value);
+        if (temp == NULL) {
+            PyErr_SetString(PyExc_TypeError,
+                            "Could not encode 'cleaned_seq' as ASCII.");
+            return -1;
+        }
+
+        obj->read->cleaned_seq = std::string(PyBytes_AS_STRING(temp));
+        Py_DECREF(temp);
+    }
+    // in python2 not everything is a unicode object
+    else {
+        obj->read->cleaned_seq = std::string(PyBytes_AS_STRING(value));
+    }
+
+    return 0;
 }
 
 
@@ -343,6 +499,11 @@ static PyGetSetDef khmer_Read_accessors [ ] = {
         (getter)Read_get_annotations, (setter)NULL,
         (char *)"Annotations.", NULL
     },
+    {
+        (char *)"cleaned_seq",
+        (getter)Read_get_cleaned_seq, (setter)Read_set_cleaned_seq,
+        (char *)"Cleaned sequence.", NULL
+    },
 
     { NULL, NULL, NULL, NULL, NULL } // sentinel
 };
@@ -350,7 +511,7 @@ static PyGetSetDef khmer_Read_accessors [ ] = {
 
 static PyTypeObject khmer_Read_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)        /* init & ob_size */
-    "_khmer.Read",                        /* tp_name */
+    "khmer.Read",                         /* tp_name */
     sizeof(khmer_Read_Object),            /* tp_basicsize */
     0,                                    /* tp_itemsize */
     (destructor)khmer_Read_dealloc,       /* tp_dealloc */
@@ -360,7 +521,7 @@ static PyTypeObject khmer_Read_Type = {
     0,                                    /* tp_compare */
     0,                                    /* tp_repr */
     0,                                    /* tp_as_number */
-    0,                                    /* tp_as_sequence */
+    &khmer_Read_sequence_methods,         /* tp_as_sequence */
     0,                                    /* tp_as_mapping */
     0,                                    /* tp_hash */
     0,                                    /* tp_call */
@@ -379,7 +540,16 @@ static PyTypeObject khmer_Read_Type = {
     0,                                    /* tp_methods */
     0,                                    /* tp_members */
     (PyGetSetDef *)khmer_Read_accessors,  /* tp_getset */
+    0,                                    /* tp_base */
+    0,                                    /* tp_dict */
+    0,                                    /* tp_descr_get */
+    0,                                    /* tp_descr_set */
+    0,                                    /* tp_dictoffset */
+    (initproc)khmer_Read_init,            /* tp_init */
+    0,                                    /* tp_alloc */
+    khmer_Read_new,                       /* tp_new */
 };
+
 
 /***********************************************************************/
 
@@ -1196,6 +1366,11 @@ typedef struct {
 } khmer_KHashtable_Object;
 
 typedef struct {
+    khmer_KHashtable_Object khashtable;
+    Hashgraph * hashgraph;
+} khmer_KHashgraph_Object;
+
+typedef struct {
     PyObject_HEAD
     SubsetPartition * subset;
 } khmer_KSubsetPartition_Object;
@@ -1227,22 +1402,22 @@ static PyTypeObject khmer_KSubsetPartition_Type = {
 };
 
 typedef struct {
-    khmer_KHashtable_Object khashtable;
-    Hashbits * hashbits;
-} khmer_KHashbits_Object;
+    khmer_KHashgraph_Object khashgraph;
+    Nodegraph * nodegraph;
+} khmer_KNodegraph_Object;
 
-static void khmer_hashbits_dealloc(khmer_KHashbits_Object * obj);
-static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args,
+static void khmer_nodegraph_dealloc(khmer_KNodegraph_Object * obj);
+static PyObject* khmer_nodegraph_new(PyTypeObject * type, PyObject * args,
                                     PyObject * kwds);
 
 static PyTypeObject khmer_KNodegraph_Type
-CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashbits_Object")
+CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KNodegraph_Object")
 = {
     PyVarObject_HEAD_INIT(NULL, 0) /* init & ob_size */
     "_khmer.Nodegraph",             /* tp_name */
-    sizeof(khmer_KHashbits_Object), /* tp_basicsize */
+    sizeof(khmer_KNodegraph_Object), /* tp_basicsize */
     0,                             /* tp_itemsize */
-    (destructor)khmer_hashbits_dealloc, /*tp_dealloc*/
+    (destructor)khmer_nodegraph_dealloc, /*tp_dealloc*/
     0,              /*tp_print*/
     0,              /*tp_getattr*/
     0,              /*tp_setattr*/
@@ -1258,7 +1433,7 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashbits_Object")
     0,              /*tp_setattro*/
     0,              /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,       /*tp_flags*/
-    "hashbits object",           /* tp_doc */
+    "nodegraph object",           /* tp_doc */
     0,                       /* tp_traverse */
     0,                       /* tp_clear */
     0,                       /* tp_richcompare */
@@ -1275,7 +1450,7 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashbits_Object")
     0,                       /* tp_dictoffset */
     0,                       /* tp_init */
     0,                       /* tp_alloc */
-    khmer_hashbits_new,                  /* tp_new */
+    khmer_nodegraph_new,                  /* tp_new */
 };
 
 
@@ -1328,7 +1503,7 @@ hashtable_reverse_hash(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    if (!convert_PyObject_to_HashIntoType(val_o, val, 0)) {
+    if (!ht_convert_PyObject_to_HashIntoType(val_o, val, hashtable)) {
         return NULL;
     }
 
@@ -1506,7 +1681,41 @@ hashtable_get(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
-hashtable_find_high_degree_nodes(khmer_KHashtable_Object * me, PyObject * args)
+hashtable_set_use_bigcount(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    PyObject * x;
+    if (!PyArg_ParseTuple(args, "O", &x)) {
+        return NULL;
+    }
+    int setme = PyObject_IsTrue(x);
+    if (setme < 0) {
+        return NULL;
+    }
+    hashtable->set_use_bigcount((bool)setme);
+
+    Py_RETURN_NONE;
+}
+
+static
+PyObject *
+hashtable_get_use_bigcount(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    if (!PyArg_ParseTuple(args, "")) {
+        return NULL;
+    }
+
+    bool val = hashtable->get_use_bigcount();
+
+    return PyBool_FromLong((int)val);
+}
+
+static
+PyObject *
+hashtable_get_min_count(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
 
@@ -1522,48 +1731,187 @@ hashtable_find_high_degree_nodes(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    SeenSet * hashes = new SeenSet;
-    hashtable->find_high_degree_nodes(long_str, *hashes);
+    BoundedCounterType c = hashtable->get_min_count(long_str);
+    unsigned int N = c;
 
-    khmer_HashSet_Object * o;
-    o = create_HashSet_Object(hashes, hashtable->ksize());
-
-    return (PyObject *) o;
+    return PyLong_FromLong(N);
 }
 
 static
 PyObject *
-hashtable_neighbors(khmer_KHashtable_Object * me, PyObject * args)
+hashtable_get_max_count(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
-    PyObject * val_obj;
 
-    if (!PyArg_ParseTuple(args, "O", &val_obj)) {
+    const char * long_str;
+
+    if (!PyArg_ParseTuple(args, "s", &long_str)) {
         return NULL;
     }
 
-    Kmer start_kmer;
-    if (!ht_convert_PyObject_to_Kmer(val_obj, start_kmer, hashtable)) {
+    if (strlen(long_str) < hashtable->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "string length must >= the hashtable k-mer size");
         return NULL;
     }
 
-    KmerQueue node_q;
-    Traverser traverser(hashtable);
+    BoundedCounterType c = hashtable->get_max_count(long_str);
+    unsigned int N = c;
 
-    traverser.traverse(start_kmer, node_q);
+    return PyLong_FromLong(N);
+}
 
-    PyObject * x =  PyList_New(node_q.size());
+static
+PyObject *
+hashtable_abundance_distribution_with_reads_parser(khmer_KHashtable_Object * me,
+        PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    khmer :: python :: khmer_ReadParser_Object * rparser_obj = NULL;
+    khmer_KNodegraph_Object *tracking_obj = NULL;
+
+    if (!PyArg_ParseTuple(args, "O!O!", &python::khmer_ReadParser_Type,
+                          &rparser_obj, &khmer_KNodegraph_Type, &tracking_obj)) {
+        return NULL;
+    }
+
+    read_parsers::IParser *rparser      = rparser_obj->parser;
+    Nodegraph           *nodegraph        = tracking_obj->nodegraph;
+    uint64_t           *dist            = NULL;
+    const char         *value_exception = NULL;
+    const char         *file_exception  = NULL;
+    std::string exc_string;
+
+    Py_BEGIN_ALLOW_THREADS
+    try {
+        dist = hashtable->abundance_distribution(rparser, nodegraph);
+    } catch (khmer_file_exception &exc) {
+        exc_string = exc.what();
+        file_exception = exc_string.c_str();
+    } catch (khmer_value_exception &exc) {
+        exc_string = exc.what();
+        value_exception = exc_string.c_str();
+    }
+    Py_END_ALLOW_THREADS
+
+    if (file_exception != NULL) {
+        PyErr_SetString(PyExc_OSError, file_exception);
+        return NULL;
+    }
+    if (value_exception != NULL) {
+        PyErr_SetString(PyExc_ValueError, value_exception);
+        return NULL;
+    }
+
+    PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
+    if (x == NULL) {
+        delete[] dist;
+        return NULL;
+    }
+    for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
+        PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(dist[i]));
+    }
+
+    delete[] dist;
+    return x;
+}
+
+static
+PyObject *
+hashtable_trim_on_abundance(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    const char * seq = NULL;
+    unsigned int min_count_i = 0;
+
+    if (!PyArg_ParseTuple(args, "sI", &seq, &min_count_i)) {
+        return NULL;
+    }
+
+    unsigned long trim_at;
+    Py_BEGIN_ALLOW_THREADS
+
+    BoundedCounterType min_count = min_count_i;
+
+    trim_at = hashtable->trim_on_abundance(seq, min_count);
+
+    Py_END_ALLOW_THREADS;
+
+    PyObject * trim_seq = PyUnicode_FromStringAndSize(seq, trim_at);
+    if (trim_seq == NULL) {
+        return NULL;
+    }
+    PyObject * ret = Py_BuildValue("Ok", trim_seq, trim_at);
+    Py_DECREF(trim_seq);
+
+    return ret;
+}
+
+static
+PyObject *
+hashtable_trim_below_abundance(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    const char * seq = NULL;
+    BoundedCounterType max_count_i = 0;
+
+    if (!PyArg_ParseTuple(args, "sH", &seq, &max_count_i)) {
+        return NULL;
+    }
+
+    unsigned long trim_at;
+    Py_BEGIN_ALLOW_THREADS
+
+    BoundedCounterType max_count = max_count_i;
+
+    trim_at = hashtable->trim_below_abundance(seq, max_count);
+
+    Py_END_ALLOW_THREADS;
+
+    PyObject * trim_seq = PyUnicode_FromStringAndSize(seq, trim_at);
+    if (trim_seq == NULL) {
+        return NULL;
+    }
+    PyObject * ret = Py_BuildValue("Ok", trim_seq, trim_at);
+    Py_DECREF(trim_seq);
+
+    return ret;
+}
+
+static
+PyObject *
+hashtable_find_spectral_error_positions(khmer_KHashtable_Object * me,
+                                        PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    const char * seq = NULL;
+    BoundedCounterType max_count = 0; // unsigned short int
+
+    if (!PyArg_ParseTuple(args, "sH", &seq, &max_count)) {
+        return NULL;
+    }
+
+    std::vector<unsigned int> posns;
+
+    try {
+        posns = hashtable->find_spectral_error_positions(seq, max_count);
+    } catch (khmer_exception &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return NULL;
+    }
+
+    Py_ssize_t posns_size = posns.size();
+
+    PyObject * x = PyList_New(posns_size);
     if (x == NULL) {
         return NULL;
     }
-
-    unsigned int i;
-    PyObject * value = nullptr;
-    for (i = 0; node_q.size() > 0; i++) {
-        const HashIntoType h = node_q.front();
-        node_q.pop();
-        convert_HashIntoType_to_PyObject(h, &value);
-        PyList_SET_ITEM(x, i, value);
+    for (Py_ssize_t i = 0; i < posns_size; i++) {
+        PyList_SET_ITEM(x, i, PyLong_FromLong(posns[i]));
     }
 
     return x;
@@ -1571,74 +1919,66 @@ hashtable_neighbors(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
-hashtable_traverse_linear_path(khmer_KHashtable_Object * me, PyObject * args)
+hashtable_abundance_distribution(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
 
-    PyObject * val_o;
-    khmer_KHashbits_Object * nodegraph_o = NULL;
-    khmer_HashSet_Object * hdn_o = NULL;
-
-    if (!PyArg_ParseTuple(args, "OO!O!", &val_o,
-                          &khmer_HashSet_Type, &hdn_o,
-                          &khmer_KNodegraph_Type, &nodegraph_o)) {
-        return NULL;
-    }
-    Kmer start_kmer;
-    if (!ht_convert_PyObject_to_Kmer(val_o, start_kmer, hashtable)) {
+    const char * filename = NULL;
+    khmer_KNodegraph_Object * tracking_obj = NULL;
+    if (!PyArg_ParseTuple(args, "sO!", &filename, &khmer_KNodegraph_Type,
+                          &tracking_obj)) {
         return NULL;
     }
 
-    SeenSet * adj = new SeenSet;
-    SeenSet * visited = new SeenSet;
-    unsigned int size = hashtable->traverse_linear_path(start_kmer,
-                        *adj, *visited,
-                        *nodegraph_o->hashbits,
-                        *hdn_o->hashes);
+    Nodegraph           *nodegraph        = tracking_obj->nodegraph;
+    uint64_t           *dist            = NULL;
+    const char         *value_exception = NULL;
+    const char         *file_exception  = NULL;
+    std::string exc_string;
 
-    khmer_HashSet_Object * adj_o = create_HashSet_Object(adj,
-                                   hashtable->ksize());
-    khmer_HashSet_Object * visited_o = create_HashSet_Object(visited,
-                                       hashtable->ksize());
+    Py_BEGIN_ALLOW_THREADS
+    try {
+        dist = hashtable->abundance_distribution(filename, nodegraph);
+    } catch (khmer_file_exception &exc) {
+        exc_string = exc.what();
+        file_exception = exc_string.c_str();
+    } catch (khmer_value_exception &exc) {
+        exc_string = exc.what();
+        value_exception = exc_string.c_str();
+    }
+    Py_END_ALLOW_THREADS
 
-    PyObject * ret = Py_BuildValue("kOO", (unsigned long) size,
-                                   (PyObject *) adj_o, (PyObject *) visited_o);
-    Py_DECREF(adj_o);
-    Py_DECREF(visited_o);
-
-    return ret;
-}
-
-static
-PyObject *
-hashtable_assemble_linear_path(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    PyObject * val_o;
-    khmer_KHashbits_Object * nodegraph_o = NULL;
-    Hashbits * stop_bf = NULL;
-
-    if (!PyArg_ParseTuple(args, "O|O!", &val_o,
-                          &khmer_KNodegraph_Type, &nodegraph_o)) {
+    if (file_exception != NULL) {
+        PyErr_SetString(PyExc_OSError, file_exception);
+        if (dist != NULL) {
+            delete []dist;
+        }
+        return NULL;
+    }
+    if (value_exception != NULL) {
+        PyErr_SetString(PyExc_ValueError, value_exception);
+        if (dist != NULL) {
+            delete []dist;
+        }
         return NULL;
     }
 
-    Kmer start_kmer;
-    if (!ht_convert_PyObject_to_Kmer(val_o, start_kmer, hashtable)) {
+    PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
+    if (x == NULL) {
+        if (dist != NULL) {
+            delete []dist;
+        }
         return NULL;
     }
-
-    if (nodegraph_o) {
-        stop_bf = nodegraph_o->hashbits;
+    for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
+        PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(dist[i]));
     }
-    LinearAssembler assembler(hashtable);
 
-    std::string contig = assembler.assemble(start_kmer, stop_bf);
+    if (dist != NULL) {
+        delete []dist;
+    }
 
-    PyObject * ret = Py_BuildValue("s", contig.c_str());
-
-    return ret;
+    return x;
 }
 
 static
@@ -1708,132 +2048,6 @@ hashtable_get_hashsizes(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
-hashtable_consume_and_tag(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * seq;
-
-    if (!PyArg_ParseTuple(args, "s", &seq)) {
-        return NULL;
-    }
-
-    // call the C++ function, and trap signals => Python
-
-    unsigned long long n_consumed = 0;
-
-    // @CTB needs to normalize
-    hashtable->consume_sequence_and_tag(seq, n_consumed);
-
-    return Py_BuildValue("K", n_consumed);
-}
-
-static
-PyObject *
-hashtable_get_tags_and_positions(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * seq;
-
-    if (!PyArg_ParseTuple(args, "s", &seq)) {
-        return NULL;
-    }
-
-    // call the C++ function, and trap signals => Python
-
-    std::vector<unsigned int> posns;
-    std::vector<HashIntoType> tags;
-
-    unsigned int pos = 1;
-    KmerIterator kmers(seq, hashtable->ksize());
-
-    while (!kmers.done()) {
-        HashIntoType kmer = kmers.next();
-        if (set_contains(hashtable->all_tags, kmer)) {
-            posns.push_back(pos);
-            tags.push_back(kmer);
-        }
-        pos++;
-    }
-
-    PyObject * tag = nullptr;
-    PyObject * posns_list = PyList_New(posns.size());
-    for (size_t i = 0; i < posns.size(); i++) {
-        convert_HashIntoType_to_PyObject(tags[i], &tag);
-        PyObject * tup = Py_BuildValue("IO", posns[i], tag);
-        PyList_SET_ITEM(posns_list, i, tup);
-    }
-
-    return posns_list;
-}
-
-static
-PyObject *
-hashtable_find_all_tags_list(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * kmer_s = NULL;
-
-    if (!PyArg_ParseTuple(args, "s", &kmer_s)) {
-        return NULL;
-    }
-
-    if (strlen(kmer_s) != hashtable->ksize()) {
-        PyErr_SetString(PyExc_ValueError,
-                        "k-mer length must equal the counting table k-mer size");
-        return NULL;
-    }
-
-    SeenSet * tags = new SeenSet;
-
-    Kmer start_kmer = hashtable->build_kmer(kmer_s);
-
-    Py_BEGIN_ALLOW_THREADS
-
-    hashtable->partition->find_all_tags(start_kmer, *tags,
-                                        hashtable->all_tags);
-
-    Py_END_ALLOW_THREADS
-
-    PyObject * x = (PyObject *) create_HashSet_Object(tags,
-                   hashtable->ksize());
-    return x;
-}
-
-static
-PyObject *
-hashtable_consume_fasta_and_tag(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * filename;
-
-    if (!PyArg_ParseTuple(args, "s", &filename)) {
-        return NULL;
-    }
-
-    // call the C++ function, and trap signals => Python
-
-    unsigned long long n_consumed;
-    unsigned int total_reads;
-
-    try {
-        hashtable->consume_fasta_and_tag(filename, total_reads, n_consumed);
-    } catch (khmer_file_exception &exc) {
-        PyErr_SetString(PyExc_OSError, exc.what());
-        return NULL;
-    } catch (khmer_value_exception &exc) {
-        PyErr_SetString(PyExc_ValueError, exc.what());
-        return NULL;
-    }
-
-    return Py_BuildValue("IK", total_reads, n_consumed);
-}
-
-static
-PyObject *
 hashtable_get_median_count(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
@@ -1883,996 +2097,6 @@ hashtable_median_at_least(khmer_KHashtable_Object * me, PyObject * args)
     Py_RETURN_FALSE;
 
 }
-
-static
-PyObject *
-hashtable_n_tags(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    if (!PyArg_ParseTuple(args, "")) {
-        return NULL;
-    }
-
-    return PyLong_FromSize_t(hashtable->n_tags());
-}
-
-static
-PyObject *
-hashtable_print_stop_tags(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * filename = NULL;
-
-    if (!PyArg_ParseTuple(args, "s", &filename)) {
-        return NULL;
-    }
-
-    hashtable->print_stop_tags(filename);
-
-    Py_RETURN_NONE;
-}
-
-static
-PyObject *
-hashtable_print_tagset(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * filename = NULL;
-
-    if (!PyArg_ParseTuple(args, "s", &filename)) {
-        return NULL;
-    }
-
-    hashtable->print_tagset(filename);
-
-    Py_RETURN_NONE;
-}
-
-static
-PyObject *
-hashtable_load_stop_tags(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * filename = NULL;
-    PyObject * clear_tags_o = NULL;
-
-    if (!PyArg_ParseTuple(args, "s|O", &filename, &clear_tags_o)) {
-        return NULL;
-    }
-
-    bool clear_tags = true;
-    if (clear_tags_o && !PyObject_IsTrue(clear_tags_o)) {
-        clear_tags = false;
-    }
-
-
-    try {
-        hashtable->load_stop_tags(filename, clear_tags);
-    } catch (khmer_file_exception &e) {
-        PyErr_SetString(PyExc_OSError, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-
-
-static
-PyObject *
-hashtable_save_stop_tags(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * filename = NULL;
-
-    if (!PyArg_ParseTuple(args, "s", &filename)) {
-        return NULL;
-    }
-
-    try {
-        hashtable->save_stop_tags(filename);
-    } catch (khmer_file_exception &e) {
-        PyErr_SetString(PyExc_OSError, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static PyObject * hashtable_repartition_largest_partition(
-    khmer_KHashtable_Object * me,
-    PyObject * args);
-
-static
-PyObject *
-hashtable_calc_connected_graph_size(khmer_KHashtable_Object * me,
-                                    PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * _kmer;
-    unsigned int max_size = 0;
-    PyObject * break_on_circum_o = NULL;
-    if (!PyArg_ParseTuple(args, "s|IO", &_kmer, &max_size, &break_on_circum_o)) {
-        return NULL;
-    }
-
-    bool break_on_circum = false;
-    if (break_on_circum_o && PyObject_IsTrue(break_on_circum_o)) {
-        break_on_circum = true;
-    }
-
-    unsigned long long size = 0;
-    Kmer start_kmer = hashtable->build_kmer(_kmer);
-
-    Py_BEGIN_ALLOW_THREADS
-    KmerSet keeper;
-    hashtable->calc_connected_graph_size(start_kmer, size, keeper, max_size,
-                                         break_on_circum);
-    Py_END_ALLOW_THREADS
-
-    return PyLong_FromUnsignedLongLong(size);
-}
-
-static
-PyObject *
-hashtable_kmer_degree(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * kmer_s = NULL;
-
-    if (!PyArg_ParseTuple(args, "s", &kmer_s)) {
-        return NULL;
-    }
-
-    return PyLong_FromLong(hashtable->kmer_degree(kmer_s));
-}
-
-static
-PyObject *
-hashtable_trim_on_stoptags(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * seq = NULL;
-
-    if (!PyArg_ParseTuple(args, "s", &seq)) {
-        return NULL;
-    }
-
-    size_t trim_at;
-    Py_BEGIN_ALLOW_THREADS
-
-    trim_at = hashtable->trim_on_stoptags(seq);
-
-    Py_END_ALLOW_THREADS;
-
-    PyObject * trim_seq = PyUnicode_FromStringAndSize(seq, trim_at);
-    if (trim_seq == NULL) {
-        return NULL;
-    }
-    PyObject * ret = Py_BuildValue("Ok", trim_seq, (unsigned long) trim_at);
-    Py_DECREF(trim_seq);
-
-    return ret;
-}
-
-static
-PyObject *
-hashtable_do_subset_partition(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    PyObject * start_kmer_obj;
-    PyObject * end_kmer_obj;
-    HashIntoType start_kmer, end_kmer;
-    PyObject * break_on_stop_tags_o = NULL;
-    PyObject * stop_big_traversals_o = NULL;
-
-    if (!PyArg_ParseTuple(args, "|OOOO", &start_kmer_obj, &end_kmer_obj,
-                          &break_on_stop_tags_o,
-                          &stop_big_traversals_o)) {
-        return NULL;
-    }
-    if (!ht_convert_PyObject_to_HashIntoType(start_kmer_obj, start_kmer,
-                                             hashtable)) {
-        return NULL;
-    }
-    if (!ht_convert_PyObject_to_HashIntoType(end_kmer_obj, end_kmer,
-                                             hashtable)) {
-        return NULL;
-    }
-
-    bool break_on_stop_tags = false;
-    if (break_on_stop_tags_o && PyObject_IsTrue(break_on_stop_tags_o)) {
-        break_on_stop_tags = true;
-    }
-    bool stop_big_traversals = false;
-    if (stop_big_traversals_o && PyObject_IsTrue(stop_big_traversals_o)) {
-        stop_big_traversals = true;
-    }
-
-    SubsetPartition * subset_p = NULL;
-    try {
-        Py_BEGIN_ALLOW_THREADS
-        subset_p = new SubsetPartition(hashtable);
-        subset_p->do_partition(start_kmer, end_kmer, break_on_stop_tags,
-                               stop_big_traversals);
-        Py_END_ALLOW_THREADS
-    } catch (std::bad_alloc &e) {
-        return PyErr_NoMemory();
-    }
-
-    khmer_KSubsetPartition_Object * subset_obj = (khmer_KSubsetPartition_Object *)\
-            PyObject_New(khmer_KSubsetPartition_Object, &khmer_KSubsetPartition_Type);
-
-    if (subset_obj == NULL) {
-        delete subset_p;
-        return NULL;
-    }
-
-    subset_obj->subset = subset_p;
-
-    return (PyObject *) subset_obj;
-}
-
-
-static
-PyObject *
-hashtable_merge_subset(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    khmer_KSubsetPartition_Object * subset_obj = NULL;
-    if (!PyArg_ParseTuple(args, "O!", &khmer_KSubsetPartition_Type,
-                          &subset_obj)) {
-        return NULL;
-    }
-
-    SubsetPartition * subset_p = subset_obj->subset;
-
-    hashtable->partition->merge(subset_p);
-
-    Py_RETURN_NONE;
-}
-
-static
-PyObject *
-hashtable_merge_from_disk(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * filename = NULL;
-    if (!PyArg_ParseTuple(args, "s", &filename)) {
-        return NULL;
-    }
-
-    try {
-        hashtable->partition->merge_from_disk(filename);
-    } catch (khmer_file_exception &e) {
-        PyErr_SetString(PyExc_OSError, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static
-PyObject *
-hashtable_consume_fasta_and_tag_with_reads_parser(khmer_KHashtable_Object * me,
-        PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    python::khmer_ReadParser_Object * rparser_obj = NULL;
-
-    if (!PyArg_ParseTuple( args, "O!", &python::khmer_ReadParser_Type,
-                           &rparser_obj)) {
-        return NULL;
-    }
-
-    read_parsers:: IParser * rparser = rparser_obj-> parser;
-
-    // call the C++ function, and trap signals => Python
-    const char         *value_exception = NULL;
-    const char         *file_exception  = NULL;
-    unsigned long long  n_consumed      = 0;
-    unsigned int        total_reads     = 0;
-    std::string exc_string;
-
-    Py_BEGIN_ALLOW_THREADS
-    try {
-        hashtable->consume_fasta_and_tag(rparser, total_reads, n_consumed);
-    } catch (khmer_file_exception &exc) {
-        exc_string = exc.what();
-        file_exception = exc_string.c_str();
-    } catch (khmer_value_exception &exc) {
-        exc_string = exc.what();
-        value_exception = exc_string.c_str();
-    }
-    Py_END_ALLOW_THREADS
-
-    if (file_exception != NULL) {
-        PyErr_SetString(PyExc_OSError, file_exception);
-        return NULL;
-    }
-    if (value_exception != NULL) {
-        PyErr_SetString(PyExc_ValueError, value_exception);
-    }
-
-    return Py_BuildValue("IK", total_reads, n_consumed);
-}
-
-static
-PyObject *
-hashtable_consume_partitioned_fasta(khmer_KHashtable_Object * me,
-                                    PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * filename;
-
-    if (!PyArg_ParseTuple(args, "s", &filename)) {
-        return NULL;
-    }
-
-    // call the C++ function, and trap signals => Python
-
-    unsigned long long n_consumed;
-    unsigned int total_reads;
-
-    try {
-        hashtable->consume_partitioned_fasta(filename, total_reads, n_consumed);
-    } catch (khmer_file_exception &exc) {
-        PyErr_SetString(PyExc_OSError, exc.what());
-        return NULL;
-    } catch (khmer_value_exception &exc) {
-        PyErr_SetString(PyExc_ValueError, exc.what());
-        return NULL;
-    }
-
-    return Py_BuildValue("IK", total_reads, n_consumed);
-}
-
-static
-PyObject *
-hashtable_find_all_tags(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * kmer_s = NULL;
-
-    if (!PyArg_ParseTuple(args, "s", &kmer_s)) {
-        return NULL;
-    }
-
-    if (strlen(kmer_s) != hashtable->ksize()) {
-        PyErr_SetString( PyExc_ValueError,
-                         "k-mer size must equal the k-mer size of the presence table");
-        return NULL;
-    }
-
-    pre_partition_info * ppi = NULL;
-
-    Kmer kmer = hashtable->build_kmer(kmer_s);
-
-    Py_BEGIN_ALLOW_THREADS
-
-    try {
-        ppi = new pre_partition_info(kmer);
-    } catch (std::bad_alloc &e) {
-        return PyErr_NoMemory();
-    }
-    hashtable->partition->find_all_tags(kmer, ppi->tagged_kmers,
-                                        hashtable->all_tags);
-    hashtable->add_kmer_to_tags(kmer);
-
-    Py_END_ALLOW_THREADS
-
-    khmer_PrePartitionInfo_Object * ppi_obj = (khmer_PrePartitionInfo_Object *) \
-            PyObject_New(khmer_PrePartitionInfo_Object, &khmer_PrePartitionInfo_Type);
-
-    ppi_obj->PrePartitionInfo = ppi;
-
-    return (PyObject*)ppi_obj;
-}
-
-static
-PyObject *
-hashtable_assign_partition_id(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    khmer_PrePartitionInfo_Object * ppi_obj;
-    if (!PyArg_ParseTuple(args, "O!", &khmer_PrePartitionInfo_Type, &ppi_obj)) {
-        return NULL;
-    }
-
-    pre_partition_info * ppi;
-    ppi = ppi_obj->PrePartitionInfo;
-
-    PartitionID p;
-    p = hashtable->partition->assign_partition_id(ppi->kmer,
-            ppi->tagged_kmers);
-
-    return PyLong_FromLong(p);
-}
-
-static
-PyObject *
-hashtable_add_tag(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * kmer_s = NULL;
-    if (!PyArg_ParseTuple(args, "s", &kmer_s)) {
-        return NULL;
-    }
-
-    HashIntoType kmer = hashtable->hash_dna(kmer_s);
-    hashtable->add_tag(kmer);
-
-    Py_RETURN_NONE;
-}
-
-static
-PyObject *
-hashtable_add_stop_tag(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * kmer_s = NULL;
-    if (!PyArg_ParseTuple(args, "s", &kmer_s)) {
-        return NULL;
-    }
-
-    HashIntoType kmer = hashtable->hash_dna(kmer_s);
-    hashtable->add_stop_tag(kmer);
-
-    Py_RETURN_NONE;
-}
-
-static
-PyObject *
-hashtable_get_stop_tags(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    if (!PyArg_ParseTuple(args, "")) {
-        return NULL;
-    }
-
-    SeenSet::const_iterator si;
-
-    PyObject * x = PyList_New(hashtable->stop_tags.size());
-    unsigned long long i = 0;
-    for (si = hashtable->stop_tags.begin(); si != hashtable->stop_tags.end();
-            ++si) {
-        std::string s = hashtable->unhash_dna(*si);
-        PyList_SET_ITEM(x, i, Py_BuildValue("s", s.c_str()));
-        i++;
-    }
-
-    return x;
-}
-
-static
-PyObject *
-hashtable_get_tagset(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    if (!PyArg_ParseTuple(args, "")) {
-        return NULL;
-    }
-
-    SeenSet::const_iterator si;
-
-    PyObject * x = PyList_New(hashtable->all_tags.size());
-    unsigned long long i = 0;
-    for (si = hashtable->all_tags.begin(); si != hashtable->all_tags.end();
-            ++si) {
-        std::string s = hashtable->unhash_dna(*si);
-        PyList_SET_ITEM(x, i, Py_BuildValue("s", s.c_str()));
-        i++;
-    }
-
-    return x;
-}
-
-static
-PyObject *
-hashtable_output_partitions(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * filename = NULL;
-    const char * output = NULL;
-    PyObject * output_unassigned_o = NULL;
-
-    if (!PyArg_ParseTuple(args, "ss|O", &filename, &output,
-                          &output_unassigned_o)) {
-        return NULL;
-    }
-
-    bool output_unassigned = false;
-    if (output_unassigned_o != NULL && PyObject_IsTrue(output_unassigned_o)) {
-        output_unassigned = true;
-    }
-
-    size_t n_partitions = 0;
-
-    try {
-        SubsetPartition * subset_p = hashtable->partition;
-        n_partitions = subset_p->output_partitioned_file(filename,
-                       output,
-                       output_unassigned);
-    } catch (khmer_file_exception &e) {
-        PyErr_SetString(PyExc_OSError, e.what());
-        return NULL;
-    } catch (khmer_value_exception &exc) {
-        PyErr_SetString(PyExc_ValueError, exc.what());
-        return NULL;
-    }
-
-    return PyLong_FromLong(n_partitions);
-}
-
-static
-PyObject *
-hashtable_save_partitionmap(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * filename = NULL;
-
-    if (!PyArg_ParseTuple(args, "s", &filename)) {
-        return NULL;
-    }
-
-    try {
-        hashtable->partition->save_partitionmap(filename);
-    } catch (khmer_file_exception &e) {
-        PyErr_SetString(PyExc_OSError, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static
-PyObject *
-hashtable_load_partitionmap(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * filename = NULL;
-
-    if (!PyArg_ParseTuple(args, "s", &filename)) {
-        return NULL;
-    }
-
-    try {
-        hashtable->partition->load_partitionmap(filename);
-    } catch (khmer_file_exception &e) {
-        PyErr_SetString(PyExc_OSError, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static
-PyObject *
-hashtable__validate_partitionmap(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    if (!PyArg_ParseTuple(args, "")) {
-        return NULL;
-    }
-
-    hashtable->partition->_validate_pmap();
-
-    Py_RETURN_NONE;
-}
-
-static
-PyObject *
-hashtable_count_partitions(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    if (!PyArg_ParseTuple(args, "")) {
-        return NULL;
-    }
-
-    size_t n_partitions = 0, n_unassigned = 0;
-    hashtable->partition->count_partitions(n_partitions, n_unassigned);
-
-    return Py_BuildValue("nn", (Py_ssize_t) n_partitions,
-                         (Py_ssize_t) n_unassigned);
-}
-
-static
-PyObject *
-hashtable_subset_count_partitions(khmer_KHashtable_Object * me, PyObject * args)
-{
-    khmer_KSubsetPartition_Object * subset_obj = NULL;
-
-    if (!PyArg_ParseTuple(args, "O!", &khmer_KSubsetPartition_Type,
-                          &subset_obj)) {
-        return NULL;
-    }
-
-
-    size_t n_partitions = 0, n_unassigned = 0;
-    subset_obj->subset->count_partitions(n_partitions, n_unassigned);
-
-    return Py_BuildValue("nn", (Py_ssize_t) n_partitions,
-                         (Py_ssize_t) n_unassigned);
-}
-
-static
-PyObject *
-hashtable_subset_partition_size_distribution(khmer_KHashtable_Object * me,
-        PyObject * args)
-{
-    khmer_KSubsetPartition_Object * subset_obj = NULL;
-    if (!PyArg_ParseTuple(args, "O!", &khmer_KSubsetPartition_Type,
-                          &subset_obj)) {
-        return NULL;
-    }
-
-    SubsetPartition * subset_p = subset_obj->subset;
-
-    PartitionCountDistribution d;
-
-    unsigned int n_unassigned = 0;
-    subset_p->partition_size_distribution(d, n_unassigned);
-
-    PyObject * x = PyList_New(d.size());
-    if (x == NULL) {
-        return NULL;
-    }
-    PartitionCountDistribution::iterator di;
-
-    unsigned int i;
-    for (i = 0, di = d.begin(); di != d.end(); ++di, i++) {
-        PyObject * value =  Py_BuildValue("KK", di->first, di->second);
-        if (value == NULL) {
-            Py_DECREF(x);
-            return NULL;
-        }
-        PyList_SET_ITEM(x, i, value);
-    }
-    if (!(i == d.size())) {
-        throw khmer_exception();
-    }
-
-    PyObject * returnValue = Py_BuildValue("NI", x, n_unassigned);
-    if (returnValue == NULL) {
-        Py_DECREF(x);
-        return NULL;
-    }
-    return returnValue;
-}
-
-static
-PyObject *
-hashtable_load_tagset(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * filename = NULL;
-    PyObject * clear_tags_o = NULL;
-
-    if (!PyArg_ParseTuple(args, "s|O", &filename, &clear_tags_o)) {
-        return NULL;
-    }
-
-    bool clear_tags = true;
-    if (clear_tags_o && !PyObject_IsTrue(clear_tags_o)) {
-        clear_tags = false;
-    }
-
-    try {
-        hashtable->load_tagset(filename, clear_tags);
-    } catch (khmer_file_exception &e) {
-        PyErr_SetString(PyExc_OSError, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static
-PyObject *
-hashtable_save_tagset(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * filename = NULL;
-
-    if (!PyArg_ParseTuple(args, "s", &filename)) {
-        return NULL;
-    }
-
-    try {
-        hashtable->save_tagset(filename);
-    } catch (khmer_file_exception &e) {
-        PyErr_SetString(PyExc_OSError, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static
-PyObject *
-hashtable_save_subset_partitionmap(khmer_KHashtable_Object * me,
-                                   PyObject * args)
-{
-    const char * filename = NULL;
-    khmer_KSubsetPartition_Object * subset_obj = NULL;
-
-    if (!PyArg_ParseTuple(args, "O!s", &khmer_KSubsetPartition_Type,
-                          &subset_obj, &filename)) {
-        return NULL;
-    }
-
-    SubsetPartition * subset_p = subset_obj->subset;
-
-    Py_BEGIN_ALLOW_THREADS
-
-    try {
-        subset_p->save_partitionmap(filename);
-    } catch (khmer_file_exception &e) {
-        PyErr_SetString(PyExc_OSError, e.what());
-        return NULL;
-    }
-
-    Py_END_ALLOW_THREADS
-
-    Py_RETURN_NONE;
-}
-
-static
-PyObject *
-hashtable_load_subset_partitionmap(khmer_KHashtable_Object * me,
-                                   PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * filename = NULL;
-
-    if (!PyArg_ParseTuple(args, "s", &filename)) {
-        return NULL;
-    }
-
-    SubsetPartition * subset_p;
-    try {
-        subset_p = new SubsetPartition(hashtable);
-    } catch (std::bad_alloc &e) {
-        return PyErr_NoMemory();
-    }
-
-    const char         *file_exception  = NULL;
-
-    std::string exc_string ;
-    Py_BEGIN_ALLOW_THREADS
-    try {
-        subset_p->load_partitionmap(filename);
-    } catch (khmer_file_exception &exc) {
-        exc_string = exc.what();
-        file_exception = exc_string.c_str();
-    }
-    Py_END_ALLOW_THREADS
-
-    if (file_exception != NULL) {
-        PyErr_SetString(PyExc_OSError, file_exception);
-        delete subset_p;
-        return NULL;
-    }
-
-    khmer_KSubsetPartition_Object * subset_obj = (khmer_KSubsetPartition_Object *)\
-            PyObject_New(khmer_KSubsetPartition_Object, &khmer_KSubsetPartition_Type);
-
-    if (subset_obj == NULL) {
-        delete subset_p;
-        return NULL;
-    }
-
-    subset_obj->subset = subset_p;
-
-    return (PyObject *) subset_obj;
-}
-
-static
-PyObject *
-hashtable__set_tag_density(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    unsigned int d;
-    if (!PyArg_ParseTuple(args, "I", &d)) {
-        return NULL;
-    }
-
-    hashtable->_set_tag_density(d);
-
-    Py_RETURN_NONE;
-}
-
-static
-PyObject *
-hashtable__get_tag_density(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    if (!PyArg_ParseTuple(args, "")) {
-        return NULL;
-    }
-
-    unsigned int d = hashtable->_get_tag_density();
-
-    return PyLong_FromLong(d);
-}
-
-static
-PyObject *
-hashtable__validate_subset_partitionmap(khmer_KHashtable_Object * me,
-                                        PyObject * args)
-{
-    khmer_KSubsetPartition_Object * subset_obj = NULL;
-
-    if (!PyArg_ParseTuple(args, "O!", &khmer_KSubsetPartition_Type,
-                          &subset_obj)) {
-        return NULL;
-    }
-
-    SubsetPartition * subset_p = subset_obj->subset;
-
-    subset_p->_validate_pmap();
-
-    Py_RETURN_NONE;
-}
-
-static
-PyObject *
-hashtable_set_partition_id(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * kmer = NULL;
-    PartitionID p = 0;
-
-    if (!PyArg_ParseTuple(args, "sI", &kmer, &p)) {
-        return NULL;
-    }
-
-    hashtable->partition->set_partition_id(kmer, p);
-
-    Py_RETURN_NONE;
-}
-
-static
-PyObject *
-hashtable_join_partitions(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    PartitionID p1 = 0, p2 = 0;
-
-    if (!PyArg_ParseTuple(args, "II", &p1, &p2)) {
-        return NULL;
-    }
-
-    p1 = hashtable->partition->join_partitions(p1, p2);
-
-    return PyLong_FromLong(p1);
-}
-
-static
-PyObject *
-hashtable_get_partition_id(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * kmer = NULL;
-
-    if (!PyArg_ParseTuple(args, "s", &kmer)) {
-        return NULL;
-    }
-
-    PartitionID partition_id;
-    partition_id = hashtable->partition->get_partition_id(kmer);
-
-    return PyLong_FromLong(partition_id);
-}
-
-static
-PyObject *
-hashtable_divide_tags_into_subsets(khmer_KHashtable_Object * me,
-                                   PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    unsigned int subset_size = 0;
-
-    if (!PyArg_ParseTuple(args, "I", &subset_size)) {
-        return NULL;
-    }
-
-    SeenSet * divvy = new SeenSet;
-    hashtable->divide_tags_into_subsets(subset_size, *divvy);
-
-    PyObject * x = (PyObject *) create_HashSet_Object(divvy,
-                   hashtable->ksize());
-    return x;
-}
-
-static
-PyObject *
-hashtable_count_kmers_within_radius(khmer_KHashtable_Object * me,
-                                    PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * kmer = NULL;
-    unsigned int radius = 0;
-    unsigned int max_count = 0;
-
-    if (!PyArg_ParseTuple(args, "sI|I", &kmer, &radius, &max_count)) {
-        return NULL;
-    }
-
-    unsigned int n;
-
-    Py_BEGIN_ALLOW_THREADS
-    Kmer start_kmer = hashtable->build_kmer(kmer);
-    KmerSet seen;
-    n = hashtable->traverse_from_kmer(start_kmer, radius,
-                                      seen, max_count);
-
-    Py_END_ALLOW_THREADS
-
-    return PyLong_FromUnsignedLong(n);
-}
-
-static
-PyObject *
-hashtable_extract_unique_paths(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * sequence = NULL;
-    unsigned int min_length = 0;
-    float min_unique_f = 0;
-    if (!PyArg_ParseTuple(args, "sIf", &sequence, &min_length, &min_unique_f)) {
-        return NULL;
-    }
-
-    std::vector<std::string> results;
-    hashtable->extract_unique_paths(sequence, min_length, min_unique_f, results);
-
-    PyObject * x = PyList_New(results.size());
-    if (x == NULL) {
-        return NULL;
-    }
-
-    for (unsigned int i = 0; i < results.size(); i++) {
-        PyList_SET_ITEM(x, i, PyUnicode_FromString(results[i].c_str()));
-    }
-
-    return x;
-}
-
 
 static
 PyObject *
@@ -3067,106 +2291,60 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "Retrieve an ordered list of the counts of all k-mers in the string."
     },
 
-    //
-    // graph/traversal functionality
-    //
-
     {
-        "neighbors",
-        (PyCFunction)hashtable_neighbors, METH_VARARGS,
-        "Get a list of neighbor nodes for this k-mer.",
+        "set_use_bigcount",
+        (PyCFunction)hashtable_set_use_bigcount, METH_VARARGS,
+        "Count past maximum binsize of hashtable (set to T/F)"
     },
     {
-        "calc_connected_graph_size",
-        (PyCFunction)hashtable_calc_connected_graph_size, METH_VARARGS, ""
+        "get_use_bigcount",
+        (PyCFunction)hashtable_get_use_bigcount, METH_VARARGS,
+        "Get value of bigcount flag (T/F)"
     },
     {
-        "kmer_degree",
-        (PyCFunction)hashtable_kmer_degree, METH_VARARGS,
-        "Calculate the number of immediate neighbors this k-mer has in "
-        "the graph."
+        "get_min_count",
+        (PyCFunction)hashtable_get_min_count, METH_VARARGS,
+        "Get the smallest count of all the k-mers in the string"
     },
     {
-        "count_kmers_within_radius",
-        (PyCFunction)hashtable_count_kmers_within_radius, METH_VARARGS,
-        "Calculate the number of neighbors with given radius in the graph."
-    },
-
-    {
-        "find_high_degree_nodes",
-        (PyCFunction)hashtable_find_high_degree_nodes, METH_VARARGS,
-        "Examine the given sequence for degree > 2 nodes and add to  "
-        "list; used in graph contraction.",
+        "get_max_count",
+        (PyCFunction)hashtable_get_max_count, METH_VARARGS,
+        "Get the largest count of all the k-mers in the string"
     },
     {
-        "traverse_linear_path",
-        (PyCFunction)hashtable_traverse_linear_path, METH_VARARGS,
-        "Traverse the path through the graph starting with the given "
-        "k-mer and avoiding high-degree nodes, finding (and returning) "
-        "traversed k-mers and any encountered high-degree nodes.",
+        "trim_on_abundance",
+        (PyCFunction)hashtable_trim_on_abundance, METH_VARARGS,
+        "Trim string at first k-mer below the given abundance"
     },
     {
-        "assemble_linear_path",
-        (PyCFunction)hashtable_assemble_linear_path, METH_VARARGS,
-        "Assemble a purely linear path starting with the given "
-        "k-mer, returning traversed k-mers and any encountered high-degree "
-        "nodes.",
+        "trim_below_abundance",
+        (PyCFunction)hashtable_trim_below_abundance, METH_VARARGS,
+        "Trim string at first k-mer above the given abundance"
     },
-
-    //
-    // tagging / sparse graph functionality
-    //
-
-    { "consume_and_tag", (PyCFunction)hashtable_consume_and_tag, METH_VARARGS, "Consume a sequence and tag it" },
-    { "get_tags_and_positions", (PyCFunction)hashtable_get_tags_and_positions, METH_VARARGS, "Retrieve tags and their positions in a sequence." },
-    { "find_all_tags_list", (PyCFunction)hashtable_find_all_tags_list, METH_VARARGS, "Find all tags within range of the given k-mer, return as list" },
-    { "consume_fasta_and_tag", (PyCFunction)hashtable_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
-    { "get_median_count", (PyCFunction)hashtable_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
-    { "median_at_least", (PyCFunction)hashtable_median_at_least, METH_VARARGS, "Return true if the median is at least the given cutoff" },
-    { "extract_unique_paths", (PyCFunction)hashtable_extract_unique_paths, METH_VARARGS, "" },
-    { "print_tagset", (PyCFunction)hashtable_print_tagset, METH_VARARGS, "" },
-    { "add_tag", (PyCFunction)hashtable_add_tag, METH_VARARGS, "" },
-    { "get_tagset", (PyCFunction)hashtable_get_tagset, METH_VARARGS, "" },
-    { "load_tagset", (PyCFunction)hashtable_load_tagset, METH_VARARGS, "" },
-    { "save_tagset", (PyCFunction)hashtable_save_tagset, METH_VARARGS, "" },
-    { "n_tags", (PyCFunction)hashtable_n_tags, METH_VARARGS, "" },
-    { "divide_tags_into_subsets", (PyCFunction)hashtable_divide_tags_into_subsets, METH_VARARGS, "" },
-    { "_get_tag_density", (PyCFunction)hashtable__get_tag_density, METH_VARARGS, "" },
-    { "_set_tag_density", (PyCFunction)hashtable__set_tag_density, METH_VARARGS, "" },
-
-    // partitioning
-    { "do_subset_partition", (PyCFunction)hashtable_do_subset_partition, METH_VARARGS, "" },
-    { "find_all_tags", (PyCFunction)hashtable_find_all_tags, METH_VARARGS, "" },
-    { "assign_partition_id", (PyCFunction)hashtable_assign_partition_id, METH_VARARGS, "" },
-    { "output_partitions", (PyCFunction)hashtable_output_partitions, METH_VARARGS, "" },
-    { "load_partitionmap", (PyCFunction)hashtable_load_partitionmap, METH_VARARGS, "" },
-    { "save_partitionmap", (PyCFunction)hashtable_save_partitionmap, METH_VARARGS, "" },
-    { "_validate_partitionmap", (PyCFunction)hashtable__validate_partitionmap, METH_VARARGS, "" },
     {
-        "consume_fasta_and_tag_with_reads_parser", (PyCFunction)hashtable_consume_fasta_and_tag_with_reads_parser,
-        METH_VARARGS, "Count all k-mers using a given reads parser"
+        "find_spectral_error_positions",
+        (PyCFunction)hashtable_find_spectral_error_positions, METH_VARARGS,
+        "Identify positions of low-abundance k-mers"
     },
-    { "consume_partitioned_fasta", (PyCFunction)hashtable_consume_partitioned_fasta, METH_VARARGS, "Count all k-mers in a given file" },
-    { "merge_subset", (PyCFunction)hashtable_merge_subset, METH_VARARGS, "" },
-    { "merge_subset_from_disk", (PyCFunction)hashtable_merge_from_disk, METH_VARARGS, "" },
-    { "count_partitions", (PyCFunction)hashtable_count_partitions, METH_VARARGS, "" },
-    { "subset_count_partitions", (PyCFunction)hashtable_subset_count_partitions, METH_VARARGS, "" },
-    { "subset_partition_size_distribution", (PyCFunction)hashtable_subset_partition_size_distribution, METH_VARARGS, "" },
-    { "save_subset_partitionmap", (PyCFunction)hashtable_save_subset_partitionmap, METH_VARARGS },
-    { "load_subset_partitionmap", (PyCFunction)hashtable_load_subset_partitionmap, METH_VARARGS },
-    { "_validate_subset_partitionmap", (PyCFunction)hashtable__validate_subset_partitionmap, METH_VARARGS, "" },
-    { "set_partition_id", (PyCFunction)hashtable_set_partition_id, METH_VARARGS, "" },
-    { "join_partitions", (PyCFunction)hashtable_join_partitions, METH_VARARGS, "" },
-    { "get_partition_id", (PyCFunction)hashtable_get_partition_id, METH_VARARGS, "" },
-    { "repartition_largest_partition", (PyCFunction)hashtable_repartition_largest_partition, METH_VARARGS, "" },
-
-    // stop tags
-    { "load_stop_tags", (PyCFunction)hashtable_load_stop_tags, METH_VARARGS, "" },
-    { "save_stop_tags", (PyCFunction)hashtable_save_stop_tags, METH_VARARGS, "" },
-    { "print_stop_tags", (PyCFunction)hashtable_print_stop_tags, METH_VARARGS, "" },
-    { "trim_on_stoptags", (PyCFunction)hashtable_trim_on_stoptags, METH_VARARGS, "" },
-    { "add_stop_tag", (PyCFunction)hashtable_add_stop_tag, METH_VARARGS, "" },
-    { "get_stop_tags", (PyCFunction)hashtable_get_stop_tags, METH_VARARGS, "" },
+    {
+        "abundance_distribution",
+        (PyCFunction)hashtable_abundance_distribution, METH_VARARGS,
+        "Calculate the k-mer abundance distribution of the given file"
+    },
+    {
+        "abundance_distribution_with_reads_parser",
+        (PyCFunction)hashtable_abundance_distribution_with_reads_parser,
+        METH_VARARGS,
+        "Calculate the k-mer abundance distribution for a reads parser handle"
+    },
+    { "get_median_count",
+      (PyCFunction)hashtable_get_median_count, METH_VARARGS,
+      "Get the median, average, and stddev of the k-mer counts in the string"
+    },
+    { "median_at_least",
+      (PyCFunction)hashtable_median_at_least, METH_VARARGS,
+      "Return true if the median is at least the given cutoff"
+    },
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
@@ -3213,132 +2391,34 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashtable_Object")
     0,                                   /* tp_new */
 };
 
-#define is_hashtable_obj(v)  (Py_TYPE(v) == &khmer_KHashtable_Type)
+#include "_cpy_nodetable.hh"
+#include "_cpy_counttable.hh"
+#include "_cpy_hashgraph.hh"
 
 //
-// KCountingHash object
+// KCountgraph object
 //
 
 typedef struct {
-    khmer_KHashtable_Object khashtable;
-    CountingHash * counting;
-} khmer_KCountingHash_Object;
+    khmer_KHashgraph_Object khashgraph;
+    Countgraph * countgraph;
+} khmer_KCountgraph_Object;
 
 typedef struct {
     PyObject_HEAD
     ReadAligner * aligner;
 } khmer_ReadAligner_Object;
 
-static void khmer_counting_dealloc(khmer_KCountingHash_Object * obj);
+static void khmer_countgraph_dealloc(khmer_KCountgraph_Object * obj);
 
 static
 PyObject *
-count_trim_on_abundance(khmer_KCountingHash_Object * me, PyObject * args)
+count_get_raw_tables(khmer_KCountgraph_Object * self, PyObject * args)
 {
-    CountingHash * counting = me->counting;
+    Countgraph * countgraph = self->countgraph;
 
-    const char * seq = NULL;
-    unsigned int min_count_i = 0;
-
-    if (!PyArg_ParseTuple(args, "sI", &seq, &min_count_i)) {
-        return NULL;
-    }
-
-    unsigned long trim_at;
-    Py_BEGIN_ALLOW_THREADS
-
-    BoundedCounterType min_count = min_count_i;
-
-    trim_at = counting->trim_on_abundance(seq, min_count);
-
-    Py_END_ALLOW_THREADS;
-
-    PyObject * trim_seq = PyUnicode_FromStringAndSize(seq, trim_at);
-    if (trim_seq == NULL) {
-        return NULL;
-    }
-    PyObject * ret = Py_BuildValue("Ok", trim_seq, trim_at);
-    Py_DECREF(trim_seq);
-
-    return ret;
-}
-
-static
-PyObject *
-count_trim_below_abundance(khmer_KCountingHash_Object * me, PyObject * args)
-{
-    CountingHash * counting = me->counting;
-
-    const char * seq = NULL;
-    BoundedCounterType max_count_i = 0;
-
-    if (!PyArg_ParseTuple(args, "sH", &seq, &max_count_i)) {
-        return NULL;
-    }
-
-    unsigned long trim_at;
-    Py_BEGIN_ALLOW_THREADS
-
-    BoundedCounterType max_count = max_count_i;
-
-    trim_at = counting->trim_below_abundance(seq, max_count);
-
-    Py_END_ALLOW_THREADS;
-
-    PyObject * trim_seq = PyUnicode_FromStringAndSize(seq, trim_at);
-    if (trim_seq == NULL) {
-        return NULL;
-    }
-    PyObject * ret = Py_BuildValue("Ok", trim_seq, trim_at);
-    Py_DECREF(trim_seq);
-
-    return ret;
-}
-
-static
-PyObject *
-count_find_spectral_error_positions(khmer_KCountingHash_Object * me,
-                                    PyObject * args)
-{
-    khmer::CountingHash * counting = me->counting;
-
-    const char * seq = NULL;
-    khmer::BoundedCounterType max_count = 0; // unsigned short int
-
-    if (!PyArg_ParseTuple(args, "sH", &seq, &max_count)) {
-        return NULL;
-    }
-
-    std::vector<unsigned int> posns;
-
-    try {
-        posns = counting->find_spectral_error_positions(seq, max_count);
-    } catch (khmer_exception &e) {
-        PyErr_SetString(PyExc_ValueError, e.what());
-        return NULL;
-    }
-
-    Py_ssize_t posns_size = posns.size();
-
-    PyObject * x = PyList_New(posns_size);
-    if (x == NULL) {
-        return NULL;
-    }
-    for (Py_ssize_t i = 0; i < posns_size; i++) {
-        PyList_SET_ITEM(x, i, PyLong_FromLong(posns[i]));
-    }
-
-    return x;
-}
-
-static
-PyObject *
-count_get_raw_tables(khmer_KCountingHash_Object * self, PyObject * args)
-{
-    CountingHash * counting = self->counting;
-
-    khmer::Byte ** table_ptrs = counting->get_raw_tables();
-    std::vector<uint64_t> sizes = counting->get_tablesizes();
+    khmer::Byte ** table_ptrs = countgraph->get_raw_tables();
+    std::vector<uint64_t> sizes = countgraph->get_tablesizes();
 
     PyObject * raw_tables = PyList_New(sizes.size());
     for (unsigned int i=0; i<sizes.size(); ++i) {
@@ -3360,212 +2440,10 @@ count_get_raw_tables(khmer_KCountingHash_Object * self, PyObject * args)
 
 static
 PyObject *
-count_set_use_bigcount(khmer_KCountingHash_Object * me, PyObject * args)
-{
-    CountingHash * counting = me->counting;
-
-    PyObject * x;
-    if (!PyArg_ParseTuple(args, "O", &x)) {
-        return NULL;
-    }
-    int setme = PyObject_IsTrue(x);
-    if (setme < 0) {
-        return NULL;
-    }
-    counting->set_use_bigcount((bool)setme);
-
-    Py_RETURN_NONE;
-}
-
-static
-PyObject *
-count_get_use_bigcount(khmer_KCountingHash_Object * me, PyObject * args)
-{
-    CountingHash * counting = me->counting;
-
-    if (!PyArg_ParseTuple(args, "")) {
-        return NULL;
-    }
-
-    bool val = counting->get_use_bigcount();
-
-    return PyBool_FromLong((int)val);
-}
-
-static
-PyObject *
-count_get_min_count(khmer_KCountingHash_Object * me, PyObject * args)
-{
-    CountingHash * counting = me->counting;
-
-    const char * long_str;
-
-    if (!PyArg_ParseTuple(args, "s", &long_str)) {
-        return NULL;
-    }
-
-    if (strlen(long_str) < counting->ksize()) {
-        PyErr_SetString(PyExc_ValueError,
-                        "string length must >= the hashtable k-mer size");
-        return NULL;
-    }
-
-    BoundedCounterType c = counting->get_min_count(long_str);
-    unsigned int N = c;
-
-    return PyLong_FromLong(N);
-}
-
-static
-PyObject *
-count_get_max_count(khmer_KCountingHash_Object * me, PyObject * args)
-{
-    CountingHash * counting = me->counting;
-
-    const char * long_str;
-
-    if (!PyArg_ParseTuple(args, "s", &long_str)) {
-        return NULL;
-    }
-
-    if (strlen(long_str) < counting->ksize()) {
-        PyErr_SetString(PyExc_ValueError,
-                        "string length must >= the hashtable k-mer size");
-        return NULL;
-    }
-
-    BoundedCounterType c = counting->get_max_count(long_str);
-    unsigned int N = c;
-
-    return PyLong_FromLong(N);
-}
-
-static
-PyObject *
-count_abundance_distribution_with_reads_parser(khmer_KCountingHash_Object * me,
+count_do_subset_partition_with_abundance(khmer_KCountgraph_Object * me,
         PyObject * args)
 {
-    CountingHash * counting = me->counting;
-
-    khmer :: python :: khmer_ReadParser_Object * rparser_obj = NULL;
-    khmer_KHashbits_Object *tracking_obj = NULL;
-
-    if (!PyArg_ParseTuple(args, "O!O!", &python::khmer_ReadParser_Type,
-                          &rparser_obj, &khmer_KNodegraph_Type, &tracking_obj)) {
-        return NULL;
-    }
-
-    read_parsers::IParser *rparser      = rparser_obj->parser;
-    Hashbits           *hashbits        = tracking_obj->hashbits;
-    uint64_t           *dist            = NULL;
-    const char         *value_exception = NULL;
-    const char         *file_exception  = NULL;
-    std::string exc_string;
-
-    Py_BEGIN_ALLOW_THREADS
-    try {
-        dist = counting->abundance_distribution(rparser, hashbits);
-    } catch (khmer_file_exception &exc) {
-        exc_string = exc.what();
-        file_exception = exc_string.c_str();
-    } catch (khmer_value_exception &exc) {
-        exc_string = exc.what();
-        value_exception = exc_string.c_str();
-    }
-    Py_END_ALLOW_THREADS
-
-    if (file_exception != NULL) {
-        PyErr_SetString(PyExc_OSError, file_exception);
-        return NULL;
-    }
-    if (value_exception != NULL) {
-        PyErr_SetString(PyExc_ValueError, value_exception);
-        return NULL;
-    }
-
-    PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
-    if (x == NULL) {
-        delete[] dist;
-        return NULL;
-    }
-    for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
-        PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(dist[i]));
-    }
-
-    delete[] dist;
-    return x;
-}
-
-static
-PyObject *
-count_abundance_distribution(khmer_KCountingHash_Object * me, PyObject * args)
-{
-    CountingHash * counting = me->counting;
-
-    const char * filename = NULL;
-    khmer_KHashbits_Object * tracking_obj = NULL;
-    if (!PyArg_ParseTuple(args, "sO!", &filename, &khmer_KNodegraph_Type,
-                          &tracking_obj)) {
-        return NULL;
-    }
-
-    Hashbits           *hashbits        = tracking_obj->hashbits;
-    uint64_t           *dist            = NULL;
-    const char         *value_exception = NULL;
-    const char         *file_exception  = NULL;
-    std::string exc_string;
-
-    Py_BEGIN_ALLOW_THREADS
-    try {
-        dist = counting->abundance_distribution(filename, hashbits);
-    } catch (khmer_file_exception &exc) {
-        exc_string = exc.what();
-        file_exception = exc_string.c_str();
-    } catch (khmer_value_exception &exc) {
-        exc_string = exc.what();
-        value_exception = exc_string.c_str();
-    }
-    Py_END_ALLOW_THREADS
-
-    if (file_exception != NULL) {
-        PyErr_SetString(PyExc_OSError, file_exception);
-        if (dist != NULL) {
-            delete []dist;
-        }
-        return NULL;
-    }
-    if (value_exception != NULL) {
-        PyErr_SetString(PyExc_ValueError, value_exception);
-        if (dist != NULL) {
-            delete []dist;
-        }
-        return NULL;
-    }
-
-    PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
-    if (x == NULL) {
-        if (dist != NULL) {
-            delete []dist;
-        }
-        return NULL;
-    }
-    for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
-        PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(dist[i]));
-    }
-
-    if (dist != NULL) {
-        delete []dist;
-    }
-
-    return x;
-}
-
-static
-PyObject *
-count_do_subset_partition_with_abundance(khmer_KCountingHash_Object * me,
-        PyObject * args)
-{
-    CountingHash * counting = me->counting;
+    Countgraph * countgraph = me->countgraph;
 
     HashIntoType start_kmer = 0, end_kmer = 0;
     PyObject * break_on_stop_tags_o = NULL;
@@ -3592,7 +2470,7 @@ count_do_subset_partition_with_abundance(khmer_KCountingHash_Object * me,
     SubsetPartition * subset_p = NULL;
     try {
         Py_BEGIN_ALLOW_THREADS
-        subset_p = new SubsetPartition(counting);
+        subset_p = new SubsetPartition(countgraph);
         subset_p->do_partition_with_abundance(start_kmer, end_kmer,
                                               min_count, max_count,
                                               break_on_stop_tags,
@@ -3615,35 +2493,27 @@ count_do_subset_partition_with_abundance(khmer_KCountingHash_Object * me,
     return (PyObject *) subset_obj;
 }
 
-static PyMethodDef khmer_counting_methods[] = {
-    { "set_use_bigcount", (PyCFunction)count_set_use_bigcount, METH_VARARGS, "" },
-    { "get_use_bigcount", (PyCFunction)count_get_use_bigcount, METH_VARARGS, "" },
-    { "get_min_count", (PyCFunction)count_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
-    { "get_max_count", (PyCFunction)count_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
-    { "trim_on_abundance", (PyCFunction)count_trim_on_abundance, METH_VARARGS, "Trim on >= abundance" },
-    { "trim_below_abundance", (PyCFunction)count_trim_below_abundance, METH_VARARGS, "Trim on >= abundance" },
-    { "find_spectral_error_positions", (PyCFunction)count_find_spectral_error_positions, METH_VARARGS, "Identify positions of low-abundance k-mers" },
-    { "abundance_distribution", (PyCFunction)count_abundance_distribution, METH_VARARGS, "" },
-    { "abundance_distribution_with_reads_parser", (PyCFunction)count_abundance_distribution_with_reads_parser, METH_VARARGS, "" },
+static PyMethodDef khmer_countgraph_methods[] = {
     {
-        "get_raw_tables", (PyCFunction)count_get_raw_tables,
-        METH_VARARGS, "Get a list of the raw tables as memoryview objects"
+        "get_raw_tables",
+        (PyCFunction)count_get_raw_tables, METH_VARARGS,
+        "Get a list of the raw storage tables as memoryview objects."
     },
     { "do_subset_partition_with_abundance", (PyCFunction)count_do_subset_partition_with_abundance, METH_VARARGS, "" },
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
-static PyObject* _new_counting_hash(PyTypeObject * type, PyObject * args,
-                                    PyObject * kwds);
+static PyObject* khmer_countgraph_new(PyTypeObject * type, PyObject * args,
+                                      PyObject * kwds);
 
 static PyTypeObject khmer_KCountgraph_Type
-CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KCountingHash_Object")
+CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KCountgraph_Object")
 = {
     PyVarObject_HEAD_INIT(NULL, 0)       /* init & ob_size */
     "_khmer.Countgraph",                 /*tp_name*/
-    sizeof(khmer_KCountingHash_Object),  /*tp_basicsize*/
+    sizeof(khmer_KCountgraph_Object),  /*tp_basicsize*/
     0,                                   /*tp_itemsize*/
-    (destructor)khmer_counting_dealloc,  /*tp_dealloc*/
+    (destructor)khmer_countgraph_dealloc,  /*tp_dealloc*/
     0,                                   /*tp_print*/
     0,                                   /*tp_getattr*/
     0,                                   /*tp_setattr*/
@@ -3659,14 +2529,14 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KCountingHash_Object")
     0,                                   /*tp_setattro*/
     0,                                   /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,                  /*tp_flags*/
-    "counting hash object",              /* tp_doc */
+    "countgraph hash object",              /* tp_doc */
     0,                                   /* tp_traverse */
     0,                                   /* tp_clear */
     0,                                   /* tp_richcompare */
     0,                                   /* tp_weaklistoffset */
     0,                                   /* tp_iter */
     0,                                   /* tp_iternext */
-    khmer_counting_methods,              /* tp_methods */
+    khmer_countgraph_methods,              /* tp_methods */
     0,                                   /* tp_members */
     0,                                   /* tp_getset */
     0,                                   /* tp_base */
@@ -3676,21 +2546,19 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KCountingHash_Object")
     0,                                   /* tp_dictoffset */
     0,                                   /* tp_init */
     0,                                   /* tp_alloc */
-    _new_counting_hash,                  /* tp_new */
+    khmer_countgraph_new,                /* tp_new */
 };
 
-#define is_counting_obj(v)  (Py_TYPE(v) == &khmer_KCountgraph_Type)
-
 //
-// _new_counting_hash
+// khmer_countgraph_new
 //
 
-static PyObject* _new_counting_hash(PyTypeObject * type, PyObject * args,
-                                    PyObject * kwds)
+static PyObject* khmer_countgraph_new(PyTypeObject * type, PyObject * args,
+                                      PyObject * kwds)
 {
-    khmer_KCountingHash_Object * self;
+    khmer_KCountgraph_Object * self;
 
-    self = (khmer_KCountingHash_Object *)type->tp_alloc(type, 0);
+    self = (khmer_KCountgraph_Object *)type->tp_alloc(type, 0);
 
     if (self != NULL) {
         WordLength k = 0;
@@ -3702,35 +2570,20 @@ static PyObject* _new_counting_hash(PyTypeObject * type, PyObject * args,
         }
 
         std::vector<uint64_t> sizes;
-        Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
-        if (sizes_list_o_length == -1) {
+        if (!convert_Pytablesizes_to_vector(sizes_list_o, sizes)) {
             Py_DECREF(self);
-            PyErr_SetString(PyExc_ValueError, "error with hashtable primes!");
             return NULL;
-        }
-        for (Py_ssize_t i = 0; i < sizes_list_o_length; i++) {
-            PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
-            if (PyLong_Check(size_o)) {
-                sizes.push_back(PyLong_AsUnsignedLongLong(size_o));
-            } else if (PyInt_Check(size_o)) {
-                sizes.push_back(PyInt_AsLong(size_o));
-            } else if (PyFloat_Check(size_o)) {
-                sizes.push_back(PyFloat_AS_DOUBLE(size_o));
-            } else {
-                Py_DECREF(self);
-                PyErr_SetString(PyExc_TypeError,
-                                "2nd argument must be a list of ints, longs, or floats");
-                return NULL;
-            }
         }
 
         try {
-            self->counting = new CountingHash(k, sizes);
+            self->countgraph = new Countgraph(k, sizes);
         } catch (std::bad_alloc &e) {
             Py_DECREF(self);
             return PyErr_NoMemory();
         }
-        self->khashtable.hashtable = dynamic_cast<Hashtable*>(self->counting);
+        self->khashgraph.khashtable.hashtable =
+            dynamic_cast<Hashtable*>(self->countgraph);
+        self->khashgraph.hashgraph = dynamic_cast<Hashgraph*>(self->countgraph);
     }
 
     return (PyObject *) self;
@@ -3738,20 +2591,20 @@ static PyObject* _new_counting_hash(PyTypeObject * type, PyObject * args,
 
 static
 PyObject *
-hashbits_update(khmer_KHashbits_Object * me, PyObject * args)
+nodegraph_update(khmer_KNodegraph_Object * me, PyObject * args)
 {
-    Hashbits * hashbits = me->hashbits;
-    Hashbits * other;
-    khmer_KHashbits_Object * other_o;
+    Nodegraph * nodegraph = me->nodegraph;
+    Nodegraph * other;
+    khmer_KNodegraph_Object * other_o;
 
     if (!PyArg_ParseTuple(args, "O!", &khmer_KNodegraph_Type, &other_o)) {
         return NULL;
     }
 
-    other = other_o->hashbits;
+    other = other_o->nodegraph;
 
     try {
-        hashbits->update_from(*other);
+        nodegraph->update_from(*other);
     } catch (khmer_exception &e) {
         PyErr_SetString(PyExc_ValueError, e.what());
         return NULL;
@@ -3762,12 +2615,12 @@ hashbits_update(khmer_KHashbits_Object * me, PyObject * args)
 
 static
 PyObject *
-hashbits_get_raw_tables(khmer_KHashbits_Object * self, PyObject * args)
+nodegraph_get_raw_tables(khmer_KNodegraph_Object * self, PyObject * args)
 {
-    Hashbits * counting = self->hashbits;
+    Nodegraph * countgraph = self->nodegraph;
 
-    khmer::Byte ** table_ptrs = counting->get_raw_tables();
-    std::vector<uint64_t> sizes = counting->get_tablesizes();
+    khmer::Byte ** table_ptrs = countgraph->get_raw_tables();
+    std::vector<uint64_t> sizes = countgraph->get_tablesizes();
 
     PyObject * raw_tables = PyList_New(sizes.size());
     for (unsigned int i=0; i<sizes.size(); ++i) {
@@ -3787,29 +2640,29 @@ hashbits_get_raw_tables(khmer_KHashbits_Object * self, PyObject * args)
     return raw_tables;
 }
 
-static PyMethodDef khmer_hashbits_methods[] = {
+static PyMethodDef khmer_nodegraph_methods[] = {
     {
         "update",
-        (PyCFunction) hashbits_update, METH_VARARGS,
+        (PyCFunction) nodegraph_update, METH_VARARGS,
         "a set update: update this nodegraph with all the entries from the other"
     },
     {
         "get_raw_tables",
-        (PyCFunction) hashbits_get_raw_tables, METH_VARARGS,
+        (PyCFunction) nodegraph_get_raw_tables, METH_VARARGS,
         "Get a list of the raw tables as memoryview objects"
     },
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
-// __new__ for hashbits; necessary for proper subclassing
+// __new__ for nodegraph; necessary for proper subclassing
 // This will essentially do what the old factory function did. Unlike many __new__
-// methods, we take our arguments here, because there's no "uninitialized" hashbits
+// methods, we take our arguments here, because there's no "uninitialized" nodegraph
 // object; we have to have k and the table sizes before creating the new objects
-static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args,
+static PyObject* khmer_nodegraph_new(PyTypeObject * type, PyObject * args,
                                     PyObject * kwds)
 {
-    khmer_KHashbits_Object * self;
-    self = (khmer_KHashbits_Object *)type->tp_alloc(type, 0);
+    khmer_KNodegraph_Object * self;
+    self = (khmer_KNodegraph_Object *)type->tp_alloc(type, 0);
 
     if (self != NULL) {
         WordLength k = 0;
@@ -3821,35 +2674,23 @@ static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args,
         }
 
         std::vector<uint64_t> sizes;
-        Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
-        for (Py_ssize_t i = 0; i < sizes_list_o_length; i++) {
-            PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
-            if (PyLong_Check(size_o)) {
-                sizes.push_back(PyLong_AsUnsignedLongLong(size_o));
-            } else if (PyInt_Check(size_o)) {
-                sizes.push_back(PyInt_AsLong(size_o));
-            } else if (PyFloat_Check(size_o)) {
-                sizes.push_back(PyFloat_AS_DOUBLE(size_o));
-            } else {
-                Py_DECREF(self);
-                PyErr_SetString(PyExc_TypeError,
-                                "2nd argument must be a list of ints, longs, or floats");
-                return NULL;
-            }
+        if (!convert_Pytablesizes_to_vector(sizes_list_o, sizes)) {
+            Py_DECREF(self);
+            return NULL;
         }
 
         try {
-            self->hashbits = new Hashbits(k, sizes);
+            self->nodegraph = new Nodegraph(k, sizes);
         } catch (std::bad_alloc &e) {
             Py_DECREF(self);
             return PyErr_NoMemory();
         }
-        self->khashtable.hashtable = self->hashbits;
+        self->khashgraph.khashtable.hashtable =
+            dynamic_cast<Hashtable*>(self->nodegraph);
+        self->khashgraph.hashgraph = dynamic_cast<Hashgraph*>(self->nodegraph);
     }
     return (PyObject *) self;
 }
-
-#define is_hashbits_obj(v)  (Py_TYPE(v) == &khmer_KNodegraph_Type)
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -3977,14 +2818,14 @@ subset_partition_average_coverages(khmer_KSubsetPartition_Object * me,
 {
     SubsetPartition * subset_p = me->subset;
 
-    khmer_KCountingHash_Object * counting_o;
+    khmer_KCountgraph_Object * countgraph_o;
 
-    if (!PyArg_ParseTuple(args, "O!", &khmer_KCountgraph_Type, &counting_o)) {
+    if (!PyArg_ParseTuple(args, "O!", &khmer_KCountgraph_Type, &countgraph_o)) {
         return NULL;
     }
 
     PartitionCountMap cm;
-    subset_p->partition_average_coverages(cm, counting_o -> counting);
+    subset_p->partition_average_coverages(cm, countgraph_o -> countgraph);
 
     unsigned int i;
     PartitionCountMap::iterator mi;
@@ -4047,8 +2888,6 @@ typedef struct {
 static PyObject * khmer_graphlabels_new(PyTypeObject * type, PyObject *args,
                                         PyObject *kwds);
 
-#define is_graphlabels_obj(v)  (Py_TYPE(v) == &khmer_KGraphLabels_Type)
-
 static void khmer_graphlabels_dealloc(khmer_KGraphLabels_Object * obj)
 {
     delete obj->labelhash;
@@ -4064,20 +2903,20 @@ static PyObject * khmer_graphlabels_new(PyTypeObject *type, PyObject *args,
     self = (khmer_KGraphLabels_Object*)type->tp_alloc(type, 0);
 
     if (self != NULL) {
-        PyObject * hashtable_o;
-        khmer::Hashtable * hashtable = NULL;
+        PyObject * hashgraph_o;
+        khmer::Hashgraph * hashgraph = NULL; // @CTB
 
-        if (!PyArg_ParseTuple(args, "O", &hashtable_o)) {
+        if (!PyArg_ParseTuple(args, "O", &hashgraph_o)) {
             Py_DECREF(self);
             return NULL;
         }
 
-        if (PyObject_TypeCheck(hashtable_o, &khmer_KNodegraph_Type)) {
-            khmer_KHashbits_Object * kho = (khmer_KHashbits_Object *) hashtable_o;
-            hashtable = kho->hashbits;
-        } else if (PyObject_TypeCheck(hashtable_o, &khmer_KCountgraph_Type)) {
-            khmer_KCountingHash_Object * cho = (khmer_KCountingHash_Object *) hashtable_o;
-            hashtable = cho->counting;
+        if (PyObject_TypeCheck(hashgraph_o, &khmer_KNodegraph_Type)) {
+            khmer_KNodegraph_Object * kho = (khmer_KNodegraph_Object *) hashgraph_o;
+            hashgraph = kho->nodegraph;
+        } else if (PyObject_TypeCheck(hashgraph_o, &khmer_KCountgraph_Type)) {
+            khmer_KCountgraph_Object * cho = (khmer_KCountgraph_Object *) hashgraph_o;
+            hashgraph = cho->countgraph;
         } else {
             PyErr_SetString(PyExc_ValueError,
                             "graph object must be a NodeGraph or CountGraph");
@@ -4086,7 +2925,7 @@ static PyObject * khmer_graphlabels_new(PyTypeObject *type, PyObject *args,
         }
 
         try {
-            self->labelhash = new LabelHash(hashtable);
+            self->labelhash = new LabelHash(hashgraph);
         } catch (std::bad_alloc &e) {
             Py_DECREF(self);
             return PyErr_NoMemory();
@@ -4344,7 +3183,7 @@ labelhash_get_tag_labels(khmer_KGraphLabels_Object * me, PyObject * args)
         return NULL;
     }
     if (!ht_convert_PyObject_to_HashIntoType(tag_o, tag,
-                                             labelhash->graph)) {
+            labelhash->graph)) {
         return NULL;
     }
 
@@ -4410,8 +3249,8 @@ labelhash_assemble_labeled_path(khmer_KGraphLabels_Object * me,
     LabelHash* labelhash = me->labelhash;
 
     PyObject * val_o;
-    khmer_KHashbits_Object * nodegraph_o = NULL;
-    Hashbits * stop_bf = NULL;
+    khmer_KNodegraph_Object * nodegraph_o = NULL;
+    Nodegraph * stop_bf = NULL;
 
     if (!PyArg_ParseTuple(args, "O|O!", &val_o,
                           &khmer_KNodegraph_Type, &nodegraph_o)) {
@@ -4424,7 +3263,7 @@ labelhash_assemble_labeled_path(khmer_KGraphLabels_Object * me,
     }
 
     if (nodegraph_o) {
-        stop_bf = nodegraph_o->hashbits;
+        stop_bf = nodegraph_o->nodegraph;
     }
 
     SimpleLabeledAssembler assembler(labelhash);
@@ -4546,18 +3385,18 @@ static PyTypeObject khmer_KGraphLabels_Type = {
 
 static
 PyObject *
-hashtable_repartition_largest_partition(khmer_KHashtable_Object * me,
+hashgraph_repartition_largest_partition(khmer_KHashgraph_Object * me,
                                         PyObject * args)
 {
-    Hashtable * hashtable = me->hashtable;
-    khmer_KCountingHash_Object * counting_o = NULL;
+    Hashgraph * hashgraph = me->hashgraph;
+    khmer_KCountgraph_Object * countgraph_o = NULL;
     PyObject * subset_o = NULL;
     SubsetPartition * subset_p;
     unsigned int distance, threshold, frequency;
 
     if (!PyArg_ParseTuple(args, "OO!III",
                           &subset_o,
-                          &khmer_KCountgraph_Type, &counting_o,
+                          &khmer_KCountgraph_Type, &countgraph_o,
                           &distance, &threshold, &frequency)) {
         return NULL;
     }
@@ -4565,15 +3404,15 @@ hashtable_repartition_largest_partition(khmer_KHashtable_Object * me,
     if (PyObject_TypeCheck(subset_o, &khmer_KSubsetPartition_Type)) {
         subset_p = ((khmer_KSubsetPartition_Object *) subset_o)->subset;
     } else {
-        subset_p = hashtable->partition;
+        subset_p = hashgraph->partition;
     }
 
-    CountingHash * counting = counting_o->counting;
+    Countgraph * countgraph = countgraph_o->countgraph;
 
     unsigned long next_largest;
     try {
         next_largest = subset_p->repartition_largest_partition(distance,
-                       threshold, frequency, *counting);
+                       threshold, frequency, *countgraph);
     } catch (khmer_exception &e) {
         PyErr_SetString(PyExc_RuntimeError, e.what());
         return NULL;
@@ -4737,7 +3576,7 @@ static PyObject* khmer_ReadAligner_new(PyTypeObject *type, PyObject * args,
     self = (khmer_ReadAligner_Object *)type->tp_alloc(type, 0);
 
     if (self != NULL) {
-        khmer_KCountingHash_Object * ch = NULL;
+        khmer_KCountgraph_Object * ch = NULL;
         unsigned short int trusted_cov_cutoff = 2;
         double bits_theta = 1;
         double scoring_matrix[] = { 0, 0, 0, 0 };
@@ -4762,7 +3601,7 @@ static PyObject* khmer_ReadAligner_new(PyTypeObject *type, PyObject * args,
             return NULL;
         }
 
-        self->aligner = new ReadAligner(ch->counting, trusted_cov_cutoff,
+        self->aligner = new ReadAligner(ch->countgraph, trusted_cov_cutoff,
                                         bits_theta, scoring_matrix,
                                         transitions);
     }
@@ -4812,30 +3651,30 @@ static PyTypeObject khmer_ReadAlignerType = {
 };
 
 //
-// khmer_counting_dealloc -- clean up a counting hash object.
+// khmer_countgraph_dealloc -- clean up a countgraph hash object.
 //
 
-static void khmer_counting_dealloc(khmer_KCountingHash_Object * obj)
+static void khmer_countgraph_dealloc(khmer_KCountgraph_Object * obj)
 {
-    delete obj->counting;
-    obj->counting = NULL;
+    delete obj->countgraph;
+    obj->countgraph = NULL;
     Py_TYPE(obj)->tp_free((PyObject*)obj);
 }
 
 //
-// khmer_hashbits_dealloc -- clean up a hashbits object.
+// khmer_nodegraph_dealloc -- clean up a nodegraph object.
 //
-static void khmer_hashbits_dealloc(khmer_KHashbits_Object * obj)
+static void khmer_nodegraph_dealloc(khmer_KNodegraph_Object * obj)
 {
-    delete obj->hashbits;
-    obj->hashbits = NULL;
+    delete obj->nodegraph;
+    obj->nodegraph = NULL;
 
     Py_TYPE(obj)->tp_free((PyObject*)obj);
 }
 
 
 //
-// khmer_subset_dealloc -- clean up a hashbits object.
+// khmer_subset_dealloc -- clean up a subset object.
 //
 
 static void khmer_subset_dealloc(khmer_KSubsetPartition_Object * obj)
@@ -4854,7 +3693,7 @@ static void khmer_subset_dealloc(khmer_KSubsetPartition_Object * obj)
 
 typedef struct {
     PyObject_HEAD
-    khmer::HLLCounter * hllcounter;
+    HLLCounter * hllcounter;
 } khmer_KHLLCounter_Object;
 
 static PyObject* khmer_hllcounter_new(PyTypeObject * type, PyObject * args,
@@ -5194,8 +4033,6 @@ static PyTypeObject khmer_KHLLCounter_Type = {
     khmer_hllcounter_new,                      /* tp_new */
 };
 
-#define is_hllcounter_obj(v)  (Py_TYPE(v) == &khmer_KHLLCounter_Type)
-
 static PyObject * hllcounter_merge(khmer_KHLLCounter_Object * me,
                                    PyObject * args)
 {
@@ -5214,6 +4051,499 @@ static PyObject * hllcounter_merge(khmer_KHLLCounter_Object * me,
 
     Py_RETURN_NONE;
 }
+
+/********************************
+ * Assembler classes
+ ********************************/
+
+
+typedef struct {
+    PyObject_HEAD
+    LinearAssembler * assembler;
+} khmer_KLinearAssembler_Object;
+
+static void khmer_linearassembler_dealloc(khmer_KLinearAssembler_Object * obj)
+{
+    delete obj->assembler;
+    obj->assembler = NULL;
+
+    Py_TYPE(obj)->tp_free((PyObject*)obj);
+}
+
+static PyObject * khmer_linearassembler_new(PyTypeObject *type, PyObject *args,
+        PyObject *kwds)
+{
+    khmer_KLinearAssembler_Object *self;
+    self = (khmer_KLinearAssembler_Object*)type->tp_alloc(type, 0);
+
+    if (self != NULL) {
+        PyObject * hashgraph_o;
+        Hashgraph * hashgraph = NULL;
+
+        if (!PyArg_ParseTuple(args, "O", &hashgraph_o)) {
+            Py_DECREF(self);
+            return NULL;
+        }
+
+        if (PyObject_TypeCheck(hashgraph_o, &khmer_KNodegraph_Type)) {
+            khmer_KNodegraph_Object * kho = (khmer_KNodegraph_Object *) hashgraph_o;
+            hashgraph = kho->nodegraph;
+        } else if (PyObject_TypeCheck(hashgraph_o, &khmer_KCountgraph_Type)) {
+            khmer_KCountgraph_Object * cho = (khmer_KCountgraph_Object *) hashgraph_o;
+            hashgraph = cho->countgraph;
+        } else {
+            PyErr_SetString(PyExc_ValueError,
+                            "graph object must be a NodeGraph or CountGraph");
+            Py_DECREF(self);
+            return NULL;
+        }
+
+        try {
+            self->assembler = new LinearAssembler(hashgraph);
+        } catch (std::bad_alloc &e) {
+            Py_DECREF(self);
+            return PyErr_NoMemory();
+        }
+
+    }
+
+    return (PyObject *) self;
+}
+
+
+static
+PyObject *
+linearassembler_assemble(khmer_KLinearAssembler_Object * me,
+                         PyObject * args, PyObject *kwargs)
+{
+    LinearAssembler * assembler= me->assembler;
+
+    PyObject * val_o;
+    khmer_KNodegraph_Object * nodegraph_o = NULL;
+    Nodegraph * stop_bf = NULL;
+    const char * dir_str = NULL;
+    char dir = NULL;
+
+    const char *kwnames[] = {"seed_kmer", "stop_filter", "direction", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|O!s",
+                                     const_cast<char **>(kwnames),
+                                     &val_o, &khmer_KNodegraph_Type,
+                                     &nodegraph_o, &dir_str)) {
+        return NULL;
+    }
+    if (dir_str != NULL) {
+        dir = dir_str[0];
+    } else {
+        dir = 'B';
+    }
+
+    Kmer start_kmer;
+    if (!ht_convert_PyObject_to_Kmer(val_o, start_kmer, assembler->graph)) {
+        return NULL;
+    }
+
+    if (nodegraph_o) {
+        stop_bf = nodegraph_o->nodegraph;
+    }
+
+    std::string contig;
+    if (dir == 'B') {
+        contig = assembler->assemble(start_kmer, stop_bf);
+    } else if (dir == 'L') {
+        contig = assembler->assemble_left(start_kmer, stop_bf);
+    } else if (dir == 'R') {
+        contig = assembler->assemble_right(start_kmer, stop_bf);
+    } else {
+        PyErr_SetString(PyExc_ValueError, "Direction must be B (both), L (left),"
+                        " or R (right).");
+        return NULL;
+    }
+
+    PyObject * ret = Py_BuildValue("s", contig.c_str());
+    return ret;
+}
+
+
+static PyMethodDef khmer_linearassembler_methods[] = {
+    {
+        "assemble",
+        (PyCFunction)linearassembler_assemble, METH_VARARGS | METH_KEYWORDS,
+        "Assemble a path linearly until a branch is reached."
+    },
+    {NULL, NULL, 0, NULL}           /* sentinel */
+};
+
+static PyTypeObject khmer_KLinearAssembler_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)  /* init & ob_size */
+    "_khmer.LinearAssembler",            /* tp_name */
+    sizeof(khmer_KLinearAssembler_Object), /* tp_basicsize */
+    0,                       /* tp_itemsize */
+    (destructor)khmer_linearassembler_dealloc, /* tp_dealloc */
+    0,                       /* tp_print */
+    0,                       /* tp_getattr */
+    0,                       /* tp_setattr */
+    0,                       /* tp_compare */
+    0,                       /* tp_repr */
+    0,                       /* tp_as_number */
+    0,                       /* tp_as_sequence */
+    0,                       /* tp_as_mapping */
+    0,                       /* tp_hash */
+    0,                       /* tp_call */
+    0,                       /* tp_str */
+    0,                       /* tp_getattro */
+    0,                       /* tp_setattro */
+    0,                       /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,   /* tp_flags */
+    0,                       /* tp_doc */
+    0,                       /* tp_traverse */
+    0,                       /* tp_clear */
+    0,                       /* tp_richcompare */
+    0,                       /* tp_weaklistoffset */
+    0,                       /* tp_iter */
+    0,                       /* tp_iternext */
+    khmer_linearassembler_methods, /* tp_methods */
+    0,                       /* tp_members */
+    0,                       /* tp_getset */
+    0,                       /* tp_base */
+    0,                       /* tp_dict */
+    0,                       /* tp_descr_get */
+    0,                       /* tp_descr_set */
+    0,                       /* tp_dictoffset */
+    0,                       /* tp_init */
+    0,                       /* tp_alloc */
+    khmer_linearassembler_new,      /* tp_new */
+};
+
+
+
+typedef struct {
+    PyObject_HEAD
+    SimpleLabeledAssembler * assembler;
+} khmer_KSimpleLabeledAssembler_Object;
+
+
+static void khmer_simplelabeledassembler_dealloc(khmer_KLinearAssembler_Object *
+        obj)
+{
+    delete obj->assembler;
+    obj->assembler = NULL;
+
+    Py_TYPE(obj)->tp_free((PyObject*)obj);
+}
+
+static PyObject * khmer_simplelabeledassembler_new(PyTypeObject *type,
+        PyObject *args,
+        PyObject *kwds)
+{
+    khmer_KSimpleLabeledAssembler_Object *self;
+    self = (khmer_KSimpleLabeledAssembler_Object*)type->tp_alloc(type, 0);
+
+    if (self != NULL) {
+        PyObject * labelhash_o;
+        LabelHash * labelhash = NULL;
+
+        if (!PyArg_ParseTuple(args, "O", &labelhash_o)) {
+            Py_DECREF(self);
+            return NULL;
+        }
+
+        if (PyObject_TypeCheck(labelhash_o, &khmer_KGraphLabels_Type)) {
+            khmer_KGraphLabels_Object * klo = (khmer_KGraphLabels_Object *) labelhash_o;
+            labelhash = klo->labelhash;
+        } else {
+            PyErr_SetString(PyExc_ValueError,
+                            "SimpleLabeledAssembler needs a GraphLabels object.");
+            Py_DECREF(self);
+            return NULL;
+        }
+
+        try {
+            self->assembler = new SimpleLabeledAssembler(labelhash);
+        } catch (std::bad_alloc &e) {
+            Py_DECREF(self);
+            return PyErr_NoMemory();
+        }
+
+    }
+
+    return (PyObject *) self;
+}
+
+
+static
+PyObject *
+simplelabeledassembler_assemble(khmer_KSimpleLabeledAssembler_Object * me,
+                                PyObject * args, PyObject *kwargs)
+{
+    SimpleLabeledAssembler * assembler = me->assembler;
+
+    PyObject * val_o;
+    khmer_KNodegraph_Object * nodegraph_o = NULL;
+    Nodegraph * stop_bf = NULL;
+
+    const char *kwnames[] = {"seed_kmer", "stop_filter", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|O!",
+                                     const_cast<char **>(kwnames),
+                                     &val_o, &khmer_KNodegraph_Type,
+                                     &nodegraph_o)) {
+        return NULL;
+    }
+
+
+    Kmer start_kmer;
+    if (!ht_convert_PyObject_to_Kmer(val_o, start_kmer, assembler->graph)) {
+        return NULL;
+    }
+
+    if (nodegraph_o) {
+        stop_bf = nodegraph_o->nodegraph;
+    }
+
+    std::vector<std::string> contigs = assembler->assemble(start_kmer, stop_bf);
+
+    PyObject * ret = PyList_New(contigs.size());
+    for (unsigned int i = 0; i < contigs.size(); i++) {
+        PyList_SET_ITEM(ret, i, PyUnicode_FromString(contigs[i].c_str()));
+    }
+
+    return ret;
+}
+
+
+static PyMethodDef khmer_simplelabeledassembler_methods[] = {
+    {
+        "assemble",
+        (PyCFunction)simplelabeledassembler_assemble, METH_VARARGS | METH_KEYWORDS,
+        "Assemble paths, using labels to jump branches."
+    },
+    {NULL, NULL, 0, NULL}           /* sentinel */
+};
+
+static PyTypeObject khmer_KSimpleLabeledAssembler_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)  /* init & ob_size */
+    "_khmer.SimpleLabeledAssembler",            /* tp_name */
+    sizeof(khmer_KSimpleLabeledAssembler_Object), /* tp_basicsize */
+    0,                       /* tp_itemsize */
+    (destructor)khmer_simplelabeledassembler_dealloc, /* tp_dealloc */
+    0,                       /* tp_print */
+    0,                       /* tp_getattr */
+    0,                       /* tp_setattr */
+    0,                       /* tp_compare */
+    0,                       /* tp_repr */
+    0,                       /* tp_as_number */
+    0,                       /* tp_as_sequence */
+    0,                       /* tp_as_mapping */
+    0,                       /* tp_hash */
+    0,                       /* tp_call */
+    0,                       /* tp_str */
+    0,                       /* tp_getattro */
+    0,                       /* tp_setattro */
+    0,                       /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,   /* tp_flags */
+    0,                       /* tp_doc */
+    0,                       /* tp_traverse */
+    0,                       /* tp_clear */
+    0,                       /* tp_richcompare */
+    0,                       /* tp_weaklistoffset */
+    0,                       /* tp_iter */
+    0,                       /* tp_iternext */
+    khmer_simplelabeledassembler_methods, /* tp_methods */
+    0,                       /* tp_members */
+    0,                       /* tp_getset */
+    0,                       /* tp_base */
+    0,                       /* tp_dict */
+    0,                       /* tp_descr_get */
+    0,                       /* tp_descr_set */
+    0,                       /* tp_dictoffset */
+    0,                       /* tp_init */
+    0,                       /* tp_alloc */
+    khmer_simplelabeledassembler_new,      /* tp_new */
+};
+
+
+
+/********************************
+ * JunctionCountAssembler
+ ********************************/
+
+
+typedef struct {
+    PyObject_HEAD
+    JunctionCountAssembler * assembler;
+} khmer_KJunctionCountAssembler_Object;
+
+static void khmer_junctioncountassembler_dealloc(
+    khmer_KJunctionCountAssembler_Object * obj)
+{
+    delete obj->assembler;
+    obj->assembler = NULL;
+
+    Py_TYPE(obj)->tp_free((PyObject*)obj);
+}
+
+static PyObject * khmer_junctioncountassembler_new(PyTypeObject *type,
+        PyObject *args,
+        PyObject *kwds)
+{
+    khmer_KJunctionCountAssembler_Object *self;
+    self = (khmer_KJunctionCountAssembler_Object*)type->tp_alloc(type, 0);
+
+    if (self != NULL) {
+        PyObject * hashgraph_o;
+        Hashgraph * hashgraph = NULL;
+
+        if (!PyArg_ParseTuple(args, "O", &hashgraph_o)) {
+            Py_DECREF(self);
+            return NULL;
+        }
+
+        if (PyObject_TypeCheck(hashgraph_o, &khmer_KNodegraph_Type)) {
+            khmer_KNodegraph_Object * kho = (khmer_KNodegraph_Object *) hashgraph_o;
+            hashgraph = kho->nodegraph;
+        } else if (PyObject_TypeCheck(hashgraph_o, &khmer_KCountgraph_Type)) {
+            khmer_KCountgraph_Object * cho = (khmer_KCountgraph_Object *) hashgraph_o;
+            hashgraph = cho->countgraph;
+        } else {
+            PyErr_SetString(PyExc_ValueError,
+                            "graph object must be a NodeGraph or CountGraph");
+            Py_DECREF(self);
+            return NULL;
+        }
+
+        try {
+            self->assembler = new JunctionCountAssembler(hashgraph);
+        } catch (std::bad_alloc &e) {
+            Py_DECREF(self);
+            return PyErr_NoMemory();
+        }
+
+    }
+
+    return (PyObject *) self;
+}
+
+
+static
+PyObject *
+junctioncountassembler_assemble(khmer_KJunctionCountAssembler_Object * me,
+                                PyObject * args, PyObject *kwargs)
+{
+    JunctionCountAssembler * assembler = me->assembler;
+
+    PyObject * val_o;
+    khmer_KNodegraph_Object * nodegraph_o = NULL;
+    Nodegraph * stop_bf = NULL;
+
+    const char *kwnames[] = {"seed_kmer", "stop_filter", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|O!",
+                                     const_cast<char **>(kwnames),
+                                     &val_o, &khmer_KNodegraph_Type,
+                                     &nodegraph_o)) {
+        return NULL;
+    }
+
+    Kmer start_kmer;
+    if (!ht_convert_PyObject_to_Kmer(val_o, start_kmer, assembler->graph)) {
+        return NULL;
+    }
+
+    if (nodegraph_o) {
+        stop_bf = nodegraph_o->nodegraph;
+    }
+
+    std::vector<std::string> contigs = assembler->assemble(start_kmer, stop_bf);
+
+    PyObject * ret = PyList_New(contigs.size());
+    for (unsigned int i = 0; i < contigs.size(); i++) {
+        PyList_SET_ITEM(ret, i, PyUnicode_FromString(contigs[i].c_str()));
+    }
+
+    return ret;
+}
+
+
+static
+PyObject *
+junctioncountassembler_consume(khmer_KJunctionCountAssembler_Object * me,
+                               PyObject * args)
+{
+    JunctionCountAssembler * assembler = me->assembler;
+    const char * long_str;
+
+    if (!PyArg_ParseTuple(args, "s", &long_str)) {
+        return NULL;
+    }
+
+    if (strlen(long_str) < assembler->_ksize) {
+        PyErr_SetString(PyExc_ValueError,
+                        "string length must >= the hashgraph k-mer size");
+        return NULL;
+    }
+
+    uint16_t n_junctions = assembler->consume(long_str);
+
+    return PyLong_FromLong((HashIntoType) n_junctions);
+}
+
+
+static PyMethodDef khmer_junctioncountassembler_methods[] = {
+    {
+        "assemble",
+        (PyCFunction)junctioncountassembler_assemble, METH_VARARGS | METH_KEYWORDS,
+        "Assemble paths, using recorded junctions to jump branches."
+    },
+    {
+        "consume",
+        (PyCFunction)junctioncountassembler_consume, METH_VARARGS,
+        "Consume a string and count its branch junctions."
+    },
+    {NULL, NULL, 0, NULL}           /* sentinel */
+};
+
+static PyTypeObject khmer_KJunctionCountAssembler_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)  /* init & ob_size */
+    "_khmer.JunctionCountAssembler",            /* tp_name */
+    sizeof(khmer_KJunctionCountAssembler_Object), /* tp_basicsize */
+    0,                       /* tp_itemsize */
+    (destructor)khmer_junctioncountassembler_dealloc, /* tp_dealloc */
+    0,                       /* tp_print */
+    0,                       /* tp_getattr */
+    0,                       /* tp_setattr */
+    0,                       /* tp_compare */
+    0,                       /* tp_repr */
+    0,                       /* tp_as_number */
+    0,                       /* tp_as_sequence */
+    0,                       /* tp_as_mapping */
+    0,                       /* tp_hash */
+    0,                       /* tp_call */
+    0,                       /* tp_str */
+    0,                       /* tp_getattro */
+    0,                       /* tp_setattro */
+    0,                       /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,   /* tp_flags */
+    0,                       /* tp_doc */
+    0,                       /* tp_traverse */
+    0,                       /* tp_clear */
+    0,                       /* tp_richcompare */
+    0,                       /* tp_weaklistoffset */
+    0,                       /* tp_iter */
+    0,                       /* tp_iternext */
+    khmer_junctioncountassembler_methods, /* tp_methods */
+    0,                       /* tp_members */
+    0,                       /* tp_getset */
+    0,                       /* tp_base */
+    0,                       /* tp_dict */
+    0,                       /* tp_descr_get */
+    0,                       /* tp_descr_set */
+    0,                       /* tp_dictoffset */
+    0,                       /* tp_init */
+    0,                       /* tp_alloc */
+    khmer_junctioncountassembler_new,      /* tp_new */
+};
+
 
 //////////////////////////////
 // standalone functions
@@ -5411,7 +4741,23 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
-    khmer_KCountgraph_Type.tp_base = &khmer_KHashtable_Type;
+    khmer_KCounttable_Type.tp_base = &khmer_KHashtable_Type;
+    if (PyType_Ready(&khmer_KCounttable_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    khmer_KNodetable_Type.tp_base = &khmer_KHashtable_Type;
+    if (PyType_Ready(&khmer_KNodetable_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    khmer_KHashgraph_Type.tp_base = &khmer_KHashtable_Type;
+    khmer_KHashgraph_Type.tp_methods = khmer_hashgraph_methods;
+    if (PyType_Ready(&khmer_KHashgraph_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    khmer_KCountgraph_Type.tp_base = &khmer_KHashgraph_Type;
     if (PyType_Ready(&khmer_KCountgraph_Type) < 0) {
         return MOD_ERROR_VAL;
     }
@@ -5425,9 +4771,19 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
-    khmer_KNodegraph_Type.tp_base = &khmer_KHashtable_Type;
-    khmer_KNodegraph_Type.tp_methods = khmer_hashbits_methods;
+    khmer_KNodegraph_Type.tp_base = &khmer_KHashgraph_Type;
+    khmer_KNodegraph_Type.tp_methods = khmer_nodegraph_methods;
     if (PyType_Ready(&khmer_KNodegraph_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    if (PyType_Ready(&khmer_KLinearAssembler_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+    if (PyType_Ready(&khmer_KSimpleLabeledAssembler_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+    if (PyType_Ready(&khmer_KJunctionCountAssembler_Type) < 0) {
         return MOD_ERROR_VAL;
     }
 
@@ -5467,9 +4823,27 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
+    Py_INCREF(&khmer_Read_Type);
+    if (PyModule_AddObject( m, "Read",
+                            (PyObject *)&khmer_Read_Type ) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
     Py_INCREF(&khmer_ReadParser_Type);
     if (PyModule_AddObject( m, "ReadParser",
                             (PyObject *)&khmer_ReadParser_Type ) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    Py_INCREF(&khmer_KCounttable_Type);
+    if (PyModule_AddObject( m, "Counttable",
+                            (PyObject *)&khmer_KCounttable_Type ) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    Py_INCREF(&khmer_KNodetable_Type);
+    if (PyModule_AddObject( m, "Nodetable",
+                            (PyObject *)&khmer_KNodetable_Type ) < 0) {
         return MOD_ERROR_VAL;
     }
 
@@ -5488,6 +4862,24 @@ MOD_INIT(_khmer)
     Py_INCREF(&khmer_KGraphLabels_Type);
     if (PyModule_AddObject(m, "GraphLabels",
                            (PyObject *)&khmer_KGraphLabels_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    Py_INCREF(&khmer_KLinearAssembler_Type);
+    if (PyModule_AddObject(m, "LinearAssembler",
+                           (PyObject *)&khmer_KLinearAssembler_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    Py_INCREF(&khmer_KSimpleLabeledAssembler_Type);
+    if (PyModule_AddObject(m, "SimpleLabeledAssembler",
+                           (PyObject *)&khmer_KSimpleLabeledAssembler_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    Py_INCREF(&khmer_KJunctionCountAssembler_Type);
+    if (PyModule_AddObject(m, "JunctionCountAssembler",
+                           (PyObject *)&khmer_KJunctionCountAssembler_Type) < 0) {
         return MOD_ERROR_VAL;
     }
 

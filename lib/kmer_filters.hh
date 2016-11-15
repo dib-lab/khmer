@@ -63,6 +63,9 @@ KmerFilter get_stop_bf_filter(const Hashtable * stop_bf);
 
 KmerFilter get_visited_filter(const SeenSet * visited);
 
+KmerFilter get_junction_count_filter(const Kmer& src_node,
+                                     Countgraph * junctions,
+                                     const unsigned int min_cov = 2);
 
 }
 #endif

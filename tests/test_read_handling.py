@@ -259,36 +259,6 @@ def test_interleave_reads_2_fa():
     assert n > 0
 
 
-def execute_split_paired_streaming(ifilename):
-    fifo = utils.get_temp_filename('fifo')
-    in_dir = os.path.dirname(fifo)
-    outfile1 = utils.get_temp_filename('paired-1.fa')
-    outfile2 = utils.get_temp_filename('paired-2.fa')
-    script = 'split-paired-reads.py'
-    args = [fifo, '-1', outfile1, '-2', outfile2]
-
-    # make a fifo to simulate streaming
-    os.mkfifo(fifo)
-
-    thread = threading.Thread(target=utils.runscript,
-                              args=(script, args, in_dir))
-    thread.start()
-    ifile = open(ifilename, 'r')
-    fifofile = open(fifo, 'w')
-    chunk = ifile.read(4)
-    while len(chunk) > 0:
-        fifofile.write(chunk)
-        chunk = ifile.read(4)
-    fifofile.close()
-    thread.join()
-    assert os.path.exists(outfile1), outfile1
-    assert os.path.exists(outfile2), outfile2
-
-
-def test_split_paired_streaming():
-    o = execute_split_paired_streaming(utils.get_test_data('paired.fa'))
-
-
 def test_split_paired_reads_1_fa():
     # test input file
     infile = utils.get_test_data('paired.fa')

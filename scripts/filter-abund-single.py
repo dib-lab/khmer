@@ -51,7 +51,8 @@ import sys
 import threading
 import textwrap
 import khmer
-import screed
+
+from khmer import ReadParser
 from khmer.utils import broken_paired_reader, write_record
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, report_on_config,
@@ -164,8 +165,8 @@ def main():
     outfp = open(outfile, 'wb')
     outfp = get_file_writer(outfp, args.gzip, args.bzip)
 
-    screed_iter = screed.open(args.datafile)
-    paired_iter = broken_paired_reader(screed_iter, min_length=graph.ksize(),
+    paired_iter = broken_paired_reader(ReadParser(args.datafile),
+                                       min_length=graph.ksize(),
                                        force_single=True)
 
     for n, is_pair, read1, read2 in paired_iter:
