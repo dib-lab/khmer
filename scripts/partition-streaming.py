@@ -9,7 +9,7 @@ from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
                               report_on_config, info, calculate_graphsize,
                               sanitize_help, check_argument_range)
-from khmer import _oxli
+from khmer._oxli.partitioning import StreamingPartitioner
 import argparse
 from khmer.utils import (write_record, broken_paired_reader, ReadBundle)
 
@@ -27,10 +27,12 @@ def main():
     parser = build_counting_args()
     parser.add_argument('-stats-dir', default='component_stats')
     parser.add_argument('samples', nargs='+')
+    parser.add_argument('-Z', dest='norm', default=10)
+    parser.add_argument('--stats-interval', default=50000)
     args = parser.parse_args()
 
     graph = khmer_args.create_countgraph(args)
-    partitioner = _oxli.StreamingPartitioner(graph)
+    partitioner = StreamingPartitioner(graph)
 
     try:
         os.mkdir(args.stats_dir)
@@ -40,11 +42,19 @@ def main():
     for sample in args.samples:
         print('== Starting {0} =='.format(sample))
         for n, read in enumerate(screed.open(sample)):
-            if n % 500 == 0:
+            if n % 1000 == 0:
                 print (n, '...', sep='')
-            if n > 0 and n % 10000 == 0:
+            if args.stats_interval > 0 and n > 0 and n % args.stats_interval == 0:
                 write_stats(partitioner, args.stats_dir, n, sample)
-            partitioner.consume_sequence(read.sequence)
+            cov, _, _ = graph.get_median_count(read.sequence)
+            if cov < args.norm:
+                graph.consume(read.sequence)
+            else:
+                seq, pos = graph.trim_on_abundance(read.sequence, 2)
+                if len(seq) < args.ksize:
+                    continue
+                partitioner.consume_sequence(read.sequence)
+
         write_stats(partitioner, args.stats_dir, n, sample)
 
 if __name__ == '__main__':
