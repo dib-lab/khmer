@@ -544,7 +544,7 @@ public:
     }
 
     bool done() const {
-        return (index + _ksize >= length);
+        return (index + _ksize > length);
     }
 
     unsigned int get_start_pos() const { return index; }
