@@ -90,6 +90,7 @@ struct Read {
     std:: string    annotations;
     std:: string    sequence;
     std:: string    quality;
+    std:: string    cleaned_seq;
     // TODO? Add description field.
 
     inline void reset ( )
