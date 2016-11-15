@@ -47,8 +47,7 @@ def test_get_kmer_hashes():
     a = khmer.Counttable(33, 1e6, 3)
     assert a.get_kmer_hashes(s[:33]) == [48584371158645721]
     assert a.get_kmer_hashes(s[:34]) == [48584371158645721,
-                                         12916831244904756973,]
-                                         
+                                         12916831244904756973]
 
     assert a.get_kmer_hashes(s[0:33]) == [48584371158645721]
     assert a.get_kmer_hashes(s[1:34]) == [12916831244904756973]
