@@ -260,9 +260,9 @@ def test_normalize_by_median_report_fp():
     # this tests basic reporting of diginorm stats => report.out, including
     # a test of aggregate stats for two input files.
 
-    infile = utils.copy_test_data(test-abund-read-2.fa)
+    infile = utils.copy_test_data("test-abund-read-2.fa")
 
-    infile2 = utils.copy_test_data(test-abund-read-2.fa)
+    infile2 = utils.copy_test_data("test-abund-read-2.fa")
 
 
     in_dir = os.path.dirname(infile)
