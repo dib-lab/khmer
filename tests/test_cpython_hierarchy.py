@@ -67,8 +67,5 @@ def test_nodegraph_vs_table():
 def test_counttable_no_unhash():
     x = khmer.Counttable(4, 21, 3)
 
-    try:
+    with pytest.raises(ValueError):
         x.reverse_hash(1)
-        assert 0
-    except ValueError:
-        pass
