@@ -58,6 +58,8 @@ Contact: khmer-project@idyll.org
 #include "storage.hh"
 #include "subset.hh"
 
+using namespace std;
+
 namespace khmer
 {
 namespace read_parsers
@@ -110,11 +112,14 @@ protected:
     explicit Hashtable(const Hashtable&);
     Hashtable& operator=(const Hashtable&);
 
-    virtual KmerHashIterator * new_kmer_iterator(const char * sp) const {
+    virtual unique_ptr<KmerHashIterator>
+    new_kmer_iterator(const char * sp) const {
         KmerHashIterator * ki = new TwoBitKmerHashIterator(sp, _ksize);
-        return ki;
+        return unique_ptr<KmerHashIterator>(ki);
     }
-    virtual KmerHashIterator * new_kmer_iterator(const std::string& s) const {
+
+    virtual unique_ptr<KmerHashIterator>
+    new_kmer_iterator(const std::string& s) const {
         return new_kmer_iterator(s.c_str());
     }
 
@@ -351,7 +356,8 @@ public:
         throw khmer_exception("not implemented");
     }
 
-    virtual KmerHashIterator * new_kmer_iterator(const char * sp) const;
+    virtual unique_ptr<KmerHashIterator>
+        new_kmer_iterator(const char * sp) const;
 };
     
 // Hashtable-derived class with BitStorage.
