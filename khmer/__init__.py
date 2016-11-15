@@ -255,7 +255,7 @@ def get_n_primes_near_x(number, target):
         i -= 1
     while len(primes) != number and i > 0:
         if is_prime(i):
-            primes.append(i)
+            primes.append(int(i))
         i -= 2
 
     if len(primes) != number:
