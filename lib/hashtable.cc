@@ -317,9 +317,9 @@ BoundedCounterType Hashtable::get_min_count(const std::string &s)
 
 BoundedCounterType Hashtable::get_max_count(const std::string &s)
 {
-    KmerHashIterator * kmers = new_kmer_iterator(s);
-
     BoundedCounterType max_count = 0;
+
+    KmerHashIterator * kmers = new_kmer_iterator(s);
 
     while(!kmers->done()) {
         HashIntoType kmer = kmers->next();

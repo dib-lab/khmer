@@ -50,8 +50,9 @@ import os
 import textwrap
 import argparse
 import khmer
-import screed
+
 from khmer import __version__
+from khmer import ReadParser
 from khmer.utils import (broken_paired_reader, write_record)
 from khmer.khmer_args import (ComboFormatter, add_threading_args, info,
                               sanitize_help, _VersionStdErrAction,
@@ -152,8 +153,8 @@ def main():
             outfp = open(outfile, 'wb')
             outfp = get_file_writer(outfp, args.gzip, args.bzip)
 
-        screed_iter = screed.open(infile)
-        paired_iter = broken_paired_reader(screed_iter, min_length=ksize,
+        paired_iter = broken_paired_reader(ReadParser(infile),
+                                           min_length=ksize,
                                            force_single=True)
 
         for n, is_pair, read1, read2 in paired_iter:
