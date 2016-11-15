@@ -1,3 +1,7 @@
+2016-11-14  Shannon EK Joslin	<sejoslin@ucdavis.edu>
+   *khmer/tests/test_countgraph.py: Refactor test code to use load_countgraph #1474
+   *khmer/tests/test_nodegraph.py: Refactor test code to use load_nodegraph and load_countgraph #1474
+
 2016-11-14  Tim Head  <betatim@gmail.com>
 
   * .travis.yml: whitelist `master` branch to allow build-on-push without
