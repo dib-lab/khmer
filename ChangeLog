@@ -1,6 +1,6 @@
 2016-11-15 Nicole Kingsley <nbkingsley@ucdavis.edu>
 
-   * test_normalize_by_median.py, test_scripts.py:
+   * tests/{test_normalize_by_median.py,test_scripts.py}:
    Replaced two lines that created a file and stored test data with one
    line that calls the utils.copy_test_data function to complete the 
    same task. 
