@@ -60,7 +60,6 @@ def test_toobig():
     except MemoryError as err:
         print(str(err))
 
-
 def test__get_set_tag_density():
     nodegraph = khmer._Nodegraph(32, [1]) 
 
@@ -739,7 +738,6 @@ def test_nodegraph_file_type_check():
     kh = khmer._Countgraph(12, [1])
     savepath = utils.get_temp_filename('tempcountingsave0.ct')
     kh.save(savepath)
-
 
     try:
         nodegraph = khmer.load_nodegraph(savepath)
