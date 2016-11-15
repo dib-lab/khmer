@@ -1,6 +1,6 @@
 # Change Log
 All notable changes to the khmer project will be documented in this file.
-See [this](http://keepachangelog.com/) for more info.
+See [keepachangelog](http://keepachangelog.com/) for more info.
 
 The khmer project's command line scripts adhere to
 [Semantic Versioning](http://semver.org/). The Python and C++ APIs are not yet
