@@ -44,6 +44,10 @@ import math
 import textwrap
 from argparse import _VersionAction
 from collections import namedtuple
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 import screed
 import khmer
@@ -98,11 +102,16 @@ class ComboFormatter(argparse.ArgumentDefaultsHelpFormatter,
 # binary mode flag. Upstream bug tracked in https://bugs.python.org/issue14156
 class FileType(argparse.FileType):
     def __call__(self, fname):
-        if fname == '-' and sys.version_info.major == 3:
+        if (fname == '-' and
+            sys.version_info.major == 3 and
+            # detect if stdout is being faked (during unittests) in which
+            # case we do not have to do anything
+            not isinstance(sys.stdout, StringIO)):
             if 'r' in self._mode:
                 fname = sys.stdin.fileno()
             elif 'w' in self._mode:
                 fname = sys.stdout.fileno()
+
         return super(FileType, self).__call__(fname)
 
 
