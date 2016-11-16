@@ -4,24 +4,24 @@
    Copyright (C) 2015 The Regents of the University of California.
    It is licensed under the three-clause BSD license; see LICENSE.
    Contact: khmer-project@idyll.org
-   
+
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are
    met:
-   
+
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
-   
+
     * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the following
       disclaimer in the documentation and/or other materials provided
       with the distribution.
-   
+
     * Neither the name of the Michigan State University nor the names
       of its contributors may be used to endorse or promote products
       derived from this software without specific prior written
       permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -33,7 +33,7 @@
    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-   
+
    Contact: khmer-project@idyll.org
 
 Command line scripts, ``scripts/``, and ``sandbox/``
@@ -88,15 +88,32 @@ All *new* scripts being added to ``sandbox/`` should:
 * be used in a protocol (see khmer-protocols) or a recipe (see khmer-recipes)
 * be pep8 clean and pylint clean-ish (see ``make pep8`` and ``make_diff_pylint``).
 
-Command line standard options for scripts/
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Standard and reserved command line options for ``scripts/``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-All scripts in scripts/ should have the following options, if they could apply:
+The following options are reserved, and the short option flag cannot be
+redefined in any official script.
 
-* ``--version`` - should always apply
-* ``--help`` - should always apply
-* ``--force`` - override any sanity checks that may prevent the script from running
-* ``--loadgraph`` and ``--savegraph`` - where appropriate (see khmer_args.py)
+* ``-h|--help`` - this must always print out a descriptive usage statement
+* ``-v|--version`` - this must always print out the khmer version number
+* ``-x|--max-tablesize`` - this must always specify the approximate table size
+  for storing sketches of k-mer hashes
+* ``-N|--n_tables`` - this must always specify the number of tables for storing
+  sketches of k-mer hashes
+* ``-M|--max-memory-usage`` - this must always specify the maximum amount of
+  memory to be consumed for storing sketches of k-mer hashes
+* ``-U|--unique-kmers`` - this must always specify the approximate number of
+  unique k-mers in the data set
+* ``-k|--ksize`` - this must always specify the k-mer size to use
+* ``-q|--quiet`` - this must always indicate that the script's diagnostic output
+  should be minimized or altogether eliminated
+
+Additionally, all scripts in ``scripts/`` should have the following options.
+
+* ``-h|--help``
+* ``-v|--version``
+* ``-f|--force`` - if applicable, override any sanity checks that may prevent
+  the script from running
 
 If an option is of type ``type=argparse.FileType('w')`` then you need to also
 specify a ``metavar`` for the documentation and help formatting. Example::
