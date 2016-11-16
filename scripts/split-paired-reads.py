@@ -53,7 +53,7 @@ import argparse
 from khmer import __version__
 from khmer import ReadParser
 from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
-                              _VersionStdErrAction)
+                              _VersionStdErrAction, FileType)
 from khmer.utils import (write_record, broken_paired_reader,
                          UnpairedReadsError)
 from khmer.kfile import (check_input_files, check_space,
@@ -105,13 +105,13 @@ def get_parser():
     parser.add_argument('-0', '--output-orphaned', metavar='output_orphaned',
                         help='Allow "orphaned" reads and extract them to ' +
                         'this file',
-                        type=argparse.FileType('wb'))
+                        type=FileType('wb'))
     parser.add_argument('-1', '--output-first', metavar='output_first',
                         default=None, help='Output "left" reads to this '
-                        'file', type=argparse.FileType('wb'))
+                        'file', type=FileType('wb'))
     parser.add_argument('-2', '--output-second', metavar='output_second',
                         default=None, help='Output "right" reads to this '
-                        'file', type=argparse.FileType('wb'))
+                        'file', type=FileType('wb'))
     parser.add_argument('--version', action=_VersionStdErrAction,
                         version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',

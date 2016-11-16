@@ -56,7 +56,7 @@ from khmer import khmer_args
 from contextlib import contextmanager
 from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
                               report_on_config, info, calculate_graphsize,
-                              sanitize_help, check_argument_range)
+                              sanitize_help, check_argument_range, FileType)
 import argparse
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
@@ -282,7 +282,7 @@ def get_parser():
                         help='continue past file reading errors',
                         action='store_true')
     parser.add_argument('-o', '--output', metavar="filename",
-                        type=argparse.FileType('wb'),
+                        type=FileType('wb'),
                         default=None, dest='single_output_file',
                         help='only output a single file with '
                         'the specified filename; use a single dash "-" to '

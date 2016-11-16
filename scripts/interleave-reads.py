@@ -53,7 +53,7 @@ import argparse
 from khmer import __version__
 from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
-                              _VersionStdErrAction)
+                              _VersionStdErrAction, FileType)
 from khmer.kfile import (add_output_compression_type, get_file_writer,
                          describe_file_handle)
 from khmer.utils import (write_record_pair, check_is_left, check_is_right,
@@ -88,7 +88,7 @@ def get_parser():
     parser.add_argument('left')
     parser.add_argument('right')
     parser.add_argument('-o', '--output', metavar="filename",
-                        type=argparse.FileType('wb'),
+                        type=FileType('wb'),
                         default=sys.stdout)
     parser.add_argument('--version', action=_VersionStdErrAction,
                         version='khmer {v}'.format(v=__version__))
