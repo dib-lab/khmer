@@ -65,6 +65,7 @@ them, please visit the following URLs:
 The maintainers can be contacted at khmer-project@idyll.org.
 
 For getting help please see this guide: http://khmer.readthedocs.io/en/stable/user/getting-help.html
+Your first port of call when looking for help should be: https://github.com/dib-lab/khmer/issues
 
 
 Important note: cite us!
