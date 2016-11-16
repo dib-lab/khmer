@@ -58,7 +58,7 @@ from khmer import ReadParser
 
 from khmer.khmer_args import (build_counting_args, info, add_loadgraph_args,
                               report_on_config, calculate_graphsize,
-                              sanitize_help)
+                              sanitize_help, FileType)
 from khmer.utils import (write_record, write_record_pair, broken_paired_reader,
                          ReadBundle)
 from khmer.kfile import (check_space, check_space_for_graph,
@@ -114,7 +114,7 @@ def get_parser():
                         default=DEFAULT_TRIM_AT_COVERAGE)
 
     parser.add_argument('-o', '--output', metavar="output_filename",
-                        type=argparse.FileType('wb'),
+                        type=FileType('wb'),
                         help='only output a single file with '
                         'the specified filename; use a single dash "-" to '
                         'specify that output should go to STDOUT (the '

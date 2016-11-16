@@ -94,6 +94,18 @@ class ComboFormatter(argparse.ArgumentDefaultsHelpFormatter,
     pass
 
 
+# XXX Temporary fix to argparse's FileType which ignores the
+# binary mode flag. Upstream bug tracked in https://bugs.python.org/issue14156
+class FileType(argparse.FileType):
+    def __call__(self, fname):
+        if fname == '-' and sys.version_info.major == 3:
+            if 'r' in self._mode:
+                fname = sys.stdin.fileno()
+            elif 'w' in self._mode:
+                fname = sys.stdout.fileno()
+        return super(FileType, self).__call__(fname)
+
+
 def memory_setting(label):
     """
     Parse user-supplied memory setting.
