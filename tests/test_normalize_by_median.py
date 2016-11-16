@@ -262,7 +262,7 @@ def test_normalize_by_median_report_fp():
 
     infile = utils.copy_test_data("test-abund-read-2.fa")
 
-    infile2 = utils.copy_test_data("test-abund-read-2.fa")
+    infile2 = utils.copy_test_data("test-abund-read-2.fa", "copyDataTwo")
 
 
     in_dir = os.path.dirname(infile)
@@ -517,11 +517,11 @@ def test_normalize_by_median_force():
 
 
 def test_normalize_by_median_no_bigcount():
-    infile = utils.copy_test_data('test-abund-read-2.fa')
+    infile = utils.copy_test_data("test-abund-read-2.fa")
     hashfile = utils.get_temp_filename('test-out.ct')
     in_dir = os.path.dirname(infile)
 
-    iter_out = screed.open(outfile)
+
 
     script = 'normalize-by-median.py'
     # 256 is outside the range of valid values for C
