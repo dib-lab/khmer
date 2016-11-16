@@ -35,11 +35,11 @@ LICENSE (END)
 
 Contact: khmer-project@idyll.org
 */
-#include <math.h>
-#include <stdlib.h>
 #include <algorithm>
 #include <map>
+#include <math.h>
 #include <numeric>
+#include <stdlib.h>
 #include <utility>
 
 #include "hllcounter.hh"
@@ -59,9 +59,8 @@ Contact: khmer-project@idyll.org
 
 using namespace khmer;
 
-std::map<int, std::vector<double> > rawEstimateData;
-std::map<int, std::vector<double> > biasData;
-
+std::map<int, std::vector<double>> rawEstimateData;
+std::map<int, std::vector<double>> biasData;
 
 double calc_alpha(const int p)
 {
@@ -97,9 +96,9 @@ double calc_alpha(const int p)
 void init_raw_estimate_data()
 {
     if (rawEstimateData.empty()) {
-        for(int i=4; i <= 18; i++) {
+        for (int i = 4; i <= 18; i++) {
             std::vector<double> v;
-            switch(i) {
+            switch (i) {
             case 4:
                 v.assign(RAW_ESTIMATE_DATA_4, arr_len(RAW_ESTIMATE_DATA_4));
                 break;
@@ -154,9 +153,9 @@ void init_raw_estimate_data()
 void init_bias_data()
 {
     if (biasData.empty()) {
-        for(int i=4; i <= 18; i++) {
+        for (int i = 4; i <= 18; i++) {
             std::vector<double> v;
-            switch(i) {
+            switch (i) {
             case 4:
                 v.assign(RAW_BIAS_DATA_4, arr_len(RAW_BIAS_DATA_4));
                 break;
@@ -215,13 +214,12 @@ double get_threshold(int p)
 
 std::vector<int> get_nearest_neighbors(double E, std::vector<double> estimate)
 {
-    std::vector< std::pair<double,int> > distance_map;
+    std::vector<std::pair<double, int>> distance_map;
     std::vector<int> nearest;
 
     int i = 0;
     for (std::vector<double>::iterator it = estimate.begin();
-            it != estimate.end();
-            ++it) {
+            it != estimate.end(); ++it) {
         std::pair<double, int> p(pow(E - *it, 2.0), i);
         distance_map.push_back(p);
         i++;
@@ -229,7 +227,7 @@ std::vector<int> get_nearest_neighbors(double E, std::vector<double> estimate)
 
     sort(distance_map.begin(), distance_map.end());
 
-    for(int k=0; k < 6; k++) {
+    for (int k = 0; k < 6; k++) {
         nearest.push_back(distance_map[k].second);
     }
 
@@ -244,8 +242,7 @@ double estimate_bias(double E, int p)
     std::vector<int> nearest = get_nearest_neighbors(E, raw_estimate);
     double estimate = 0.0;
 
-    for (std::vector<int>::iterator it = nearest.begin();
-            it != nearest.end();
+    for (std::vector<int>::iterator it = nearest.begin(); it != nearest.end();
             ++it) {
         estimate += bias[*it];
     }
@@ -358,11 +355,11 @@ unsigned int HLLCounter::consume_string(const std::string &inp)
     std::string kmer = "";
     std::string s = inp;
 
-    for (unsigned int i = 0; i < s.length(); i++)  {
+    for (unsigned int i = 0; i < s.length(); i++) {
         s[i] &= 0xdf; // toupper - knock out the "lowercase bit"
     }
 
-    for(std::string::const_iterator it = s.begin(); it != s.end(); ++it) {
+    for (std::string::const_iterator it = s.begin(); it != s.end(); ++it) {
         kmer.push_back(*it);
         if (kmer.size() < _ksize) {
             continue;
@@ -375,28 +372,23 @@ unsigned int HLLCounter::consume_string(const std::string &inp)
     return n_consumed;
 }
 
-void HLLCounter::consume_fasta(
-    std::string const &filename,
-    bool stream_records,
-    unsigned int &total_reads,
-    unsigned long long &n_consumed)
+void HLLCounter::consume_fasta(std::string const &filename, bool stream_records,
+                               unsigned int &total_reads,
+                               unsigned long long &n_consumed)
 {
-    read_parsers::IParser * parser = read_parsers::IParser::get_parser(filename);
+    read_parsers::IParser *parser = read_parsers::IParser::get_parser(filename);
 
     consume_fasta(parser, stream_records, total_reads, n_consumed);
 
     delete parser;
 }
 
-void HLLCounter::consume_fasta(
-    read_parsers::IParser *parser,
-    bool stream_records,
-    unsigned int &      total_reads,
-    unsigned long long &    n_consumed)
+void HLLCounter::consume_fasta(read_parsers::IParser *parser,
+                               bool stream_records, unsigned int &total_reads,
+                               unsigned long long &n_consumed)
 {
-
     read_parsers::Read read;
-    HLLCounter** counters;
+    HLLCounter **counters;
     unsigned int *n_consumed_partial;
     unsigned int *total_reads_partial;
 
@@ -406,21 +398,19 @@ void HLLCounter::consume_fasta(
     {
         #pragma omp master
         {
-            counters = (HLLCounter**)calloc(omp_get_num_threads(),
-            sizeof(HLLCounter*));
-            n_consumed_partial = (unsigned int*)calloc(omp_get_num_threads(),
+            counters = (HLLCounter **)calloc(omp_get_num_threads(),
+            sizeof(HLLCounter *));
+            n_consumed_partial = (unsigned int *)calloc(omp_get_num_threads(),
             sizeof(unsigned int));
-            total_reads_partial = (unsigned int*)calloc(omp_get_num_threads(),
+            total_reads_partial = (unsigned int *)calloc(omp_get_num_threads(),
             sizeof(unsigned int));
 
-            for (int i=0; i < omp_get_num_threads(); i++)
-            {
+            for (int i = 0; i < omp_get_num_threads(); i++) {
                 HLLCounter *newc = new HLLCounter(this->p, this->_ksize);
                 counters[i] = newc;
             }
 
-            while (!parser->is_complete())
-            {
+            while (!parser->is_complete()) {
                 // Iterate through the reads and consume their k-mers.
                 try {
                     read = parser->get_next_read();
@@ -432,7 +422,7 @@ void HLLCounter::consume_fasta(
                     read.write_to(std::cout);
                 }
 
-                #pragma omp task default(none) firstprivate(read) \
+                #pragma omp task default(none) firstprivate(read)                              \
                 shared(counters, n_consumed_partial, total_reads_partial)
                 {
                     bool is_valid;
@@ -451,12 +441,12 @@ void HLLCounter::consume_fasta(
 
         #pragma omp master
         {
-            for (int i=0; i < omp_get_num_threads(); ++i)
-            {
+            for (int i = 0; i < omp_get_num_threads(); ++i) {
                 this->merge(*counters[i]);
                 delete counters[i];
                 n_consumed += n_consumed_partial[i];
-                total_reads += total_reads_partial[i];;
+                total_reads += total_reads_partial[i];
+                ;
             }
             free(counters);
             free(n_consumed_partial);
@@ -490,7 +480,7 @@ bool HLLCounter::check_and_normalize_read(std::string &read) const
         if (read[i] == 'N') {
             read[i] = 'A';
         }
-        if (!is_valid_dna( read[i] )) {
+        if (!is_valid_dna(read[i])) {
             is_valid = false;
             break;
         }
@@ -502,9 +492,10 @@ bool HLLCounter::check_and_normalize_read(std::string &read) const
 void HLLCounter::merge(HLLCounter &other)
 {
     if (this->p != other.p || this->_ksize != other._ksize) {
-        throw khmer_exception("HLLCounters to be merged must be created with same parameters");
+        throw khmer_exception(
+            "HLLCounters to be merged must be created with same parameters");
     }
-    for(unsigned int i=0; i < this->M.size(); ++i) {
+    for (unsigned int i = 0; i < this->M.size(); ++i) {
         this->M[i] = std::max(other.M[i], this->M[i]);
     }
 }

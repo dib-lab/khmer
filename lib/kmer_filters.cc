@@ -36,22 +36,20 @@ Contact: khmer-project@idyll.org
 */
 #include <algorithm>
 
-#include "khmer.hh"
 #include "hashtable.hh"
-#include "labelhash.hh"
+#include "khmer.hh"
 #include "kmer_filters.hh"
-
+#include "labelhash.hh"
 
 namespace khmer
 {
-
-bool apply_kmer_filters(const Kmer& node, const std::list<KmerFilter>& filters)
+bool apply_kmer_filters(const Kmer &node, const std::list<KmerFilter> &filters)
 {
     if (!filters.size()) {
         return false;
     }
 
-    for(auto filter : filters) {
+    for (auto filter : filters) {
         if (filter(node)) {
             return true;
         }
@@ -60,10 +58,9 @@ bool apply_kmer_filters(const Kmer& node, const std::list<KmerFilter>& filters)
     return false;
 }
 
-
-KmerFilter get_label_filter(const Label label, const LabelHash * lh)
+KmerFilter get_label_filter(const Label label, const LabelHash *lh)
 {
-    KmerFilter filter = [=] (const Kmer& node) {
+    KmerFilter filter = [=](const Kmer &node) {
         LabelSet ls;
         lh->get_tag_labels(node, ls);
 #if DEBUG_FILTERS
@@ -80,30 +77,28 @@ KmerFilter get_label_filter(const Label label, const LabelHash * lh)
     return filter;
 }
 
-
-KmerFilter get_simple_label_intersect_filter(const LabelSet& src_labels,
-        const LabelHash * lh,
+KmerFilter get_simple_label_intersect_filter(const LabelSet &src_labels,
+        const LabelHash *lh,
         const unsigned int min_cov)
 {
     auto src_begin = src_labels.begin();
     auto src_end = src_labels.end();
     unsigned int src_size = src_labels.size();
 
-    KmerFilter filter = [=] (const Kmer& node) {
+    KmerFilter filter = [=](const Kmer &node) {
         LabelSet dst_labels;
         lh->get_tag_labels(node, dst_labels);
 
         LabelSet intersect;
-        std::set_intersection(src_begin, src_end,
-                              dst_labels.begin(), dst_labels.end(),
+        std::set_intersection(src_begin, src_end, dst_labels.begin(),
+                              dst_labels.end(),
                               std::inserter(intersect, intersect.begin()));
 
-        if ((intersect.size() == 1)
-                && (dst_labels.size() == 1)
-                && (src_size >= min_cov)) {
+        if ((intersect.size() == 1) && (dst_labels.size() == 1) &&
+                (src_size >= min_cov)) {
 #if DEBUG_FILTERS
-            std::cout << "TIP: " << intersect.size() << ", " <<
-                      dst_labels.size() << ", " << src_size << std::endl;
+            std::cout << "TIP: " << intersect.size() << ", "
+                      << dst_labels.size() << ", " << src_size << std::endl;
 #endif
             // putative error / tip
             return true;
@@ -118,13 +113,13 @@ KmerFilter get_simple_label_intersect_filter(const LabelSet& src_labels,
     return filter;
 }
 
-
-KmerFilter get_junction_count_filter(const Kmer& src_node,
-                                     Countgraph * junctions,
+KmerFilter get_junction_count_filter(const Kmer &src_node,
+                                     Countgraph *junctions,
                                      const unsigned int min_cov)
 {
-    KmerFilter filter = [=] (const Kmer& dst_node) {
-        unsigned int jc = junctions->get_count(src_node.kmer_u ^ dst_node.kmer_u);
+    KmerFilter filter = [=](const Kmer &dst_node) {
+        unsigned int jc =
+            junctions->get_count(src_node.kmer_u ^ dst_node.kmer_u);
 #if DEBUG_FILTERS
         std::cout << "Junction Count: " << jc << std::endl;
 #endif
@@ -134,26 +129,23 @@ KmerFilter get_junction_count_filter(const Kmer& src_node,
     return filter;
 }
 
-
-KmerFilter get_stop_bf_filter(const Hashtable * stop_bf)
+KmerFilter get_stop_bf_filter(const Hashtable *stop_bf)
 {
-    KmerFilter filter = [=] (const Kmer& n) {
+    KmerFilter filter = [=](const Kmer &n) {
         return stop_bf->get_count(n);
     };
     return filter;
 }
 
-
-KmerFilter get_visited_filter(const SeenSet * visited)
+KmerFilter get_visited_filter(const SeenSet *visited)
 {
 #if DEBUG_FILTERS
-    std::cout << "Create new visited filter with " << visited <<
-              " containing " << visited->size() << " nodes" << std::endl;
+    std::cout << "Create new visited filter with " << visited << " containing "
+              << visited->size() << " nodes" << std::endl;
 #endif
-    KmerFilter filter = [=] (const Kmer& node) {
+    KmerFilter filter = [=](const Kmer &node) {
         return set_contains(*visited, node);
     };
     return filter;
 }
-
 }

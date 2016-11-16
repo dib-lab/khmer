@@ -43,29 +43,25 @@ Contact: khmer-project@idyll.org
 #include "kmer_hash.hh"
 #include "labelhash.hh"
 
-
 namespace khmer
 {
-
 class Hashtable;
 class LabelHash;
 
+bool apply_kmer_filters(const Kmer &node, const KmerFilterList &filters);
 
-bool apply_kmer_filters(const Kmer& node, const KmerFilterList& filters);
+KmerFilter get_label_filter(const Label label, const LabelHash *lh);
 
-KmerFilter get_label_filter(const Label label, const LabelHash * lh);
-
-KmerFilter get_simple_label_intersect_filter(const LabelSet& src_labels,
-        const LabelHash * lh,
+KmerFilter get_simple_label_intersect_filter(const LabelSet &src_labels,
+        const LabelHash *lh,
         const unsigned int min_cov = 5);
 
-KmerFilter get_stop_bf_filter(const Hashtable * stop_bf);
+KmerFilter get_stop_bf_filter(const Hashtable *stop_bf);
 
-KmerFilter get_visited_filter(const SeenSet * visited);
+KmerFilter get_visited_filter(const SeenSet *visited);
 
-KmerFilter get_junction_count_filter(const Kmer& src_node,
-                                     Countgraph * junctions,
+KmerFilter get_junction_count_filter(const Kmer &src_node,
+                                     Countgraph *junctions,
                                      const unsigned int min_cov = 2);
-
 }
 #endif

@@ -41,12 +41,10 @@ namespace khmer
 {
 namespace alphabets
 {
-
 extern std::string DNA_SIMPLE;
 extern std::string DNAN_SIMPLE;
 extern std::string IUPAC_NUCL;
 extern std::string IUPAC_AA;
-
 }
 }
 #endif

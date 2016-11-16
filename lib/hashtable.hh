@@ -38,16 +38,15 @@ Contact: khmer-project@idyll.org
 #ifndef HASHTABLE_HH
 #define HASHTABLE_HH
 
-
-#include <stddef.h>
-#include <stdint.h>
-#include <string.h>
 #include <fstream>
 #include <iostream>
 #include <list>
 #include <map>
 #include <queue>
 #include <set>
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
 #include <string>
 #include <vector>
 
@@ -63,37 +62,35 @@ namespace khmer
 namespace read_parsers
 {
 struct IParser;
-}  // namespace read_parsers
-}  // namespace khmer
+} // namespace read_parsers
+} // namespace khmer
 
 #define CALLBACK_PERIOD 100000
 
 namespace khmer
 {
-class Hashtable: public
-    KmerFactory  		// Base class implementation of a Bloom ht.
+class Hashtable : public KmerFactory // Base class implementation of a Bloom ht.
 {
     friend class SubsetPartition;
     friend class LabelHash;
 
 protected:
-    Storage * store;
-    unsigned int    _max_count;
-    unsigned int    _max_bigcount;
+    Storage *store;
+    unsigned int _max_count;
+    unsigned int _max_bigcount;
 
-    //WordLength	    _ksize;
-    HashIntoType    bitmask;
-    unsigned int    _nbits_sub_1;
+    // WordLength	    _ksize;
+    HashIntoType bitmask;
+    unsigned int _nbits_sub_1;
 
-    explicit Hashtable( WordLength ksize, Storage * s)
-        : KmerFactory( ksize ), store(s),
-          _max_count( MAX_KCOUNT ),
-          _max_bigcount( MAX_BIGCOUNT )
+    explicit Hashtable(WordLength ksize, Storage *s)
+        : KmerFactory(ksize), store(s), _max_count(MAX_KCOUNT),
+          _max_bigcount(MAX_BIGCOUNT)
     {
         _init_bitstuff();
     }
 
-    virtual ~Hashtable( )
+    virtual ~Hashtable()
     {
         delete store;
     }
@@ -104,11 +101,11 @@ protected:
         for (unsigned int i = 0; i < _ksize; i++) {
             bitmask = (bitmask << 2) | 3;
         }
-        _nbits_sub_1 = (_ksize*2 - 2);
+        _nbits_sub_1 = (_ksize * 2 - 2);
     }
 
-    explicit Hashtable(const Hashtable&);
-    Hashtable& operator=(const Hashtable&);
+    explicit Hashtable(const Hashtable &);
+    Hashtable &operator=(const Hashtable &);
 
 public:
     // accessor to get 'k'
@@ -118,43 +115,31 @@ public:
     }
 
     // various hash functions.
-    inline
-    virtual
-    HashIntoType
-    hash_dna(const char * kmer) const
+    inline virtual HashIntoType hash_dna(const char *kmer) const
     {
         return _hash(kmer, _ksize);
     }
 
-    inline
-    virtual
-    HashIntoType
-    hash_dna_top_strand(const char * kmer) const
+    inline virtual HashIntoType hash_dna_top_strand(const char *kmer) const
     {
         HashIntoType f = 0, r = 0;
         _hash(kmer, _ksize, f, r);
         return f;
     }
 
-    inline
-    virtual
-    HashIntoType
-    hash_dna_bottom_strand(const char * kmer) const
+    inline virtual HashIntoType hash_dna_bottom_strand(const char *kmer) const
     {
         HashIntoType f = 0, r = 0;
         _hash(kmer, _ksize, f, r);
         return r;
     }
 
-    inline
-    virtual
-    std::string
-    unhash_dna(HashIntoType hashval) const
+    inline virtual std::string unhash_dna(HashIntoType hashval) const
     {
         return _revhash(hashval, _ksize);
     }
 
-    void count(const char * kmer)
+    void count(const char *kmer)
     {
         store->add(hash_dna(kmer));
     }
@@ -162,7 +147,7 @@ public:
     {
         store->add(khash);
     }
-    void add(const char * kmer)
+    void add(const char *kmer)
     {
         store->add(hash_dna(kmer));
     }
@@ -172,7 +157,7 @@ public:
     }
 
     // get the count for the given k-mer.
-    const BoundedCounterType get_count(const char * kmer) const
+    const BoundedCounterType get_count(const char *kmer) const
     {
         return store->get_count(hash_dna(kmer));
     }
@@ -198,26 +183,19 @@ public:
     bool check_and_normalize_read(std::string &read) const;
 
     // check each read for non-ACGT characters, and then consume it.
-    unsigned int check_and_process_read(std::string &read,
-                                        bool &is_valid);
+    unsigned int check_and_process_read(std::string &read, bool &is_valid);
 
     // Count every k-mer in a FASTA or FASTQ file.
     // Note: Yes, the name 'consume_fasta' is a bit misleading,
     //	     but the FASTA format is effectively a subset of the FASTQ format
     //	     and the FASTA portion is what we care about in this case.
-    void consume_fasta(
-        std::string const   &filename,
-        unsigned int	    &total_reads,
-        unsigned long long  &n_consumed
-    );
+    void consume_fasta(std::string const &filename, unsigned int &total_reads,
+                       unsigned long long &n_consumed);
 
     // Count every k-mer from a stream of FASTA or FASTQ reads,
     // using the supplied parser.
-    void consume_fasta(
-        read_parsers:: IParser *	    parser,
-        unsigned int	    &total_reads,
-        unsigned long long  &n_consumed
-    );
+    void consume_fasta(read_parsers::IParser *parser, unsigned int &total_reads,
+                       unsigned long long &n_consumed);
 
     void set_use_bigcount(bool b)
     {
@@ -228,13 +206,10 @@ public:
         return store->get_use_bigcount();
     }
 
-    bool median_at_least(const std::string &s,
-                         unsigned int cutoff);
+    bool median_at_least(const std::string &s, unsigned int cutoff);
 
-    void get_median_count(const std::string &s,
-                          BoundedCounterType &median,
-                          float &average,
-                          float &stddev);
+    void get_median_count(const std::string &s, BoundedCounterType &median,
+                          float &average, float &stddev);
 
     // number of unique k-mers
     const uint64_t n_unique_kmers() const
@@ -259,8 +234,7 @@ public:
     }
 
     // return all k-mer substrings, on the forward strand.
-    void get_kmers(const std::string &s, std::vector<std::string> &kmers)
-    const;
+    void get_kmers(const std::string &s, std::vector<std::string> &kmers) const;
 
     // return hash values for all k-mer substrings
     void get_kmer_hashes(const std::string &s,
@@ -268,14 +242,14 @@ public:
 
     // return hash values for all k-mer substrings in a SeenSet
     void get_kmer_hashes_as_hashset(const std::string &s,
-                                    SeenSet& hashes) const;
+                                    SeenSet &hashes) const;
 
     // return counts of all k-mers in this string.
     void get_kmer_counts(const std::string &s,
                          std::vector<BoundedCounterType> &counts) const;
 
     // get access to raw tables.
-    Byte ** get_raw_tables()
+    Byte **get_raw_tables()
     {
         return store->get_raw_tables();
     }
@@ -287,10 +261,9 @@ public:
     BoundedCounterType get_max_count(const std::string &s);
 
     // calculate the abundance distribution of kmers in the given file.
-    uint64_t * abundance_distribution(read_parsers::IParser * parser,
-                                      Hashtable * tracking);
-    uint64_t * abundance_distribution(std::string filename,
-                                      Hashtable * tracking);
+    uint64_t *abundance_distribution(read_parsers::IParser *parser,
+                                     Hashtable *tracking);
+    uint64_t *abundance_distribution(std::string filename, Hashtable *tracking);
 
     // return the index of the first position in the sequence with k-mer
     // abundance below min_abund.
@@ -303,8 +276,9 @@ public:
                                        BoundedCounterType max_abund) const;
 
     // detect likely positions of errors
-    std::vector<unsigned int> find_spectral_error_positions(std::string seq,
-            BoundedCounterType min_abund) const;
+    std::vector<unsigned int>
+    find_spectral_error_positions(std::string seq,
+                                  BoundedCounterType min_abund) const;
 };
 
 // Hashtable-derived class with ByteStorage.
@@ -312,16 +286,16 @@ class Counttable : public khmer::Hashtable
 {
 public:
     explicit Counttable(WordLength ksize, std::vector<uint64_t> sizes)
-        : Hashtable(ksize, new ByteStorage(sizes)) { } ;
-};
-    
-// Hashtable-derived class with BitStorage.
-class Nodetable : public Hashtable {
-public:
-    explicit Nodetable(WordLength ksize, std::vector<uint64_t> sizes)
-        : Hashtable(ksize, new BitStorage(sizes)) { } ;
+        : Hashtable(ksize, new ByteStorage(sizes)) {};
 };
 
+// Hashtable-derived class with BitStorage.
+class Nodetable : public Hashtable
+{
+public:
+    explicit Nodetable(WordLength ksize, std::vector<uint64_t> sizes)
+        : Hashtable(ksize, new BitStorage(sizes)) {};
+};
 }
 
 #endif // HASHTABLE_HH

@@ -48,71 +48,70 @@ Contact: khmer-project@idyll.org
 
 // test validity
 #ifdef KHMER_EXTRA_SANITY_CHECKS
-#   define is_valid_dna(ch) ((toupper(ch)) == 'A' || (toupper(ch)) == 'C' || \
-			    (toupper(ch)) == 'G' || (toupper(ch)) == 'T')
+#define is_valid_dna(ch)                                                       \
+    ((toupper(ch)) == 'A' || (toupper(ch)) == 'C' || (toupper(ch)) == 'G' ||   \
+     (toupper(ch)) == 'T')
 #else
 // NOTE: Assumes data is already sanitized as it should be by parsers.
 //	     This assumption eliminates 4 function calls.
-#   define is_valid_dna(ch) ((ch) == 'A' || (ch) == 'C' || \
-			     (ch) == 'G' || (ch) == 'T')
+#define is_valid_dna(ch)                                                       \
+    ((ch) == 'A' || (ch) == 'C' || (ch) == 'G' || (ch) == 'T')
 #endif
 
 // bit representation of A/T/C/G.
 #ifdef KHMER_EXTRA_SANITY_CHECKS
-#   define twobit_repr(ch) ((toupper(ch)) == 'A' ? 0LL : \
-			    (toupper(ch)) == 'T' ? 1LL : \
-			    (toupper(ch)) == 'C' ? 2LL : 3LL)
+#define twobit_repr(ch)                                                        \
+    ((toupper(ch)) == 'A'                                                      \
+         ? 0LL                                                                 \
+         : (toupper(ch)) == 'T' ? 1LL : (toupper(ch)) == 'C' ? 2LL : 3LL)
 #else
 // NOTE: Assumes data is already sanitized as it should be by parsers.
 //	     This assumption eliminates 4 function calls.
-#   define twobit_repr(ch) ((ch) == 'A' ? 0LL : \
-			    (ch) == 'T' ? 1LL : \
-			    (ch) == 'C' ? 2LL : 3LL)
+#define twobit_repr(ch)                                                        \
+    ((ch) == 'A' ? 0LL : (ch) == 'T' ? 1LL : (ch) == 'C' ? 2LL : 3LL)
 #endif
 
-#define revtwobit_repr(n) ((n) == 0 ? 'A' : \
-                           (n) == 1 ? 'T' : \
-                           (n) == 2 ? 'C' : 'G')
+#define revtwobit_repr(n)                                                      \
+    ((n) == 0 ? 'A' : (n) == 1 ? 'T' : (n) == 2 ? 'C' : 'G')
 
 #ifdef KHMER_EXTRA_SANITY_CHECKS
-#   define twobit_comp(ch) ((toupper(ch)) == 'A' ? 1LL : \
-			    (toupper(ch)) == 'T' ? 0LL : \
-			    (toupper(ch)) == 'C' ? 3LL : 2LL)
+#define twobit_comp(ch)                                                        \
+    ((toupper(ch)) == 'A'                                                      \
+         ? 1LL                                                                 \
+         : (toupper(ch)) == 'T' ? 0LL : (toupper(ch)) == 'C' ? 3LL : 2LL)
 #else
 // NOTE: Assumes data is already sanitized as it should be by parsers.
 //	     This assumption eliminates 4 function calls.
-#   define twobit_comp(ch) ((ch) == 'A' ? 1LL : \
-			    (ch) == 'T' ? 0LL : \
-			    (ch) == 'C' ? 3LL : 2LL)
+#define twobit_comp(ch)                                                        \
+    ((ch) == 'A' ? 1LL : (ch) == 'T' ? 0LL : (ch) == 'C' ? 3LL : 2LL)
 #endif
 
 // choose wisely between forward and rev comp.
 #ifndef NO_UNIQUE_RC
 #define uniqify_rc(f, r) ((f) < (r) ? (f) : (r))
 #else
-#define uniqify_rc(f,r)(f)
+#define uniqify_rc(f, r) (f)
 #endif
-
 
 namespace khmer
 {
 // two-way hash functions.
-HashIntoType _hash(const char * kmer, const WordLength k);
-HashIntoType _hash(const char * kmer, const WordLength k,
-                   HashIntoType& h, HashIntoType& r);
+HashIntoType _hash(const char *kmer, const WordLength k);
+HashIntoType _hash(const char *kmer, const WordLength k, HashIntoType &h,
+                   HashIntoType &r);
 HashIntoType _hash(const std::string kmer, const WordLength k);
-HashIntoType _hash(const std::string kmer, const WordLength k,
-                   HashIntoType& h, HashIntoType& r);
-HashIntoType _hash_forward(const char * kmer, WordLength k);
+HashIntoType _hash(const std::string kmer, const WordLength k, HashIntoType &h,
+                   HashIntoType &r);
+HashIntoType _hash_forward(const char *kmer, WordLength k);
 
 std::string _revhash(HashIntoType hash, WordLength k);
-std::string _revcomp(const std::string& kmer);
+std::string _revcomp(const std::string &kmer);
 
 // two-way hash functions, MurmurHash3.
-HashIntoType _hash_murmur(const std::string& kmer);
-HashIntoType _hash_murmur(const std::string& kmer,
-                          HashIntoType& h, HashIntoType& r);
-HashIntoType _hash_murmur_forward(const std::string& kmer);
+HashIntoType _hash_murmur(const std::string &kmer);
+HashIntoType _hash_murmur(const std::string &kmer, HashIntoType &h,
+                          HashIntoType &r);
+HashIntoType _hash_murmur_forward(const std::string &kmer);
 
 /**
  * \class Kmer
@@ -132,9 +131,7 @@ HashIntoType _hash_murmur_forward(const std::string& kmer);
  */
 class Kmer
 {
-
 public:
-
     /// The forward hash
     HashIntoType kmer_f;
     /// The reverse (complement) hash
@@ -179,7 +176,7 @@ public:
         return kmer_u;
     }
 
-    bool operator< (const Kmer &other) const
+    bool operator<(const Kmer &other) const
     {
         return kmer_u < other.kmer_u;
     }
@@ -197,7 +194,8 @@ public:
     std::string repr(WordLength K) const
     {
         std::string s = "<Us=" + _revhash(kmer_u, K) + ", Fs=" +
-                        _revhash(kmer_f, K) + ", Rs=" + _revhash(kmer_r, K) + ">";
+                        _revhash(kmer_f, K) + ", Rs=" + _revhash(kmer_r, K) +
+                        ">";
         //", U=" + std::to_string(kmer_u) + ", F=" + std::to_string(kmer_f) +
         //", R=" + std::to_string(kmer_r) + ">";
         return s;
@@ -208,7 +206,6 @@ public:
         return kmer_f == kmer_u;
     }
 };
-
 
 /**
  * \class KmerFactory
@@ -236,17 +233,17 @@ protected:
     WordLength _ksize;
 
 public:
-
-    explicit KmerFactory(WordLength K): _ksize(K) {}
+    explicit KmerFactory(WordLength K) : _ksize(K)
+    {
+    }
 
     /** @param[in]  kmer_u Uniqified hash value.
      *  @return A complete Kmer object.
      */
-    Kmer build_kmer(HashIntoType kmer_u)
-    const
+    Kmer build_kmer(HashIntoType kmer_u) const
     {
         HashIntoType kmer_f, kmer_r;
-        std:: string kmer_s = _revhash(kmer_u, _ksize);
+        std::string kmer_s = _revhash(kmer_u, _ksize);
         _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
         return Kmer(kmer_f, kmer_r, kmer_u);
     }
@@ -257,8 +254,7 @@ public:
      *  @param[in]  kmer_r Reverse complement hash value.
      *  @return A complete Kmer object.
      */
-    Kmer build_kmer(HashIntoType kmer_f, HashIntoType kmer_r)
-    const
+    Kmer build_kmer(HashIntoType kmer_f, HashIntoType kmer_r) const
     {
         HashIntoType kmer_u = uniqify_rc(kmer_f, kmer_r);
         return Kmer(kmer_f, kmer_r, kmer_u);
@@ -283,7 +279,7 @@ public:
      *  @param[in]  kmer_c The character array representation of a k-mer.
      *  @return A complete Kmer object hashed from the given char array.
      */
-    Kmer build_kmer(const char * kmer_c) const
+    Kmer build_kmer(const char *kmer_c) const
     {
         HashIntoType kmer_f, kmer_r, kmer_u;
         kmer_u = _hash(kmer_c, _ksize, kmer_f, kmer_r);
@@ -297,7 +293,8 @@ public:
  * \brief Emit Kmer objects generated from the given sequence.
  *
  * Given a string \f$S\f$ and a length \f$K > 0\f$, we define
- * the k-mers of \f$S\f$ as the set \f$S_{i..i+K} \forall i \in \{0..|S|-K+1\}\f$,
+ * the k-mers of \f$S\f$ as the set \f$S_{i..i+K} \forall i \in
+ * \{0..|S|-K+1\}\f$,
  * where \f$|S|\f$ is the length and \f$S_{j..k}\f$ is the half-open
  * substring starting at \f$j\f$ and terminating at \f$k\f$.
  *
@@ -311,10 +308,10 @@ public:
  * Contact: camille.scott.w@gmail.com
  *
  */
-class KmerIterator: public KmerFactory
+class KmerIterator : public KmerFactory
 {
 protected:
-    const char * _seq;
+    const char *_seq;
 
     HashIntoType _kmer_f, _kmer_r;
     HashIntoType bitmask;
@@ -322,20 +319,21 @@ protected:
     unsigned int index;
     size_t length;
     bool initialized;
+
 public:
-    KmerIterator(const char * seq, unsigned char k);
+    KmerIterator(const char *seq, unsigned char k);
 
     /** @param[in]  f The forward hash value.
      *  @param[in]  r The reverse complement hash value.
      *  @return The first Kmer of the sequence.
      */
-    Kmer first(HashIntoType& f, HashIntoType& r);
+    Kmer first(HashIntoType &f, HashIntoType &r);
 
     /** @param[in]  f The current forward hash value
      *  @param[in]  r The current reverse complement hash value
      *  @return The next Kmer in the sequence
      */
-    Kmer next(HashIntoType& f, HashIntoType& r);
+    Kmer next(HashIntoType &f, HashIntoType &r);
 
     Kmer first()
     {
@@ -363,7 +361,6 @@ public:
         return index;
     }
 }; // class KmerIterator
-
 }
 
 #endif // KMER_HASH_HH

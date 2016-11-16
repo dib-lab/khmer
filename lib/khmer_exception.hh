@@ -43,7 +43,6 @@ Contact: khmer-project@idyll.org
 
 namespace khmer
 {
-
 ///
 // A base class for all exceptions.
 //
@@ -52,11 +51,15 @@ namespace khmer
 class khmer_exception : public std::exception
 {
 public:
-    explicit khmer_exception(const std::string& msg = "Generic khmer exception")
-        : _msg(msg) { }
+    explicit khmer_exception(const std::string &msg = "Generic khmer exception")
+        : _msg(msg)
+    {
+    }
 
-    virtual ~khmer_exception() throw() { }
-    virtual const char* what() const throw ()
+    virtual ~khmer_exception() throw()
+    {
+    }
+    virtual const char *what() const throw()
     {
         return _msg.c_str();
     }
@@ -64,7 +67,6 @@ public:
 protected:
     const std::string _msg;
 };
-
 
 /////// Base Exceptions /////
 
@@ -74,16 +76,19 @@ protected:
 class khmer_file_exception : public khmer_exception
 {
 public:
-    explicit khmer_file_exception(const std::string& msg)
-        : khmer_exception(msg) { }
+    explicit khmer_file_exception(const std::string &msg) : khmer_exception(msg)
+    {
+    }
 };
 
 // A base exception for value exceptions
 class khmer_value_exception : public khmer_exception
 {
 public:
-    explicit khmer_value_exception(const std::string& msg)
-        : khmer_exception(msg) { }
+    explicit khmer_value_exception(const std::string &msg)
+        : khmer_exception(msg)
+    {
+    }
 };
 
 /////// Specialised Exceptions /////
@@ -91,21 +96,24 @@ public:
 class InvalidStream : public khmer_file_exception
 {
 public:
-    InvalidStream()
-        : khmer_file_exception("Generic InvalidStream error") {}
-    explicit InvalidStream(const std::string& msg)
-        : khmer_file_exception(msg) {}
+    InvalidStream() : khmer_file_exception("Generic InvalidStream error")
+    {
+    }
+    explicit InvalidStream(const std::string &msg) : khmer_file_exception(msg)
+    {
+    }
 };
 
 class StreamReadError : public khmer_file_exception
 {
 public:
-    StreamReadError()
-        : khmer_file_exception("Generic StreamReadError error") {}
-    explicit StreamReadError(const std::string& msg)
-        : khmer_file_exception(msg) {}
+    StreamReadError() : khmer_file_exception("Generic StreamReadError error")
+    {
+    }
+    explicit StreamReadError(const std::string &msg) : khmer_file_exception(msg)
+    {
+    }
 };
-
 
 ///
 // An exception for invalid arguments to functions
@@ -114,8 +122,9 @@ public:
 class InvalidValue : public khmer_value_exception
 {
 public:
-    explicit InvalidValue(const std::string& msg)
-        : khmer_value_exception(msg) { }
+    explicit InvalidValue(const std::string &msg) : khmer_value_exception(msg)
+    {
+    }
 };
 
 ///
@@ -125,8 +134,9 @@ public:
 class ReadOnlyAttribute : public khmer_exception
 {
 public:
-    explicit ReadOnlyAttribute(const std::string& msg)
-        : khmer_exception(msg) { }
+    explicit ReadOnlyAttribute(const std::string &msg) : khmer_exception(msg)
+    {
+    }
 };
 
 } // end namespace khmer

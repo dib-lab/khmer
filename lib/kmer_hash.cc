@@ -35,10 +35,10 @@ LICENSE (END)
 
 Contact: khmer-project@idyll.org
 */
+#include <algorithm>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
-#include <algorithm>
 #include <string>
 
 #include "MurmurHash3.h"
@@ -54,19 +54,19 @@ using namespace std;
 
 namespace khmer
 {
-
-HashIntoType _hash(const char * kmer, const WordLength k,
-                   HashIntoType& _h, HashIntoType& _r)
+HashIntoType _hash(const char *kmer, const WordLength k, HashIntoType &_h,
+                   HashIntoType &_r)
 {
     // sizeof(HashIntoType) * 8 bits / 2 bits/base
-    if (!(k <= sizeof(HashIntoType)*4) || !(strlen(kmer) >= k)) {
-        throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
+    if (!(k <= sizeof(HashIntoType) * 4) || !(strlen(kmer) >= k)) {
+        throw khmer_exception(
+            "Supplied kmer string doesn't match the underlying k-size.");
     }
 
     HashIntoType h = 0, r = 0;
 
     h |= twobit_repr(kmer[0]);
-    r |= twobit_comp(kmer[k-1]);
+    r |= twobit_comp(kmer[k - 1]);
 
     for (WordLength i = 1, j = k - 2; i < k; i++, j--) {
         h = h << 2;
@@ -84,7 +84,7 @@ HashIntoType _hash(const char * kmer, const WordLength k,
 
 // _hash: return the maximum of the forward and reverse hash.
 
-HashIntoType _hash(const char * kmer, const WordLength k)
+HashIntoType _hash(const char *kmer, const WordLength k)
 {
     HashIntoType h = 0;
     HashIntoType r = 0;
@@ -94,14 +94,13 @@ HashIntoType _hash(const char * kmer, const WordLength k)
 
 // _hash_forward: return the hash from the forward direction only.
 
-HashIntoType _hash_forward(const char * kmer, WordLength k)
+HashIntoType _hash_forward(const char *kmer, WordLength k)
 {
     HashIntoType h = 0;
     HashIntoType r = 0;
 
-
     khmer::_hash(kmer, k, h, r);
-    return h;			// return forward only
+    return h; // return forward only
 }
 
 HashIntoType _hash(const std::string kmer, const WordLength k)
@@ -109,8 +108,8 @@ HashIntoType _hash(const std::string kmer, const WordLength k)
     return _hash(kmer.c_str(), k);
 }
 
-HashIntoType _hash(const std::string kmer, const WordLength k,
-                   HashIntoType& h, HashIntoType& r)
+HashIntoType _hash(const std::string kmer, const WordLength k, HashIntoType &h,
+                   HashIntoType &r)
 {
     return _hash(kmer.c_str(), k, h, r);
 }
@@ -137,15 +136,15 @@ std::string _revhash(HashIntoType hash, WordLength k)
     return s;
 }
 
-std::string _revcomp(const std::string& kmer)
+std::string _revcomp(const std::string &kmer)
 {
     std::string out = kmer;
     size_t ksize = out.size();
 
-    for (size_t i=0; i < ksize; ++i) {
+    for (size_t i = 0; i < ksize; ++i) {
         char complement;
 
-        switch(kmer[i]) {
+        switch (kmer[i]) {
         case 'A':
             complement = 'T';
             break;
@@ -167,7 +166,7 @@ std::string _revcomp(const std::string& kmer)
     return out;
 }
 
-HashIntoType _hash_murmur(const std::string& kmer)
+HashIntoType _hash_murmur(const std::string &kmer)
 {
     HashIntoType h = 0;
     HashIntoType r = 0;
@@ -175,8 +174,8 @@ HashIntoType _hash_murmur(const std::string& kmer)
     return khmer::_hash_murmur(kmer, h, r);
 }
 
-HashIntoType _hash_murmur(const std::string& kmer,
-                          HashIntoType& h, HashIntoType& r)
+HashIntoType _hash_murmur(const std::string &kmer, HashIntoType &h,
+                          HashIntoType &r)
 {
     uint64_t out[2];
     uint32_t seed = 0;
@@ -190,7 +189,7 @@ HashIntoType _hash_murmur(const std::string& kmer,
     return h ^ r;
 }
 
-HashIntoType _hash_murmur_forward(const std::string& kmer)
+HashIntoType _hash_murmur_forward(const std::string &kmer)
 {
     HashIntoType h = 0;
     HashIntoType r = 0;
@@ -199,15 +198,14 @@ HashIntoType _hash_murmur_forward(const std::string& kmer)
     return h;
 }
 
-KmerIterator::KmerIterator(const char * seq,
-                           unsigned char k) :
-    KmerFactory(k), _seq(seq)
+KmerIterator::KmerIterator(const char *seq, unsigned char k)
+    : KmerFactory(k), _seq(seq)
 {
     bitmask = 0;
     for (unsigned char i = 0; i < _ksize; i++) {
         bitmask = (bitmask << 2) | 3;
     }
-    _nbits_sub_1 = (_ksize*2 - 2);
+    _nbits_sub_1 = (_ksize * 2 - 2);
 
     index = _ksize - 1;
     length = strlen(_seq);
@@ -217,7 +215,7 @@ KmerIterator::KmerIterator(const char * seq,
     initialized = false;
 }
 
-Kmer KmerIterator::first(HashIntoType& f, HashIntoType& r)
+Kmer KmerIterator::first(HashIntoType &f, HashIntoType &r)
 {
     HashIntoType x;
     x = _hash(_seq, _ksize, _kmer_f, _kmer_r);
@@ -230,7 +228,7 @@ Kmer KmerIterator::first(HashIntoType& f, HashIntoType& r)
     return Kmer(_kmer_f, _kmer_r, x);
 }
 
-Kmer KmerIterator::next(HashIntoType& f, HashIntoType& r)
+Kmer KmerIterator::next(HashIntoType &f, HashIntoType &r)
 {
     if (done()) {
         throw khmer_exception();
@@ -265,5 +263,4 @@ Kmer KmerIterator::next(HashIntoType& f, HashIntoType& r)
 
     return build_kmer(_kmer_f, _kmer_r);
 }
-
 }

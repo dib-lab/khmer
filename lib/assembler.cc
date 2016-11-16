@@ -44,22 +44,19 @@ using namespace std;
 
 namespace khmer
 {
-
 /********************************
  * Simple Linear Assembly
  ********************************/
 
-LinearAssembler::LinearAssembler(const Hashgraph * ht) :
-    graph(ht), _ksize(ht->ksize())
+LinearAssembler::LinearAssembler(const Hashgraph *ht)
+    : graph(ht), _ksize(ht->ksize())
 {
-
 }
 
 // Starting from the given seed k-mer, assemble the maximal linear path in
 // both directions.
 std::string LinearAssembler::assemble(const Kmer seed_kmer,
-                                      const Hashgraph * stop_bf)
-const
+                                      const Hashgraph *stop_bf) const
 {
     if (graph->get_count(seed_kmer) == 0) {
         // If the seed k-mer is not in the de Bruijn graph, stop trying to make
@@ -78,10 +75,8 @@ const
     return left_contig + right_contig;
 }
 
-
 std::string LinearAssembler::assemble_right(const Kmer seed_kmer,
-        const Hashgraph * stop_bf)
-const
+        const Hashgraph *stop_bf) const
 {
     std::list<KmerFilter> node_filters;
     if (stop_bf) {
@@ -92,10 +87,8 @@ const
     return _assemble_directed<RIGHT>(cursor);
 }
 
-
 std::string LinearAssembler::assemble_left(const Kmer seed_kmer,
-        const Hashgraph * stop_bf)
-const
+        const Hashgraph *stop_bf) const
 {
     std::list<KmerFilter> node_filters;
     if (stop_bf) {
@@ -107,9 +100,8 @@ const
 }
 
 template <>
-std::string LinearAssembler::_assemble_directed<LEFT>(AssemblerTraverser<LEFT>&
-        cursor)
-const
+std::string LinearAssembler::_assemble_directed<LEFT>(
+    AssemblerTraverser<LEFT> &cursor) const
 {
     std::string contig = cursor.cursor.get_string_rep(_ksize);
     if (!cursor.cursor.is_forward()) {
@@ -137,10 +129,9 @@ const
     return contig;
 }
 
-template<>
-std::string LinearAssembler::_assemble_directed<RIGHT>
-(AssemblerTraverser<RIGHT>& cursor)
-const
+template <>
+std::string LinearAssembler::_assemble_directed<RIGHT>(
+    AssemblerTraverser<RIGHT> &cursor) const
 {
     std::string contig = cursor.cursor.get_string_rep(_ksize);
     if (!cursor.cursor.is_forward()) {
@@ -163,13 +154,12 @@ const
     return contig;
 }
 
-
 /********************************
  * Labeled Assembly
  ********************************/
 
-SimpleLabeledAssembler::SimpleLabeledAssembler(const LabelHash * lh) :
-    graph(lh->graph), lh(lh), _ksize(lh->graph->ksize())
+SimpleLabeledAssembler::SimpleLabeledAssembler(const LabelHash *lh)
+    : graph(lh->graph), lh(lh), _ksize(lh->graph->ksize())
 {
     linear_asm = new LinearAssembler(graph);
 }
@@ -179,12 +169,10 @@ SimpleLabeledAssembler::~SimpleLabeledAssembler()
     delete this->linear_asm;
 }
 
-
 // Starting from the given seed k-mer, assemble all maximal linear paths in
 // both directions, using labels to skip over tricky bits.
 StringVector SimpleLabeledAssembler::assemble(const Kmer seed_kmer,
-        const Hashgraph * stop_bf)
-const
+        const Hashgraph *stop_bf) const
 {
 #if DEBUG_ASSEMBLY
     std::cout << "Assemble Labeled: " << seed_kmer.repr(_ksize) << std::endl;
@@ -198,14 +186,16 @@ const
     SeenSet visited;
 
 #if DEBUG_ASSEMBLY
-    std::cout << "Assemble Labeled RIGHT: " << seed_kmer.repr(_ksize) << std::endl;
+    std::cout << "Assemble Labeled RIGHT: " << seed_kmer.repr(_ksize)
+              << std::endl;
 #endif
     StringVector right_paths;
     NonLoopingAT<RIGHT> rcursor(graph, seed_kmer, node_filters, &visited);
     _assemble_directed<RIGHT>(rcursor, right_paths);
 
 #if DEBUG_ASSEMBLY
-    std::cout << "Assemble Labeled LEFT: " << seed_kmer.repr(_ksize) << std::endl;
+    std::cout << "Assemble Labeled LEFT: " << seed_kmer.repr(_ksize)
+              << std::endl;
 #endif
     StringVector left_paths;
     NonLoopingAT<LEFT> lcursor(graph, seed_kmer, node_filters, &visited);
@@ -226,35 +216,33 @@ const
 }
 
 template <bool direction>
-void SimpleLabeledAssembler::_assemble_directed(NonLoopingAT<direction>&
-        start_cursor,
-        StringVector& paths)
-const
+void SimpleLabeledAssembler::_assemble_directed(
+    NonLoopingAT<direction> &start_cursor, StringVector &paths) const
 {
 #if DEBUG_ASSEMBLY
-    std::cout << "## assemble_labeled_directed_" << direction << " [start] at " <<
-              start_cursor.cursor.repr(_ksize) << std::endl;
+    std::cout << "## assemble_labeled_directed_" << direction << " [start] at "
+              << start_cursor.cursor.repr(_ksize) << std::endl;
 #endif
 
     // prime the traversal with the first linear segment
-    std::string root_contig = linear_asm->_assemble_directed<direction>
-                              (start_cursor);
+    std::string root_contig =
+        linear_asm->_assemble_directed<direction>(start_cursor);
 #if DEBUG_ASSEMBLY
     std::cout << "Primed: " << root_contig << std::endl;
     std::cout << "Cursor: " << start_cursor.cursor.repr(_ksize) << std::endl;
 #endif
     StringVector segments;
-    std::vector< NonLoopingAT<direction> > cursors;
+    std::vector<NonLoopingAT<direction>> cursors;
 
     segments.push_back(root_contig);
     cursors.push_back(start_cursor);
 
-    while(segments.size() != 0) {
-
+    while (segments.size() != 0) {
         std::string segment = segments.back();
         NonLoopingAT<direction> cursor = cursors.back();
 #if DEBUG_ASSEMBLY
-        std::cout << "Pop: " << segments.size() << " segments on stack." << std::endl;
+        std::cout << "Pop: " << segments.size() << " segments on stack."
+                  << std::endl;
         std::cout << "Segment: " << segment << std::endl;
         std::cout << "Cursor: " << cursor.cursor.repr(_ksize) << std::endl;
         std::cout << "n_filters: " << cursor.n_filters() << std::endl;
@@ -264,12 +252,11 @@ const
 
         // check if the cursor has hit a HDN or reached a dead end
         if (cursor.cursor_degree() > 1) {
-
             LabelSet labels;
             lh->get_tag_labels(cursor.cursor, labels);
 
-            if(labels.size() == 0) {
-                // if no labels are found we can do nothing; gather this contig
+            if (labels.size() == 0) {
+// if no labels are found we can do nothing; gather this contig
 #if DEBUG_ASSEMBLY
                 std::cout << "no-label dead-end" << std::endl;
 #endif
@@ -278,7 +265,8 @@ const
             } else {
                 // if there are labels, try to hop the HDN.
                 // first, get a label filter
-                cursor.push_filter(get_simple_label_intersect_filter(labels, lh));
+                cursor.push_filter(
+                    get_simple_label_intersect_filter(labels, lh));
                 KmerQueue branch_starts;
                 // now get neighbors that pass the filter
                 cursor.neighbors(branch_starts);
@@ -295,31 +283,36 @@ const
                 }
 
                 // found some neighbors; extend them
-                while(!branch_starts.empty()) {
+                while (!branch_starts.empty()) {
                     // spin off a cursor for the new branch
                     NonLoopingAT<direction> branch_cursor(cursor);
                     branch_cursor.cursor = branch_starts.front();
                     branch_starts.pop();
 
 #if DEBUG_ASSEMBLY
-                    std::cout << "Branch cursor: " << branch_cursor.cursor.repr(
-                                  _ksize) << std::endl;
+                    std::cout << "Branch cursor: "
+                              << branch_cursor.cursor.repr(_ksize) << std::endl;
 #endif
 
                     // assemble linearly as far as possible
-                    std::string branch = linear_asm->_assemble_directed<direction>(branch_cursor);
+                    std::string branch =
+                        linear_asm->_assemble_directed<direction>(
+                            branch_cursor);
                     // create a new segment with the branch
-                    std::string new_segment = branch_cursor.join_contigs(segment, branch, 1);
+                    std::string new_segment =
+                        branch_cursor.join_contigs(segment, branch, 1);
 #if DEBUG_ASSEMBLY
                     std::cout << "Push segment: " << new_segment << std::endl;
-                    std::cout << "Push cursor: " << branch_cursor.cursor.repr(_ksize) << std::endl;
+                    std::cout
+                            << "Push cursor: " << branch_cursor.cursor.repr(_ksize)
+                            << std::endl;
 #endif
                     segments.push_back(new_segment);
                     cursors.push_back(branch_cursor);
                 }
             }
         } else {
-            // this segment is a dead-end; keep the contig
+// this segment is a dead-end; keep the contig
 #if DEBUG_ASSEMBLY
             std::cout << "degree-1 dead-end" << std::endl;
 #endif
@@ -333,13 +326,12 @@ const
  * Junction-counting assembler
  ***************************************/
 
-JunctionCountAssembler::JunctionCountAssembler(Hashgraph * ht) :
-    graph(ht), _ksize(ht->ksize()), traverser(ht), linear_asm(ht)
+JunctionCountAssembler::JunctionCountAssembler(Hashgraph *ht)
+    : graph(ht), _ksize(ht->ksize()), traverser(ht), linear_asm(ht)
 {
     std::vector<uint64_t> table_sizes = graph->get_tablesizes();
     junctions = new Countgraph(_ksize, table_sizes);
 }
-
 
 JunctionCountAssembler::~JunctionCountAssembler()
 {
@@ -365,15 +357,15 @@ uint16_t JunctionCountAssembler::consume(std::string sequence)
     uint16_t next_d = this->traverser.degree(next_kmer);
     uint16_t n_junctions = 0;
 
-    while(!kmers.done()) {
+    while (!kmers.done()) {
         if (d > 2 || next_d > 2) {
             count_junction(kmer, next_kmer);
             n_junctions++;
 #if DEBUG_ASSEMBLY
-            std::cout << "Junction: " << kmer.repr(_ksize) << ", " << next_kmer.repr(
-                          _ksize) << std::endl;
-            std::cout << "Junction Count: " << get_junction_count(kmer,
-                      next_kmer) << std::endl;
+            std::cout << "Junction: " << kmer.repr(_ksize) << ", "
+                      << next_kmer.repr(_ksize) << std::endl;
+            std::cout << "Junction Count: "
+                      << get_junction_count(kmer, next_kmer) << std::endl;
 #endif
         }
         kmer = next_kmer;
@@ -391,8 +383,7 @@ void JunctionCountAssembler::count_junction(Kmer kmer_a, Kmer kmer_b)
 }
 
 BoundedCounterType JunctionCountAssembler::get_junction_count(Kmer kmer_a,
-        Kmer kmer_b)
-const
+        Kmer kmer_b) const
 {
     return junctions->get_count(kmer_a.kmer_u ^ kmer_b.kmer_u);
 }
@@ -400,8 +391,7 @@ const
 // Starting from the given seed k-mer, assemble all maximal linear paths in
 // both directions, using junction counts to skip over tricky bits.
 StringVector JunctionCountAssembler::assemble(const Kmer seed_kmer,
-        const Hashtable * stop_bf)
-const
+        const Hashtable *stop_bf) const
 {
 #if DEBUG_ASSEMBLY
     std::cout << "Assemble Junctions: " << seed_kmer.repr(_ksize) << std::endl;
@@ -415,15 +405,16 @@ const
     SeenSet visited;
 
 #if DEBUG_ASSEMBLY
-    std::cout << "Assemble Junctions RIGHT: " << seed_kmer.repr(
-                  _ksize) << std::endl;
+    std::cout << "Assemble Junctions RIGHT: " << seed_kmer.repr(_ksize)
+              << std::endl;
 #endif
     StringVector right_paths;
     NonLoopingAT<RIGHT> rcursor(graph, seed_kmer, node_filters, &visited);
     _assemble_directed<RIGHT>(rcursor, right_paths);
 
 #if DEBUG_ASSEMBLY
-    std::cout << "Assemble Junctions LEFT: " << seed_kmer.repr(_ksize) << std::endl;
+    std::cout << "Assemble Junctions LEFT: " << seed_kmer.repr(_ksize)
+              << std::endl;
 #endif
     StringVector left_paths;
     NonLoopingAT<LEFT> lcursor(graph, seed_kmer, node_filters, &visited);
@@ -444,35 +435,34 @@ const
 }
 
 template <bool direction>
-void JunctionCountAssembler::_assemble_directed(NonLoopingAT<direction>&
-        start_cursor,
-        StringVector& paths)
-const
+void JunctionCountAssembler::_assemble_directed(
+    NonLoopingAT<direction> &start_cursor, StringVector &paths) const
 {
 #if DEBUG_ASSEMBLY
-    std::cout << "## assemble_junctions_directed_" << direction << " [start] at " <<
-              start_cursor.cursor.repr(_ksize) << std::endl;
+    std::cout << "## assemble_junctions_directed_" << direction
+              << " [start] at " << start_cursor.cursor.repr(_ksize)
+              << std::endl;
 #endif
 
     // prime the traversal with the first linear segment
-    std::string root_contig = linear_asm._assemble_directed<direction>
-                              (start_cursor);
+    std::string root_contig =
+        linear_asm._assemble_directed<direction>(start_cursor);
 #if DEBUG_ASSEMBLY
     std::cout << "Primed: " << root_contig << std::endl;
     std::cout << "Cursor: " << start_cursor.cursor.repr(_ksize) << std::endl;
 #endif
     StringVector segments;
-    std::vector< NonLoopingAT<direction> > cursors;
+    std::vector<NonLoopingAT<direction>> cursors;
 
     segments.push_back(root_contig);
     cursors.push_back(start_cursor);
 
-    while(segments.size() != 0) {
-
+    while (segments.size() != 0) {
         std::string segment = segments.back();
         NonLoopingAT<direction> cursor = cursors.back();
 #if DEBUG_ASSEMBLY
-        std::cout << "Pop: " << segments.size() << " segments on stack." << std::endl;
+        std::cout << "Pop: " << segments.size() << " segments on stack."
+                  << std::endl;
         std::cout << "Segment: " << segment << std::endl;
         std::cout << "Cursor: " << cursor.cursor.repr(_ksize) << std::endl;
         std::cout << "n_filters: " << cursor.n_filters() << std::endl;
@@ -482,8 +472,8 @@ const
 
         // check if the cursor has hit a HDN or reached a dead end
         if (cursor.cursor_degree() > 1) {
-
-            cursor.push_filter(get_junction_count_filter(cursor.cursor, this->junctions));
+            cursor.push_filter(
+                get_junction_count_filter(cursor.cursor, this->junctions));
             KmerQueue branch_starts;
             // now get neighbors that pass the filter
             cursor.neighbors(branch_starts);
@@ -497,7 +487,7 @@ const
             }
 
             // found some neighbors; extend them
-            while(!branch_starts.empty()) {
+            while (!branch_starts.empty()) {
                 // spin off a cursor for the new branch
                 NonLoopingAT<direction> branch_cursor(cursor);
 
@@ -505,9 +495,11 @@ const
                 branch_starts.pop();
 
                 // assemble linearly as far as possible
-                std::string branch = linear_asm._assemble_directed<direction>(branch_cursor);
+                std::string branch =
+                    linear_asm._assemble_directed<direction>(branch_cursor);
                 // create a new segment with the branch
-                std::string new_segment = branch_cursor.join_contigs(segment, branch, 1);
+                std::string new_segment =
+                    branch_cursor.join_contigs(segment, branch, 1);
 
                 segments.push_back(new_segment);
                 cursors.push_back(branch_cursor);
@@ -519,5 +511,4 @@ const
         }
     }
 }
-
 }

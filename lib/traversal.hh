@@ -37,17 +37,16 @@ Contact: khmer-project@idyll.org
 #ifndef TRAVERSAL_HH
 #define TRAVERSAL_HH
 
-#include <queue>
 #include <functional>
+#include <queue>
 
-#include "khmer.hh"
 #include "hashtable.hh"
-#include "kmer_hash.hh"
+#include "khmer.hh"
 #include "kmer_filters.hh"
+#include "kmer_hash.hh"
 
 namespace khmer
 {
-
 #ifndef LEFT
 #define LEFT 0
 #endif
@@ -61,31 +60,28 @@ class LabelHash;
 /**
  * @brief Gather neighbors from a given node.
  *
- * The most basic traversal utility. Stores a list of KmerFilter functions, and given
+ * The most basic traversal utility. Stores a list of KmerFilter functions, and
+ * given
  * a Kmer, finds all its neighbors that pass the filter function.s
  *
  * @tparam direction The direction in the graph to gather nodes from.
  */
-template<bool direction>
-class NodeGatherer: public KmerFactory
+template <bool direction> class NodeGatherer : public KmerFactory
 {
     friend class Hashgraph;
 
 protected:
-
     KmerFilterList filters;
     HashIntoType bitmask;
     unsigned int rc_left_shift;
-    const Hashgraph * graph;
+    const Hashgraph *graph;
 
 public:
+    explicit NodeGatherer(const Hashgraph *ht, KmerFilterList filters);
 
-    explicit NodeGatherer(const Hashgraph * ht,
-                          KmerFilterList filters);
+    explicit NodeGatherer(const Hashgraph *ht);
 
-    explicit NodeGatherer(const Hashgraph * ht);
-
-    explicit NodeGatherer(const Hashgraph * ht, KmerFilter filter);
+    explicit NodeGatherer(const Hashgraph *ht, KmerFilter filter);
 
     /**
      * @brief Push a new filter on to the filter stack.
@@ -115,8 +111,10 @@ public:
     /**
      * @brief Build the Kmer for the potential neighbor node of the given Kmer.
      *
-     * When templated for RIGHT, will return the Kmer built from the length K-1 suffix of the
-     * input Kmer with the new base appended; when LEFT, the length K-1 prefix of the input Kmer
+     * When templated for RIGHT, will return the Kmer built from the length K-1
+     * suffix of the
+     * input Kmer with the new base appended; when LEFT, the length K-1 prefix
+     * of the input Kmer
      * with the new base prepended.
      *
      * @param node The starting node.
@@ -124,18 +122,18 @@ public:
      *
      * @return The new Kmer.
      */
-    Kmer get_neighbor(const Kmer& node, const char ch) const;
+    Kmer get_neighbor(const Kmer &node, const char ch) const;
 
     /**
-     * @brief Get all neighbors which are present in the graph and pass the filters.
+     * @brief Get all neighbors which are present in the graph and pass the
+     * filters.
      *
      * @param node The Kmer to start at.
      * @param node_q To collect the results.
      *
      * @return Number of neighbors found.
      */
-    unsigned int neighbors(const Kmer& node,
-                           KmerQueue &node_q) const;
+    unsigned int neighbors(const Kmer &node, KmerQueue &node_q) const;
 
     /**
      * @brief Get the degree of the given Kmer in the templated direction.
@@ -144,34 +142,27 @@ public:
      *
      * @return The degree.
      */
-    unsigned int degree(const Kmer& node) const;
+    unsigned int degree(const Kmer &node) const;
 };
-
 
 /**
  * @brief A stateful NodeGatherer. Stores its current position.
  *
  * @tparam direction The direction to gather nodes from.
  */
-template <bool direction>
-class NodeCursor: public NodeGatherer<direction>
+template <bool direction> class NodeCursor : public NodeGatherer<direction>
 {
-
 public:
-
     // The current position.
     Kmer cursor;
     using NodeGatherer<direction>::push_filter;
 
-    explicit NodeCursor(const Hashgraph * ht,
-                        Kmer start_kmer,
+    explicit NodeCursor(const Hashgraph *ht, Kmer start_kmer,
                         KmerFilterList filters);
 
-    explicit NodeCursor(const Hashgraph * ht,
-                        Kmer start_kmer);
+    explicit NodeCursor(const Hashgraph *ht, Kmer start_kmer);
 
-    explicit NodeCursor(const Hashgraph * ht,
-                        Kmer start_kmer,
+    explicit NodeCursor(const Hashgraph *ht, Kmer start_kmer,
                         KmerFilter filter);
 
     /**
@@ -182,7 +173,7 @@ public:
      *
      * @return Number of neighbors found.
      */
-    unsigned int neighbors(KmerQueue& node_q) const
+    unsigned int neighbors(KmerQueue &node_q) const
     {
         return NodeGatherer<direction>::neighbors(cursor, node_q);
     }
@@ -191,49 +182,39 @@ public:
      * @return Degree of the current cursor position and direction.
      */
     unsigned int cursor_degree() const;
-
 };
-
 
 /**
  * @brief Wraps a LEFT and RIGHT NodeGatherer.
  */
-class Traverser: public KmerFactory
+class Traverser : public KmerFactory
 {
-
 protected:
-
-    const Hashgraph * graph;
+    const Hashgraph *graph;
     NodeGatherer<LEFT> left_gatherer;
     NodeGatherer<RIGHT> right_gatherer;
 
 public:
+    explicit Traverser(const Hashgraph *ht, KmerFilterList filters);
 
-    explicit Traverser(const Hashgraph * ht,
-                       KmerFilterList filters);
+    explicit Traverser(const Hashgraph *ht) : Traverser(ht, KmerFilterList())
+    {
+    }
 
-    explicit Traverser(const Hashgraph * ht) : Traverser(ht, KmerFilterList()) {}
-
-    explicit Traverser(const Hashgraph * ht,
-                       KmerFilter filter);
+    explicit Traverser(const Hashgraph *ht, KmerFilter filter);
 
     void push_filter(KmerFilter filter);
 
-    unsigned int traverse(const Kmer& node,
-                          KmerQueue& node_q) const;
+    unsigned int traverse(const Kmer &node, KmerQueue &node_q) const;
 
-    unsigned int traverse_left(const Kmer& node,
-                               KmerQueue& node_q) const;
+    unsigned int traverse_left(const Kmer &node, KmerQueue &node_q) const;
 
-    unsigned int traverse_right(const Kmer& node,
-                                KmerQueue& node_q) const;
+    unsigned int traverse_right(const Kmer &node, KmerQueue &node_q) const;
 
-    unsigned int degree(const Kmer& node) const;
-    unsigned int degree_left(const Kmer& node) const;
-    unsigned int degree_right(const Kmer& node) const;
-
+    unsigned int degree(const Kmer &node) const;
+    unsigned int degree_left(const Kmer &node) const;
+    unsigned int degree_right(const Kmer &node) const;
 };
-
 
 /**
  * @brief A NodeCursor specialized for assembling contigs.
@@ -241,9 +222,8 @@ public:
  * @tparam direction The direction to assemble.
  */
 template <bool direction>
-class AssemblerTraverser: public NodeCursor<direction>
+class AssemblerTraverser : public NodeCursor<direction>
 {
-
 public:
     using NodeCursor<direction>::NodeCursor;
 
@@ -251,16 +231,20 @@ public:
      * @brief Get the next symbol.
      *
      * Finds the next symbol which passes the filters, so long as there is only
-     * one branch. Does not return a new symbol if there are multiple potential neighbors.
+     * one branch. Does not return a new symbol if there are multiple potential
+     * neighbors.
      *
-     * @return A member of alphabets::DNA_SIMPLE if a neighbor is found; '\0' otherwise.
+     * @return A member of alphabets::DNA_SIMPLE if a neighbor is found; '\0'
+     * otherwise.
      */
     virtual char next_symbol();
 
     /**
-     * @brief Utility function to join two overlapping contigs with proper directionality.
+     * @brief Utility function to join two overlapping contigs with proper
+     * directionality.
      *
-     *  By default, assumes the two contigs overlap by length K. This can be reduced via the
+     *  By default, assumes the two contigs overlap by length K. This can be
+     * reduced via the
      *  offset parameter.
      *
      * @param contig_a
@@ -269,35 +253,30 @@ public:
      *
      * @return The joined contig.
      */
-    std::string join_contigs(std::string& contig_a,
-                             std::string& contig_b,
+    std::string join_contigs(std::string &contig_a, std::string &contig_b,
                              WordLength offset = 0) const;
 };
 
-
 /**
- * @brief An AssemblerTraverser which does not traverse to Kmers it has already encountered.
+ * @brief An AssemblerTraverser which does not traverse to Kmers it has already
+ * encountered.
  *
- * Simply adds a new filter to check if the Kmer has been seen, and adds the Kmer to the set
+ * Simply adds a new filter to check if the Kmer has been seen, and adds the
+ * Kmer to the set
  * of seen Kmers after calling ::next_symbol.
  *
  * @tparam direction The direction to assemble.
  */
-template<bool direction>
-class NonLoopingAT: public AssemblerTraverser<direction>
+template <bool direction>
+class NonLoopingAT : public AssemblerTraverser<direction>
 {
 protected:
-
-    SeenSet * visited;
+    SeenSet *visited;
 
 public:
-
-    explicit NonLoopingAT(const Hashgraph * ht,
-                          Kmer start_kmer,
-                          KmerFilterList filters,
-                          SeenSet * visited);
+    explicit NonLoopingAT(const Hashgraph *ht, Kmer start_kmer,
+                          KmerFilterList filters, SeenSet *visited);
     virtual char next_symbol();
 };
-
 }
 #endif

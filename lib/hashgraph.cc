@@ -34,15 +34,15 @@ LICENSE (END)
 
 Contact: khmer-project@idyll.org
 */
-#include <errno.h>
-#include <math.h>
 #include <algorithm>
 #include <deque>
+#include <errno.h>
 #include <fstream>
 #include <iostream>
-#include <sstream> // IWYU pragma: keep
+#include <math.h>
 #include <queue>
 #include <set>
+#include <sstream> // IWYU pragma: keep
 
 #include "hashgraph.hh"
 #include "khmer.hh"
@@ -50,7 +50,7 @@ Contact: khmer-project@idyll.org
 
 using namespace std;
 using namespace khmer;
-using namespace khmer:: read_parsers;
+using namespace khmer::read_parsers;
 
 void Hashgraph::save_tagset(std::string outfilename)
 {
@@ -58,18 +58,18 @@ void Hashgraph::save_tagset(std::string outfilename)
     const size_t tagset_size = n_tags();
     unsigned int save_ksize = _ksize;
 
-    HashIntoType * buf = new HashIntoType[tagset_size];
+    HashIntoType *buf = new HashIntoType[tagset_size];
 
     outfile.write(SAVED_SIGNATURE, 4);
     unsigned char version = SAVED_FORMAT_VERSION;
-    outfile.write((const char *) &version, 1);
+    outfile.write((const char *)&version, 1);
 
     unsigned char ht_type = SAVED_TAGS;
-    outfile.write((const char *) &ht_type, 1);
+    outfile.write((const char *)&ht_type, 1);
 
-    outfile.write((const char *) &save_ksize, sizeof(save_ksize));
-    outfile.write((const char *) &tagset_size, sizeof(tagset_size));
-    outfile.write((const char *) &_tag_density, sizeof(_tag_density));
+    outfile.write((const char *)&save_ksize, sizeof(save_ksize));
+    outfile.write((const char *)&tagset_size, sizeof(tagset_size));
+    outfile.write((const char *)&_tag_density, sizeof(_tag_density));
 
     unsigned int i = 0;
     for (SeenSet::iterator pi = all_tags.begin(); pi != all_tags.end();
@@ -77,7 +77,7 @@ void Hashgraph::save_tagset(std::string outfilename)
         buf[i] = *pi;
     }
 
-    outfile.write((const char *) buf, sizeof(HashIntoType) * tagset_size);
+    outfile.write((const char *)buf, sizeof(HashIntoType) * tagset_size);
     if (outfile.fail()) {
         delete[] buf;
         throw khmer_file_exception(strerror(errno));
@@ -108,8 +108,8 @@ void Hashgraph::load_tagset(std::string infilename, bool clear_tags)
     } catch (const std::exception &e) {
         // Catching std::exception is a stopgap for
         // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
-        std::string err = "Unknown error opening file: " + infilename + " "
-                          + strerror(errno);
+        std::string err =
+            "Unknown error opening file: " + infilename + " " + strerror(errno);
         throw khmer_file_exception(err);
     }
 
@@ -121,36 +121,36 @@ void Hashgraph::load_tagset(std::string infilename, bool clear_tags)
     unsigned int save_ksize = 0;
 
     size_t tagset_size = 0;
-    HashIntoType * buf = NULL;
+    HashIntoType *buf = NULL;
 
     try {
         char signature[4];
         infile.read(signature, 4);
-        infile.read((char *) &version, 1);
-        infile.read((char *) &ht_type, 1);
+        infile.read((char *)&version, 1);
+        infile.read((char *)&ht_type, 1);
         if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
             std::ostringstream err;
             err << "Incorrect file signature 0x";
-            for(size_t i=0; i < 4; ++i) {
-                err << std::hex << (int) signature[i];
+            for (size_t i = 0; i < 4; ++i) {
+                err << std::hex << (int)signature[i];
             }
-            err << " while reading tagset from " << infilename
-                << "; should be " << SAVED_SIGNATURE;
+            err << " while reading tagset from " << infilename << "; should be "
+                << SAVED_SIGNATURE;
             throw khmer_file_exception(err.str());
         } else if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
-            err << "Incorrect file format version " << (int) version
-                << " while reading tagset from " << infilename
-                << "; should be " << (int) SAVED_FORMAT_VERSION;
+            err << "Incorrect file format version " << (int)version
+                << " while reading tagset from " << infilename << "; should be "
+                << (int)SAVED_FORMAT_VERSION;
             throw khmer_file_exception(err.str());
         } else if (!(ht_type == SAVED_TAGS)) {
             std::ostringstream err;
-            err << "Incorrect file format type " << (int) ht_type
+            err << "Incorrect file format type " << (int)ht_type
                 << " while reading tagset from " << infilename;
             throw khmer_file_exception(err.str());
         }
 
-        infile.read((char *) &save_ksize, sizeof(save_ksize));
+        infile.read((char *)&save_ksize, sizeof(save_ksize));
         if (!(save_ksize == _ksize)) {
             std::ostringstream err;
             err << "Incorrect k-mer size " << save_ksize
@@ -158,12 +158,12 @@ void Hashgraph::load_tagset(std::string infilename, bool clear_tags)
             throw khmer_file_exception(err.str());
         }
 
-        infile.read((char *) &tagset_size, sizeof(tagset_size));
-        infile.read((char *) &_tag_density, sizeof(_tag_density));
+        infile.read((char *)&tagset_size, sizeof(tagset_size));
+        infile.read((char *)&_tag_density, sizeof(_tag_density));
 
         buf = new HashIntoType[tagset_size];
 
-        infile.read((char *) buf, sizeof(HashIntoType) * tagset_size);
+        infile.read((char *)buf, sizeof(HashIntoType) * tagset_size);
 
         for (unsigned int i = 0; i < tagset_size; i++) {
             all_tags.insert(buf[i]);
@@ -179,7 +179,8 @@ void Hashgraph::load_tagset(std::string infilename, bool clear_tags)
         /* Yes, this is boneheaded. Unfortunately, there is a bug in gcc > 5
          * regarding the basic_ios::failure that makes it impossible to catch
          * with more specificty. So, we catch *all* exceptions after trying to
-         * get the ifstream::failure, and assume it must have been the buggy one.
+         * get the ifstream::failure, and assume it must have been the buggy
+         * one.
          * Unfortunately, this would also cause us to catch the
          * khmer_file_exceptions thrown above, so we catch them again first and
          * rethrow them :) If this is understandably irritating to you, please
@@ -191,15 +192,15 @@ void Hashgraph::load_tagset(std::string infilename, bool clear_tags)
     } catch (khmer_file_exception &e) {
         throw e;
     } catch (const std::exception &e) {
-        std::string err = "Unknown error opening file: " + infilename + " "
-                          + strerror(errno);
+        std::string err =
+            "Unknown error opening file: " + infilename + " " + strerror(errno);
         throw khmer_file_exception(err);
     }
 }
 
-void Hashgraph::consume_sequence_and_tag(const std::string& seq,
-        unsigned long long& n_consumed,
-        SeenSet * found_tags)
+void Hashgraph::consume_sequence_and_tag(const std::string &seq,
+        unsigned long long &n_consumed,
+        SeenSet *found_tags)
 {
     bool kmer_tagged;
 
@@ -208,7 +209,7 @@ void Hashgraph::consume_sequence_and_tag(const std::string& seq,
 
     unsigned int since = _tag_density / 2 + 1;
 
-    while(!kmers.done()) {
+    while (!kmers.done()) {
         kmer = kmers.next();
         bool is_new_kmer;
 
@@ -217,7 +218,7 @@ void Hashgraph::consume_sequence_and_tag(const std::string& seq,
         // This is probably better than first testing and then setting the bits,
         // as a failed test essentially results in doing the same amount of work
         // twice.
-        if ((is_new_kmer = store->test_and_set_bits( kmer ))) {
+        if ((is_new_kmer = store->test_and_set_bits(kmer))) {
             ++n_consumed;
         }
 
@@ -260,9 +261,9 @@ void Hashgraph::consume_sequence_and_tag(const std::string& seq,
 
     } // iteration over kmers
 
-    if (since >= _tag_density/2 - 1) {
+    if (since >= _tag_density / 2 - 1) {
         ACQUIRE_ALL_TAGS_SPIN_LOCK
-        all_tags.insert(kmer);	// insert the last k-mer, too.
+        all_tags.insert(kmer); // insert the last k-mer, too.
         RELEASE_ALL_TAGS_SPIN_LOCK
         if (found_tags) {
             found_tags->insert(kmer);
@@ -276,56 +277,44 @@ void Hashgraph::consume_sequence_and_tag(const std::string& seq,
 //
 
 // TODO? Inline in header.
-void
-Hashgraph::
-consume_fasta_and_tag(
-    std:: string const  &filename,
-    unsigned int	      &total_reads, unsigned long long	&n_consumed
-)
+void Hashgraph::consume_fasta_and_tag(std::string const &filename,
+                                      unsigned int &total_reads,
+                                      unsigned long long &n_consumed)
 {
-    IParser *	  parser =
-        IParser::get_parser( filename );
+    IParser *parser = IParser::get_parser(filename);
 
-    consume_fasta_and_tag(
-        parser,
-        total_reads, n_consumed
-    );
+    consume_fasta_and_tag(parser, total_reads, n_consumed);
 
     delete parser;
 }
 
-void
-Hashgraph::
-consume_fasta_and_tag(
-    read_parsers:: IParser *  parser,
-    unsigned int		    &total_reads,   unsigned long long	&n_consumed
-)
+void Hashgraph::consume_fasta_and_tag(read_parsers::IParser *parser,
+                                      unsigned int &total_reads,
+                                      unsigned long long &n_consumed)
 {
-    Read			  read;
+    Read read;
 
     // TODO? Delete the following assignments.
     total_reads = 0;
     n_consumed = 0;
 
     // Iterate through the reads and consume their k-mers.
-    while (!parser->is_complete( )) {
-
+    while (!parser->is_complete()) {
         try {
-            read = parser->get_next_read( );
+            read = parser->get_next_read();
         } catch (NoMoreReadsAvailable &e) {
             // Bail out if this error is raised
             break;
         }
 
-        if (check_and_normalize_read( read.sequence )) {
+        if (check_and_normalize_read(read.sequence)) {
             unsigned long long this_n_consumed = 0;
-            consume_sequence_and_tag( read.sequence, this_n_consumed );
+            consume_sequence_and_tag(read.sequence, this_n_consumed);
 
-            __sync_add_and_fetch( &n_consumed, this_n_consumed );
-            __sync_add_and_fetch( &total_reads, 1 );
+            __sync_add_and_fetch(&n_consumed, this_n_consumed);
+            __sync_add_and_fetch(&total_reads, 1);
         }
     } // while reads left for parser
-
 }
 
 //
@@ -334,7 +323,7 @@ consume_fasta_and_tag(
 //
 
 void Hashgraph::divide_tags_into_subsets(unsigned int subset_size,
-        SeenSet& divvy)
+        SeenSet &divvy)
 {
     unsigned int i = 0;
 
@@ -359,7 +348,7 @@ void Hashgraph::consume_partitioned_fasta(const std::string &filename,
     total_reads = 0;
     n_consumed = 0;
 
-    IParser* parser = IParser::get_parser(filename.c_str());
+    IParser *parser = IParser::get_parser(filename.c_str());
     Read read;
 
     string seq = "";
@@ -372,7 +361,7 @@ void Hashgraph::consume_partitioned_fasta(const std::string &filename,
     // iterate through the FASTA file & consume the reads.
     //
 
-    while(!parser->is_complete())  {
+    while (!parser->is_complete()) {
         try {
             read = parser->get_next_read();
         } catch (NoMoreReadsAvailable &exc) {
@@ -381,7 +370,8 @@ void Hashgraph::consume_partitioned_fasta(const std::string &filename,
         seq = read.sequence;
 
         if (check_and_normalize_read(seq)) {
-            // First, figure out what the partition is (if non-zero), and save that.
+            // First, figure out what the partition is (if non-zero), and save
+            // that.
             PartitionID p = _parse_partition_id(read.name);
 
             // Then consume the sequence
@@ -405,12 +395,10 @@ void Hashgraph::consume_partitioned_fasta(const std::string &filename,
 //////////////////////////////////////////////////////////////////////
 // graph stuff
 
-void Hashgraph::calc_connected_graph_size(Kmer start,
-        unsigned long long& count,
-        KmerSet& keeper,
+void Hashgraph::calc_connected_graph_size(Kmer start, unsigned long long &count,
+        KmerSet &keeper,
         const unsigned long long threshold,
-        bool break_on_circum)
-const
+        bool break_on_circum) const
 {
     const BoundedCounterType val = get_count(start);
 
@@ -424,12 +412,12 @@ const
     // Avoid high-circumference k-mers
     Traverser traverser(this);
 
-    KmerFilter filter = [&] (const Kmer& n) {
+    KmerFilter filter = [&](const Kmer &n) {
         return break_on_circum && traverser.degree(n) > 4;
     };
     traverser.push_filter(filter);
 
-    while(!node_q.empty()) {
+    while (!node_q.empty()) {
         Kmer node = node_q.front();
         node_q.pop();
 
@@ -465,7 +453,7 @@ unsigned int Hashgraph::kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r)
     return traverser.degree(node);
 }
 
-unsigned int Hashgraph::kmer_degree(const char * kmer_s)
+unsigned int Hashgraph::kmer_degree(const char *kmer_s)
 {
     Traverser traverser(this);
     Kmer node = build_kmer(kmer_s);
@@ -492,20 +480,17 @@ size_t Hashgraph::trim_on_stoptags(std::string seq) const
     return seq.length();
 }
 
-unsigned int Hashgraph::traverse_from_kmer(Kmer start,
-        unsigned int radius,
+unsigned int Hashgraph::traverse_from_kmer(Kmer start, unsigned int radius,
         KmerSet &keeper,
-        unsigned int max_count)
-const
+        unsigned int max_count) const
 {
-
     KmerQueue node_q;
     std::queue<unsigned int> breadth_q;
     unsigned int cur_breadth = 0;
     unsigned int total = 0;
     unsigned int nfound = 0;
 
-    KmerFilter filter = [&] (const Kmer& n) {
+    KmerFilter filter = [&](const Kmer &n) {
         return set_contains(keeper, n);
     };
     Traverser traverser(this, filter);
@@ -513,7 +498,7 @@ const
     node_q.push(start);
     breadth_q.push(0);
 
-    while(!node_q.empty()) {
+    while (!node_q.empty()) {
         Kmer node = node_q.front();
         node_q.pop();
 
@@ -540,7 +525,8 @@ const
         keeper.insert(node);
         total++;
 
-        if (!(breadth >= cur_breadth)) { // keep track of watermark, for debugging.
+        if (!(breadth >=
+                cur_breadth)) { // keep track of watermark, for debugging.
             throw khmer_exception();
         }
         if (breadth > cur_breadth) {
@@ -548,12 +534,12 @@ const
         }
 
         nfound = traverser.traverse_right(node, node_q);
-        for (unsigned int i = 0; i<nfound; ++i) {
+        for (unsigned int i = 0; i < nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
 
         nfound = traverser.traverse_left(node, node_q);
-        for (unsigned int i = 0; i<nfound; ++i) {
+        for (unsigned int i = 0; i < nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
     }
@@ -582,8 +568,8 @@ void Hashgraph::load_stop_tags(std::string infilename, bool clear_tags)
     } catch (const std::exception &e) {
         // Catching std::exception is a stopgap for
         // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
-        std::string err = "Unknown error opening file: " + infilename + " "
-                          + strerror(errno);
+        std::string err =
+            "Unknown error opening file: " + infilename + " " + strerror(errno);
         throw khmer_file_exception(err);
     }
 
@@ -599,42 +585,42 @@ void Hashgraph::load_stop_tags(std::string infilename, bool clear_tags)
     try {
         char signature[4];
         infile.read(signature, 4);
-        infile.read((char *) &version, 1);
-        infile.read((char *) &ht_type, 1);
+        infile.read((char *)&version, 1);
+        infile.read((char *)&ht_type, 1);
         if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
             std::ostringstream err;
             err << "Incorrect file signature 0x";
-            for(size_t i=0; i < 4; ++i) {
-                err << std::hex << (int) signature[i];
+            for (size_t i = 0; i < 4; ++i) {
+                err << std::hex << (int)signature[i];
             }
             err << " while reading stoptags from " << infilename
                 << "; should be " << SAVED_SIGNATURE;
             throw khmer_file_exception(err.str());
         } else if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
-            err << "Incorrect file format version " << (int) version
+            err << "Incorrect file format version " << (int)version
                 << " while reading stoptags from " << infilename
-                << "; should be " << (int) SAVED_FORMAT_VERSION;
+                << "; should be " << (int)SAVED_FORMAT_VERSION;
             throw khmer_file_exception(err.str());
         } else if (!(ht_type == SAVED_STOPTAGS)) {
             std::ostringstream err;
-            err << "Incorrect file format type " << (int) ht_type
+            err << "Incorrect file format type " << (int)ht_type
                 << " while reading stoptags from " << infilename;
             throw khmer_file_exception(err.str());
         }
 
-        infile.read((char *) &save_ksize, sizeof(save_ksize));
+        infile.read((char *)&save_ksize, sizeof(save_ksize));
         if (!(save_ksize == _ksize)) {
             std::ostringstream err;
             err << "Incorrect k-mer size " << save_ksize
                 << " while reading stoptags from " << infilename;
             throw khmer_file_exception(err.str());
         }
-        infile.read((char *) &tagset_size, sizeof(tagset_size));
+        infile.read((char *)&tagset_size, sizeof(tagset_size));
 
-        HashIntoType * buf = new HashIntoType[tagset_size];
+        HashIntoType *buf = new HashIntoType[tagset_size];
 
-        infile.read((char *) buf, sizeof(HashIntoType) * tagset_size);
+        infile.read((char *)buf, sizeof(HashIntoType) * tagset_size);
 
         for (unsigned int i = 0; i < tagset_size; i++) {
             stop_tags.insert(buf[i]);
@@ -648,8 +634,8 @@ void Hashgraph::load_stop_tags(std::string infilename, bool clear_tags)
     } catch (const std::exception &e) {
         // Catching std::exception is a stopgap for
         // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
-        std::string err = "Unknown error opening file: " + infilename + " "
-                          + strerror(errno);
+        std::string err =
+            "Unknown error opening file: " + infilename + " " + strerror(errno);
         throw khmer_file_exception(err);
     }
 }
@@ -659,18 +645,18 @@ void Hashgraph::save_stop_tags(std::string outfilename)
     ofstream outfile(outfilename.c_str(), ios::binary);
     size_t tagset_size = stop_tags.size();
 
-    HashIntoType * buf = new HashIntoType[tagset_size];
+    HashIntoType *buf = new HashIntoType[tagset_size];
 
     outfile.write(SAVED_SIGNATURE, 4);
     unsigned char version = SAVED_FORMAT_VERSION;
-    outfile.write((const char *) &version, 1);
+    outfile.write((const char *)&version, 1);
 
     unsigned char ht_type = SAVED_STOPTAGS;
-    outfile.write((const char *) &ht_type, 1);
+    outfile.write((const char *)&ht_type, 1);
 
     unsigned int save_ksize = _ksize;
-    outfile.write((const char *) &save_ksize, sizeof(save_ksize));
-    outfile.write((const char *) &tagset_size, sizeof(tagset_size));
+    outfile.write((const char *)&save_ksize, sizeof(save_ksize));
+    outfile.write((const char *)&tagset_size, sizeof(tagset_size));
 
     unsigned int i = 0;
     for (SeenSet::iterator pi = stop_tags.begin(); pi != stop_tags.end();
@@ -678,7 +664,7 @@ void Hashgraph::save_stop_tags(std::string outfilename)
         buf[i] = *pi;
     }
 
-    outfile.write((const char *) buf, sizeof(HashIntoType) * tagset_size);
+    outfile.write((const char *)buf, sizeof(HashIntoType) * tagset_size);
     outfile.close();
 
     delete[] buf;
@@ -712,8 +698,7 @@ void Hashgraph::print_tagset(std::string infilename)
     printfile.close();
 }
 
-void Hashgraph::extract_unique_paths(std::string seq,
-                                     unsigned int min_length,
+void Hashgraph::extract_unique_paths(std::string seq, unsigned int min_length,
                                      float min_unique_f,
                                      std::vector<std::string> &results)
 {
@@ -768,7 +753,7 @@ void Hashgraph::extract_unique_paths(std::string seq,
         if (!(j == min_length)) {
             throw khmer_exception();
         }
-        if ( ((float)seen_counter / (float) j) <= max_seen) {
+        if (((float)seen_counter / (float)j) <= max_seen) {
             unsigned int start = i;
 
             // extend the window until the end of the sequence...
@@ -782,14 +767,15 @@ void Hashgraph::extract_unique_paths(std::string seq,
                 start++;
 
                 // ...or until we've seen too many of the k-mers.
-                if (((float)seen_counter / (float) min_length) > max_seen) {
+                if (((float)seen_counter / (float)min_length) > max_seen) {
                     break;
                 }
             }
 
             // adjust for ending point.
-            if (start + min_length == n_kmers) {	// potentially decrement twice at end
-                if (((float)seen_counter / (float) min_length) > max_seen) {
+            if (start + min_length ==
+                    n_kmers) { // potentially decrement twice at end
+                if (((float)seen_counter / (float)min_length) > max_seen) {
                     start--;
                 }
                 start--;
@@ -797,7 +783,8 @@ void Hashgraph::extract_unique_paths(std::string seq,
                 start -= 2;
             }
 
-            // ...and now extract the relevant portion of the sequence, and adjust
+            // ...and now extract the relevant portion of the sequence, and
+            // adjust
             // starting pos'n.
             results.push_back(seq.substr(i, start + min_length + _ksize - i));
 
@@ -808,16 +795,14 @@ void Hashgraph::extract_unique_paths(std::string seq,
     }
 }
 
-
-void Hashgraph::find_high_degree_nodes(const char * s,
-                                       SeenSet& high_degree_nodes)
-const
+void Hashgraph::find_high_degree_nodes(const char *s,
+                                       SeenSet &high_degree_nodes) const
 {
     Traverser traverser(this);
     KmerIterator kmers(s, _ksize);
 
     unsigned long n = 0;
-    while(!kmers.done()) {
+    while (!kmers.done()) {
         n++;
         if (n % 10000 == 0) {
             std::cout << "... find_high_degree_nodes: " << n << "\n";
@@ -833,8 +818,7 @@ const
 unsigned int Hashgraph::traverse_linear_path(const Kmer seed_kmer,
         SeenSet &adjacencies,
         SeenSet &visited, Hashtable &bf,
-        SeenSet &high_degree_nodes)
-const
+        SeenSet &high_degree_nodes) const
 {
     unsigned int size = 0;
 
@@ -884,9 +868,9 @@ void Nodegraph::update_from(const Nodegraph &otherBASE)
     if (_ksize != otherBASE._ksize) {
         throw khmer_exception("both nodegraphs must have same k size");
     }
-    BitStorage * myself = dynamic_cast<BitStorage *>(this->store);
-    const BitStorage * other;
-    other = dynamic_cast<const BitStorage*>(otherBASE.store);
+    BitStorage *myself = dynamic_cast<BitStorage *>(this->store);
+    const BitStorage *other;
+    other = dynamic_cast<const BitStorage *>(otherBASE.store);
 
     // if dynamic_cast worked, then the pointers will be not null.
     if (myself && other) {
