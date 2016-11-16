@@ -63,176 +63,102 @@ One-time Preparation
 
 #. Install the dependencies.
 
-   OS X users
+   i. Mac users
 
-   a.  Install Xcode from the `Mac App Store (requires root)
-       <https://developer.apple.com/xcode/>`_.
-   #.  `Register as an Apple Developer
-       <https://developer.apple.com/register>`__.
-   #.  Install the Xcode command-line tools: Xcode -> preferences ->
-       Downloads -> Command Line Tools (requires root).
+      a.  Install Xcode with::
 
-   Linux users
+             xcode-select --install
 
-   a.  Install the python development environment, virtualenv, pip, gcc, and
-       g++.
+      #.  Install `Homebrew <http://brew.sh/>`__ with::
 
-       On recent Debian and Ubuntu this can be done with::
+             /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
-           sudo apt-get install python2.7-dev python-virtualenv python-pip gcc \
-           g++ git astyle gcovr cppcheck enchant
+      #.  Install the python development environment and some additional development packages::
 
-       For RHEL6::
+             brew install python astyle gcovr cppcheck enchant
+             sudo pip install --upgrade pip virtualenv
 
-           sudo yum install -y python-devel python-pip git gcc gcc-c++ make enchant
-           sudo pip install virtualenv
+   ii. Linux users
 
-#. Get a `GitHub <http://github.com>`__ account.
+      a.  Install the python development environment and some additional
+          development packages. On recent versions of Debian or Ubuntu this can
+          be done with::
 
-   (We use GitHub to manage khmer contributions.)
+              sudo apt-get install python2.7-dev python-virtualenv python-pip \
+              gcc g++ git astyle gcovr cppcheck enchant
+
+          For Red Hat, Fedora, and CentOS::
+
+              sudo yum install -y python-devel python-pip git gcc gcc-c++ make enchant
+              sudo pip install virtualenv
+
+#. Create a `GitHub <http://github.com>`__ account.
+
+   We use GitHub to manage khmer contributions.
 
 #. Fork `github.com/dib-lab/khmer <https://github.com/dib-lab/khmer>`__.
 
-   Visit that page, and then click on the 'fork' button (upper right).
-
-   (This makes a copy of the khmer source code in your own GitHub account.)
+   Visit that page, and then click on the 'fork' button (upper right). This
+   makes a copy of the khmer source code in your own GitHub account.
 
 #. Clone your copy of khmer to your local development environment.
 
-   Your clone URL should look something like this::
+   Your shell command should look something like::
 
-       https://github.com/empty-titus/khmer.git
+       git clone https://github.com/your-github-username/khmer.git
 
-   and the UNIX shell command should be::
-
-       git clone https://github.com/empty-titus/khmer.git
-
-   (This makes a local copy of khmer on your development machine.)
+   This makes a local copy of khmer on your development machine.
 
 #. Add a git reference to the khmer dib-lab repository::
 
        cd khmer
        git remote add dib https://github.com/dib-lab/khmer.git
-       cd ../
 
-   (This makes it easy for you to pull down the latest changes in the
-   main repository.)
+   This makes it easy for you to pull down the latest changes in the
+   main repository.
 
-#. Create a virtual Python environment within which to work with
-   `virtualenv <https://pypi.python.org/pypi/virtualenv>`__::
+#. Optional: create a virtual Python environment for khmer development
 
-       python2.7 -m virtualenv env
+   See the **Virtual Environments** heading in :doc:`intermediate` for more
+   details on creating and using a virtual environment for development.
+   This is not strictly required but highly recommended.
 
-   This gives you a place to install packages necessary for running khmer.
+#. Install Python dependencies
 
-   OS X users and others may need to download virtualenv first::
-
-	curl -O https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.11.6.tar.gz
-	tar xzf virtualenv*
-	cd virtualenv-*; python2.7 virtualenv.py ../env; cd ..
-
-   `Mac ports <https://www.macports.org/>`__ users on the OS X platform can
-   install pip by execution from the command line::
-
-       sudo port install py27-pip
-
-   `Homebrew <http://brew.sh/>`__ users on the OS X platform will have pip
-   already installed
-
-
-   `Conda <https://github.com/conda/conda>`__ users on any platform
-   should instead create a separate Conda environment::
-
-       conda create -n khmer anaconda
-
-#. Activate the virtualenv and install a few packages::
-
-       source env/bin/activate
-       cd khmer
-       make install-dependencies
-
-   (This installs `Sphinx <http://sphinx-doc.org/>`__ and `pytest
-   <https://pytest.org/>`__, packages we use for
-   building the documentation and running the tests.)
-
-   In Conda to activate the previously created environment and install
-   dependencies::
-
-       source activate khmer
-       cd khmer
-       make install-dependencies
-
-#. Cppcheck installation:
-
-   `Debian <https://www.debian.org/>`__ and
-   `Ubuntu <http://www.ubuntu.com/>`__ Linux distro users can
-   install cppcheck by executing from the command line::
-
-       sudo apt-get install cppcheck
-
-   `Mac ports <https://www.macports.org/>`__ users on the OS X platform can
-   install cppcheck by executing from the command line::
-
-       sudo port install cppcheck
-
-   `Homebrew <http://brew.sh/>`__ users on the OS X platform can
-   install cppcheck by executing from the command line::
-
-       sudo brew install cppcheck
-
-
-#. ccache installation:
-
-   Debian and Ubuntu Linux distro users can install ``ccache`` to speed up
-   their compile times::
-
-       sudo apt-get install ccache
-       echo 'export PATH="/usr/lib/ccache:$PATH" # enable ccache' >> ~/.bashrc
-       export PATH="/usr/lib/ccache:$PATH"
+   From within the khmer directory, invoke the ``make install-dep`` command. If
+   you are not using a virtual environment, you may need to invoke ``sudo make
+   install-dep`` instead. This will install several packages used in khmer
+   testing and development.
 
 
 Building khmer and running the tests
 ------------------------------------
 
-#. Activate (or re-activate) the virtualenv::
-
-      source ../env/bin/activate
-
-   ... or for Conda users::
-
-      source activate khmer
-
-   You can run this many times without any ill effects.
-
-   (This puts you in the development environment.)
-
 #. Build khmer::
 
       make
 
-   If this fails, we apologize -- please `go create a new issue
+   This compiles the C++ source code into something that Python can run. If the
+   command fails, we apologize -- please `go create a new issue
    <https://github.com/dib-lab/khmer/issues?direction=desc&sort=created&state=open>`__,
    paste in the failure message, and we'll try to help you work through it!
-
-   (This takes the C++ source code and compiles it into something that Python
-   can run.)
 
 #. Run the tests::
 
       make test
 
-   You should see lots of output, with something like::
+   This will run all of the Python tests in the ``tests/`` directory. You should
+   see lots of output, with something like::
 
       ====== 658 passed, 22 deselected in 40.93 seconds =======
 
    at the end.
 
-   (This will run all of the Python tests in the tests/ directory.)
-
 Congratulations! You're ready to develop!
 
+
 Claiming an issue and starting to develop
-------------------------------------------
+-----------------------------------------
 
 #. Find an open issue and claim it.
 
@@ -256,32 +182,8 @@ Claiming an issue and starting to develop
    (This pulls in all of the latest changes from whatever we've been
    doing on dib-lab.)
 
-   It is possible that when you do a `git pull` you will get a "merge
-   conflict" -- This is what happens when something changed in the branch you're
-   pulling in in the same place you made a change in your local copy. This
-   frequently happens in the `ChangeLog` file.
-
-   Git will complain loudly about merges and tell you specifically in which
-   files they occurred. If you open the file, you'll see something vaguely
-   like this in the place where the merge occurred::
-
-      <<<<<<< HEAD
-      Changes made on the branch that is being merged into. In most cases,
-      this is the branch that you have currently checked out
-      =======
-      Changes made on the branch that is being merged in, almost certainly
-      master.
-      >>>>>>> abcde1234
-
-   Though there are a variety of tools to assist with resolving merge
-   conflicts they can be quite complicated at first glance and it is usually
-   easy enough to manually resolve the conflict.
-
-   To resolve the conflict you simply have to manually 'meld' the changes
-   together and remove the merge markers.
-
-   After this you'll have to add and commit the merge just like any other set
-   of changes. It's also recommended that you run tests.
+   If git complains about a "merge conflict" when you execute ``git pull``,
+   refer to the **Resolving merge conflicts** section of :doc:`intermediate`.
 
 #. Create a new branch and link it to your fork on GitHub::
 
@@ -357,7 +259,7 @@ Claiming an issue and starting to develop
 
    In a Web browser, go to your GitHub fork of khmer, e.g.::
 
-      https://github.com/empty-titus/khmer
+      https://github.com/your-github-username/khmer
 
    and you will see a list of "recently pushed branches" just above the
    source code listing.  On the right side of that should be a
@@ -379,13 +281,16 @@ Claiming an issue and starting to develop
 #. Paste in the committer checklist from :doc:`coding-guidelines-and-review`
    and, after its pasted in, check off as many of the boxes as you can.
 
-#. As you add new commits to address bugs or formatting issues, you can keep
+#. Review the pull request checklist and make any necessary additional changes.
+
+   As you add new commits to address bugs or formatting issues, you can keep
    pushing your changes to the pull request by doing::
 
       git push origin
 
 #. When you are ready to have the pull request reviewed, please mention
-   @luizirber, @camillescott, @mr-c, or @ctb with a comment 'Ready for review!'
+   @luizirber, @camillescott, @standage, @betatim, and/or @ctb with the comment
+   'Ready for review!'
 
 #. The khmer team will now review your pull request and communicate
    with you through the pull request page.  Please feel free to add
@@ -428,67 +333,3 @@ Here are a few suggestions:
 
 * You can also help other people out by watching for new issues or
   looking at pull requests.  Remember to be nice and polite!
-
-Your second contribution...
----------------------------
-
-Here are a few pointers on getting started on your second (or third,
-or fourth, or nth contribution).
-
-So, assuming you've found an issue you'd like to work on there are a
-couple things to do to make sure your local copy of the repository is
-ready for a new issue--specifically, we need to make sure it's in sync
-with the remote repository so you aren't working on a old copy. So::
-
-        git checkout master
-        git fetch --all
-        git pull
-
-This puts you on the latest master branch and pulls down updates from
-GitHub with any changes that may have been made since your last
-contribution (usually including the merge of your last
-contribution). Then we merge those changes into your local copy of the
-master branch.
-
-Now, you can go back to `Claiming an issue and starting to develop`_.
-
-Advanced merging with git-merge-changelog
------------------------------------------
-
-Often one can get a merge conflict due to updates in the ChangeLog. To teach
-Git how to handle these on its own you can install a special merge driver.
-
-On Debian & Ubuntu systems you'll need the `git-merge-changelog` package::
-
-        sudo apt-get install git-merge-changelog
-
-Ubuntu 14.04 LTS users will need to add an external repository that contains a
-backport of the package first before installing::
-
-        sudo apt-add-repository ppa:misterc/gedlab
-        sudo apt-get update
-        sudo apt-get install git-merge-changelog
-
-Everyone should then update their `~/.gitconfig` file with the following::
-
-        [merge "merge-changelog"]
-                  name = GNU-style ChangeLog merge driver
-                  driver = /usr/bin/git-merge-changelog %O %A %B
-
-Pull request cleanup (commit squashing)
----------------------------------------
-
-Submitters are invited to reduce the numbers of commits in their pull requests
-either via `git rebase -i dib/master` or this recipe::
-
-        git pull # make sure the local is up to date
-        git pull dib master # get up to date
-        # fix any merge conflicts
-        git status # sanity check
-        git diff dib/master # does the diff look correct? (no merge markers)
-        git reset --soft dib/master # un-commit the differences from dib/master
-        git status # sanity check
-        git commit --all # package all differences in one commit
-        git status # sanity check
-        git push # should fail
-        git push --force # override what's in GitHub's copy of the branch/pull request
