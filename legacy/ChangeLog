@@ -1,3 +1,8 @@
+2016-11-15  Daniel Standage  <daniel.standage@gmail.com>
+
+   * docs/dev/scripts-and-sandbox.rst: Added documentation for reserved flags
+     for command line scripts.
+
 2016-11-15  Titus Brown  <titus@idyll.org>
 
    * khmer/{_cpy_counttable,_cpy_hashgraph.hh,cpy_nodetable.hh,_khmer.cc,
