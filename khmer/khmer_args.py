@@ -105,8 +105,8 @@ class FileType(argparse.FileType):
         # detect if stdout is being faked (StringIO during unittests) in which
         # case we do not have to do anything
         if (fname == '-' and
-            sys.version_info.major == 3 and
-            not isinstance(sys.stdout, StringIO)):
+                sys.version_info.major == 3 and
+                not isinstance(sys.stdout, StringIO)):
             if 'r' in self._mode:
                 fname = sys.stdin.fileno()
             elif 'w' in self._mode:
