@@ -98,12 +98,13 @@ class ComboFormatter(argparse.ArgumentDefaultsHelpFormatter,
     pass
 
 
-# XXX Temporary fix to argparse's FileType which ignores the
+# Temporary fix to argparse FileType which ignores the
 # binary mode flag. Upstream bug tracked in https://bugs.python.org/issue14156
+# pylint: disable=too-few-public-methods,missing-docstring
 class FileType(argparse.FileType):
     def __call__(self, fname):
-        # detect if stdout is being faked (StringIO during unittests) in which
-        # case we do not have to do anything
+        # detect if stdout is being faked (StringIO during unit tests) in
+        # which case we do not have to do anything
         if (fname == '-' and
                 sys.version_info.major == 3 and
                 not isinstance(sys.stdout, StringIO)):

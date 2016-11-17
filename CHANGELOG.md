@@ -34,6 +34,7 @@ under semantic versioning, but will be in future versions of khmer.
   Hashbits --> Nodegraph.
 
 ### Fixed
+- Bug in compressed(gzip) streaming output from scripts
 - The hashbits `update_from` function to correctly track occupied bins for
   calculating FPR.
 - Bug in the `filter-abund.py` script when `--gzip` and `-o` flags are used
