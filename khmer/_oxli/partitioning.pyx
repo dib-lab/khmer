@@ -102,9 +102,14 @@ cdef class StreamingPartitioner:
         self._components = deref(self._this).get_component_set()
         self.n_consumed = 0
 
-    def consume_sequence(self, sequence):
-        deref(self._this).consume_sequence(sequence.encode('utf-8'))
+    def consume(self, sequence):
+        deref(self._this).consume(sequence.encode('utf-8'))
         self.n_consumed += 1
+
+    def consume_pair(self, first, second):
+        deref(self._this).consume_pair(first.encode('utf-8'),
+                                       second.encode('utf-8'))
+        self.n_consumed += 2
 
     def consume_fasta(self, filename):
         return deref(self._this).consume_fasta(filename.encode('utf-8'))

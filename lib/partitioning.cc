@@ -83,7 +83,7 @@ uint64_t StreamingPartitioner::consume_fasta(const std::string& filename)
 
         bool is_valid = graph->check_and_normalize_read(read.sequence);
         if (is_valid) {
-            consume_sequence(read.sequence);
+            consume(read.sequence);
         } else {
             n_invalid++;
         }
@@ -94,7 +94,26 @@ uint64_t StreamingPartitioner::consume_fasta(const std::string& filename)
 }
 
 
-void StreamingPartitioner::consume_sequence(const std::string& seq)
+void StreamingPartitioner::consume(const std::string& seq)
+{
+    std::set<HashIntoType> tags;
+    consume_and_connect_tags(seq, tags);
+    create_and_connect_components(tags);
+}
+
+
+void StreamingPartitioner::consume_pair(const std::string& first,
+                                        const std::string& second)
+{
+    std::set<HashIntoType> tags;
+    consume_and_connect_tags(first, tags);
+    consume_and_connect_tags(second, tags);
+    create_and_connect_components(tags);
+}
+
+
+void StreamingPartitioner::consume_and_connect_tags(const std::string& seq,
+                                                    std::set<HashIntoType>& tags)
 {
     /* For the following comments, let G be the set of k-mers
      * known in the graph before inserting the k-mers R from
@@ -181,6 +200,14 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
 #endif
         // Now search for tagged nodes connected to U.
         find_connected_tags(search_from, tags, seen, false);
+    } else {
+        throw khmer_ptr_exception("Hashtable has been deleted.");
+    }
+}
+
+
+void StreamingPartitioner::create_and_connect_components(std::set<HashIntoType> &tags)
+{
 
         // Now resolve components. First, get components from existing tags.
         ComponentPtrSet found_comps;
@@ -227,10 +254,6 @@ void StreamingPartitioner::consume_sequence(const std::string& seq)
                 merge_components(root_comp, found_comps);
             }
         }
-
-    } else {
-        throw khmer_ptr_exception("Hashtable has been deleted.");
-    }
 }
 
 

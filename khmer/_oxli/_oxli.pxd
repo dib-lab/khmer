@@ -150,8 +150,10 @@ cdef extern from "partitioning.hh" namespace "khmer":
     cdef cppclass CpStreamingPartitioner "khmer::StreamingPartitioner":
         CpStreamingPartitioner(CpHashtable * ) except +MemoryError
 
-        void consume_sequence(string&) except +MemoryError
+        void consume(string&) except +MemoryError
+        void consume_pair(string&, string&) except +MemoryError
         uint64_t consume_fasta(string&) except +MemoryError
+
         void map_tags_to_component(set[HashIntoType]&, ComponentPtr&)
         void find_connected_tags(queue[CpKmer]&, 
                                  set[HashIntoType]&,
