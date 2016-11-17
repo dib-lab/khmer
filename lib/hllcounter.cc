@@ -423,7 +423,7 @@ void HLLCounter::consume_fasta(
             {
                 // Iterate through the reads and consume their k-mers.
                 try {
-                    read = parser->get_next_read();
+                    parser->imprint_next_read(read);
                 } catch (read_parsers::NoMoreReadsAvailable) {
                     break;
                 }

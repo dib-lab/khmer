@@ -123,20 +123,7 @@ struct IParser {
 
     virtual bool		is_complete( ) = 0;
 
-    // Note: 'get_next_read' exists for legacy reasons.
-    //	     In the long term, it should be eliminated in favor of direct use of
-    //	     'imprint_next_read'. A potentially costly copy-by-value happens
-    //	     upon return.
-    // TODO: Eliminate all calls to 'get_next_read'.
-    // Or switch to C++11 w/ move constructors
-    inline Read		get_next_read( )
-    {
-        Read the_read;
-        imprint_next_read( the_read );
-        return the_read;
-    }
     virtual void	imprint_next_read( Read &the_read ) = 0;
-
     virtual void	imprint_next_read_pair(
         ReadPair &the_read_pair,
         uint8_t mode = PAIR_MODE_ERROR_ON_UNPAIRED

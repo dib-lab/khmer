@@ -142,7 +142,7 @@ size_t SubsetPartition::output_partitioned_file(
 
     while(!parser->is_complete()) {
         try {
-            read = parser->get_next_read();
+            parser->imprint_next_read(read);
         } catch (NoMoreReadsAvailable &exc) {
             break;
         }
