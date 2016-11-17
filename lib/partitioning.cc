@@ -184,8 +184,6 @@ void StreamingPartitioner::consume_and_connect_tags(const std::string& seq,
         kmer = kmers.first();
         tags.insert(kmer);
 
-        intersection.clear();
-
 #if(DEBUG_SP)
         std::cout << "Done iterating k-mers" << std::endl;
         std::cout << tags.size() << " tags in sequence" << std::endl;
