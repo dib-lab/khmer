@@ -6,7 +6,7 @@ import itertools
 import random
 
 import khmer
-from khmer import _oxli
+from khmer._oxli.partitioning import StreamingPartitioner, Component
 from khmer.khmer_args import estimate_optimal_with_K_and_f as optimal_fp
 from khmer import reverse_complement as revcomp
 from khmer import reverse_hash as revhash
@@ -23,7 +23,7 @@ def teardown():
 
 @pytest.fixture
 def partitioner(graph):
-    sp = _oxli.StreamingPartitioner(graph)
+    sp = StreamingPartitioner(graph)
     return graph, sp
 
 
@@ -31,7 +31,7 @@ def partitioner(graph):
 def single_component(partitioner, random_sequence):
     graph, partitioner = partitioner
     sequence = random_sequence()
-    partitioner.consume_sequence(sequence)
+    partitioner.consume(sequence)
     return graph, partitioner, sequence
 
 
@@ -50,8 +50,8 @@ class TestStreamingPartitionerBasic:
         inpath = utils.get_test_data('random-20-a.fa')
 
         cg = khmer.Countgraph(K, 1e5, 4)
-        sp = _oxli.StreamingPartitioner(cg)
-        sp.consume_sequence(known_sequence)
+        sp = StreamingPartitioner(cg)
+        sp.consume(known_sequence)
 
         assert sp.n_components == 1
 
@@ -60,12 +60,12 @@ class TestStreamingPartitionerBasic:
         comp2 = random_sequence(exclude=comp1)
 
         cg = khmer.Nodegraph(K, 1e5, 4)
-        sp = _oxli.StreamingPartitioner(cg)
+        sp = StreamingPartitioner(cg)
         
-        sp.consume_sequence(comp1)
+        sp.consume(comp1)
         assert sp.n_components == 1
         
-        sp.consume_sequence(comp2)
+        sp.consume(comp2)
         assert sp.n_components == 2
 
     def test_components_iter(self, random_sequence):
@@ -73,10 +73,10 @@ class TestStreamingPartitionerBasic:
         comp2 = random_sequence(exclude=comp1)
 
         cg = khmer.Nodegraph(K, 1e5, 4)
-        sp = _oxli.StreamingPartitioner(cg)
+        sp = StreamingPartitioner(cg)
         
-        sp.consume_sequence(comp1)
-        sp.consume_sequence(comp2)
+        sp.consume(comp1)
+        sp.consume(comp2)
         assert sp.n_components == 2
 
         comps = list(sp.components())
@@ -86,8 +86,8 @@ class TestStreamingPartitionerBasic:
         seq = random_sequence()
 
         cg = khmer.Nodegraph(K, 1e5, 4)
-        sp = _oxli.StreamingPartitioner(cg)
-        sp.consume_sequence(seq)
+        sp = StreamingPartitioner(cg)
+        sp.consume(seq)
 
         tags = [t for t,c in sp.tag_components()]
         comp = sp.get_nearest_component(seq[:K])
@@ -98,10 +98,10 @@ class TestStreamingPartitionerBasic:
         comp2 = random_sequence(exclude=comp1)
 
         cg = khmer.Nodegraph(K, 1e5, 4)
-        sp = _oxli.StreamingPartitioner(cg)
+        sp = StreamingPartitioner(cg)
         
-        sp.consume_sequence(comp1)
-        sp.consume_sequence(comp2)
+        sp.consume(comp1)
+        sp.consume(comp2)
         assert sp.n_components == 2
 
         tags = []
@@ -119,10 +119,10 @@ class TestStreamingPartitionerBasic:
         seq2 = random_sequence(exclude=seq1)
 
         cg = khmer.Nodegraph(K, 1e5, 4)
-        sp = _oxli.StreamingPartitioner(cg)
+        sp = StreamingPartitioner(cg)
         
-        sp.consume_sequence(seq1)
-        sp.consume_sequence(seq2)
+        sp.consume(seq1)
+        sp.consume(seq2)
 
         c1 = sp.get_nearest_component(seq1[:K])
         c2 = sp.get_nearest_component(seq2[:K])
@@ -141,13 +141,13 @@ class TestStreamingPartitionerBasic:
         seq2 = random_sequence(exclude=seq1)
 
         cg = khmer.Nodegraph(K, 1e5, 4)
-        sp = _oxli.StreamingPartitioner(cg)
+        sp = StreamingPartitioner(cg)
         
-        sp.consume_sequence(seq1)
-        sp.consume_sequence(seq2)
+        sp.consume(seq1)
+        sp.consume(seq2)
         assert sp.n_components == 2
 
-        sp.consume_sequence(seq1 + seq2)
+        sp.consume(seq1 + seq2)
         assert sp.n_components == 1
 
         comps = list(sp.components())
@@ -160,14 +160,14 @@ class TestStreamingPartitionerBasic:
         seq3 = random_sequence(exclude=seq1+seq2)
 
         cg = khmer.Nodegraph(K, 1e5, 4)
-        sp = _oxli.StreamingPartitioner(cg)
+        sp = StreamingPartitioner(cg)
         
-        sp.consume_sequence(seq1)
-        sp.consume_sequence(seq2)
-        sp.consume_sequence(seq3)
+        sp.consume(seq1)
+        sp.consume(seq2)
+        sp.consume(seq3)
         assert sp.n_components == 3
 
-        sp.consume_sequence(seq1 + seq2 + seq3)
+        sp.consume(seq1 + seq2 + seq3)
         assert sp.n_components == 1
 
     def test_nomerge_k_minus_2_overlap(self, single_component, random_sequence):
@@ -179,7 +179,7 @@ class TestStreamingPartitionerBasic:
         neighbor = random_sequence(exclude=seq) + first
 
         assert partitioner.n_components == 1
-        partitioner.consume_sequence(neighbor)
+        partitioner.consume(neighbor)
         print(seq, neighbor, graph.assemble_linear_path(seq[:K]), sep='\n')
         assert partitioner.n_components == 2
 
@@ -198,7 +198,7 @@ class TestStreamingPartitionerBasic:
             neighbor = overlap + random_sequence(exclude=seq)
 
         assert partitioner.n_components == 1
-        partitioner.consume_sequence(neighbor)
+        partitioner.consume(neighbor)
         path = graph.assemble_linear_path(seq[:K])
         assert partitioner.n_components == 1
 
@@ -211,7 +211,7 @@ class TestStreamingPartitionerBasic:
         neighbor = random_sequence(exclude=seq) + first
 
         assert partitioner.n_components == 1
-        partitioner.consume_sequence(neighbor)
+        partitioner.consume(neighbor)
         print(seq, neighbor, graph.assemble_linear_path(seq[:K]), sep='\n')
         assert partitioner.n_components == 1
         
@@ -222,9 +222,9 @@ class TestStreamingPartitionerBasic:
         seq_reads = list(reads(seq, dbg_cover=True, N=n_reads))
 
         G = khmer.Nodegraph(K, 1e6, 4)
-        sp = _oxli.StreamingPartitioner(G)
+        sp = StreamingPartitioner(G)
         for read in seq_reads:
-            sp.consume_sequence(read)
+            sp.consume(read)
 
         assert sp.n_components == 1
 
@@ -241,11 +241,11 @@ class TestStreamingPartitionerBasic:
         random.shuffle(seq_reads)
 
         G = khmer.Nodegraph(K, 1e6, 4)
-        sp = _oxli.StreamingPartitioner(G)
+        sp = StreamingPartitioner(G)
 
         for read in seq_reads:
             assert len(read) >= K
-            sp.consume_sequence(read)
+            sp.consume(read)
         assert sp.n_components == n_components
 
         comps = list(sp.components())
@@ -262,11 +262,11 @@ class TestStreamingPartitionerBasic:
         for _ in range(n_components):
             seqs.append(random_sequence(exclude=''.join(seqs)))
         G = khmer.Countgraph(K, 1e6, 4)
-        sp = _oxli.StreamingPartitioner(G)
+        sp = StreamingPartitioner(G)
 
         for seq in seqs:
             for _ in range(cov):
-                sp.consume_sequence(seq)
+                sp.consume(seq)
         for seq in seqs:
             (med, _, _) = G.get_median_count(seq)
             assert med == cov
