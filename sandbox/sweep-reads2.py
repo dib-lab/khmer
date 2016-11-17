@@ -80,21 +80,25 @@ def main():
 
     print('starting sweep.')
 
-    n = 0
     m = 0
     K = ht.ksize()
-    for record in screed.open(readsfile):
-        if len(record.sequence) < K:
-            continue
-
+    instream = screed.open(readsfile)
+    for n, is_pair, read1, read2 in broken_paired_reader(instream):
         if n % 10000 == 0:
             print('...', n, m)
 
-        count = ht.get_median_count(record.sequence)[0]
-        if count:
-            m += 1
-            write_record(record, outfp)
-        n += 1
+        if is_pair:
+            count1 = ht.get_median_count(read1.sequence)[0]
+            count2 = ht.get_median_count(read2.sequence)[0]
+            if count1 and count2:
+                m += 1
+                write_record(read1, outfp)
+                write_record(read2, outfp)
+        else:
+            count = ht.get_median_count(read1.sequence)[0]
+            if count:
+                m += 1
+                write_record(read1, outfp)
 
 if __name__ == '__main__':
     main()
