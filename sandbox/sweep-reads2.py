@@ -50,6 +50,7 @@ import os.path
 import screed
 from khmer import khmer_args
 from khmer.khmer_args import (build_nodegraph_args, DEFAULT_MAX_TABLESIZE)
+from khmer.utils import write_record
 
 
 def main():
@@ -92,11 +93,7 @@ def main():
         count = ht.get_median_count(record.sequence)[0]
         if count:
             m += 1
-            if hasattr(record, 'quality'):
-                outfp.write('@%s\n%s\n+\n%s\n' % (record.name, record.sequence,
-                                                  record.quality))
-            else:
-                outfp.write('>%s\n%s\n' % (record.name, record.sequence))
+            write_record(record, outfp)
         n += 1
 
 if __name__ == '__main__':
