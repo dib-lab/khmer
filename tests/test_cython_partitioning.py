@@ -277,3 +277,61 @@ class TestStreamingPartitionerBasic:
         assert len(results) == n_components
         for row in results:
             assert abs(float(row[2])-float(cov)) < 2
+
+
+class TestStreamingPartitionerPaired:
+
+    def teardown_method(self, method):
+        # Force garbage to collect. When Python component objects exist and
+        # their underlying c++ Component objects are destroyed, the Python
+        # wrapper becomes the sole owner of the pointer. By manually collecting
+        # garbage between tests we assure that these objects are freed, and we
+        # can properly test the _n_destroyed property to make sure there are no
+        # real memory leaks.
+        gc.collect()
+
+    def test_one_paired_component(self, random_sequence):
+        first = random_sequence()
+        second = random_sequence(exclude=first)
+
+        cg = khmer.Countgraph(K, 1e5, 4)
+        sp = StreamingPartitioner(cg)
+        sp.consume_pair(first, second)
+
+        assert sp.n_components == 1
+
+    def test_two_paired_components_merge(self, random_sequence):
+        comp1 = random_sequence()
+        comp2 = random_sequence(exclude=comp1)
+
+        cg = khmer.Nodegraph(K, 1e5, 4)
+        sp = StreamingPartitioner(cg)
+        
+        sp.consume(comp1)
+        assert sp.n_components == 1
+        
+        sp.consume(comp2)
+        assert sp.n_components == 2
+
+        sp.consume_pair(comp1, comp2)
+        assert sp.n_components == 1
+
+    def test_multi_paired_components_merge(self, random_sequence):
+        seq1 = random_sequence()
+        seq2 = random_sequence(exclude=seq1)
+        seq3 = random_sequence(exclude=seq1+seq2)
+
+        cg = khmer.Nodegraph(K, 1e5, 4)
+        sp = StreamingPartitioner(cg)
+        
+        sp.consume(seq1)
+        sp.consume(seq2)
+        sp.consume(seq3)
+        assert sp.n_components == 3
+
+        sp.consume_pair(seq1, seq2)
+        assert sp.n_components == 2
+
+        sp.consume_pair(seq2, seq3)
+        assert sp.n_components == 1
+
