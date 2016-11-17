@@ -38,16 +38,18 @@ cdef class Sequence:
         return deref(self._this).name
 
     @property
-    def annotations(self):
-        return deref(self._this).annotations
-
-    @property
     def sequence(self):
         return deref(self._this).sequence
 
     @property
+    def annotations(self):
+        cdef str annotations = deref(self._this).annotations
+        return annotations if annotations else None
+
+    @property
     def quality(self):
-        return deref(self._this).quality
+        cdef str quality = deref(self._this).quality
+        return quality if quality else None
 
     @staticmethod
     def create(str name, str sequence, str annotations=None, str quality=None):
@@ -168,6 +170,60 @@ cdef class FastxParser:
             seq = self._next()
 
 
+cdef class SplitPairedReader:
+
+    def __cinit__(self, FastxParser left_parser,
+                         FastxParser right_parser,
+                         int min_length=-1):
+
+        self.left_parser = left_parser
+        self.right_parser = right_parser
+        self.min_length = min_length
+
+    def __iter__(self):
+        cdef Sequence first, second
+        cdef object err
+        cdef read_num = 0
+        cdef int found
+
+        found, first, second, err = self._next()
+        while found != 0:
+            if err is not None:
+                raise err
+            
+            if self.min_length > 0:
+                if len(first) >= self.min_length or \
+                   len(second) >= self.min_length:
+
+                    yield read_num, True, first, second
+            else:
+                yield read_num, True, first, second
+
+            read_num += 2
+            found, first, second, err = self._next()
+
+    cdef tuple _next(self):
+        cdef Sequence first = Sequence(create=True)
+        cdef Sequence second = Sequence(create=True)
+        cdef bool left_has_next, right_has_next
+
+        left_has_next = self.left_parser._imprint_next(first)
+        right_has_next = self.right_parser._imprint_next(second)
+
+        if left_has_next != right_has_next:
+            err = UnpairedReadsError('Differing lengths of left '\
+                                     'and right files!')
+            return -1, None, None, err
+
+        if left_has_next == False:
+            return 0, None, None, None
+
+        if _check_is_pair(first, second):
+            return 2, first, second, None
+        else:
+            err =  UnpairedReadsError(first, second)
+            return -1, None, None, err
+
 cdef class BrokenPairedReader:
 
     def __cinit__(self, FastxParser parser, 
@@ -242,7 +298,7 @@ cdef class BrokenPairedReader:
                     err = UnpairedReadsError(
                         "Unpaired reads when require_paired is set!",
                         first, second)
-                    return 0, None, None, err
+                    return -1, None, None, err
                 self.record = second
                 return 1, first, None, None
         else:
@@ -250,7 +306,7 @@ cdef class BrokenPairedReader:
             if self.require_paired:
                 err =  UnpairedReadsError("Unpaired reads when require_paired "
                                           "is set!", first, None)
-                return 0, None, None, err
+                return -1, None, None, err
             self.record = None
             return 1, first, None, None
 

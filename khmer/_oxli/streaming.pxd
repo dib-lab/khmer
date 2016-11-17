@@ -32,6 +32,15 @@ cdef class FastxParser:
     cdef Sequence _next(self)
 
 
+cdef class SplitPairedReader:
+
+    cdef FastxParser left_parser
+    cdef FastxParser right_parser
+    cdef readonly int min_length
+
+    cdef tuple _next(self)
+
+
 cdef class BrokenPairedReader:
 
     cdef FastxParser parser
