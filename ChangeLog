@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 2016-11-15 Nicole Kingsley <nbkingsley@ucdavis.edu>
 
    * tests/{test_normalize_by_median.py,test_scripts.py}:
@@ -6,15 +5,12 @@
    line that calls the utils.copy_test_data function to complete the 
    same task. 
 
-2016-11-15  Titus Brown  <titus@idyll.org
-=======
 2016-11-15  Daniel Standage  <daniel.standage@gmail.com>
 
    * docs/dev/scripts-and-sandbox.rst: Added documentation for reserved flags
      for command line scripts.
 
 2016-11-15  Titus Brown  <titus@idyll.org>
->>>>>>> 7b51c853761e3baebc74c386045859495f125afa
 
    * khmer/{_cpy_counttable,_cpy_hashgraph.hh,cpy_nodetable.hh,_khmer.cc,
    khmer/__init__.py}: new Counttable and Nodetable CPython types, plus
