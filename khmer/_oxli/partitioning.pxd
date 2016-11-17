@@ -5,11 +5,12 @@ from libc.stdint cimport uint32_t, uint8_t, uint64_t
 from _oxli cimport ComponentPtr, ComponentPtrSet, CpGuardedKmerCompMap
 from _oxli cimport CpHashtable, CpStreamingPartitioner, BoundedCounterType
 
+
 cdef class Component:
     cdef ComponentPtr _this
 
     @staticmethod
-    cdef Component create(ComponentPtr ptr)
+    cdef Component wrap(ComponentPtr ptr)
 
     @staticmethod
     cdef vector[BoundedCounterType] _tag_counts(ComponentPtr comp, CpHashtable * graph)
@@ -24,5 +25,3 @@ cdef class StreamingPartitioner:
     cdef weak_ptr[CpGuardedKmerCompMap] _tag_component_map
     cdef CpHashtable * _graph_ptr
     cdef readonly uint64_t n_consumed
-
-

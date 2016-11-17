@@ -56,7 +56,7 @@ cdef class Component:
             raise NotImplementedError('Operator not available.')
 
     @staticmethod
-    cdef Component create(ComponentPtr ptr):
+    cdef Component wrap(ComponentPtr ptr):
         cdef Component comp = Component()
         comp._this = ptr
         return comp
@@ -120,7 +120,7 @@ cdef class StreamingPartitioner:
         if compptr == NULL:
             return None
         else:
-            return Component.create(compptr)
+            return Component.wrap(compptr)
 
     def get_nearest_component(self, kmer):
         cdef ComponentPtr compptr
@@ -128,7 +128,7 @@ cdef class StreamingPartitioner:
         if compptr == NULL:
             return None
         else:
-            return Component.create(compptr)
+            return Component.wrap(compptr)
 
     def components(self):
         cdef shared_ptr[ComponentPtrSet] locked
@@ -136,7 +136,7 @@ cdef class StreamingPartitioner:
         lockedptr = self._components.lock()
         if lockedptr:
             for cmpptr in deref(lockedptr):
-                yield Component.create(cmpptr)
+                yield Component.wrap(cmpptr)
         else:
             raise MemoryError("Can't locked underlying Component set")
 
@@ -146,7 +146,7 @@ cdef class StreamingPartitioner:
         lockedptr = self._tag_component_map.lock()
         if lockedptr:
             for cpair in deref(lockedptr).data:
-                yield cpair.first, Component.create(cpair.second)
+                yield cpair.first, Component.wrap(cpair.second)
         else:
             raise MemoryError("Can't locked underlying Component set")
 
