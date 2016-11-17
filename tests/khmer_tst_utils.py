@@ -240,7 +240,7 @@ def longify(listofints):
     return listofints
 
 
-def copy_test_data(testfile, newfilename = None):
+def copy_test_data(testfile, newfilename=None):
     basename = os.path.basename(testfile)
     if newfilename is not None:
         basename = newfilename
