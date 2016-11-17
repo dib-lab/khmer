@@ -128,22 +128,16 @@ void StreamingPartitioner::consume_and_connect_tags(const std::string& seq,
         KmerIterator kmers(seq.c_str(), graph->ksize());
         unsigned int since = _tag_density / 2 + 1;
 
-        std::set<HashIntoType> tags;
         std::set<HashIntoType> seen;
         std::set<HashIntoType> intersection;
         KmerQueue search_from;
 
         bool in_known_territory = false;
         bool found_tag_in_territory = false;
-
-        // First check if we overlap any tags
-        //Kmer kmer = kmers.next();
-        //tags.insert(kmer); //always tag the first k-mer
-        //bool is_new_kmer = graph->test_and_set_bits(kmer);
-        //search_from.push(kmer);
-
+        
+        Kmer kmer;
         do {
-            Kmer kmer = kmers.next();
+            kmer = kmers.next();
             bool is_new_kmer = graph->test_and_set_bits(kmer);
             bool kmer_tagged = false;
 
@@ -183,16 +177,14 @@ void StreamingPartitioner::consume_and_connect_tags(const std::string& seq,
             }
         } while (!kmers.done());
 
-        if (tags.size() == 0) {
-            // if no tags are found or seeded, add the middle k-mer
-            uint32_t start = (seq.length() - graph->ksize()) / 2;
-            std::string kmer = seq.substr(start, graph->ksize());
-            tags.insert(graph->hash_dna(kmer.c_str()));
-        }
+        // always tag the last k-mer
+        tags.insert(kmer);
 
-        //tags.insert(kmer);	// always tag the last k-mer
-        //search_from.push(kmer);
-        //intersection.clear();
+        // now go back and make sure to tag the first k-mer
+        kmer = kmers.first();
+        tags.insert(kmer);
+
+        intersection.clear();
 
 #if(DEBUG_SP)
         std::cout << "Done iterating k-mers" << std::endl;
