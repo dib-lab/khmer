@@ -41,8 +41,7 @@ Contact: khmer-project@idyll.org
 #include <sstream> // IWYU pragma: keep
 #include <set>
 
-#include "hashbits.hh"
-#include "hashtable.hh"
+#include "hashgraph.hh"
 #include "khmer_exception.hh"
 #include "labelhash.hh"
 #include "read_parsers.hh"
@@ -240,7 +239,7 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
             kmer = kmers.next();
             bool is_new_kmer;
 
-            if ((is_new_kmer = graph->test_and_set_bits( kmer ))) {
+            if ((is_new_kmer = graph->store->test_and_set_bits( kmer ))) {
                 ++n_consumed;
                 printdbg(test_and_set_bits)
             }

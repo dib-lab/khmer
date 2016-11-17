@@ -50,7 +50,7 @@ namespace khmer
  ******************************************/
 
 template <bool direction>
-NodeGatherer<direction>::NodeGatherer(const Hashtable * ht,
+NodeGatherer<direction>::NodeGatherer(const Hashgraph * ht,
                                       KmerFilterList filters) :
     KmerFactory(ht->ksize()), graph(ht), filters(filters)
 {
@@ -63,14 +63,14 @@ NodeGatherer<direction>::NodeGatherer(const Hashtable * ht,
 
 
 template <bool direction>
-NodeGatherer<direction>::NodeGatherer(const Hashtable * ht) :
+NodeGatherer<direction>::NodeGatherer(const Hashgraph * ht) :
     NodeGatherer(ht, KmerFilterList())
 {
 }
 
 
 template <bool direction>
-NodeGatherer<direction>::NodeGatherer(const Hashtable * ht,
+NodeGatherer<direction>::NodeGatherer(const Hashgraph * ht,
                                       KmerFilter filter) :
     NodeGatherer(ht, KmerFilterList())
 {
@@ -148,7 +148,7 @@ const
  ******************************************/
 
 template<bool direction>
-NodeCursor<direction>::NodeCursor(const Hashtable * ht,
+NodeCursor<direction>::NodeCursor(const Hashgraph * ht,
                                   Kmer start_kmer,
                                   KmerFilterList filters) :
     NodeGatherer<direction>(ht, filters)
@@ -158,7 +158,7 @@ NodeCursor<direction>::NodeCursor(const Hashtable * ht,
 
 
 template<bool direction>
-NodeCursor<direction>::NodeCursor(const Hashtable * ht,
+NodeCursor<direction>::NodeCursor(const Hashgraph * ht,
                                   Kmer start_kmer) :
     NodeCursor<direction>(ht, start_kmer, KmerFilterList())
 {
@@ -166,7 +166,7 @@ NodeCursor<direction>::NodeCursor(const Hashtable * ht,
 
 
 template<bool direction>
-NodeCursor<direction>::NodeCursor(const Hashtable * ht,
+NodeCursor<direction>::NodeCursor(const Hashgraph * ht,
                                   Kmer start_kmer,
                                   KmerFilter filter) :
     NodeCursor<direction>(ht, start_kmer)
@@ -188,7 +188,7 @@ const
  * Traverser
  ******************************************/
 
-Traverser::Traverser(const Hashtable * ht,
+Traverser::Traverser(const Hashgraph * ht,
                      KmerFilterList filters) :
     KmerFactory(ht->ksize()),
     graph(ht),
@@ -197,7 +197,7 @@ Traverser::Traverser(const Hashtable * ht,
 {
 }
 
-Traverser::Traverser(const Hashtable * ht,
+Traverser::Traverser(const Hashgraph * ht,
                      KmerFilter filter) :
     KmerFactory(ht->ksize()),
     graph(ht),
@@ -315,7 +315,7 @@ char AssemblerTraverser<direction>::next_symbol()
  ******************************************/
 
 template<bool direction>
-NonLoopingAT<direction>::NonLoopingAT(const Hashtable * ht,
+NonLoopingAT<direction>::NonLoopingAT(const Hashgraph * ht,
                                       Kmer start_kmer,
                                       KmerFilterList filters,
                                       SeenSet * visited) :

@@ -41,16 +41,16 @@ Contact: khmer-project@idyll.org
 
 #include "khmer.hh"
 #include "kmer_hash.hh"
-
-#include "labelhash.hh"
-#include "traversal.hh"
+#include "hashgraph.hh"
 #include "kmer_filters.hh"
+#include "traversal.hh"
+#include "labelhash.hh"
 
 
 namespace khmer
 {
 
-class Hashtable;
+class Hashgraph;
 class LabelHash;
 
 /**
@@ -74,22 +74,21 @@ class LabelHash;
  */
 class LinearAssembler
 {
-    friend class Hashtable;
-    const Hashtable * graph;
-    WordLength _ksize;
-
 public:
 
-    explicit LinearAssembler(const Hashtable * ht);
+    WordLength _ksize;
+    const Hashgraph * graph;
+
+    explicit LinearAssembler(const Hashgraph * ht);
 
     std::string assemble(const Kmer seed_kmer,
-                         const Hashtable * stop_bf = 0) const;
+                         const Hashgraph * stop_bf = 0) const;
 
     std::string assemble_right(const Kmer seed_kmer,
-                               const Hashtable * stop_bf = 0) const;
+                               const Hashgraph * stop_bf = 0) const;
 
     std::string assemble_left(const Kmer seed_kmer,
-                              const Hashtable * stop_bf = 0) const;
+                              const Hashgraph * stop_bf = 0) const;
 
     template <bool direction>
     std::string _assemble_directed(AssemblerTraverser<direction>& cursor) const;
@@ -126,18 +125,19 @@ std::string LinearAssembler::_assemble_directed<RIGHT>(AssemblerTraverser<RIGHT>
  */
 class SimpleLabeledAssembler
 {
-    friend class Hashtable;
     const LinearAssembler * linear_asm;
-    const Hashtable * graph;
-    const LabelHash * lh;
-    WordLength _ksize;
 
 public:
 
+    const Hashgraph * graph;
+    const LabelHash * lh;
+    WordLength _ksize;
+
     explicit SimpleLabeledAssembler(const LabelHash * lh);
+    ~SimpleLabeledAssembler();
 
     StringVector assemble(const Kmer seed_kmer,
-                          const Hashtable * stop_bf=0) const;
+                          const Hashgraph * stop_bf=0) const;
 
     template <bool direction>
     void _assemble_directed(NonLoopingAT<direction>& start_cursor,
@@ -145,5 +145,33 @@ public:
 
 };
 
-}
+
+class JunctionCountAssembler
+{
+    LinearAssembler linear_asm;
+    Countgraph * junctions;
+    Traverser traverser;
+
+public:
+
+    Hashgraph * graph;
+    WordLength _ksize;
+
+    explicit JunctionCountAssembler(Hashgraph * ht);
+    ~JunctionCountAssembler();
+
+
+    StringVector assemble(const Kmer seed_kmer,
+                          const Hashtable * stop_bf=0) const;
+
+    uint16_t consume(std::string sequence);
+    void count_junction(Kmer kmer_a, Kmer kmer_b);
+    BoundedCounterType get_junction_count(Kmer kmer_a, Kmer kmer_b) const;
+
+    template <bool direction>
+    void _assemble_directed(NonLoopingAT<direction>& start_cursor,
+                            StringVector& paths) const;
+
+};
+} //namespace khmer
 #endif
