@@ -1,34 +1,67 @@
-//
-// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2014. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt.
-// Contact: khmer-project@idyll.org
-//
+/*
+This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+Copyright (C) 2010-2015, Michigan State University.
+Copyright (C) 2015, The Regents of the University of California.
 
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of the Michigan State University nor the names
+      of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written
+      permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+LICENSE (END)
+
+Contact: khmer-project@idyll.org
+*/
 #ifndef SUBSET_HH
 #define SUBSET_HH
+
+#include <stddef.h>
+#include <queue>
+#include <string>
 
 #include "khmer.hh"
 
 namespace khmer
 {
-class CountingHash;
-class Hashtable;
-class Hashbits;
+class Countgraph;
+class Hashgraph;
 
 struct pre_partition_info {
     HashIntoType kmer;
     SeenSet tagged_kmers;
 
-    pre_partition_info(HashIntoType _kmer) : kmer(_kmer) {};
+    explicit pre_partition_info(HashIntoType _kmer) : kmer(_kmer) {};
 };
 
 class SubsetPartition
 {
-    friend class Hashtable;
+    friend class Hashgraph;
 protected:
     unsigned int next_partition_id;
-    Hashtable * _ht;
+    Hashgraph * _ht;
     PartitionMap partition_map;
     ReversePartitionMap reverse_pmap;
 
@@ -40,10 +73,7 @@ protected:
                                            const HashIntoType kmer);
 
 public:
-    SubsetPartition(Hashtable * ht) : next_partition_id(2), _ht(ht)
-    {
-        ;
-    };
+    explicit SubsetPartition(Hashgraph * ht);
 
     ~SubsetPartition()
     {
@@ -73,14 +103,7 @@ public:
     void load_partitionmap(std::string infile);
     void _validate_pmap();
 
-    void queue_neighbors(HashIntoType kmer_f,
-                         HashIntoType kmer_r,
-                         unsigned int breadth,
-                         SeenSet& traversed_kmers,
-                         NodeQueue& node_q,
-                         std::queue<unsigned int>& breadth_q);
-
-    void find_all_tags(HashIntoType kmer_f, HashIntoType kmer_r,
+    void find_all_tags(Kmer start_kmer,
                        SeenSet& tagged_kmers,
                        const SeenSet& all_tags,
                        bool break_on_stop_tags=false,
@@ -93,8 +116,7 @@ public:
                                 bool break_on_stop_tags,
                                 bool stop_big_traversals);
 
-    void find_all_tags_truncate_on_abundance(HashIntoType kmer_f,
-            HashIntoType kmer_r,
+    void find_all_tags_truncate_on_abundance(Kmer start_kmer,
             SeenSet& tagged_kmers,
             const SeenSet& all_tags,
             BoundedCounterType min_count,
@@ -127,16 +149,6 @@ public:
                                    CallbackFn callback=0,
                                    void * callback_data=0);
 
-    unsigned int find_unpart(const std::string &infilename,
-                             bool traverse,
-                             bool stop_big_traversals,
-                             CallbackFn callback=0,
-                             void * callback_data=0);
-
-    bool is_single_partition(std::string sequence);
-
-    void join_partitions_by_path(std::string sequence);
-
     void partition_sizes(PartitionCountMap &cm,
                          unsigned int& n_unassigned) const;
 
@@ -144,10 +156,10 @@ public:
                                      unsigned int& n_unassigned) const;
 
     void partition_average_coverages(PartitionCountMap &cm,
-                                     CountingHash * ht) const;
+                                     Countgraph * ht) const;
 
     unsigned long long repartition_largest_partition(unsigned int, unsigned int,
-            unsigned int, CountingHash&);
+            unsigned int, Countgraph&);
 
     void repartition_a_partition(const SeenSet& partition_tags);
     void _clear_partition(PartitionID, SeenSet& partition_tags);
@@ -157,11 +169,6 @@ public:
                       PartitionPtrMap& diskp_to_pp);
 
     void report_on_partitions();
-
-    void compare_to_partition(PartitionID, SubsetPartition *, PartitionID,
-                              unsigned int &n_only1,
-                              unsigned int &n_only2,
-                              unsigned int &n_shared);
 };
 }
 

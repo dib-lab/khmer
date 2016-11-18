@@ -1,10 +1,38 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) 2010-2015, Michigan State University.
+# Copyright (C) 2015, The Regents of the University of California.
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 # Contact: khmer-project@idyll.org
-#
 # pylint: disable=invalid-name,missing-docstring
 
 """
@@ -18,36 +46,52 @@ length.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 import argparse
 import screed
+import textwrap
 import sys
+from khmer import __version__
 from khmer.utils import write_record
+from khmer.kfile import add_output_compression_type, get_file_writer
+from khmer.khmer_args import (ComboFormatter, sanitize_help, info,
+                              _VersionStdErrAction)
 
 
 def get_parser():
+    epilog = """\
+    Example::
+
+        extract-long-sequences.py --length 10 tests/test-data/paired-mixed.fa
+    """
     parser = argparse.ArgumentParser(
         description='Extract FASTQ or FASTA sequences longer than'
         ' specified length (default: 200 bp).',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        formatter_class=ComboFormatter, epilog=textwrap.dedent(epilog))
 
     parser.add_argument('input_filenames', help='Input FAST[AQ]'
                         ' sequence filename.', nargs='+')
     parser.add_argument('-o', '--output', help='The name of the output'
-                        ' sequence file.', default="/dev/stdout")
+                        ' sequence file.', default=sys.stdout,
+                        metavar='output', type=argparse.FileType('wb'))
     parser.add_argument('-l', '--length', help='The minimum length of'
                         ' the sequence file.',
                         type=int, default=200)
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
+    add_output_compression_type(parser)
     return parser
 
 
 def main():
-    args = get_parser().parse_args()
-    outfp = open(args.output, 'w')
+    info('extract-long-sequences.py')
+    args = sanitize_help(get_parser()).parse_args()
+    outfp = get_file_writer(args.output, args.gzip, args.bzip)
     for filename in args.input_filenames:
-        for record in screed.open(filename, parse_description=False):
+        for record in screed.open(filename):
             if len(record['sequence']) >= args.length:
                 write_record(record, outfp)
-    print >> sys.stderr, 'wrote to: ' + args.output
+    print('wrote to: ' + args.output.name, file=sys.stderr)
 
 if __name__ == '__main__':
     main()

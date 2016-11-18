@@ -1,11 +1,39 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) 2011-2015, Michigan State University.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 # Contact: khmer-project@idyll.org
-#
-# pylint: disable=invalid-name,missing-docstring
+# pylint: disable=missing-docstring
 """
 Eliminate surplus reads.
 
@@ -17,194 +45,186 @@ option to output to STDOUT.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 
 import sys
 import screed
 import os
 import khmer
 import textwrap
-from itertools import izip
-from khmer.khmer_args import (build_counting_args, add_loadhash_args,
-                              report_on_config, info)
+from khmer import khmer_args
+from contextlib import contextmanager
+from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
+                              report_on_config, info, calculate_graphsize,
+                              sanitize_help, check_argument_range)
 import argparse
-from khmer.kfile import (check_space, check_space_for_hashtable,
-                         check_valid_file_exists)
-from khmer.utils import write_record, check_is_pair
-DEFAULT_DESIRED_COVERAGE = 10
-
-# Iterate a collection in arbitrary batches
-# from: http://stackoverflow.com/questions/4628290/pairs-from-single-list
+from khmer.kfile import (check_space, check_space_for_graph,
+                         check_valid_file_exists, add_output_compression_type,
+                         get_file_writer, is_block, describe_file_handle)
+from khmer.utils import (write_record, broken_paired_reader, ReadBundle)
+from khmer.khmer_logger import (configure_logging, log_info, log_error)
 
 
-def batchwise(coll, size):
-    iter_coll = iter(coll)
-    return izip(*[iter_coll] * size)
-
-# Returns true if the pair of records are properly pairs
+DEFAULT_DESIRED_COVERAGE = 20
 
 
-# pylint: disable=too-many-locals,too-many-branches
-def normalize_by_median(input_filename, outfp, htable, paired, cutoff,
-                        report_fp=None):
+class WithDiagnostics(object):
+    """
+    Generator/context manager to do boilerplate output of statistics.
 
-    desired_coverage = cutoff
-    ksize = htable.ksize()
+    uses a Normalizer object.
+    """
 
-    # In paired mode we read two records at a time
-    batch_size = 1
-    if paired:
-        batch_size = 2
+    def __init__(self, norm, report_fp=None, report_frequency=100000):
+        self.norm = norm
+        self.report_fp = report_fp
+        if report_fp:
+            report_fp.write('total,kept,f_kept\n')
 
-    index = -1
-    total = 0
-    discarded = 0
-    for index, batch in enumerate(batchwise(screed.open(
-            input_filename, parse_description=False), batch_size)):
-        if index > 0 and index % 100000 == 0:
-            print >>sys.stderr, '... kept {kept} of {total} or'\
-                ' {perc:2}%'.format(kept=total - discarded, total=total,
-                                    perc=int(100. - discarded /
-                                             float(total) * 100.))
-            print >>sys.stderr, '... in file', input_filename
+        self.total = 0
+        self.kept = 0
 
-            if report_fp:
-                print >> report_fp, total, total - discarded, \
-                    1. - (discarded / float(total))
-                report_fp.flush()
+        self.report_frequency = report_frequency
+        self.next_report_at = self.report_frequency
+        self.last_report_at = self.report_frequency
 
-        total += batch_size
+    def __call__(self, reader, ifilename):
+        norm = self.norm
+        report_fp = self.report_fp
 
-        # If in paired mode, check that the reads are properly interleaved
+        reads_start = self.total
+        total = self.total
+        kept = self.kept
 
-        if paired:
-            if not check_is_pair(batch[0], batch[1]):
-                raise IOError('Error: Improperly interleaved pairs \
-                    {b0} {b1}'.format(b0=batch[0].name, b1=batch[1].name))
+        try:
+            for _, is_paired, read0, read1 in reader:
+                if is_paired:
+                    total += 2
+                else:
+                    total += 1
 
-        # Emit the batch of reads if any read passes the filter
-        # and all reads are longer than K
-        passed_filter = False
-        passed_length = True
-        for record in batch:
-            if len(record.sequence) < ksize:
-                passed_length = False
-                continue
+                # do diginorm
+                for record in norm(is_paired, read0, read1):
+                    kept += 1
+                    yield record
 
-            seq = record.sequence.replace('N', 'A')
-            med, _, _ = htable.get_median_count(seq)
+                # report!
+                if total >= self.next_report_at:
+                    self.next_report_at += self.report_frequency
+                    self.last_report_at = total
 
-            if med < desired_coverage:
-                htable.consume(seq)
-                passed_filter = True
+                    perc_kept = kept / float(total)
 
-        # Emit records if any passed
-        if passed_length and passed_filter:
-            for record in batch:
-                write_record(record, outfp)
+                    log_info('... kept {kept} of {tot} or {perc_kept:.1%} so'
+                             'far', kept=kept, tot=total,
+                             perc_kept=perc_kept)
+                    log_info('... in file {name}', name=ifilename)
+
+                    if report_fp:
+                        print("{total},{kept},{f_kept:.4}"
+                              .format(total=total, f_kept=perc_kept,
+                                      kept=kept),
+                              file=report_fp)
+                        report_fp.flush()
+        finally:
+            self.total = total
+            self.kept = kept
+
+        # per file diagnostic output
+        if total == reads_start:
+            log_info('SKIPPED empty file {name}', name=ifilename)
         else:
-            discarded += batch_size
+            perc_kept = kept / float(total)
 
-    if report_fp:
-        print >> report_fp, total, total - discarded, \
-            1. - (discarded / float(total))
-        report_fp.flush()
+            log_info('DONE with {inp}; kept {kept} of {total} or '
+                     '{perc_kept:.1%}', inp=ifilename, kept=kept, total=total,
+                     perc_kept=perc_kept)
 
-    return total, discarded
+        # make sure there's at least one report per file, at the end of each
+        # file.
+        if report_fp and total != self.last_report_at:
+            perc_kept = kept / float(total)
+
+            print("{total},{kept},{f_kept:.4}"
+                  .format(total=total, f_kept=perc_kept, kept=kept),
+                  file=report_fp)
+            report_fp.flush()
 
 
-def handle_error(error, output_name, input_name, fail_save, htable):
-    print >> sys.stderr, '** ERROR:', error
-    print >> sys.stderr, '** Failed on {name}: '.format(name=input_name)
-    if fail_save:
-        tablename = os.path.basename(input_name) + '.ct.failed'
-        print >> sys.stderr, \
-            '** ...dumping k-mer counting table to {tn}'.format(tn=tablename)
-        htable.save(tablename)
+class Normalizer(object):
+    """Digital normalization algorithm."""
+
+    def __init__(self, desired_coverage, countgraph):
+        self.countgraph = countgraph
+        self.desired_coverage = desired_coverage
+
+    def __call__(self, is_paired, read0, read1):
+        """
+        Actually does digital normalization - the core algorithm.
+
+        * get one (unpaired) or two (paired) reads;
+        * sanitize the sequences (convert Ns to As);
+        * get the median k-mer count of one/both reads;
+        * if any read's median k-mer count is below desired coverage, keep all;
+        * consume and yield kept reads.
+        """
+        batch = ReadBundle(read0, read1)
+        desired_coverage = self.desired_coverage
+
+        # if any in batch have coverage below desired coverage, consume &yield
+        if not batch.coverages_at_least(self.countgraph, desired_coverage):
+            for record in batch.reads:
+                self.countgraph.consume(record.cleaned_seq)
+                yield record
+
+
+@contextmanager
+def catch_io_errors(ifile, out, single_out, force, corrupt_files):
+    """Context manager to do boilerplate handling of IOErrors."""
     try:
-        os.remove(output_name)
-    except:  # pylint: disable=bare-except
-        print >> sys.stderr, '** ERROR: problem removing corrupt filtered file'
-
-
-def normalize_by_median_and_check(input_filename, htable, single_output_file,
-                                  fail_save, paired, cutoff, force,
-                                  corrupt_files, report_fp=None):
-    total = 0
-    discarded = 0
-
-    total_acc = None
-    discarded_acc = None
-
-    if single_output_file:
-        if single_output_file is sys.stdout:
-            output_name = '/dev/stdout'
-        else:
-            output_name = single_output_file.name
-        outfp = single_output_file
-
-    else:
-        output_name = os.path.basename(input_filename) + '.keep'
-        outfp = open(output_name, 'w')
-
-    try:
-        total_acc, discarded_acc = normalize_by_median(
-            input_filename, outfp, htable, paired, cutoff, report_fp=None)
-    except IOError as err:
-        handle_error(err, output_name, input_filename, fail_save,
-                     htable)
+        yield
+    except (IOError, OSError, ValueError) as error:
+        log_error('** ERROR: {error}', error=str(error))
+        log_error('** Failed on {name}: ', name=ifile)
+        if not single_out:
+            os.remove(out.name)
         if not force:
-            print >> sys.stderr, '** Exiting!'
+            log_error('** Exiting!')
 
             sys.exit(1)
         else:
-            print >> sys.stderr, '*** Skipping error file, moving on...'
-            corrupt_files.append(input_filename)
-    else:
-        if total_acc == 0 and discarded_acc == 0:
-            print >> sys.stderr, 'SKIPPED empty file', input_filename
-        else:
-            total += total_acc
-            discarded += discarded_acc
-            print >> sys.stderr, \
-                'DONE with {inp}; kept {kept} of {total} or {perc:2}%'\
-                .format(inp=input_filename, kept=total - discarded,
-                        total=total, perc=int(100. - discarded /
-                                              float(total) * 100.))
-            print >> sys.stderr, 'output in', output_name
-
-    return total_acc, discarded_acc, corrupt_files
+            log_error('*** Skipping error file, moving on...')
+            corrupt_files.append(ifile)
 
 
 def get_parser():
-    epilog = ("""
+    epilog = """\
     Discard sequences based on whether or not their median k-mer abundance lies
     above a specified cutoff. Kept sequences will be placed in <fileN>.keep.
 
-    Paired end reads will be considered together if :option:`-p` is set. If
-    either read will be kept, then both will be kept. This should result in
-    keeping (or discarding) each sequencing fragment. This helps with retention
-    of repeats, especially. With :option: `-u`/:option:`--unpaired-reads`, 
-    unpaired reads from the specified file will be read after the paired data
-    is read. 
+    By default, paired end reads will be considered together; if
+    either read should be kept, both will be kept. (This keeps both
+    reads from a fragment, and helps with retention of repeats.)
+    Unpaired reads are treated individually.
 
-    With :option:`-s`/:option:`--savetable`, the k-mer counting table
+    If :option:`-p`/:option:`--paired` is set, then proper pairing is required
+    and the script will exit on unpaired reads, although
+    :option:`--unpaired-reads` can be used to supply a file of orphan
+    reads to be read after the paired reads.
+
+    :option:`--force_single` will ignore all pairing information and treat
+    reads individually.
+
+    With :option:`-s`/:option:`--savegraph`, the k-mer countgraph
     will be saved to the specified file after all sequences have been
-    processed. With :option:`-d`, the k-mer counting table will be
-    saved every d files for multifile runs; if :option:`-s` is set,
-    the specified name will be used, and if not, the name `backup.ct`
-    will be used.  :option:`-l`/:option:`--loadtable` will load the
-    specified k-mer counting table before processing the specified
-    files.  Note that these tables are are in the same format as those
+    processed. :option:`-l`/:option:`--loadgraph` will load the
+    specified k-mer countgraph before processing the specified
+    files.  Note that these graphs are are in the same format as those
     produced by :program:`load-into-counting.py` and consumed by
     :program:`abundance-dist.py`.
 
-    :option:`-f`/:option:`--fault-tolerant` will force the program to continue
-    upon encountering a formatting error in a sequence file; the k-mer counting
-    table up to that point will be dumped, and processing will continue on the
-    next file.
-
     To append reads to an output file (rather than overwriting it), send output
-    to STDOUT with `--out -` and use UNIX file redirection syntax (`>>`) to
+    to STDOUT with `--output -` and use UNIX file redirection syntax (`>>`) to
     append to the file.
 
     Example::
@@ -213,154 +233,191 @@ def get_parser():
 
     Example::
 
-""" "        normalize-by-median.py -p -k 17 tests/test-data/test-abund-read-paired.fa"  # noqa
-    """
+        normalize-by-median.py -p -k 17 \\
+        tests/test-data/test-abund-read-paired.fa
 
     Example::
 
-""" "        normalize-by-median.py -p -k 17 -o - tests/test-data/paired.fq >> appended-output.fq"  # noqa
-    """
+        normalize-by-median.py -p -k 17 -o - tests/test-data/paired.fq \\
+        >> appended-output.fq
 
     Example::
 
-""" "        normalize-by-median.py -k 17 -f tests/test-data/test-error-reads.fq tests/test-data/test-fastq-reads.fq"  # noqa
-    """
+        normalize-by-median.py -k 17 -f tests/test-data/test-error-reads.fq \\
+        tests/test-data/test-fastq-reads.fq
 
     Example::
 
-""" "        normalize-by-median.py -k 17 -d 2 -s test.ct tests/test-data/test-abund-read-2.fa tests/test-data/test-fastq-reads")   # noqa
+        normalize-by-median.py -k 17 -s test.ct \\
+        tests/test-data/test-abund-read-2.fa \\
+        tests/test-data/test-fastq-reads.fq"""
     parser = build_counting_args(
         descr="Do digital normalization (remove mostly redundant sequences)",
         epilog=textwrap.dedent(epilog))
-    parser.add_argument('-C', '--cutoff', type=int,
+    parser.add_argument('-q', '--quiet', dest='quiet', default=False,
+                        action='store_true')
+    parser.add_argument('-C', '--cutoff', help="when the median "
+                        "k-mer coverage level is above this number the "
+                        "read is not kept.",
+                        type=check_argument_range(0, 256, "cutoff"),
                         default=DEFAULT_DESIRED_COVERAGE)
-    parser.add_argument('-p', '--paired', action='store_true')
+    parser.add_argument('-p', '--paired', action='store_true',
+                        help='require that all sequences be properly paired')
+    parser.add_argument('--force_single', dest='force_single',
+                        action='store_true',
+                        help='treat all sequences as single-ended/unpaired')
     parser.add_argument('-u', '--unpaired-reads',
-                        metavar="unpaired_reads_filename", help='with paired data only,\
-                        include an unpaired file')
-    parser.add_argument('-s', '--savetable', metavar="filename", default='',
-                        help='save the k-mer counting table to disk after all'
+                        metavar="unpaired_reads_filename",
+                        help='include a file of unpaired reads to which '
+                        '-p/--paired does not apply.')
+    parser.add_argument('-s', '--savegraph', metavar="filename", default='',
+                        help='save the k-mer countgraph to disk after all '
                         'reads are loaded.')
     parser.add_argument('-R', '--report',
-                        metavar='filename', type=argparse.FileType('w'))
-    parser.add_argument('-f', '--fault-tolerant', dest='force',
-                        help='continue on next file if read errors are \
-                         encountered', action='store_true')
-    parser.add_argument('--save-on-failure', dest='fail_save',
-                        action='store_false', default=True,
-                        help='Save k-mer counting table when an error occurs')
-    parser.add_argument('-d', '--dump-frequency', dest='dump_frequency',
-                        type=int, help='dump k-mer counting table every d '
-                        'files', default=-1)
-    parser.add_argument('-o', '--out', metavar="filename",
-                        dest='single_output_file',
-                        type=argparse.FileType('w'),
-                        default=None, help='only output a single file with '
+                        metavar='report_filename', type=argparse.FileType('w'))
+    parser.add_argument('--report-frequency',
+                        metavar='report_frequency', type=int,
+                        default=100000)
+    parser.add_argument('-f', '--force', dest='force',
+                        help='continue past file reading errors',
+                        action='store_true')
+    parser.add_argument('-o', '--output', metavar="filename",
+                        type=argparse.FileType('wb'),
+                        default=None, dest='single_output_file',
+                        help='only output a single file with '
                         'the specified filename; use a single dash "-" to '
                         'specify that output should go to STDOUT (the '
                         'terminal)')
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename.', nargs='+')
-    parser.add_argument('--report-total-kmers', '-t', action='store_true',
-                        help="Prints the total number of k-mers"
-                        " post-normalization to stderr")
-    parser.add_argument('--force', default=False, action='store_true',
-                        help='Overwrite output file if it exists')
-    add_loadhash_args(parser)
+    add_loadgraph_args(parser)
+    add_output_compression_type(parser)
     return parser
 
 
 def main():  # pylint: disable=too-many-branches,too-many-statements
-    info('normalize-by-median.py', ['diginorm'])
-    args = get_parser().parse_args()
+    parser = sanitize_help(get_parser())
+    args = parser.parse_args()
 
+    if not args.quiet:
+        info('normalize-by-median.py', ['diginorm'])
+
+    configure_logging(args.quiet)
     report_on_config(args)
 
     report_fp = args.report
+    force_single = args.force_single
 
     # check for similar filenames
+    # if we're using a single output file only check for identical filenames
+    # otherwise, check for identical BASE names as well.
     filenames = []
+    basenames = []
     for pathfilename in args.input_filenames:
-        filename = pathfilename.split('/')[-1]
-        if (filename in filenames):
-            print >>sys.stderr, "WARNING: At least two input files are named \
-%s . (The script normalize-by-median.py can not handle this, only one .keep \
-file for one of the input files will be generated.)" % filename
-        else:
-            filenames.append(filename)
+        filenames.append(pathfilename)
+        if args.single_output_file:
+            continue  # nothing more to worry about
 
-    # check for others
+        basename = os.path.basename(pathfilename)
+        if basename in basenames:
+            log_error('ERROR: Duplicate filename--Cannot handle this!')
+            log_error('** Exiting!')
+            sys.exit(1)
+
+        basenames.append(basename)
+
+    # check that files exist and there is sufficient output disk space.
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
-    if args.savetable:
-        check_space_for_hashtable(
-            args.n_tables * args.min_tablesize, args.force)
+    if args.savegraph:
+        graphsize = calculate_graphsize(args, 'countgraph')
+        check_space_for_graph(args.savegraph, graphsize, args.force)
 
-    # list to save error files along with throwing exceptions
-    corrupt_files = []
-
-    if args.loadtable:
-        print 'loading k-mer counting table from', args.loadtable
-        htable = khmer.load_counting_hash(args.loadtable)
+    # load or create counting table.
+    if args.loadgraph:
+        log_info('loading k-mer countgraph from {graph}',
+                 graph=args.loadgraph)
+        countgraph = khmer.load_countgraph(args.loadgraph)
     else:
-        print >> sys.stderr, 'making k-mer counting table'
-        htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
-                                         args.n_tables)
+        log_info('making countgraph')
+        countgraph = khmer_args.create_countgraph(args)
 
-    input_filename = None
+    # create an object to handle diginorm of all files
+    norm = Normalizer(args.cutoff, countgraph)
+    with_diagnostics = WithDiagnostics(norm, report_fp, args.report_frequency)
 
-    for index, input_filename in enumerate(args.input_filenames):
-        total_acc, discarded_acc, corrupt_files = \
-            normalize_by_median_and_check(
-                input_filename, htable, args.single_output_file,
-                args.fail_save, args.paired, args.cutoff, args.force,
-                corrupt_files, report_fp)
+    # make a list of all filenames and if they're paired or not;
+    # if we don't know if they're paired, default to allowing but not
+    # forcing pairing.
+    files = []
+    for element in filenames:
+        files.append([element, args.paired])
+    if args.unpaired_reads:
+        files.append([args.unpaired_reads, False])
 
-        if (args.dump_frequency > 0 and
-                index > 0 and index % args.dump_frequency == 0):
-            print 'Backup: Saving k-mer counting file through', input_filename
-            if args.savetable:
-                hashname = args.savetable
-                print '...saving to', hashname
-            else:
-                hashname = 'backup.ct'
-                print 'Nothing given for savetable, saving to', hashname
-            htable.save(hashname)
+    corrupt_files = []
+    outfp = None
+    output_name = None
 
-    if args.paired and args.unpaired_reads:
-        args.paired = False
-        output_name = args.unpaired_reads
+    if args.single_output_file:
+        outfp = get_file_writer(args.single_output_file, args.gzip, args.bzip)
+    else:
+        if '-' in filenames or '/dev/stdin' in filenames:
+            print("Accepting input from stdin; output filename must "
+                  "be provided with '-o'.", file=sys.stderr)
+            sys.exit(1)
+
+    #
+    # main loop: iterate over all files given, do diginorm.
+    #
+
+    for filename, require_paired in files:
         if not args.single_output_file:
-            output_name = os.path.basename(args.unpaired_reads) + '.keep'
-        outfp = open(output_name, 'w')
-        total_acc, discarded_acc, corrupt_files = \
-            normalize_by_median_and_check(
-                args.unpaired_reads, htable, args.single_output_file,
-                args.fail_save, args.paired, args.cutoff, args.force,
-                corrupt_files, report_fp)
+            output_name = os.path.basename(filename) + '.keep'
+            outfp = open(output_name, 'wb')
+            outfp = get_file_writer(outfp, args.gzip, args.bzip)
 
-    if args.report_total_kmers:
-        print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
-            htable.n_unique_kmers())
+        # failsafe context manager in case an input file breaks
+        with catch_io_errors(filename, outfp, args.single_output_file,
+                             args.force, corrupt_files):
 
-    if args.savetable:
-        print 'Saving k-mer counting table through', input_filename
-        print '...saving to', args.savetable
-        htable.save(args.savetable)
+            screed_iter = screed.open(filename)
+            reader = broken_paired_reader(screed_iter, min_length=args.ksize,
+                                          force_single=force_single,
+                                          require_paired=require_paired)
+
+            # actually do diginorm
+            for record in with_diagnostics(reader, filename):
+                if record is not None:
+                    write_record(record, outfp)
+
+            log_info('output in {name}', name=describe_file_handle(outfp))
+            if not args.single_output_file:
+                outfp.close()
+
+    # finished - print out some diagnostics.
+
+    log_info('Total number of unique k-mers: {umers}',
+             umers=countgraph.n_unique_kmers())
+
+    if args.savegraph:
+        log_info('...saving to {name}', name=args.savegraph)
+        countgraph.save(args.savegraph)
 
     fp_rate = \
-        khmer.calc_expected_collisions(htable, args.force, max_false_pos=.8)
+        khmer.calc_expected_collisions(countgraph, False, max_false_pos=.8)
     # for max_false_pos see Zhang et al., http://arxiv.org/abs/1309.2975
 
-    print >> sys.stderr, \
-        'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
+    log_info('fp rate estimated to be {fpr:1.3f}', fpr=fp_rate)
 
     if args.force and len(corrupt_files) > 0:
-        print >> sys.stderr, "** WARNING: Finished with errors!"
-        print >> sys.stderr, "** IOErrors occurred in the following files:"
-        print >> sys.stderr, "\t", " ".join(corrupt_files)
+        log_error("** WARNING: Finished with errors!")
+        log_error("** I/O Errors occurred in the following files:")
+        log_error("\t" + " ".join(corrupt_files))
+
 
 if __name__ == '__main__':
     main()
 
-# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
+# vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
+# vim: set textwidth=79:

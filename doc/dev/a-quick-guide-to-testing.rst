@@ -1,3 +1,41 @@
+..
+   This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+   Copyright (C) 2014-2015 Michigan State University
+   Copyright (C) 2015 The Regents of the University of California.
+   It is licensed under the three-clause BSD license; see LICENSE.
+   Contact: khmer-project@idyll.org
+   
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are
+   met:
+   
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+   
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+   
+    * Neither the name of the Michigan State University nor the names
+      of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written
+      permission.
+   
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+   HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   
+   Contact: khmer-project@idyll.org
+
 A quick guide to testing (for khmer)
 ====================================
 
@@ -81,10 +119,10 @@ scratch, or copy an existing one.  (We recommend the latter.)
 
 To write a new one, you'll need to know how to write tests. For
 getting an idea of the syntax, read this `introductory guide
-<http://ivory.idyll.org/articles/nose-intro.html>`__ and the `official
-documentation
-<https://nose.readthedocs.org/en/latest/writing_tests.html>`__.  Then
-find the right file in ``tests/*.py`` and add your test!
+<http://ivory.idyll.org/articles/nose-intro.html>`__ and the `writing tests
+documentation from Astropy
+<http://docs.astropy.org/en/v1.1/development/testguide.html#writing-tests>`__.
+Then find the right file in ``tests/*.py`` and add your test!
 
 A better approach is, frankly, to go into the existing test code, find
 a test that does something similar to what you want to do, copy it,
@@ -101,7 +139,11 @@ review.
 
 To run one specific test rather than all of them, you can do::
 
-  ./setup.py nosetests --tests tests/test_scripts.py:test_load_into_counting
+  ./setup.py test --addopts "tests/test_scripts.py::test_load_into_counting"
 
 Here, you're running just one test -- the test function named
 ``test_load_into_counting`` in the file ``test_scripts.py``.
+
+You can also use py.test directly, it is a bit less verbose::
+
+  py.test tests/test_scripts.py::test_load_into_counting

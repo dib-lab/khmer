@@ -1,18 +1,89 @@
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) 2013-2015, Michigan State University.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 # Contact: khmer-project@idyll.org
-#
+# pylint: disable=missing-docstring,invalid-name
 
 # Tests for the ReadParser and Read classes.
-
-
-import khmer
+from __future__ import print_function
+from __future__ import absolute_import
+from khmer import Read
 from khmer import ReadParser
-import khmer_tst_utils as utils
-from nose.plugins.attrib import attr
-from functools import reduce
+from screed import Record
+from . import khmer_tst_utils as utils
+import pytest
+from functools import reduce  # pylint: disable=redefined-builtin
+
+
+def test_read_type_basic():
+    # test that basic properties of khmer.Read behave like screed.Record
+    # Constructing without mandatory arguments should raise an exception
+    with pytest.raises(TypeError):
+        Read()
+
+    name = "895:1:1:1246:14654 1:N:0:NNNNN"
+    sequence = "ACGT"
+    r = Read(name, sequence)
+    s = Record(dict(name=name, sequence=sequence))
+
+    for x in (r, s):
+        assert x.name == name
+        assert x.sequence == sequence
+        assert not hasattr(x, 'quality'), x
+        assert not hasattr(x, 'annotations'), x
+
+
+def test_read_type_attributes():
+    r = Read(sequence='ACGT', quality='good', name='1234', annotations='ann')
+    assert r.sequence == 'ACGT'
+    assert r.quality == 'good'
+    assert r.name == '1234'
+    assert r.annotations == 'ann'
+    # test setting and deleting of cleaned_seq
+
+    with pytest.raises(TypeError):
+        r.cleaned_seq = 12
+
+    assert not hasattr(r, 'cleaned_seq')
+    r.cleaned_seq = "ACGT"
+    r.cleaned_seq = u"ACGT"
+
+    assert hasattr(r, 'cleaned_seq')
+    del r.cleaned_seq
+    assert not hasattr(r, 'cleaned_seq')
+
+    with pytest.raises(TypeError):
+        r.cleaned_seq = u"some weird unicode \u2588"
 
 
 def test_read_properties():
@@ -24,7 +95,8 @@ def test_read_properties():
     for read in rparser:
         assert read.name == "895:1:1:1246:14654 1:N:0:NNNNN"
         assert read.sequence == "CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT"
-        assert read.annotations == ""
+        # if an attribute is empty it shouldn't exist
+        assert not hasattr(read, 'annotations')
         assert read.quality == """][aaX__aa[`ZUZ[NONNFNNNNNO_____^RQ_"""
 
 
@@ -56,7 +128,7 @@ def test_num_reads():
     assert rparser.num_reads == 100
 
 
-@attr('multithread')
+@pytest.mark.multithread
 def test_num_reads_threads():
     """Test threadsaftey of ReadParser's read counting"""
     import threading
@@ -68,7 +140,7 @@ def test_num_reads_threads():
     n_threads = 4
     threads = []
     rparser = ReadParser(utils.get_test_data("100-reads.fq.gz"))
-    for _ in xrange(n_threads):
+    for _ in range(n_threads):
         thr = threading.Thread(target=count_reads, args=[rparser, ])
         threads.append(thr)
         thr.start()
@@ -83,9 +155,9 @@ def test_num_reads_truncated():
     n_reads = 0
     rparser = ReadParser(utils.get_test_data("truncated.fq"))
     try:
-        for read in rparser:
+        for _ in rparser:
             n_reads += 1
-    except IOError as err:
+    except ValueError as err:
         assert "Sequence is empty" in str(err), str(err)
     assert rparser.num_reads == 1, "%d valid reads in file, got %d" % (
         n_reads, rparser.num_reads)
@@ -94,7 +166,7 @@ def test_num_reads_truncated():
 def test_gzip_decompression():
     reads_count = 0
     rparser = ReadParser(utils.get_test_data("100-reads.fq.gz"))
-    for read in rparser:
+    for _ in rparser:
         reads_count += 1
 
     assert 100 == reads_count
@@ -104,29 +176,31 @@ def test_gzip_decompression_truncated():
 
     rparser = ReadParser(utils.get_test_data("100-reads.fq.truncated.gz"))
     try:
-        for read in rparser:
+        for _ in rparser:
             pass
         assert 0, "this should fail"
-    except IOError as err:
-        print str(err)
+    except OSError as err:
+        print(str(err))
 
 
 def test_gzip_decompression_truncated_pairiter():
 
     rparser = ReadParser(utils.get_test_data("100-reads.fq.truncated.gz"))
     try:
-        for read in rparser.iter_read_pairs():
+        for _ in rparser.iter_read_pairs():
             pass
         assert 0, "this should fail"
-    except IOError as err:
-        print str(err)
+    except OSError as err:
+        print(str(err))
+    except ValueError as err:
+        print(str(err))
 
 
 def test_bzip2_decompression():
 
     reads_count = 0
     rparser = ReadParser(utils.get_test_data("100-reads.fq.bz2"))
-    for read in rparser:
+    for _ in rparser:
         reads_count += 1
 
     assert 100 == reads_count
@@ -136,37 +210,41 @@ def test_bzip2_decompression_truncated():
 
     rparser = ReadParser(utils.get_test_data("100-reads.fq.truncated.bz2"))
     try:
-        for read in rparser:
+        for _ in rparser:
             pass
         assert 0, "this should fail"
-    except IOError as err:
-        print str(err)
+    except OSError as err:
+        print(str(err))
+    except ValueError as err:
+        print(str(err))
 
 
 def test_bzip2_decompression_truncated_pairiter():
 
     rparser = ReadParser(utils.get_test_data("100-reads.fq.truncated.bz2"))
     try:
-        for read in rparser.iter_read_pairs():
+        for _ in rparser.iter_read_pairs():
             pass
         assert 0, "this should fail"
-    except IOError as err:
-        print str(err)
+    except OSError as err:
+        print(str(err))
+    except ValueError as err:
+        print(str(err))
 
 
 def test_badbzip2():
     try:
         rparser = ReadParser(utils.get_test_data("test-empty.fa.bz2"))
-        for read in rparser:
+        for _ in rparser:
             pass
         assert 0, "this should fail"
-    except IOError as err:
-        print str(err)
+    except OSError as err:
+        print(str(err))
     except ValueError as err:
-        print str(err)
+        print(str(err))
 
 
-@attr('multithread')
+@pytest.mark.multithread
 def test_with_multiple_threads(testfile="test-reads.fq.bz2"):
 
     import operator
@@ -174,7 +252,7 @@ def test_with_multiple_threads(testfile="test-reads.fq.bz2"):
 
     reads_count_1thr = 0
     rparser = ReadParser(utils.get_test_data(testfile))
-    for read in rparser:
+    for _ in rparser:
         reads_count_1thr += 1
 
     def count_reads(rparser, counters, tnum):
@@ -184,7 +262,7 @@ def test_with_multiple_threads(testfile="test-reads.fq.bz2"):
     threads = []
     reads_counts_per_thread = [0] * N_THREADS
     rparser = ReadParser(utils.get_test_data(testfile))
-    for tnum in xrange(N_THREADS):
+    for tnum in range(N_THREADS):
         t = \
             threading.Thread(
                 target=count_reads,
@@ -199,12 +277,12 @@ def test_with_multiple_threads(testfile="test-reads.fq.bz2"):
         reads_counts_per_thread
 
 
-@attr('multithread')
+@pytest.mark.multithread
 def test_with_multiple_threads_big():
     test_with_multiple_threads(testfile="test-large.fa")
 
 
-@attr('multithread')
+@pytest.mark.multithread
 def test_old_illumina_pair_mating():
 
     import threading
@@ -212,11 +290,11 @@ def test_old_illumina_pair_mating():
     rparser = ReadParser(utils.get_test_data("test-reads.fa"))
 
     def thread_1_runtime(rparser):
-        for read in rparser:
+        for _ in rparser:
             pass
 
     def thread_2_runtime(rparser):
-        for readnum, read in enumerate(rparser):
+        for readnum, _ in enumerate(rparser):
             if 0 == readnum:
                 pass
 
@@ -230,7 +308,7 @@ def test_old_illumina_pair_mating():
     t2.join()
 
 
-@attr('multithread')
+@pytest.mark.multithread
 def test_casava_1_8_pair_mating():
 
     import threading
@@ -241,11 +319,11 @@ def test_casava_1_8_pair_mating():
     rparser = ReadParser(utils.get_test_data("test-reads.fq.bz2"))
 
     def thread_1_runtime(rparser):
-        for read in rparser:
+        for _ in rparser:
             pass
 
     def thread_2_runtime(rparser):
-        for readnum, read in enumerate(rparser):
+        for readnum, _ in enumerate(rparser):
             if 0 == readnum:
                 pass
             # assert "895:1:1:1761:13189 2:N:0:NNNNN" == read.name, read.name
@@ -264,10 +342,10 @@ def test_read_truncated():
 
     rparser = ReadParser(utils.get_test_data("truncated.fq"))
     try:
-        for read in rparser:
+        for _ in rparser:
             pass
         assert 0, "No exception raised on a truncated file"
-    except IOError as err:
+    except ValueError as err:
         assert "Sequence is empty" in str(err), str(err)
 
 
@@ -279,7 +357,7 @@ def test_iterator_identities():
     assert rparser is rparser.iter_reads()
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_read_pair_iterator_in_error_mode():
     assert 0
 
@@ -307,14 +385,12 @@ def test_read_pair_iterator_in_error_mode():
     for read_1, read_2 \
             in rparser.iter_read_pairs(ReadParser.PAIR_MODE_ERROR_ON_UNPAIRED):
         read_pairs_2.append([read_1, read_2])
-    matches = \
-        map(
-            lambda rp1, rp2: rp1[0].name == rp2[0].name,
-            read_pairs_1, read_pairs_2
-        )
+    matches = [(rp1, rp2) for rp1, rp2 in zip(read_pairs_1, read_pairs_2)
+               if rp1[0].name == rp2[0].name]
     assert all(matches)  # Assert ALL the matches. :-]
 
 
+@pytest.mark.linux
 def test_read_pair_iterator_in_error_mode_xfail():
 
     rparser = \
@@ -322,15 +398,30 @@ def test_read_pair_iterator_in_error_mode_xfail():
 
     failed = True
     try:
-        for rpair in rparser.iter_read_pairs():
+        for _ in rparser.iter_read_pairs():
             pass
         failed = False
-    except IOError as exc:
+    except ValueError as exc:
+        assert "Invalid read pair" in str(exc), str(exc)
+    assert failed
+
+
+def test_read_pair_iterator_in_error_mode_xfail_osxsafe():
+
+    rparser = \
+        ReadParser(utils.get_test_data("test-abund-read-impaired.fa"))
+
+    failed = True
+    try:
+        for _ in rparser.iter_read_pairs():
+            pass
+        failed = False
+    except ValueError:
         pass
     assert failed
 
 
-@attr('known_failing')
+@pytest.mark.known_failing
 def test_read_pair_iterator_in_ignore_mode():
     assert 0
 
@@ -349,16 +440,18 @@ def test_constructor():
 
     # Note: Using a data file with only one read.
     try:
-        rparser = ReadParser(utils.get_test_data("single-read.fq"), "a")
+        ReadParser(utils.get_test_data("single-read.fq"), "a")
         assert 0, ("ReadParser's constructor shouldn't accept a character for "
                    "the number of threads")
     except TypeError as err:
-        print str(err)
+        print(str(err))
     try:
-        rparser = ReadParser("non-existent-file-name")
+        ReadParser("non-existent-file-name")
         assert 0, "ReadParser shouldn't accept a non-existant file name"
     except ValueError as err:
-        print str(err)
+        print(str(err))
+    except OSError as err:
+        print(str(err))
 
 
 def test_iternext():
@@ -368,8 +461,9 @@ def test_iternext():
         for read_1, read_2 in rparser.iter_read_pairs():
             read_pairs.append(read_1, read_2)
         assert 0, "Shouldn't be able to iterate over non FASTA file"
-    except IOError as err:
-        print str(err)
+    except OSError as err:
+        print(str(err))
     except ValueError as err:
-        print str(err)
-# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
+        print(str(err))
+# vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
+# vim: set textwidth=79:

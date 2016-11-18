@@ -1,16 +1,47 @@
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) 2014-2015, Michigan State University.
+# Copyright (C) 2015, The Regents of the University of California.
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2014-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 # Contact: khmer-project@idyll.org
-#
-
 """File handling/checking utilities for command-line scripts."""
+
+from __future__ import print_function, unicode_literals
 
 import os
 import sys
 import errno
-from stat import S_ISBLK, S_ISFIFO
+from stat import S_ISBLK, S_ISFIFO, S_ISCHR
+import gzip
+import bz2file
 
 
 def check_input_files(file_path, force):
@@ -22,34 +53,41 @@ def check_input_files(file_path, force):
     """
     mode = None
 
-    if file_path is '-':
+    if file_path == '-':
         return
+
     try:
         mode = os.stat(file_path).st_mode
     except OSError:
-        print >>sys.stderr, "ERROR: Input file %s does not exist" % \
-                            file_path
+        print("ERROR: Input file %s does not exist" %
+              file_path, file=sys.stderr)
 
         if not force:
-            print >>sys.stderr, "Exiting"
+            print("NOTE: This can be overridden using the --force argument",
+                  file=sys.stderr)
+            print("Exiting", file=sys.stderr)
             sys.exit(1)
         else:
             return
 
-    # block devices will be nonzero
-    if S_ISBLK(mode) or S_ISFIFO(mode):
+    # block devices/stdin will be nonzero
+    if S_ISBLK(mode) or S_ISFIFO(mode) or S_ISCHR(mode):
         return
 
     if not os.path.exists(file_path):
-        print >>sys.stderr, "ERROR: Input file %s does not exist; exiting" % \
-                            file_path
+        print("ERROR: Input file %s does not exist; exiting" %
+              file_path, file=sys.stderr)
         if not force:
+            print("NOTE: This can be overridden using the --force argument",
+                  file=sys.stderr)
             sys.exit(1)
     else:
         if os.stat(file_path).st_size == 0:
-            print >>sys.stderr, "ERROR: Input file %s is empty; exiting." % \
-                                file_path
+            print("ERROR: Input file %s is empty; exiting." %
+                  file_path, file=sys.stderr)
             if not force:
+                print("NOTE: This can be overridden using the --force"
+                      " argument", file=sys.stderr)
                 sys.exit(1)
 
 
@@ -59,11 +97,11 @@ def check_file_writable(file_path):
         file_obj = open(file_path, "a")
     except IOError as error:
         if error.errno == errno.EACCES:
-            print >>sys.stderr, "ERROR: File %s does not have write " \
-                % file_path + "permission; exiting"
+            print("ERROR: File %s does not have write "
+                  % file_path + "permission; exiting", file=sys.stderr)
             sys.exit(1)
         else:
-            print >>sys.stderr, "ERROR: " + error.strerror
+            print("ERROR: " + error.strerror, file=sys.stderr)
     else:
         file_obj.close()
         return
@@ -97,23 +135,26 @@ def check_space(in_files, force, _testhook_free_space=None):
 
     size_diff = total_size - free_space
     if size_diff > 0:
-        print >>sys.stderr, "ERROR: Not enough free space on disk " \
-                            "for output files;\n" \
-                            "       Need at least %.1f GB more." \
-                            % (float(size_diff) / 1e9)
-        print >>sys.stderr, "       Estimated output size: %.1f GB" \
-                            % (float(total_size) / 1e9,)
-        print >>sys.stderr, "       Free space: %.1f GB" \
-                            % (float(free_space) / 1e9,)
+        print("ERROR: Not enough free space on disk "
+              "for output files;\n"
+              "       Need at least %.1f GB more."
+              % (float(size_diff) / 1e9), file=sys.stderr)
+        print("       Estimated output size: %.1f GB"
+              % (float(total_size) / 1e9,), file=sys.stderr)
+        print("       Free space: %.1f GB"
+              % (float(free_space) / 1e9,), file=sys.stderr)
         if not force:
+            print("NOTE: This can be overridden using the --force argument",
+                  file=sys.stderr)
             sys.exit(1)
 
 
-def check_space_for_hashtable(hash_size, force, _testhook_free_space=None):
-    """Check we have enough size to write a hash table."""
-    cwd = os.getcwd()
-    dir_path = os.path.dirname(os.path.realpath(cwd))
+def check_space_for_graph(outfile_name, hash_size, force,
+                          _testhook_free_space=None):
+    """Check that we have enough size to write the specified graph."""
+    dir_path = os.path.dirname(os.path.realpath(outfile_name))
     target = os.statvfs(dir_path)
+
     if _testhook_free_space is None:
         free_space = target.f_frsize * target.f_bavail
     else:
@@ -121,15 +162,17 @@ def check_space_for_hashtable(hash_size, force, _testhook_free_space=None):
 
     size_diff = hash_size - free_space
     if size_diff > 0:
-        print >>sys.stderr, "ERROR: Not enough free space on disk " \
-                            "for saved table files;" \
-                            "       Need at least %s GB more." \
-                            % (float(size_diff) / 1e9,)
-        print >>sys.stderr, "       Table size: %.1f GB" \
-                            % (float(hash_size) / 1e9,)
-        print >>sys.stderr, "       Free space: %.1f GB" \
-                            % (float(free_space) / 1e9,)
+        print("ERROR: Not enough free space on disk "
+              "for saved graph files;"
+              "       Need at least %.1f GB more."
+              % (float(size_diff) / 1e9,), file=sys.stderr)
+        print("       Table size: %.1f GB"
+              % (float(hash_size) / 1e9,), file=sys.stderr)
+        print("       Free space: %.1f GB"
+              % (float(free_space) / 1e9,), file=sys.stderr)
         if not force:
+            print("NOTE: This can be overridden using the --force argument",
+                  file=sys.stderr)
             sys.exit(1)
 
 
@@ -142,12 +185,58 @@ def check_valid_file_exists(in_files):
     or non-existent.
     """
     for in_file in in_files:
-        if os.path.exists(in_file):
-            if os.stat(in_file).st_size > 0:
+        if in_file == '-':
+            pass
+        elif os.path.exists(in_file):
+            mode = os.stat(in_file).st_mode
+            if os.stat(in_file).st_size > 0 or S_ISBLK(mode) or S_ISFIFO(mode):
                 return
             else:
-                print >>sys.stderr, 'WARNING: Input file %s is empty' % \
-                                    in_file
+                print('WARNING: Input file %s is empty' %
+                      in_file, file=sys.stderr)
         else:
-            print >>sys.stderr, 'WARNING: Input file %s not found' % \
-                                in_file
+            print('WARNING: Input file %s not found' %
+                  in_file, file=sys.stderr)
+
+
+def is_block(fthing):
+    """Take in a file object and checks to see if it's a block or fifo."""
+    if fthing is sys.stdout or fthing is sys.stdin:
+        return True
+    else:
+        mode = os.stat(fthing.name).st_mode
+        return S_ISBLK(mode) or S_ISCHR(mode)
+
+
+def describe_file_handle(fthing):
+    """Return the name of file or a description."""
+    if is_block(fthing):
+        return "block device"
+    else:
+        return fthing.name
+
+
+def add_output_compression_type(parser):
+    """Add compression arguments to a parser object."""
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--gzip', default=False, action='store_true',
+                       help='Compress output using gzip')
+    group.add_argument('--bzip', default=False, action='store_true',
+                       help='Compress output using bzip2')
+
+
+def get_file_writer(file_handle, do_gzip, do_bzip):
+    """Generate and return a file object with specified compression."""
+    ofile = None
+
+    if do_gzip and do_bzip:
+        raise ValueError("Cannot specify both bzip and gzip compression!")
+
+    if do_gzip:
+        ofile = gzip.GzipFile(fileobj=file_handle, mode='w')
+    elif do_bzip:
+        ofile = bz2file.open(file_handle, mode='w')
+    else:
+        ofile = file_handle
+
+    return ofile

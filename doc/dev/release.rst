@@ -1,4 +1,40 @@
-.. vim: set filetype=rst
+..
+   This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+   Copyright (C) 2013-2015 Michigan State University
+   Copyright (C) 2015-2016 The Regents of the University of California.
+   It is licensed under the three-clause BSD license; see LICENSE.
+   Contact: khmer-project@idyll.org
+
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are
+   met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of the Michigan State University nor the names
+      of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written
+      permission.
+
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+   HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+   Contact: khmer-project@idyll.org
 
 ================================
 Releasing a new version of khmer
@@ -16,7 +52,7 @@ release makers, following this checklist by MRC.
 #. The below should be done in a clean checkout::
 
         cd `mktemp -d`
-        git clone git@github.com:ged-lab/khmer.git
+        git clone git@github.com:dib-lab/khmer.git
         cd khmer
 
 #. (Optional) Check for updates to versioneer::
@@ -25,9 +61,9 @@ release makers, following this checklist by MRC.
         versioneer-installer
 
         git diff
-        
+
         ./setup.py versioneer
-        git diff 
+        git diff
         git commit -m -a "new version of versioneer.py"
         # or
         git checkout -- versioneer.py khmer/_version.py khmer/__init__.py MANIFEST.in
@@ -40,7 +76,15 @@ release makers, following this checklist by MRC.
 #. Review the issue list for any new bugs that will not be fixed in this
    release. Add them to ``doc/known-issues.txt``
 
-#. Verify that the build is clean: http://ci.ged.msu.edu/job/khmer-master/
+#. Check for new authors. Update ``.mailmap`` to normalize their email address
+   and name spelling. If they want to opt out update the ``list-*`` Makefile
+   targets to exclude them. Run ``make list-citation`` and adapt the output to
+   the relevant parts of ``CITATION``, ``setup.py``, ``doc/index.rst``.
+
+#. Verify that the build is clean: http://ci.oxli.org/job/khmer-master/
+
+#. Run through the `API examples <../user/api-examples.html>`__ to verify they
+   are still valid.
 
 #. Submit a build to Coverity Scan if it hasn't been done
    recently. You can get the token from
@@ -65,7 +109,7 @@ release makers, following this checklist by MRC.
    the letter 'v'::
 
         git tag v${new_version}-${rc}
-        git push --tags git@github.com:ged-lab/khmer.git
+        git push --tags git@github.com:dib-lab/khmer.git
 
 #. Test the release candidate. Bonus: repeat on Mac OS X::
 
@@ -75,14 +119,14 @@ release makers, following this checklist by MRC.
         virtualenv testenv3
         virtualenv testenv4
         # First we test the tag
-        
+
         cd testenv1
         source bin/activate
-        git clone --depth 1 --branch v${new_version}-${rc} https://github.com/ged-lab/khmer.git
+        git clone --depth 1 --branch v${new_version}-${rc} https://github.com/dib-lab/khmer.git
         cd khmer
         make install-dependencies
         make test
-        normalize-by-median.py --version 2>&1 | grep ${new_version}-${rc} && \
+        normalize-by-median.py --version 2>&1 | grep khmer\ ${new_version}-${rc} && \
                 echo 1st manual version check passed
         pip uninstall -y khmer; pip uninstall -y khmer; make install
         mkdir ../not-khmer # if there is a subdir named 'khmer' nosetest will execute tests
@@ -91,11 +135,11 @@ release makers, following this checklist by MRC.
 
 
         # Secondly we test via pip
-        
-        cd ../testenv2
+
+        cd ../../testenv2
         source bin/activate
         pip install -U setuptools==3.4.1
-        pip install -e git+https://github.com/ged-lab/khmer.git@v${new_version}-${rc}#egg=khmer
+        pip install -e git+https://github.com/dib-lab/khmer.git@v${new_version}-${rc}#egg=khmer
         cd src/khmer
         make install-dependencies
         make dist
@@ -103,13 +147,13 @@ release makers, following this checklist by MRC.
         cp dist/khmer*tar.gz ../../../testenv3/
         pip uninstall -y khmer; pip uninstall -y khmer; make install
         cd ../.. # no subdir named khmer here, safe for nosetesting installed khmer module
-        normalize-by-median.py --version 2>&1 | grep ${new_version}-${rc} && \
+        normalize-by-median.py --version 2>&1 | grep khmer\ ${new_version}-${rc} && \
                 echo 2nd manual version check passed
         nosetests khmer --attr '!known_failing'
 
         # Is the distribution in testenv2 complete enough to build another
         # functional distribution?
-        
+
         cd ../testenv3/
         source bin/activate
         pip install -U setuptools==3.4.1
@@ -141,7 +185,7 @@ release makers, following this checklist by MRC.
         pip install screed nose
         pip install -i https://testpypi.python.org/pypi --pre --no-clean khmer
         nosetests khmer --attr '!known_failing'
-        normalize-by-median.py --version 2>&1 | grep ${new_version}-${rc} && \
+        normalize-by-median.py --version 2>&1 | grep khmer\ ${new_version}-${rc} && \
                 echo 3rd manual version check passed
         cd build/khmer
         make test
@@ -166,8 +210,8 @@ so:
 #. Delete the release candidate tag and push the tag updates to GitHub.::
 
         git tag -d v${new_version}-${rc}
-        git push git@github.com:ged-lab/khmer.git
-        git push --tags git@github.com:ged-lab/khmer.git
+        git push git@github.com:dib-lab/khmer.git
+        git push --tags git@github.com:dib-lab/khmer.git
 
 #. Add the release on GitHub, using the tag you just pushed.  Name
    it 'version X.Y.Z', and copy and paste in the release notes.
@@ -183,11 +227,11 @@ so:
         ./setup.py bdist_wheel upload
 
 #. Update Read the Docs to point to the new version. Visit
-   https://readthedocs.org/builds/khmer/ and 'Build Version: master' to pick up
+   https://readthedocs.io/builds/khmer/ and 'Build Version: master' to pick up
    the new tag. Once that build has finished check the "Activate" box next to
-   the new version at https://readthedocs.org/dashboard/khmer/versions/ under
+   the new version at https://readthedocs.io/dashboard/khmer/versions/ under
    "Choose Active Versions". Finally change the default version at
-   https://readthedocs.org/dashboard/khmer/advanced/ to the new version.
+   https://readthedocs.io/dashboard/khmer/advanced/ to the new version.
 
 #. Delete any RC tags created::
 
@@ -221,7 +265,7 @@ cross-platform testing environment.
 Setuptools Bootstrap
 --------------------
 
-ez_setup.py is from https://bitbucket.org/pypa/setuptools/raw/bootstrap/
+`ez_setup.py` is from https://bitbucket.org/pypa/setuptools/raw/bootstrap/
 
 Before major releases it should be examined to see if there are new
 versions available and if the change would be useful
@@ -236,7 +280,7 @@ files ``versioneer.py``, the top of ``khmer/__init__.py``,
 ``khmer/_version.py``, ``setup.py``, and ``doc/conf.py`` for the
 implementation.
 
-The version number is determined through several methods: see 
+The version number is determined through several methods: see
 https://github.com/warner/python-versioneer#version-identifiers
 
 If the source tree is from a git checkout then the version number is derived by

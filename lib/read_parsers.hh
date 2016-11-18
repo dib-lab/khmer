@@ -1,17 +1,53 @@
-//
-// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt.
-// Contact: khmer-project@idyll.org
-//
+/*
+This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+Copyright (C) 2012-2015, Michigan State University.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of the Michigan State University nor the names
+      of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written
+      permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+LICENSE (END)
+
+Contact: khmer-project@idyll.org
+*/
 #ifndef READ_PARSERS_HH
 #define READ_PARSERS_HH
 
 #include <regex.h>
-#include <iostream>
+#include <stddef.h>
+#include <stdint.h>
 #include <cstdlib>
+#include <iostream>
+#include <string>
+#include <utility>
+
 #include "khmer.hh"
+#include "khmer_exception.hh"
 
 namespace khmer
 {
@@ -21,32 +57,32 @@ namespace khmer
 namespace read_parsers
 {
 
-struct NoMoreReadsAvailable : public  khmer_exception {
-    explicit NoMoreReadsAvailable(const char *msg) :
-        khmer_exception(msg) {}
+struct NoMoreReadsAvailable : public  khmer_file_exception {
+    explicit NoMoreReadsAvailable(const std::string& msg) :
+        khmer_file_exception(msg) {}
     NoMoreReadsAvailable() :
-        khmer_exception("No more reads available in this stream.") {}
+        khmer_file_exception("No more reads available in this stream.") {}
 };
 
-struct InvalidRead : public  khmer_exception {
-    explicit InvalidRead(const char *msg) :
-        khmer_exception(msg) {}
+struct InvalidRead : public  khmer_value_exception {
+    explicit InvalidRead(const std::string& msg) :
+        khmer_value_exception(msg) {}
     InvalidRead() :
-        khmer_exception("Invalid read") {}
+        khmer_value_exception("Invalid FASTA/Q read") {}
 };
 
-struct UnknownPairReadingMode : public  khmer_exception {
-    explicit UnknownPairReadingMode(const char *msg) :
-        khmer_exception(msg) {}
+struct UnknownPairReadingMode : public  khmer_value_exception {
+    explicit UnknownPairReadingMode(const std::string& msg) :
+        khmer_value_exception(msg) {}
     UnknownPairReadingMode() :
-        khmer_exception("Unknown pair reading mode supplied.") {}
+        khmer_value_exception("Unknown pair reading mode supplied.") {}
 };
 
-struct InvalidReadPair : public  khmer_exception {
-    explicit InvalidReadPair(const char *msg) :
-        khmer_exception(msg) {}
+struct InvalidReadPair : public  khmer_value_exception {
+    explicit InvalidReadPair(const std::string& msg) :
+        khmer_value_exception(msg) {}
     InvalidReadPair() :
-        khmer_exception("Invalid read pair detected.") {}
+        khmer_value_exception("Invalid read pair detected.") {}
 };
 
 struct Read {
@@ -54,6 +90,7 @@ struct Read {
     std:: string    annotations;
     std:: string    sequence;
     std:: string    quality;
+    std:: string    cleaned_seq;
     // TODO? Add description field.
 
     inline void reset ( )
@@ -63,6 +100,8 @@ struct Read {
         sequence.clear( );
         quality.clear( );
     }
+
+    void write_to(std::ostream&);
 };
 
 typedef std:: pair< Read, Read >	ReadPair;
@@ -70,7 +109,6 @@ typedef std:: pair< Read, Read >	ReadPair;
 struct IParser {
 
     enum {
-        PAIR_MODE_ALLOW_UNPAIRED = 0,
         PAIR_MODE_IGNORE_UNPAIRED,
         PAIR_MODE_ERROR_ON_UNPAIRED
     };
@@ -116,12 +154,6 @@ protected:
     regex_t		_re_read_1;
     regex_t		_re_read_2;
 
-#if (0)
-    void		_imprint_next_read_pair_in_allow_mode(
-        ReadPair &the_read_pair
-    );
-#endif
-
     void		_imprint_next_read_pair_in_ignore_mode(
         ReadPair &the_read_pair
     );
@@ -134,18 +166,19 @@ protected:
 
 }; // struct IParser
 
-class SeqAnParser : public IParser
+class FastxParser : public IParser
 {
 
 public:
-    SeqAnParser( const char * filename );
-    ~SeqAnParser( );
+    explicit FastxParser( const char * filename );
+    ~FastxParser( );
 
     bool is_complete( );
     void imprint_next_read(Read &the_read);
 
 private:
     struct Handle;
+
     Handle* _private;
 
 };

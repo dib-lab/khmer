@@ -1,19 +1,50 @@
-//
-// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2014-2015. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt.
-// Contact: khmer-project@idyll.org
-//
+/*
+This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+Copyright (C) 2014-2015, Michigan State University.
+Copyright (C) 2015-2016, The Regents of the University of California.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of the Michigan State University nor the names
+      of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written
+      permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+LICENSE (END)
+
+Contact: khmer-project@idyll.org
+*/
+#include <math.h>
+#include <stdlib.h>
+#include <algorithm>
+#include <map>
+#include <numeric>
+#include <utility>
 
 #include "hllcounter.hh"
-
-#include <math.h>
-#include <algorithm>
-#include <numeric>
-#include <inttypes.h>
-#include <sstream>
-
 #include "khmer.hh"
+#include "khmer_exception.hh"
 #include "kmer_hash.hh"
 #include "read_parsers.hh"
 
@@ -301,7 +332,7 @@ double HLLCounter::_Ep()
     return E;
 }
 
-HashIntoType HLLCounter::estimate_cardinality()
+uint64_t HLLCounter::estimate_cardinality()
 {
     long V = count(this->M.begin(), this->M.end(), 0);
 
@@ -317,14 +348,19 @@ HashIntoType HLLCounter::estimate_cardinality()
 void HLLCounter::add(const std::string &value)
 {
     HashIntoType x = khmer::_hash_murmur(value);
-    HashIntoType j = x & (this->m - 1);
+    uint64_t j = x & (this->m - 1);
     this->M[j] = std::max(this->M[j], get_rho(x >> this->p, 64 - this->p));
 }
 
-unsigned int HLLCounter::consume_string(const std::string &s)
+unsigned int HLLCounter::consume_string(const std::string &inp)
 {
     unsigned int n_consumed = 0;
     std::string kmer = "";
+    std::string s = inp;
+
+    for (unsigned int i = 0; i < s.length(); i++)  {
+        s[i] &= 0xdf; // toupper - knock out the "lowercase bit"
+    }
 
     for(std::string::const_iterator it = s.begin(); it != s.end(); ++it) {
         kmer.push_back(*it);
@@ -341,18 +377,20 @@ unsigned int HLLCounter::consume_string(const std::string &s)
 
 void HLLCounter::consume_fasta(
     std::string const &filename,
+    bool stream_records,
     unsigned int &total_reads,
     unsigned long long &n_consumed)
 {
     read_parsers::IParser * parser = read_parsers::IParser::get_parser(filename);
 
-    consume_fasta(parser, total_reads, n_consumed);
+    consume_fasta(parser, stream_records, total_reads, n_consumed);
 
     delete parser;
 }
 
 void HLLCounter::consume_fasta(
     read_parsers::IParser *parser,
+    bool stream_records,
     unsigned int &      total_reads,
     unsigned long long &    n_consumed)
 {
@@ -366,7 +404,7 @@ void HLLCounter::consume_fasta(
 
     #pragma omp parallel
     {
-        #pragma omp single
+        #pragma omp master
         {
             counters = (HLLCounter**)calloc(omp_get_num_threads(),
             sizeof(HLLCounter*));
@@ -386,27 +424,32 @@ void HLLCounter::consume_fasta(
                 // Iterate through the reads and consume their k-mers.
                 try {
                     read = parser->get_next_read();
-
-                    #pragma omp task default(none) firstprivate(read) \
-                    shared(counters, n_consumed_partial, total_reads_partial)
-                    {
-                        bool is_valid;
-                        int n, t = omp_get_thread_num();
-                        n = counters[t]->check_and_process_read(read.sequence,
-                        is_valid);
-                        n_consumed_partial[t] += n;
-                        if (is_valid) {
-                            total_reads_partial[t] += 1;
-                        }
-                    }
                 } catch (read_parsers::NoMoreReadsAvailable) {
+                    break;
+                }
+
+                if (stream_records) {
+                    read.write_to(std::cout);
+                }
+
+                #pragma omp task default(none) firstprivate(read) \
+                shared(counters, n_consumed_partial, total_reads_partial)
+                {
+                    bool is_valid;
+                    int n, t = omp_get_thread_num();
+                    n = counters[t]->check_and_process_read(read.sequence,
+                                                            is_valid);
+                    n_consumed_partial[t] += n;
+                    if (is_valid) {
+                        total_reads_partial[t] += 1;
+                    }
                 }
 
             } // while reads left for parser
         }
         #pragma omp taskwait
 
-        #pragma omp single
+        #pragma omp master
         {
             for (int i=0; i < omp_get_num_threads(); ++i)
             {
@@ -443,8 +486,11 @@ bool HLLCounter::check_and_normalize_read(std::string &read) const
     }
 
     for (unsigned int i = 0; i < read.length(); i++) {
-        read[ i ] &= 0xdf; // toupper - knock out the "lowercase bit"
-        if (!is_valid_dna( read[ i ] )) {
+        read[i] &= 0xdf; // toupper - knock out the "lowercase bit"
+        if (read[i] == 'N') {
+            read[i] = 'A';
+        }
+        if (!is_valid_dna( read[i] )) {
             is_valid = false;
             break;
         }
@@ -455,6 +501,9 @@ bool HLLCounter::check_and_normalize_read(std::string &read) const
 
 void HLLCounter::merge(HLLCounter &other)
 {
+    if (this->p != other.p || this->_ksize != other._ksize) {
+        throw khmer_exception("HLLCounters to be merged must be created with same parameters");
+    }
     for(unsigned int i=0; i < this->M.size(); ++i) {
         this->M[i] = std::max(other.M[i], this->M[i]);
     }

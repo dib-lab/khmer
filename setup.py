@@ -1,7 +1,38 @@
-#! /usr/bin/env python2
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+#! /usr/bin/env python
+# vim: set fileencoding=utf-8
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) 2013-2015, Michigan State University.
+# Copyright (C) 2015-2016, The Regents of the University of California.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 # Contact: khmer-project@idyll.org
 """Setup for khmer project."""
 
@@ -26,11 +57,6 @@ from distutils.errors import DistutilsPlatformError
 import versioneer
 ez_setup.use_setuptools(version="3.4.1")
 
-versioneer.VCS = 'git'
-versioneer.versionfile_source = 'khmer/_version.py'
-versioneer.versionfile_build = 'khmer/_version.py'
-versioneer.tag_prefix = 'v'  # tags are like v1.2.0
-versioneer.parentdir_prefix = '.'
 CMDCLASS = versioneer.get_cmdclass()
 
 # strip out -Wstrict-prototypes; a hack suggested by
@@ -68,8 +94,8 @@ def check_for_openmp():
         # Attempt to compile a test script.
         # See http://openmp.org/wp/openmp-compilers/
         filename = r'test.c'
-        file = open(filename, 'wt', 1)
-        file.write(
+        source = open(filename, 'wt', 1)
+        source.write(
             """
             #include <omp.h>
             #include <stdio.h>
@@ -85,7 +111,7 @@ def check_for_openmp():
                                         stdout=fnull, stderr=fnull)
 
         # Clean up
-        file.close()
+        source.close()
     finally:
         os.chdir(curdir)
         shutil.rmtree(tmpdir)
@@ -101,24 +127,30 @@ BZIP2DIR = 'third-party/bzip2'
 
 BUILD_DEPENDS = []
 BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
-    "khmer", "kmer_hash", "hashtable", "counting", "hashbits", "labelhash",
-    "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers"])
+    "khmer", "kmer_hash", "hashtable", "labelhash", "hashgraph",
+    "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers",
+    "kmer_filters", "traversal", "assembler", "alphabets", "storage"])
+BUILD_DEPENDS.extend(path_join("khmer", bn + ".hh") for bn in [
+    "_cpy_counttable", "_cpy_hashgraph", "_cpy_nodetable"])
 
-SOURCES = ["khmer/_khmermodule.cc"]
+SOURCES = ["khmer/_khmer.cc"]
 SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
-    "trace_logger", "perf_metrics", "read_parsers", "kmer_hash", "hashtable",
-    "hashbits", "labelhash", "counting", "subset", "read_aligner",
-    "hllcounter"])
+    "read_parsers", "kmer_hash", "hashtable", "hashgraph",
+    "labelhash", "subset", "read_aligner",
+    "hllcounter", "traversal", "kmer_filters", "assembler", "alphabets",
+    "storage"])
 
 SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
 
-EXTRA_COMPILE_ARGS = ['-O3', ]
+# Don't forget to update lib/Makefile with these flags!
+EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11', '-pedantic']
 EXTRA_LINK_ARGS = []
 
 if sys.platform == 'darwin':
     # force 64bit only builds
-    EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64'])
+    EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64', '-mmacosx-version-min=10.7',
+                               '-stdlib=libc++'])
 
 if check_for_openmp():
     EXTRA_COMPILE_ARGS.extend(['-fopenmp'])
@@ -134,8 +166,7 @@ EXTENSION_MOD_DICT = \
         "define_macros": [("VERSION", versioneer.get_version()), ],
     }
 
-EXTENSION_MOD = Extension("khmer._khmermodule",  # pylint: disable=W0142
-                          ** EXTENSION_MOD_DICT)
+EXTENSION_MOD = Extension("khmer._khmer", ** EXTENSION_MOD_DICT)
 SCRIPTS = []
 SCRIPTS.extend([path_join("scripts", script)
                 for script in os_listdir("scripts")
@@ -150,8 +181,9 @@ CLASSIFIERS = [
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS :: MacOS X",
     "Programming Language :: C++",
-    "Programming Language :: Python :: 2 :: Only",
     "Programming Language :: Python :: 2.7",
+    "Programming Language :: Python :: 3.3",
+    "Programming Language :: Python :: 3.4",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
 if "-rc" in versioneer.get_version():
@@ -165,25 +197,46 @@ SETUP_METADATA = \
         "version": versioneer.get_version(),
         "description": 'khmer k-mer counting library',
         "long_description": open("README.rst").read(),
-        "author": 'Michael R. Crusoe, Greg Edvenson, Jordan Fish,'
-        ' Adina Howe, Luiz Irber, Eric McDonald, Joshua Nahum, Kaben Nanlohy,'
-        ' Humberto Ortiz-Zuazaga, Jason Pell, Jared Simpson, Camille Scott,'
-        ' Ramakrishnan Rajaram Srinivasan, Qingpeng Zhang, and C. Titus Brown',
+        "author": "Michael R. Crusoe, Hussien F. Alameldin, Sherine Awad, "
+                  "Elmar Bucher, Adam Caldwell, Reed Cartwright, "
+                  "Amanda Charbonneau, Bede Constantinides, Greg Edvenson, "
+                  "Scott Fay, Jacob Fenton, Thomas Fenzl, Jordan Fish, "
+                  "Leonor Garcia-Gutierrez, Phillip Garland, Jonathan Gluck, "
+                  "Iván González, Sarah Guermond, Jiarong Guo, Aditi Gupta, "
+                  "Joshua R. Herr, Adina Howe, Alex Hyer, Andreas Härpfer, "
+                  "Luiz Irber, Rhys Kidd, David Lin, Justin Lippi, "
+                  "Tamer Mansour, Pamela McA'Nulty, Eric McDonald, "
+                  "Jessica Mizzi, Kevin D. Murray, Joshua R. Nahum, "
+                  "Kaben Nanlohy, Alexander Johan Nederbragt, "
+                  "Humberto Ortiz-Zuazaga, Jeramia Ory, Jason Pell, "
+                  "Charles Pepe-Ranney, Zachary N Russ, Erich Schwarz, "
+                  "Camille Scott, Josiah Seaman, Scott Sievert, "
+                  "Jared Simpson, Connor T. Skennerton, James Spencer, "
+                  "Ramakrishnan Srinivasan, Daniel Standage, "
+                  "James A. Stapleton, Joe Stein, Susan R Steinman, "
+                  "Benjamin Taylor, Will Trimble, Heather L. Wiencko, "
+                  "Michael Wright, Brian Wyss, Qingpeng Zhang, en zyme, "
+                  "C. Titus Brown",
         "author_email": 'khmer-project@idyll.org',
         # "maintainer": 'Michael R. Crusoe', # this overrides the author field
         # "maintainer_email": 'mcrusoe@msu.edu', # so don't include it
         # http://docs.python.org/2/distutils/setupscript.html
-        # additiona-meta-data note #3
-        "url": 'http://ged.msu.edu/',
-        "packages": ['khmer', 'khmer.tests'],
+        # additional-meta-data note #3
+        "url": 'https://khmer.readthedocs.io/',
+        "packages": ['khmer', 'khmer.tests', 'oxli'],
         "package_dir": {'khmer.tests': 'tests'},
-        "install_requires": ['screed >= 0.8'],
-        # testing screed download link
-
+        "install_requires": ['screed >= 0.9', 'bz2file'],
+        "setup_requires": ["pytest-runner>=2.0,<3dev"],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
-                           'tests': ['nose >= 1.0']},
+                           'tests': ['pytest>=2.9'],
+                           'read_aligner_training': ['simplesam']},
         "scripts": SCRIPTS,
+        # "entry_points": { # Not ready for distribution yet.
+        #    'console_scripts': [
+        #        "oxli = oxli:main"
+        #    ]
+        # },
         "ext_modules": [EXTENSION_MOD, ],
         # "platforms": '', # empty as is conveyed by the classifiers below
         # "license": '', # empty as is conveyed by the classifier below
@@ -194,7 +247,6 @@ SETUP_METADATA = \
 
 
 class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
-
     """Specialized Python extension builder for khmer project.
 
     Only run the library setup when needed, not on every invocation.
@@ -208,6 +260,9 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
         if "%x" % sys.maxsize != '7fffffffffffffff':
             raise DistutilsPlatformError("%s require 64-bit operating system" %
                                          SETUP_METADATA["packages"])
+
+        if sys.platform == 'darwin' and 'gcov' in self.libraries:
+            self.libraries.remove('gcov')
 
         if "z" not in self.libraries:
             zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'
@@ -238,7 +293,7 @@ def reinitialize_command(self, command, reinit_subcommands):
     """Monkeypatch the original version from distutils.
 
     It's supposed to match the behavior of Distribution.get_command_obj()
-    This fixes issues with 'pip install -e' and './setup.py nosetests' not
+    This fixes issues with 'pip install -e' and './setup.py test' not
     respecting the setup.cfg configuration directives for the build_ext
     command.
     """
@@ -251,6 +306,4 @@ def reinitialize_command(self, command, reinit_subcommands):
 Distribution.reinitialize_command = reinitialize_command
 
 
-# pylint: disable=W0142
-setup(cmdclass=CMDCLASS,
-      **SETUP_METADATA)
+setup(cmdclass=CMDCLASS, **SETUP_METADATA)

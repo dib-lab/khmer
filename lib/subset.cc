@@ -1,16 +1,54 @@
-//
-// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2014. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt.
-// Contact: khmer-project@idyll.org
-//
+/*
+This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+Copyright (C) 2010-2015, Michigan State University.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
-#include "hashbits.hh"
-#include "subset.hh"
-#include "read_parsers.hh"
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
 
-#include <sstream>
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of the Michigan State University nor the names
+      of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written
+      permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+LICENSE (END)
+
+Contact: khmer-project@idyll.org
+*/
+#include <assert.h>
 #include <errno.h>
+#include <string.h>
+#include <iostream>
+#include <sstream> // IWYU pragma: keep
+#include <map>
+#include <set>
+#include <utility>
+
+#include "hashgraph.hh"
+#include "khmer_exception.hh"
+#include "read_parsers.hh"
+#include "subset.hh"
+#include "traversal.hh"
 
 #define IO_BUF_SIZE 250*1000*1000
 #define BIG_TRAVERSALS_ARE 200
@@ -42,6 +80,11 @@ static void print_tag_set(SeenSet& p)
 }
 
 #endif //0
+
+SubsetPartition::SubsetPartition(Hashgraph * ht) :
+    next_partition_id(2), _ht(ht)
+{
+}
 
 void SubsetPartition::count_partitions(
     size_t& n_partitions,
@@ -98,7 +141,12 @@ size_t SubsetPartition::output_partitioned_file(
     //
 
     while(!parser->is_complete()) {
-        read = parser->get_next_read();
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable &exc) {
+            break;
+        }
+
         seq = read.sequence;
 
         if (_ht->check_and_normalize_read(seq)) {
@@ -106,7 +154,7 @@ size_t SubsetPartition::output_partitioned_file(
 
             bool found_tag = false;
             for (unsigned int i = 0; i < seq.length() - ksize + 1; i++) {
-                kmer = _hash(kmer_s + i, ksize);
+                kmer = _ht->hash_dna(kmer_s + i);
 
                 // is this a known tag?
                 if (set_contains(partition_map, kmer)) {
@@ -142,12 +190,6 @@ size_t SubsetPartition::output_partitioned_file(
                     outfile << "\n" << seq << "\n";
                 }
             }
-#ifdef VALIDATE_PARTITIONS
-            std::cout << "checking: " << read.name << "\n";
-            if (!is_single_partition(seq)) {
-                throw khmer_exception();
-            }
-#endif // VALIDATE_PARTITIONS
 
             total_reads++;
 
@@ -172,314 +214,74 @@ size_t SubsetPartition::output_partitioned_file(
     return partitions.size() + n_singletons;
 }
 
-unsigned int SubsetPartition::find_unpart(
-    const std::string	&infilename,
-    bool		traverse,
-    bool		stop_big_traversals,
-    CallbackFn		callback,
-    void *		callback_data)
-{
-    IParser* parser = IParser::get_parser(infilename);
-
-    unsigned int total_reads = 0;
-    unsigned int reads_kept = 0;
-    unsigned int n_singletons = 0;
-
-    Read read;
-    string seq;
-
-    SeenSet tags_todo;
-
-    const unsigned int ksize = _ht->ksize();
-
-    //
-    // go through all the new reads, and consume & tag them.  keep track
-    // of all waypoints in the read in 'found_tags', and then check to
-    // see if we've found either tags with no partition, or tags from
-    // different partitions, or, heck, anything new.  if we did, then
-    // we have "new stuff" from the perspective of the graph.
-    //
-    // so, we can either traverse the graph, or just merge the partitions.
-    // the former is exact, the latter is inexact but way faster :)
-    //
-
-    while(!parser->is_complete()) {
-        read = parser->get_next_read();
-        seq = read.sequence;
-
-        if (_ht->check_and_normalize_read(seq)) {
-            unsigned long long n_consumed = 0;
-            SeenSet found_tags;
-            _ht->consume_sequence_and_tag(seq, n_consumed, &found_tags);
-
-            PartitionSet pset;
-            bool found_zero = false;
-
-            for (SeenSet::iterator si = found_tags.begin();
-                    si != found_tags.end(); ++si) {
-                PartitionMap::iterator pi = partition_map.find(*si);
-                PartitionID partition_id = 0;
-                if (pi != partition_map.end() && pi->second != NULL) {
-                    partition_id = *(pi->second);
-                }
-                if (partition_id == 0) {
-                    found_zero = true;
-                } else {
-                    pset.insert(partition_id);
-                }
-            }
-
-            if (pset.size() > 1 || found_zero || n_consumed) {
-
-                // ok, we found something unaccounted for by the current
-                // partitioning. We can either
-                //    (1) redo the partitioning of this area from scratch;
-                //    (2) just join tags that are on the same sequence (incl 0-tags);
-                // 1 is "perfect", 2 is imperfect but really fast.
-
-                // note, in the case of #2, we can dispense with the hashtable,
-                // and just use the tagset/partition map.
-
-                if (traverse) {
-                    // go with behavior #1
-
-                    if (n_consumed || found_zero) {
-                        for (SeenSet::iterator si = found_tags.begin(); si !=
-                                found_tags.end(); ++si) {
-                            tags_todo.insert(*si);
-                        }
-                    } else {
-                        assign_partition_id(*(found_tags.begin()), found_tags);
-                    }
-                } else {
-                    assign_partition_id(*(found_tags.begin()), found_tags);
-                }
-
-                //	std::cout << "got one! " << read.name << "\n";
-                // std::cout << pset.size() << " " << found_zero << " "
-                // << n_consumed << "\n";
-            }
-
-            total_reads++;
-
-            // run callback, if specified
-            if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-                try {
-                    callback("find_unpart", callback_data,
-                             total_reads, reads_kept);
-                } catch (...) {
-                    delete parser;
-                    parser = NULL;
-                    throw;
-                }
-            }
-        }
-    }
-
-    if (traverse) {
-        // std::cout << "new tags size: " << tags_todo.size() << "\n";
-
-        unsigned int n = 0;
-        std::string kmer_s;
-        HashIntoType kmer_f, kmer_r;
-        SeenSet tagged_kmers;
-        for (SeenSet::iterator si = tags_todo.begin(); si != tags_todo.end();
-                ++si) {
-            n += 1;
-
-            kmer_s = _revhash(*si, ksize); // @CTB hackity hack hack!
-            HashIntoType kmer = _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
-
-            // find all tagged kmers within range.
-            tagged_kmers.clear();
-            find_all_tags(kmer_f, kmer_r, tagged_kmers, _ht->all_tags,
-                          true, stop_big_traversals);
-
-            // std::cout << "found " << tagged_kmers.size() << "\n";
-
-            // assign the partition ID
-            // std::cout << next_partition_id << "\n";
-            assign_partition_id(kmer, tagged_kmers);
-
-            // print out
-            if (n % 1000 == 0) {
-                cout << "unpart-part " << n << " " << next_partition_id
-                     << "\n";
-            }
-        }
-    }
-
-    delete parser;
-    parser = NULL;
-
-    return n_singletons;
-}
-
-/* @cswelcher Brilliant idea: let's *not* copy this same piece of code
- * over and over again!
- */
-void SubsetPartition::queue_neighbors(
-    HashIntoType		kmer_f,
-    HashIntoType		kmer_r,
-    unsigned int		breadth,
-    SeenSet&			traversed_kmers,
-    NodeQueue&			node_q,
-    std::queue<unsigned int>&	breadth_q)
-{
-
-    HashIntoType f, r;
-    const unsigned int rc_left_shift = _ht->ksize()*2 - 2;
-    const HashIntoType bitmask = _ht->bitmask;
-
-    f = next_f(kmer_f, 'A');
-    r = next_r(kmer_r, 'A');
-    if (_ht->get_count(uniqify_rc(f,r)) &&
-            !set_contains(traversed_kmers, uniqify_rc(f,r))) {
-        node_q.push(f);
-        node_q.push(r);
-        breadth_q.push(breadth + 1);
-    }
-
-    f = next_f(kmer_f, 'C');
-    r = next_r(kmer_r, 'C');
-    if (_ht->get_count(uniqify_rc(f,r)) &&
-            !set_contains(traversed_kmers, uniqify_rc(f,r))) {
-        node_q.push(f);
-        node_q.push(r);
-        breadth_q.push(breadth + 1);
-    }
-
-    f = next_f(kmer_f, 'G');
-    r = next_r(kmer_r, 'G');
-    if (_ht->get_count(uniqify_rc(f,r)) &&
-            !set_contains(traversed_kmers, uniqify_rc(f,r))) {
-        node_q.push(f);
-        node_q.push(r);
-        breadth_q.push(breadth + 1);
-    }
-
-    f = next_f(kmer_f, 'T');
-    r = next_r(kmer_r, 'T');
-    if (_ht->get_count(uniqify_rc(f,r)) &&
-            !set_contains(traversed_kmers, uniqify_rc(f,r))) {
-        node_q.push(f);
-        node_q.push(r);
-        breadth_q.push(breadth + 1);
-    }
-
-    // PREVIOUS.
-    r = prev_r(kmer_r, 'A');
-    f = prev_f(kmer_f, 'A');
-    if (_ht->get_count(uniqify_rc(f,r)) &&
-            !set_contains(traversed_kmers, uniqify_rc(f,r))) {
-        node_q.push(f);
-        node_q.push(r);
-        breadth_q.push(breadth + 1);
-    }
-
-    r = prev_r(kmer_r, 'C');
-    f = prev_f(kmer_f, 'C');
-    if (_ht->get_count(uniqify_rc(f,r)) &&
-            !set_contains(traversed_kmers, uniqify_rc(f,r))) {
-        node_q.push(f);
-        node_q.push(r);
-        breadth_q.push(breadth + 1);
-    }
-
-    r = prev_r(kmer_r, 'G');
-    f = prev_f(kmer_f, 'G');
-    if (_ht->get_count(uniqify_rc(f,r)) &&
-            !set_contains(traversed_kmers, uniqify_rc(f,r))) {
-        node_q.push(f);
-        node_q.push(r);
-        breadth_q.push(breadth + 1);
-    }
-
-    r = prev_r(kmer_r, 'T');
-    f = prev_f(kmer_f, 'T');
-    if (_ht->get_count(uniqify_rc(f,r)) &&
-            !set_contains(traversed_kmers, uniqify_rc(f,r))) {
-        node_q.push(f);
-        node_q.push(r);
-        breadth_q.push(breadth + 1);
-    }
-}
-
-///
-
 // find_all_tags: the core of the partitioning code.  finds all tagged k-mers
 //    connected to kmer_f/kmer_r in the graph.
 
 void SubsetPartition::find_all_tags(
-    HashIntoType	kmer_f,
-    HashIntoType	kmer_r,
+    Kmer start_kmer,
     SeenSet&		tagged_kmers,
     const SeenSet&	all_tags,
     bool		break_on_stop_tags,
     bool		stop_big_traversals)
 {
-    const HashIntoType bitmask = _ht->bitmask;
 
-    HashIntoType f, r;
     bool first = true;
-    NodeQueue node_q;
+    KmerQueue node_q;
     std::queue<unsigned int> breadth_q;
+
     unsigned int cur_breadth = 0;
     const unsigned int max_breadth = (2 * _ht->_tag_density) + 1;
 
-    const unsigned int rc_left_shift = _ht->ksize()*2 - 2;
     unsigned int total = 0;
+    unsigned int nfound = 0;
 
-    SeenSet keeper;		// keep track of traversed kmers
+    KmerSet keeper;		// keep track of traversed kmers
+    KmerFilter filter = [&] (const Kmer& n) -> bool {
+        return set_contains(keeper, n);
+    };
+    Traverser traverser(_ht, filter);
 
-    // start breadth-first search.
-
-    node_q.push(kmer_f);
-    node_q.push(kmer_r);
+    node_q.push(start_kmer);
     breadth_q.push(0);
 
     while(!node_q.empty()) {
+
         if (stop_big_traversals && keeper.size() > BIG_TRAVERSALS_ARE) {
             tagged_kmers.clear();
             break;
         }
 
-        kmer_f = node_q.front();
+        Kmer node = node_q.front();
         node_q.pop();
-        kmer_r = node_q.front();
-        node_q.pop();
+
         unsigned int breadth = breadth_q.front();
         breadth_q.pop();
 
-        HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-
-        // Have we already seen this k-mer?  If so, skip.
-        // @cswelcher this is redundant, as we already check before queuing
-        if (set_contains(keeper, kmer)) {
+        if (set_contains(keeper, node)) {
             continue;
         }
 
-        // Do we want to traverse through this k-mer?  If not, skip.
-        if (break_on_stop_tags && set_contains(_ht->stop_tags, kmer)) {
-            // @CTB optimize by inserting into keeper set?
+        if (break_on_stop_tags && set_contains(_ht->stop_tags, node)) {
             continue;
         }
 
         // keep track of seen kmers
-        keeper.insert(kmer);
+        keeper.insert(node);
         total++;
 
         // Is this a kmer-to-tag, and have we put this tag in a partition
         // already? Search no further in this direction.  (This is where we
         // connect partitions.)
-        if (!first && set_contains(all_tags, kmer)) {
-            tagged_kmers.insert(kmer);
+        if (!first && set_contains(all_tags, node)) {
+            tagged_kmers.insert(node);
             continue;
         }
 
         if (!(breadth >= cur_breadth)) { // keep track of watermark, for
-            // debugging.
-            throw khmer_exception();
+            // debugging
+            throw khmer_exception("Desynchonization between traversal "
+                                  "and breadth tracking. Did you forget "
+                                  "to pop the node or breadth queue?");
         }
         if (breadth > cur_breadth) {
             cur_breadth = breadth;
@@ -489,92 +291,24 @@ void SubsetPartition::find_all_tags(
             continue;    // truncate search @CTB exit?
         }
 
-        //
-        // Enqueue next set of nodes.
-        //
-
-        // NEXT
-        f = next_f(kmer_f, 'A');
-        r = next_r(kmer_r, 'A');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
+        nfound = traverser.traverse_right(node, node_q);
+        for (unsigned int i = 0; i<nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
 
-        f = next_f(kmer_f, 'C');
-        r = next_r(kmer_r, 'C');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
+        nfound = traverser.traverse_left(node, node_q);
+        for (unsigned int i = 0; i<nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
 
-        f = next_f(kmer_f, 'G');
-        r = next_r(kmer_r, 'G');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'T');
-        r = next_r(kmer_r, 'T');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        // PREVIOUS.
-        r = prev_r(kmer_r, 'A');
-        f = prev_f(kmer_f, 'A');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'C');
-        f = prev_f(kmer_f, 'C');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'G');
-        f = prev_f(kmer_f, 'G');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'T');
-        f = prev_f(kmer_f, 'T');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
 
         first = false;
     }
 }
 
-
-
 // Perform a breadth-first search starting from the k-mers in the given
-// sequence
+// sequence.
+
 unsigned int SubsetPartition::sweep_for_tags(
     const std::string&	seq,
     SeenSet&		tagged_kmers,
@@ -584,116 +318,93 @@ unsigned int SubsetPartition::sweep_for_tags(
     bool		stop_big_traversals)
 {
 
-    SeenSet traversed_kmers;
-    NodeQueue node_q;
+    KmerSet traversed_nodes;
+    KmerQueue node_q;
     std::queue<unsigned int> breadth_q;
-    //unsigned int cur_breadth = 0;
 
     unsigned int max_breadth = range;
-    //unsigned int breadth_seen = 0;
-
     unsigned int total = 0;
+    unsigned int nfound = 0;
 
-    // start breadth-first search.
-
-    HashIntoType kmer_f, kmer_r;
-    KMerIterator kmers(seq.c_str(), _ht->ksize());
-    std::string kmer_s;
+    KmerFilter filter = [&] (const Kmer& n) -> bool {
+        return set_contains(traversed_nodes, n);
+    };
+    Traverser traverser(_ht, filter);
 
     // Queue up all the sequence's k-mers at breadth zero
     // We are searching around the perimeter of the known k-mers
-    // @cswelcher still using kludgy kmer iterator, let's fix this sometime...
+    KmerIterator kmers(seq.c_str(), _ht->ksize());
     while (!kmers.done()) {
-        HashIntoType kmer = kmers.next();
-        kmer_s = _revhash(kmer, _ht->ksize());
-        kmer = _hash(kmer_s.c_str(), _ht->ksize(), kmer_f, kmer_r);
-        traversed_kmers.insert(kmer);
+        Kmer node = kmers.next();
+        traversed_nodes.insert(node);
 
-        node_q.push(kmer_f);
-        node_q.push(kmer_r);
+        node_q.push(node);
         breadth_q.push(0);
     }
 
     size_t seq_length = node_q.size() / 2;
     size_t BIG_PERIMETER_TRAVERSALS = BIG_TRAVERSALS_ARE * seq_length;
 
-    //unsigned int cur_it = 0;
     while(!node_q.empty()) {
         // change this to a better hueristic
-        if (stop_big_traversals && traversed_kmers.size() >
+        if (stop_big_traversals && traversed_nodes.size() >
                 BIG_PERIMETER_TRAVERSALS) {
             tagged_kmers.clear();
             break;
         }
 
-        kmer_f = node_q.front();
+        Kmer node = node_q.front();
         node_q.pop();
-        kmer_r = node_q.front();
-        node_q.pop();
+
         unsigned int breadth = breadth_q.front();
         breadth_q.pop();
-        //cur_it++;
-        //printf("current iteration: %u, current breadth: %u\n", cur_it, breadth);
-
-        //if (breadth > breadth_seen) {
-        //  breadth_seen = breadth;
-        //}
-
-        HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-
-        // Have we already seen this k-mer?  If so, skip.
-        // @cswelcher we already check before queuing
-        //if (set_contains(traversed_kmers, kmer)) {
-        // continue;
-        //}
 
         // Do we want to traverse through this k-mer?  If not, skip.
-        if (break_on_stop_tags && set_contains(_ht->stop_tags, kmer)) {
-            // @CTB optimize by inserting into traversed_kmers set?
+        if (break_on_stop_tags && set_contains(_ht->stop_tags, node)) {
             continue;
         }
 
-        // keep track of seen kmers
-        traversed_kmers.insert(kmer);
+        traversed_nodes.insert(node);
         total++;
 
-        //
-        if (set_contains(all_tags, kmer)) {
-            tagged_kmers.insert(kmer);
+        if (set_contains(all_tags, node)) {
+            tagged_kmers.insert(node);
             // if we find a tag, finish the remaining queued nodes,
             // but don't queue up any more
             // max_breadth = breadth;
             continue;
         }
 
-        // removed for not doing anything
-        //assert(breadth >= cur_breadth); // keep track of watermark, for
-        //debugging.
-        //if (breadth > cur_breadth) { cur_breadth = breadth; }
-
         if (breadth == max_breadth) {
             continue;
         }
+
         // finish up nodes on the current level, but if we go beyond, end it
-        // immediately this keeps from having to look at nodes which have
+        // immediately; this keeps from having to look at nodes which have
         // already been queued once we lower the limit after finding a tag
         else if (breadth > max_breadth) {
-            return total;    // truncate search @CTB exit?
+            return total;
         }
 
-        queue_neighbors(kmer_f, kmer_r, breadth, traversed_kmers, node_q,
-                        breadth_q);
+        nfound = traverser.traverse_right(node, node_q);
+        for (unsigned int i = 0; i<nfound; ++i) {
+            breadth_q.push(breadth + 1);
+        }
+
+        nfound = traverser.traverse_left(node, node_q);
+        for (unsigned int i = 0; i<nfound; ++i) {
+            breadth_q.push(breadth + 1);
+        }
     }
-    //printf("breadth_seen=%u, total=%u, traverse_kmers=%u\n", breadth_seen, total, traversed_kmers.size());
+
     return total;
 }
 
-// find_all_tags: the core of the partitioning code.  finds all tagged k-mers
-//    connected to kmer_f/kmer_r in the graph.
+// find_all_tags_truncate_on_abundance: experimental code for streaming
+// partitioning.
 
 void SubsetPartition::find_all_tags_truncate_on_abundance(
-    HashIntoType	kmer_f,
-    HashIntoType	kmer_r,
+    Kmer start_kmer,
     SeenSet&		tagged_kmers,
     const SeenSet&	all_tags,
     BoundedCounterType	min_count,
@@ -701,24 +412,25 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(
     bool		break_on_stop_tags,
     bool		stop_big_traversals)
 {
-    const HashIntoType bitmask = _ht->bitmask;
 
-    HashIntoType f, r;
     bool first = true;
-    NodeQueue node_q;
+    KmerQueue node_q;
     std::queue<unsigned int> breadth_q;
+
     unsigned int cur_breadth = 0;
-
     const unsigned int max_breadth = (2 * _ht->_tag_density) + 1;
-    const unsigned int rc_left_shift = _ht->ksize()*2 - 2;
+
     unsigned int total = 0;
+    unsigned int nfound = 0;
 
-    SeenSet keeper;		// keep track of traversed kmers
+    KmerSet keeper;		// keep track of traversed kmers
+    KmerFilter filter = [&] (const Kmer& n) -> bool {
+        return set_contains(keeper, n);
+    };
 
-    // start breadth-first search.
+    Traverser traverser(_ht, filter);
 
-    node_q.push(kmer_f);
-    node_q.push(kmer_r);
+    node_q.push(start_kmer);
     breadth_q.push(0);
 
     while(!node_q.empty()) {
@@ -727,47 +439,47 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(
             break;
         }
 
-        kmer_f = node_q.front();
+        Kmer node = node_q.front();
         node_q.pop();
-        kmer_r = node_q.front();
-        node_q.pop();
+
         unsigned int breadth = breadth_q.front();
         breadth_q.pop();
 
-        HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-
         // Have we already seen this k-mer?  If so, skip.
-        if (set_contains(keeper, kmer)) {
+        // NOTE: redundant, move this to before while loop
+        if (set_contains(keeper, node)) {
             continue;
         }
 
         // Do we want to traverse through this k-mer?  If not, skip.
-        if (break_on_stop_tags && set_contains(_ht->stop_tags, kmer)) {
+        if (break_on_stop_tags && set_contains(_ht->stop_tags, node)) {
             // @CTB optimize by inserting into keeper set?
             continue;
         }
 
-        BoundedCounterType count = _ht->get_count(kmer);
+        BoundedCounterType count = _ht->get_count(node);
         if (count < min_count || count > max_count) {
             continue;
         }
 
         // keep track of seen kmers
-        keeper.insert(kmer);
+        keeper.insert(node);
         total++;
 
         // Is this a kmer-to-tag, and have we put this tag in a partition
         // already? Search no further in this direction.  (This is where we
         // connect partitions.)
-        if (!first && set_contains(all_tags, kmer)) {
-            tagged_kmers.insert(kmer);
+        if (!first && set_contains(all_tags, node)) {
+            tagged_kmers.insert(node);
             continue;
         }
 
         // @cswelcher Do these lines actually do anything?
         if (!(breadth >= cur_breadth)) { // keep track of watermark, for
             // debugging.
-            throw khmer_exception();
+            throw khmer_exception("Desynchonization between traversal "
+                                  "and breadth tracking. Did you forget "
+                                  "to pop the node or breadth queue?");
         }
         if (breadth > cur_breadth) {
             cur_breadth = breadth;
@@ -777,81 +489,13 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(
             continue;    // truncate search @CTB exit?
         }
 
-        //
-        // Enqueue next set of nodes.
-        //
-
-        // NEXT
-        f = next_f(kmer_f, 'A');
-        r = next_r(kmer_r, 'A');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
+        nfound = traverser.traverse_right(node, node_q);
+        for (unsigned int i = 0; i<nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
 
-        f = next_f(kmer_f, 'C');
-        r = next_r(kmer_r, 'C');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'G');
-        r = next_r(kmer_r, 'G');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'T');
-        r = next_r(kmer_r, 'T');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        // PREVIOUS.
-        r = prev_r(kmer_r, 'A');
-        f = prev_f(kmer_f, 'A');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'C');
-        f = prev_f(kmer_f, 'C');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'G');
-        f = prev_f(kmer_f, 'G');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'T');
-        f = prev_f(kmer_f, 'T');
-        if (_ht->get_count(uniqify_rc(f,r)) &&
-                !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
+        nfound = traverser.traverse_left(node, node_q);
+        for (unsigned int i = 0; i<nfound; ++i) {
             breadth_q.push(breadth + 1);
         }
 
@@ -859,7 +503,7 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(
     }
 }
 
-///////////////////////////////////////////////////////////////////////
+// do_partition: Main partitioning code, to find components in large graphs.
 
 void SubsetPartition::do_partition(
     HashIntoType	first_kmer,
@@ -871,11 +515,7 @@ void SubsetPartition::do_partition(
 {
     unsigned int total_reads = 0;
 
-    std::string kmer_s;
-    HashIntoType kmer_f, kmer_r;
     SeenSet tagged_kmers;
-    const unsigned char ksize = _ht->ksize();
-
     SeenSet::const_iterator si, end;
 
     if (first_kmer) {
@@ -892,12 +532,11 @@ void SubsetPartition::do_partition(
     for (; si != end; ++si) {
         total_reads++;
 
-        kmer_s = _revhash(*si, ksize); // @CTB hackity hack hack!
-        HashIntoType kmer = _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
+        Kmer kmer = _ht->build_kmer(*si);
 
         // find all tagged kmers within range.
         tagged_kmers.clear();
-        find_all_tags(kmer_f, kmer_r, tagged_kmers, _ht->all_tags,
+        find_all_tags(kmer, tagged_kmers, _ht->all_tags,
                       break_on_stop_tags, stop_big_traversals);
 
         // assign the partition ID
@@ -920,6 +559,8 @@ void SubsetPartition::do_partition(
     }
 }
 
+// do_partition with abundance: Experimental code to do streaming partitioning.
+
 void SubsetPartition::do_partition_with_abundance(
     HashIntoType	first_kmer,
     HashIntoType	last_kmer,
@@ -932,11 +573,7 @@ void SubsetPartition::do_partition_with_abundance(
 {
     unsigned int total_reads = 0;
 
-    std::string kmer_s;
-    HashIntoType kmer_f, kmer_r;
     SeenSet tagged_kmers;
-    const unsigned char ksize = _ht->ksize();
-
     SeenSet::const_iterator si, end;
 
     if (first_kmer) {
@@ -953,12 +590,11 @@ void SubsetPartition::do_partition_with_abundance(
     for (; si != end; ++si) {
         total_reads++;
 
-        kmer_s = _revhash(*si, ksize); // @CTB hackity hack hack!
-        HashIntoType kmer = _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
+        Kmer kmer = _ht->build_kmer(*si);
 
         // find all tagged kmers within range.
         tagged_kmers.clear();
-        find_all_tags_truncate_on_abundance(kmer_f, kmer_r, tagged_kmers,
+        find_all_tags_truncate_on_abundance(kmer, tagged_kmers,
                                             _ht->all_tags, min_count,
                                             max_count, break_on_stop_tags,
                                             stop_big_traversals);
@@ -994,7 +630,7 @@ void SubsetPartition::set_partition_id(
     if (!(kmer_s.length() >= _ht->ksize())) {
         throw khmer_exception();
     }
-    kmer = _hash(kmer_s.c_str(), _ht->ksize());
+    kmer = _ht->hash_dna(kmer_s.c_str());
 
     set_partition_id(kmer, p);
 }
@@ -1143,8 +779,8 @@ PartitionID SubsetPartition::join_partitions(
         return 0;
     }
 
-    if (reverse_pmap.find(orig) == reverse_pmap.end() ||
-            reverse_pmap.find(join) == reverse_pmap.end() ||
+    if (!set_contains(reverse_pmap, orig) ||
+            !set_contains(reverse_pmap, join) ||
             reverse_pmap[orig] == NULL ||
             reverse_pmap[join] == NULL) {
         return 0;
@@ -1164,14 +800,14 @@ PartitionID SubsetPartition::get_partition_id(std::string kmer_s)
     if (!(kmer_s.length() >= _ht->ksize())) {
         throw khmer_exception();
     }
-    kmer = _hash(kmer_s.c_str(), _ht->ksize());
+    kmer = _ht->hash_dna(kmer_s.c_str());
 
     return get_partition_id(kmer);
 }
 
 PartitionID SubsetPartition::get_partition_id(HashIntoType kmer)
 {
-    if (partition_map.find(kmer) != partition_map.end()) {
+    if (set_contains(partition_map, kmer)) {
         PartitionID * pp = partition_map[kmer];
         if (pp == NULL) {
             return 0;
@@ -1255,6 +891,7 @@ void SubsetPartition::_merge_other(
 void SubsetPartition::merge_from_disk(string other_filename)
 {
     ifstream infile;
+    unsigned long long expected_pmap_size;
 
     // configure ifstream to raise exceptions for everything.
     infile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -1269,15 +906,32 @@ void SubsetPartition::merge_from_disk(string other_filename)
             err = "Unknown error in opening file: " + other_filename;
         }
         throw khmer_file_exception(err);
+    } catch (const std::exception &e) {
+        // Catching std::exception is a stopgap for
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
+        std::string err = "Unknown error opening file: " + other_filename + " "
+                          + strerror(errno);
+        throw khmer_file_exception(err);
     }
 
     try {
         unsigned int save_ksize = 0;
+        char signature[4];
         unsigned char version, ht_type;
 
+        infile.read(signature, 4);
         infile.read((char *) &version, 1);
         infile.read((char *) &ht_type, 1);
-        if (!(version == SAVED_FORMAT_VERSION)) {
+        if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
+            std::ostringstream err;
+            err << "Incorrect file signature 0x";
+            for(size_t i=0; i < 4; ++i) {
+                err << std::hex << (int) signature[i];
+            }
+            err << " while reading subset pmap from " << other_filename
+                << " Should be: " << SAVED_SIGNATURE;
+            throw khmer_file_exception(err.str());
+        } else if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
             err << "Incorrect file format version " << (int) version
                 << " while reading subset pmap from " << other_filename;
@@ -1296,12 +950,19 @@ void SubsetPartition::merge_from_disk(string other_filename)
                 << " while reading subset pmap from " << other_filename;
             throw khmer_file_exception(err.str());
         }
+
+        infile.read((char *) &expected_pmap_size, sizeof(expected_pmap_size));
     } catch (std::ifstream::failure &e) {
         std::string err;
         err = "Unknown error reading header info from: " + other_filename;
         throw khmer_file_exception(err);
+    } catch (khmer_file_exception &e) {
+        throw e;
+    } catch (const std::exception &e) {
+        std::string err = "Unknown error opening file: " + other_filename + " "
+                          + strerror(errno);
+        throw khmer_file_exception(err);
     }
-
     char * buf = new char[IO_BUF_SIZE];
 
     unsigned int loaded = 0;
@@ -1325,13 +986,14 @@ void SubsetPartition::merge_from_disk(string other_filename)
 
         try {
             infile.read(buf + remainder, IO_BUF_SIZE - remainder);
-        } catch (std::ifstream::failure &e) {
+        } catch (std::exception &e) {
 
             // We may get an exception here if we fail to read all the
             // expected bytes due to EOF -- only pass it up if we read
             // _nothing_.  Note that the while loop exits on EOF.
 
             if (infile.gcount() == 0) {
+                delete[] buf;
                 std::string err;
                 err = "Unknown error reading data from: " + other_filename;
                 throw khmer_file_exception(err);
@@ -1350,21 +1012,21 @@ void SubsetPartition::merge_from_disk(string other_filename)
             diskp = (PartitionID *) (buf + i);
             i += sizeof(PartitionID);
 
-            if (!(*diskp != 0)) {		// sanity check.
-                throw khmer_exception();
-            }
+            assert((*diskp != 0)); // sanity check!
 
             _merge_other(*kmer_p, *diskp, diskp_to_pp);
 
             loaded++;
         }
-        if (!(i == n_bytes)) {
-            throw khmer_exception();
-        }
+        assert(i == n_bytes);
         memcpy(buf, buf + n_bytes, remainder);
     }
-
     delete[] buf;
+
+    if (loaded != expected_pmap_size) {
+        throw khmer_file_exception("error loading partitionmap - "
+                                   "invalid # of items");
+    }
 }
 
 // Save a partition map to disk.
@@ -1374,6 +1036,7 @@ void SubsetPartition::save_partitionmap(string pmap_filename)
     ofstream outfile(pmap_filename.c_str(), ios::binary);
 
     unsigned char version = SAVED_FORMAT_VERSION;
+    outfile.write(SAVED_SIGNATURE, 4);
     outfile.write((const char *) &version, 1);
 
     unsigned char ht_type = SAVED_SUBSET;
@@ -1381,6 +1044,9 @@ void SubsetPartition::save_partitionmap(string pmap_filename)
 
     unsigned int save_ksize = _ht->ksize();
     outfile.write((const char *) &save_ksize, sizeof(save_ksize));
+
+    unsigned long long pmap_size = partition_map.size();
+    outfile.write((const char *) &pmap_size, sizeof(pmap_size));
 
     ///
 
@@ -1491,51 +1157,6 @@ void SubsetPartition::_clear_all_partitions()
 }
 
 
-bool SubsetPartition::is_single_partition(std::string seq)
-{
-    if (!_ht->check_and_normalize_read(seq)) {
-        return 0;
-    }
-
-    PartitionSet partitions;
-    PartitionID *pp;
-
-    KMerIterator kmers(seq.c_str(), _ht->ksize());
-    while (!kmers.done()) {
-        HashIntoType kmer = kmers.next();
-
-        if (partition_map.find(kmer) != partition_map.end()) {
-            pp = partition_map[kmer];
-            if (pp) {
-                partitions.insert(*pp);
-            }
-        }
-    }
-
-    if (partitions.size() > 1) {
-        return false;
-    }
-
-    return true;
-}
-
-void SubsetPartition::join_partitions_by_path(std::string seq)
-{
-    SeenSet tagged_kmers;
-
-    KMerIterator kmers(seq.c_str(), _ht->ksize());
-
-    while(!kmers.done()) {
-        HashIntoType kmer = kmers.next();
-        if (_ht->all_tags.find(kmer) != _ht->all_tags.end()) {
-            tagged_kmers.insert(kmer);
-        }
-    }
-
-    // assert(tagged_kmers.size());
-    assign_partition_id(*(tagged_kmers.begin()), tagged_kmers);
-}
-
 void SubsetPartition::partition_size_distribution(
     PartitionCountDistribution	&d,
     unsigned int		&n_unassigned)
@@ -1571,7 +1192,7 @@ const
 
 void SubsetPartition::partition_average_coverages(
     PartitionCountMap	&cm,
-    CountingHash *	ht) const
+    Countgraph * ht) const
 {
     PartitionCountMap csum;
     PartitionCountMap cN;
@@ -1596,7 +1217,7 @@ unsigned long long SubsetPartition::repartition_largest_partition(
     unsigned int distance,
     unsigned int threshold,
     unsigned int frequency,
-    CountingHash &counting)
+    Countgraph &counting)
 {
     PartitionCountMap cm;
     unsigned int n_unassigned = 0;
@@ -1627,11 +1248,11 @@ unsigned long long SubsetPartition::repartition_largest_partition(
 
     // find biggest.
     PartitionCountDistribution::const_iterator di = d.end();
-    --di;
 
     if (d.empty()) {
         throw khmer_exception();
     }
+    --di;
 
     for (PartitionCountMap::const_iterator cmi = cm.begin(); cmi != cm.end();
             ++cmi) {
@@ -1646,13 +1267,15 @@ unsigned long long SubsetPartition::repartition_largest_partition(
 #if VERBOSE_REPARTITION
     std::cout << "biggest partition: " << di->first << "\n";
 #endif // 0
-    --di;
 
 #if VERBOSE_REPARTITION
     std::cout << "biggest partition ID: " << biggest_p << "\n";
 #endif // 0
 
-    next_largest = di->first;
+    if (di != d.begin()) {
+        --di;
+        next_largest = di->first;
+    }
 
 #if VERBOSE_REPARTITION
     std::cout << "next biggest partition: " << di->first << "\n";
@@ -1673,7 +1296,7 @@ unsigned long long SubsetPartition::repartition_largest_partition(
     unsigned int n = 0;
     unsigned int count;
     unsigned int n_big = 0;
-    SeenSet keeper;
+    KmerSet keeper;
 
     SeenSet::const_iterator si = bigtags.begin();
 
@@ -1686,15 +1309,16 @@ unsigned long long SubsetPartition::repartition_largest_partition(
         }
 #endif //0
 
-        count = _ht->traverse_from_kmer(*si, distance, keeper);
+        count = _ht->traverse_from_kmer(_ht->build_kmer(*si),
+                                        distance, keeper);
 
         if (count >= threshold) {
             n_big++;
 
-            SeenSet::const_iterator ti;
+            KmerSet::const_iterator ti;
             for (ti = keeper.begin(); ti != keeper.end(); ++ti) {
                 if (counting.get_count(*ti) > frequency) {
-                    _ht->stop_tags.insert(*ti);
+                    _ht->stop_tags.insert((*ti).kmer_u);
                 } else {
                     counting.count(*ti);
                 }
@@ -1712,13 +1336,13 @@ unsigned long long SubsetPartition::repartition_largest_partition(
         }
         keeper.clear();
 
-        if (n % 1000 == 0) {
 #if VERBOSE_REPARTITION
+        if (n % 1000 == 0) {
             std::cout << "found big 'un!  traversed " << n << " tags, " <<
                       n_big << " big; " << bigtags.size() << " total tags; " <<
                       _ht->stop_tags.size() << " stop tags\n";
-#endif // 0
         }
+#endif // 0
     }
 
     // return next_largest;
@@ -1735,10 +1359,6 @@ unsigned long long SubsetPartition::repartition_largest_partition(
 void SubsetPartition::repartition_a_partition(const SeenSet& partition_tags)
 {
     SeenSet tagged_kmers;
-    std::string kmer_s;
-    HashIntoType kmer_f, kmer_r;
-    unsigned int ksize = _ht->ksize();
-
     SeenSet::const_iterator si;
 
     unsigned n = 0;
@@ -1750,11 +1370,10 @@ void SubsetPartition::repartition_a_partition(const SeenSet& partition_tags)
 #endif // 0
         }
 
-        kmer_s = _revhash(*si, ksize); // @CTB hackity hack hack!
-        HashIntoType kmer = _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
+        Kmer kmer = _ht->build_kmer(*si);
 
         tagged_kmers.clear();
-        find_all_tags(kmer_f, kmer_r, tagged_kmers, _ht->all_tags, true, false);
+        find_all_tags(kmer, tagged_kmers, _ht->all_tags, true, false);
 
         // only join things already in bigtags.
         SeenSet::iterator ssi = tagged_kmers.begin();
@@ -1810,7 +1429,7 @@ void SubsetPartition::report_on_partitions()
 
     for (SeenSet::iterator ti = _ht->all_tags.begin();
             ti != _ht->all_tags.end(); ++ti) {
-        std::cout << "TAG: " << _revhash(*ti, _ht->ksize()) << "\n";
+        std::cout << "TAG: " << _ht->unhash_dna(*ti) << "\n";
         PartitionID *pid = partition_map[*ti];
         if (pid) {
             std::cout << "partition: " << *(partition_map[*ti]) << "\n";
@@ -1819,38 +1438,4 @@ void SubsetPartition::report_on_partitions()
         }
         std::cout << "--\n";
     }
-}
-
-void SubsetPartition::compare_to_partition(
-    PartitionID		pid1,
-    SubsetPartition	*p2,
-    PartitionID		pid2,
-    unsigned int	&n_only1,
-    unsigned int	&n_only2,
-    unsigned int	&n_shared)
-{
-    SubsetPartition * p1 = this;
-
-    for (PartitionMap::iterator pi = p1->partition_map.begin();
-            pi != p1->partition_map.end(); ++pi) {
-        PartitionID * pid = pi->second;
-        if (pid && *pid == pid1) {
-            PartitionID * pp2 = p2->partition_map[pi->first];
-            if (pp2 && *pp2 == pid2) {
-                n_shared++;
-            } else {
-                n_only1++;
-            }
-        }
-    }
-
-    for (PartitionMap::iterator pi = p2->partition_map.begin();
-            pi != p2->partition_map.end(); ++pi) {
-        PartitionID * pid = pi->second;
-        if (pid && *pid == pid2) {
-            n_only2++;
-        }
-    }
-
-    n_only2 -= n_shared;
 }

@@ -1,10 +1,39 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) 2013-2015, Michigan State University.
+# Copyright (C) 2015, The Regents of the University of California.
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 # Contact: khmer-project@idyll.org
-#
+# pylint: disable=missing-docstring
 """
 Display summary statistics for one or more FASTA/FASTQ files.
 
@@ -12,6 +41,7 @@ Display summary statistics for one or more FASTA/FASTQ files.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 
 import sys
 import csv
@@ -19,23 +49,28 @@ import screed
 import argparse
 import textwrap
 
+from khmer import __version__
+from khmer.khmer_args import (sanitize_help, ComboFormatter, info,
+                              _VersionStdErrAction)
+
 
 def get_parser():
     descr = "Display summary statistics for one or more FASTA/FASTQ files."
-    epilog = ("""
+    epilog = """\
     Report number of bases, number of sequences, and average sequence length
     for one or more FASTA/FASTQ files; and report aggregate statistics at end.
 
-    With :option:`-o`/:options:`--output`, the output will be saved to the
+    With :option:`-o`/:option:`--output`, the output will be saved to the
     specified file.
 
     Example::
 
         readstats.py tests/test-data/test-abund-read-2.fa
-    """)
+    """
 
-    parser = argparse.ArgumentParser(description=descr,
-                                     epilog=textwrap.dedent(epilog))
+    parser = argparse.ArgumentParser(
+        description=descr, formatter_class=ComboFormatter,
+        epilog=textwrap.dedent(epilog),)
     parser.add_argument('filenames', nargs='+')
     parser.add_argument('-o', '--output', dest='outfp', metavar="filename",
                         help="output file for statistics; defaults to stdout.",
@@ -43,12 +78,14 @@ def get_parser():
     parser.add_argument('--csv', default=False, action='store_true',
                         help='Use the CSV format for the statistics, '
                         'including column headers.')
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     return parser
 
 
-class StatisticsOutput(object):
-    #  pylint: disable=too-few-public-methods
-    """Output statistics for several data files.
+class StatisticsOutput(object):  # pylint: disable=too-few-public-methods
+    """
+    Output statistics for several data files.
 
     The format of the output is determined by the formatter used.
     All statistics are aggregated and a summary is added to the data.
@@ -58,22 +95,24 @@ class StatisticsOutput(object):
         self.formatter = formatter
 
     def __enter__(self):
+        """Write header upon entry."""
         self.formatter.write_header()
         return self
 
     def append(self, basepairs, seqs, filename):
-        """Append a new line for the given basepair number, sequences and file.
-        """
+        """Append a new line for the given basepair num, sequences and file."""
         self.formatter.append(
             basepairs, seqs, basepairs / float(seqs), filename)
 
     def __exit__(self, exc_type, exc_value, traceback):
+        """No exception? Finalize the formatter on exit."""
         if exc_type is None:
             self.formatter.finalize()
 
 
 class CsvFormatter(object):
-    """Format the statistis information as CSV."""
+    """Format the statistics information as CSV."""
+
     headers = ['bp', 'seqs', 'avg_len', 'filename']
 
     def __init__(self, underlying_file):
@@ -88,8 +127,7 @@ class CsvFormatter(object):
         self.file.writerow([basepairs, seqs, "%.1f" % avg_len, filename])
 
     def finalize(self):
-        """No statistics since the CSV data is supposed to be processed further.
-        """
+        """No statistics since the CSV data is to be processed further."""
         pass
 
 
@@ -127,10 +165,10 @@ def analyze_file(filename):
     """Run over the given file and count base pairs and sequences."""
     bps = 0
     seqs = 0
-    input_iter = screed.open(filename, parse_description=False)
+    input_iter = screed.open(filename)
     for record in input_iter:
         if seqs % 100000 == 0:
-            print >>sys.stderr, '...', filename, seqs
+            print('...', filename, seqs, file=sys.stderr)
         bps += len(record.sequence)
         seqs += 1
     return bps, seqs
@@ -138,11 +176,8 @@ def analyze_file(filename):
 
 def main():
     """Main function - run when executed as a script."""
-    parser = get_parser()
-    args = parser.parse_args()
-
-    total_bp = 0
-    total_seqs = 0
+    info('readstats.py')
+    args = sanitize_help(get_parser()).parse_args()
 
     statistics = []
 
@@ -150,8 +185,8 @@ def main():
         try:
             bps, seqs = analyze_file(filename)
         except (IOError, OSError, EOFError) as exc:
-            print >>sys.stderr, 'ERROR in opening %s:' % filename
-            print >>sys.stderr, '     ', str(exc)
+            print('ERROR in opening %s:' % filename, file=sys.stderr)
+            print('     ', str(exc), file=sys.stderr)
             continue
 
         if seqs:
@@ -161,11 +196,9 @@ def main():
                                                                    seqs,
                                                                    avg,
                                                                    filename)
-
-            print >>sys.stderr, '... found', msg
-
+            print('... found', msg, file=sys.stderr)
         else:
-            print >>sys.stderr, 'No sequences found in %s' % filename
+            print('No sequences found in %s' % filename, file=sys.stderr)
 
     if statistics:
         if args.csv:
@@ -176,8 +209,8 @@ def main():
             for stat in statistics:
                 out.append(*stat)
     else:
-        print >>args.outfp, \
-            'No sequences found in %d files' % len(args.filenames)
+        print('No sequences found in %d files' %
+              len(args.filenames), file=args.outfp)
 
 
 if __name__ == '__main__':

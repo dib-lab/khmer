@@ -1,13 +1,87 @@
-//
-// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
-//
-#include "read_aligner.hh"
+/*
+This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+Copyright (C) 2013-2015, Michigan State University.
+Copyright (C) 2015-2016, The Regents of the University of California.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of the Michigan State University nor the names
+      of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written
+      permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+LICENSE (END)
+
+Contact: khmer-project@idyll.org
+*/
+#include <ctype.h>
+#include <algorithm>
+#include <limits>
+#include <map>
+#include <memory>
+#include <set>
+#include <utility>
+
+#include "hashtable.hh"
 #include "khmer_exception.hh"
+#include "read_aligner.hh"
 
 namespace khmer
 {
+
+Alignment * _empty_alignment()
+{
+    Alignment* ret = new Alignment;
+    ret->score = -std::numeric_limits<double>::infinity();
+    ret->read_alignment = "";
+    ret->graph_alignment = "";
+    ret->truncated = true;
+    return ret;
+}
+
+static Nucl _ch_to_nucl(char base)
+{
+    base = toupper(base);
+
+    Nucl e = A;
+    switch(base) {
+    case 'A':
+        e = A;
+        break;
+    case 'C':
+        e = C;
+        break;
+    case 'G':
+        e = G;
+        break;
+    case 'T':
+    case 'U':
+        e = T;
+        break;
+    }
+    return e;
+}
 
 struct del_alignment_node_t {
     del_alignment_node_t& operator()(AlignmentNode* p)
@@ -222,6 +296,7 @@ void ReadAligner::Enumerate(
 
             next->score = curr->score + sc + m_sm.tsc[trans];
             next->trusted = (kmerCov >= m_trusted_cutoff);
+            next->cov = kmerCov;
             next->h_score = hcost;
             next->f_score = next->score + next->h_score;
 
@@ -242,8 +317,8 @@ void ReadAligner::WriteNode(AlignmentNode* curr)
 {
     std::cerr << "curr: " << curr << " "
               << curr->prev << " " << " state=" << curr->state << " "
-              << _revhash(curr->fwd_hash, m_ch->ksize()) << " "
-              << _revhash(curr->rc_hash, m_ch->ksize())
+              << m_ch->unhash_dna(curr->fwd_hash) << " "
+              << m_ch->unhash_dna(curr->rc_hash)
               << " cov="
               << m_ch->get_count(uniqify_rc(curr->fwd_hash, curr->rc_hash))
               << " emission=" << curr->base
@@ -347,6 +422,8 @@ Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node,
     std::string read_alignment = "";
     std::string graph_alignment = "";
     std::string trusted = "";
+    std::vector<BoundedCounterType> covs;
+    size_t farthest_seq_idx = node->seq_idx;
     ret->score = node->score;
     ret->truncated = (node->seq_idx != 0)
                      && (node->seq_idx != read.length() - 1);
@@ -386,14 +463,15 @@ Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node,
                   << node->f_score << "\t" << node->length << "\t"
                   << node->state << "\t" << node->trusted << "\t"
                   << node->seq_idx << "\t"
-                  << _revhash(node->fwd_hash, m_ch->ksize()) << "\t"
-                  << _revhash(node->rc_hash, m_ch->ksize()) << std::endl;
+                  << m_ch->unhash_dna(node->fwd_hash) << "\t"
+                  << m_ch->unhash_dna(node->rc_hash) << std::endl;
 #endif
 
         if(forward) {
             graph_alignment = graph_base + graph_alignment;
             read_alignment = read_base + read_alignment;
             trusted = ((node->trusted)? "T" : "F") + trusted;
+            covs.insert(covs.begin(), node->cov);
         } else {
             graph_alignment = graph_alignment + graph_base;
             read_alignment = read_alignment + read_base;
@@ -405,6 +483,19 @@ Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node,
     ret->graph_alignment = graph_alignment;
     ret->read_alignment = read_alignment;
     ret->trusted = trusted;
+    ret->covs = covs;
+
+    if(ret->truncated) {
+        std::string new_graph_alignment;
+        if (forward) {
+            new_graph_alignment = graph_alignment +
+                                  read.substr(farthest_seq_idx + 1, std::string::npos);
+        } else {
+            new_graph_alignment = read.substr(0, node->seq_idx)
+                                  + graph_alignment;
+        }
+        ret->graph_alignment = new_graph_alignment;
+    }
 
     return ret;
 
@@ -418,7 +509,7 @@ struct SearchStart {
 
 Alignment* ReadAligner::Align(const std::string& read)
 {
-    int k = m_ch->ksize();
+    WordLength k = m_ch->ksize();
     size_t num_kmers = read.length() - k + 1;
 
     SearchStart start;
@@ -436,90 +527,148 @@ Alignment* ReadAligner::Align(const std::string& read)
         }
     }
 
-    if(start.k_cov > 0) {
-        HashIntoType fhash = 0, rhash = 0;
-        _hash(start.kmer.c_str(), k, fhash, rhash);
-#if READ_ALIGNER_DEBUG
-        std::cerr << "Starting kmer: " << start.kmer << " "
-                  << _revhash(fhash, m_ch->ksize()) << " "
-                  << _revhash(rhash, m_ch->ksize())
-                  << " cov: " << start.k_cov << " idx: " << start.kmer_idx << ", "
-                  << start.kmer_idx + k - 1
-                  << " emission: " << start.kmer[k - 1] << std::endl;
-#endif
-        char base = toupper(start.kmer[k - 1]);
-        Nucl e = A;
-        switch(base) {
-        case 'A':
-            e = A;
-            break;
-        case 'C':
-            e = C;
-            break;
-        case 'G':
-            e = G;
-            break;
-        case 'T':
-        case 'U':
-            e = T;
-            break;
-        }
-
-        AlignmentNode startingNode = AlignmentNode(NULL,
-                                     e, start.kmer_idx + k - 1,
-                                     MATCH, MM, fhash, rhash, k);
-        startingNode.f_score = 0;
-        startingNode.h_score = 0;
-        Alignment* forward = NULL;
-        Alignment* reverse = NULL;
-        size_t final_length = 0;
-
-        if(start.k_cov >= m_trusted_cutoff) {
-            startingNode.score = k * m_sm.trusted_match + k * m_sm.tsc[MM];
-        } else {
-            startingNode.score = k * m_sm.untrusted_match + k * m_sm.tsc[MM];
-        }
-
-        forward = Subalign(&startingNode, read.length(), true, read);
-        final_length = forward->read_alignment.length() + k;
-
-        startingNode.seq_idx = start.kmer_idx;
-        reverse = Subalign(&startingNode, read.length(), false, read);
-        final_length += reverse->read_alignment.length();
-
-        Alignment* ret = new Alignment;
-        //We've actually counted the starting node score
-        //twice, so we need to adjust for that
-        ret->score = reverse->score + forward->score - startingNode.score;
-        ret->read_alignment = reverse->read_alignment +
-                              start.kmer + forward->read_alignment;
-        ret->graph_alignment = reverse->graph_alignment +
-                               start.kmer + forward->graph_alignment;
-        ret->score = ret->score -  GetNull(final_length);
-        ret->truncated = forward->truncated || reverse->truncated;
-
-#if READ_ALIGNER_DEBUG
-        fprintf(stderr,
-                "FORWARD\n\tread_aln:%s\n\tgraph_aln:%s\n\tscore:%f\n\ttrunc:%d\n",
-                forward->read_alignment.c_str(), forward->graph_alignment.c_str(),
-                forward->score, forward->truncated);
-        fprintf(stderr,
-                "REVERSE\n\tread_aln:%s\n\tgraph_aln:%s\n\tscore:%f\n\ttrunc:%d\n",
-                reverse->read_alignment.c_str(), reverse->graph_alignment.c_str(),
-                reverse->score, reverse->truncated);
-#endif
-
-        delete forward;
-        delete reverse;
-        return ret;
-    } else {
-
-        Alignment* ret = new Alignment;
-        ret->score = -std::numeric_limits<double>::infinity();
-        ret->read_alignment = "";
-        ret->graph_alignment = "";
-        ret->truncated = true;
-        return ret;
+    if(start.k_cov == 0) {
+        return _empty_alignment();
     }
+
+    HashIntoType fhash = 0, rhash = 0;
+    fhash = m_ch->hash_dna_top_strand(start.kmer.c_str());
+    rhash = m_ch->hash_dna_bottom_strand(start.kmer.c_str());
+
+#if READ_ALIGNER_DEBUG
+    std::cerr << "Starting kmer: " << start.kmer << " "
+              << m_ch->unhash_dna(fhash) << " "
+              << m_ch->unhash_dna(rhash)
+              << " cov: " << start.k_cov << " idx: " << start.kmer_idx << ", "
+              << start.kmer_idx + k - 1
+              << " emission: " << start.kmer[k - 1] << std::endl;
+#endif
+
+    Nucl e = _ch_to_nucl(start.kmer[k - 1]);
+    AlignmentNode startingNode = AlignmentNode(NULL,
+                                 e, start.kmer_idx + k - 1,
+                                 MATCH, MM, fhash, rhash, k);
+    startingNode.f_score = 0;
+    startingNode.h_score = 0;
+    Alignment* forward = NULL;
+    Alignment* reverse = NULL;
+    size_t final_length = 0;
+
+    if(start.k_cov >= m_trusted_cutoff) {
+        startingNode.score = k * m_sm.trusted_match + k * m_sm.tsc[MM];
+    } else {
+        startingNode.score = k * m_sm.untrusted_match + k * m_sm.tsc[MM];
+    }
+
+    forward = Subalign(&startingNode, read.length(), true, read);
+    final_length = forward->read_alignment.length() + k;
+
+    startingNode.seq_idx = start.kmer_idx;
+    reverse = Subalign(&startingNode, read.length(), false, read);
+    final_length += reverse->read_alignment.length();
+
+    Alignment* ret = new Alignment;
+
+    // We've actually counted the starting node score
+    // twice, so we need to adjust for that
+    ret->score = reverse->score + forward->score - startingNode.score;
+    ret->read_alignment = reverse->read_alignment +
+                          start.kmer + forward->read_alignment;
+    ret->graph_alignment = reverse->graph_alignment +
+                           start.kmer + forward->graph_alignment;
+    ret->score = ret->score - GetNull(final_length);
+    ret->truncated = forward->truncated || reverse->truncated;
+
+#if READ_ALIGNER_DEBUG
+    fprintf(stderr,
+            "FORWARD\n\tread_aln:%s\n\tgraph_aln:%s\n\tscore:%f\n\ttrunc:%d\n",
+            forward->read_alignment.c_str(), forward->graph_alignment.c_str(),
+            forward->score, forward->truncated);
+    fprintf(stderr,
+            "REVERSE\n\tread_aln:%s\n\tgraph_aln:%s\n\tscore:%f\n\ttrunc:%d\n",
+            reverse->read_alignment.c_str(), reverse->graph_alignment.c_str(),
+            reverse->score, reverse->truncated);
+#endif
+
+    delete forward;
+    delete reverse;
+
+    return ret;
 }
+
+Alignment* ReadAligner::AlignForward(const std::string& read)
+{
+    WordLength k = m_ch->ksize();
+
+    // start with seed at position 0
+    SearchStart start;
+    start.kmer = read.substr(0, k);
+    start.kmer_idx = 0;
+    start.k_cov = m_ch->get_count(start.kmer.c_str());
+
+    if(start.k_cov == 0) {
+        return _empty_alignment();
+    }
+
+    HashIntoType fhash = 0, rhash = 0;
+    fhash = m_ch->hash_dna_top_strand(start.kmer.c_str());
+    rhash = m_ch->hash_dna_bottom_strand(start.kmer.c_str());
+
+#if READ_ALIGNER_DEBUG
+    std::cerr << "Starting kmer: " << start.kmer << " "
+              << m_ch->unhash_dna(fhash) << " "
+              << m_ch->unhash_dna(rhash)
+              << " cov: " << start.k_cov << " idx: " << start.kmer_idx << ", "
+              << start.kmer_idx + k - 1
+              << " emission: " << start.kmer[k - 1] << std::endl;
+#endif
+
+    Nucl e = _ch_to_nucl(start.kmer[k - 1]);
+    AlignmentNode startingNode = AlignmentNode(NULL,
+                                 e, start.kmer_idx + k - 1,
+                                 MATCH, MM, fhash, rhash, k);
+    startingNode.f_score = 0;
+    startingNode.h_score = 0;
+    Alignment* forward = NULL;
+    size_t final_length = 0;
+
+    if(start.k_cov >= m_trusted_cutoff) {
+        startingNode.score = k * m_sm.trusted_match + k * m_sm.tsc[MM];
+    } else {
+        startingNode.score = k * m_sm.untrusted_match + k * m_sm.tsc[MM];
+    }
+
+    forward = Subalign(&startingNode, read.length(), true, read);
+    final_length = forward->read_alignment.length() + k;
+
+    Alignment* ret = new Alignment;
+
+    ret->score = forward->score;
+    ret->read_alignment = start.kmer + forward->read_alignment;
+    ret->graph_alignment = start.kmer + forward->graph_alignment;
+    ret->score = ret->score - GetNull(final_length);
+    ret->truncated = forward->truncated;
+
+    ret->covs = forward->covs;
+    ret->covs.insert(ret->covs.begin(), start.k_cov);
+    for (WordLength i = 0; i < k - 1; i++) {
+        ret->covs.push_back(0);
+    }
+
+#if READ_ALIGNER_DEBUG
+    fprintf(stderr,
+            "FORWARD\n\tread_aln:%s\n\tgraph_aln:%s\n\tscore:%f\n\ttrunc:%d\n",
+            forward->read_alignment.c_str(), forward->graph_alignment.c_str(),
+            forward->score, forward->truncated);
+#endif
+
+    delete forward;
+    return ret;
+}
+
+ScoringMatrix ReadAligner::getScoringMatrix()
+{
+    return m_sm;
+}
+
 }

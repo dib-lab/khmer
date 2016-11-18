@@ -1,10 +1,38 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) 2010-2015, Michigan State University.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 # Contact: khmer-project@idyll.org
-#
 # pylint: disable=invalid-name,missing-docstring
 """
 Find highly-connected k-mers.
@@ -13,15 +41,16 @@ k-mers are output into a .stoptags file, for later use in partitioning.
 
 % python scripts/find-knots.py <base>
 """
+from __future__ import print_function
 
-import argparse
 import glob
 import os
 import textwrap
 import khmer
 import sys
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import info
+from khmer import khmer_args
+from khmer.khmer_args import (build_counting_args, info, sanitize_help)
 
 # counting hash parameters.
 DEFAULT_COUNTING_HT_SIZE = 3e6                # number of bytes
@@ -45,13 +74,15 @@ EXCURSION_KMER_COUNT_THRESHOLD = 2
 
 
 def get_parser():
-    epilog = """
-    Load an k-mer presence table/tagset pair created by load-graph, and a set
-    of pmap files created by partition-graph. Go through each pmap file,
+    epilog = """\
+    Load an k-mer nodegraph/tagset pair created by
+    :program:`load-graph.py`, and a set of pmap files created by
+    :program:`partition-graph.py`. Go through each pmap file,
     select the largest partition in each, and do the same kind of traversal as
     in :program:`make-initial-stoptags.py` from each of the waypoints in that
-    partition; this should identify all of the HCKs in that partition. These
-    HCKs are output to <graphbase>.stoptags after each pmap file.
+    partition; this should identify all of the Highly Connected Kmers in that
+    partition. These HCKs are output to ``<graphbase>.stoptags`` after each
+    pmap file.
 
     Parameter choice is reasonably important. See the pipeline in
     :doc:`partitioning-big-data` for an example run.
@@ -61,94 +92,95 @@ def get_parser():
     process, and if you eliminate the already-processed pmap files, you can
     continue where you left off.
     """
-    parser = argparse.ArgumentParser(
-        description="Find all highly connected k-mers.",
-        epilog=textwrap.dedent(epilog),
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser = build_counting_args(
+        descr="Find all highly connected k-mers.",
+        epilog=textwrap.dedent(epilog))
 
-    parser.add_argument('--n_tables', '-N', type=int,
-                        default=DEFAULT_COUNTING_HT_N,
-                        help='number of k-mer counting tables to use')
-    parser.add_argument('--min-tablesize', '-x', type=float,
-                        default=DEFAULT_COUNTING_HT_SIZE, help='lower bound on'
-                        ' the size of the k-mer counting table(s)')
     parser.add_argument('graphbase', help='Basename for the input and output '
                         'files.')
-    parser.add_argument('--version', action='version', version='%(prog)s ' +
-                        khmer.__version__)
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Continue past warnings')
     return parser
 
 
 def main():
     info('find-knots.py', ['graph'])
-    args = get_parser().parse_args()
+    parser = get_parser()
+    parser.epilog = parser.epilog.replace(
+        ":doc:`partitioning-big-data`",
+        "http://khmer.readthedocs.io/en/stable/user/"
+        "partitioning-big-data.html"
+    )
+    args = sanitize_help(parser).parse_args()
 
     graphbase = args.graphbase
 
     # @RamRS: This might need some more work
-    infiles = [graphbase + '.pt', graphbase + '.tagset']
+    infiles = [graphbase, graphbase + '.tagset']
     if os.path.exists(graphbase + '.stoptags'):
         infiles.append(graphbase + '.stoptags')
     for _ in infiles:
-        check_input_files(_, False)
+        check_input_files(_, args.force)
 
-    check_space(infiles)
+    check_space(infiles, args.force)
 
-    print >>sys.stderr, 'loading k-mer presence table %s.pt' % graphbase
-    htable = khmer.load_hashbits(graphbase + '.pt')
+    print('loading k-mer nodegraph %s' % graphbase, file=sys.stderr)
+    graph = khmer.load_nodegraph(graphbase)
 
-    print >>sys.stderr, 'loading tagset %s.tagset...' % graphbase
-    htable.load_tagset(graphbase + '.tagset')
+    print('loading tagset %s.tagset...' % graphbase, file=sys.stderr)
+    graph.load_tagset(graphbase + '.tagset')
 
     initial_stoptags = False    # @CTB regularize with make-initial
     if os.path.exists(graphbase + '.stoptags'):
-        print >>sys.stderr, 'loading stoptags %s.stoptags' % graphbase
-        htable.load_stop_tags(graphbase + '.stoptags')
+        print('loading stoptags %s.stoptags' % graphbase, file=sys.stderr)
+        graph.load_stop_tags(graphbase + '.stoptags')
         initial_stoptags = True
 
     pmap_files = glob.glob(args.graphbase + '.subset.*.pmap')
 
-    print >>sys.stderr, 'loading %d pmap files (first one: %s)' % \
-        (len(pmap_files), pmap_files[0])
-    print >>sys.stderr, '---'
-    print >>sys.stderr, 'output stoptags will be in', graphbase + '.stoptags'
+    print('loading %d pmap files (first one: %s)' %
+          (len(pmap_files), pmap_files[0]), file=sys.stderr)
+    print('---', file=sys.stderr)
+    print('output stoptags will be in',
+          graphbase + '.stoptags', file=sys.stderr)
     if initial_stoptags:
-        print >>sys.stderr, \
-            '(these output stoptags will include the already-loaded set)'
-    print >>sys.stderr, '---'
+        print(
+            '(these output stoptags will include the already-loaded set)',
+            file=sys.stderr)
+    print('---', file=sys.stderr)
 
-    # create counting hash
-    ksize = htable.ksize()
-    counting = khmer.new_counting_hash(ksize, args.min_tablesize,
-                                       args.n_tables)
+    # create countgraph
+    ksize = graph.ksize()
+    counting = khmer_args.create_countgraph(args, ksize=ksize)
 
     # load & merge
     for index, subset_file in enumerate(pmap_files):
-        print >>sys.stderr, '<-', subset_file
-        subset = htable.load_subset_partitionmap(subset_file)
+        print('<-', subset_file, file=sys.stderr)
+        subset = graph.load_subset_partitionmap(subset_file)
 
-        print >>sys.stderr, '** repartitioning subset... %s' % subset_file
-        htable.repartition_largest_partition(subset, counting,
-                                             EXCURSION_DISTANCE,
-                                             EXCURSION_KMER_THRESHOLD,
-                                             EXCURSION_KMER_COUNT_THRESHOLD)
+        print('** repartitioning subset... %s' % subset_file, file=sys.stderr)
+        graph.repartition_largest_partition(subset, counting,
+                                            EXCURSION_DISTANCE,
+                                            EXCURSION_KMER_THRESHOLD,
+                                            EXCURSION_KMER_COUNT_THRESHOLD)
 
-        print >>sys.stderr, '** merging subset... %s' % subset_file
-        htable.merge_subset(subset)
+        print('** merging subset... %s' % subset_file, file=sys.stderr)
+        graph.merge_subset(subset)
 
-        print >>sys.stderr, '** repartitioning, round 2... %s' % subset_file
-        size = htable.repartition_largest_partition(
+        print('** repartitioning, round 2... %s' %
+              subset_file, file=sys.stderr)
+        size = graph.repartition_largest_partition(
             None, counting, EXCURSION_DISTANCE, EXCURSION_KMER_THRESHOLD,
             EXCURSION_KMER_COUNT_THRESHOLD)
 
-        print >>sys.stderr, '** repartitioned size:', size
+        print('** repartitioned size:', size, file=sys.stderr)
 
-        print >>sys.stderr, 'saving stoptags binary'
-        htable.save_stop_tags(graphbase + '.stoptags')
+        print('saving stoptags binary', file=sys.stderr)
+        graph.save_stop_tags(graphbase + '.stoptags')
         os.rename(subset_file, subset_file + '.processed')
-        print >>sys.stderr, '(%d of %d)\n' % (index, len(pmap_files))
+        print('(%d of %d)\n' % (index, len(pmap_files)), file=sys.stderr)
 
-    print >>sys.stderr, 'done!'
+    print('done!', file=sys.stderr)
 
 if __name__ == '__main__':
     main()

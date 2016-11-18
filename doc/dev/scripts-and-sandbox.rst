@@ -1,3 +1,41 @@
+..
+   This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+   Copyright (C) 2015 Michigan State University
+   Copyright (C) 2015 The Regents of the University of California.
+   It is licensed under the three-clause BSD license; see LICENSE.
+   Contact: khmer-project@idyll.org
+
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are
+   met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of the Michigan State University nor the names
+      of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written
+      permission.
+
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+   HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+   Contact: khmer-project@idyll.org
+
 Command line scripts, ``scripts/``, and ``sandbox/``
 ====================================================
 
@@ -38,7 +76,7 @@ All scripts in ``sandbox/`` must:
 * be importable (enforced by ``test_import_all`` in
   ``test_sandbox_scripts.py``)
 * be mentioned in ``sandbox/README.rst``
-* have a hash-bang line (``#! /usr/bin/env python2``) at the top
+* have a hash-bang line (``#! /usr/bin/env python``) at the top
 * be command-line executable (``chmod a+x``)
 * have a Copyright message (see below)
 * have lowercase names
@@ -50,31 +88,56 @@ All *new* scripts being added to ``sandbox/`` should:
 * be used in a protocol (see khmer-protocols) or a recipe (see khmer-recipes)
 * be pep8 clean and pylint clean-ish (see ``make pep8`` and ``make_diff_pylint``).
 
-Command line standard options for scripts/
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Standard and reserved command line options for ``scripts/``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-All scripts in scripts/ should have the following options, if they could apply:
+The following options are reserved, and the short option flag cannot be
+redefined in any official script.
 
-* ``--version`` - should always apply
-* ``--help`` - should always apply
-* ``--force`` - override any sanity checks that may prevent the script from running
-* ``--loadtable`` and ``--savetable`` - where appropriate (see khmer_args.py)
+* ``-h|--help`` - this must always print out a descriptive usage statement
+* ``-v|--version`` - this must always print out the khmer version number
+* ``-x|--max-tablesize`` - this must always specify the approximate table size
+  for storing sketches of k-mer hashes
+* ``-N|--n_tables`` - this must always specify the number of tables for storing
+  sketches of k-mer hashes
+* ``-M|--max-memory-usage`` - this must always specify the maximum amount of
+  memory to be consumed for storing sketches of k-mer hashes
+* ``-U|--unique-kmers`` - this must always specify the approximate number of
+  unique k-mers in the data set
+* ``-k|--ksize`` - this must always specify the k-mer size to use
+* ``-q|--quiet`` - this must always indicate that the script's diagnostic output
+  should be minimized or altogether eliminated
+
+Additionally, all scripts in ``scripts/`` should have the following options.
+
+* ``-h|--help``
+* ``-v|--version``
+* ``-f|--force`` - if applicable, override any sanity checks that may prevent
+  the script from running
+
+If an option is of type ``type=argparse.FileType('w')`` then you need to also
+specify a ``metavar`` for the documentation and help formatting. Example::
+
+    parser.add_argument('-R', '--report', metavar='report_filename',
+        type=argparse.FileType('w'))
 
 Copyright message
 ~~~~~~~~~~~~~~~~~
 
-Our current Copyright message is::
+The copyright message should be of the form::
 
    #
-   # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-   # Copyright (C) Michigan State University, 2009-2015. It is licensed under
+   # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+   # Copyright (C) ___WHO___, ___YEAR(s)___. It is licensed under
    # the three-clause BSD license; see doc/LICENSE.txt.
    # Contact: khmer-project@idyll.org
    #
 
-The beginning year should be the first year that this file existed in
-the repo; the end year should be the last year a coding change was
-made in the file.
+Where ___WHO___ is replaced with one or more of "Michigan State University" or
+"The Regents of the University of California" and ___YEAR(s)___ is replaced
+with the year or years the file was created or modified. The copyright
+statement for new files should only refer to "The Regents of the University of
+California".
 
 Upgrading a script from 'sandbox' to 'scripts'
 ----------------------------------------------
@@ -116,5 +179,6 @@ development/PR checklist::
    - [ ] version and citation information is output to STDERR (`khmer_args.info(...)`)
    - [ ] support '-' (STDIN) as an input file, if appropriate
    - [ ] support designation of an output file (including STDOUT), if appropriate
+   - [ ] script reads and writes sequences in compressed format
    - [ ] runtime diagnostic information (progress, etc.) is output to STDERR
    - [ ] script has been removed from sandbox/README.rst

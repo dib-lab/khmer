@@ -1,36 +1,86 @@
-.. vim: set filetype=rst
+..
+   This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+   Copyright (C) 2014-2015 Michigan State University
+   Copyright (C) 2015 The Regents of the University of California.
+   It is licensed under the three-clause BSD license; see LICENSE.
+   Contact: khmer-project@idyll.org
+
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are
+   met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of the Michigan State University nor the names
+      of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written
+      permission.
+
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+   HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+   Contact: khmer-project@idyll.org
 
 .. If you update this file then you may need to update the citations in
-   scripts/galaxy/macro.xml and khmer/khmer_args.py as well
+   khmer/khmer_args.py as well
 
+*********
 Citations
----------
+*********
 
 Software Citation
-^^^^^^^^^^^^^^^^^
+=================
 
 If you use the khmer software, you must cite:
 
-   Crusoe et al., The khmer software package: enabling efficient sequence
-   analysis. 2014. http://dx.doi.org/10.6084/m9.figshare.979190
+   Crusoe et al., The khmer software package: enabling efficient nucleotide
+   sequence analysis. 2015. http://dx.doi.org/10.12688/f1000research.6924.1
 
 .. code-block:: tex
 
-  @article{khmer2014,
-      author = "Crusoe, Michael and Edvenson, Greg and Fish, Jordan and Howe,
-  Adina and McDonald, Eric and Nahum, Joshua and Nanlohy, Kaben and
-  Ortiz-Zuazaga, Humberto and Pell, Jason and Simpson, Jared and Scott, Camille
-  and Srinivasan, Ramakrishnan Rajaram and Zhang, Qingpeng and Brown, C. Titus",
-      title = "The khmer software package: enabling efficient sequence
-  analysis",
-      year = "2014",
-      month = "04",
-      publisher = "Figshare",
-      url = "http://dx.doi.org/10.6084/m9.figshare.979190"
+  @article{khmer2015,
+     author = "Crusoe, Michael R. and Alameldin, Hussien F. and Awad, Sherine
+  and Bucher, Elmar and Caldwell, Adam and Cartwright, Reed and Charbonneau,
+  Amanda and Constantinides, Bede and Edvenson, Greg and Fay, Scott and Fenton,
+  Jacob and Fenzl, Thomas and Fish, Jordan and Garcia-Gutierrez, Leonor and
+  Garland, Phillip and Gluck, Jonathan and GonzÃ¡lez, IvÃ¡n and Guermond, Sarah
+  and Guo, Jiarong and Gupta, Aditi and Herr, Joshua R. and Howe, Adina and
+  Hyer, Alex and HÃ¤rpfer, Andreas and Irber, Luiz and Kidd, Rhys and Lin, David
+  and Lippi, Justin and Mansour, Tamer and McA'Nulty, Pamela and McDonald, Eric
+  and Mizzi, Jessica and Murray, Kevin D. and Nahum, Joshua R. and Nanlohy,
+  Kaben and Nederbragt, Alexander Johan and Ortiz-Zuazaga, Humberto and Ory,
+  Jeramia and Pell, Jason and Pepe-Ranney, Charles and Russ, Zachary N and
+  Schwarz, Erich and Scott, Camille and Seaman, Josiah and Sievert, Scott and
+  Simpson, Jared and Skennerton, Connor T. and Spencer, James and Srinivasan,
+  Ramakrishnan and Standage, Daniel and Stapleton, James A. and Stein, Joe and
+  Steinman, Susan R and Taylor, Benjamin and Trimble, Will and Wiencko, Heather
+  L. and Wright, Michael and Wyss, Brian and Zhang, Qingpeng and zyme, en and
+  Brown, C. Titus"
+     title = "The khmer software package: enabling efficient nucleotide
+  sequence analysis",
+     year = "2015",
+     month = "08",
+     publisher = "F1000",
+     url = "http://dx.doi.org/10.12688/f1000research.6924.1"
   }
 
-If you use any of our published scientific methods, you should *also*
-cite the relevant paper(s), as directed below. Additionally some scripts use
+If you use any of our published scientific methods you should *also*
+cite the relevant paper(s) as directed below. Additionally some scripts use
 the `SeqAn library <http://www.seqan.de>`_ for read parsing: the full citation
 for that library is also included below.
 
@@ -38,10 +88,10 @@ To see a quick summary of papers for a given script just run it without using
 any command line arguments.
 
 Graph partitioning and/or compressible graph representation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================================================
 
-The load-graph.py, partition-graph.py, find-knots.py, load-graph.py,
-and partition-graph.py scripts are part of the compressible graph
+The :program:`load-graph.py`, :program:`partition-graph.py`,
+and :program:`find-knots.py` scripts are part of the compressible graph
 representation and partitioning algorithms described in:
 
    Pell J, Hintze A, Canino-Koning R, Howe A, Tiedje JM, Brown CT.
@@ -84,10 +134,10 @@ representation and partitioning algorithms described in:
   }
 
 Digital normalization
-^^^^^^^^^^^^^^^^^^^^^
+=====================
 
-The normalize-by-median.py and count-median.py scripts are part of
-the digital normalization algorithm, described in:
+The :program:`normalize-by-median.py` and :program:`count-median.py` scripts
+are part of the digital normalization algorithm, described in:
 
    A Reference-Free Algorithm for Computational Normalization of
    Shotgun Sequencing Data
@@ -107,11 +157,33 @@ the digital normalization algorithm, described in:
       url = "http://arxiv.org/abs/1203.4802",
   }
 
-K-mer counting
-^^^^^^^^^^^^^^
+Efficient k-mer error trimming
+==============================
 
-The abundance-dist.py, filter-abund.py, and load-into-counting.py scripts
-implement the probabilistic k-mer counting described in:
+The :program:`script trim-low-abund.py` is described in:
+
+   Crossing the streams: a framework for streaming analysis of short DNA
+   sequencing reads
+   Zhang Q, Awad S, Brown CT
+   https://dx.doi.org/10.7287/peerj.preprints.890v1
+
+.. code-block:: tex
+
+  @unpublished{semistream,
+      author = "Qingpeng Zhang and Sherine Awad and C. Titus Brown",
+      title = "Crossing the streams: a framework for streaming analysis of
+          short DNA sequencing reads",
+      year = "2015",
+      eprint = "PeerJ Preprints 3:e1100",
+      url = "https://dx.doi.org/10.7287/peerj.preprints.890v1"
+  }
+
+K-mer counting
+==============
+
+The :program:`abundance-dist.py`, :program:`filter-abund.py`, and
+:program:`load-into-counting.py` scripts implement the probabilistic k-mer
+counting described in:
 
    These Are Not the K-mers You Are Looking For: Efficient Online K-mer
    Counting Using a Probabilistic Data Structure
@@ -130,7 +202,7 @@ implement the probabilistic k-mer counting described in:
       year = "2014",
       month = "07",
       volume = "9",
-      url = "http://dx.doi.org/10.1371%2Fjournal.pone.0101271",
+      url = "http://dx.doi.org/10.1371/journal.pone.0101271",
       pages = "e101271",
       abstract = "<p>K-mer abundance analysis is widely used for many purposes in
   nucleotide sequence analysis, including data preprocessing for de novo
@@ -153,13 +225,13 @@ implement the probabilistic k-mer counting described in:
   digital normalization of reads in the context of high khmer false positive
   rates. khmer is implemented in C++ wrapped in a Python interface, offers a
   tested and robust API, and is freely available under the BSD license at
-  github.com/ged-lab/khmer.</p>",
+  github.com/dib-lab/khmer.</p>",
       number = "7",
       doi = "10.1371/journal.pone.0101271"
   }
 
 FASTA and FASTQ reading
-^^^^^^^^^^^^^^^^^^^^^^^
+=======================
 
 Several scripts use the SeqAn library for FASTQ and FASTA reading as described
 in:
@@ -208,3 +280,4 @@ in:
     algorithms.},
   }
 
+.. vim: set filetype=rst:

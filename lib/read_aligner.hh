@@ -1,21 +1,56 @@
-//
-// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
-//
+/*
+This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+Copyright (C) 2013-2015, Michigan State University.
+Copyright (C) 2015, The Regents of the University of California.
 
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of the Michigan State University nor the names
+      of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written
+      permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+LICENSE (END)
+
+Contact: khmer-project@idyll.org
+*/
 #ifndef READ_ALIGNER_HH
 #define READ_ALIGNER_HH
 
-#include "khmer.hh"
-#include "counting.hh"
-
-#include <limits>
+#include <math.h>
+#include <stddef.h>
 #include <algorithm>
-#include <set>
-#include <vector>
-#include <queue>
+#include <limits>
 #include <memory>
+#include <queue>
+#include <set>
+#include <string>
+#include <vector>
+
+#include "khmer.hh"
+#include "hashgraph.hh"
+#include "kmer_hash.hh"
 
 #define READ_ALIGNER_DEBUG 0
 
@@ -100,6 +135,7 @@ struct AlignmentNode {
     double f_score;
     double h_score;
     bool trusted;
+    BoundedCounterType cov;
 
     size_t num_indels;
 
@@ -111,7 +147,7 @@ struct AlignmentNode {
         :prev(_prev), base(_emission), seq_idx(_seq_idx),
          state(_state), trans(_trans), fwd_hash(_fwd_hash),
          rc_hash(_rc_hash), score(0), f_score(0), h_score(0), trusted(false),
-         num_indels(0), length(_length) {}
+         cov(0), num_indels(0), length(_length) {}
 
     bool operator== (const AlignmentNode& rhs) const
     {
@@ -164,6 +200,7 @@ struct Alignment {
     std::string graph_alignment;
     std::string read_alignment;
     std::string trusted;
+    std::vector<BoundedCounterType> covs;
     double score;
     bool truncated;
 };
@@ -189,7 +226,7 @@ private:
     const HashIntoType bitmask;
     const size_t rc_left_shift;
 
-    khmer::CountingHash* m_ch;
+    khmer::Countgraph* m_ch;
     ScoringMatrix m_sm;
 
     size_t m_trusted_cutoff;
@@ -203,11 +240,11 @@ private:
         }
         return ret;
     }
-
 public:
     Alignment* Align(const std::string&);
+    Alignment* AlignForward(const std::string&);
 
-    ReadAligner(khmer::CountingHash* ch,
+    ReadAligner(khmer::Countgraph* ch,
                 BoundedCounterType trusted_cutoff, double bits_theta)
         : bitmask(comp_bitmask(ch->ksize())),
           rc_left_shift(ch->ksize() * 2 - 2),
@@ -227,7 +264,20 @@ public:
                   << std::endl;
 #endif
     }
+
+    ReadAligner(khmer::Countgraph* ch,
+                BoundedCounterType trusted_cutoff, double bits_theta,
+                double* scoring_matrix, double* transitions)
+        : bitmask(comp_bitmask(ch->ksize())),
+          rc_left_shift(ch->ksize() * 2 - 2),
+          m_ch(ch), m_sm(scoring_matrix[0], scoring_matrix[1],
+                         scoring_matrix[2], scoring_matrix[3],
+                         transitions),
+          m_trusted_cutoff(trusted_cutoff),
+          m_bits_theta(bits_theta) {};
+
+    ScoringMatrix getScoringMatrix();
+
 };
 }
-
 #endif // READ_ALIGNER_HH

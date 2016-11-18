@@ -1,10 +1,38 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
+# This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+# Copyright (C) 2011-2015, Michigan State University.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2015. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#     * Neither the name of the Michigan State University nor the names
+#       of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written
+#       permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 # Contact: khmer-project@idyll.org
-#
 # pylint: disable=invalid-name, missing-docstring
 """
 Partition a graph.
@@ -15,71 +43,43 @@ This will output many <base>.subset.N.pmap files.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 
 import threading
-import Queue
+import argparse
+import textwrap
+import sys
 import gc
 import os.path
-import argparse
-import khmer
-import sys
-from khmer.khmer_args import (add_threading_args, info)
-from khmer.kfile import check_input_files, check_space
 
-# Debugging Support
-import re
-import platform
-if "Linux" == platform.system():
-    def __debug_vm_usage(msg):
-        print >>sys.stderr, "===> DEBUG: " + msg
-        for vmstat in re.findall(r".*Vm.*", file("/proc/self/status").read()):
-            print >>sys.stderr, vmstat
-else:
-    def __debug_vm_usage(msg):  # pylint: disable=unused-argument
-        pass
+from khmer import __version__, load_nodegraph
+from khmer.khmer_args import (add_threading_args, info, sanitize_help,
+                              ComboFormatter, _VersionStdErrAction)
+from khmer.kfile import check_input_files
+from oxli.partition import worker
+
+# stdlib queue module was renamed on Python 3
+try:
+    import queue
+except ImportError:
+    import Queue as queue
 
 DEFAULT_SUBSET_SIZE = int(1e5)
 DEFAULT_N_THREADS = 4
 
 
-def worker(queue, basename, stop_big_traversals):
-    while True:
-        try:
-            (htable, index, start, stop) = queue.get(False)
-        except Queue.Empty:
-            print >>sys.stderr, 'exiting'
-            return
-
-        outfile = basename + '.subset.%d.pmap' % (index,)
-        if os.path.exists(outfile):
-            print >>sys.stderr, 'SKIPPING', outfile, ' -- already exists'
-            continue
-
-        print >>sys.stderr, 'starting:', basename, index
-
-        # pay attention to stoptags when partitioning; take command line
-        # direction on whether or not to exhaustively traverse.
-        subset = htable.do_subset_partition(start, stop, True,
-                                            stop_big_traversals)
-
-        print >>sys.stderr, 'saving:', basename, index
-        htable.save_subset_partitionmap(subset, outfile)
-        del subset
-        gc.collect()
-
-
 def get_parser():
-    epilog = """
-    The resulting partition maps are saved as '${basename}.subset.#.pmap'
+    epilog = """\
+    The resulting partition maps are saved as ``${basename}.subset.#.pmap``
     files.
     """
     parser = argparse.ArgumentParser(
         description="Partition a sequence graph based upon waypoint "
-        "connectivity", epilog=epilog,
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        "connectivity", epilog=textwrap.dedent(epilog),
+        formatter_class=ComboFormatter)
 
-    parser.add_argument('basename', help="basename of the input k-mer presence"
-                        " table + tagset files")
+    parser.add_argument('basename', help="basename of the input k-mer "
+                        "nodegraph  + tagset files")
     parser.add_argument('--stoptags', '-S', metavar='filename', default='',
                         help="Use stoptags in this file during partitioning")
     parser.add_argument('--subset-size', '-s', default=DEFAULT_SUBSET_SIZE,
@@ -88,8 +88,8 @@ def get_parser():
     parser.add_argument('--no-big-traverse', action='store_true',
                         default=False, help='Truncate graph joins at big '
                         'traversals')
-    parser.add_argument('--version', action='version', version='%(prog)s ' +
-                        khmer.__version__)
+    parser.add_argument('--version', action=_VersionStdErrAction,
+                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     add_threading_args(parser)
@@ -98,59 +98,58 @@ def get_parser():
 
 def main():
     info('partition-graph.py', ['graph'])
-    args = get_parser().parse_args()
+    args = sanitize_help(get_parser()).parse_args()
     basename = args.basename
 
-    filenames = [basename + '.pt', basename + '.tagset']
+    filenames = [basename, basename + '.tagset']
     for _ in filenames:
         check_input_files(_, args.force)
 
-    check_space(filenames, args.force)
-
-    print >>sys.stderr, '--'
-    print >>sys.stderr, 'SUBSET SIZE', args.subset_size
-    print >>sys.stderr, 'N THREADS', args.threads
+    print('--', file=sys.stderr)
+    print('SUBSET SIZE', args.subset_size, file=sys.stderr)
+    print('N THREADS', args.threads, file=sys.stderr)
     if args.stoptags:
-        print >>sys.stderr, 'stoptag file:', args.stoptags
-    print >>sys.stderr, '--'
+        print('stoptag file:', args.stoptags, file=sys.stderr)
+    print('--', file=sys.stderr)
 
-    print >>sys.stderr, 'loading ht %s.pt' % basename
-    htable = khmer.load_hashbits(basename + '.pt')
-    htable.load_tagset(basename + '.tagset')
+    print('loading nodegraph %s' % basename, file=sys.stderr)
+    nodegraph = load_nodegraph(basename)
+    nodegraph.load_tagset(basename + '.tagset')
 
     # do we want to load stop tags, and do they exist?
     if args.stoptags:
-        print >>sys.stderr, 'loading stoptags from', args.stoptags
-        htable.load_stop_tags(args.stoptags)
+        print('loading stoptags from', args.stoptags, file=sys.stderr)
+        nodegraph.load_stop_tags(args.stoptags)
 
     # do we want to exhaustively traverse the graph?
     stop_big_traversals = args.no_big_traverse
     if stop_big_traversals:
-        print >>sys.stderr, '** This script brakes for lumps:', \
-                            ' stop_big_traversals is true.'
+        print('** This script brakes for lumps:',
+              ' stop_big_traversals is true.', file=sys.stderr)
     else:
-        print >>sys.stderr, '** Traverse all the things:', \
-                            ' stop_big_traversals is false.'
+        print('** Traverse all the things:',
+              ' stop_big_traversals is false.', file=sys.stderr)
 
     #
     # now, partition!
     #
 
     # divide the tags up into subsets
-    divvy = htable.divide_tags_into_subsets(int(args.subset_size))
+    divvy = nodegraph.divide_tags_into_subsets(int(args.subset_size))
+    divvy = list(divvy)
     n_subsets = len(divvy)
     divvy.append(0)
 
     # build a queue of tasks:
-    worker_q = Queue.Queue()
+    worker_q = queue.Queue()
 
     # break up the subsets into a list of worker tasks
     for _ in range(0, n_subsets):
         start = divvy[_]
         end = divvy[_ + 1]
-        worker_q.put((htable, _, start, end))
+        worker_q.put((nodegraph, _, start, end))
 
-    print >>sys.stderr, 'enqueued %d subset tasks' % n_subsets
+    print('enqueued %d subset tasks' % n_subsets, file=sys.stderr)
     open('%s.info' % basename, 'w').write('%d subsets total\n' % (n_subsets))
 
     n_threads = args.threads
@@ -158,8 +157,8 @@ def main():
         n_threads = n_subsets
 
     # start threads!
-    print >>sys.stderr, 'starting %d threads' % n_threads
-    print >>sys.stderr, '---'
+    print('starting %d threads' % n_threads, file=sys.stderr)
+    print('---', file=sys.stderr)
 
     threads = []
     for _ in range(n_threads):
@@ -168,15 +167,15 @@ def main():
         threads.append(cur_thrd)
         cur_thrd.start()
 
-    print >>sys.stderr, 'done starting threads'
+    print('done starting threads', file=sys.stderr)
 
     # wait for threads
     for _ in threads:
         _.join()
 
-    print >>sys.stderr, '---'
-    print >>sys.stderr, 'done making subsets! see %s.subset.*.pmap' % \
-        (basename,)
+    print('---', file=sys.stderr)
+    print('done making subsets! see %s.subset.*.pmap' %
+          (basename,), file=sys.stderr)
 
 if __name__ == '__main__':
     main()
