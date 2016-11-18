@@ -90,10 +90,9 @@ def main():
         if is_pair:
             count1 = ht.get_median_count(read1.sequence)[0]
             count2 = ht.get_median_count(read2.sequence)[0]
-            if count1 and count2:
+            if count1 or count2:
                 m += 1
-                write_record(read1, outfp)
-                write_record(read2, outfp)
+                write_record_pair(read1, read2, outfp)
         else:
             count = ht.get_median_count(read1.sequence)[0]
             if count:
