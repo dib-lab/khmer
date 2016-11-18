@@ -14,4 +14,3 @@
   changes were made?
 - [ ] Do the changes respect streaming IO? (Are they
   tested for streaming IO?)
-- [ ] Is the Copyright year up to date?

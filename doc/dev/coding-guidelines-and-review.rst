@@ -149,7 +149,6 @@ checklist::
      changes were made?
    - [ ] Do the changes respect streaming IO? (Are they
      tested for streaming IO?)
-   - [ ] Is the Copyright year up to date?
 
 **Note** that after you submit the pull request you can check and uncheck
 the individual boxes on the formatted comment; no need to put x or y
