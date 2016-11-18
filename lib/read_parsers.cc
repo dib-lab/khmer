@@ -201,21 +201,16 @@ IParser::
 imprint_next_read_pair( ReadPair &the_read_pair, uint8_t mode )
 {
     switch (mode) {
-#if (0)
-    case IParser:: PAIR_MODE_ALLOW_UNPAIRED:
-        _imprint_next_read_pair_in_allow_mode( the_read_pair );
-        break;
-#endif
-    case IParser:: PAIR_MODE_IGNORE_UNPAIRED:
-        _imprint_next_read_pair_in_ignore_mode( the_read_pair );
-        break;
-    case IParser:: PAIR_MODE_ERROR_ON_UNPAIRED:
-        _imprint_next_read_pair_in_error_mode( the_read_pair );
-        break;
-    default:
-        std::ostringstream oss;
-        oss << "Unknown pair reading mode: " << mode;
-        throw UnknownPairReadingMode(oss.str());
+        case IParser::PAIR_MODE_IGNORE_UNPAIRED:
+            _imprint_next_read_pair_in_ignore_mode(the_read_pair);
+            break;
+        case IParser::PAIR_MODE_ERROR_ON_UNPAIRED:
+            _imprint_next_read_pair_in_error_mode(the_read_pair);
+            break;
+        default:
+            std::ostringstream oss;
+            oss << "Unknown pair reading mode: " << mode;
+            throw UnknownPairReadingMode(oss.str());
     }
 }
 
