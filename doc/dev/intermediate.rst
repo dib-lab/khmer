@@ -40,6 +40,8 @@ Intermediate-to-advanced khmer development
 
 .. contents::
 
+
+
 This document is for people who have made contributions to khmer and want some
 tips to improve their development process. If you are just getting started with
 khmer development, please refer to the introductory guide at

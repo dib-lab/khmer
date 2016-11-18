@@ -80,17 +80,17 @@ One-time Preparation
 
    ii. Linux users
 
-      a.  Install the python development environment and some additional
-          development packages. On recent versions of Debian or Ubuntu this can
-          be done with::
+       Install the python development environment and some additional
+       development packages. On recent versions of Debian or Ubuntu this can
+       be done with::
 
-              sudo apt-get install python2.7-dev python-virtualenv python-pip \
-              gcc g++ git astyle gcovr cppcheck enchant
+          sudo apt-get install python2.7-dev python-virtualenv python-pip \
+          gcc g++ git astyle gcovr cppcheck enchant
 
-          For Red Hat, Fedora, and CentOS::
+       For Red Hat, Fedora, and CentOS::
 
-              sudo yum install -y python-devel python-pip git gcc gcc-c++ make enchant
-              sudo pip install virtualenv
+          sudo yum install -y python-devel python-pip git gcc gcc-c++ make enchant
+          sudo pip install virtualenv
 
 #. Create a `GitHub <http://github.com>`__ account.
 
