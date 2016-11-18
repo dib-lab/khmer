@@ -898,21 +898,7 @@ void _init_ReadParser_Type_constants()
 
     // Place pair mode constants into class dictionary.
     int result;
-
-    PyObject * value = PyLong_FromLong( IParser:: PAIR_MODE_ALLOW_UNPAIRED );
-    if (value == NULL) {
-        Py_DECREF(cls_attrs_DICT);
-        return;
-    }
-    result = PyDict_SetItemString(cls_attrs_DICT,
-                                  "PAIR_MODE_ALLOW_UNPAIRED", value);
-    Py_XDECREF(value);
-    if (!result) {
-        Py_DECREF(cls_attrs_DICT);
-        return;
-    }
-
-    value = PyLong_FromLong( IParser:: PAIR_MODE_IGNORE_UNPAIRED );
+    PyObject *value = PyLong_FromLong( IParser:: PAIR_MODE_IGNORE_UNPAIRED );
     if (value == NULL) {
         Py_DECREF(cls_attrs_DICT);
         return;
