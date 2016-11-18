@@ -56,10 +56,9 @@ Contents:
    getting-started
    a-quick-guide-to-testing
    codebase-guide
-   coding-guidelines-and-review
+   guidelines-continued-dev
    scripts-and-sandbox
    for-khmer-developers
-   intermediate
    release
 
    details

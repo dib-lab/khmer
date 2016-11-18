@@ -39,11 +39,8 @@
 A quick guide to the khmer codebase
 ===================================
 
-This document describes the khmer project's directory layout.
-
-----
-
-The ChangeLog file lists changes to the codebase, most recent first.
+The ``CHANGELOG.md`` file lists major changes to the codebase with each version,
+with th4e most recent version first.
 
 The ``lib/`` directory contains all of the C++ code.
 
