@@ -43,13 +43,11 @@ Contact: khmer-project@idyll.org
 #include <string>
 
 #include "khmer.hh"
-#include "traversal.hh"
 
 namespace khmer
 {
-class CountingHash;
-class Hashbits;
-class Hashtable;
+class Countgraph;
+class Hashgraph;
 
 struct pre_partition_info {
     HashIntoType kmer;
@@ -60,10 +58,10 @@ struct pre_partition_info {
 
 class SubsetPartition
 {
-    friend class Hashtable;
+    friend class Hashgraph;
 protected:
     unsigned int next_partition_id;
-    Hashtable * _ht;
+    Hashgraph * _ht;
     PartitionMap partition_map;
     ReversePartitionMap reverse_pmap;
 
@@ -75,7 +73,7 @@ protected:
                                            const HashIntoType kmer);
 
 public:
-    explicit SubsetPartition(Hashtable * ht);
+    explicit SubsetPartition(Hashgraph * ht);
 
     ~SubsetPartition()
     {
@@ -151,16 +149,6 @@ public:
                                    CallbackFn callback=0,
                                    void * callback_data=0);
 
-    unsigned int find_unpart(const std::string &infilename,
-                             bool traverse,
-                             bool stop_big_traversals,
-                             CallbackFn callback=0,
-                             void * callback_data=0);
-
-    bool is_single_partition(std::string sequence);
-
-    void join_partitions_by_path(std::string sequence);
-
     void partition_sizes(PartitionCountMap &cm,
                          unsigned int& n_unassigned) const;
 
@@ -168,10 +156,10 @@ public:
                                      unsigned int& n_unassigned) const;
 
     void partition_average_coverages(PartitionCountMap &cm,
-                                     CountingHash * ht) const;
+                                     Countgraph * ht) const;
 
     unsigned long long repartition_largest_partition(unsigned int, unsigned int,
-            unsigned int, CountingHash&);
+            unsigned int, Countgraph&);
 
     void repartition_a_partition(const SeenSet& partition_tags);
     void _clear_partition(PartitionID, SeenSet& partition_tags);
@@ -181,11 +169,6 @@ public:
                       PartitionPtrMap& diskp_to_pp);
 
     void report_on_partitions();
-
-    void compare_to_partition(PartitionID, SubsetPartition *, PartitionID,
-                              unsigned int &n_only1,
-                              unsigned int &n_only2,
-                              unsigned int &n_shared);
 };
 }
 

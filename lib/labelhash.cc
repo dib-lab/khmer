@@ -1,7 +1,7 @@
 /*
 This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 Copyright (C) 2013-2015, Michigan State University.
-Copyright (C) 2015, The Regents of the University of California.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -41,8 +41,7 @@ Contact: khmer-project@idyll.org
 #include <sstream> // IWYU pragma: keep
 #include <set>
 
-#include "hashbits.hh"
-#include "hashtable.hh"
+#include "hashgraph.hh"
 #include "khmer_exception.hh"
 #include "labelhash.hh"
 #include "read_parsers.hh"
@@ -52,6 +51,8 @@ Contact: khmer-project@idyll.org
 
 #define LABEL_DBG 0
 #define printdbg(m) if(LABEL_DBG) std::cout << #m << std::endl;
+
+#define DEBUG 0
 
 using namespace std;
 using namespace khmer;
@@ -98,9 +99,8 @@ LabelHash::consume_fasta_and_tag_with_labels(
     total_reads = 0;
     n_consumed = 0;
 
-    Label _tag_label = 0;
+    Label the_label = 0;
 
-    Label * the_label;
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( )) {
         try {
@@ -112,11 +112,10 @@ LabelHash::consume_fasta_and_tag_with_labels(
         if (graph->check_and_normalize_read( read.sequence )) {
             // TODO: make threadsafe!
             unsigned long long this_n_consumed = 0;
-            the_label = check_and_allocate_label(_tag_label);
             consume_sequence_and_tag_with_labels( read.sequence,
                                                   this_n_consumed,
-                                                  *the_label );
-            _tag_label++;
+                                                  the_label );
+            the_label++;
 
 #if (0) // Note: Used with callback - currently disabled.
             n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
@@ -169,7 +168,6 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
     //
     // iterate through the FASTA file & consume the reads.
     //
-    Label * c;
     PartitionID p;
     while(!parser->is_complete())  {
         read = parser->get_next_read();
@@ -180,13 +178,10 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
             // save that.
             printdbg(parsing partition id)
             p = _parse_partition_id(read.name);
-            printdbg(checking label and allocating if necessary) {
-                c = check_and_allocate_label(p);
-            }
             printdbg(consuming sequence and tagging)
             consume_sequence_and_tag_with_labels( seq,
                                                   n_consumed,
-                                                  *c );
+                                                  p );
             printdbg(back in consume_partitioned)
         }
 
@@ -214,17 +209,19 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
 }
 
 // @cswelcher: double-check -- is it valid to pull the address from a reference?
-void LabelHash::link_tag_and_label(HashIntoType& kmer, Label& kmer_label)
+void LabelHash::link_tag_and_label(const HashIntoType kmer,
+                                   const Label kmer_label)
 {
     printdbg(linking tag and label)
-    tag_labels.insert(TagLabelPtrPair(kmer, &kmer_label));
-    label_tag_ptrs.insert(LabelTagPair(kmer_label, kmer));
+    tag_labels.insert(TagLabelPair(kmer, kmer_label));
+    label_tag.insert(LabelTagPair(kmer_label, kmer));
+    all_labels.insert(kmer_label);
     printdbg(done linking tag and label)
 }
 
 void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
         unsigned long long& n_consumed,
-        Label& current_label,
+        Label current_label,
         SeenSet * found_tags)
 {
 
@@ -242,11 +239,10 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
             kmer = kmers.next();
             bool is_new_kmer;
 
-            if ((is_new_kmer = graph->test_and_set_bits( kmer ))) {
+            if ((is_new_kmer = graph->store->test_and_set_bits( kmer ))) {
                 ++n_consumed;
                 printdbg(test_and_set_bits)
             }
-#if (1)
             if (is_new_kmer) {
                 printdbg(new kmer...)
                 ++since;
@@ -277,16 +273,6 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
                     ++since;
                 }
             }
-#else
-            if (!is_new_kmer && set_contains(graph->all_tags, kmer)) {
-                since = 1;
-                if (found_tags) {
-                    found_tags->insert(kmer);
-                }
-            } else {
-                since++;
-            }
-#endif
             //
             if (since >= graph->_tag_density) {
                 printdbg(exceeded tag density: drop a tag and label --
@@ -327,7 +313,7 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
 }
 
 unsigned int LabelHash::sweep_label_neighborhood(const std::string& seq,
-        LabelPtrSet& found_labels,
+        LabelSet& found_labels,
         unsigned int range,
         bool break_on_stoptags,
         bool stop_big_traversals)
@@ -349,16 +335,24 @@ unsigned int LabelHash::sweep_label_neighborhood(const std::string& seq,
     return num_traversed;
 }
 
-LabelPtrSet LabelHash::get_tag_labels(const HashIntoType& tag)
+void LabelHash::get_tag_labels(const HashIntoType tag,
+                               LabelSet& labels) const
 {
-    LabelPtrSet labels;
-    //unsigned int num_labels;
-    _get_tag_labels(tag, tag_labels, labels);
-    return labels;
+    if (set_contains(graph->all_tags, tag)) {
+        _get_tag_labels(tag, tag_labels, labels);
+    }
 }
 
-void LabelHash::traverse_labels_and_resolve(const SeenSet& tagged_kmers,
-        LabelPtrSet& found_labels)
+void LabelHash::get_tags_from_label(const Label label,
+                                    TagSet& tags) const
+{
+    if(set_contains(all_labels, label)) {
+        _get_tags_from_label(label, label_tag, tags);
+    }
+}
+
+void LabelHash::traverse_labels_and_resolve(const SeenSet tagged_kmers,
+        LabelSet& found_labels)
 {
 
     SeenSet::const_iterator si;
@@ -375,10 +369,7 @@ void LabelHash::traverse_labels_and_resolve(const SeenSet& tagged_kmers,
 
 LabelHash::~LabelHash()
 {
-    for (LabelPtrMap::iterator itr=label_ptrs.begin();
-            itr!=label_ptrs.end(); ++itr) {
-        delete itr->second;
-    }
+    ;
 }
 
 
@@ -410,14 +401,14 @@ void LabelHash::save_labels_and_tags(std::string filename)
     // For each tag in the partition map, save the tag and the associated
     // partition ID.
 
-    TagLabelPtrMap::const_iterator pi = tag_labels.begin();
+    TagLabelMap::const_iterator pi = tag_labels.begin();
     for (; pi != tag_labels.end(); ++pi) {
         HashIntoType *k_p = (HashIntoType *) (buf + n_bytes);
         *k_p = pi->first;
         n_bytes += sizeof(HashIntoType);
 
         Label * l_p = (Label *) (buf + n_bytes);
-        *l_p = *(pi->second);
+        *l_p = pi->second;
         n_bytes += sizeof(Label);
 
         // flush to disk
@@ -456,6 +447,12 @@ void LabelHash::load_labels_and_tags(std::string filename)
         } else {
             err = "Unknown error in opening file: " + filename;
         }
+        throw khmer_file_exception(err);
+    } catch (const std::exception &e) {
+        // Catching std::exception is a stopgap for
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
+        std::string err = "Unknown error opening file: " + filename + " "
+                          + strerror(errno);
         throw khmer_file_exception(err);
     }
 
@@ -502,6 +499,12 @@ void LabelHash::load_labels_and_tags(std::string filename)
         std::string err;
         err = "Unknown error reading header info from: " + filename;
         throw khmer_file_exception(err);
+    } catch (khmer_file_exception &e) {
+        throw e;
+    } catch (const std::exception &e) {
+        std::string err = "Unknown error opening file: " + filename + " "
+                          + strerror(errno);
+        throw khmer_file_exception(err);
     }
 
     char * buf = new char[IO_BUF_SIZE];
@@ -520,7 +523,7 @@ void LabelHash::load_labels_and_tags(std::string filename)
 
         try {
             infile.read(buf + remainder, IO_BUF_SIZE - remainder);
-        } catch (std::ifstream::failure &e) {
+        } catch (std::exception &e) {
 
             // We may get an exception here if we fail to read all the
             // expected bytes due to EOF -- only pass it up if we read
@@ -548,11 +551,9 @@ void LabelHash::load_labels_and_tags(std::string filename)
             labelp = (Label *) (buf + i);
             i += sizeof(Label);
 
-            Label * labelp2;
-
             graph->all_tags.insert(*kmer_p);
-            labelp2 = check_and_allocate_label(*labelp);
-            link_tag_and_label(*kmer_p, *labelp2);
+            all_labels.insert(*labelp);
+            link_tag_and_label(*kmer_p, *labelp);
 
             loaded++;
         }
@@ -575,3 +576,46 @@ void LabelHash::load_labels_and_tags(std::string filename)
 
     delete[] buf;
 }
+
+// tag & label k-mers on either side of an HDN.
+
+void LabelHash::label_across_high_degree_nodes(const char * s,
+        SeenSet& high_degree_nodes,
+        const Label label)
+{
+    KmerIterator kmers(s, graph->_ksize);
+
+    unsigned long n = 0;
+
+    Kmer prev_kmer = kmers.next();
+    if (kmers.done()) {
+        return;
+    }
+    Kmer kmer = kmers.next();
+    if (kmers.done()) {
+        return;
+    }
+    Kmer next_kmer = kmers.next();
+
+    // ignore any situation where HDN is at beginning or end of sequence
+    // @CTB testme :)
+    while(!kmers.done()) {
+        n++;
+        if (n % 10000 == 0) {
+            std::cout << "... label_across_hdn: " << n << "\n";
+        }
+        if (set_contains(high_degree_nodes, kmer)) {
+            graph->add_tag(prev_kmer);
+            graph->add_tag(kmer);
+            graph->add_tag(next_kmer);
+            link_tag_and_label(prev_kmer, label);
+            link_tag_and_label(kmer, label);
+            link_tag_and_label(next_kmer, label);
+        }
+        prev_kmer = kmer;
+        kmer = next_kmer;
+        next_kmer = kmers.next();
+    }
+}
+
+// vim: set sts=2 sw=2:

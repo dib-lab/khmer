@@ -2,7 +2,7 @@
 # vim: set fileencoding=utf-8
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2013-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -57,11 +57,6 @@ from distutils.errors import DistutilsPlatformError
 import versioneer
 ez_setup.use_setuptools(version="3.4.1")
 
-versioneer.VCS = 'git'
-versioneer.versionfile_source = 'khmer/_version.py'
-versioneer.versionfile_build = 'khmer/_version.py'
-versioneer.tag_prefix = 'v'  # tags are like v1.2.0
-versioneer.parentdir_prefix = '.'
 CMDCLASS = versioneer.get_cmdclass()
 
 # strip out -Wstrict-prototypes; a hack suggested by
@@ -99,8 +94,8 @@ def check_for_openmp():
         # Attempt to compile a test script.
         # See http://openmp.org/wp/openmp-compilers/
         filename = r'test.c'
-        file = open(filename, 'wt', 1)
-        file.write(
+        source = open(filename, 'wt', 1)
+        source.write(
             """
             #include <omp.h>
             #include <stdio.h>
@@ -116,7 +111,7 @@ def check_for_openmp():
                                         stdout=fnull, stderr=fnull)
 
         # Clean up
-        file.close()
+        source.close()
     finally:
         os.chdir(curdir)
         shutil.rmtree(tmpdir)
@@ -132,15 +127,18 @@ BZIP2DIR = 'third-party/bzip2'
 
 BUILD_DEPENDS = []
 BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
-    "khmer", "kmer_hash", "hashtable", "counting", "hashbits", "labelhash",
+    "khmer", "kmer_hash", "hashtable", "labelhash", "hashgraph",
     "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers",
-    "traversal"])
+    "kmer_filters", "traversal", "assembler", "alphabets", "storage"])
+BUILD_DEPENDS.extend(path_join("khmer", bn + ".hh") for bn in [
+    "_cpy_counttable", "_cpy_hashgraph", "_cpy_nodetable"])
 
 SOURCES = ["khmer/_khmer.cc"]
 SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
-    "read_parsers", "kmer_hash", "hashtable",
-    "hashbits", "labelhash", "counting", "subset", "read_aligner",
-    "hllcounter", "traversal"])
+    "read_parsers", "kmer_hash", "hashtable", "hashgraph",
+    "labelhash", "subset", "read_aligner",
+    "hllcounter", "traversal", "kmer_filters", "assembler", "alphabets",
+    "storage"])
 
 SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
@@ -168,8 +166,7 @@ EXTENSION_MOD_DICT = \
         "define_macros": [("VERSION", versioneer.get_version()), ],
     }
 
-EXTENSION_MOD = Extension("khmer._khmer",  # pylint: disable=W0142
-                          ** EXTENSION_MOD_DICT)
+EXTENSION_MOD = Extension("khmer._khmer", ** EXTENSION_MOD_DICT)
 SCRIPTS = []
 SCRIPTS.extend([path_join("scripts", script)
                 for script in os_listdir("scripts")
@@ -225,13 +222,15 @@ SETUP_METADATA = \
         # "maintainer_email": 'mcrusoe@msu.edu', # so don't include it
         # http://docs.python.org/2/distutils/setupscript.html
         # additional-meta-data note #3
-        "url": 'https://khmer.readthedocs.org/',
+        "url": 'https://khmer.readthedocs.io/',
         "packages": ['khmer', 'khmer.tests', 'oxli'],
         "package_dir": {'khmer.tests': 'tests'},
         "install_requires": ['screed >= 0.9', 'bz2file'],
+        "setup_requires": ["pytest-runner>=2.0,<3dev"],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
-                           'tests': ['nose >= 1.0']},
+                           'tests': ['pytest>=2.9'],
+                           'read_aligner_training': ['simplesam']},
         "scripts": SCRIPTS,
         # "entry_points": { # Not ready for distribution yet.
         #    'console_scripts': [
@@ -248,7 +247,6 @@ SETUP_METADATA = \
 
 
 class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
-
     """Specialized Python extension builder for khmer project.
 
     Only run the library setup when needed, not on every invocation.
@@ -262,6 +260,9 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
         if "%x" % sys.maxsize != '7fffffffffffffff':
             raise DistutilsPlatformError("%s require 64-bit operating system" %
                                          SETUP_METADATA["packages"])
+
+        if sys.platform == 'darwin' and 'gcov' in self.libraries:
+            self.libraries.remove('gcov')
 
         if "z" not in self.libraries:
             zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'
@@ -292,7 +293,7 @@ def reinitialize_command(self, command, reinit_subcommands):
     """Monkeypatch the original version from distutils.
 
     It's supposed to match the behavior of Distribution.get_command_obj()
-    This fixes issues with 'pip install -e' and './setup.py nosetests' not
+    This fixes issues with 'pip install -e' and './setup.py test' not
     respecting the setup.cfg configuration directives for the build_ext
     command.
     """
@@ -305,6 +306,4 @@ def reinitialize_command(self, command, reinit_subcommands):
 Distribution.reinitialize_command = reinitialize_command
 
 
-# pylint: disable=W0142
-setup(cmdclass=CMDCLASS,
-      **SETUP_METADATA)
+setup(cmdclass=CMDCLASS, **SETUP_METADATA)

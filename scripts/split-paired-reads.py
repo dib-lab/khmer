@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2013-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -35,7 +35,7 @@
 # Contact: khmer-project@idyll.org
 # pylint: disable=invalid-name,missing-docstring
 """
-De-interleave a file.
+Deinterleave a file.
 
 Take an interleaved set of reads (/1 and /2), and extract them into separate
 files (.1 and .2).
@@ -45,19 +45,20 @@ files (.1 and .2).
 Reads FASTQ and FASTA input, retains format for output.
 """
 from __future__ import print_function
-import screed
 import sys
 import os
 import textwrap
 import argparse
+
 from khmer import __version__
+from khmer import ReadParser
 from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
                               _VersionStdErrAction)
 from khmer.utils import (write_record, broken_paired_reader,
                          UnpairedReadsError)
 from khmer.kfile import (check_input_files, check_space,
                          add_output_compression_type,
-                         get_file_writer, is_block, describe_file_handle)
+                         get_file_writer, describe_file_handle)
 
 
 def get_parser():
@@ -133,6 +134,8 @@ def main():
 
     # decide where to put output files - specific directory? or just default?
     if infile in ('/dev/stdin', '-'):
+        # seqan only treats '-' as "read from stdin"
+        infile = '-'
         if not (args.output_first and args.output_second):
             print("Accepting input from stdin; "
                   "output filenames must be provided.", file=sys.stderr)
@@ -170,10 +173,8 @@ def main():
     counter3 = 0
     index = None
 
-    screed_iter = screed.open(infile)
-
     # walk through all the reads in broken-paired mode.
-    paired_iter = broken_paired_reader(screed_iter,
+    paired_iter = broken_paired_reader(ReadParser(infile),
                                        require_paired=not args.output_orphaned)
 
     try:
@@ -191,7 +192,7 @@ def main():
                 counter3 += 1
     except UnpairedReadsError as e:
         print("Unpaired reads found starting at {name}; exiting".format(
-            name=e.r1.name), file=sys.stderr)
+            name=e.read1.name), file=sys.stderr)
         sys.exit(1)
 
     print("DONE; split %d sequences (%d left, %d right, %d orphans)" %

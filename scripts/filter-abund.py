@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2011-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -45,17 +45,23 @@ Output sequences will be placed in 'infile.abundfilt'.
 Use '-h' for parameter help.
 """
 from __future__ import print_function
+import sys
 import os
-import khmer
 import textwrap
 import argparse
-import sys
-from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
+import khmer
+
+from khmer import __version__
+from khmer import ReadParser
+from khmer.utils import (broken_paired_reader, write_record)
 from khmer.khmer_args import (ComboFormatter, add_threading_args, info,
-                              sanitize_help, _VersionStdErrAction)
+                              sanitize_help, _VersionStdErrAction,
+                              check_argument_range)
 from khmer.kfile import (check_input_files, check_space,
                          add_output_compression_type, get_file_writer)
-from khmer import __version__
+from khmer.khmer_logger import (configure_logging, log_info, log_error,
+                                log_warn)
+from khmer.trimming import (trim_record)
 
 DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
@@ -83,7 +89,8 @@ def get_parser():
                         help='Input FAST[AQ] sequence filename', nargs='+')
     add_threading_args(parser)
     parser.add_argument('--cutoff', '-C', dest='cutoff',
-                        default=DEFAULT_CUTOFF, type=int,
+                        default=DEFAULT_CUTOFF,
+                        type=check_argument_range(0, 256, 'cutoff'),
                         help="Trim at k-mers below this abundance.")
     parser.add_argument('--variable-coverage', '-V', action='store_true',
                         dest='variable_coverage', default=False,
@@ -103,20 +110,24 @@ def get_parser():
                         version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
+    parser.add_argument('-q', '--quiet', dest='quiet', default=False,
+                        action='store_true')
     add_output_compression_type(parser)
     return parser
 
 
 def main():
-    info('filter-abund.py', ['counting'])
     args = sanitize_help(get_parser()).parse_args()
+    if not args.quiet:
+        info('filter-abund.py', ['counting'])
 
-    check_input_files(args.input_graph, args.force)
+    configure_logging(args.quiet)
+
     infiles = args.input_filename
     if ('-' in infiles or '/dev/stdin' in infiles) and not \
        args.single_output_file:
-        print("Accepting input from stdin; output filename must "
-              "be provided with -o.", file=sys.stderr)
+        log_error("Accepting input from stdin; output filename must "
+                  "be provided with -o.")
         sys.exit(1)
 
     for filename in infiles:
@@ -124,32 +135,11 @@ def main():
 
     check_space(infiles, args.force)
 
-    print('loading countgraph:', args.input_graph,
-          file=sys.stderr)
+    log_info('loading countgraph: {graph}', graph=args.input_graph)
     countgraph = khmer.load_countgraph(args.input_graph)
     ksize = countgraph.ksize()
 
-    print("K:", ksize, file=sys.stderr)
-
-    # the filtering function.
-    def process_fn(record):
-        name = record.name
-        seq = record.sequence
-        seqN = seq.replace('N', 'A')
-
-        if args.variable_coverage:  # only trim when sequence has high enough C
-            med, _, _ = countgraph.get_median_count(seqN)
-            if med < args.normalize_to:
-                return name, seq
-
-        _, trim_at = countgraph.trim_on_abundance(seqN, args.cutoff)
-
-        if trim_at >= ksize:
-            # be sure to not to change the 'N's in the trimmed sequence -
-            # so, return 'seq' and not 'seqN'.
-            return name, seq[:trim_at]
-
-        return None, None
+    log_info("K: {ksize}", ksize=ksize)
 
     if args.single_output_file:
         outfile = args.single_output_file.name
@@ -157,16 +147,27 @@ def main():
 
     # the filtering loop
     for infile in infiles:
-        print('filtering', infile, file=sys.stderr)
+        log_info('filtering {infile}', infile=infile)
         if not args.single_output_file:
             outfile = os.path.basename(infile) + '.abundfilt'
             outfp = open(outfile, 'wb')
             outfp = get_file_writer(outfp, args.gzip, args.bzip)
 
-        tsp = ThreadedSequenceProcessor(process_fn, n_workers=args.threads)
-        tsp.start(verbose_loader(infile), outfp)
+        paired_iter = broken_paired_reader(ReadParser(infile),
+                                           min_length=ksize,
+                                           force_single=True)
 
-        print('output in', outfile, file=sys.stderr)
+        for n, is_pair, read1, read2 in paired_iter:
+            assert not is_pair
+            assert read2 is None
+
+            trimmed_record, _ = trim_record(countgraph, read1, args.cutoff,
+                                            args.variable_coverage,
+                                            args.normalize_to)
+            if trimmed_record:
+                write_record(trimmed_record, outfp)
+
+        log_info('output in {outfile}', outfile=outfile)
 
 
 if __name__ == '__main__':

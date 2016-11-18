@@ -1,7 +1,5 @@
-#! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) 2010-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -15,7 +13,7 @@
 #       disclaimer in the documentation and/or other materials provided
 #       with the distribution.
 #
-#     * Neither the name of the Michigan State University nor the names
+#     * Neither the name of the University of California nor the names
 #       of its contributors may be used to endorse or promote products
 #       derived from this software without specific prior written
 #       permission.
@@ -33,38 +31,34 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-from __future__ import division
+# pylint: disable=C0111,C0103,missing-docstring,no-member,protected-access
+
 from __future__ import print_function
-import sys
+from __future__ import absolute_import
 
-def main():
-    n = 0
-    countSum = [0] * 255
-    countN = [0] * 255
+import khmer
 
-    freqfile = sys.argv[1]
+import pytest
+from . import khmer_tst_utils as utils
 
-    print('opening .freq file:', freqfile, file=sys.stderr)
-    fd = open(freqfile)
-    for n, line in enumerate(fd):
-        if n % 100000 == 0:
-            print('...', n, file=sys.stderr)
 
-        tok = line.split()
+def test_countgraph_vs_table():
+    x = khmer.Counttable(4, 21, 3)
+    y = khmer.Countgraph(4, 21, 3)
 
-        for i in range(len(tok)):
-            countSum[i] += int(tok[i])
-            countN[i] += 1
+    assert hasattr(x, 'add')
+    assert hasattr(y, 'add')
 
-    print('summarizing.', file=sys.stderr)
-    y = [0.0] * len(countSum)
+    assert not hasattr(x, 'consume_and_tag')
+    assert hasattr(y, 'consume_and_tag')
 
-    for i in range(len(countSum)):
-        if countN[i]:
-            y[i] = float(countSum[i]) / float(countN[i])
 
-    for n, i in enumerate(y):
-        print(n, i)
+def test_nodegraph_vs_table():
+    x = khmer.Nodetable(4, 21, 3)
+    y = khmer.Nodegraph(4, 21, 3)
 
-if __name__ == '__main__':
-    main()
+    assert hasattr(x, 'add')
+    assert hasattr(y, 'add')
+
+    assert not hasattr(x, 'consume_and_tag')
+    assert hasattr(y, 'consume_and_tag')

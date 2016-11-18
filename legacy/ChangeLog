@@ -1,3 +1,476 @@
+2016-11-15 Nicole Kingsley <nbkingsley@ucdavis.edu>
+
+   * tests/{test_normalize_by_median.py,test_scripts.py}:
+   Replaced two lines that created a file and stored test data with one
+   line that calls the utils.copy_test_data function to complete the
+   same task.
+
+2016-11-15  Daniel Standage  <daniel.standage@gmail.com>
+
+   * docs/dev/scripts-and-sandbox.rst: Added documentation for reserved flags
+     for command line scripts.
+
+2016-11-15  Titus Brown  <titus@idyll.org>
+
+   * khmer/{_cpy_counttable,_cpy_hashgraph.hh,cpy_nodetable.hh,_khmer.cc,
+   khmer/__init__.py}: new Counttable and Nodetable CPython types, plus
+   renaming of CountingHash to CountGraph and Hashbits to Nodegraph;
+   refactoring of CPython hierarchy to separate graph methods from table
+   methods.
+   * lib/hashtable.{cc,hh}: pull some more CountingHash/Counttable methods
+   back to base class; rename.
+   * lib/hashgraph.{cc,hh}: create new files containing the Countgraph
+   and Nodegraph classes.
+   * Makefile,  setup.py: updated dependencies for added and removed files.
+   * lib/Makefile: eliminated lib/counting.{cc,hh} and lib/hashbits.{cc,hh}.
+   * lib/{labelhash.cc,read_aligner.hh,storage.cc,storage.hh,subset.cc,
+   subset.hh,test-Colors.cc,test-compile.cc},
+   examples/c++-api/count-demo.cc - renamed CountingHash and Hashbits.
+   * tests/test_cpython_hierarchy.py - some preliminary tests for new CPython
+   inheritance hierarchy.
+   * tests/{test_nodegraph,test_countgraph}.py - added creation tests of
+   'tablesizes' passed into Nodegraph and Countgraph constructors.
+
+2016-11-15  Luiz Irber  <khmer@luizirber.org>
+
+   * khmer/__init__.py,tests/test_functions.py: Fix get_n_primes_near_x to
+   always return integers.
+
+2016-11-14  Tim Head  <betatim@gmail.com>
+
+   * khmer/_khmer.cc,lib/read_parsers.hh: Expose khmer's Read type fully to
+   the python side.
+   * scripts/{extract-paired-reads.py,filter-abund-single.py,filter-abund.py,
+   sample-reads-randomly.py,split-paired-reads.py,trim-low-abund.py}: Switch to
+   using ReadParser to speed up scripts.
+   * tests/test_read_handling.py,tests/test_scripts.py: Remove streaming tests
+   that use a FIFO.
+
+2016-11-14  Shannon EK Joslin	<sejoslin@ucdavis.edu>
+   *khmer/tests/test_countgraph.py: Refactor test code to use load_countgraph #1474
+   *khmer/tests/test_nodegraph.py: Refactor test code to use load_nodegraph and load_countgraph #1474
+
+2016-11-14  Tim Head  <betatim@gmail.com>
+
+  * .travis.yml: whitelist `master` branch to allow build-on-push without
+  building every push for a PR twice.
+
+2016-11-11  Titus Brown  <titus@idyll.org>
+
+  * doc/requirements.txt: set autoprogram version requirements to something
+  that works on python 2.7, in order to fix ReadTheDocs builds.
+
+2016-11-10  Camille Scott  <camille.scott.w@gmail.com>
+
+  * lib/assembler.{hh,cc}: add JunctionCountAssembler implementation.
+  * lib/kmer_filters.{hh,cc}: add get junction_count_filter function.
+  * khmer/{__init__.py,_khmer.cc}: add LinearAssembler,
+  SimpleLabeledAssembler, and JunctionCountAssembler to CPython interface.
+  * tests/test_assembly.py: minor refactoring, & tests for
+  JunctionCountAssembler and newly exposed C++ functions.
+  * sandbox/streaming-assembly-simple.py: demo script for streaming assembly.
+  * Makefile: update debug flags.
+  * lib/{counting.hh,hashtable.{hh,cc},hllcounter.hh,labelhash.hh,
+  read_aligner.hh,subset.{hh,cc}}: minor cleanup.
+  * tests/test_sandbox_scripts.py: minor cleanup.
+
+2016-11-07  Luiz Irber  <khmer@luizirber.org>
+
+   * Makefile: add --ignore-installed flag to pip install (fix installation
+   on conda environments.
+   * doc/requirements.txt: change hard requirement to 'newer than', avoid
+   installing a quite old setuptools version.
+
+2016-11-04  Tim Head  <betatim@gmail.com>
+
+   * Make khmer's Read type accessible from the python API.
+
+2016-11-03  Titus Brown  <titus@idyll.org>
+
+   * lib/{counting.cc,counting.hh,hashbits.cc,hashbits.hh,hashtable.cc,
+   hashtable.hh,storage.cc,storage.hh}: extracted in-memory storage details
+   into Storage/Bitstorage/ByteStorage classes.
+   * khmer/_khmer.cc,lib/{assembler.cc,assembler.hh,subset.cc,
+   subset.hh,labelhash.cc,labelhash.hh,traversal.cc,traversal.hh}: renamed
+   Hashtable to Hashgraph.
+   * setup.py,lib/Makefile: added storage.{cc,hh} to build.
+
+2016-10-31  Titus Brown  <titus@idyll.org>
+
+   * lib/{counting.hh,hashbits.hh,hashtable.hh}: factor out global functions
+   _hash and _revhash into Hashtable methods hash_dna and unhash_dna.
+   * khmer/_khmer.cc, lib/{hashtable.cc,read_aligner.cc,subset.cc}: update
+   Hashtable code to use new hash_dna and unhash_dna methods.
+
+2016-10-31  Camille Scott  <camille.scott.w@gmail.com>
+
+   * khmer/__init__.py, khmer/_khmer.cc, tests/test_functions.py: Expose
+   reverse_complement to Python.
+   * lib/{traversal.cc, traversal.hh}: Add two new Traverser classes,
+   AssemblerTraverser and NonloopingAT, to do the traversal portions of
+   assembly.
+   * lib/{assembler.cc, assembler.hh}, khmer/_khmer.cc: New code files
+   containing the LinearAssembler and LabeledLinearAssembler classes which wrap
+   AssemblerTraverser and NonloopingAT, respectively, and expose a contig
+   assembly interface.
+   * lib/{hashtable.cc, hashtable.hh, labelhash.cc, labelhash.hh}: Move
+   assembler API to the new assembler.hh.
+   * lib/{kmer_filters.hh, kmer_filters.cc}: Helper filter-functions for the
+   AssemblerTraversers.
+   * lib/kmer_hash.hh: Helper functions for the Kmer class.
+   * lib/{alphabets.hh, alphabets.cc}: Global DNA alphabets.
+   * tests/test_assembly.py: Tests for the assembler API.
+
+2016-10-28  Daniel Standage  <daniel.standage@gmail.com>
+
+   * lib/hashtable.cc,tests/test_nodegraph.py: fix bug in assemble_linear_path
+     that returns seed k-mer even if it is not present in the DBG.
+
+2016-10-13  Camille Scott  <camille.scott.w@gmail.com>
+
+   * Wrap IO functions in with an extra catch to handle the gcc
+     basic_ios_failure bug.
+
+2016-10-03  Tim Head  <betatim@gmail.com>
+
+   * .travis.yml: adjust setup for exclusive use of travis (jenkins is retiring)
+
+2016-10-02  Titus Brown  <titus@idyll.org>
+
+   * khmer/{utils.py,thread_utils.py,trimming.py}: introduce new function,
+   clean_input_reads, that does consistent read cleaning; update ReadBundle
+   and trimming to make use of new cleaned_seq attribute.
+   * scripts/{normalize-by-median.py,trim-low-abund.py}: refactor to use
+   cleaned_seq attribute properly; this fixed a bug in normalize-by-median.py
+   that led to ignoring lowercase 'actgn'.
+   * doc/dev/development.rst: update developer documentation for new
+   cleaned_seq attribute and ReadBundle behavior.
+   * tests/test_script_output.py: update md5 signatures for output to reflect
+   corrected behavior.
+   * tests/test_functions.py: add test for broken_paired_iter uppercase
+   behavior.
+   * tests/test_read_handling.py: update tests for ReadBundle.
+
+2016-10-01  Titus Brown  <titus@idyll.org>
+
+   * khmer/trimming.py,scripts/{filter-abund-single.py,filter-abund.py,
+   trim-low-abund.py}: extracted similar trimming code and refactored.
+   * khmer/utils.py,tests/test_read_handling.py: change ReadBundle.trimmed_reads
+   to trimmed_seqs; fix associated tests.
+   * tests/test_functions.py: updated tests to use screed.Record instead of
+   namedtuple classes.
+
+2016-10-01  Titus Brown  <titus@idyll.org>
+
+   * lib/hashtable.{cc,hh}: added assemble_linear_path function & helpers.
+   * khmer/_khmer.cc: CPython API for assemble_linear_path.
+   * tests/test_nodegraph.py: tests for new assemble_linear_path behavior.
+   * khmer/khmer_args.py, tests/test_script_arguments.py: fix some lingering
+   PEP 8 errors.
+   * lib/kmer_hash.hh: added string -> string _revcomp function.
+
+2016-09-30  Daniel Standage  <daniel.standage@gmail.com>
+
+   * scripts/trim-low-abund.py, khmer/utils.py, doc/dev/development.rst: moved
+   ReadBundle class to utils
+   * tests/test_read_handling.py, tests/test-data/unclean-reads.fastq: tests
+   related to ReadBundle
+
+2016-09-29  Tim Head  <betatim@gmail.com>
+
+   * khmer/khmer_args.py, tests/test_functions.py,
+   tests/test_script_arguments.py: fix up formatting
+
+2016-09-26 Ali Aliyari <aaliyari@ucdavis.edu>
+
+   * khmer/khmer_args.py: prevent -N from being set to more than 20 (override by -f)
+   * tests/test_script_arguments.py added test functions for the above change
+
+2016-09-26  Luiz Irber  <khmer@luizirber.org>
+
+   * khmer/khmer_args.py: Update HLL citation to point to preprint.
+
+2016-09-23  Tim Head  <betatim@gmail.com>
+
+   * khmer/_khmer.cc, lib/counting.{cc,hh}, lib/hashbits.{cc,hh},
+     lib/hashtable.hh, lib/hllcounter.{cc,hh}, lib/kmer_hash.cc,
+     tests/khmer_tst_utils.py, tests/test_functions.py: move away from using
+     HashIntoType as synonym to uint64.
+
+2016-09-21  Tim Head  <betatim@gmail.com>
+
+   * .travis.yml: add python 3.5 to the build matrix and allow fast finishing
+
+2016-09-20  Titus Brown  <titus@idyll.org>
+
+   * khmer/utils.py: fixed bug in broken_paired_reader when short reads
+   are discarded and require_paired is set; improved read pair error reporting.
+   * tests/test_functions.py: added tests for broken_paired_reader fix.
+   * tests/khmer_tst_utils.py: de-nested exceptions for better error reporting
+   from tests.
+
+2016-09-09  Daniel Standage  <daniel.standage@gmail.com>
+
+   * lib/read_parsers.{cc,hh}: rename SeqAnParser to FastxParser.
+
+2016-09-09  Tim Head  <betatim@gmail.com>
+
+   * tests/test_filter_abund.py: remove for loops introduce to the test suite.
+
+2016-09-01  Tim Head  <betatim@gmail.com>
+
+   * khmer/khmer_args.py: added check_argument_range to check an integer
+   command-line argument is within a given range.
+   * scripts/{normalize-by-median.py, filter-abund.py, filter-abund-single.py}
+   now use check_argument_range for the cutoff parameter.
+   * tests/test_normalize_by_median.py: modified
+   test_normalize_by_median_no_bigcount.
+
+2016-09-01  Tim Head  <betatim@gmail.com>
+
+   * scripts/filter-abund-single.py: Add support for variable coverage trimming
+
+2016-08-31  Tim Head  <betatim@gmail.com>
+
+   * Fixed several source code style issues in python and cpp.
+   * Makefile: removed setup.py from the list of files passed to astyle
+
+2016-08-30  Tim Head  <betatim@gmail.com>
+
+   * Fix coverage reporting on OSX and rename nosetests.xml to pytests.xml
+
+2016-08-29  Daniel Standage  <daniel.standage@gmail.com>
+
+   * doc/dev/getting-started.rst: updated dev environment setup instructions to
+   include installation of 'enchant' library, and dropped Arch linux install
+   instructions.
+
+2016-08-26  Daniel Standage  <daniel.standage@gmail.com>
+
+   * tests/test_scripts.py: fix PEP8 errors missed with previous PR (due to CI
+   issues)
+   * Makefile: make the pep8 target less verbose by removing the --show-pep8
+   option
+
+2016-08-26  Ryan Shean  <rcs333@uw.edu>
+
+   * tests/{test_countergraph.py, test_filter_abund.py,
+   test_normalize_by_median.py, test_read_handling.py,
+   test_sandbox_scripts.py, test_scripts.py}: updated to use
+   copy_test_data function
+
+2016-07-18  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmer.cc: fixed ReadPairIterator exception return error messages.
+
+2016-07-03  Titus Brown  <titus@idyll.org>
+
+   * lib/{hashtable.cc, hashtable.hh}: added get_kmer_hashes_as_hashset to
+   graphs.
+   * khmer/_khmer.cc: updated CPython API to add get_kmer_hashes_as_hashset.
+   * tests/test_countgraph.py: added test for get_kmer_hashes_as_hashset.
+
+2016-06-27  Titus Brown  <titus@idyll.org>
+
+   * doc/requirements.txt: updated sphinx-autoprogram requirement for building
+   documentation, to point at released version.
+
+2016-06-26  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmer.cc, tests/test_nodegraph.py: 'add' is now a synonym for
+   graph.count(kmer).
+   * khmer/thread_utils.py: update verbose_loader function to take 'verbose'
+   argument.
+   * scripts/{abundance-dist-single.py, abundance-dist.py,
+   filter-abund-single.py, filter-abund.py, load-into-counting.py,
+   normalize-by-median.py,trim-low-abund.py}: updated to
+   respect -q/--quiet.
+   * tests/test_filter_abund.py: tests for '-q'.
+   * scripts/partition-graph.py: fix typo in args help message.
+
+2016-06-26  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmer.cc, lib/{hashtable.cc, hashtable.hh},
+   tests/test-data/simple-genome.fa, tests/test_nodegraph.py: added functions
+   'find_high_degree_nodes' and 'traverse_linear_path' to hashtables/graphs.
+   * lib/kmer_hash.cc: minor change to use object member _seq instead of
+   constructor argument seq in KmerIterator.
+   * lib/kmer_hash.hh: added const to Kmer::get_string_rep(...) signature.
+   * sandbox/extract-compact-dbg.py: new sandbox script to
+   extract compact De Bruijn graphs (with linear paths contracted).
+   * tests/test_sandbox_scripts.py: added tests for the extract-compact-dbg.py
+   script.
+
+2016-06-26  Titus Brown  <titus@idyll.org>
+
+   * lib/khmer.hh,lib/{labelhash.cc,labelhash.hh}: removed label pointer-based
+   indirection from labelhash code.
+   * khmer/_khmer.cc: updated CPython API to match new behavior.
+   * tests/test_labelhash.py: renamed to match new API; no changes in test
+   logic.
+
+2016-06-17  Daniel Standage <daniel.standage@gmail.com>
+
+   * scripts/filter-abund-single.py: add -o/--outfile option.
+   * tests/test_script_output.py: move `_calc_md5` function for calculating
+   file MD5 hashes to test utils module (tests/khmer_tst_utils.py).
+   * tests/{test_filter_abund.py,test_scripts.py): move filter_abund tests to
+   dedicated test script, add minimal test for new -o option.
+   * tests/test-data/paired-mixed-witherror.fa.pe: add data file in support of
+   new test.
+   * .gitignore: add .cache/ directory, which appears to be an artifact of the
+   py.test framework.
+
+2016-06-17  Daniel Standage <daniel.standage@gmail.com>
+
+  * scripts/filter-abund-single.py: add -o/--outfile option.
+  * tests/test_script_output.py: move `_calc_md5` function for calculating file
+  MD5 hashes to test utils module (tests/khmer_tst_utils.py).
+  * tests/{test_filter_abund.py,test_scripts.py): move filter_abund tests to
+  dedicated test script, add minimal test for new -o option.
+  * tests/test-data/paired-mixed-witherror.fa.pe: add data file in support of
+  new test.
+  * .gitignore: add .cache/ directory, which appears to be an artifact of the
+  py.test framework.
+
+2016-05-25  Titus Brown  <titus@idyll.org>
+
+   * scripts/trim-low-abund.py: switched to watermark-based reporting to
+   isolate a hard-to-trigger undefined variable error in reporting.
+   * tests/test_scripts.py: added a test for basic reporting functionality.
+
+2016-05-16  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmer.cc: define new khmer_HashSet_Type and khmer_HashSet_Object;
+   lots of associated cleanup of k-mer <-> C++ interface; added
+   Hashtable::neighbors; added Hashtable::hash and Hashtable::reverse_hash;
+   CPython 'hashtable.count(...)' function now takes either hash or string.
+   * lib/{kmer_hash.cc, kmer_hash.hh}: added some function overloads so that
+   _hash(...) could take strings as arguments without conversion; added
+   Kmer::set_from_unique_hash convenience function.
+   * lib/{hashtable.cc, hashtable.hh}: minor cleanup;
+   * lib/{read_aligner.cc, subset.cc}: minor refactoring.
+   * lib/{traversal.cc, traversal.hh}: made 'filter' argument to traverse*
+   functions optional; added 'traverse' function for combine traversal.
+   * tests/test_hashset.py: tests for new HashSet class.
+   * tests/test_countgraph.py: tests for new hash/reverse_hash functions,
+   and 'count' behavior.
+   * tests/test_nodegraph.py: tests for new neighbors function.
+   * khmer/__init__.py: import new HashSet type from _khmer.
+   * scripts/{do-partition.py, make-initial-stoptags.py,
+   partition-graph.py},tests/{test_labelhash.py, test_subset_graph.py}:
+   refactor existing code to use HashSet object.
+   * tests/test_counting_single.py: add printout to assert.
+
+2016-05-16  Luiz Irber  <khmer@luizirber.org>
+
+   * Makefile,jenkins-build.sh,setup.cfg,tests/khmer_tst_utils.py,
+   tests/test_{countgraph,counting_single,hll,labelhash,nodegraph,
+   normalize_by_median,read_aligner,read_handling,read_parsers,sandbox_scripts,
+   scripts,version}.py: replace nose with pytest, update configuration.
+
+2016-05-16  Luiz Irber  <khmer@luizirber.org>
+
+   * lib/hashtable.cc: fix bug with substr
+   * tests/test_countgraph.py: add test to trigger the substr bug.
+
+2016-05-11  Titus Brown  <titus@idyll.org>
+
+   * scripts/trim-low-abund.py: refactor to use generators; add --diginorm
+   option to include digital normalization in trim-low-abund functionality.
+   * tests/test_script_output.py: added md5sum hashing tests to pin down
+   functionality in trim-low-abund.py and normalize-by-median.py; verified
+   that refactoring does not alter existing functionality.
+   * tests/test-data/simple-genome-reads.fa: supporting file for md5sum
+   tests.
+   * tests/test-data/README.rst: a new README for describing test files,
+   how to generate them, and their uses.
+   * tests/test_scripts.py: added additional tests for trim-low-abund.py
+   functionality and error cases.
+
+2016-05-11  Titus Brown  <titus@idyll.org>
+
+   * tests/test_read_parsers.py: fixed syntax error introduced by previous
+   merge.
+
+2016-05-08  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * scripts/{do-partition,partition-graph}.py,oxli/partition.py: pulled up
+   duplicate `worker` partition function into a reusable place.
+
+2016-05-08  Michael R. Crusoe  <michael.crusoe@gmail.com>
+
+   * .dictionary, pylintrc:  added `pylint` configuration that checks spelling
+   in Python files. Added dictionary of project specific words.
+   * khmer/__init__.py, scripts/readstats.py, setup.py: Fixed typos.
+   * Makefile: line-wrapped; bumped up `pep8` version; beefed up `cppcheck`
+   target to correctly list the defines and includes for the current platform
+   which eliminates false positives; `*.pyc` files are now cleaned from the
+   `sandbox` as well as the `dist` directory. Added `cppcheck-long` target to
+   also examine the seqan headers. Fed the dynamically constucted list of
+   includes to Doxygen. Added simultaneous OS X, Debian, and Ubuntu
+   compatibility to many targets. Added helper target to print the value of
+   any variable via `make print-VARNAME`. Fixed the `make coverage-report`
+   target. pep257 is now called pydocstyle
+   * third-party/seqan/core/include/seqan/basic/debug_test_system.h,
+   third-party/seqan/ChangeLog: silenced bogus import
+   * doc/dev/coding-guidelines-and-review.rst,.github/PULL_REQUEST_TEMPLATE.md:
+   reformulated checklist to list action followed by a motivating question.
+   * doc/dev/release.rst: added author management to release checklist
+   * lib/counting.{cc,hh},sandbox/find-high-abund-kmers.py,
+   sandbox/README.rsr: removed the unused function
+   CountingHash::collect_high_abundance_kmers and the nonfunctional sandbox
+   script that called it.
+   * lib/kmer_hash.hh: make KmerFactory's default contrustor explicit to avoid
+   auto-casting optimizations.
+   * */*.py: a multitude of pylint inspired cleanups and bug fixes. Some
+   checks silenced in place.
+
+2016-05-08  Michael R. Crusoe  <michael.crusoe@gmail.com>
+
+   * README.rst: add depsy badge
+
+2016-05-08 Michael R. Crusoe  <michael.crusoe@gmail.com>
+
+   * setup.py,sandbox/{readaligner_pairhmm_train.py,
+   Makefile.read_aligner_training}: switch to BAM parsing using simplesam
+
+2016-05-06  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmer.cc, lib/{counting.cc,counting.hh,hashbits.cc,hashbits.hh,
+     hashtable.cc,hashtable.hh,subset.cc,subset.hh},
+   sandbox/{fasta-to-abundance-hist.py,find-high-abund-kmers.py
+     hi-lo-abundance-by-position.py,stoptag-abundance-hist.py,
+     abundance-hist-by-position.py},
+   tests/{test_countgraph.py,test_counting_single.py,test_filter.py,
+     test_nodegraph.py,test_subset_graph.py}: removed unused functions,
+   sandbox scripts, and tests for many functions. Specifically,
+   consume_fasta_and_tag_with_stoptags, identify_stop_tags_by_position and
+   identify_stoptags_by_position,
+   count_and_transfer_to_stoptags, traverse_from_tags,
+   filter_if_present, consume_fasta_and_traverse,
+   collect_high_abundance_kmers, fasta_dump_kmers_by_abundance,
+   fasta_count_kmers_by_position, output_fasta_kmer_pos_freq,
+   compare_partitions/compare_to_partition, join_partitions_by_path,
+   is_single_partition, and find_unpart function.
+
+   * sandbox/README.rst: updated for removed sandbox scripts.
+
+2016-04-29  Luiz Irber  <khmer@luizirber.org>
+
+   * jenkins-build.sh: add codecov coverage upload tool.
+
+2016-02-17  Daniel Standage <daniel.standage@gmail.com>
+
+   * ./github/CONTRIBUTING.md,.github/PULL_REQUEST_TEMPLATE.md: auto-populate
+   pull requests with checklist using GitHub's new template feature
+   * doc/dev/coding-guidelines-and-review.rst: update developer docs with
+   compensatory changes
+
+2016-02-15  Kevin Murray <spam@kdmurray.id.au>
+
+   * scripts/load-into-counting.py: Insert khmer's version into .info files
+
 2015-11-30  Luiz Irber  <khmer@luizirber.org>
 
    * lib/Makefile: add missing hllcounter.hh header to KHMER_HEADERS.
@@ -11,6 +484,13 @@
 
    * scripts/normalize-by-median.py,tests/test_normalize_by_median.py: test
    and fix for close of --output file after first input file.
+
+2015-10-19  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * versioneer.py,khmer/_version.py,setup.py,setup.cfg: upgrade Versioneer to
+   version 0.15+dev, Mon Jun 29 2015 99d5d9341830945f7080537ddd3bbd79c4aa1732
+   * doc/conf.py, lib/Makefile: update method of retrieving current version
+   * lib/get_version.py: no longer needed, removed
 
 2015-10-05  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
@@ -190,6 +670,12 @@
    * tests/test_streaming_io.py: Fix unique-kmers tests, use new option.
    * khmer/_khmer.cc, lib/hllcounter.cc: Rename some variables for consistency.
 
+2015-08-13  Jacob Fenton  <bocajnotnef@gmail.com>
+
+      * scripts/extract-partitions.py: refactored much of the processing into
+      generators
+      * tests/test_scripts.py: added test
+
 2015-08-12  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * doc/dev/{codebase-guide,coding-guidelines-and-review,development,
@@ -201,7 +687,7 @@
    * scripts/*.py, khmer/khmer_args.py: added epilog sanitation
    * scripts/{load-into-counting,load-graph,load-into-countgraph,
    load-into-nodegraph}.py, tests/{test_scripts,test_normalize_by_median,
-   test_streaming_io,test_countgraph}: renamed load-into-counting -> 
+   test_streaming_io,test_countgraph}: renamed load-into-counting ->
    load-into-countgraph, load-graph -> load-into-nodegraph, fixed tests to not
    bork
 
@@ -214,7 +700,7 @@
    * CITATION, doc/{index,introduction,user/scripts}.rst, khmer/khmer_args.py:
    formatting fixes and new citation for the software as a whole
    * Makefile: PDF building hints, tweaked dependencies, update coverity URL,
-   new target to generate author list for the paper citation 
+   new target to generate author list for the paper citation
    * sort-authors-list.py: helper script for the above
    * doc/conf.py: don't generate a module index
    * doc/contributors.rst: formatting, remove references to old lab
@@ -246,18 +732,18 @@
    and KmerIterator, respectively.
    * lib/Makefile: Add -std=c++11 flag.
    * Makefile: Update -std=c++11 flag in libtest target.
-   * lib/hashtable.{cc,hh}: Update calc_connected_graph_size to use Traverser. 
+   * lib/hashtable.{cc,hh}: Update calc_connected_graph_size to use Traverser.
    Change kmer_degree to use functions from traversal.cc. Remove redundant
    count_kmers_with_radius in favor of calc_connected_graph_size. Update
    traverse_from_kmer to use Traverser. Hashtable subclasses KmerFactory.
    * lib/{hashtable.hh,kmer_hash.{cc,hh}}: Move KmerIterator from hashtable.hh
    to kmer_hash.{cc,hh}. Add Kmer class to store forward, reverse, and
    uniqified integer representations of k-mers, and to handle string
-   conversion. Update KmerIterator to emit objects of type Kmer and to subclass 
+   conversion. Update KmerIterator to emit objects of type Kmer and to subclass
    KmerFactory; add doxygen markup.
    * lib/khmer.hh: Forward declare Kmer and typedef new Kmer data structures.
    * lib/subset.{cc,hh}: Move constructor definition to .cc file. Remove
-   queue_neighbors in favor of new traversal machinery. Update find_all_tags, 
+   queue_neighbors in favor of new traversal machinery. Update find_all_tags,
    sweep_for_tags, and find_all_tags_truncate_on_abundance to use Traverser.
    * setup.py: Add traversal.{cc,hh} to deps.
 
@@ -323,9 +809,9 @@
 
 2015-08-04  Jacob Fenton  <bocajnotnef@gmail.com>
 
-   * khmer/khmer_args.py, oxli/functions.py: migrated estimation functions out 
+   * khmer/khmer_args.py, oxli/functions.py: migrated estimation functions out
    oxli and into khmer_args
-   * oxli/build_graph.py, tests/test_oxli_functions.py, 
+   * oxli/build_graph.py, tests/test_oxli_functions.py,
    sandbox/{estimate_optimal_hash,optimal_args_hashbits}.py,
    scripts/{normalize-by-median,unique-kmers}.py: changed to not break on
    location change
@@ -550,7 +1036,7 @@
    abundance-dist}.py,tests/test_{normalize_by_median,subset_graph,hashbits,
    oxli_function}.py: pylint cleanup.
 
-2015-07-17  Michael R. Crusoe  <crusoe@ucdavis.edu>  
+2015-07-17  Michael R. Crusoe  <crusoe@ucdavis.edu>
 
    * Makefile, tests/test_read_aligner.py: import khmer when pylinting.
 
@@ -602,7 +1088,7 @@
 
 2015-07-05  Jacob Fenton  <bocajnotnef@gmail.com>
 
-   * doc/whats-new-2.0.rst: added in normalize-by-median.py broken paired 
+   * doc/whats-new-2.0.rst: added in normalize-by-median.py broken paired
    updates.
 
 2015-07-05  Michael R. Crusoe  <crusoe@ucdavis.edu>
@@ -679,7 +1165,7 @@
 
 2015-06-28  Qingpeng Zhang  <qingpeng@msu.edu>
 
-   * sandbox/{estimate_optimal_hash,optimal_args_hashbits}.py: added sandbox 
+   * sandbox/{estimate_optimal_hash,optimal_args_hashbits}.py: added sandbox
    methods for estimating memory usage based on desired fp rate, etc.
 
 2015-06-27  Kevin Murray  <spam@kdmurray.id.au>
@@ -1017,7 +1503,7 @@
 
 2015-04-17  Jessica Mizzi  <mizzijes@msu.edu>
 
-   * tests/test_scripts.py: split test_extract_long_sequences 
+   * tests/test_scripts.py: split test_extract_long_sequences
    into test_extract_long_sequences_fa and test_extract_long_sequences_fq
 
 2015-04-15  Elmar Bucher <buchere@ohsu.edu>
@@ -1053,7 +1539,7 @@
 2015-04-15  Sarah Guermond  <sarah.guermond@gmail.com>
 
    * scripts/trim-low-abund.py: implemented STDOUT output, redirected
-   existing print statements to STDERR, fixed existing & new PEP 8 issues 
+   existing print statements to STDERR, fixed existing & new PEP 8 issues
    * tests/test_scripts.py: added test for above changes
 
 2014-04-15  Andreas Härpfer  <ahaerpfer@gmail.com>
@@ -1067,25 +1553,25 @@
 
 2015-04-15  Susan Steinman  <steinman.tutoring@gmail.com>
 
-   * khmer/scripts/normalize-by-median.py: pass individual arg values to 
+   * khmer/scripts/normalize-by-median.py: pass individual arg values to
       functions instead of ArgParse object
 
 2015-04-15  Thomas Fenzl  <thomas.fenzl@gmx.net>
 
-   * scripts/{count-overlap.py,readstats.py},tests/test_scripts.py: 
+   * scripts/{count-overlap.py,readstats.py},tests/test_scripts.py:
    added a --csv option to readstats
    updated documentation for count-overlap
-   * khmer/_khmermodule.cc: fixed missing error handling 
+   * khmer/_khmermodule.cc: fixed missing error handling
    for hashbits_count_overlap
 
 2015-04-15  en zyme  <en_zyme@outlook.com>
 
    * khmer/khmer/kfile.py: check_file_status() -> check_input_files()
-   * khmer/sandbox/{collect-reads, khmer/sandbox/sweep-reads}.py 
+   * khmer/sandbox/{collect-reads, khmer/sandbox/sweep-reads}.py
      khmer/scripts/{abundance-dist-single, abundance-dist, annotate-partitions,
-     count-median, count-overlap, do-partition, extract-paired-reads, 
+     count-median, count-overlap, do-partition, extract-paired-reads,
      extract-partitions, filter-abund-single, filter-abund, filter-stoptags,
-     find-knots, interleave-reads, load-graph, load-into-counting, 
+     find-knots, interleave-reads, load-graph, load-into-counting,
      make-initial-stoptags, merge-partitions, partition-graph,
      sample-reads-randomly, split-paired-reads}.py:
        check_file_status() -> check_input_files()
@@ -1161,7 +1647,7 @@
 
 2015-04-13  Thomas Fenzl  <thomas.fenzl@gmx.net>
 
-   * lib/{khmer_exception.hh,{counting,hashbits,hashtable,subset}.cc}: changed 
+   * lib/{khmer_exception.hh,{counting,hashbits,hashtable,subset}.cc}: changed
    khmer_exception to use std::string to fix memory management.
 
 2015-04-13  Elmar Bucher  <buchere@ohsu.edu>
@@ -1188,7 +1674,7 @@
 
 2015-04-13  David Lin
 
-   * scripts/abundance-dist.py: disambiguate documentation for force and 
+   * scripts/abundance-dist.py: disambiguate documentation for force and
    squash options
 
 2015-04-13  Michael R. Crusoe  <mcrusoe@msu.edu>
@@ -1208,7 +1694,7 @@
 
 2015-04-10  Jacob Fenton  <bocajnotnef@gmail.com>
 
-   * scripts/test-{scripts.py}: added test for check_file_writable using 
+   * scripts/test-{scripts.py}: added test for check_file_writable using
    load_into_counting
 
 2015-04-10  Phillip Garland  <pgarland@gmail.com>
@@ -1374,7 +1860,7 @@
    * scripts/abundance-dist-single.py: Use CSV format for the histogram.
    * scripts/count-overlap.py: Use CSV format for the curve file output.
    Includes column headers.
-   * scripts/abundance-dist-single.py: Use CSV format for the histogram. 
+   * scripts/abundance-dist-single.py: Use CSV format for the histogram.
    Includes column headers.
    * tests/test_scripts.py: add test functions for the --csv option in
    abundance-dist-single.py and count-overlap.py
@@ -1386,9 +1872,9 @@
 
 2015-02-25  Aditi Gupta  <agupta@msu.edu>
 
-   * sandbox/{collect-reads.py, correct-errors.py, 
-   normalize-by-median-pct.py, slice-reads-by-coverage.py, 
-   sweep-files.py, sweep-reads3.py, to-casava-1.8-fastq.py}: 
+   * sandbox/{collect-reads.py, correct-errors.py,
+   normalize-by-median-pct.py, slice-reads-by-coverage.py,
+   sweep-files.py, sweep-reads3.py, to-casava-1.8-fastq.py}:
    Replaced 'accuracy' with 'quality'. Fixes #787.
 
 2015-02-25  Tamer A. Mansour  <drtamermansour@gmail.com>
@@ -1618,7 +2104,7 @@
 
     * khmer/utils.py: Added single write_record fuction to write FASTA/Q
     * scripts/{abundance-dist,extract-long-sequences,extract-partitions,
-    interleave-reads,normalize-by-median,sample-reads-randomly}.py: 
+    interleave-reads,normalize-by-median,sample-reads-randomly}.py:
     Replaced FASTA/Q writing method with write_record
 
 2015-01-23  Michael R. Crusoe  <mcrusoe@msu.edu>
@@ -1686,13 +2172,13 @@
 2015-01-09  Rhys Kidd  <rhyskidd@gmail.com>
 
     * lib/khmer.hh: implement generic NONCOPYABLE() macro guard
-    * lib/hashtable.hh: apply NONCOPYABLE macro guard in case of future 
-    modifications to Hashtable that might exposure potential memory corruption 
+    * lib/hashtable.hh: apply NONCOPYABLE macro guard in case of future
+    modifications to Hashtable that might exposure potential memory corruption
     with default copy constructor
 
 2014-12-30  Michael Wright  <wrig517@msu.edu>
 
-    * tests/test_scripts.py: Attained complete testing coverage for 
+    * tests/test_scripts.py: Attained complete testing coverage for
     scripts/filter_abund.py
 
 2014-12-30  Brian Wyss  <wyssbria@msu.edu>
@@ -1754,8 +2240,8 @@
     filter-stoptags,interleave-reads,load-graph,load-into-counting,
     make-initial-stoptags,merge-partitions,normalize-by-median,partition-graph,
     sample-reads-randomly,split-paired-reads}.py,setup.cfg,
-    tests/{test_script_arguments,test_scripts}.py: Added force option to all 
-    scripts to script IO sanity checks and updated tests to match. 
+    tests/{test_script_arguments,test_scripts}.py: Added force option to all
+    scripts to script IO sanity checks and updated tests to match.
 
 2014-12-17  Michael R. Crusoe  <mcrusoe@msu.edu>
 
@@ -1884,7 +2370,7 @@
 
 2014-11-11  Jacob Fenton  <bocajnotnef@gmail.com>
 
-    * do-partition.py: replaced threading args in scripts with things from 
+    * do-partition.py: replaced threading args in scripts with things from
     khmer_args
     * khmer/theading_args.py: removed as it has been deprecated
 
@@ -1912,7 +2398,7 @@
     annotate-partitions, count-median, count-overlap, do-partition,
     extract-paired-reads, extract-partitions, filter-abund, filter-abund-single,
     filter-stoptags, find-knots, load-graph, load-into-counting,
-    make-initial-stoptags, merge-partitions, normalize-by-median, 
+    make-initial-stoptags, merge-partitions, normalize-by-median,
     partition-graph, sample-reads-randomly}.py:
     changed stdout output in scripts to go to stderr.
 
@@ -1943,11 +2429,11 @@
     * scripts/{abundance-dist-single, abundance-dist, count-median,
     count-overlap, extract-paired-reads, filter-abund-single,
     load-graph, load-into-counting, make-initial-stoptags,
-    partition-graph, split-paired-reads}.py: 
+    partition-graph, split-paired-reads}.py:
     added output file listing at end of file
     * scripts/extract-long-sequences.py: refactored to set write_out to
     sys.stdout by default; added output location listing.
-    * scripts/{fastq-to-fasta, interleave-reads}.py: 
+    * scripts/{fastq-to-fasta, interleave-reads}.py:
     added output file listing sensitive to optional -o argument
     * tests/test_scripts.py: added test for scripts/make-initial-stoptags.py
 
@@ -1963,7 +2449,7 @@
     .empty() instead of .size()
 
 2014-09-19  Ben Taylor  <taylo886@msu.edu>
-		
+
     * Makefile: Add astyle, format targets
     * doc/dev/coding-guidelines-and-review.txt: Add reference to `make format`
 		target
@@ -1976,7 +2462,7 @@
 	average cutoff.
     * sandbox/slice-reads-by-coverage.py: added script to extract reads with
 	a specific coverage slice (based on median k-mer abundance).
-	
+
 2014-09-09  Titus Brown  <titus@idyll.org>
 
     * Added sandbox/README.rst to describe/reference removed files,
@@ -2108,7 +2594,7 @@
     * khmer/thread_utils.py, sandbox/filter-below-abund.py,
 	scripts/{extract-long-sequences,load-graph,load-into-counting,
 	normalize-by-median,split-paired-reads}.py,
-	scripts/galaxy/gedlab.py: fix minor PyLint issues 
+	scripts/galaxy/gedlab.py: fix minor PyLint issues
 
 2014-08-20  Michael R. Crusoe  <mcrusoe@msu.edu>
 
@@ -2116,7 +2602,7 @@
 
 2014-08-20  Rhys Kidd  <rhyskidd@gmail.com>
 
-    * setup.py,README.rst,doc/user/install.txt: Test requirement for a 
+    * setup.py,README.rst,doc/user/install.txt: Test requirement for a
     64-bit operating system, documentation changes. Fixes #529
 
 2014-08-19  Michael R. Crusoe  <mcrusoe@msu.edu>
@@ -2203,7 +2689,7 @@
 
 2014-07-23  Qingpeng Zhang  <qingpeng@gmail.com>
 
-    * scripts/load-graph.py: write fp rate into *.info file with option 
+    * scripts/load-graph.py: write fp rate into *.info file with option
     to switch on
     * tests/test_scripts.py: add test_load_graph_write_fp
 
@@ -2213,16 +2699,16 @@
 
 2014-07-23  Leonor Garcia-Gutierrez  <l.garcia-gutierrez@warwick.ac.uk>
 
-    * tests/test_hashbits.py, tests/test_graph.py, 
+    * tests/test_hashbits.py, tests/test_graph.py,
     tests/test_lump.py: reduced memory requirement
-    
+
 2014-07-23  Heather L. Wiencko  <wienckhl@tcd.ie>
 
     * khmer_tst_utils.py: added import traceback
     * test_scripts.py: added test for normalize_by_median.py for fpr rate
 
 2014-07-22  Justin Lippi  <jlippi@gmail.com>
- 
+
     * khmer/_khmermodule.cc: removed unused assignment
     * lib/read_aligner.cc,lib/read_aligner.hh: wrapped function declarations
     in the same compiler options that the only invocations are in to avoid
@@ -2245,7 +2731,7 @@
      * scripts/filter-abund.py: no longer asks for parameters that are unused,
      issue #524
 
-2014-07-22  Justin Lippi  <jlippi@gmail.com> 
+2014-07-22  Justin Lippi  <jlippi@gmail.com>
 
     * tests/khmer_tst_utils.py: put runscript here
     * tests/test_sandbox_scripts.py: remove 'runsandbox', renamed to runscript
@@ -2259,11 +2745,11 @@
 2014-07-22  Rodney Picett  <pickett.rodney@gmail.com>
 
     * lib/scoringmatrix.{cc,hh}: removed assign function, issue #502
- 
+
 2014-07-22  Leonor Garcia-Gutierrez  <l.garcia-gutierrez@warwick.ac.uk>
 
     * tests/test_counting_single.py: reduced memory requirements
-    
+
 2014-07-21  Titus Brown  <t@idyll.org>
 
     * sandbox/saturate-by-median.py: introduce new sandbox script for
@@ -2284,7 +2770,7 @@
 
 2014-06-20  Chuck Pepe-Ranney  <chuck.peperanney@gmail.com>
 
-    * scripts/extract-partitions.py: added epilog documentation for 
+    * scripts/extract-partitions.py: added epilog documentation for
 	<base>.dist columns.
 
 2014-06-20  Michael R. Crusoe  <mcrusoe@msu.edu>
@@ -2373,7 +2859,7 @@
 
 2014-06-11  Michael Wright <wrigh517@msu.edu>
 
-    * scripts/load-into-counting: Fixed docstring misnomer to 
+    * scripts/load-into-counting: Fixed docstring misnomer to
 	load-into-counting.py
 
 2014-06-10  Michael R. Crusoe  <mcrusoe@msu.edu>
@@ -2397,7 +2883,7 @@
 
 2014-06-10  Michael Wright <wrigh517@msu.edu>
 
-    * scripts/extract-long-sequences: Moved from sandbox, added argparse and 
+    * scripts/extract-long-sequences: Moved from sandbox, added argparse and
     FASTQ support.
     * scripts/fastq-to-fasta: Fixed outdated argparse oversight.
     * tests/test_scripts.py: Added tests for extract-long-sequences.py
@@ -2415,7 +2901,7 @@
 
 2014-06-03 Chuck Pepe-Ranney <chuck.peperanney@gmail.com>
 
-    * scripts/abundance-dist.py: removed call to check_space on infiles.  
+    * scripts/abundance-dist.py: removed call to check_space on infiles.
 
 2014-05-31  Michael R. Crusoe  <mcrusoe@msu.edu>
 
@@ -2448,10 +2934,10 @@
 
 2014-05-22  Michael Wright  <wrigh517@msu.edu>
 
-    * scripts/fastq-to-fasta: Moved and improved fastq-to-fasta.py into scripts 
+    * scripts/fastq-to-fasta: Moved and improved fastq-to-fasta.py into scripts
     from sandbox
     * tests/test_scripts.py: Added tests for fastq-to-fasta.py
-    * tests/test-data: Added test-fastq-n-to-fasta.py file with N's in 
+    * tests/test-data: Added test-fastq-n-to-fasta.py file with N's in
     sequence for testing
 
 2014-05-19  Michael R. Crusoe  <mcrusoe@msu.edu>
@@ -2501,7 +2987,7 @@
 
     * sandbox/calc-best-assembly.py: added script to calculate best
     assembly from a list of contig/scaffold files
-	
+
 2014-04-23  Titus Brown  <titus@idyll.org>
 
     * scripts/abundance-dist-single.py: fixed problem where ReadParser was
@@ -2641,7 +3127,7 @@
     * test_scripts.py: add test code for count-overlap.py
     * count-overlap.py: (fix a bug because of a typo and hashsize was replaced
     by min_hashsize)
-    * count-overlap.py: needs hashbits table generated by load-graph.py. 
+    * count-overlap.py: needs hashbits table generated by load-graph.py.
     This information is added to the "usage:" line.
     * count-overlap.py: fix minor PyLint issues
 
@@ -2724,7 +3210,7 @@
 2014-03-03  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * lib/trace_logger.{cc,hh}: fix for Coverity CID 1063852: Uninitialized
-    scalar field (UNINIT_CTOR) 
+    scalar field (UNINIT_CTOR)
     * lib/node.cc: fix for Coverity CID 1173035:  Uninitialized scalar field
     (UNINIT_CTOR)
     * lib/hashbits.hh: fix for Coverity CID 1153101:  Resource leak in object
@@ -2754,7 +3240,7 @@ users without root access to install virtualenv instead of pip.
 
 * Added support for sparse graph labeling
 
-* Added script to reinflate partitions from read files using the 
+* Added script to reinflate partitions from read files using the
   labeling system, called sweep-reads-by-partition-buffered.py
 
 * Implemented __new__ methods for Hashbits, enforced inheritance
@@ -2822,14 +3308,14 @@ clarified and simplified.
 * khmer/_khmermodule.cc has gotten a once-over with cpychecker. Type errors
 were eliminated and the error checking has improved.
 
-* Several fixes motivated by the results of a Coverity C/C++ scan. 
+* Several fixes motivated by the results of a Coverity C/C++ scan.
 
 * Tests that require greater than 0.5 gigabytes of memory are now annotated as
 being 'highmem' and be skipped by changing two lines in setup.cfg
 
 * warnings about -Wstrict-prototypes will no longer appear
 
-* contributors to this release are: ctb, mr-c and camillescott. 
+* contributors to this release are: ctb, mr-c and camillescott.
 
 2013-10-15  Michael R. Crusoe  <mcrusoe@msu.edu>
 
@@ -2952,7 +3438,7 @@ project to conform to the standard layout
     * test_scripts.py: add test code for count-overlap.py
     * count-overlap.py: (fix a bug because of a typo and hashsize was replaced
     by min_hashsize)
-    * count-overlap.py: needs hashbits table generated by load-graph.py. 
+    * count-overlap.py: needs hashbits table generated by load-graph.py.
     This information is added to the "usage:" line.
     * count-overlap.py: fix minor PyLint issues
 
@@ -3035,7 +3521,7 @@ project to conform to the standard layout
 2014-03-03  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * lib/trace_logger.{cc,hh}: fix for Coverity CID 1063852: Uninitialized
-    scalar field (UNINIT_CTOR) 
+    scalar field (UNINIT_CTOR)
     * lib/node.cc: fix for Coverity CID 1173035:  Uninitialized scalar field
     (UNINIT_CTOR)
     * lib/hashbits.hh: fix for Coverity CID 1153101:  Resource leak in object
@@ -3065,7 +3551,7 @@ users without root access to install virtualenv instead of pip.
 
 * Added support for sparse graph labeling
 
-* Added script to reinflate partitions from read files using the 
+* Added script to reinflate partitions from read files using the
   labeling system, called sweep-reads-by-partition-buffered.py
 
 * Implemented __new__ methods for Hashbits, enforced inheritance
@@ -3133,14 +3619,14 @@ clarified and simplified.
 * khmer/_khmermodule.cc has gotten a once-over with cpychecker. Type errors
 were eliminated and the error checking has improved.
 
-* Several fixes motivated by the results of a Coverity C/C++ scan. 
+* Several fixes motivated by the results of a Coverity C/C++ scan.
 
 * Tests that require greater than 0.5 gigabytes of memory are now annotated as
 being 'highmem' and be skipped by changing two lines in setup.cfg
 
 * warnings about -Wstrict-prototypes will no longer appear
 
-* contributors to this release are: ctb, mr-c and camillescott. 
+* contributors to this release are: ctb, mr-c and camillescott.
 
 2013-10-15  Michael R. Crusoe  <mcrusoe@msu.edu>
 

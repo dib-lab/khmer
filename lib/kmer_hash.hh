@@ -1,7 +1,7 @@
 /*
 This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 Copyright (C) 2010-2015, Michigan State University.
-Copyright (C) 2015, The Regents of the University of California.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -100,9 +100,13 @@ namespace khmer
 HashIntoType _hash(const char * kmer, const WordLength k);
 HashIntoType _hash(const char * kmer, const WordLength k,
                    HashIntoType& h, HashIntoType& r);
+HashIntoType _hash(const std::string kmer, const WordLength k);
+HashIntoType _hash(const std::string kmer, const WordLength k,
+                   HashIntoType& h, HashIntoType& r);
 HashIntoType _hash_forward(const char * kmer, WordLength k);
 
 std::string _revhash(HashIntoType hash, WordLength k);
+std::string _revcomp(const std::string& kmer);
 
 // two-way hash functions, MurmurHash3.
 HashIntoType _hash_murmur(const std::string& kmer);
@@ -149,10 +153,24 @@ public:
         kmer_u = u;
     }
 
+    /** @param[in]   s     DNA k-mer
+        @param[in]   ksize k-mer size
+     */
+    Kmer(const std::string s, WordLength ksize)
+    {
+        kmer_u = _hash(s.c_str(), ksize, kmer_f, kmer_r);
+    }
+
     /// @warning The default constructor builds an invalid k-mer.
     Kmer()
     {
         kmer_f = kmer_r = kmer_u = 0;
+    }
+
+    void set_from_unique_hash(HashIntoType h, WordLength ksize)
+    {
+        std::string s = _revhash(h, ksize);
+        kmer_u = _hash(s.c_str(), ksize, kmer_f, kmer_r);
     }
 
     /// Allows complete backwards compatibility
@@ -166,12 +184,31 @@ public:
         return kmer_u < other.kmer_u;
     }
 
-    std::string get_string_rep(WordLength K)
+    std::string get_string_rep(WordLength K) const
     {
         return _revhash(kmer_u, K);
     }
 
+    char get_last_base() const
+    {
+        return revtwobit_repr(kmer_f & 3);
+    }
+
+    std::string repr(WordLength K) const
+    {
+        std::string s = "<Us=" + _revhash(kmer_u, K) + ", Fs=" +
+                        _revhash(kmer_f, K) + ", Rs=" + _revhash(kmer_r, K) + ">";
+        //", U=" + std::to_string(kmer_u) + ", F=" + std::to_string(kmer_f) +
+        //", R=" + std::to_string(kmer_r) + ">";
+        return s;
+    }
+
+    bool is_forward() const
+    {
+        return kmer_f == kmer_u;
+    }
 };
+
 
 /**
  * \class KmerFactory
@@ -200,12 +237,13 @@ protected:
 
 public:
 
-    KmerFactory(WordLength K): _ksize(K) {}
+    explicit KmerFactory(WordLength K): _ksize(K) {}
 
     /** @param[in]  kmer_u Uniqified hash value.
      *  @return A complete Kmer object.
      */
     Kmer build_kmer(HashIntoType kmer_u)
+    const
     {
         HashIntoType kmer_f, kmer_r;
         std:: string kmer_s = _revhash(kmer_u, _ksize);
@@ -220,6 +258,7 @@ public:
      *  @return A complete Kmer object.
      */
     Kmer build_kmer(HashIntoType kmer_f, HashIntoType kmer_r)
+    const
     {
         HashIntoType kmer_u = uniqify_rc(kmer_f, kmer_r);
         return Kmer(kmer_f, kmer_r, kmer_u);
@@ -231,7 +270,7 @@ public:
      *  @param[in]  kmer_s String representation of a k-mer.
      *  @return A complete Kmer object hashed from the given string.
      */
-    Kmer build_kmer(std::string kmer_s)
+    Kmer build_kmer(std::string kmer_s) const
     {
         HashIntoType kmer_f, kmer_r, kmer_u;
         kmer_u = _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
@@ -244,7 +283,7 @@ public:
      *  @param[in]  kmer_c The character array representation of a k-mer.
      *  @return A complete Kmer object hashed from the given char array.
      */
-    Kmer build_kmer(const char * kmer_c)
+    Kmer build_kmer(const char * kmer_c) const
     {
         HashIntoType kmer_f, kmer_r, kmer_u;
         kmer_u = _hash(kmer_c, _ksize, kmer_f, kmer_r);

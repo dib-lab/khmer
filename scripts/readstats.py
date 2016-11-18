@@ -33,6 +33,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
+# pylint: disable=missing-docstring
 """
 Display summary statistics for one or more FASTA/FASTQ files.
 
@@ -83,7 +84,6 @@ def get_parser():
 
 
 class StatisticsOutput(object):  # pylint: disable=too-few-public-methods
-
     """
     Output statistics for several data files.
 
@@ -95,6 +95,7 @@ class StatisticsOutput(object):  # pylint: disable=too-few-public-methods
         self.formatter = formatter
 
     def __enter__(self):
+        """Write header upon entry."""
         self.formatter.write_header()
         return self
 
@@ -104,13 +105,13 @@ class StatisticsOutput(object):  # pylint: disable=too-few-public-methods
             basepairs, seqs, basepairs / float(seqs), filename)
 
     def __exit__(self, exc_type, exc_value, traceback):
+        """No exception? Finalize the formatter on exit."""
         if exc_type is None:
             self.formatter.finalize()
 
 
 class CsvFormatter(object):
-
-    """Format the statistis information as CSV."""
+    """Format the statistics information as CSV."""
 
     headers = ['bp', 'seqs', 'avg_len', 'filename']
 
@@ -131,7 +132,6 @@ class CsvFormatter(object):
 
 
 class StdFormatter(object):
-
     """Format the statistics in a human readable string."""
 
     def __init__(self, underlying_file):
@@ -178,9 +178,6 @@ def main():
     """Main function - run when executed as a script."""
     info('readstats.py')
     args = sanitize_help(get_parser()).parse_args()
-
-    total_bp = 0
-    total_seqs = 0
 
     statistics = []
 

@@ -1,7 +1,5 @@
-#! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) 2010-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -33,25 +31,38 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-from __future__ import print_function
-import sys
-import khmer
+"""Common methods for trimming short reads on k-mer abundance."""
+from __future__ import print_function, unicode_literals
+import screed
 
 
-def main():
-    files = sys.argv[2:]
+def trim_record(countgraph, record, cutoff, variable_coverage=False,
+                normalize_to=None):
+    name = record.name
+    seq = record.sequence
+    seqN = record.cleaned_seq
 
-    total_reads = len(files) * [0]
-    n_consumed = len(files) * [0]
-    n_seq_kept = len(files) * [0]
+    if variable_coverage:  # only trim when sequence has high enough C
+        if not countgraph.median_at_least(seqN, normalize_to):
+            return record, False                 # return unmodified
 
-    print('loading ht')
-    ht = khmer.load_countgraph(sys.argv[1])
+    _, trim_at = countgraph.trim_on_abundance(seqN, cutoff)
 
-    for i, infile in enumerate(files):
-        print('outputting', infile + '.freq')
-        ht.output_fasta_kmer_pos_freq(infile, infile + ".freq")
+    # too short? eliminate read
+    if trim_at < countgraph.ksize():
+        return None, True
 
+    # would we trim? if not, return unmodified.
+    if trim_at == len(seq):
+        return record, False
 
-if __name__ == '__main__':
-    main()
+    # construct new record
+    trim_seq = seq[:trim_at]
+    if hasattr(record, 'quality'):
+        trim_qual = record.quality[:trim_at]
+        trim_rec = screed.Record(name=name, sequence=trim_seq,
+                                 quality=trim_qual)
+    else:
+        trim_rec = screed.Record(name=name, sequence=trim_seq)
+
+    return trim_rec, True

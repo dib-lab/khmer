@@ -1,7 +1,7 @@
 /*
 This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 Copyright (C) 2010-2015, Michigan State University.
-Copyright (C) 2015, The Regents of the University of California.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -104,6 +104,17 @@ HashIntoType _hash_forward(const char * kmer, WordLength k)
     return h;			// return forward only
 }
 
+HashIntoType _hash(const std::string kmer, const WordLength k)
+{
+    return _hash(kmer.c_str(), k);
+}
+
+HashIntoType _hash(const std::string kmer, const WordLength k,
+                   HashIntoType& h, HashIntoType& r)
+{
+    return _hash(kmer.c_str(), k, h, r);
+}
+
 //
 // _revhash: given an unsigned int, return the associated k-mer.
 //
@@ -167,7 +178,7 @@ HashIntoType _hash_murmur(const std::string& kmer)
 HashIntoType _hash_murmur(const std::string& kmer,
                           HashIntoType& h, HashIntoType& r)
 {
-    HashIntoType out[2];
+    uint64_t out[2];
     uint32_t seed = 0;
     MurmurHash3_x64_128((void *)kmer.c_str(), kmer.size(), seed, &out);
     h = out[0];
@@ -199,7 +210,7 @@ KmerIterator::KmerIterator(const char * seq,
     _nbits_sub_1 = (_ksize*2 - 2);
 
     index = _ksize - 1;
-    length = strlen(seq);
+    length = strlen(_seq);
     _kmer_f = 0;
     _kmer_r = 0;
 

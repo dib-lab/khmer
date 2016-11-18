@@ -1,7 +1,7 @@
 /*
 This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 Copyright (C) 2012-2015, Michigan State University.
-Copyright (C) 2015, The Regents of the University of California.
+Copyright (C) 2015-2016, The Regents of the University of California.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -90,6 +90,7 @@ struct Read {
     std:: string    annotations;
     std:: string    sequence;
     std:: string    quality;
+    std:: string    cleaned_seq;
     // TODO? Add description field.
 
     inline void reset ( )
@@ -108,7 +109,6 @@ typedef std:: pair< Read, Read >	ReadPair;
 struct IParser {
 
     enum {
-        PAIR_MODE_ALLOW_UNPAIRED = 0,
         PAIR_MODE_IGNORE_UNPAIRED,
         PAIR_MODE_ERROR_ON_UNPAIRED
     };
@@ -154,12 +154,6 @@ protected:
     regex_t		_re_read_1;
     regex_t		_re_read_2;
 
-#if (0)
-    void		_imprint_next_read_pair_in_allow_mode(
-        ReadPair &the_read_pair
-    );
-#endif
-
     void		_imprint_next_read_pair_in_ignore_mode(
         ReadPair &the_read_pair
     );
@@ -172,12 +166,12 @@ protected:
 
 }; // struct IParser
 
-class SeqAnParser : public IParser
+class FastxParser : public IParser
 {
 
 public:
-    explicit SeqAnParser( const char * filename );
-    ~SeqAnParser( );
+    explicit FastxParser( const char * filename );
+    ~FastxParser( );
 
     bool is_complete( );
     void imprint_next_read(Read &the_read);

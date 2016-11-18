@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2014-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -41,10 +41,8 @@ import json
 import sys
 import os
 import stat
-import shutil
 from io import StringIO
 import traceback
-from nose.plugins.attrib import attr
 import threading
 import bz2
 import gzip
@@ -55,6 +53,7 @@ from . import khmer_tst_utils as utils
 import khmer
 import khmer.kfile
 import screed
+from khmer.utils import clean_input_reads
 
 
 def test_interleave_read_stdout():
@@ -260,36 +259,6 @@ def test_interleave_reads_2_fa():
     assert n > 0
 
 
-def execute_split_paired_streaming(ifilename):
-    fifo = utils.get_temp_filename('fifo')
-    in_dir = os.path.dirname(fifo)
-    outfile1 = utils.get_temp_filename('paired-1.fa')
-    outfile2 = utils.get_temp_filename('paired-2.fa')
-    script = 'split-paired-reads.py'
-    args = [fifo, '-1', outfile1, '-2', outfile2]
-
-    # make a fifo to simulate streaming
-    os.mkfifo(fifo)
-
-    thread = threading.Thread(target=utils.runscript,
-                              args=(script, args, in_dir))
-    thread.start()
-    ifile = open(ifilename, 'r')
-    fifofile = open(fifo, 'w')
-    chunk = ifile.read(4)
-    while len(chunk) > 0:
-        fifofile.write(chunk)
-        chunk = ifile.read(4)
-    fifofile.close()
-    thread.join()
-    assert os.path.exists(outfile1), outfile1
-    assert os.path.exists(outfile2), outfile2
-
-
-def test_split_paired_streaming():
-    o = execute_split_paired_streaming(utils.get_test_data('paired.fa'))
-
-
 def test_split_paired_reads_1_fa():
     # test input file
     infile = utils.get_test_data('paired.fa')
@@ -364,8 +333,7 @@ def test_split_paired_reads_2_fq():
 
 def test_split_paired_reads_2_mixed_fq_require_pair():
     # test input file
-    infile = utils.get_temp_filename('test.fq')
-    shutil.copyfile(utils.get_test_data('paired-mixed.fq'), infile)
+    infile = utils.copy_test_data('paired-mixed.fq')
     in_dir = os.path.dirname(infile)
 
     script = 'split-paired-reads.py'
@@ -387,8 +355,7 @@ def test_split_paired_reads_2_stdin_no_out():
 
 def test_split_paired_reads_2_mixed_fq():
     # test input file
-    infile = utils.get_temp_filename('test.fq')
-    shutil.copyfile(utils.get_test_data('paired-mixed-2.fq'), infile)
+    infile = utils.copy_test_data('paired-mixed-2.fq')
     in_dir = os.path.dirname(infile)
 
     script = 'split-paired-reads.py'
@@ -401,8 +368,7 @@ def test_split_paired_reads_2_mixed_fq():
 
 def test_split_paired_reads_2_mixed_fq_orphans_to_file():
     # test input file
-    infile = utils.get_temp_filename('test.fq')
-    shutil.copyfile(utils.get_test_data('paired-mixed-2.fq'), infile)
+    infile = utils.copy_test_data('paired-mixed-2.fq')
     in_dir = os.path.dirname(infile)
     outfile = utils.get_temp_filename('out.fq')
 
@@ -430,8 +396,7 @@ def test_split_paired_reads_2_mixed_fq_orphans_to_file():
 
 def test_split_paired_reads_2_mixed_fq_gzfile():
     # test input file
-    infile = utils.get_temp_filename('test.fq')
-    shutil.copyfile(utils.get_test_data('paired-mixed-2.fq'), infile)
+    infile = utils.copy_test_data('paired-mixed-2.fq')
     in_dir = os.path.dirname(infile)
     outfile = utils.get_temp_filename('out.fq')
 
@@ -457,8 +422,7 @@ def test_split_paired_reads_2_mixed_fq_gzfile():
 
 def test_split_paired_reads_2_mixed_fq_broken_pairing_format():
     # test input file
-    infile = utils.get_temp_filename('test.fq')
-    shutil.copyfile(utils.get_test_data('paired-mixed-broken.fq'), infile)
+    infile = utils.copy_test_data('paired-mixed-broken.fq')
     in_dir = os.path.dirname(infile)
 
     script = 'split-paired-reads.py'
@@ -784,3 +748,50 @@ def test_extract_paired_reads_5_stdin_error():
     status, out, err = utils.runscript(script, args, fail_ok=True)
     assert status == 1
     assert "output filenames must be provided." in err
+
+
+def test_read_bundler():
+    infile = utils.get_test_data('unclean-reads.fastq')
+    records = [r for r in clean_input_reads(screed.open(infile))]
+    bundle = khmer.utils.ReadBundle(*records)
+
+    raw_seqs = (
+        'GGTTGACGGGGNNNAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGCAGCTGTCGTCAGGGGATTTCCG'
+        'GGGCGGAGGCCGCAGACGCGAGTGGTGGAGG',
+        'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGCAGCTGTCGTCAGGGGANNNCCG'
+        'GGGCGGAGGCCGCAGACGCGAGTGGTGGAGG',
+    )
+
+    cleaned_seqs = (
+        'GGTTGACGGGGAAAAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGCAGCTGTCGTCAGGGGATTTCCG'
+        'GGGCGGAGGCCGCAGACGCGAGTGGTGGAGG',
+        'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGCAGCTGTCGTCAGGGGAAAACCG'
+        'GGGCGGAGGCCGCAGACGCGAGTGGTGGAGG',
+    )
+
+    assert bundle.num_reads == 2
+    assert bundle.total_length == 200
+
+    for read, raw_seq, clean_seq in zip(bundle.reads, raw_seqs, cleaned_seqs):
+        assert read.sequence == raw_seq
+        assert read.cleaned_seq == clean_seq
+
+
+def test_read_bundler_single_read():
+    infile = utils.get_test_data('single-read.fq')
+    records = [r for r in clean_input_reads(screed.open(infile))]
+    bundle = khmer.utils.ReadBundle(*records)
+    assert bundle.num_reads == 1
+    assert bundle.reads[0].sequence == bundle.reads[0].cleaned_seq
+
+
+def test_read_bundler_empty_file():
+    infile = utils.get_test_data('empty-file')
+    records = [r for r in clean_input_reads(screed.open(infile))]
+    bundle = khmer.utils.ReadBundle(*records)
+    assert bundle.num_reads == 0
+
+
+def test_read_bundler_empty_list():
+    bundle = khmer.utils.ReadBundle(*[])
+    assert bundle.num_reads == 0

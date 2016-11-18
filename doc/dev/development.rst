@@ -1,27 +1,27 @@
 ..
    This file is part of khmer, https://github.com/dib-lab/khmer/, and is
    Copyright (C) 2012-2015 Michigan State University
-   Copyright (C) 2015 The Regents of the University of California.
+   Copyright (C) 2015-2016 The Regents of the University of California.
    It is licensed under the three-clause BSD license; see LICENSE.
    Contact: khmer-project@idyll.org
-   
+
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are
    met:
-   
+
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
-   
+
     * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the following
       disclaimer in the documentation and/or other materials provided
       with the distribution.
-   
+
     * Neither the name of the Michigan State University nor the names
       of its contributors may be used to endorse or promote products
       derived from this software without specific prior written
       permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -33,7 +33,7 @@
    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-   
+
    Contact: khmer-project@idyll.org
 
 Development miscellany
@@ -144,12 +144,12 @@ Python / C integration
 ----------------------
 
 The Python extension that wraps the C++ core of khmer lives in
-``khmer/_khmermodule.cc``
+``khmer/_khmer.cc``
 
 This wrapper code is tedious and annoying so we use a static analysis tool to
 check for correctness.
 
-https://gcc-python-plugin.readthedocs.org/en/latest/cpychecker.html
+https://gcc-python-plugin.readthedocs.io/en/latest/cpychecker.html
 
 Developers using Ubuntu Precise will want to install the gcc-4.6-plugin-dev
 package
@@ -168,13 +168,13 @@ Errors to ignore: "Unhandled Python exception raised calling 'execute' method",
 
 Warnings to address: ::
 
-        khmer/_khmermodule.cc:3109:1: note: this function is too complicated
+        khmer/_khmer.cc:3109:1: note: this function is too complicated
         for the reference-count checker to fully analyze: not all paths were
         analyzed
 
 Adjust --maxtrans and re-run. ::
 
-	khmer/_khmermodule.cc:2191:61: warning: Mismatching type in call to
+	khmer/_khmer.cc:2191:61: warning: Mismatching type in call to
 	Py_BuildValue with format code "i" [enabled by default]
 	  argument 2 ("D.68937") had type
 	    "long long unsigned int"
@@ -183,7 +183,45 @@ Adjust --maxtrans and re-run. ::
 	  for format code "i"
 
 See below for a format string cheat sheet One also benefits by matching C type
-with the function signature used later. 
+with the function signature used later.
 
 "I" for unsigned int
 "K" for unsigned long long a.k.a khmer::HashIntoType.
+
+Read handling
+-------------
+
+Several bugs have gone unnoticed due to inconsistencies in read handling.
+On the C++ side, there are an abundance of ``consume`` functions for loading
+Fasta/Fastq sequences. On the Python side, read handling is sometimes delegated
+to the C++ library, and sometimes handled in Python using screed.
+
+In an attempt to normalize read handling in Python, the functions in
+``khmer/utils.py`` should be used whenever possible.  Here,
+``broken_paired_reader`` in ``khmer/utils.py`` should be used to do all
+paired-end sequence handling, and sequence loading should
+go through ``khmer.utils.clean_input_reads(iter)``; this is a
+generator that wraps the iterator produced by ``screed.open``, and it
+adds a ``cleaned_seq`` attribute to screed ``Record`` objects.  This
+attribute should be used for any k-mer or graph operations, while
+the normal ``sequence`` attribute is what should be written out.
+``write_record`` and ``write_record_pair`` should be used to output
+records.  All of these functions are aware of FASTA and FASTQ records,
+too.
+
+For applying operations to collections of reads, the ``ReadBundle`` class is
+available.  This is used to wrap a collection of reads for examination and
+processing in situations where (for example) something should be done to
+either both reads in a pair, or neither.
+
+Some basic rules of sequence handling in khmer are:
+
+* consume and produce "broken paired" format, such that pairs of sequences
+  always stay together; see ``khmer.utils.broken_paired_reader``.
+
+* when looking at the coverage of reads (for trimming or digital normalization)
+  always consider pairs; see ``khmer.utils.ReadBundle(...)``.
+
+* only apply graph or k-mer operations to sequences consisting only of ATCG;
+  typically this will be ``record.cleaned_seq``.  See
+  ``khmer.utils.clean_input_read(...)``.
