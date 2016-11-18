@@ -40,7 +40,7 @@ A quick guide to the khmer codebase
 ===================================
 
 The ``CHANGELOG.md`` file lists major changes to the codebase with each version,
-with th4e most recent version first.
+with the most recent version first.
 
 The ``lib/`` directory contains all of the C++ code.
 
