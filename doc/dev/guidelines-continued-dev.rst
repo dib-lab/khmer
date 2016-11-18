@@ -175,7 +175,34 @@ of changes. It's also recommended that you run tests.
 Virtual environments
 --------------------
 
-FIXME FIXME
+The khmer package, like many software packages, relies on other third-party
+software. Some of this software has been bundled together with khmer and is
+compiled when you invoke ``make`` on the command line. But some of the software
+khmer depends on is distributed as Python packages separately from khmer.
+
+Python `virtual environments <https://pypi.python.org/pypi/virtualenv>`_ were
+designed to isolate a stable development environment for a particular project.
+This makes it possible to maintain different versions of a Python package for
+different projects on your computer.
+
+The installation instructions in the :doc:`Getting Started <getting-started>`
+docs install the ``virtualenv`` command on your computer. After completing those
+instructions, you can create a virtual environment with the command::
+
+    virtualenv -p python2 env/
+
+(You can substitute `python3` for `python2` if Python version 3 is installed on
+your system.) This command will create a new directory `env/` containing your
+new virtual environment. The command::
+
+    source env/bin/activate
+
+will activate the virtual environment. Now any Python packages that you install
+with ``pip`` or ``make install-dep`` will be installed into your isolated
+virtual environment.
+
+Note that any time you create a new terminal session, using the virtual
+environment requires that you re-activate it.
 
 Pull request cleanup (commit squashing)
 ---------------------------------------
