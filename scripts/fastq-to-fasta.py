@@ -52,6 +52,7 @@ from khmer.kfile import (add_output_compression_type, get_file_writer,
 from khmer.utils import write_record
 from khmer.khmer_args import (sanitize_help, ComboFormatter, info,
                               _VersionStdErrAction)
+from khmer.khmer_args import FileType as khFileType
 
 
 def get_parser():
@@ -62,7 +63,7 @@ def get_parser():
     parser.add_argument('input_sequence', help='The name of the input'
                         ' FASTQ sequence file.')
     parser.add_argument('-o', '--output', metavar="filename",
-                        type=argparse.FileType('wb'),
+                        type=khFileType('wb'),
                         help='The name of the output'
                         ' FASTA sequence file.',
                         default=sys.stdout)
