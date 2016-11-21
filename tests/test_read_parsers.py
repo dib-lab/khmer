@@ -440,6 +440,18 @@ def test_read_pair_iterator_in_error_mode_xfail_osxsafe():
     assert failed
 
 
+def test_read_broken_pairs():
+    rparser = ReadParser(utils.get_test_data("test-abund-read-impaired.fa"))
+
+    for n, (r1, r2) in enumerate(rparser.iter_read_pairs(0)):
+        print(r1, r2)
+        print(r1.name, r1.sequence)
+        if r2 is not None:
+            print(r2.name, r2.sequence)
+
+    assert n == 3
+
+
 @pytest.mark.known_failing
 def test_read_pair_iterator_in_ignore_mode():
     assert 0

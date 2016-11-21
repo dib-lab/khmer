@@ -109,7 +109,7 @@ class IParser
 {
 public:
     enum {
-        PAIR_MODE_IGNORE_UNPAIRED,
+        PAIR_MODE_IGNORE_UNPAIRED = 1,
         PAIR_MODE_ERROR_ON_UNPAIRED
     };
 
