@@ -575,8 +575,8 @@ typedef struct {
     PyObject *  parent;
     //! Persistent value of pair mode across invocations.
     int pair_mode;
-    Read read;
-    bool prev_read = false;
+    Read prev_read;
+    bool has_prev_read = false;
 } khmer_ReadPairIterator_Object;
 
 
@@ -708,23 +708,23 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
     stop_iteration = parser->is_complete();
 
     if (!stop_iteration) {
-        if (pair_mode == 0) {
-            if (!myself->prev_read) {
-                myself->prev_read = true;
-                myself->read = parser->get_next_read();
+        if (pair_mode == IParser::PAIR_MODE_ALLOW_UNPAIRED) {
+            if (!myself->has_prev_read) {
+                myself->has_prev_read = true;
+                myself->prev_read = parser->get_next_read();
             }
-            Read prev{myself->read};
-            Read next{parser->get_next_read()};
+            Read prev(myself->prev_read);
+            Read next(parser->get_next_read());
             if (_is_pair(prev, next)) {
-                myself->prev_read = false;
+                myself->has_prev_read = false;
                 the_read_pair.first = prev;
                 the_read_pair.second = next;
             }
             else {
                 the_read_pair.first = prev;
                 the_read_pair.second.sequence = "";
-                myself->read = next;
-                myself->prev_read = true;
+                myself->prev_read = next;
+                myself->has_prev_read = true;
             }
         }
         else {

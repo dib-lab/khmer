@@ -441,7 +441,8 @@ def test_read_pair_iterator_in_error_mode_xfail_osxsafe():
 
 
 def test_read_broken_pairs():
-    rparser = ReadParser(utils.get_test_data("test-abund-read-impaired.fa"))
+    test_fname = utils.get_test_data("test-abund-read-impaired.fa")
+    rparser = ReadParser(test_fname)
 
     for n, (r1, r2) in enumerate(rparser.iter_read_pairs(0)):
         print(r1, r2)
