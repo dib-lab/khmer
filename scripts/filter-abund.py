@@ -56,7 +56,8 @@ from khmer import ReadParser
 from khmer.utils import (broken_paired_reader, write_record)
 from khmer.khmer_args import (ComboFormatter, add_threading_args, info,
                               sanitize_help, _VersionStdErrAction,
-                              check_argument_range, FileType)
+                              check_argument_range)
+from khmer.khmer_args import FileType as khFileType
 from khmer.kfile import (check_input_files, check_space,
                          add_output_compression_type, get_file_writer)
 from khmer.khmer_logger import (configure_logging, log_info, log_error,
@@ -101,7 +102,7 @@ def get_parser():
                         ' k-mer abundance.',
                         default=DEFAULT_NORMALIZE_LIMIT)
     parser.add_argument('-o', '--output', dest='single_output_file',
-                        type=FileType('wb'),
+                        type=khFileType('wb'),
                         metavar="optional_output_filename",
                         help='Output the trimmed sequences into a single file '
                         'with the given filename instead of creating a new '

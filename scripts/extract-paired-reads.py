@@ -55,7 +55,8 @@ from khmer import __version__
 from khmer import ReadParser
 from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
-                              _VersionStdErrAction, FileType)
+                              _VersionStdErrAction)
+from khmer.khmer_args import FileType as khFileType
 from khmer.kfile import add_output_compression_type
 from khmer.kfile import get_file_writer
 
@@ -101,11 +102,11 @@ def get_parser():
                         'split reads to specified directory. Creates '
                         'directory if necessary')
     parser.add_argument('--output-paired', '-p', metavar="filename",
-                        type=FileType('wb'),
+                        type=khFileType('wb'),
                         default=None, help='Output paired reads to this '
                         'file')
     parser.add_argument('--output-single', '-s', metavar="filename",
-                        type=FileType('wb'), default=None,
+                        type=khFileType('wb'), default=None,
                         help='Output orphaned reads to this file')
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
