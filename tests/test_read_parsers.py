@@ -453,6 +453,19 @@ def test_read_broken_pairs():
     assert n == 3
 
 
+def test_broken_pair_single_read():
+    # Note: Using a data file with only one read.
+    rparser = ReadParser(utils.get_test_data("single-read.fq"))
+
+    # Check the properties of all one reads in data set.
+    for read in rparser.iter_read_pairs(0):
+        assert read.name == "895:1:1:1246:14654 1:N:0:NNNNN"
+        assert read.sequence == "CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT"
+        # if an attribute is empty it shouldn't exist
+        assert not hasattr(read, 'annotations')
+        assert read.quality == """][aaX__aa[`ZUZ[NONNFNNNNNO_____^RQ_"""
+
+
 @pytest.mark.known_failing
 def test_read_pair_iterator_in_ignore_mode():
     assert 0

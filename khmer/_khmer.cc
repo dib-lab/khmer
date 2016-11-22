@@ -575,7 +575,7 @@ typedef struct {
     PyObject *  parent;
     //! Persistent value of pair mode across invocations.
     int pair_mode;
-    Read prev_read;
+    Read* prev_read;
     bool has_prev_read = false;
 } khmer_ReadPairIterator_Object;
 
@@ -711,10 +711,32 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
         if (pair_mode == IParser::PAIR_MODE_ALLOW_UNPAIRED) {
             if (!myself->has_prev_read) {
                 myself->has_prev_read = true;
-                myself->prev_read = parser->get_next_read();
+                try {
+                    //myself->prev_read = parser->get_next_read();
+                    parser->imprint_next_read(*(myself->prev_read));
+                } catch (NoMoreReadsAvailable &exc) {
+                    stop_iteration = true;
+                } catch (khmer_file_exception &exc) {
+                    exc_string = exc.what();
+                    file_exception = exc_string.c_str();
+                } catch (khmer_value_exception &exc) {
+                    exc_string = exc.what();
+                    value_exception = exc_string.c_str();
+                }
             }
-            Read prev(myself->prev_read);
-            Read next(parser->get_next_read());
+            Read prev(*(myself->prev_read));
+            Read next;
+            try {
+                next = parser->get_next_read();
+            } catch (NoMoreReadsAvailable &exc) {
+                stop_iteration = true;
+            } catch (khmer_file_exception &exc) {
+                exc_string = exc.what();
+                file_exception = exc_string.c_str();
+            } catch (khmer_value_exception &exc) {
+                exc_string = exc.what();
+                value_exception = exc_string.c_str();
+            }
             if (_is_pair(prev, next)) {
                 myself->has_prev_read = false;
                 the_read_pair.first = prev;
@@ -723,7 +745,8 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
             else {
                 the_read_pair.first = prev;
                 the_read_pair.second.sequence = "";
-                myself->prev_read = next;
+                delete myself->prev_read;
+                myself->prev_read = new Read(next);
                 myself->has_prev_read = true;
             }
         }
@@ -851,6 +874,7 @@ ReadParser_iter_read_pairs(PyObject * self, PyObject * args )
     khmer_ReadPairIterator_Object * rpi   = (khmer_ReadPairIterator_Object *)obj;
     rpi->parent             = self;
     rpi->pair_mode          = pair_mode;
+    rpi->prev_read = new Read();
 
     // Increment reference count on existing ReadParser object so that it
     // will not go away until all ReadPairIterator instances have gone away.

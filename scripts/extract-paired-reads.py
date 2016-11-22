@@ -155,7 +155,9 @@ def main():
     n_se = 0
 
     screed_iter = ReadParser(infile)
-    for index, is_pair, read1, read2 in broken_paired_reader(screed_iter):
+    #for index, is_pair, read1, read2 in broken_paired_reader(screed_iter):
+    for index, (read1, read2) in enumerate(screed_iter.iter_read_pairs(0)):
+        is_pair = read2 is not None
         if index % 100000 == 0 and index > 0:
             print('...', index, file=sys.stderr)
 
