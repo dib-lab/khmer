@@ -86,7 +86,8 @@ def get_parser():
     """
     parser = build_counting_args(
         descr="Trims sequences at a minimum k-mer abundance "
-        "(in memory version).", epilog=textwrap.dedent(epilog))
+        "(in memory version).", epilog=textwrap.dedent(epilog),
+        citations=['counting', 'SeqAn'])
     add_threading_args(parser)
 
     parser.add_argument('--cutoff', '-C', default=DEFAULT_CUTOFF,

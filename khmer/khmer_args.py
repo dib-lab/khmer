@@ -77,6 +77,16 @@ ALGORITHMS = {
 }
 
 
+class CitationAction(argparse.Action):
+    def __init__(self, *args, **kwargs):
+        self.citations = kwargs.pop('citations')
+        super(CitationAction, self).__init__(*args, nargs=0, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        info(parser.prog, self.citations)
+        parser.exit()
+
+
 class _VersionStdErrAction(_VersionAction):
     # pylint: disable=too-few-public-methods, protected-access
     """Force output to StdErr."""
@@ -372,7 +382,7 @@ def _check_fp_rate(args, desired_max_fp):
     return args
 
 
-def build_graph_args(descr=None, epilog=None, parser=None):
+def build_graph_args(descr=None, epilog=None, parser=None, citations=None):
     """Build an ArgumentParser with args for bloom filter based scripts."""
     if parser is None:
         parser = argparse.ArgumentParser(description=descr, epilog=epilog,
@@ -380,6 +390,9 @@ def build_graph_args(descr=None, epilog=None, parser=None):
 
     parser.add_argument('--version', action=_VersionStdErrAction,
                         version='khmer {v}'.format(v=__version__))
+
+    parser.add_argument('--info', action=CitationAction,
+                        citations=citations)
 
     parser.add_argument('--ksize', '-k', type=int, default=DEFAULT_K,
                         help='k-mer size to use')
@@ -406,9 +419,9 @@ def build_graph_args(descr=None, epilog=None, parser=None):
     return parser
 
 
-def build_counting_args(descr=None, epilog=None):
+def build_counting_args(descr=None, epilog=None, citations=None):
     """Build an ArgumentParser with args for countgraph based scripts."""
-    parser = build_graph_args(descr=descr, epilog=epilog)
+    parser = build_graph_args(descr=descr, epilog=epilog, citations=citations)
 
     return parser
 
