@@ -235,17 +235,28 @@ def write_record(record, fileobj):
             sequence=record.sequence)
 
     try:
-        fileobj.write(bytes(recstr, 'utf-8'))
+        fileobj.write(bytes(recstr, 'ascii'))
     except TypeError:
         fileobj.write(recstr)
 
 
+_rec_pair = '@%s\n%s\n+\n%s\n' * 2
+_rec_pair_no_qual = '>%s\n%s\n' * 2
 def write_record_pair(read1, read2, fileobj):
     """Write a pair of sequence records to 'fileobj' in FASTA/FASTQ format."""
     if hasattr(read1, 'quality'):
         assert hasattr(read2, 'quality')
-    write_record(read1, fileobj)
-    write_record(read2, fileobj)
+        recstr = _rec_pair % (read1.name, read1.sequence, read1.quality,
+                              read2.name, read2.sequence, read2.quality)
+
+    else:
+        recstr = _rec_pair_no_qual % (read1.name, read1.sequence,
+                                      read2.name, read2.sequence)
+
+    try:
+        fileobj.write(bytes(recstr, 'ascii'))
+    except TypeError:
+        fileobj.write(recstr)
 
 
 def clean_input_reads(screed_iter):
