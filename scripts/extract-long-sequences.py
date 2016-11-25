@@ -54,8 +54,8 @@ import sys
 from khmer import __version__
 from khmer.utils import write_record
 from khmer.kfile import add_output_compression_type, get_file_writer
-from khmer.khmer_args import (ComboFormatter, sanitize_help, info,
-                              _VersionStdErrAction)
+from khmer.khmer_args import (ComboFormatter, sanitize_help,
+                              _VersionStdErrAction, CitationAction)
 
 
 def get_parser():
@@ -79,12 +79,13 @@ def get_parser():
                         type=int, default=200)
     parser.add_argument('--version', action=_VersionStdErrAction,
                         version='khmer {v}'.format(v=__version__))
+    parser.add_argument('--info', action=CitationAction,
+                        citations=None)
     add_output_compression_type(parser)
     return parser
 
 
 def main():
-    info('extract-long-sequences.py')
     args = sanitize_help(get_parser()).parse_args()
     outfp = get_file_writer(args.output, args.gzip, args.bzip)
     for filename in args.input_filenames:

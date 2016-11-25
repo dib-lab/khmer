@@ -52,8 +52,8 @@ import textwrap
 import argparse
 from khmer import __version__
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
-                              _VersionStdErrAction)
+from khmer.khmer_args import (sanitize_help, ComboFormatter,
+                              _VersionStdErrAction, CitationAction)
 from khmer.khmer_args import FileType as khFileType
 from khmer.kfile import (add_output_compression_type, get_file_writer,
                          describe_file_handle)
@@ -93,6 +93,8 @@ def get_parser():
                         default=sys.stdout)
     parser.add_argument('--version', action=_VersionStdErrAction,
                         version='khmer {v}'.format(v=__version__))
+    parser.add_argument('--info', action=CitationAction,
+                        citations=None)
     parser.add_argument('--no-reformat', default=False, action='store_true',
                         help='Do not reformat read names or enforce\
                               consistency')
@@ -103,7 +105,6 @@ def get_parser():
 
 
 def main():
-    info('interleave-reads.py')
     args = sanitize_help(get_parser()).parse_args()
 
     check_input_files(args.left, args.force)

@@ -53,7 +53,7 @@ import argparse
 from khmer import __version__
 from khmer import ReadParser
 from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
-                              _VersionStdErrAction)
+                              _VersionStdErrAction, CitationAction)
 from khmer.khmer_args import FileType as khFileType
 from khmer.utils import (write_record, broken_paired_reader,
                          UnpairedReadsError)
@@ -115,6 +115,8 @@ def get_parser():
                         'file', type=khFileType('wb'))
     parser.add_argument('--version', action=_VersionStdErrAction,
                         version='khmer {v}'.format(v=__version__))
+    parser.add_argument('--info', action=CitationAction,
+                        citations=None)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     add_output_compression_type(parser)
@@ -122,7 +124,6 @@ def get_parser():
 
 
 def main():
-    info('split-paired-reads.py')
     args = sanitize_help(get_parser()).parse_args()
 
     infile = args.infile

@@ -58,8 +58,8 @@ import textwrap
 
 from khmer import __version__, load_countgraph
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
-                              _VersionStdErrAction)
+from khmer.khmer_args import (sanitize_help, ComboFormatter,
+                              _VersionStdErrAction, CitationAction)
 
 
 def get_parser():
@@ -91,13 +91,14 @@ def get_parser():
                         type=argparse.FileType('w'))
     parser.add_argument('--version', action=_VersionStdErrAction,
                         version='khmer {v}'.format(v=__version__))
+    parser.add_argument('--info', action=CitationAction,
+                        citations=['diginorm'])
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
 
 
 def main():
-    info('count-median.py', ['diginorm'])
     args = sanitize_help(get_parser()).parse_args()
 
     htfile = args.countgraph

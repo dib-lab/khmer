@@ -53,8 +53,9 @@ import gc
 import os.path
 
 from khmer import __version__, load_nodegraph
-from khmer.khmer_args import (add_threading_args, info, sanitize_help,
-                              ComboFormatter, _VersionStdErrAction)
+from khmer.khmer_args import (add_threading_args, sanitize_help,
+                              ComboFormatter, _VersionStdErrAction,
+                              CitationAction)
 from khmer.kfile import check_input_files
 from oxli.partition import worker
 
@@ -90,6 +91,8 @@ def get_parser():
                         'traversals')
     parser.add_argument('--version', action=_VersionStdErrAction,
                         version='khmer {v}'.format(v=__version__))
+    parser.add_argument('--info', action=CitationAction,
+                        citations=['graph'])
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     add_threading_args(parser)
@@ -97,7 +100,6 @@ def get_parser():
 
 
 def main():
-    info('partition-graph.py', ['graph'])
     args = sanitize_help(get_parser()).parse_args()
     basename = args.basename
 

@@ -51,8 +51,9 @@ import sys
 import textwrap
 
 import khmer
-from khmer.khmer_args import (DEFAULT_K, info, ComboFormatter,
-                              _VersionStdErrAction, sanitize_help)
+from khmer.khmer_args import (DEFAULT_K, ComboFormatter,
+                              _VersionStdErrAction, CitationAction,
+                              sanitize_help)
 from khmer.khmer_args import graphsize_args_report
 from khmer import __version__
 
@@ -105,6 +106,9 @@ def get_parser():
     parser.add_argument('--version', action=_VersionStdErrAction,
                         version='khmer {v}'.format(v=__version__))
 
+    parser.add_argument('--info', action=CitationAction,
+                        citations=['SeqAn', 'hll'])
+
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
 
@@ -134,7 +138,6 @@ def get_parser():
 
 
 def main():
-    info('unique-kmers.py', ['SeqAn', 'hll'])
     args = sanitize_help(get_parser()).parse_args()
 
     total_hll = khmer.HLLCounter(args.error_rate, args.ksize)

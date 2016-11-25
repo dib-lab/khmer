@@ -50,8 +50,8 @@ from khmer import __version__
 from khmer.kfile import (add_output_compression_type, get_file_writer,
                          describe_file_handle)
 from khmer.utils import write_record
-from khmer.khmer_args import (sanitize_help, ComboFormatter, info,
-                              _VersionStdErrAction)
+from khmer.khmer_args import (sanitize_help, ComboFormatter,
+                              _VersionStdErrAction, CitationAction)
 from khmer.khmer_args import FileType as khFileType
 
 
@@ -72,12 +72,13 @@ def get_parser():
                              'input_sequence file. Default is to drop reads')
     parser.add_argument('--version', action=_VersionStdErrAction,
                         version='khmer {v}'.format(v=__version__))
+    parser.add_argument('--info', action=CitationAction,
+                        citations=None)
     add_output_compression_type(parser)
     return parser
 
 
 def main():
-    info('fastq-to-fasta.py')
     args = sanitize_help(get_parser()).parse_args()
 
     print('fastq from ', args.input_sequence, file=sys.stderr)

@@ -53,8 +53,8 @@ import sys
 from khmer import __version__, Nodegraph
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
-                              _VersionStdErrAction)
+from khmer.khmer_args import (sanitize_help, ComboFormatter,
+                              _VersionStdErrAction, CitationAction)
 
 # @CTB K should be loaded from file...
 DEFAULT_K = 32
@@ -76,13 +76,14 @@ def get_parser():
                         nargs='+')
     parser.add_argument('--version', action=_VersionStdErrAction,
                         version='khmer {v}'.format(v=__version__))
+    parser.add_argument('--info', action=CitationAction,
+                        citations=['graph'])
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
 
 
 def main():
-    info('filter-stoptags.py', ['graph'])
     args = sanitize_help(get_parser()).parse_args()
     stoptags = args.stoptags_file
     infiles = args.input_filenames

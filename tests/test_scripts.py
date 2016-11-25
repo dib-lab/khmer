@@ -2762,10 +2762,16 @@ def test_version_and_basic_citation(scriptname):
         line = script.readline()
         line = script.readline()
         if 'khmer' in line:
-            version = re.compile("^khmer .*$", re.MULTILINE)
-            status, out, err = utils.runscript(scriptname, ["--version"])
+            # check citation information appears when using --info
+            status, out, err = utils.runscript(scriptname, ["--info"])
             assert status == 0, status
             print(out)
             print(err)
-            # assert "publication" in err, err
-            assert version.search(err) is not None, err
+            assert "publication" in err, err
+            assert "usage:" not in err, err
+
+            # check no citation information appears otherwise
+            status, out, err = utils.runscript(scriptname, ["--help"])
+            assert status == 0, status
+            assert "publication" not in out, out
+            assert "usage:" in out, out

@@ -51,8 +51,8 @@ import textwrap
 import os
 from khmer import __version__
 from khmer.kfile import check_input_files
-from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
-                              _VersionStdErrAction)
+from khmer.khmer_args import (sanitize_help, ComboFormatter,
+                              _VersionStdErrAction, CitationAction)
 from khmer.khmer_logger import (configure_logging, log_info, log_error,
                                 log_warn)
 
@@ -88,6 +88,8 @@ def get_parser():
                         help='Do not count k-mers past 255')
     parser.add_argument('--version', action=_VersionStdErrAction,
                         version='khmer {v}'.format(v=__version__))
+    parser.add_argument('--info', action=CitationAction,
+                        citations=['counting'])
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Continue even if specified input files '
                         'do not exist or are empty.')
@@ -98,8 +100,6 @@ def get_parser():
 
 def main():
     args = sanitize_help(get_parser()).parse_args()
-    if not args.quiet:
-        info('abundance-dist.py', ['counting'])
 
     configure_logging(args.quiet)
 
