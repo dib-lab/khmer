@@ -240,10 +240,11 @@ def write_record(record, fileobj):
         fileobj.write(recstr)
 
 
-_rec_pair = '@%s\n%s\n+\n%s\n' * 2
-_rec_pair_no_qual = '>%s\n%s\n' * 2
 def write_record_pair(read1, read2, fileobj):
     """Write a pair of sequence records to 'fileobj' in FASTA/FASTQ format."""
+    _rec_pair = '@%s\n%s\n+\n%s\n' * 2
+    _rec_pair_no_qual = '>%s\n%s\n' * 2
+
     if hasattr(read1, 'quality'):
         assert hasattr(read2, 'quality')
         recstr = _rec_pair % (read1.name, read1.sequence, read1.quality,
