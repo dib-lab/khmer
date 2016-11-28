@@ -278,6 +278,33 @@ class TestStreamingPartitionerBasic:
         for row in results:
             assert abs(float(row[2])-float(cov)) < 2
 
+    @pytest.mark.parametrize("n_components", [1, 10, 50, 100])
+    def test_save_partitioner(self, random_sequence, n_components, tmpdir):
+        import json
+        out_prefix = str(tmpdir.join('test_save'))
+        seqs = []
+        for _ in range(n_components):
+            seqs.append(random_sequence(exclude=''.join(seqs)))
+        G = khmer.Countgraph(K, 1e6, 4)
+        sp = StreamingPartitioner(G)
+        for seq in seqs:
+            sp.consume(seq)
+
+        sp.save(out_prefix)
+
+        with open(out_prefix + '.json') as fp:
+            print(fp.read())
+            fp.seek(0)
+            result = json.load(fp)
+
+        assert 'graph' in result
+        assert result['graph'] == out_prefix + '.graph'
+        assert 'n_components' in result
+        assert result['n_components'] == n_components
+        result_comps = {d['component_id']: d for d in result['components']}
+        for comp in sp.components():
+            assert comp.component_id in result_comps
+
 
 class TestStreamingPartitionerPaired:
 

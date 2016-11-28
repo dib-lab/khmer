@@ -131,6 +131,10 @@ class Component {
             n_created++;
         }
 
+        explicit Component(uint64_t component_id): component_id(component_id) {
+            n_created++;
+        }
+
         ~Component() {
             n_destroyed++;
         }
@@ -205,6 +209,7 @@ class StreamingPartitioner {
 
         uint64_t consume_fasta(std::string const &filename);
         void map_tags_to_component(std::set<HashIntoType>& tags, ComponentPtr& comp);
+        void add_component(ComponentPtr comp);
         void find_connected_tags(KmerQueue& node_q,
                                  std::set<HashIntoType>& found_tags,
                                  std::set<HashIntoType>& seen,

@@ -1,3 +1,4 @@
+# cython: c_string_type=unicode, c_string_encoding=utf8
 import cython
 from cython.operator cimport dereference as deref, preincrement as inc
 
@@ -7,7 +8,7 @@ from libcpp.vector cimport vector
 from libcpp.map cimport map
 from libcpp.set cimport set
 from libcpp.queue cimport queue
-from libcpp.memory cimport unique_ptr, weak_ptr, shared_ptr
+from libcpp.memory cimport unique_ptr, weak_ptr, shared_ptr, make_shared
 from libcpp.utility cimport pair
 
 from libc.stdint cimport uint32_t, uint8_t, uint64_t
@@ -56,12 +57,6 @@ cdef class Component:
             raise NotImplementedError('Operator not available.')
 
     @staticmethod
-    cdef Component wrap(ComponentPtr ptr):
-        cdef Component comp = Component()
-        comp._this = ptr
-        return comp
-
-    @staticmethod
     cdef vector[BoundedCounterType] _tag_counts(ComponentPtr comp, CpHashtable * graph):
         cdef uint64_t n_tags = deref(comp).get_n_tags()
         cdef vector[BoundedCounterType] counts
@@ -86,6 +81,34 @@ cdef class Component:
             acc += <float>deref(graph).get_count(tag)
         return acc / <float>n_tags
 
+    cdef void save(self, FILE* fp):
+        cdef HashIntoType tag
+        cdef int i
+
+        fprintf(fp, "{\"component_id\": %llu, \"tags\": [", deref(self._this).component_id)
+        for i, tag in enumerate(deref(self._this).tags):
+            if i != 0:
+                fprintf(fp, ",")
+            fprintf(fp, "%llu", tag)
+        fprintf(fp, "]}")
+    
+    @staticmethod
+    cdef ComponentPtr load(uint64_t component_id, list tags):
+        cdef ComponentPtr comp
+        cdef HashIntoType tag
+        cdef int i, N = len(tags)
+        comp.reset(new CpComponent(component_id))
+        for i in range(N):
+            tag = tags[i]
+            deref(comp).add_tag(tag)
+        return comp
+    
+    @staticmethod
+    cdef Component wrap(ComponentPtr ptr):
+        cdef Component comp = Component()
+        comp._this = ptr
+        return comp
+
 
 cdef class StreamingPartitioner:
 
@@ -93,6 +116,7 @@ cdef class StreamingPartitioner:
         if not (isinstance(graph, Countgraph) or isinstance(graph, Nodegraph)):
             raise ValueError('Must take an object with Hashtable *')
         
+        self.graph = graph
         cdef CPyHashtable_Object* ptr = <CPyHashtable_Object*> graph
         self._graph_ptr = deref(ptr).hashtable
         
@@ -101,6 +125,7 @@ cdef class StreamingPartitioner:
         self._tag_component_map = deref(self._this).get_tag_component_map()
         self._components = deref(self._this).get_component_set()
         self.n_consumed = 0
+        self.component_dict = {comp.component_id: comp for comp in self.components()}
 
     def consume(self, sequence):
         deref(self._this).consume(sequence.encode('utf-8'))
@@ -143,18 +168,18 @@ cdef class StreamingPartitioner:
     def tag_components(self):
         cdef shared_ptr[CpGuardedKmerCompMap] locked
         cdef pair[HashIntoType,ComponentPtr] cpair
-        lockedptr = self._tag_component_map.lock()
-        if lockedptr:
-            for cpair in deref(lockedptr).data:
+        locked = self._tag_component_map.lock()
+        if locked:
+            for cpair in deref(locked).data:
                 yield cpair.first, Component.wrap(cpair.second)
         else:
-            raise MemoryError("Can't locked underlying Component set")
+            raise MemoryError("Can't lock underlying Component set")
 
     def write_components(self, filename):
         cdef FILE* fp
         fp = fopen(filename.encode('utf-8'), 'wb')
         if fp == NULL:
-            raise IOError("Can't open file.")
+            raise IOError('Can\'t open file.')
         
         cdef ComponentPtr cmpptr
         cdef shared_ptr[ComponentPtrSet] lockedptr
@@ -167,6 +192,35 @@ cdef class StreamingPartitioner:
                         deref(cmpptr).get_n_tags(),
                         Component._mean_tag_count(cmpptr, self._graph_ptr))
         fclose(fp)
+
+    def save(self, filename):
+        graph_filename = '{0}.graph'.format(filename)
+        comp_filename = '{0}.json'.format(filename)
+        bytes_graph_filename = graph_filename.encode('utf-8')
+        cdef char * c_graph_filename = bytes_graph_filename
+        self.graph.save(graph_filename)
+
+        cdef FILE* fp = fopen(comp_filename.encode('utf-8'), 'w')
+        if fp == NULL:
+            raise IOError('Can\'t open file.')
+
+        fprintf(fp, "{\"graph\": \"%s\",\n\"n_components\": %llu,\n",
+                c_graph_filename, deref(self._this).get_n_components())
+        fprintf(fp, "\"n_tags\": %llu,\n", deref(self._this).get_n_tags())
+        fprintf(fp, "\"components\": [\n")
+
+        cdef Component comp
+        cdef int i
+        cdef shared_ptr[ComponentPtrSet] locked
+        locked = self._components.lock()
+        if locked:
+            for i, comp in enumerate(self.components()):
+                if i != 0:
+                    fprintf(fp, ",\n")
+                comp.save(fp)
+        fprintf(fp, "\n]}")
+        fclose(fp)
+
 
     property n_components:
         def __get__(self):

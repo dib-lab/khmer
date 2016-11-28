@@ -111,6 +111,12 @@ void StreamingPartitioner::consume_pair(const std::string& first,
     create_and_connect_components(tags);
 }
 
+void StreamingPartitioner::add_component(ComponentPtr comp)
+{
+    components->insert(comp);
+    map_tags_to_component(comp->tags, comp);
+}
+
 
 void StreamingPartitioner::consume_and_connect_tags(const std::string& seq,
                                                     std::set<HashIntoType>& tags)

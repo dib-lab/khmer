@@ -127,6 +127,9 @@ cdef extern from "traversal.hh":
 cdef extern from "partitioning.hh" namespace "khmer":
 
     cdef cppclass CpComponent "khmer::Component":
+        CpComponent()
+        CpComponent(uint64_t)
+
         const uint64_t component_id
         set[HashIntoType] tags
 
@@ -154,6 +157,7 @@ cdef extern from "partitioning.hh" namespace "khmer":
         void consume_pair(string&, string&) except +MemoryError
         uint64_t consume_fasta(string&) except +MemoryError
 
+        void add_component(ComponentPtr comp)
         void map_tags_to_component(set[HashIntoType]&, ComponentPtr&)
         void find_connected_tags(queue[CpKmer]&, 
                                  set[HashIntoType]&,
