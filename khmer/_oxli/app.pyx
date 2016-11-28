@@ -22,9 +22,9 @@ cdef class PartitioningApp:
 
     def __init__(self, args=sys.argv[1:]):
         self.args = self.parse_args(args)
-        self.args.write_stats = self.stats_interval > 0
+        self.args.write_stats = self.args.stats_interval > 0
 
-        self.graph = create_countgraph(self)
+        self.graph = create_countgraph(self.args)
         self.partitioner = StreamingPartitioner(self.graph)
 
     def parse_args(self, args):
@@ -34,15 +34,15 @@ cdef class PartitioningApp:
         parser.add_argument('--pairing-mode', 
                             choices=['split', 'interleaved', 'single'],
                             default='split')
-        parser.add_argument('-Z', dest='norm', default=10)
-        parser.add_argument('--stats-interval', default=0)
+        parser.add_argument('-Z', dest='norm', default=10, type=int)
+        parser.add_argument('--stats-interval', default=0, type=int)
         
         return parser.parse_args(args)
 
     def write_components(self, folder, n, sample):
         sample = os.path.basename(sample)
         filename = os.path.join(folder,
-                                '{0}-{1}.stats.csv'.format(sample, n))
+                                '{0}.{1}.stats.csv'.format(n, sample))
         print('# {0}: {1} tags, {2} components.'.format(n, self.partitioner.n_tags, 
                                                         self.partitioner.n_components))
         print('  writing results to file -> {0}'.format(filename))
@@ -50,7 +50,7 @@ cdef class PartitioningApp:
 
     def run(self):
 
-        if self.args.write_stats > 0:
+        if self.args.write_stats:
             try:
                 os.mkdir(self.args.stats_dir)
             except OSError as e:
@@ -63,6 +63,8 @@ cdef class PartitioningApp:
                     raise ValueError('Must have even number of samples!')
         else:
             samples = self.args.samples
+
+        last = 0
         for group in samples:
             if self.args.pairing_mode == 'split':
                 sample_name = '{0}.{1}'.format(group[0], group[1])
@@ -79,14 +81,14 @@ cdef class PartitioningApp:
                 if n % 1000 == 0:
                     print (n, '...', sep='')
                 if self.args.write_stats and n > 0 and n % self.args.stats_interval == 0:
-                    self.write_components(self.args.stats_dir, n, sample_name)
+                    self.write_components(self.args.stats_dir, last+n, sample_name)
 
                 if paired:
                     self.partitioner.consume_pair(first.sequence,
                                                   second.sequence)
                 else:
                     self.partitioner.consume(first.sequence)
+            last = n
+            self.write_components(self.args.stats_dir, last+n, sample_name)
 
-            self.write_components(self.args.stats_dir, n, sample_name)
-
-
+        return self.partitioner
