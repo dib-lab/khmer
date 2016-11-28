@@ -44,16 +44,13 @@ merged pmap file will be in <base>.pmap.merged.
 """
 from __future__ import print_function
 
-import argparse
 import glob
 import os
 import textwrap
 import khmer
 import sys
-from khmer import __version__
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import (sanitize_help, ComboFormatter,
-                              _VersionStdErrAction, CitationAction)
+from khmer.khmer_args import sanitize_help, KhmerArgumentParser
 
 DEFAULT_K = 32
 
@@ -64,9 +61,10 @@ def get_parser():
     single ``${graphbase}.pmap.merged`` file for
     :program:`annotate-partitions.py` to use.
     """
-    parser = argparse.ArgumentParser(
+    parser = KhmerArgumentParser(
         description="Merge partition map '.pmap' files.",
-        epilog=textwrap.dedent(epilog), formatter_class=ComboFormatter)
+        epilog=textwrap.dedent(epilog),
+        citations=['graph'])
     parser.add_argument('--ksize', '-k', type=int, default=DEFAULT_K,
                         help="k-mer size (default: %d)" % DEFAULT_K)
     parser.add_argument('--keep-subsets', dest='remove_subsets',
@@ -74,10 +72,6 @@ def get_parser():
                         help='Keep individual subsets (default: False)')
     parser.add_argument('graphbase', help='basename for input and output '
                         'files')
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
-    parser.add_argument('--info', action=CitationAction,
-                        citations=['graph'])
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser

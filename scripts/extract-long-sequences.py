@@ -54,8 +54,7 @@ import sys
 from khmer import __version__
 from khmer.utils import write_record
 from khmer.kfile import add_output_compression_type, get_file_writer
-from khmer.khmer_args import (ComboFormatter, sanitize_help,
-                              _VersionStdErrAction, CitationAction)
+from khmer.khmer_args import sanitize_help, KhmerArgumentParser
 
 
 def get_parser():
@@ -64,10 +63,10 @@ def get_parser():
 
         extract-long-sequences.py --length 10 tests/test-data/paired-mixed.fa
     """
-    parser = argparse.ArgumentParser(
+    parser = KhmerArgumentParser(
         description='Extract FASTQ or FASTA sequences longer than'
         ' specified length (default: 200 bp).',
-        formatter_class=ComboFormatter, epilog=textwrap.dedent(epilog))
+        epilog=textwrap.dedent(epilog))
 
     parser.add_argument('input_filenames', help='Input FAST[AQ]'
                         ' sequence filename.', nargs='+')
@@ -77,10 +76,6 @@ def get_parser():
     parser.add_argument('-l', '--length', help='The minimum length of'
                         ' the sequence file.',
                         type=int, default=200)
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
-    parser.add_argument('--info', action=CitationAction,
-                        citations=None)
     add_output_compression_type(parser)
     return parser
 
@@ -93,6 +88,7 @@ def main():
             if len(record['sequence']) >= args.length:
                 write_record(record, outfp)
     print('wrote to: ' + args.output.name, file=sys.stderr)
+
 
 if __name__ == '__main__':
     main()

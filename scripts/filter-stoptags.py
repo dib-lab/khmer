@@ -47,14 +47,12 @@ Use '-h' for parameter help.
 from __future__ import print_function
 
 import os
-import argparse
 import textwrap
 import sys
 from khmer import __version__, Nodegraph
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import (sanitize_help, ComboFormatter,
-                              _VersionStdErrAction, CitationAction)
+from khmer.khmer_args import sanitize_help, KhmerArgumentParser
 
 # @CTB K should be loaded from file...
 DEFAULT_K = 32
@@ -66,18 +64,14 @@ def get_parser():
     or remove the sequences in `<file1-N>`.  Trimmed sequences will be placed
     in `<fileN>.stopfilt`.
     """
-    parser = argparse.ArgumentParser(
+    parser = KhmerArgumentParser(
         description="Trim sequences at stoptags.",
-        epilog=textwrap.dedent(epilog), formatter_class=ComboFormatter)
+        epilog=textwrap.dedent(epilog), citations=['graph'])
     parser.add_argument('--ksize', '-k', default=DEFAULT_K, type=int,
                         help='k-mer size')
     parser.add_argument('stoptags_file', metavar='input_stoptags_filename')
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         nargs='+')
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
-    parser.add_argument('--info', action=CitationAction,
-                        citations=['graph'])
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser

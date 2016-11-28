@@ -46,13 +46,11 @@ Use '-h' for parameter help.
 from __future__ import print_function
 
 import os
-import argparse
 import textwrap
 import sys
 from khmer import __version__, Nodegraph
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import (sanitize_help, ComboFormatter,
-                              _VersionStdErrAction, CitationAction)
+from khmer.khmer_args import (sanitize_help, KhmerArgumentParser)
 
 DEFAULT_K = 32
 
@@ -71,9 +69,9 @@ def get_parser():
         merge-partitions.py -k 20 example
         annotate-partitions.py -k 20 example tests/test-data/random-20-a.fa
     """
-    parser = argparse.ArgumentParser(
+    parser = KhmerArgumentParser(
         description="Annotate sequences with partition IDs.",
-        epilog=textwrap.dedent(epilog), formatter_class=ComboFormatter)
+        epilog=textwrap.dedent(epilog))
 
     parser.add_argument('--ksize', '-k', type=int, default=DEFAULT_K,
                         help="k-mer size (default: %d)" % DEFAULT_K)
@@ -82,10 +80,6 @@ def get_parser():
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         nargs='+', help='input FAST[AQ] sequences to '
                         'annotate.')
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
-    parser.add_argument('--info', action=CitationAction,
-                        citations=['graph'])
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser

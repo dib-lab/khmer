@@ -45,7 +45,7 @@ import sys
 import textwrap
 import khmer
 from khmer import khmer_args
-from khmer.khmer_args import (build_counting_args, info, sanitize_help)
+from khmer.khmer_args import (build_counting_args, sanitize_help)
 from khmer.kfile import check_input_files
 
 DEFAULT_SUBSET_SIZE = int(1e4)
@@ -85,7 +85,8 @@ def get_parser():
     """
     parser = build_counting_args(
         descr="Find an initial set of highly connected k-mers.",
-        epilog=textwrap.dedent(epilog))
+        epilog=textwrap.dedent(epilog),
+        citations=['graph'])
     parser.add_argument('--subset-size', '-s', default=DEFAULT_SUBSET_SIZE,
                         dest='subset_size', type=float,
                         help='Set subset size (default 1e4 is prob ok)')
@@ -99,8 +100,6 @@ def get_parser():
 
 
 def main():
-
-    info('make-initial-stoptags.py', ['graph'])
     args = sanitize_help(get_parser()).parse_args()
 
     graphbase = args.graphbase

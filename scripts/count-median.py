@@ -50,16 +50,15 @@ The output file contains sequence id, median, average, stddev, and seq length.
 NOTE: All 'N's in the input sequences are converted to 'A's.
 """
 from __future__ import print_function
-import screed
 import argparse
+import screed
 import sys
 import csv
 import textwrap
 
 from khmer import __version__, load_countgraph
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import (sanitize_help, ComboFormatter,
-                              _VersionStdErrAction, CitationAction)
+from khmer.khmer_args import (sanitize_help, KhmerArgumentParser)
 
 
 def get_parser():
@@ -78,9 +77,9 @@ def get_parser():
 
     NOTE: All 'N's in the input sequences are converted to 'A's.
     """
-    parser = argparse.ArgumentParser(
+    parser = KhmerArgumentParser(
         description='Count k-mers summary stats for sequences',
-        epilog=textwrap.dedent(epilog), formatter_class=ComboFormatter)
+        epilog=textwrap.dedent(epilog))
 
     parser.add_argument('countgraph', metavar='input_count_graph_filename',
                         help='input k-mer countgraph filename')
@@ -89,10 +88,6 @@ def get_parser():
     parser.add_argument('output', metavar='output_summary_filename',
                         help='output summary filename',
                         type=argparse.FileType('w'))
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
-    parser.add_argument('--info', action=CitationAction,
-                        citations=['diginorm'])
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser

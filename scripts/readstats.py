@@ -43,15 +43,14 @@ Use '-h' for parameter help.
 """
 from __future__ import print_function
 
+import argparse
 import sys
 import csv
 import screed
-import argparse
 import textwrap
 
 from khmer import __version__
-from khmer.khmer_args import (sanitize_help, ComboFormatter,
-                              _VersionStdErrAction, CitationAction)
+from khmer.khmer_args import sanitize_help, KhmerArgumentParser
 
 
 def get_parser():
@@ -68,9 +67,9 @@ def get_parser():
         readstats.py tests/test-data/test-abund-read-2.fa
     """
 
-    parser = argparse.ArgumentParser(
-        description=descr, formatter_class=ComboFormatter,
-        epilog=textwrap.dedent(epilog),)
+    parser = KhmerArgumentParser(
+        description=descr,
+        epilog=textwrap.dedent(epilog))
     parser.add_argument('filenames', nargs='+')
     parser.add_argument('-o', '--output', dest='outfp', metavar="filename",
                         help="output file for statistics; defaults to stdout.",
@@ -78,10 +77,6 @@ def get_parser():
     parser.add_argument('--csv', default=False, action='store_true',
                         help='Use the CSV format for the statistics, '
                         'including column headers.')
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
-    parser.add_argument('--info', action=CitationAction,
-                        citations=None)
     return parser
 
 

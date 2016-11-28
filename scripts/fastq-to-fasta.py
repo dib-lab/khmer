@@ -44,21 +44,18 @@ Use '-h' for parameter help.
 """
 from __future__ import print_function, unicode_literals
 import sys
-import argparse
 import screed
 from khmer import __version__
 from khmer.kfile import (add_output_compression_type, get_file_writer,
                          describe_file_handle)
 from khmer.utils import write_record
-from khmer.khmer_args import (sanitize_help, ComboFormatter,
-                              _VersionStdErrAction, CitationAction)
+from khmer.khmer_args import sanitize_help, KhmerArgumentParser
 from khmer.khmer_args import FileType as khFileType
 
 
 def get_parser():
-    parser = argparse.ArgumentParser(
-        description='Converts FASTQ format (.fq) files to FASTA format (.fa).',
-        formatter_class=ComboFormatter)
+    parser = KhmerArgumentParser(
+        description='Converts FASTQ format (.fq) files to FASTA format (.fa).')
 
     parser.add_argument('input_sequence', help='The name of the input'
                         ' FASTQ sequence file.')
@@ -70,10 +67,6 @@ def get_parser():
     parser.add_argument('-n', '--n_keep', default=False, action='store_true',
                         help='Option to keep reads containing \'N\'s in '
                              'input_sequence file. Default is to drop reads')
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
-    parser.add_argument('--info', action=CitationAction,
-                        citations=None)
     add_output_compression_type(parser)
     return parser
 

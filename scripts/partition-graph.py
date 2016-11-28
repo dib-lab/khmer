@@ -46,7 +46,6 @@ Use '-h' for parameter help.
 from __future__ import print_function
 
 import threading
-import argparse
 import textwrap
 import sys
 import gc
@@ -54,8 +53,7 @@ import os.path
 
 from khmer import __version__, load_nodegraph
 from khmer.khmer_args import (add_threading_args, sanitize_help,
-                              ComboFormatter, _VersionStdErrAction,
-                              CitationAction)
+                              KhmerArgumentParser)
 from khmer.kfile import check_input_files
 from oxli.partition import worker
 
@@ -74,10 +72,10 @@ def get_parser():
     The resulting partition maps are saved as ``${basename}.subset.#.pmap``
     files.
     """
-    parser = argparse.ArgumentParser(
+    parser = KhmerArgumentParser(
         description="Partition a sequence graph based upon waypoint "
         "connectivity", epilog=textwrap.dedent(epilog),
-        formatter_class=ComboFormatter)
+        citations=['graph'])
 
     parser.add_argument('basename', help="basename of the input k-mer "
                         "nodegraph  + tagset files")
@@ -89,10 +87,6 @@ def get_parser():
     parser.add_argument('--no-big-traverse', action='store_true',
                         default=False, help='Truncate graph joins at big '
                         'traversals')
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
-    parser.add_argument('--info', action=CitationAction,
-                        citations=['graph'])
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     add_threading_args(parser)

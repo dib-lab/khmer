@@ -57,8 +57,7 @@ from khmer import __version__
 from khmer import ReadParser
 from khmer.kfile import (check_input_files, add_output_compression_type,
                          get_file_writer)
-from khmer.khmer_args import (sanitize_help, ComboFormatter,
-                              _VersionStdErrAction, CitationAction)
+from khmer.khmer_args import sanitize_help, KhmerArgumentParser
 from khmer.utils import write_record, broken_paired_reader
 
 DEFAULT_NUM_READS = int(1e5)
@@ -82,9 +81,9 @@ def get_parser():
     <http://en.wikipedia.org/wiki/Reservoir_sampling>`__ algorithm.
     """
 
-    parser = argparse.ArgumentParser(
+    parser = KhmerArgumentParser(
         description="Uniformly subsample sequences from a collection of files",
-        formatter_class=ComboFormatter, epilog=textwrap.dedent(epilog))
+        epilog=textwrap.dedent(epilog))
 
     parser.add_argument('filenames', nargs='+')
     parser.add_argument('-N', '--num_reads', type=int, dest='num_reads',
@@ -100,10 +99,6 @@ def get_parser():
     parser.add_argument('-o', '--output', dest='output_file',
                         type=argparse.FileType('wb'),
                         metavar="filename", default=None)
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
-    parser.add_argument('--info', action=CitationAction,
-                        citations=None)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exits')
     add_output_compression_type(parser)

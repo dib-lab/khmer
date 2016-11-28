@@ -49,11 +49,9 @@ from __future__ import print_function
 import screed
 import sys
 import textwrap
-import argparse
 from khmer import __version__
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import (sanitize_help, ComboFormatter,
-                              _VersionStdErrAction, CitationAction)
+from khmer.khmer_args import sanitize_help, KhmerArgumentParser
 from khmer.khmer_args import FileType as khFileType
 from khmer.kfile import (add_output_compression_type, get_file_writer,
                          describe_file_handle)
@@ -82,19 +80,15 @@ def get_parser():
 
         interleave-reads.py tests/test-data/paired.fq.1 \\
                 tests/test-data/paired.fq.2 -o paired.fq"""
-    parser = argparse.ArgumentParser(
+    parser = KhmerArgumentParser(
         description='Produce interleaved files from R1/R2 paired files',
-        epilog=textwrap.dedent(epilog), formatter_class=ComboFormatter)
+        epilog=textwrap.dedent(epilog))
 
     parser.add_argument('left')
     parser.add_argument('right')
     parser.add_argument('-o', '--output', metavar="filename",
                         type=khFileType('wb'),
                         default=sys.stdout)
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
-    parser.add_argument('--info', action=CitationAction,
-                        citations=None)
     parser.add_argument('--no-reformat', default=False, action='store_true',
                         help='Do not reformat read names or enforce\
                               consistency')

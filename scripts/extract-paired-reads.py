@@ -49,13 +49,11 @@ import screed
 import sys
 import os.path
 import textwrap
-import argparse
 
 from khmer import __version__
 from khmer import ReadParser
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import (sanitize_help, ComboFormatter,
-                              _VersionStdErrAction, CitationAction)
+from khmer.khmer_args import sanitize_help, KhmerArgumentParser
 from khmer.khmer_args import FileType as khFileType
 from khmer.kfile import add_output_compression_type
 from khmer.kfile import get_file_writer
@@ -91,15 +89,10 @@ def get_parser():
 
         extract-paired-reads.py tests/test-data/paired.fq
     """
-    parser = argparse.ArgumentParser(
+    parser = KhmerArgumentParser(
         description='Take a mixture of reads and split into pairs and '
-        'orphans.', epilog=textwrap.dedent(epilog),
-        formatter_class=ComboFormatter)
+        'orphans.', epilog=textwrap.dedent(epilog))
     parser.add_argument('infile', nargs='?', default='/dev/stdin')
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
-    parser.add_argument('--info', action=CitationAction,
-                        citations=None)
     parser.add_argument('-d', '--output-dir', default='', help='Output '
                         'split reads to specified directory. Creates '
                         'directory if necessary')

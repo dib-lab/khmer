@@ -56,7 +56,7 @@ from khmer import ReadParser
 from khmer.utils import broken_paired_reader, write_record
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, report_on_config,
-                              add_threading_args, info, calculate_graphsize,
+                              add_threading_args, calculate_graphsize,
                               sanitize_help, check_argument_range)
 from khmer.kfile import (check_input_files, check_space,
                          check_space_for_graph,
@@ -120,8 +120,6 @@ def get_parser():
 
 def main():
     args = sanitize_help(get_parser()).parse_args()
-    if not args.quiet:
-        info('filter-abund-single.py', ['counting', 'SeqAn'])
 
     configure_logging(args.quiet)
     check_input_files(args.datafile, args.force)

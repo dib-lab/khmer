@@ -48,12 +48,10 @@ from __future__ import print_function
 import sys
 import os
 import textwrap
-import argparse
 
 from khmer import __version__
 from khmer import ReadParser
-from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
-                              _VersionStdErrAction, CitationAction)
+from khmer.khmer_args import sanitize_help, KhmerArgumentParser
 from khmer.khmer_args import FileType as khFileType
 from khmer.utils import (write_record, broken_paired_reader,
                          UnpairedReadsError)
@@ -92,10 +90,9 @@ def get_parser():
 
         split-paired-reads.py -1 reads.1 -2 reads.2 tests/test-data/paired.fq
     """
-    parser = argparse.ArgumentParser(
+    parser = KhmerArgumentParser(
         description='Split interleaved reads into two files, left and right.',
-        epilog=textwrap.dedent(epilog),
-        formatter_class=ComboFormatter)
+        epilog=textwrap.dedent(epilog))
 
     parser.add_argument('infile', nargs='?', default='/dev/stdin')
 
@@ -113,10 +110,6 @@ def get_parser():
     parser.add_argument('-2', '--output-second', metavar='output_second',
                         default=None, help='Output "right" reads to this '
                         'file', type=khFileType('wb'))
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
-    parser.add_argument('--info', action=CitationAction,
-                        citations=None)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     add_output_compression_type(parser)

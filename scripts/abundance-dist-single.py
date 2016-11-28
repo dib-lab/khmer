@@ -52,7 +52,7 @@ import threading
 import textwrap
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, add_threading_args,
-                              report_on_config, info, calculate_graphsize,
+                              report_on_config, calculate_graphsize,
                               sanitize_help)
 from khmer.kfile import (check_input_files, check_space_for_graph)
 from khmer.khmer_logger import (configure_logging, log_info, log_error,
@@ -76,7 +76,8 @@ def get_parser():
     '''
     parser = build_counting_args(
         descr="Calculate the abundance distribution of k-mers from a "
-        "single sequence file.", epilog=textwrap.dedent(epilog))
+        "single sequence file.", epilog=textwrap.dedent(epilog),
+        citations=['counting', 'SeqAn'])
     add_threading_args(parser)
 
     parser.add_argument('input_sequence_filename', help='The name of the input'
@@ -106,8 +107,6 @@ def get_parser():
 
 def main():  # pylint: disable=too-many-locals,too-many-branches
     args = sanitize_help(get_parser()).parse_args()
-    if not args.quiet:
-        info('abundance-dist-single.py', ['counting', 'SeqAn'])
 
     configure_logging(args.quiet)
     report_on_config(args)

@@ -92,6 +92,9 @@ class _VersionStdErrAction(_VersionAction):
     """Force output to StdErr."""
 
     def __call__(self, parser, namespace, values, option_string=None):
+        # have to call info() directly as the version action exits
+        # which means parse_args() does not get a chance to run
+        info(parser.prog, parser._citations)
         version = self.version
         if version is None:
             version = parser.version
@@ -106,6 +109,29 @@ class ComboFormatter(argparse.ArgumentDefaultsHelpFormatter,
     """Both ArgumentDefaults and RawDescription formatters."""
 
     pass
+
+
+class KhmerArgumentParser(argparse.ArgumentParser):
+    def __init__(self, citations=None, formatter_class=ComboFormatter,
+                 **kwargs):
+        super(KhmerArgumentParser, self).__init__(
+            formatter_class=formatter_class, **kwargs)
+        self._citations = citations
+
+        self.add_argument('--version', action=_VersionStdErrAction,
+                          version='khmer {v}'.format(v=__version__))
+        self.add_argument('--info', action=CitationAction,
+                          citations=self._citations)
+
+    def parse_args(self, args=None, namespace=None):
+        args = super(KhmerArgumentParser, self).parse_args(args=args,
+                                                           namespace=namespace)
+
+        # some scripts do not have a quiet flag, assume quiet=False for those
+        if 'quiet' not in args or not args.quiet:
+            info(self.prog, self._citations)
+
+        return args
 
 
 # Temporary fix to argparse FileType which ignores the
@@ -385,14 +411,8 @@ def _check_fp_rate(args, desired_max_fp):
 def build_graph_args(descr=None, epilog=None, parser=None, citations=None):
     """Build an ArgumentParser with args for bloom filter based scripts."""
     if parser is None:
-        parser = argparse.ArgumentParser(description=descr, epilog=epilog,
-                                         formatter_class=ComboFormatter)
-
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
-
-    parser.add_argument('--info', action=CitationAction,
-                        citations=citations)
+        parser = KhmerArgumentParser(description=descr, epilog=epilog,
+                                     citations=citations)
 
     parser.add_argument('--ksize', '-k', type=int, default=DEFAULT_K,
                         help='k-mer size to use')
@@ -426,9 +446,10 @@ def build_counting_args(descr=None, epilog=None, citations=None):
     return parser
 
 
-def build_nodegraph_args(descr=None, epilog=None, parser=None):
+def build_nodegraph_args(descr=None, epilog=None, parser=None, citations=None):
     """Build an ArgumentParser with args for nodegraph based scripts."""
-    parser = build_graph_args(descr=descr, epilog=epilog, parser=parser)
+    parser = build_graph_args(descr=descr, epilog=epilog, parser=parser,
+                              citations=citations)
 
     return parser
 
