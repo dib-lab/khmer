@@ -31,6 +31,7 @@ cdef class PartitioningApp:
         parser = build_counting_args()
         parser.add_argument('--stats-dir', default='component-stats')
         parser.add_argument('samples', nargs='+')
+        parser.add_argument('--save', default=None)
         parser.add_argument('--pairing-mode', 
                             choices=['split', 'interleaved', 'single'],
                             default='split')
@@ -91,4 +92,6 @@ cdef class PartitioningApp:
             last = n
             self.write_components(self.args.stats_dir, last+n, sample_name)
 
+        if self.args.save is not None:
+            self.partitioner.save(self.args.save)
         return self.partitioner
