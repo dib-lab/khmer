@@ -32,4 +32,3 @@ cdef class StreamingPartitioner:
     cdef CpHashtable * _graph_ptr
     cdef object graph
     cdef readonly uint64_t n_consumed
-    cdef readonly dict component_dict

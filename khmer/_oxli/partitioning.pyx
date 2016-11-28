@@ -127,7 +127,6 @@ cdef class StreamingPartitioner:
         self._tag_component_map = deref(self._this).get_tag_component_map()
         self._components = deref(self._this).get_component_set()
         self.n_consumed = 0
-        self.component_dict = {comp.component_id: comp for comp in self.components()}
 
     def consume(self, sequence):
         deref(self._this).consume(sequence.encode('utf-8'))
@@ -247,11 +246,14 @@ cdef class StreamingPartitioner:
             deref(partitioner._this).add_component(comp_ptr)
         return partitioner
 
+    @property
+    def component_dict(self):
+        return {comp.component_id: comp for comp in self.components()}
 
-    property n_components:
-        def __get__(self):
-            return deref(self._this).get_n_components()
+    @property 
+    def n_components(self):
+        return deref(self._this).get_n_components()
         
-    property n_tags:
-        def __get__(self):
-            return deref(self._this).get_n_tags()
+    @property
+    def n_tags(self):
+        return deref(self._this).get_n_tags()
