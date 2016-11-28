@@ -174,11 +174,13 @@ cdef class SplitPairedReader:
 
     def __cinit__(self, FastxParser left_parser,
                          FastxParser right_parser,
-                         int min_length=-1):
+                         int min_length=-1,
+                         bool force_name_match=False):
 
         self.left_parser = left_parser
         self.right_parser = right_parser
         self.min_length = min_length
+        self.force_name_match = force_name_match
 
     def __iter__(self):
         cdef Sequence first, second
@@ -218,11 +220,14 @@ cdef class SplitPairedReader:
         if left_has_next == False:
             return 0, None, None, None
 
-        if _check_is_pair(first, second):
-            return 2, first, second, None
+        if self.force_name_match:
+            if _check_is_pair(first, second):
+                return 2, first, second, None
+            else:
+                err =  UnpairedReadsError('', first, second)
+                return -1, None, None, err
         else:
-            err =  UnpairedReadsError(first, second)
-            return -1, None, None, err
+            return 2, first, second, None
 
 cdef class BrokenPairedReader:
 

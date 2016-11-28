@@ -37,6 +37,7 @@ cdef class SplitPairedReader:
     cdef FastxParser left_parser
     cdef FastxParser right_parser
     cdef readonly int min_length
+    cdef readonly bool force_name_match
 
     cdef tuple _next(self)
 
