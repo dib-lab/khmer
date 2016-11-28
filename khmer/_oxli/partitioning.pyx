@@ -17,9 +17,11 @@ from libc.limits cimport UINT_MAX
 from libc.stdint cimport uintptr_t
 from libc.stdio cimport FILE, fopen, fwrite, fclose, stdout, stderr, fprintf
 
+import json
 from _oxli cimport *
 from .._khmer import Countgraph
 from .._khmer import Nodegraph
+from khmer import load_countgraph, load_nodegraph
 
 cdef class Component:
 
@@ -220,6 +222,30 @@ cdef class StreamingPartitioner:
                 comp.save(fp)
         fprintf(fp, "\n]}")
         fclose(fp)
+
+    @staticmethod
+    def load(filename):
+
+        with open(filename) as fp:
+            data = json.load(fp)
+
+        cdef object graph
+        graph_filename = data['graph']
+        try:
+            graph = load_countgraph(graph_filename)
+            print('Loading', graph_filename, 'as CountGraph')
+        except OSError as e:
+            # maybe it was a nodegraph instead
+            graph = load_nodegraph(graph_filename)
+            print('Loading', graph_filename, 'as NodeGraph')
+
+        partitioner = StreamingPartitioner(graph)
+        cdef ComponentPtr comp_ptr
+        for comp_info in data['components']:
+            comp_ptr = Component.load(comp_info['component_id'],
+                                      comp_info['tags'])
+            deref(partitioner._this).add_component(comp_ptr)
+        return partitioner
 
 
     property n_components:
