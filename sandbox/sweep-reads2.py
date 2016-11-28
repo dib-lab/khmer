@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2012-2015, Michigan State University.
 # Copyright (C) 2015, The Regents of the University of California.
@@ -50,7 +50,7 @@ import os.path
 import screed
 from khmer import khmer_args
 from khmer.khmer_args import (build_nodegraph_args, DEFAULT_MAX_TABLESIZE)
-from khmer.utils import write_record
+from khmer.utils import broken_paired_reader, write_record
 
 
 def main():
