@@ -127,15 +127,18 @@ BZIP2DIR = 'third-party/bzip2'
 
 BUILD_DEPENDS = []
 BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
-    "khmer", "kmer_hash", "hashtable", "counting", "hashbits", "labelhash",
+    "khmer", "kmer_hash", "hashtable", "labelhash", "hashgraph",
     "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers",
-    "traversal"])
+    "kmer_filters", "traversal", "assembler", "alphabets", "storage"])
+BUILD_DEPENDS.extend(path_join("khmer", bn + ".hh") for bn in [
+    "_cpy_counttable", "_cpy_hashgraph", "_cpy_nodetable"])
 
 SOURCES = ["khmer/_khmer.cc"]
 SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
-    "read_parsers", "kmer_hash", "hashtable",
-    "hashbits", "labelhash", "counting", "subset", "read_aligner",
-    "hllcounter", "traversal"])
+    "read_parsers", "kmer_hash", "hashtable", "hashgraph",
+    "labelhash", "subset", "read_aligner",
+    "hllcounter", "traversal", "kmer_filters", "assembler", "alphabets",
+    "storage"])
 
 SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])

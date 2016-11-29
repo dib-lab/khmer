@@ -39,6 +39,7 @@ from __future__ import absolute_import
 
 import khmer
 from khmer import ReadParser
+from khmer import reverse_complement as revcomp
 
 import screed
 
@@ -60,9 +61,15 @@ def test_toobig():
         print(str(err))
 
 
+def test_bad_create():
+    try:
+        nodegraph = khmer._Nodegraph(5, [])
+    except ValueError as err:
+        assert 'tablesizes needs to be one or more numbers' in str(err)
+
+
 def test__get_set_tag_density():
     nodegraph = khmer._Nodegraph(32, [1])
-
     orig = nodegraph._get_tag_density()
     assert orig != 2
     nodegraph._set_tag_density(2)
@@ -604,9 +611,8 @@ def test_badget():
 def test_load_notexist_should_fail():
     savepath = utils.get_temp_filename('tempnodegraphsave0.htable')
 
-    hi = khmer._Countgraph(12, [1])
     try:
-        hi.load(savepath)
+        hi = khmer.load_countgraph(savepath)
         assert 0, "load should fail"
     except OSError:
         pass
@@ -629,9 +635,8 @@ def test_load_truncated_should_fail():
     fp.write(data[:1000])
     fp.close()
 
-    hi = khmer._Countgraph(12, [1])
     try:
-        hi.load(savepath)
+        hi = khmer.load_countgraph(savepath)
         assert 0, "load should fail"
     except OSError as e:
         print(str(e))
@@ -726,12 +731,11 @@ def _build_testfiles():
 
 
 def test_hashbits_file_version_check():
-    nodegraph = khmer._Nodegraph(12, [1])
 
     inpath = utils.get_test_data('badversion-k12.htable')
 
     try:
-        nodegraph.load(inpath)
+        nodegraph = khmer.load_nodegraph(inpath)
         assert 0, "this should fail"
     except OSError as e:
         print(str(e))
@@ -742,10 +746,8 @@ def test_nodegraph_file_type_check():
     savepath = utils.get_temp_filename('tempcountingsave0.ct')
     kh.save(savepath)
 
-    nodegraph = khmer._Nodegraph(12, [1])
-
     try:
-        nodegraph.load(savepath)
+        nodegraph = khmer.load_nodegraph(savepath)
         assert 0, "this should fail"
     except OSError as e:
         print(str(e))
@@ -1091,265 +1093,13 @@ def test_traverse_linear_path_3_stopgraph():
     assert len(conns) == 0
 
 
-def _equals_rc(query, match):
-    return (query == match) or (screed.rc(query) == match)
-
-
-def test_assemble_linear_path_1():
-    # assemble from beginning of contig, up until branch point
-    contigfile = utils.get_test_data('simple-genome.fa')
-    contig = list(screed.open(contigfile))[0].sequence
-    print('contig len', len(contig))
-
-    K = 21
-
-    nodegraph = khmer.Nodegraph(K, 1e5, 4)
-
-    nodegraph.consume(contig)
-    nodegraph.count(contig[101:121] + 'G')  # will add another neighbor
-
-    path = nodegraph.assemble_linear_path(contig[0:K])
-    len_path = len(path)
-
-    assert _equals_rc(path, contig[:len_path])
-
-
-def test_assemble_linear_path_2():
-    # assemble from branch point back to beginning of contig
-    contigfile = utils.get_test_data('simple-genome.fa')
-    contig = list(screed.open(contigfile))[0].sequence
-    print('contig len', len(contig))
-
-    K = 21
-
-    nodegraph = khmer.Nodegraph(K, 1e5, 4)
-
-    nodegraph.consume(contig)
-    nodegraph.count(contig[101:121] + 'G')  # will add another neighbor
-
-    path = nodegraph.assemble_linear_path(contig[100:100 + K])
-    len_path = len(path)
-
-    assert _equals_rc(path, contig[:len_path])
-
-
-def test_assemble_linear_path_3():
-    # assemble entire contig, starting from wherever
-    contigfile = utils.get_test_data('simple-genome.fa')
-    contig = list(screed.open(contigfile))[0].sequence
-    print('contig len', len(contig))
-
-    K = 21
-
-    nodegraph = khmer.Nodegraph(K, 1e5, 4)
-
-    nodegraph.consume(contig)
-
-    for start in range(0, len(contig), 150):
-        path = nodegraph.assemble_linear_path(contig[start:start + K])
-        assert _equals_rc(path, contig), start
-
-
-def test_assemble_linear_path_4():
-    # assemble from branch point until end
-    contigfile = utils.get_test_data('simple-genome.fa')
-    contig = list(screed.open(contigfile))[0].sequence
-    print('contig len', len(contig))
-
-    K = 21
-
-    nodegraph = khmer.Nodegraph(K, 1e5, 4)
-
-    nodegraph.consume(contig)
-    nodegraph.count(contig[101:121] + 'G')  # will add another neighbor
-
-    path = nodegraph.assemble_linear_path(contig[101:101 + K])
-    len_path = len(path)
-
-    print('len path:', len_path)
-
-    # this is actually bad behavior; we're ignoring a branch.
-    # FIXME at some point.
-    assert _equals_rc(path, contig)
-    # should? be:
-    #    assert _equals_rc(path, contig[101:])
-
-
-def test_assemble_linear_path_5():
-    # assemble from end until branch point
-    contigfile = utils.get_test_data('simple-genome.fa')
-    contig = list(screed.open(contigfile))[0].sequence
-    print('contig len', len(contig))
-
-    K = 21
-
-    nodegraph = khmer.Nodegraph(K, 1e5, 4)
-
-    nodegraph.consume(contig)
-    nodegraph.count(contig[101:121] + 'G')  # will add another neighbor
-
-    path = nodegraph.assemble_linear_path(contig[-K:])
-    len_path = len(path)
-
-    print('len path:', len_path)
-
-    # this is actually bad behavior; we're ignoring a branch.
-    # FIXME at some point.
-    assert _equals_rc(path, contig)
-    # should? be:
-    #    assert _equals_rc(path, contig[101:])
-
-
-def test_assemble_linear_path_6():
-    # assemble from end until branch point
-    contigfile = utils.get_test_data('simple-genome.fa')
-    contig = list(screed.open(contigfile))[0].sequence
-    print('contig len', len(contig))
-
-    K = 21
-
-    nodegraph = khmer.Nodegraph(K, 1e5, 4)
-
-    nodegraph.consume(contig)
-    nodegraph.count('T' + contig[101:121])  # will add another neighbor
-
-    path = nodegraph.assemble_linear_path(contig[-K:])
-    len_path = len(path)
-
-    print('len path:', len_path)
-
-    assert _equals_rc(path, contig[101:])
-
-
-def test_assemble_linear_path_7():
-    # assemble from branch point until end
-    contigfile = utils.get_test_data('simple-genome.fa')
-    contig = list(screed.open(contigfile))[0].sequence
-    print('contig len', len(contig))
-
-    K = 21
-
-    nodegraph = khmer.Nodegraph(K, 1e5, 4)
-
-    nodegraph.consume(contig)
-    nodegraph.count('T' + contig[101:121])  # will add another neighbor
-
-    path = nodegraph.assemble_linear_path(contig[101:101 + K])
-    len_path = len(path)
-
-    print('len path:', len_path)
-
-    assert _equals_rc(path, contig[101:])
-
-
-def test_assemble_linear_path_8():
-    # assemble from branch point until end
-    contigfile = utils.get_test_data('simple-genome.fa')
-    contig = list(screed.open(contigfile))[0].sequence
-    print('contig len', len(contig))
-
-    K = 21
-
-    nodegraph = khmer.Nodegraph(K, 1e5, 4)
-    stop_bf = khmer.Nodegraph(K, 1e5, 4)
-
-    nodegraph.consume(contig)
-    nodegraph.count('T' + contig[101:121])  # will add another neighbor
-    stop_bf.count('T' + contig[101:121])    # ...that we will then ignore
-
-    path = nodegraph.assemble_linear_path(contig[101:101 + K], stop_bf)
-    len_path = len(path)
-
-    print('len path:', len_path)
-
-    assert _equals_rc(path, contig)
-
-
-def test_assemble_linear_path_9():
-    # assemble entire contig, ignoring branch point b/c of stop bf
-    contigfile = utils.get_test_data('simple-genome.fa')
-    contig = list(screed.open(contigfile))[0].sequence
-    print('contig len', len(contig))
-
-    K = 21
-
-    nodegraph = khmer.Nodegraph(K, 1e5, 4)
-    stop_bf = khmer.Nodegraph(K, 1e5, 4)
-
-    nodegraph.consume(contig)
-    nodegraph.count('T' + contig[101:121])  # will add another neighbor
-    stop_bf.count('T' + contig[101:121])    # ...that we will then ignore
-
-    path = nodegraph.assemble_linear_path(contig[-K:], stop_bf)
-    len_path = len(path)
-
-    print('len path:', len_path)
-
-    assert _equals_rc(path, contig)
-
-
-def test_assemble_linear_path_10():
-    # assemble up to branch point, and include introduced branch b/c
-    # of stop bf
-    contigfile = utils.get_test_data('simple-genome.fa')
-    contig = list(screed.open(contigfile))[0].sequence
-    print('contig len', len(contig))
-
-    K = 21
-
-    nodegraph = khmer.Nodegraph(K, 1e5, 4)
-    stop_bf = khmer.Nodegraph(K, 1e5, 4)
-
-    nodegraph.consume(contig)
-    nodegraph.count('T' + contig[101:121])  # will add another neighbor
-    stop_bf.count(contig[100:121])          # ...and block original path
-
-    path = nodegraph.assemble_linear_path(contig[-K:], stop_bf)
-    len_path = len(path)
-
-    print('len path:', len_path)
-
-    assert _equals_rc(path, 'T' + contig[101:])
-
-
-def test_assemble_linear_path_single_node():
+def test_assemble_linear_path_bad_seed():
     # assemble single node.
     contigfile = utils.get_test_data('simple-genome.fa')
     contig = list(screed.open(contigfile))[0].sequence
-    print('contig len', len(contig))
 
-    K = 21
-
-    nodegraph = khmer.Nodegraph(K, 1e5, 4)
-
+    nodegraph = khmer.Nodegraph(21, 1e5, 4)
     nodegraph.consume(contig)
-    nodegraph.count(contig[101:121] + 'G')  # will add another neighbor after
-    nodegraph.count('T' + contig[100:120])  # ...and before.
 
-    path = nodegraph.assemble_linear_path(contig[100:121])
-    len_path = len(path)
-
-    print('len path:', len_path)
-
-    assert _equals_rc(path, contig[100:121])
-
-
-def test_assemble_linear_path_single_node_interrupted():
-    # assemble single node.
-    contigfile = utils.get_test_data('simple-genome.fa')
-    contig = list(screed.open(contigfile))[0].sequence
-    print('contig len', len(contig))
-
-    K = 21
-
-    nodegraph = khmer.Nodegraph(K, 1e5, 4)
-
-    nodegraph.consume(contig)
-    nodegraph.consume(contig[:110] + 'G')  # will add another neighbor/middle
-
-    path = nodegraph.assemble_linear_path(contig[100:121])
-    len_path = len(path)
-
-    print('len path:', len_path)
-
-    assert _equals_rc(path, contig)       # this is bad behavior...
+    path = nodegraph.assemble_linear_path('GATTACA' * 3)
+    assert path == ''

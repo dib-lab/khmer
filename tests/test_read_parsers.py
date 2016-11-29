@@ -37,10 +37,53 @@
 # Tests for the ReadParser and Read classes.
 from __future__ import print_function
 from __future__ import absolute_import
+from khmer import Read
 from khmer import ReadParser
+from screed import Record
 from . import khmer_tst_utils as utils
 import pytest
 from functools import reduce  # pylint: disable=redefined-builtin
+
+
+def test_read_type_basic():
+    # test that basic properties of khmer.Read behave like screed.Record
+    # Constructing without mandatory arguments should raise an exception
+    with pytest.raises(TypeError):
+        Read()
+
+    name = "895:1:1:1246:14654 1:N:0:NNNNN"
+    sequence = "ACGT"
+    r = Read(name, sequence)
+    s = Record(dict(name=name, sequence=sequence))
+
+    for x in (r, s):
+        assert x.name == name
+        assert x.sequence == sequence
+        assert not hasattr(x, 'quality'), x
+        assert not hasattr(x, 'annotations'), x
+
+
+def test_read_type_attributes():
+    r = Read(sequence='ACGT', quality='good', name='1234', annotations='ann')
+    assert r.sequence == 'ACGT'
+    assert r.quality == 'good'
+    assert r.name == '1234'
+    assert r.annotations == 'ann'
+    # test setting and deleting of cleaned_seq
+
+    with pytest.raises(TypeError):
+        r.cleaned_seq = 12
+
+    assert not hasattr(r, 'cleaned_seq')
+    r.cleaned_seq = "ACGT"
+    r.cleaned_seq = u"ACGT"
+
+    assert hasattr(r, 'cleaned_seq')
+    del r.cleaned_seq
+    assert not hasattr(r, 'cleaned_seq')
+
+    with pytest.raises(TypeError):
+        r.cleaned_seq = u"some weird unicode \u2588"
 
 
 def test_read_properties():
@@ -52,7 +95,8 @@ def test_read_properties():
     for read in rparser:
         assert read.name == "895:1:1:1246:14654 1:N:0:NNNNN"
         assert read.sequence == "CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT"
-        assert read.annotations == ""
+        # if an attribute is empty it shouldn't exist
+        assert not hasattr(read, 'annotations')
         assert read.quality == """][aaX__aa[`ZUZ[NONNFNNNNNO_____^RQ_"""
 
 

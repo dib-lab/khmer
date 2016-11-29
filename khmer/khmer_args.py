@@ -44,6 +44,10 @@ import math
 import textwrap
 from argparse import _VersionAction
 from collections import namedtuple
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 import screed
 import khmer
@@ -92,6 +96,24 @@ class ComboFormatter(argparse.ArgumentDefaultsHelpFormatter,
     """Both ArgumentDefaults and RawDescription formatters."""
 
     pass
+
+
+# Temporary fix to argparse FileType which ignores the
+# binary mode flag. Upstream bug tracked in https://bugs.python.org/issue14156
+# pylint: disable=too-few-public-methods,missing-docstring
+class FileType(argparse.FileType):
+    def __call__(self, fname):
+        # detect if stdout is being faked (StringIO during unit tests) in
+        # which case we do not have to do anything
+        if (fname == '-' and
+                sys.version_info.major == 3 and
+                not isinstance(sys.stdout, StringIO)):
+            if 'r' in self._mode:
+                fname = sys.stdin.fileno()
+            elif 'w' in self._mode:
+                fname = sys.stdout.fileno()
+
+        return super(FileType, self).__call__(fname)
 
 
 def memory_setting(label):

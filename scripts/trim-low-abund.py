@@ -53,12 +53,13 @@ import shutil
 import textwrap
 import argparse
 
-from screed import Record
 from khmer import khmer_args
+from khmer import ReadParser
 
 from khmer.khmer_args import (build_counting_args, info, add_loadgraph_args,
                               report_on_config, calculate_graphsize,
                               sanitize_help)
+from khmer.khmer_args import FileType as khFileType
 from khmer.utils import (write_record, write_record_pair, broken_paired_reader,
                          ReadBundle)
 from khmer.kfile import (check_space, check_space_for_graph,
@@ -114,7 +115,7 @@ def get_parser():
                         default=DEFAULT_TRIM_AT_COVERAGE)
 
     parser.add_argument('-o', '--output', metavar="output_filename",
-                        type=argparse.FileType('wb'),
+                        type=khFileType('wb'),
                         help='only output a single file with '
                         'the specified filename; use a single dash "-" to '
                         'specify that output should go to STDOUT (the '
@@ -365,8 +366,7 @@ def main():
         pass2list.append((filename, pass2filename, trimfp))
 
         # input file stuff: get a broken_paired reader.
-        screed_iter = screed.open(filename)
-        paired_iter = broken_paired_reader(screed_iter, min_length=K,
+        paired_iter = broken_paired_reader(ReadParser(filename), min_length=K,
                                            force_single=args.ignore_pairs)
 
         # main loop through the file.
@@ -420,8 +420,8 @@ def main():
         # so pairs will stay together if not orphaned.  This is in contrast
         # to the first loop.  Hence, force_single=True below.
 
-        screed_iter = screed.open(pass2filename, parse_description=False)
-        paired_iter = broken_paired_reader(screed_iter, min_length=K,
+        paired_iter = broken_paired_reader(ReadParser(pass2filename),
+                                           min_length=K,
                                            force_single=True)
 
         watermark = REPORT_EVERY_N_READS

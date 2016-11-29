@@ -51,6 +51,8 @@ try:
 except ImportError:
     from io import StringIO
 
+import pytest
+
 
 def test_forward_hash():
     assert khmer.forward_hash('AAAA', 4) == 0
@@ -101,6 +103,25 @@ def test_reverse_hash():
 
     s = khmer.reverse_hash(255, 4)
     assert s == "GGGG"
+
+
+def test_reverse_complement():
+    s = 'AATTCCGG'
+    assert khmer.reverse_complement(s) == 'CCGGAATT'
+
+    s = 'A'
+    assert khmer.reverse_complement(s) == 'T'
+    s = 'T'
+    assert khmer.reverse_complement(s) == 'A'
+    s = 'C'
+    assert khmer.reverse_complement(s) == 'G'
+    s = 'G'
+    assert khmer.reverse_complement(s) == 'C'
+
+
+def test_reverse_complement_exception():
+    with pytest.raises(RuntimeError):
+        khmer.reverse_complement('FGF')
 
 
 def test_reverse_hash_longs():
@@ -155,6 +176,11 @@ def test_get_primes():
     primes = khmer.get_n_primes_near_x(7, 20)
 
     assert primes == [19, 17, 13, 11, 7, 5, 3]
+
+    primes_not_float = khmer.get_n_primes_near_x(7, 20.)
+
+    assert primes_not_float == [19, 17, 13, 11, 7, 5, 3]
+    assert all(isinstance(p, int) for p in primes_not_float)
 
 
 def test_get_primes_fal():

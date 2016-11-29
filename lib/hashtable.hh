@@ -47,7 +47,6 @@ Contact: khmer-project@idyll.org
 #include <list>
 #include <map>
 #include <queue>
-#include <queue>
 #include <set>
 #include <string>
 #include <vector>
@@ -56,45 +55,29 @@ Contact: khmer-project@idyll.org
 #include "khmer_exception.hh"
 #include "kmer_hash.hh"
 #include "read_parsers.hh"
-#include "traversal.hh"
+#include "storage.hh"
 #include "subset.hh"
 
 namespace khmer
 {
-class CountingHash;
-class Hashtable;
-
 namespace read_parsers
 {
 struct IParser;
 }  // namespace read_parsers
 }  // namespace khmer
 
-#define MAX_KEEPER_SIZE int(1e6)
-
-#define next_f(kmer_f, ch) ((((kmer_f) << 2) & bitmask) | (twobit_repr(ch)))
-#define next_r(kmer_r, ch) (((kmer_r) >> 2) | (twobit_comp(ch) << rc_left_shift))
-
-#define prev_f(kmer_f, ch) ((kmer_f) >> 2 | twobit_repr(ch) << rc_left_shift)
-#define prev_r(kmer_r, ch) ((((kmer_r) << 2) & bitmask) | (twobit_comp(ch)))
-
-#define set_contains(s, e) ((s).find(e) != (s).end())
-
 #define CALLBACK_PERIOD 100000
 
 namespace khmer
 {
-
 class Hashtable: public
     KmerFactory  		// Base class implementation of a Bloom ht.
 {
     friend class SubsetPartition;
     friend class LabelHash;
-    friend class Traverser;
 
 protected:
-    unsigned int _tag_density;
-
+    Storage * store;
     unsigned int    _max_count;
     unsigned int    _max_bigcount;
 
@@ -102,23 +85,17 @@ protected:
     HashIntoType    bitmask;
     unsigned int    _nbits_sub_1;
 
-    explicit Hashtable( WordLength ksize )
-        : KmerFactory( ksize ),
+    explicit Hashtable( WordLength ksize, Storage * s)
+        : KmerFactory( ksize ), store(s),
           _max_count( MAX_KCOUNT ),
           _max_bigcount( MAX_BIGCOUNT )
     {
-        _tag_density = DEFAULT_TAG_DENSITY;
-        if (!(_tag_density % 2 == 0)) {
-            throw khmer_exception();
-        }
         _init_bitstuff();
-        partition = new SubsetPartition(this);
-        _all_tags_spin_lock = 0;
     }
 
     virtual ~Hashtable( )
     {
-        delete partition;
+        delete store;
     }
 
     void _init_bitstuff()
@@ -130,39 +107,89 @@ protected:
         _nbits_sub_1 = (_ksize*2 - 2);
     }
 
-    void _clear_all_partitions()
-    {
-        if (partition != NULL) {
-            partition->_clear_all_partitions();
-        }
-    }
-
-    uint32_t _all_tags_spin_lock;
-
     explicit Hashtable(const Hashtable&);
     Hashtable& operator=(const Hashtable&);
 
 public:
-    SubsetPartition * partition;
-    SeenSet all_tags;
-    SeenSet stop_tags;
-    SeenSet repart_small_tags;
-
     // accessor to get 'k'
     const WordLength ksize() const
     {
         return _ksize;
     }
 
-    virtual void count(const char * kmer) = 0;
-    virtual void count(HashIntoType khash) = 0;
+    // various hash functions.
+    inline
+    virtual
+    HashIntoType
+    hash_dna(const char * kmer) const
+    {
+        return _hash(kmer, _ksize);
+    }
+
+    inline
+    virtual
+    HashIntoType
+    hash_dna_top_strand(const char * kmer) const
+    {
+        HashIntoType f = 0, r = 0;
+        _hash(kmer, _ksize, f, r);
+        return f;
+    }
+
+    inline
+    virtual
+    HashIntoType
+    hash_dna_bottom_strand(const char * kmer) const
+    {
+        HashIntoType f = 0, r = 0;
+        _hash(kmer, _ksize, f, r);
+        return r;
+    }
+
+    inline
+    virtual
+    std::string
+    unhash_dna(HashIntoType hashval) const
+    {
+        return _revhash(hashval, _ksize);
+    }
+
+    void count(const char * kmer)
+    {
+        store->add(hash_dna(kmer));
+    }
+    void count(HashIntoType khash)
+    {
+        store->add(khash);
+    }
+    void add(const char * kmer)
+    {
+        store->add(hash_dna(kmer));
+    }
+    void add(HashIntoType khash)
+    {
+        store->add(khash);
+    }
 
     // get the count for the given k-mer.
-    virtual const BoundedCounterType get_count(const char * kmer) const = 0;
-    virtual const BoundedCounterType get_count(HashIntoType khash) const = 0;
+    const BoundedCounterType get_count(const char * kmer) const
+    {
+        return store->get_count(hash_dna(kmer));
+    }
+    const BoundedCounterType get_count(HashIntoType khash) const
+    {
+        return store->get_count(khash);
+    }
 
-    virtual void save(std::string) = 0;
-    virtual void load(std::string) = 0;
+    void save(std::string filename)
+    {
+        store->save(filename, _ksize);
+    }
+    void load(std::string filename)
+    {
+        store->load(filename, _ksize);
+        _init_bitstuff();
+    }
 
     // count every k-mer in the string.
     unsigned int consume_string(const std::string &s);
@@ -183,6 +210,7 @@ public:
         unsigned int	    &total_reads,
         unsigned long long  &n_consumed
     );
+
     // Count every k-mer from a stream of FASTA or FASTQ reads,
     // using the supplied parser.
     void consume_fasta(
@@ -190,6 +218,15 @@ public:
         unsigned int	    &total_reads,
         unsigned long long  &n_consumed
     );
+
+    void set_use_bigcount(bool b)
+    {
+        store->set_use_bigcount(b);
+    }
+    bool get_use_bigcount()
+    {
+        return store->get_use_bigcount();
+    }
 
     bool median_at_least(const std::string &s,
                          unsigned int cutoff);
@@ -200,125 +237,26 @@ public:
                           float &stddev);
 
     // number of unique k-mers
-    virtual const uint64_t n_unique_kmers() const = 0;
+    const uint64_t n_unique_kmers() const
+    {
+        return store->n_unique_kmers();
+    }
 
     // count number of occupied bins
-    virtual const uint64_t n_occupied() const = 0;
-
-    // partitioning stuff
-    void _validate_pmap()
+    const uint64_t n_occupied() const
     {
-        if (partition) {
-            partition->_validate_pmap();
-        }
+        return store->n_occupied();
     }
 
-    virtual void save_tagset(std::string);
-    virtual void load_tagset(std::string, bool clear_tags=true);
-
-    // for debugging/testing purposes only!
-    void _set_tag_density(unsigned int d)
+    // table information
+    std::vector<uint64_t> get_tablesizes() const
     {
-        if (!(d % 2 == 0) || !all_tags.empty()) { // must be even and tags must exist
-            throw khmer_exception();
-        }
-        _tag_density = d;
+        return store->get_tablesizes();
     }
-
-    unsigned int _get_tag_density() const
+    const size_t n_tables() const
     {
-        return _tag_density;
+        return store->n_tables();
     }
-
-    void add_tag(HashIntoType tag)
-    {
-        all_tags.insert(tag);
-    }
-    void add_stop_tag(HashIntoType tag)
-    {
-        stop_tags.insert(tag);
-    }
-
-    // Partitioning stuff.
-
-    size_t n_tags() const
-    {
-        return all_tags.size();
-    }
-
-    void divide_tags_into_subsets(unsigned int subset_size, SeenSet& divvy);
-
-    void add_kmer_to_tags(HashIntoType kmer)
-    {
-        all_tags.insert(kmer);
-    }
-
-    void clear_tags()
-    {
-        all_tags.clear();
-    }
-
-    // Count every k-mer in a FASTA or FASTQ file.
-    // Tag certain ones on the connectivity graph.
-    void consume_fasta_and_tag(
-        std::string const	  &filename,
-        unsigned int	  &total_reads,
-        unsigned long long  &n_consumed
-    );
-
-    // Count every k-mer from a stream of FASTA or FASTQ reads,
-    // using the supplied parser.
-    // Tag certain ones on the connectivity graph.
-    void consume_fasta_and_tag(
-        read_parsers:: IParser *	    parser,
-        unsigned int	    &total_reads,
-        unsigned long long  &n_consumed
-    );
-
-    void consume_sequence_and_tag(const std::string& seq,
-                                  unsigned long long& n_consumed,
-                                  SeenSet * new_tags = 0);
-
-
-    void consume_partitioned_fasta(const std::string &filename,
-                                   unsigned int &total_reads,
-                                   unsigned long long &n_consumed);
-
-    virtual BoundedCounterType test_and_set_bits(const char * kmer) = 0;
-    virtual BoundedCounterType test_and_set_bits(HashIntoType khash) = 0;
-
-    virtual std::vector<uint64_t> get_tablesizes() const = 0;
-    virtual const size_t n_tables() const = 0;
-
-    size_t trim_on_stoptags(std::string sequence) const;
-
-    unsigned int traverse_from_kmer(Kmer start,
-                                    unsigned int radius,
-                                    KmerSet &keeper,
-                                    unsigned int max_count = MAX_KEEPER_SIZE)
-    const;
-
-    virtual void print_tagset(std::string);
-    virtual void print_stop_tags(std::string);
-    virtual void save_stop_tags(std::string);
-    void load_stop_tags(std::string filename, bool clear_tags=true);
-
-    void extract_unique_paths(std::string seq,
-                              unsigned int min_length,
-                              float min_unique_f,
-                              std::vector<std::string> &results);
-
-    void calc_connected_graph_size(Kmer node,
-                                   unsigned long long& count,
-                                   KmerSet& keeper,
-                                   const unsigned long long threshold=0,
-                                   bool break_on_circum=false) const;
-
-    typedef void (*kmer_cb)(const char * k, unsigned int n_reads, void *data);
-
-
-    unsigned int kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r);
-    unsigned int kmer_degree(const char * kmer_s);
 
     // return all k-mer substrings, on the forward strand.
     void get_kmers(const std::string &s, std::vector<std::string> &kmers)
@@ -336,27 +274,54 @@ public:
     void get_kmer_counts(const std::string &s,
                          std::vector<BoundedCounterType> &counts) const;
 
-    //
-    void find_high_degree_nodes(const char * sequence,
-                                SeenSet& high_degree_nodes) const;
-    unsigned int traverse_linear_path(const Kmer start_kmer,
-                                      SeenSet &adjacencies,
-                                      SeenSet &nodes, Hashtable& bf,
-                                      SeenSet &high_degree_nodes) const;
+    // get access to raw tables.
+    Byte ** get_raw_tables()
+    {
+        return store->get_raw_tables();
+    }
 
-    std::string assemble_linear_path(const Kmer seed_kmer,
-                                     const Hashtable * stop_bf=0) const;
-    std::string _assemble_right(const char * start_kmer,
-                                const Hashtable * stop_bf=0) const;
+    // find the minimum k-mer count in the given sequence
+    BoundedCounterType get_min_count(const std::string &s);
+
+    // find the maximum k-mer count in the given sequence
+    BoundedCounterType get_max_count(const std::string &s);
+
+    // calculate the abundance distribution of kmers in the given file.
+    uint64_t * abundance_distribution(read_parsers::IParser * parser,
+                                      Hashtable * tracking);
+    uint64_t * abundance_distribution(std::string filename,
+                                      Hashtable * tracking);
+
+    // return the index of the first position in the sequence with k-mer
+    // abundance below min_abund.
+    unsigned long trim_on_abundance(std::string seq,
+                                    BoundedCounterType min_abund) const;
+
+    // return the index of the first position in the sequence with k-mer
+    // abundance above max_abund.
+    unsigned long trim_below_abundance(std::string seq,
+                                       BoundedCounterType max_abund) const;
+
+    // detect likely positions of errors
+    std::vector<unsigned int> find_spectral_error_positions(std::string seq,
+            BoundedCounterType min_abund) const;
 };
+
+// Hashtable-derived class with ByteStorage.
+class Counttable : public khmer::Hashtable
+{
+public:
+    explicit Counttable(WordLength ksize, std::vector<uint64_t> sizes)
+        : Hashtable(ksize, new ByteStorage(sizes)) { } ;
+};
+    
+// Hashtable-derived class with BitStorage.
+class Nodetable : public Hashtable {
+public:
+    explicit Nodetable(WordLength ksize, std::vector<uint64_t> sizes)
+        : Hashtable(ksize, new BitStorage(sizes)) { } ;
+};
+
 }
-
-
-
-#define ACQUIRE_ALL_TAGS_SPIN_LOCK \
-  while (!__sync_bool_compare_and_swap( &_all_tags_spin_lock, 0, 1 ));
-
-#define RELEASE_ALL_TAGS_SPIN_LOCK \
-  __sync_bool_compare_and_swap( &_all_tags_spin_lock, 1, 0 );
 
 #endif // HASHTABLE_HH

@@ -39,10 +39,10 @@ Contact: khmer-project@idyll.org
 // This file is used to test compilation with libkhmer.a/libkhmer.so, after
 // installation
 
-#include <oxli/counting.hh>
+#include <oxli/hashtable.hh>
 
 int main()
 {
-    khmer::CountingHash test(1,1);
+    khmer::Countgraph test(1,1);
     return 0;
 }

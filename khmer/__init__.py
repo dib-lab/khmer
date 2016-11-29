@@ -41,11 +41,17 @@ from math import log
 import json
 
 from khmer._khmer import Countgraph as _Countgraph
+from khmer._khmer import Counttable as _Counttable
 from khmer._khmer import GraphLabels as _GraphLabels
 from khmer._khmer import Nodegraph as _Nodegraph
+from khmer._khmer import Nodetable as _Nodetable
 from khmer._khmer import HLLCounter as _HLLCounter
 from khmer._khmer import ReadAligner as _ReadAligner
+from khmer._khmer import LinearAssembler
+from khmer._khmer import SimpleLabeledAssembler
+from khmer._khmer import JunctionCountAssembler
 from khmer._khmer import HashSet
+from khmer._khmer import Read
 from khmer._khmer import forward_hash
 # tests/test_{functions,countgraph,counting_single}.py
 
@@ -56,6 +62,8 @@ from khmer._khmer import reverse_hash  # tests/test_functions.py
 
 from khmer._khmer import hash_murmur3        # tests/test_functions.py
 from khmer._khmer import hash_no_rc_murmur3  # tests/test_functions.py
+
+from khmer._khmer import reverse_complement
 
 from khmer._khmer import get_version_cpp as __version_cpp__
 # tests/test_version.py
@@ -247,7 +255,7 @@ def get_n_primes_near_x(number, target):
         i -= 1
     while len(primes) != number and i > 0:
         if is_prime(i):
-            primes.append(i)
+            primes.append(int(i))
         i -= 2
 
     if len(primes) != number:
@@ -270,6 +278,15 @@ class Countgraph(_Countgraph):
         countgraph = _Countgraph.__new__(cls, k, primes)
         countgraph.primes = primes
         return countgraph
+
+
+class Counttable(_Counttable):
+
+    def __new__(cls, k, starting_size, n_tables):
+        primes = get_n_primes_near_x(n_tables, starting_size)
+        counttable = _Counttable.__new__(cls, k, primes)
+        counttable.primes = primes
+        return counttable
 
 
 class GraphLabels(_GraphLabels):
@@ -298,6 +315,15 @@ class Nodegraph(_Nodegraph):
         nodegraph = _Nodegraph.__new__(cls, k, primes)
         nodegraph.primes = primes
         return nodegraph
+
+
+class Nodetable(_Nodetable):
+
+    def __new__(cls, k, starting_size, n_tables):
+        primes = get_n_primes_near_x(n_tables, starting_size)
+        nodetable = _Nodetable.__new__(cls, k, primes)
+        nodetable.primes = primes
+        return nodetable
 
 
 class HLLCounter(_HLLCounter):

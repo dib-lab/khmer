@@ -7,6 +7,13 @@ dist: trusty
 notifications:
   email: false
 
+# with building pushes enabled on travis we would get
+# two builds for every new commit pushed to a branch
+# for a PR. So we disable build-on-push for all branches
+# except the ones whitelisted here.
+branches:
+  only: 
+    - master
 
 matrix:
   fast_finish: true
@@ -58,9 +65,7 @@ install:
 # command to run tests
 script:
   - make test
-  # copy of `make autopep8`, explicitly placed here as `autopep8` does not
-  # return a non-zero exit status when there are violations
-  - pep8 --ignore E309 setup.py khmer/*.py scripts/*.py tests/*.py oxli/*.py
+  - make pep8
 
 # generate all the diagnostic reports
 after_success:

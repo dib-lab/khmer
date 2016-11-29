@@ -44,23 +44,15 @@ Contact: khmer-project@idyll.org
 #include <string>
 #include <utility>
 
-#include "hashbits.hh"
-#include "hashtable.hh"
+#include "hashgraph.hh"
 #include "khmer.hh"
 #include "read_parsers.hh"
 
 namespace khmer
 {
-class Hashtable;
+class Hashgraph;
 
-namespace read_parsers
-{
-struct IParser;
-}  // namespace read_parsers
-}  // namespace khmer
-
-namespace khmer
-{
+using read_parsers::IParser;
 
 class LabelHash
 {
@@ -97,7 +89,7 @@ protected:
 
     unsigned int _get_tag_labels(const HashIntoType tag,
                                  const TagLabelMap cmap,
-                                 LabelSet& found_labels)
+                                 LabelSet& found_labels) const
     {
         unsigned int num_labels = 0;
         std::pair<TagLabelMap::const_iterator, TagLabelMap::const_iterator> ret;
@@ -111,7 +103,7 @@ protected:
 
     unsigned int _get_tags_from_label(const Label& label,
                                       const LabelTagMap& cmap,
-                                      TagSet& labeled_tags)
+                                      TagSet& labeled_tags) const
     {
         unsigned int num_tags = 0;
         std::pair<LabelTagMap::const_iterator, LabelTagMap::const_iterator> ret;
@@ -126,9 +118,9 @@ protected:
     uint32_t _tag_labels_spin_lock;
 
 public:
-    khmer::Hashtable * graph;
+    khmer::Hashgraph * graph;
 
-    explicit LabelHash(Hashtable * ht) : graph(ht)
+    explicit LabelHash(Hashgraph * ht) : graph(ht)
     {
         _tag_labels_spin_lock = 0;
 
@@ -171,7 +163,10 @@ public:
             Label current_label,
             SeenSet * new_tags = 0);
 
-    LabelSet get_tag_labels(const HashIntoType tag);
+    void get_tag_labels(const HashIntoType tag,
+                        LabelSet& labels) const;
+    void get_tags_from_label(const Label label,
+                             TagSet& tags) const;
 
     void link_tag_and_label(const HashIntoType kmer, const Label label);
 
@@ -187,6 +182,9 @@ public:
     void save_labels_and_tags(std::string);
     void load_labels_and_tags(std::string);
 
+    void label_across_high_degree_nodes(const char * sequence,
+                                        SeenSet& high_degree_nodes,
+                                        const Label label);
 };
 }
 

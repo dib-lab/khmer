@@ -1593,37 +1593,6 @@ def test_make_initial_stoptags_load_stoptags():
     assert os.path.exists(outfile1), outfile1
 
 
-def execute_extract_paired_streaming(ifilename):
-    fifo = utils.get_temp_filename('fifo')
-    in_dir = os.path.dirname(fifo)
-    outfile1 = utils.get_temp_filename('paired.pe')
-    outfile2 = utils.get_temp_filename('paired.se')
-    script = 'extract-paired-reads.py'
-    args = [fifo, '-p', outfile1, '-s', outfile2]
-
-    # make a fifo to simulate streaming
-    os.mkfifo(fifo)
-
-    thread = threading.Thread(target=utils.runscript,
-                              args=(script, args, in_dir))
-    thread.start()
-    ifile = open(ifilename, 'r')
-    fifofile = open(fifo, 'w')
-    chunk = ifile.read(4)
-    while len(chunk) > 0:
-        fifofile.write(chunk)
-        chunk = ifile.read(4)
-    fifofile.close()
-    thread.join()
-    assert os.path.exists(outfile1), outfile1
-    assert os.path.exists(outfile2), outfile2
-
-
-def test_extract_paired_streaming():
-    testinput = utils.get_test_data('paired-mixed.fa')
-    o = execute_extract_paired_streaming(testinput)
-
-
 def test_sample_reads_randomly():
     infile = utils.copy_test_data('test-reads.fa')
     in_dir = os.path.dirname(infile)
@@ -2328,12 +2297,9 @@ def test_trim_low_abund_1_stdin_err():
 
 
 def test_trim_low_abund_2():
-    infile = utils.get_temp_filename('test.fa')
-    infile2 = utils.get_temp_filename('test2.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
+    infile2 = utils.copy_test_data('test-abund-read-2.fa', 'copyDataTwo')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile2)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", '-C', '1', infile, infile2]
     utils.runscript('trim-low-abund.py', args, in_dir)
@@ -2347,13 +2313,10 @@ def test_trim_low_abund_2():
 
 
 def test_trim_low_abund_2_o_gzip():
-    infile = utils.get_temp_filename('test.fa')
-    infile2 = utils.get_temp_filename('test2.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
+    infile2 = utils.copy_test_data('test-abund-read-2.fa', 'copyDataTwo')
     outfile = utils.get_temp_filename('out.gz')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile2)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", '-C', '1',
             "-o", outfile, "--gzip",
@@ -2368,12 +2331,9 @@ def test_trim_low_abund_2_o_gzip():
 
 
 def test_trim_low_abund_3_fq_retained():
-    infile = utils.get_temp_filename('test.fq')
-    infile2 = utils.get_temp_filename('test2.fq')
+    infile = utils.copy_test_data('test-abund-read-2.fq')
+    infile2 = utils.copy_test_data('test-abund-read-2.fq', 'copyDataTwo')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile)
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile2)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", '-C', '1', infile, infile2]
     utils.runscript('trim-low-abund.py', args, in_dir)
