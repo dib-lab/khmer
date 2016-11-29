@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2012-2015, Michigan State University.
 # Copyright (C) 2015, The Regents of the University of California.
@@ -50,10 +50,13 @@ import os.path
 import screed
 from khmer import khmer_args
 from khmer.khmer_args import (build_nodegraph_args, DEFAULT_MAX_TABLESIZE)
+from khmer.utils import broken_paired_reader, write_record
 
 
 def main():
     parser = build_nodegraph_args()
+    parser.add_argument('-o', '--outfile',
+                        help='output file; default is "infile".sweep2')
     parser.add_argument('-q', '--quiet')
     parser.add_argument('input_filename')
     parser.add_argument('read_filename')
@@ -64,6 +67,8 @@ def main():
     readsfile = args.read_filename
 
     outfile = os.path.basename(readsfile) + '.sweep2'
+    if args.outfile:
+        outfile = args.outfile
     outfp = open(outfile, 'w')
 
     # create a nodegraph data structure
@@ -75,21 +80,24 @@ def main():
 
     print('starting sweep.')
 
-    n = 0
     m = 0
     K = ht.ksize()
-    for record in screed.open(readsfile):
-        if len(record.sequence) < K:
-            continue
-
+    instream = screed.open(readsfile)
+    for n, is_pair, read1, read2 in broken_paired_reader(instream):
         if n % 10000 == 0:
             print('...', n, m)
 
-        count = ht.get_median_count(record.sequence)[0]
-        if count:
-            m += 1
-            outfp.write('>%s\n%s\n' % (record.name, record.sequence))
-        n += 1
+        if is_pair:
+            count1 = ht.get_median_count(read1.sequence)[0]
+            count2 = ht.get_median_count(read2.sequence)[0]
+            if count1 or count2:
+                m += 1
+                write_record_pair(read1, read2, outfp)
+        else:
+            count = ht.get_median_count(read1.sequence)[0]
+            if count:
+                m += 1
+                write_record(read1, outfp)
 
 if __name__ == '__main__':
     main()
