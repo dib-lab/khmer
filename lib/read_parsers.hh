@@ -109,7 +109,6 @@ typedef std:: pair< Read, Read >	ReadPair;
 struct IParser {
 
     enum {
-        PAIR_MODE_ALLOW_UNPAIRED = 0,
         PAIR_MODE_IGNORE_UNPAIRED,
         PAIR_MODE_ERROR_ON_UNPAIRED
     };
@@ -154,12 +153,6 @@ protected:
     regex_t		_re_read_2_nosub;
     regex_t		_re_read_1;
     regex_t		_re_read_2;
-
-#if (0)
-    void		_imprint_next_read_pair_in_allow_mode(
-        ReadPair &the_read_pair
-    );
-#endif
 
     void		_imprint_next_read_pair_in_ignore_mode(
         ReadPair &the_read_pair

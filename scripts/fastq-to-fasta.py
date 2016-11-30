@@ -52,6 +52,7 @@ from khmer.kfile import (add_output_compression_type, get_file_writer,
 from khmer.utils import write_record
 from khmer.khmer_args import (sanitize_help, ComboFormatter, info,
                               _VersionStdErrAction)
+from khmer.khmer_args import FileType as khFileType
 
 
 def get_parser():
@@ -62,7 +63,7 @@ def get_parser():
     parser.add_argument('input_sequence', help='The name of the input'
                         ' FASTQ sequence file.')
     parser.add_argument('-o', '--output', metavar="filename",
-                        type=argparse.FileType('wb'),
+                        type=khFileType('wb'),
                         help='The name of the output'
                         ' FASTA sequence file.',
                         default=sys.stdout)
@@ -79,7 +80,7 @@ def main():
     info('fastq-to-fasta.py')
     args = sanitize_help(get_parser()).parse_args()
 
-    print(('fastq from ', args.input_sequence), file=sys.stderr)
+    print('fastq from ', args.input_sequence, file=sys.stderr)
     outfp = get_file_writer(args.output, args.gzip, args.bzip)
     n_count = 0
     for n, record in enumerate(screed.open(args.input_sequence)):

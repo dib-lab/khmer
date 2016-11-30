@@ -260,10 +260,8 @@ def test_normalize_by_median_report_fp():
     # this tests basic reporting of diginorm stats => report.out, including
     # a test of aggregate stats for two input files.
 
-    infile = utils.get_temp_filename('test.fa')
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-    infile2 = utils.get_temp_filename('test2.fa')
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile2)
+    infile = utils.copy_test_data("test-abund-read-2.fa")
+    infile2 = utils.copy_test_data("test-abund-read-2.fa", "copyDataTwo")
 
     in_dir = os.path.dirname(infile)
     outfile = utils.get_temp_filename('report.out')
@@ -517,11 +515,9 @@ def test_normalize_by_median_force():
 
 
 def test_normalize_by_median_no_bigcount():
-    infile = utils.copy_test_data('test-abund-read-2.fa')
+    infile = utils.copy_test_data("test-abund-read-2.fa")
     hashfile = utils.get_temp_filename('test-out.ct')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = 'normalize-by-median.py'
     # 256 is outside the range of valid values for C

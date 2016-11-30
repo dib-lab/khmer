@@ -2297,12 +2297,9 @@ def test_trim_low_abund_1_stdin_err():
 
 
 def test_trim_low_abund_2():
-    infile = utils.get_temp_filename('test.fa')
-    infile2 = utils.get_temp_filename('test2.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
+    infile2 = utils.copy_test_data('test-abund-read-2.fa', 'copyDataTwo')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile2)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", '-C', '1', infile, infile2]
     utils.runscript('trim-low-abund.py', args, in_dir)
@@ -2316,13 +2313,10 @@ def test_trim_low_abund_2():
 
 
 def test_trim_low_abund_2_o_gzip():
-    infile = utils.get_temp_filename('test.fa')
-    infile2 = utils.get_temp_filename('test2.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
+    infile2 = utils.copy_test_data('test-abund-read-2.fa', 'copyDataTwo')
     outfile = utils.get_temp_filename('out.gz')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile2)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", '-C', '1',
             "-o", outfile, "--gzip",
@@ -2337,12 +2331,9 @@ def test_trim_low_abund_2_o_gzip():
 
 
 def test_trim_low_abund_3_fq_retained():
-    infile = utils.get_temp_filename('test.fq')
-    infile2 = utils.get_temp_filename('test2.fq')
+    infile = utils.copy_test_data('test-abund-read-2.fq')
+    infile2 = utils.copy_test_data('test-abund-read-2.fq', 'copyDataTwo')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile)
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile2)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", '-C', '1', infile, infile2]
     utils.runscript('trim-low-abund.py', args, in_dir)

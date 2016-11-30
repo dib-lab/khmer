@@ -240,7 +240,10 @@ def longify(listofints):
     return listofints
 
 
-def copy_test_data(testfile):
-    infile = get_temp_filename(os.path.basename(testfile))
+def copy_test_data(testfile, newfilename=None):
+    basename = os.path.basename(testfile)
+    if newfilename is not None:
+        basename = newfilename
+    infile = get_temp_filename(basename)
     shutil.copyfile(get_test_data(testfile), infile)
     return infile

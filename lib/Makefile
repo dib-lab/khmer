@@ -254,6 +254,7 @@ endif
 
 KHMER_HEADERS= \
 	hashtable.hh \
+	hllcounter.hh \
 	khmer_exception.hh \
 	khmer.hh \
 	kmer_hash.hh \
