@@ -89,6 +89,17 @@ def test_check_tablespace():
         sys.stderr = save_stderr
 
 
+def test_check_tablespace_nodegraph():
+    outfile = utils.get_test_data('truncated.fq')
+    save_stderr, sys.stderr = sys.stderr, io.StringIO()
+
+    parser = khmer_args.build_counting_args()
+    args = parser.parse_args(['-M', '24e9'])
+    tablesize = khmer_args.calculate_graphsize(args, 'nodegraph')
+    sizestr = '{:.1f} GB'.format(float(tablesize) / 1e9)
+    assert sizestr == '24.0 GB'
+
+
 def test_check_space_force():
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
