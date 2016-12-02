@@ -38,7 +38,6 @@ Contact: khmer-project@idyll.org
 #ifndef STORAGE_HH
 #define STORAGE_HH
 
-#include <stdio.h>
 
 namespace khmer
 {
@@ -222,6 +221,19 @@ public:
 };
 
 
+/*
+ * \class NibbleStorage
+ *
+ * \brief A A CountMin sketch implementation using 4bit counters.
+ *
+ * NibbleStorage is used to track counts of k-mers by Hashtable
+ * and derived classes.  It contains 'n_tables' different tables of
+ * 'tablesizes' entries. It allocates half a byte per table entry.
+ *
+ * Like other Storage classes, NibbleStorage manages setting the bits and
+ * tracking statistics, as well as save/load, and not much else.
+ *
+ */
 class NibbleStorage : public Storage
 {
 protected:
@@ -229,15 +241,17 @@ protected:
     size_t _n_tables;
     uint64_t _occupied_bins;
     uint64_t _n_unique_kmers;
+    uint8_t _max_count{15};
     Byte ** _counts;
 
     uint64_t _table_index(const HashIntoType k, const uint64_t tablesize) const {
-        return (k/2) % tablesize;
+        const uint64_t bins = tablesize / 2 + 1;
+        return (k / 2) % bins;
     }
-    uint8_t _table_mask(const HashIntoType k) const {
-        return k%2 ? (16-1) : 240;
+    uint8_t _mask(const HashIntoType k) const {
+        return k%2 ? 15 : 240;
     }
-    uint8_t _table_shift(const HashIntoType k) const {
+    uint8_t _shift(const HashIntoType k) const {
         return k%2 ? 0 : 4;
     }
 
@@ -245,7 +259,6 @@ public:
     NibbleStorage(std::vector<uint64_t>& tablesizes) :
       _tablesizes{tablesizes}, _occupied_bins{0}, _n_unique_kmers{0}
     {
-      std::cout << "jupp"<<std::endl;
         _allocate_counters();
     }
 
@@ -270,7 +283,7 @@ public:
 
         for (size_t i = 0; i < _n_tables; i++) {
             const uint64_t tablesize = _tablesizes[i];
-            const uint64_t tablebytes = tablesize / 8 + 1;
+            const uint64_t tablebytes = tablesize / 2 + 1;
 
             _counts[i] = new Byte[tablebytes];
             memset(_counts[i], 0, tablebytes);
@@ -287,9 +300,8 @@ public:
     void add(HashIntoType khash) {
         bool is_new_kmer = false;
 
-        // XXX misnamed, these are independent of the table
-        const uint8_t mask = _table_mask(khash);
-        const uint8_t shift = _table_shift(khash);
+        const uint8_t mask = _mask(khash);
+        const uint8_t shift = _shift(khash);
 
         for (unsigned int i = 0; i < _n_tables; i++) {
             Byte* const table(_counts[i]);
@@ -306,9 +318,6 @@ public:
 
             // increase count, no checking for overflow
             const uint8_t new_count = (current_count + 1) << shift;
-            //printf("setting %u %u %u %u %u %u\n",
-            //       i, idx, mask, shift, current_count,
-            //       ((table[idx] & ~mask) | (new_count & mask)));
             table[idx] = (table[idx] & ~mask) | (new_count & mask);
         }
 
@@ -320,10 +329,10 @@ public:
     // get the count for the given k-mer hash.
     const BoundedCounterType get_count(HashIntoType khash) const
     {
-        uint8_t min_count = 2*2*2*2; // bound count by maximum
+        uint8_t min_count = _max_count; // bound count by maximum
 
-        const uint8_t mask = _table_mask(khash);
-        const uint8_t shift = _table_shift(khash);
+        const uint8_t mask = _mask(khash);
+        const uint8_t shift = _shift(khash);
 
         // get the min count across all tables
         for (unsigned int i = 0; i < _n_tables; i++) {
@@ -331,8 +340,6 @@ public:
             const uint64_t idx = _table_index(khash, _tablesizes[i]);
             const uint8_t the_count = (table[idx] & mask) >> shift;
 
-            //printf("getting %u %u %u %u %u %u\n",
-            //       i, idx, mask, shift, the_count, table[idx]);
             if (the_count < min_count) {
                 min_count = the_count;
             }
