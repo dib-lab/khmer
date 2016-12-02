@@ -42,6 +42,7 @@ import json
 
 from khmer._khmer import Countgraph as _Countgraph
 from khmer._khmer import Counttable as _Counttable
+from khmer._khmer import SmallCounttable as _SmallCounttable
 from khmer._khmer import GraphLabels as _GraphLabels
 from khmer._khmer import Nodegraph as _Nodegraph
 from khmer._khmer import Nodetable as _Nodetable
@@ -285,6 +286,14 @@ class Counttable(_Counttable):
     def __new__(cls, k, starting_size, n_tables):
         primes = get_n_primes_near_x(n_tables, starting_size)
         counttable = _Counttable.__new__(cls, k, primes)
+        counttable.primes = primes
+        return counttable
+
+
+class SmallCounttable(_SmallCounttable):
+    def __new__(cls, k, starting_size, n_tables):
+        primes = get_n_primes_near_x(n_tables, starting_size)
+        counttable = _SmallCounttable.__new__(cls, k, primes)
         counttable.primes = primes
         return counttable
 

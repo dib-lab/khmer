@@ -2382,6 +2382,7 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashtable_Object")
 
 #include "_cpy_nodetable.hh"
 #include "_cpy_counttable.hh"
+#include "_cpy_smallcounttable.hh"
 #include "_cpy_hashgraph.hh"
 
 //
@@ -4735,6 +4736,11 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
+    khmer_KSmallCounttable_Type.tp_base = &khmer_KHashtable_Type;
+    if (PyType_Ready(&khmer_KSmallCounttable_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
     khmer_KNodetable_Type.tp_base = &khmer_KHashtable_Type;
     if (PyType_Ready(&khmer_KNodetable_Type) < 0) {
         return MOD_ERROR_VAL;
@@ -4827,6 +4833,12 @@ MOD_INIT(_khmer)
     Py_INCREF(&khmer_KCounttable_Type);
     if (PyModule_AddObject( m, "Counttable",
                             (PyObject *)&khmer_KCounttable_Type ) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    Py_INCREF(&khmer_KSmallCounttable_Type);
+    if (PyModule_AddObject( m, "SmallCounttable",
+                            (PyObject *)&khmer_KSmallCounttable_Type ) < 0) {
         return MOD_ERROR_VAL;
     }
 
