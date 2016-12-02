@@ -87,6 +87,13 @@ class CitationAction(argparse.Action):
         parser.exit()
 
 
+class _HelpAction(argparse._HelpAction):
+    def __call__(self, parser, namespace, values, option_string=None):
+        info(parser.prog, parser._citations)
+        super(_HelpAction, self).__call__(parser, namespace, values,
+                                          option_string=option_string)
+
+
 class _VersionStdErrAction(_VersionAction):
     # pylint: disable=too-few-public-methods, protected-access
     """Force output to StdErr."""
@@ -115,13 +122,16 @@ class KhmerArgumentParser(argparse.ArgumentParser):
     def __init__(self, citations=None, formatter_class=ComboFormatter,
                  **kwargs):
         super(KhmerArgumentParser, self).__init__(
-            formatter_class=formatter_class, **kwargs)
+            formatter_class=formatter_class, add_help=False, **kwargs)
         self._citations = citations
 
         self.add_argument('--version', action=_VersionStdErrAction,
                           version='khmer {v}'.format(v=__version__))
         self.add_argument('--info', action=CitationAction,
                           citations=self._citations)
+        self.add_argument('-h', '--help', action=_HelpAction,
+                          default=argparse.SUPPRESS,
+                          help='show this help message and exit')
 
     def parse_args(self, args=None, namespace=None):
         args = super(KhmerArgumentParser, self).parse_args(args=args,

@@ -2775,3 +2775,9 @@ def test_version_and_basic_citation(scriptname):
             assert status == 0, status
             assert "publication" in err, err
             assert "usage:" not in err, err
+
+            # check citation information appears in --help
+            status, out, err = utils.runscript(scriptname, ["--help"])
+            assert status == 0, status
+            assert "publication" in err, err
+            assert "usage:" in out, out
