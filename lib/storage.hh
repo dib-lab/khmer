@@ -220,6 +220,145 @@ public:
 };
 
 
+class NibbleStorage : public Storage
+{
+protected:
+    std::vector<uint64_t> _tablesizes;
+    size_t _n_tables;
+    uint64_t _occupied_bins;
+    uint64_t _n_unique_kmers;
+    Byte ** _counts;
+
+    uint64_t _table_index(const HashIntoType k, const uint64_t tablesize) const {
+        return (k/2) % tablesize;
+    }
+    uint8_t _table_mask(const HashIntoType k) const {
+        return k%2 ? (16-1) : 240;
+    }
+    uint8_t _table_shift(const HashIntoType k) const {
+        return k%2 ? 0 : 4;
+    }
+
+public:
+    NibbleStorage(std::vector<uint64_t>& tablesizes) :
+      _tablesizes{tablesizes}, _occupied_bins{0}, _n_unique_kmers{0}
+    {
+        _allocate_counters();
+    }
+
+    ~NibbleStorage()
+    {
+        if (_counts) {
+            for (size_t i = 0; i < _n_tables; i++) {
+                delete[] _counts[i];
+                _counts[i] = NULL;
+            }
+            delete[] _counts;
+            _counts = NULL;
+            _n_tables = 0;
+        }
+    }
+
+    void _allocate_counters()
+    {
+        _n_tables = _tablesizes.size();
+
+        _counts = new Byte*[_n_tables];
+
+        for (size_t i = 0; i < _n_tables; i++) {
+            const uint64_t tablesize = _tablesizes[i];
+            const uint64_t tablebytes = tablesize / 8 + 1;
+
+            _counts[i] = new Byte[tablebytes];
+            memset(_counts[i], 0, tablebytes);
+        }
+    }
+
+
+    BoundedCounterType test_and_set_bits(HashIntoType khash) {
+        BoundedCounterType x = get_count(khash);
+        add(khash);
+        return !x;
+    }
+
+    void add(HashIntoType khash) {
+        bool is_new_kmer = false;
+
+        // XXX misnamed, these are independent of the table
+        const uint8_t mask = _table_mask(khash);
+        const uint8_t shift = _table_shift(khash);
+
+        for (unsigned int i = 0; i < _n_tables; i++) {
+            Byte* const table(_counts[i]);
+            const uint64_t idx = _table_index(khash, _tablesizes[i]);
+            const uint8_t current_count = (table[idx] & mask) >> shift;
+
+            // XXX make me more elegant
+            if (i == 0 && !is_new_kmer && current_count == 0) {
+                is_new_kmer = true;
+                // track occupied bins in the first table only, as proxy
+                // for all.
+                __sync_add_and_fetch(&_occupied_bins, 1);
+            }
+
+            // increase count, no checking for overflow
+            const uint8_t new_count = (current_count + 1) << shift;
+            table[idx] = (current_count & ~mask) | (new_count & mask);
+        }
+
+        if (is_new_kmer) {
+            __sync_add_and_fetch(&_n_unique_kmers, 1);
+        }
+    }
+
+    // get the count for the given k-mer hash.
+    const BoundedCounterType get_count(HashIntoType khash) const
+    {
+        uint8_t min_count = 4; // bound count by maximum
+
+        const uint8_t mask = _table_mask(khash);
+        const uint8_t shift = _table_shift(khash);
+
+        // get the min count across all tables
+        for (unsigned int i = 0; i < _n_tables; i++) {
+            const Byte* table(_counts[i]);
+            const uint64_t idx = _table_index(khash, _tablesizes[i]);
+            const uint8_t the_count = (table[idx] & mask) >> shift;
+
+            if (the_count < min_count) {
+                min_count = the_count;
+            }
+        }
+        return min_count;
+    }
+
+    // Accessors for protected/private table info members
+    std::vector<uint64_t> get_tablesizes() const
+    {
+        return _tablesizes;
+    }
+    const size_t n_tables() const
+    {
+        return _n_tables;
+    }
+    const uint64_t n_unique_kmers() const
+    {
+        return _n_unique_kmers;
+    }
+    const uint64_t n_occupied() const
+    {
+        return _occupied_bins;
+    }
+    void save(std::string, WordLength) {};
+    void load(std::string, WordLength&) {};
+
+    Byte ** get_raw_tables()
+    {
+        return _counts;
+    }
+};
+
+
 /*
  * \class ByteStorage
  *
