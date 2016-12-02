@@ -25,8 +25,7 @@ under semantic versioning, but will be in future versions of khmer.
   seed k-mer from a hashtable.
 - Support for assembling directly from k-mer graphs, and a new
   JunctionCountAssembler class.
-- Add --info flag for obtaining citation information, which is not printed
-  by default anymore.
+- Add --info flag for obtaining citation information.
 
 ### Changed
 - Switch from nose to py.test as the testing framework.
