@@ -38,6 +38,8 @@ Contact: khmer-project@idyll.org
 #ifndef STORAGE_HH
 #define STORAGE_HH
 
+#include <stdio.h>
+
 namespace khmer
 {
 typedef std::map<HashIntoType, BoundedCounterType> KmerCountMap;
@@ -243,6 +245,7 @@ public:
     NibbleStorage(std::vector<uint64_t>& tablesizes) :
       _tablesizes{tablesizes}, _occupied_bins{0}, _n_unique_kmers{0}
     {
+      std::cout << "jupp"<<std::endl;
         _allocate_counters();
     }
 
@@ -303,7 +306,10 @@ public:
 
             // increase count, no checking for overflow
             const uint8_t new_count = (current_count + 1) << shift;
-            table[idx] = (current_count & ~mask) | (new_count & mask);
+            //printf("setting %u %u %u %u %u %u\n",
+            //       i, idx, mask, shift, current_count,
+            //       ((table[idx] & ~mask) | (new_count & mask)));
+            table[idx] = (table[idx] & ~mask) | (new_count & mask);
         }
 
         if (is_new_kmer) {
@@ -314,7 +320,7 @@ public:
     // get the count for the given k-mer hash.
     const BoundedCounterType get_count(HashIntoType khash) const
     {
-        uint8_t min_count = 4; // bound count by maximum
+        uint8_t min_count = 2*2*2*2; // bound count by maximum
 
         const uint8_t mask = _table_mask(khash);
         const uint8_t shift = _table_shift(khash);
@@ -325,6 +331,8 @@ public:
             const uint64_t idx = _table_index(khash, _tablesizes[i]);
             const uint8_t the_count = (table[idx] & mask) >> shift;
 
+            //printf("getting %u %u %u %u %u %u\n",
+            //       i, idx, mask, shift, the_count, table[idx]);
             if (the_count < min_count) {
                 min_count = the_count;
             }
