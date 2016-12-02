@@ -35,6 +35,8 @@
 from __future__ import print_function
 from __future__ import absolute_import
 
+import random
+
 from khmer import SmallCounttable
 
 
@@ -83,3 +85,18 @@ def test_overflow():
 
     assert sct.get(b) == 1
     assert sct.get(a) == 0
+
+
+def test_random_kmers():
+    # check for out-of-bounds errors and similar with random kmers
+    rng = random.Random(1)
+
+    sct = SmallCounttable(20, 1e2, 4)
+
+    kmers = ["".join(rng.choice("ACGT") for _ in range(20))
+             for n in range(400)]
+    for kmer in kmers:
+        sct.add(kmer)
+
+    for kmer in kmers:
+        sct.get(kmer)
