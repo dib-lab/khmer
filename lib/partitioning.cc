@@ -29,7 +29,7 @@ inline std::ostream& operator<< (std::ostream& stream, Component& comp) {
 
 
 StreamingPartitioner::StreamingPartitioner(Hashtable * graph)  : 
-    graph(graph), _tag_density(DEFAULT_TAG_DENSITY)
+    graph(graph), _tag_density(DEFAULT_TAG_DENSITY), components_lock(0)
 {
 
     //if (auto graphptr = graph.lock()) {
@@ -98,7 +98,9 @@ void StreamingPartitioner::consume(const std::string& seq)
 {
     std::set<HashIntoType> tags;
     consume_and_connect_tags(seq, tags);
+    acquire_components();
     create_and_connect_components(tags);
+    release_components();
 }
 
 
@@ -108,7 +110,9 @@ void StreamingPartitioner::consume_pair(const std::string& first,
     std::set<HashIntoType> tags;
     consume_and_connect_tags(first, tags);
     consume_and_connect_tags(second, tags);
+    acquire_components();
     create_and_connect_components(tags);
+    release_components();
 }
 
 void StreamingPartitioner::add_component(ComponentPtr comp)

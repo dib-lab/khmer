@@ -59,6 +59,10 @@ namespace khmer
 template <typename T>
 class GuardedKmerMap {
 
+    private:
+
+        uint32_t lock;
+
     public:
 
         // Filter should be owned exclusively by GuardedKmerMap
@@ -67,7 +71,7 @@ class GuardedKmerMap {
         
         explicit GuardedKmerMap(WordLength ksize,
                                 unsigned short n_tables,
-                                uint64_t max_table_size)
+                                uint64_t max_table_size): lock(0)
         {
             std::vector<uint64_t> table_sizes = get_n_primes_near_x(n_tables, max_table_size);
             filter = std::unique_ptr<Hashbits>(new Hashbits(ksize, table_sizes));
@@ -84,9 +88,29 @@ class GuardedKmerMap {
             return NULL;
         }
 
+        T get_threadsafe(HashIntoType kmer) const {
+            if (filter->get_count(kmer)) {
+                acquire_lock();
+                auto search = data.find(kmer);
+                if (search != data.end()) {
+                    release_lock();
+                    return search->second;
+                }
+                release_lock();
+            }
+
+            return NULL;
+        }
+
         void set(HashIntoType kmer, T item) {
             filter->count(kmer);
             data[kmer] = item;
+        }
+
+        void set_threadsafe(HashIntoType kmer, T item) {
+            acquire_lock();
+            set(kmer, item);
+            release_lock();
         }
 
         bool contains(HashIntoType kmer) const {
@@ -95,6 +119,14 @@ class GuardedKmerMap {
 
         uint64_t size() const {
             return data.size();
+        }
+
+        inline void acquire_lock() {
+            while(!__sync_bool_compare_and_swap( &lock, 0, 1));
+        }
+
+        inline void release_lock() {
+            __sync_bool_compare_and_swap( &lock, 1, 0);
         }
 
 };
@@ -195,6 +227,7 @@ class StreamingPartitioner {
         // We should exclusively own tag_component_map.
         std::shared_ptr<GuardedKmerCompMap> tag_component_map;
         std::shared_ptr<ComponentPtrSet> components;
+        uint32_t components_lock;
 
     public:
 
@@ -237,6 +270,14 @@ class StreamingPartitioner {
 
         std::weak_ptr<GuardedKmerCompMap> get_tag_component_map() const {
             return std::weak_ptr<GuardedKmerCompMap>(tag_component_map);
+        }
+
+        inline void acquire_components() {
+            while(!__sync_bool_compare_and_swap( &components_lock, 0, 1));
+        }
+
+        inline void release_components() {
+            __sync_bool_compare_and_swap( &components_lock, 1, 0);
         }
 };
 
