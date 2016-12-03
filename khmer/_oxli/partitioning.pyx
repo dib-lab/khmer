@@ -18,6 +18,8 @@ from libc.stdint cimport uintptr_t
 from libc.stdio cimport FILE, fopen, fwrite, fclose, stdout, stderr, fprintf
 
 import json
+import os
+
 from _oxli cimport *
 from .._khmer import Countgraph
 from .._khmer import Nodegraph
@@ -65,7 +67,7 @@ cdef class Component:
         counts = vector[BoundedCounterType](n_tags)
         cdef int idx
         cdef uint64_t tag
-        for idx, tag in deref(comp).tags:
+        for idx, tag in enumerate(deref(comp).tags):
             counts[idx] = deref(graph).get_count(tag)
         return counts
 
@@ -227,9 +229,10 @@ cdef class StreamingPartitioner:
 
         with open(filename) as fp:
             data = json.load(fp)
+        directory = os.path.dirname(filename)
 
         cdef object graph
-        graph_filename = data['graph']
+        graph_filename = os.path.join(directory, data['graph'])
         try:
             graph = load_countgraph(graph_filename)
             print('Loading', graph_filename, 'as CountGraph')
