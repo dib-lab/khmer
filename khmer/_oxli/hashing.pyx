@@ -1,9 +1,11 @@
+# cython: c_string_type=unicode, c_string_encoding=utf8
+
 from libcpp.string cimport string
 from libcpp.memory cimport make_shared
 from libc.stdint cimport uint64_t
 from cython.operator cimport dereference as deref
 
-from _oxli cimport _revhash
+from _oxli cimport _revhash, HashIntoType, _revcomp
 
 cdef class Kmer:
 
@@ -35,16 +37,26 @@ cdef class Kmer:
     def kmer_u(self):
         return deref(self._this).kmer_u
 
+    def reverse_complement(self):
+        cdef HashIntoType tmp = deref(self._this).kmer_f
+        deref(self._this).kmer_f = deref(self._this).kmer_r
+        deref(self._this).kmer_r = tmp
+        self.kmer = _revcomp(self.kmer.encode('utf-8'))
+
+    @property
+    def is_forward(self):
+        return deref(self._this).is_forward()
+
     @staticmethod
     cdef Kmer wrap(CpKmer * cpkmer, WordLength K):
         cdef Kmer kmer = Kmer()
         kmer._this.reset(cpkmer)
-        kmer.kmer = _revhash(kmer.kmer_u, K).decode('utf-8')
+        kmer.kmer = _revhash(kmer.kmer_u, K)
         return kmer
 
     @staticmethod
-    cdef Kmer create(HashIntoType tag, WordLength K):
+    def create(HashIntoType tag, WordLength K):
         cdef Kmer kmer = Kmer()
         deref(kmer._this).set_from_unique_hash(tag, K)
-        kmer.kmer = _revhash(kmer.kmer_u, K).decode('utf-8')
+        kmer.kmer = _revhash(kmer.kmer_u, K)
         return kmer

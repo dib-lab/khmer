@@ -7,8 +7,3 @@ cdef class Kmer:
 
     @staticmethod
     cdef Kmer wrap(CpKmer * cpkmer, WordLength K)
-
-    @staticmethod
-    cdef Kmer create(HashIntoType tag, WordLength K)
-
-
