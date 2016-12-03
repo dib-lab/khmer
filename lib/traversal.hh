@@ -87,6 +87,11 @@ public:
 
     explicit NodeGatherer(const Hashtable * ht, KmerFilter filter);
 
+    WordLength ksize()
+    {
+        return graph->ksize();
+    }
+
     /**
      * @brief Push a new filter on to the filter stack.
      */
@@ -297,8 +302,28 @@ public:
                           Kmer start_kmer,
                           KmerFilterList filters,
                           SeenSet * visited);
+
     virtual char next_symbol();
 };
 
-}
+
+template<bool direction>
+class CompactingAT: public AssemblerTraverser<direction>
+{
+protected:
+
+    Traverser traverser;
+
+public:
+
+    explicit CompactingAT(const Hashtable * ht,
+                          Kmer start_kmer,
+                          KmerFilterList filters);
+
+    virtual char next_symbol();
+
+};
+
+} //namespace khmer
+
 #endif

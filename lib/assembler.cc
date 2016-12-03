@@ -163,6 +163,38 @@ const
     return contig;
 }
 
+/********************************
+ * Compacting Assembler
+ ********************************/
+
+
+std::string CompactingAssembler::assemble_right(const Kmer seed_kmer,
+                                                const Hashtable * stop_bf)
+const
+{
+    std::list<KmerFilter> node_filters;
+    if (stop_bf) {
+        node_filters.push_back(get_stop_bf_filter(stop_bf));
+    }
+
+    CompactingAT<RIGHT> cursor(graph, seed_kmer, node_filters);
+    return _assemble_directed<RIGHT>(cursor);
+}
+
+
+std::string CompactingAssembler::assemble_left(const Kmer seed_kmer,
+                                               const Hashtable * stop_bf)
+const
+{
+    std::list<KmerFilter> node_filters;
+    if (stop_bf) {
+        node_filters.push_back(get_stop_bf_filter(stop_bf));
+    }
+
+    CompactingAT<LEFT> cursor(graph, seed_kmer, node_filters);
+    return _assemble_directed<LEFT>(cursor);
+}
+
 
 /********************************
  * Labeled Assembly

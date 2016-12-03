@@ -53,6 +53,7 @@ namespace khmer
 class Hashtable;
 class LabelHash;
 
+
 /**
  * \class LinearAssembler
  *
@@ -104,6 +105,17 @@ std::string LinearAssembler::_assemble_directed<LEFT>(AssemblerTraverser<LEFT>
 template<>
 std::string LinearAssembler::_assemble_directed<RIGHT>(AssemblerTraverser<RIGHT>
         &cursor) const;
+
+
+class CompactingAssembler: public LinearAssembler
+{
+
+    std::string assemble_right(const Kmer seed_kmer,
+                               const Hashtable * stop_bf = 0) const;
+
+    std::string assemble_left(const Kmer seed_kmer,
+                              const Hashtable * stop_bf = 0) const;
+};
 
 
 /**

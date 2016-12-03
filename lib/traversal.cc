@@ -340,6 +340,37 @@ char NonLoopingAT<direction>::next_symbol()
     return AssemblerTraverser<direction>::next_symbol();
 }
 
+/******************************************
+ * CompactingAT
+ ******************************************/
+
+template<bool direction>
+CompactingAT<direction>::CompactingAT(const Hashtable * ht,
+                                      Kmer start_kmer,
+                                      KmerFilterList filters) :
+    AssemblerTraverser<direction>(ht, start_kmer, filters), traverser(ht)
+{
+}
+
+template<>
+char CompactingAT<RIGHT>::next_symbol()
+{
+    if (traverser.degree_left(this->cursor) > 1) {
+        return '\0';
+    }
+    return AssemblerTraverser<RIGHT>::next_symbol();
+}
+
+
+template<>
+char CompactingAT<LEFT>::next_symbol()
+{
+    if (traverser.degree_right(this->cursor) > 1) {
+        return '\0';
+    }
+    return AssemblerTraverser<LEFT>::next_symbol();
+}
+
 template class NodeGatherer<LEFT>;
 template class NodeGatherer<RIGHT>;
 template class NodeCursor<LEFT>;
@@ -348,6 +379,8 @@ template class AssemblerTraverser<RIGHT>;
 template class AssemblerTraverser<LEFT>;
 template class NonLoopingAT<RIGHT>;
 template class NonLoopingAT<LEFT>;
+template class CompactingAT<RIGHT>;
+template class CompactingAT<LEFT>;
 
 
 } // namespace khmer
