@@ -45,6 +45,7 @@ cdef extern from "kmer_hash.hh" namespace "khmer":
 
     HashIntoType _hash(const string, const WordLength)
     string _revhash(HashIntoType, WordLength)
+    string _revcomp(const string&)
 
 
 ########################################################################
@@ -93,6 +94,8 @@ cdef extern from "hashtable.hh" namespace "khmer":
         const BoundedCounterType get_count(HashIntoType) const
         const WordLength ksize() const
 
+cdef CpHashtable * get_hashtable_ptr(object graph)
+
 
 ########################################################################
 #
@@ -115,6 +118,25 @@ cdef extern from "traversal.hh":
         uint32_t degree(const CpKmer&) const
         uint32_t degree_left(const CpKmer&) const
         uint32_t degree_right(const CpKmer&) const
+
+########################################################################
+#
+# Assembler: wrapper for assembler.hh.
+#
+########################################################################
+
+
+cdef extern from "assembler.hh":
+    cdef cppclass CpLinearAssembler "khmer::LinearAssembler":
+        CpLinearAssembler(CpHashtable *)
+    
+        string assemble(const CpKmer, const CpHashtable *) const
+        string assemble_left(const CpKmer, const CpHashtable *) const     
+        string assemble_right(const CpKmer, const CpHashtable *) const
+
+        string assemble(const CpKmer) const
+        string assemble_left(const CpKmer) const     
+        string assemble_right(const CpKmer) const
 
 
 ########################################################################
@@ -153,8 +175,8 @@ cdef extern from "partitioning.hh" namespace "khmer":
     cdef cppclass CpStreamingPartitioner "khmer::StreamingPartitioner":
         CpStreamingPartitioner(CpHashtable * ) except +MemoryError
 
-        void consume(string&) except +MemoryError
-        void consume_pair(string&, string&) except +MemoryError
+        void consume(string&) nogil except +MemoryError
+        void consume_pair(string&, string&) nogil except +MemoryError
         uint64_t consume_fasta(string&) except +MemoryError
 
         void add_component(ComponentPtr comp)

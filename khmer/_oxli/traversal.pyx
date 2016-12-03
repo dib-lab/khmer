@@ -5,8 +5,8 @@ from .._khmer import Countgraph
 from .._khmer import Nodegraph
 
 from _oxli cimport *
-cimport hashing
-import hashing
+from hashing cimport Kmer
+from hashing import Kmer
 
 cdef class Traverser:
 
@@ -18,22 +18,87 @@ cdef class Traverser:
         self._graph_ptr = deref(ptr).hashtable
         
         self._this.reset(new CpTraverser(self._graph_ptr))
-    '''
-    def left_neighbors(self, Kmer kmer):
-        cdef KmerQueue kmer_q
-        cdef Kmer neighbor
-        deref(self._this).traverse_left(kmer, kmer_q)
-        for neighbor in kmer_q:
-            yield neighbor
-    '''
 
-    def right_neighbors(self, hashing.Kmer kmer):
+    def neighbors(self, node):
+        cdef Kmer kmer
+        if not isinstance(node, Kmer):
+            kmer = Kmer(node)
+        else:
+            kmer = node
+
         cdef KmerQueue kmer_q
         cdef CpKmer neighbor
-        cdef CpKmer* ptr
+        cdef Kmer pyneighbor
+        deref(self._this).traverse(deref(kmer._this), kmer_q)
+        while(kmer_q.empty() == 0):
+            neighbor = kmer_q.front()
+            pyneighbor = Kmer.wrap(new CpKmer(neighbor), deref(self._graph_ptr).ksize())
+            if pyneighbor.is_forward != kmer.is_forward:
+                pyneighbor.reverse_complement()
+            yield pyneighbor
+            kmer_q.pop()
+
+    def right_neighbors(self, node):
+        cdef Kmer kmer
+        if not isinstance(node, Kmer):
+            kmer = Kmer(node)
+        else:
+            kmer = node
+
+        cdef KmerQueue kmer_q
+        cdef CpKmer neighbor
+        cdef Kmer pyneighbor
         deref(self._this).traverse_right(deref(kmer._this), kmer_q)
         while(kmer_q.empty() == 0):
-            neighbor = kmer_q.back()
-            ptr = new CpKmer(neighbor)
-            yield hashing.Kmer.wrap(ptr, deref(self._graph_ptr).ksize())
+            neighbor = kmer_q.front()
+            pyneighbor = Kmer.wrap(new CpKmer(neighbor), deref(self._graph_ptr).ksize())
+            if pyneighbor.is_forward != kmer.is_forward:
+                pyneighbor.reverse_complement()
+            yield pyneighbor
             kmer_q.pop()
+
+    def left_neighbors(self, node):
+        cdef Kmer kmer
+        if not isinstance(node, Kmer):
+            kmer = Kmer(node)
+        else:
+            kmer = node
+
+        cdef KmerQueue kmer_q
+        cdef CpKmer neighbor
+        cdef Kmer pyneighbor
+        deref(self._this).traverse_left(deref(kmer._this), kmer_q)
+        while(kmer_q.empty() == 0):
+            neighbor = kmer_q.front()
+            pyneighbor = Kmer.wrap(new CpKmer(neighbor), deref(self._graph_ptr).ksize())
+            if pyneighbor.is_forward != kmer.is_forward:
+                pyneighbor.reverse_complement()
+            yield pyneighbor
+            kmer_q.pop()
+
+    def degree(self, node):
+        cdef Kmer kmer
+        if not isinstance(node, Kmer):
+            kmer = Kmer(node)
+        else:
+            kmer = node
+
+        return deref(self._this).degree(deref(kmer._this))
+    
+    def left_degree(self, node):
+        cdef Kmer kmer
+        if not isinstance(node, Kmer):
+            kmer = Kmer(node)
+        else:
+            kmer = node
+
+        return deref(self._this).degree_left(deref(kmer._this))
+
+    def right_degree(self, node):
+        cdef Kmer kmer
+        if not isinstance(node, Kmer):
+            kmer = Kmer(node)
+        else:
+            kmer = node
+
+        return deref(self._this).degree_right(deref(kmer._this))
