@@ -8,6 +8,8 @@ from .._khmer import Countgraph
 from .._khmer import Nodegraph
 from khmer.khmer_args import build_counting_args, create_countgraph
 
+from libcpp cimport bool
+
 from partitioning cimport StreamingPartitioner, Component
 from partitioning import StreamingPartitioner, Component
 
@@ -64,7 +66,10 @@ cdef class PartitioningApp:
                     raise ValueError('Must have even number of samples!')
         else:
             samples = self.args.samples
-
+        
+        cdef int n
+        cdef bool paired
+        cdef Sequence first, second
         last = 0
         for group in samples:
             if self.args.pairing_mode == 'split':
@@ -90,8 +95,10 @@ cdef class PartitioningApp:
                 else:
                     self.partitioner.consume(first.sequence)
             last = n
-            self.write_components(self.args.stats_dir, last+n, sample_name)
+            if self.args.write_stats:
+                self.write_components(self.args.stats_dir, last+n, sample_name)
 
         if self.args.save is not None:
             self.partitioner.save(self.args.save)
+
         return self.partitioner
