@@ -238,8 +238,14 @@ void StreamingPartitioner::create_and_connect_components(std::set<HashIntoType> 
             components->insert(new_comp);
             map_tags_to_component(tags, new_comp);
         } else {
-            // get the first component
+            // Choose the largest component as the root
+            // We want to minimize tag copying
             ComponentPtr root_comp = *(found_comps.begin());
+            for (auto other : found_comps) {
+                if (other->get_n_tags() > root_comp->get_n_tags()) {
+                    root_comp = other;
+                }
+            }
 #if(DEBUG_SP)
             std::cout << "Merge into: " << *root_comp << std::endl;
 #endif
