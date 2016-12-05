@@ -41,6 +41,7 @@ from math import log
 import json
 
 from khmer._khmer import Countgraph as _Countgraph
+from khmer._khmer import SmallCountgraph as _SmallCountgraph
 from khmer._khmer import Counttable as _Counttable
 from khmer._khmer import SmallCounttable as _SmallCounttable
 from khmer._khmer import GraphLabels as _GraphLabels
@@ -277,6 +278,15 @@ class Countgraph(_Countgraph):
     def __new__(cls, k, starting_size, n_tables):
         primes = get_n_primes_near_x(n_tables, starting_size)
         countgraph = _Countgraph.__new__(cls, k, primes)
+        countgraph.primes = primes
+        return countgraph
+
+
+class SmallCountgraph(_SmallCountgraph):
+
+    def __new__(cls, k, starting_size, n_tables):
+        primes = get_n_primes_near_x(n_tables, starting_size)
+        countgraph = _SmallCountgraph.__new__(cls, k, primes)
         countgraph.primes = primes
         return countgraph
 
