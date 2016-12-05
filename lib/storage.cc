@@ -765,3 +765,150 @@ void ByteStorage::load(std::string infilename, WordLength& ksize)
     ByteStorageFile::load(infilename, ksize, *this);
 }
 
+
+void NibbleStorage::save(std::string outfilename, WordLength ksize)
+{
+    if (!_counts[0]) {
+        throw khmer_exception();
+    }
+
+    unsigned int save_ksize = ksize;
+    unsigned char save_n_tables = _n_tables;
+    unsigned long long save_tablesize;
+    unsigned long long save_occupied_bins = _occupied_bins;
+
+    ofstream outfile(outfilename.c_str(), ios::binary);
+
+    outfile.write(SAVED_SIGNATURE, 4);
+    unsigned char version = SAVED_FORMAT_VERSION;
+    outfile.write((const char *) &version, 1);
+
+    // XXX create a new type?
+    unsigned char ht_type = SAVED_SMALLCOUNT;
+    outfile.write((const char *) &ht_type, 1);
+
+    outfile.write((const char *) &save_ksize, sizeof(save_ksize));
+    outfile.write((const char *) &save_n_tables, sizeof(save_n_tables));
+    outfile.write((const char *) &save_occupied_bins,
+                  sizeof(save_occupied_bins));
+
+    for (unsigned int i = 0; i < save_n_tables; i++) {
+        save_tablesize = _tablesizes[i];
+
+        outfile.write((const char *) &save_tablesize, sizeof(save_tablesize));
+        outfile.write((const char *) _counts[i], save_tablesize / 2 + 1);
+    }
+}
+
+void NibbleStorage::load(std::string infilename, WordLength& ksize)
+{
+    ifstream infile;
+    // configure ifstream to raise exceptions for everything.
+    infile.exceptions(std::ifstream::failbit | std::ifstream::badbit |
+                      std::ifstream::eofbit);
+
+    try {
+        infile.open(infilename.c_str(), ios::binary);
+    } catch (std::ifstream::failure &e) {
+        std::string err;
+        if (!infile.is_open()) {
+            err = "Cannot open k-mer count file: " + infilename;
+        } else {
+            err = "Unknown error in opening file: " + infilename;
+        }
+        throw khmer_file_exception(err + " " + strerror(errno));
+    } catch (const std::exception &e) {
+        std::string err = "Unknown error opening file: " + infilename + " "
+                          + strerror(errno);
+        throw khmer_file_exception(err);
+    }
+
+    if (_counts) {
+        for (unsigned int i = 0; i < _n_tables; i++) {
+            delete[] _counts[i];
+            _counts[i] = NULL;
+        }
+        delete[] _counts;
+        _counts = NULL;
+    }
+    _tablesizes.clear();
+
+    try {
+        unsigned int save_ksize = 0;
+        unsigned char save_n_tables = 0;
+        unsigned long long save_tablesize = 0;
+        unsigned long long save_occupied_bins = 0;
+        char signature [4];
+        unsigned char version = 0, ht_type = 0;
+
+        infile.read(signature, 4);
+        infile.read((char *) &version, 1);
+        infile.read((char *) &ht_type, 1);
+        if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
+            std::ostringstream err;
+            err << "Does not start with signature for a khmer file: 0x";
+            for(size_t i=0; i < 4; ++i) {
+                err << std::hex << (int) signature[i];
+            }
+            err << " Should be: " << SAVED_SIGNATURE;
+            throw khmer_file_exception(err.str());
+        } else if (!(version == SAVED_FORMAT_VERSION)) {
+            std::ostringstream err;
+            err << "Incorrect file format version " << (int) version
+                << " while reading k-mer count file from " << infilename
+                << "; should be " << (int) SAVED_FORMAT_VERSION;
+            throw khmer_file_exception(err.str());
+        } else if (!(ht_type == SAVED_SMALLCOUNT)) {
+            std::ostringstream err;
+            err << "Incorrect file format type " << (int) ht_type
+                << " while reading k-mer count file from " << infilename;
+            throw khmer_file_exception(err.str());
+        }
+
+        infile.read((char *) &save_ksize, sizeof(save_ksize));
+        infile.read((char *) &save_n_tables, sizeof(save_n_tables));
+        infile.read((char *) &save_occupied_bins, sizeof(save_occupied_bins));
+
+        ksize = (WordLength) save_ksize;
+        _n_tables = (unsigned int) save_n_tables;
+        _occupied_bins = save_occupied_bins;
+
+        _counts = new Byte*[_n_tables];
+        for (unsigned int i = 0; i < _n_tables; i++) {
+            _counts[i] = NULL;
+        }
+
+        for (unsigned int i = 0; i < _n_tables; i++) {
+            uint64_t tablesize;
+            uint64_t tablebytes;
+
+            infile.read((char *) &save_tablesize, sizeof(save_tablesize));
+
+            tablebytes = save_tablesize / 2 + 1;
+            tablesize = save_tablesize;
+            _tablesizes.push_back(tablesize);
+
+            _counts[i] = new Byte[tablebytes];
+
+            unsigned long long loaded = 0;
+            while (loaded != tablebytes) {
+                infile.read((char *) _counts[i], tablebytes - loaded);
+                loaded += infile.gcount();
+            }
+        }
+        infile.close();
+    } catch (std::ifstream::failure &e) {
+        std::string err;
+        if (infile.eof()) {
+            err = "Unexpected end of k-mer count file: " + infilename;
+        } else {
+            err = "Error reading from k-mer count file: " + infilename + " "
+                  + strerror(errno);
+        }
+        throw khmer_file_exception(err);
+    } catch (const std::exception &e) {
+        std::string err = "Error reading from k-mer count file: " + infilename + " "
+                          + strerror(errno);
+        throw khmer_file_exception(err);
+    }
+}
