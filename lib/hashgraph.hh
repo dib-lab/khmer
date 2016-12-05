@@ -246,6 +246,14 @@ public:
         : Hashgraph(ksize, new ByteStorage(sizes)) { } ;
 };
 
+// Hashgraph-derived class with NibbleStorage.
+class SmallCountgraph : public khmer::Hashgraph
+{
+public:
+    explicit SmallCountgraph(WordLength ksize, std::vector<uint64_t> sizes)
+        : Hashgraph(ksize, new NibbleStorage(sizes)) { } ;
+};
+
 // Hashgraph-derived class with BitStorage.
 class Nodegraph : public Hashgraph {
 public:
