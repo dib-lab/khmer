@@ -364,8 +364,8 @@ public:
     {
         return _occupied_bins;
     }
-    void save(std::string, WordLength) {};
-    void load(std::string, WordLength&) {};
+    void save(std::string outfilename, WordLength ksize);
+    void load(std::string infilename, WordLength& ksize);
 
     Byte ** get_raw_tables()
     {

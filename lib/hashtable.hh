@@ -315,7 +315,7 @@ public:
         : Hashtable(ksize, new ByteStorage(sizes)) { } ;
 };
 
-// Hashtable-derived class with ByteStorage.
+// Hashtable-derived class with NibbleStorage.
 class SmallCounttable : public khmer::Hashtable
 {
 public:

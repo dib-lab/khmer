@@ -39,6 +39,8 @@ import random
 
 from khmer import SmallCounttable
 
+from . import khmer_tst_utils as utils
+
 
 def test_single_add():
     sct = SmallCounttable(4, 1e6, 4)
@@ -100,3 +102,25 @@ def test_random_kmers():
 
     for kmer in kmers:
         sct.get(kmer)
+
+
+def test_read_write():
+    rng = random.Random(1)
+
+    sct = SmallCounttable(20, 1e2, 4)
+
+    kmers = ["".join(rng.choice("ACGT") for _ in range(20))
+             for n in range(400)]
+    for kmer in kmers:
+        sct.add(kmer)
+
+    fname = utils.get_temp_filename('zzz')
+
+    sct.save(fname)
+
+    # on purpose choose parameters that are different from sct
+    sct2 = SmallCounttable(3, 1e4, 2)
+    sct2.load(fname)
+    assert sct.ksize() == sct2.ksize()
+    for kmer in kmers:
+        assert sct.get(kmer) == sct2.get(kmer)
