@@ -81,7 +81,8 @@ def get_parser():
     """
 
     parser = build_counting_args("Build a k-mer countgraph from the given"
-                                 " sequences.", epilog=textwrap.dedent(epilog))
+                                 " sequences.", epilog=textwrap.dedent(epilog),
+                                 citations=['counting', 'SeqAn'])
     add_threading_args(parser)
     parser.add_argument('output_countgraph_filename', help="The name of the"
                         " file to write the k-mer countgraph to.")
@@ -107,8 +108,6 @@ def get_parser():
 def main():
 
     args = sanitize_help(get_parser()).parse_args()
-    if not args.quiet:
-        info('load-into-counting.py', ['counting', 'SeqAn'])
 
     configure_logging(args.quiet)
     report_on_config(args)

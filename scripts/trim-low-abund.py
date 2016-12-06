@@ -51,12 +51,11 @@ import khmer
 import tempfile
 import shutil
 import textwrap
-import argparse
 
 from khmer import khmer_args
 from khmer import ReadParser
 
-from khmer.khmer_args import (build_counting_args, info, add_loadgraph_args,
+from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
                               report_on_config, calculate_graphsize,
                               sanitize_help)
 from khmer.khmer_args import FileType as khFileType
@@ -101,7 +100,8 @@ def get_parser():
 
     parser = build_counting_args(
         descr='Trim low-abundance k-mers using a streaming algorithm.',
-        epilog=textwrap.dedent(epilog))
+        epilog=textwrap.dedent(epilog),
+        citations=['streaming'])
 
     parser.add_argument('input_filenames', nargs='+')
 
@@ -275,8 +275,6 @@ class Trimmer(object):
 def main():
     parser = sanitize_help(get_parser())
     args = parser.parse_args()
-    if not args.quiet:
-        info('trim-low-abund.py', ['streaming'])
 
     configure_logging(args.quiet)
 
