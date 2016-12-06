@@ -45,7 +45,6 @@ Use -h for parameter help.
 """
 from __future__ import print_function
 import sys
-import screed
 import os
 import khmer
 import tempfile
@@ -59,13 +58,11 @@ from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
                               report_on_config, calculate_graphsize,
                               sanitize_help)
 from khmer.khmer_args import FileType as khFileType
-from khmer.utils import (write_record, write_record_pair, broken_paired_reader,
-                         ReadBundle)
+from khmer.utils import write_record, broken_paired_reader, ReadBundle
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
                          get_file_writer)
-from khmer.khmer_logger import (configure_logging, log_info, log_error,
-                                log_warn)
+from khmer.khmer_logger import configure_logging, log_info, log_error
 from khmer.trimming import trim_record
 
 DEFAULT_TRIM_AT_COVERAGE = 20
@@ -151,6 +148,10 @@ def get_parser():
                         help="Do not do a second pass across the low coverage "
                         "data")
 
+    parser.add_argument('--small-count', default=False, action='store_true',
+                        help='Reduce memory usage by using a smaller counter'
+                        ' for individual kmers.')
+
     return parser
 
 
@@ -203,7 +204,6 @@ class Trimmer(object):
         TRIM_AT_COVERAGE = self.trim_at_coverage
         CUTOFF = self.cutoff
         DIGINORM_COVERAGE = self.diginorm_coverage
-        K = graph.ksize()
 
         for n, is_pair, read1, read2 in reader:
             bundle = ReadBundle(read1, read2)
@@ -246,7 +246,6 @@ class Trimmer(object):
         graph = self.graph
         TRIM_AT_COVERAGE = self.trim_at_coverage
         CUTOFF = self.cutoff
-        K = graph.ksize()
 
         for n, is_pair, read1, read2 in reader:
             bundle = ReadBundle(read1, read2)
@@ -303,7 +302,8 @@ def main():
 
     ###
 
-    report_on_config(args)
+    graphtype = 'countgraph' if not args.small_count else 'smallcountgraph'
+    report_on_config(args, graphtype=graphtype)
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
     if args.savegraph:
