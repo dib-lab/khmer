@@ -308,6 +308,10 @@ public:
             const uint64_t idx = _table_index(khash, _tablesizes[i]);
             const uint8_t current_count = (table[idx] & mask) >> shift;
 
+            if (current_count == 15) {
+                continue;
+            }
+
             // XXX make me more elegant
             if (i == 0 && !is_new_kmer && current_count == 0) {
                 is_new_kmer = true;

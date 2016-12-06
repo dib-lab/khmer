@@ -479,12 +479,15 @@ def add_loadgraph_args(parser):
 
 def calculate_graphsize(args, graphtype, multiplier=1.0):
     """Transform the table parameters into a size."""
-    if graphtype not in ('countgraph', 'nodegraph'):
+    if graphtype not in ('countgraph', 'smallcountgraph', 'nodegraph'):
         raise ValueError("unknown graph type: %s" % (graphtype,))
 
     if args.max_memory_usage:
         if graphtype == 'countgraph':
             tablesize = args.max_memory_usage / args.n_tables / \
+                float(multiplier)
+        elif graphtype == 'smallcountgraph':
+            tablesize = 2 * args.max_memory_usage / args.n_tables / \
                 float(multiplier)
         elif graphtype == 'nodegraph':
             tablesize = 8. * args.max_memory_usage / args.n_tables / \
@@ -543,7 +546,10 @@ def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
         sys.exit(1)
 
     tablesize = calculate_graphsize(args, 'countgraph', multiplier=multiplier)
-    return khmer.Countgraph(ksize, tablesize, args.n_tables)
+    if args.small_count:
+        return khmer.SmallCountgraph(ksize, tablesize, args.n_tables)
+    else:
+        return khmer.Countgraph(ksize, tablesize, args.n_tables)
 
 
 def report_on_config(args, graphtype='countgraph'):
@@ -553,7 +559,7 @@ def report_on_config(args, graphtype='countgraph'):
     made available by this module.
     """
     check_conflicting_args(args, graphtype)
-    if graphtype not in ('countgraph', 'nodegraph'):
+    if graphtype not in ('countgraph', 'smallcountgraph', 'nodegraph'):
         raise ValueError("unknown graph type: %s" % (graphtype,))
 
     tablesize = calculate_graphsize(args, graphtype)
@@ -568,6 +574,11 @@ def report_on_config(args, graphtype='countgraph'):
             "Estimated memory usage is {0:.2g} bytes "
             "(n_tables x max_tablesize)".format(
                 args.n_tables * tablesize))
+    elif graphtype == 'smallcountgraph':
+        log_info(
+            "Estimated memory usage is {0:.2g} bytes "
+            "(n_tables x max_tablesize / 2)".format(
+                args.n_tables * tablesize / 2))
     elif graphtype == 'nodegraph':
         log_info(
             "Estimated memory usage is {0:.2g} bytes "
