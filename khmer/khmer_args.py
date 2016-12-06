@@ -460,6 +460,10 @@ def build_counting_args(descr=None, epilog=None, citations=None):
     """Build an ArgumentParser with args for countgraph based scripts."""
     parser = build_graph_args(descr=descr, epilog=epilog, citations=citations)
 
+    parser.add_argument('--small-count', default=False, action='store_true',
+                        help='Reduce memory usage by using a smaller counter'
+                        ' for individual kmers.')
+
     return parser
 
 
@@ -545,10 +549,13 @@ def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
         print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
         sys.exit(1)
 
-    tablesize = calculate_graphsize(args, 'countgraph', multiplier=multiplier)
     if args.small_count:
+        tablesize = calculate_graphsize(args, 'smallcountgraph',
+                                        multiplier=multiplier)
         return khmer.SmallCountgraph(ksize, tablesize, args.n_tables)
     else:
+        tablesize = calculate_graphsize(args, 'countgraph',
+                                        multiplier=multiplier)
         return khmer.Countgraph(ksize, tablesize, args.n_tables)
 
 

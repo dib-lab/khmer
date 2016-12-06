@@ -237,6 +237,7 @@ public:
 class NibbleStorage : public Storage
 {
 protected:
+    // table size is measured in number of entries in the table, not in bytes
     std::vector<uint64_t> _tablesizes;
     size_t _n_tables;
     uint64_t _occupied_bins;
