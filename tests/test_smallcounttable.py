@@ -70,22 +70,23 @@ def test_overflow():
     a = "AAAA"
     b = "AAAT"
 
-    # overflow our 4bit counter
+    # try to overflow our 4bit counter
     for n in range(17):
         sct.add(a)
 
-    assert sct.get(a) == 1
+    assert sct.get(a) == 15
     assert sct.get(b) == 0
 
+    # repeat with the other kmer that hashes to the other half of the byte
     sct = SmallCounttable(4, 1e6, 4)
     a = "AAAA"
     b = "AAAT"
 
-    # overflow our 4bit counter
+    # try to overflow our 4bit counter
     for n in range(17):
         sct.add(b)
 
-    assert sct.get(b) == 1
+    assert sct.get(b) == 15
     assert sct.get(a) == 0
 
 

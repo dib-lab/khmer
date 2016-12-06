@@ -148,10 +148,6 @@ def get_parser():
                         help="Do not do a second pass across the low coverage "
                         "data")
 
-    parser.add_argument('--small-count', default=False, action='store_true',
-                        help='Reduce memory usage by using a smaller counter'
-                        ' for individual kmers.')
-
     return parser
 
 
