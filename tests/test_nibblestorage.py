@@ -42,6 +42,8 @@ from khmer import SmallCounttable
 from . import khmer_tst_utils as utils
 
 
+# This mostly tests the underlying NibbleStorage class
+
 def test_single_add():
     sct = SmallCounttable(4, 1e6, 4)
     sct.add("AAAA")
