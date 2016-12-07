@@ -256,15 +256,17 @@ def check_conflicting_args(args, hashtype):
                 break  # no repeat warnings
 
         infoset = None
-        if hashtype == 'countgraph':
+        if hashtype in ('countgraph', 'smallcountgraph'):
             infoset = extract_countgraph_info(args.loadgraph)
-        if info:
+        if infoset is not None:
             ksize = infoset[0]
             max_tablesize = infoset[1]
             n_tables = infoset[2]
             args.ksize = ksize
             args.n_tables = n_tables
             args.max_tablesize = max_tablesize
+            if infoset[5] == 7:
+                args.small_count = True
 
 
 def check_argument_range(low, high, parameter_name):

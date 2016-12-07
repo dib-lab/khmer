@@ -95,14 +95,20 @@ def load_nodegraph(filename):
     return nodegraph
 
 
-def load_countgraph(filename):
+def load_countgraph(filename, small=False):
     """Load a countgraph object from the given filename and return it.
 
     Keyword argument:
     filename -- the name of the countgraph file
+    small -- set this to load a SmallCountgraph instance
     """
-    countgraph = _Countgraph(1, [1])
-    countgraph.load(filename)
+    if small:
+        countgraph = _SmallCountgraph(1, [1])
+        countgraph.load(filename)
+
+    else:
+        countgraph = _Countgraph(1, [1])
+        countgraph.load(filename)
 
     return countgraph
 
@@ -172,7 +178,11 @@ def extract_countgraph_info(filename):
             signature, = unpack('4s', countgraph.read(4))
             version, = unpack('B', countgraph.read(1))
             ht_type, = unpack('B', countgraph.read(1))
-            use_bigcount, = unpack('B', countgraph.read(1))
+            # XXX 7 is the magic value of SAVED_SMALLCOUNT
+            if ht_type != 7:
+                use_bigcount, = unpack('B', countgraph.read(1))
+            else:
+                use_bigcount = None
             ksize, = unpack('I', countgraph.read(uint_size))
             n_tables, = unpack('B', countgraph.read(1))
             occupied, = unpack('Q', countgraph.read(ulonglong_size))
