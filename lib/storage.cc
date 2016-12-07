@@ -783,7 +783,6 @@ void NibbleStorage::save(std::string outfilename, WordLength ksize)
     unsigned char version = SAVED_FORMAT_VERSION;
     outfile.write((const char *) &version, 1);
 
-    // XXX create a new type?
     unsigned char ht_type = SAVED_SMALLCOUNT;
     outfile.write((const char *) &ht_type, 1);
 

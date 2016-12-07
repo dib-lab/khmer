@@ -38,7 +38,6 @@ Contact: khmer-project@idyll.org
 #ifndef STORAGE_HH
 #define STORAGE_HH
 
-
 namespace khmer
 {
 typedef std::map<HashIntoType, BoundedCounterType> KmerCountMap;
@@ -245,13 +244,17 @@ protected:
     uint8_t _max_count{15};
     Byte ** _counts;
 
+    // Compute index into the table, this retrieves the correct byte
+    // which you then need to select the correct nibble from
     uint64_t _table_index(const HashIntoType k, const uint64_t tablesize) const {
         const uint64_t bins = tablesize / 2 + 1;
         return (k / 2) % bins;
     }
+    // Compute which half of the byte to use for this hash value
     uint8_t _mask(const HashIntoType k) const {
         return k%2 ? 15 : 240;
     }
+    // Compute which half of the byte to use for this hash value
     uint8_t _shift(const HashIntoType k) const {
         return k%2 ? 0 : 4;
     }
@@ -309,7 +312,9 @@ public:
             const uint64_t idx = _table_index(khash, _tablesizes[i]);
             const uint8_t current_count = (table[idx] & mask) >> shift;
 
-            if (current_count == 15) {
+            // if we have reached the maximum count stop incrementing the
+            // counter. This avoids overflowing it.
+            if (current_count == _max_count) {
                 continue;
             }
 
@@ -339,7 +344,7 @@ public:
         const uint8_t mask = _mask(khash);
         const uint8_t shift = _shift(khash);
 
-        // get the min count across all tables
+        // get the minimum count across all tables
         for (unsigned int i = 0; i < _n_tables; i++) {
             const Byte* table(_counts[i]);
             const uint64_t idx = _table_index(khash, _tablesizes[i]);
