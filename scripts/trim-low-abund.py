@@ -314,7 +314,7 @@ def main():
 
     if args.loadgraph:
         log_info('loading countgraph from {graph}', graph=args.loadgraph)
-        ct = khmer.load_countgraph(args.loadgraph)
+        ct = khmer.load_countgraph(args.loadgraph, args.small_count)
     else:
         log_info('making countgraph')
         ct = khmer_args.create_countgraph(args)
