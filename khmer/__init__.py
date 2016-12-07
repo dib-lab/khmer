@@ -37,6 +37,7 @@
 
 
 from __future__ import print_function
+from collections import namedtuple
 from math import log
 import json
 
@@ -163,6 +164,9 @@ def extract_countgraph_info(filename):
     Keyword argument:
     filename -- the name of the countgraph file to inspect
     """
+    CgInfo = namedtuple("CgInfo", ['ksize', 'n_tables', 'table_size',
+                                   'use_bigcount', 'version', 'ht_type',
+                                   'n_occupied'])
     ksize = None
     n_tables = None
     table_size = None
@@ -194,8 +198,8 @@ def extract_countgraph_info(filename):
     except:
         raise ValueError("Count graph file '{}' is corrupt ".format(filename))
 
-    return ksize, round(table_size, -2), n_tables, use_bigcount, version, \
-        ht_type, occupied
+    return CgInfo(ksize, n_tables, round(table_size, -2), use_bigcount,
+                  version, ht_type, occupied)
 
 
 def calc_expected_collisions(graph, force=False, max_false_pos=.2):

@@ -259,13 +259,13 @@ def check_conflicting_args(args, hashtype):
         if hashtype in ('countgraph', 'smallcountgraph'):
             infoset = extract_countgraph_info(args.loadgraph)
         if infoset is not None:
-            ksize = infoset[0]
-            max_tablesize = infoset[1]
-            n_tables = infoset[2]
+            ksize = infoset.ksize
+            max_tablesize = infoset.table_size
+            n_tables = infoset.n_tables
             args.ksize = ksize
             args.n_tables = n_tables
             args.max_tablesize = max_tablesize
-            if infoset[5] == khmer.FILETYPES['SMALLCOUNT']:
+            if infoset.ht_type == khmer.FILETYPES['SMALLCOUNT']:
                 args.small_count = True
 
 
