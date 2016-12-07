@@ -258,7 +258,7 @@ static bool ht_convert_PyObject_to_Kmer(PyObject * value,
 
 
 static bool convert_Pytablesizes_to_vector(PyListObject * sizes_list_o,
-                                           std::vector<uint64_t>& sizes)
+        std::vector<uint64_t>& sizes)
 {
     Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
     if (sizes_list_o_length < 1) {
@@ -1397,7 +1397,7 @@ typedef struct {
 
 static void khmer_nodegraph_dealloc(khmer_KNodegraph_Object * obj);
 static PyObject* khmer_nodegraph_new(PyTypeObject * type, PyObject * args,
-                                    PyObject * kwds);
+                                     PyObject * kwds);
 
 static PyTypeObject khmer_KNodegraph_Type
 CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KNodegraph_Object")
@@ -2326,13 +2326,15 @@ static PyMethodDef khmer_hashtable_methods[] = {
         METH_VARARGS,
         "Calculate the k-mer abundance distribution for a reads parser handle"
     },
-    { "get_median_count",
-      (PyCFunction)hashtable_get_median_count, METH_VARARGS,
-      "Get the median, average, and stddev of the k-mer counts in the string"
+    {
+        "get_median_count",
+        (PyCFunction)hashtable_get_median_count, METH_VARARGS,
+        "Get the median, average, and stddev of the k-mer counts in the string"
     },
-    { "median_at_least",
-      (PyCFunction)hashtable_median_at_least, METH_VARARGS,
-      "Return true if the median is at least the given cutoff"
+    {
+        "median_at_least",
+        (PyCFunction)hashtable_median_at_least, METH_VARARGS,
+        "Return true if the median is at least the given cutoff"
     },
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
@@ -2650,7 +2652,7 @@ static PyMethodDef khmer_nodegraph_methods[] = {
 // methods, we take our arguments here, because there's no "uninitialized" nodegraph
 // object; we have to have k and the table sizes before creating the new objects
 static PyObject* khmer_nodegraph_new(PyTypeObject * type, PyObject * args,
-                                    PyObject * kwds)
+                                     PyObject * kwds)
 {
     khmer_KNodegraph_Object * self;
     self = (khmer_KNodegraph_Object *)type->tp_alloc(type, 0);
@@ -4825,13 +4827,13 @@ MOD_INIT(_khmer)
     }
 
     PyObject * filetype_dict = Py_BuildValue("{s,i,s,i,s,i,s,i,s,i,s,i,s,i}",
-      "COUNTING_HT", SAVED_COUNTING_HT,
-      "HASHBITS", SAVED_HASHBITS,
-      "TAGS", SAVED_TAGS,
-      "STOPTAGS", SAVED_STOPTAGS,
-      "SUBSET", SAVED_SUBSET,
-      "LABELSET", SAVED_LABELSET,
-      "SMALLCOUNT", SAVED_SMALLCOUNT);
+                               "COUNTING_HT", SAVED_COUNTING_HT,
+                               "HASHBITS", SAVED_HASHBITS,
+                               "TAGS", SAVED_TAGS,
+                               "STOPTAGS", SAVED_STOPTAGS,
+                               "SUBSET", SAVED_SUBSET,
+                               "LABELSET", SAVED_LABELSET,
+                               "SMALLCOUNT", SAVED_SMALLCOUNT);
     if (PyModule_AddObject( m, "FILETYPES", filetype_dict ) < 0) {
         return MOD_ERROR_VAL;
     }

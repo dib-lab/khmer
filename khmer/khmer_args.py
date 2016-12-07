@@ -80,6 +80,7 @@ ALGORITHMS = {
 class CitationAction(argparse.Action):
     # pylint: disable=too-few-public-methods
     """Output citation information and exit."""
+
     def __init__(self, *args, **kwargs):
         self.citations = kwargs.pop('citations')
         super(CitationAction, self).__init__(*args, nargs=0, **kwargs)
@@ -126,6 +127,7 @@ class KhmerArgumentParser(argparse.ArgumentParser):
 
     Take care of common arguments and setup printing of citation information.
     """
+
     def __init__(self, citations=None, formatter_class=ComboFormatter,
                  **kwargs):
         super(KhmerArgumentParser, self).__init__(

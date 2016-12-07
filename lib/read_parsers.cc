@@ -197,16 +197,16 @@ IParser::
 ReadPair IParser::get_next_read_pair(uint8_t mode)
 {
     switch (mode) {
-        case IParser::PAIR_MODE_IGNORE_UNPAIRED:
-            return _get_next_read_pair_in_ignore_mode();
-            break;
-        case IParser::PAIR_MODE_ERROR_ON_UNPAIRED:
-            return _get_next_read_pair_in_error_mode();
-            break;
-        default:
-            std::ostringstream oss;
-            oss << "Unknown pair reading mode: " << mode;
-            throw UnknownPairReadingMode(oss.str());
+    case IParser::PAIR_MODE_IGNORE_UNPAIRED:
+        _get_next_read_pair_in_ignore_mode();
+        break;
+    case IParser::PAIR_MODE_ERROR_ON_UNPAIRED:
+        _get_next_read_pair_in_error_mode();
+        break;
+    default:
+        std::ostringstream oss;
+        oss << "Unknown pair reading mode: " << mode;
+        throw UnknownPairReadingMode(oss.str());
     }
 }
 
