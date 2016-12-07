@@ -208,6 +208,17 @@ def test_get_raw_tables():
         assert size == len(table)
 
 
+def test_get_raw_tables_smallcountgraph():
+    # for the same number of entries a SmallCountgraph uses ~half the memory
+    # of a normal Countgraph
+    ht = khmer.SmallCountgraph(20, 1e5, 4)
+    tables = ht.get_raw_tables()
+
+    for size, table in zip(ht.hashsizes(), tables):
+        assert isinstance(table, memoryview)
+        assert size // 2 + 1 == len(table)
+
+
 def test_get_raw_tables_view():
     ht = khmer.Countgraph(20, 1e5, 4)
     tables = ht.get_raw_tables()
@@ -216,6 +227,18 @@ def test_get_raw_tables_view():
     ht.consume('AAAATTTTCCCCGGGGAAAA')
     for tab in tables:
         assert sum(tab.tolist()) == 1
+
+
+def test_get_raw_tables_view_smallcountgraph():
+    ht = khmer.SmallCountgraph(20, 1e5, 4)
+    tables = ht.get_raw_tables()
+    for tab in tables:
+        assert sum(tab.tolist()) == 0
+    ht.consume('AAAATTTTCCCCGGGGAAAA')
+    # the actual count is 1 but stored in the first 4bits of a Byte
+    # and so becomes 16
+    for tab in tables:
+        assert sum(tab.tolist()) == int('00010000', 2)
 
 
 @pytest.mark.huge
