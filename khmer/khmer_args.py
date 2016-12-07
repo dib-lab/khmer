@@ -265,7 +265,7 @@ def check_conflicting_args(args, hashtype):
             args.ksize = ksize
             args.n_tables = n_tables
             args.max_tablesize = max_tablesize
-            if infoset[5] == 7:
+            if infoset[5] == khmer.FILETYPES['SMALLCOUNT']:
                 args.small_count = True
 
 
