@@ -42,7 +42,7 @@ typedef struct {
 } khmer_KSmallCounttable_Object;
 
 static PyObject* khmer_smallcounttable_new(PyTypeObject * type, PyObject * args,
-                                           PyObject * kwds);
+        PyObject * kwds);
 
 static PyTypeObject khmer_KSmallCounttable_Type
 CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KSmallCounttable_Object")
@@ -93,7 +93,7 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KSmallCounttable_Object")
 //
 
 static PyObject* khmer_smallcounttable_new(PyTypeObject * type, PyObject * args,
-                                           PyObject * kwds)
+        PyObject * kwds)
 {
     khmer_KSmallCounttable_Object * self;
 

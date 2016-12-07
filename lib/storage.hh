@@ -246,22 +246,25 @@ protected:
 
     // Compute index into the table, this retrieves the correct byte
     // which you then need to select the correct nibble from
-    uint64_t _table_index(const HashIntoType k, const uint64_t tablesize) const {
+    uint64_t _table_index(const HashIntoType k, const uint64_t tablesize) const
+    {
         const uint64_t bins = tablesize / 2 + 1;
         return (k / 2) % bins;
     }
     // Compute which half of the byte to use for this hash value
-    uint8_t _mask(const HashIntoType k) const {
+    uint8_t _mask(const HashIntoType k) const
+    {
         return k%2 ? 15 : 240;
     }
     // Compute which half of the byte to use for this hash value
-    uint8_t _shift(const HashIntoType k) const {
+    uint8_t _shift(const HashIntoType k) const
+    {
         return k%2 ? 0 : 4;
     }
 
 public:
     NibbleStorage(std::vector<uint64_t>& tablesizes) :
-      _tablesizes{tablesizes}, _occupied_bins{0}, _n_unique_kmers{0}
+        _tablesizes{tablesizes}, _occupied_bins{0}, _n_unique_kmers{0}
     {
         _allocate_counters();
     }
@@ -295,13 +298,15 @@ public:
     }
 
 
-    BoundedCounterType test_and_set_bits(HashIntoType khash) {
+    BoundedCounterType test_and_set_bits(HashIntoType khash)
+    {
         BoundedCounterType x = get_count(khash);
         add(khash);
         return !x;
     }
 
-    void add(HashIntoType khash) {
+    void add(HashIntoType khash)
+    {
         bool is_new_kmer = false;
 
         const uint8_t mask = _mask(khash);
@@ -404,7 +409,8 @@ class ByteStorageFileWriter;
 class ByteStorageGzFileReader;
 class ByteStorageGzFileWriter;
 
-class ByteStorage : public Storage {
+class ByteStorage : public Storage
+{
     friend class ByteStorageFile;
     friend class ByteStorageFileReader;
     friend class ByteStorageFileWriter;
@@ -599,16 +605,16 @@ class ByteStorageFileReader : public ByteStorageFile
 {
 public:
     ByteStorageFileReader(const std::string &infilename,
-                           WordLength &ksize,
-                           ByteStorage &store);
+                          WordLength &ksize,
+                          ByteStorage &store);
 };
 
 class ByteStorageGzFileReader : public ByteStorageFile
 {
 public:
     ByteStorageGzFileReader(const std::string &infilename,
-                             WordLength &ksize,
-                             ByteStorage &store);
+                            WordLength &ksize,
+                            ByteStorage &store);
 };
 
 
@@ -616,16 +622,16 @@ class ByteStorageFileWriter : public ByteStorageFile
 {
 public:
     ByteStorageFileWriter(const std::string &outfilename,
-                           const WordLength ksize,
-                           const ByteStorage &store);
+                          const WordLength ksize,
+                          const ByteStorage &store);
 };
 
 class ByteStorageGzFileWriter : public ByteStorageFile
 {
 public:
     ByteStorageGzFileWriter(const std::string &outfilename,
-                             const WordLength ksize,
-                             const ByteStorage &store);
+                            const WordLength ksize,
+                            const ByteStorage &store);
 };
 }
 

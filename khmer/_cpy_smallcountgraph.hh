@@ -85,7 +85,7 @@ static PyMethodDef khmer_smallcountgraph_methods[] = {
 };
 
 static PyObject* khmer_smallcountgraph_new(PyTypeObject * type, PyObject * args,
-                                           PyObject * kwds);
+        PyObject * kwds);
 
 static PyTypeObject khmer_KSmallCountgraph_Type
 CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KSmallCountgraph_Object")
@@ -146,7 +146,7 @@ static void khmer_smallcountgraph_dealloc(khmer_KSmallCountgraph_Object * obj)
 //
 
 static PyObject* khmer_smallcountgraph_new(PyTypeObject * type, PyObject * args,
-                                           PyObject * kwds)
+        PyObject * kwds)
 {
     khmer_KSmallCountgraph_Object * self;
 

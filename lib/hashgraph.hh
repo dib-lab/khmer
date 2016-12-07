@@ -79,7 +79,8 @@ namespace khmer
 // Hashgraph: Extension of Hashtable to support graph operations.
 //
 
-class Hashgraph: public Hashtable {
+class Hashgraph: public Hashtable
+{
 
     friend class SubsetPartition;
     friend class LabelHash;
@@ -137,18 +138,36 @@ public:
         _tag_density = d;
     }
 
-    unsigned int _get_tag_density() const { return _tag_density; }
+    unsigned int _get_tag_density() const
+    {
+        return _tag_density;
+    }
 
-    void add_tag(HashIntoType tag) { all_tags.insert(tag); }
-    void add_stop_tag(HashIntoType tag) { stop_tags.insert(tag); }
+    void add_tag(HashIntoType tag)
+    {
+        all_tags.insert(tag);
+    }
+    void add_stop_tag(HashIntoType tag)
+    {
+        stop_tags.insert(tag);
+    }
 
-    size_t n_tags() const { return all_tags.size(); }
+    size_t n_tags() const
+    {
+        return all_tags.size();
+    }
 
     void divide_tags_into_subsets(unsigned int subset_size, SeenSet& divvy);
 
-    void add_kmer_to_tags(HashIntoType kmer) { all_tags.insert(kmer); }
+    void add_kmer_to_tags(HashIntoType kmer)
+    {
+        all_tags.insert(kmer);
+    }
 
-    void clear_tags() { all_tags.clear(); }
+    void clear_tags()
+    {
+        all_tags.clear();
+    }
 
     // Consume reads & build sparse graph.
     void consume_fasta_and_tag(
@@ -255,7 +274,8 @@ public:
 };
 
 // Hashgraph-derived class with BitStorage.
-class Nodegraph : public Hashgraph {
+class Nodegraph : public Hashgraph
+{
 public:
     explicit Nodegraph(WordLength ksize, std::vector<uint64_t> sizes)
         : Hashgraph(ksize, new BitStorage(sizes)) { } ;
