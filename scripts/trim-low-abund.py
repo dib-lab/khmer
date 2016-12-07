@@ -303,7 +303,7 @@ def main():
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
     if args.savegraph:
-        graphsize = calculate_graphsize(args, 'countgraph')
+        graphsize = calculate_graphsize(args, graphtype)
         check_space_for_graph(args.savegraph, graphsize, args.force)
 
     if ('-' in args.input_filenames or '/dev/stdin' in args.input_filenames) \
