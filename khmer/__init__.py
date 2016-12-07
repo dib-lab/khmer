@@ -74,6 +74,8 @@ from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 # tests/test_read_parsers.py,scripts/{filter-abund-single,load-graph}.py
 # scripts/{abundance-dist-single,load-into-counting}.py
 
+from khmer._khmer import FILETYPES
+
 import sys
 
 from struct import pack, unpack
@@ -178,8 +180,7 @@ def extract_countgraph_info(filename):
             signature, = unpack('4s', countgraph.read(4))
             version, = unpack('B', countgraph.read(1))
             ht_type, = unpack('B', countgraph.read(1))
-            # XXX 7 is the magic value of SAVED_SMALLCOUNT
-            if ht_type != 7:
+            if ht_type != FILETYPES['SMALLCOUNT']:
                 use_bigcount, = unpack('B', countgraph.read(1))
             else:
                 use_bigcount = None
