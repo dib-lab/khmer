@@ -49,6 +49,7 @@ Contact: khmer-project@idyll.org
 #include <set>
 #include <string>
 #include <vector>
+#include <memory>
 #include "MurmurHash3.h"
 
 #include "khmer.hh"
@@ -359,7 +360,7 @@ public:
     virtual unique_ptr<KmerHashIterator>
         new_kmer_iterator(const char * sp) const;
 };
-    
+
 // Hashtable-derived class with BitStorage.
 class Nodetable : public Hashtable {
 public:
