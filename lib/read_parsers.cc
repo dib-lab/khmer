@@ -46,7 +46,6 @@ Contact: khmer-project@idyll.org
 namespace khmer
 {
 
-
 namespace read_parsers
 {
 
@@ -92,9 +91,9 @@ bool FastxParser::is_complete()
     return !seqan::isGood(_private->stream) || seqan::atEnd(_private->stream);
 }
 
-void FastxParser::imprint_next_read(Read &the_read)
+Read FastxParser::get_next_read()
 {
-    the_read.reset();
+    Read the_read;
     int ret = -1;
     const char *invalid_read_exc = NULL;
     while (!__sync_bool_compare_and_swap(& _private->seqan_spin_lock, 0, 1));
@@ -135,6 +134,7 @@ void FastxParser::imprint_next_read(Read &the_read)
     if (ret != 0) {
         throw StreamReadError();
     }
+    return the_read;
 }
 
 FastxParser::~FastxParser()
@@ -146,13 +146,11 @@ FastxParser::~FastxParser()
 IParser * const
 IParser::
 get_parser(
-    std:: string const	    &ifile_name
+    std:: string const &ifile_name
 )
 {
-
     return new FastxParser(ifile_name.c_str());
 }
-
 
 IParser::
 IParser(
@@ -196,16 +194,14 @@ IParser::
     regfree( &_re_read_2 );
 }
 
-void
-IParser::
-imprint_next_read_pair( ReadPair &the_read_pair, uint8_t mode )
+ReadPair IParser::get_next_read_pair(uint8_t mode)
 {
     switch (mode) {
         case IParser::PAIR_MODE_IGNORE_UNPAIRED:
-            _imprint_next_read_pair_in_ignore_mode(the_read_pair);
+            return _get_next_read_pair_in_ignore_mode();
             break;
         case IParser::PAIR_MODE_ERROR_ON_UNPAIRED:
-            _imprint_next_read_pair_in_error_mode(the_read_pair);
+            return _get_next_read_pair_in_error_mode();
             break;
         default:
             std::ostringstream oss;
@@ -214,26 +210,10 @@ imprint_next_read_pair( ReadPair &the_read_pair, uint8_t mode )
     }
 }
 
-
-#if (0)
-void
-IParser::
-_imprint_next_read_pair_in_allow_mode( ReadPair &the_read_pair )
+ReadPair IParser::_get_next_read_pair_in_ignore_mode()
 {
-    // TODO: Implement.
-    //	     Probably need caching of reads between invocations
-    //	     and the ability to return pairs which are half empty.
-}
-#endif
-
-
-void
-IParser::
-_imprint_next_read_pair_in_ignore_mode( ReadPair &the_read_pair )
-{
-    Read	    &read_1		= the_read_pair.first;
-    Read	    &read_2		= the_read_pair.second;
-    regmatch_t	    match_1, match_2;
+    ReadPair pair;
+    regmatch_t match_1, match_2;
 
     // Hunt for a read pair until one is found or end of reads is reached.
     while (true) {
@@ -242,9 +222,9 @@ _imprint_next_read_pair_in_ignore_mode( ReadPair &the_read_pair )
         // Note: We let any exception, which flies out of the following,
         //	 pass through unhandled.
         while (true) {
-            imprint_next_read( read_1 );
+            pair.first = get_next_read();
             if (!regexec(
-                        &_re_read_1, read_1.name.c_str( ), 1, &match_1, 0
+                        &_re_read_1, pair.first.name.c_str( ), 1, &match_1, 0
                     )) {
                 break;
             }
@@ -254,9 +234,9 @@ _imprint_next_read_pair_in_ignore_mode( ReadPair &the_read_pair )
         // If not found, then restart search for pair.
         // If found, then validate match.
         // If invalid pair, then restart search for pair.
-        imprint_next_read( read_2 );
+        pair.second = get_next_read();
         if (!regexec(
-                    &_re_read_2, read_2.name.c_str( ), 1, &match_2, 0
+                    &_re_read_2, pair.second.name.c_str( ), 1, &match_2, 0
                 )) {
             if (_is_valid_read_pair( the_read_pair, match_1, match_2 )) {
                 break;
@@ -265,21 +245,19 @@ _imprint_next_read_pair_in_ignore_mode( ReadPair &the_read_pair )
 
     } // while pair not found
 
-} // _imprint_next_read_pair_in_ignore_mode
+    return pair;
+} // _get_next_read_pair_in_ignore_mode
 
 
-void
-IParser::
-_imprint_next_read_pair_in_error_mode( ReadPair &the_read_pair )
+ReadPair IParser::_get_next_read_pair_in_error_mode()
 {
-    Read	    &read_1		= the_read_pair.first;
-    Read	    &read_2		= the_read_pair.second;
-    regmatch_t	    match_1, match_2;
+    ReadPair pair;
+    regmatch_t match_1, match_2;
 
     // Note: We let any exception, which flies out of the following,
     //	     pass through unhandled.
-    imprint_next_read( read_1 );
-    imprint_next_read( read_2 );
+    pair.first = get_next_read();
+    pair.second = get_next_read();
 
     // Is the first read really the first member of a pair?
     if (REG_NOMATCH == regexec(
@@ -299,7 +277,8 @@ _imprint_next_read_pair_in_error_mode( ReadPair &the_read_pair )
         throw InvalidReadPair( );
     }
 
-} // _imprint_next_read_pair_in_error_mode
+    return pair;
+} // _get_next_read_pair_in_error_mode
 
 
 bool

@@ -646,7 +646,7 @@ _ReadParser_iternext( PyObject * self )
     stop_iteration = parser->is_complete( );
     if (!stop_iteration) {
         try {
-            parser->imprint_next_read( *the_read_PTR );
+            *the_read_PTR = parser->get_next_read();
         } catch (NoMoreReadsAvailable &exc) {
             stop_iteration = true;
         } catch (khmer_file_exception &exc) {
@@ -701,7 +701,7 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
     stop_iteration = parser->is_complete( );
     if (!stop_iteration) {
         try {
-            parser->imprint_next_read_pair( the_read_pair, pair_mode );
+            the_read_pair = parser->get_next_read_pair(pair_mode);
         } catch (NoMoreReadsAvailable &exc) {
             stop_iteration = true;
         } catch (khmer_file_exception &exc) {
