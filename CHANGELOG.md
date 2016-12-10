@@ -25,6 +25,7 @@ under semantic versioning, but will be in future versions of khmer.
   seed k-mer from a hashtable.
 - Support for assembling directly from k-mer graphs, and a new
   JunctionCountAssembler class.
+- Add --info flag for obtaining citation information.
 
 ### Changed
 - Switch from nose to py.test as the testing framework.
@@ -34,6 +35,7 @@ under semantic versioning, but will be in future versions of khmer.
   Hashbits --> Nodegraph.
 
 ### Fixed
+- Bug in compressed(gzip) streaming output from scripts
 - The hashbits `update_from` function to correctly track occupied bins for
   calculating FPR.
 - Bug in the `filter-abund.py` script when `--gzip` and `-o` flags are used

@@ -104,7 +104,7 @@ LabelHash::consume_fasta_and_tag_with_labels(
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( )) {
         try {
-            parser->imprint_next_read(read);
+            read = parser->get_next_read( );
         } catch (NoMoreReadsAvailable &exc) {
             break;
         }
@@ -170,7 +170,7 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
     //
     PartitionID p;
     while(!parser->is_complete())  {
-        parser->imprint_next_read(read);
+        read = parser->get_next_read();
         seq = read.sequence;
 
         if (graph->check_and_normalize_read(seq)) {

@@ -57,6 +57,7 @@ from contextlib import contextmanager
 from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
                               report_on_config, info, calculate_graphsize,
                               sanitize_help, check_argument_range)
+from khmer.khmer_args import FileType as khFileType
 import argparse
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
@@ -253,7 +254,8 @@ def get_parser():
         tests/test-data/test-fastq-reads.fq"""
     parser = build_counting_args(
         descr="Do digital normalization (remove mostly redundant sequences)",
-        epilog=textwrap.dedent(epilog))
+        epilog=textwrap.dedent(epilog),
+        citations=['diginorm'])
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
     parser.add_argument('-C', '--cutoff', help="when the median "
@@ -282,7 +284,7 @@ def get_parser():
                         help='continue past file reading errors',
                         action='store_true')
     parser.add_argument('-o', '--output', metavar="filename",
-                        type=argparse.FileType('wb'),
+                        type=khFileType('wb'),
                         default=None, dest='single_output_file',
                         help='only output a single file with '
                         'the specified filename; use a single dash "-" to '
@@ -298,9 +300,6 @@ def get_parser():
 def main():  # pylint: disable=too-many-branches,too-many-statements
     parser = sanitize_help(get_parser())
     args = parser.parse_args()
-
-    if not args.quiet:
-        info('normalize-by-median.py', ['diginorm'])
 
     configure_logging(args.quiet)
     report_on_config(args)

@@ -311,7 +311,7 @@ consume_fasta_and_tag(
     while (!parser->is_complete( )) {
 
         try {
-            parser->imprint_next_read(read);
+            read = parser->get_next_read( );
         } catch (NoMoreReadsAvailable &e) {
             // Bail out if this error is raised
             break;
@@ -374,7 +374,7 @@ void Hashgraph::consume_partitioned_fasta(const std::string &filename,
 
     while(!parser->is_complete())  {
         try {
-            parser->imprint_next_read(read);
+            read = parser->get_next_read();
         } catch (NoMoreReadsAvailable &exc) {
             break;
         }

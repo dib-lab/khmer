@@ -135,7 +135,7 @@ consume_fasta(
     while (!parser->is_complete( )) {
         bool is_valid;
         try {
-            parser->imprint_next_read(read);
+            read = parser->get_next_read( );
         } catch (NoMoreReadsAvailable) {
             break;
         }
@@ -351,7 +351,7 @@ Hashtable::abundance_distribution(
 
     while(!parser->is_complete()) {
         try {
-            parser->imprint_next_read(read);
+            read = parser->get_next_read();
         } catch (NoMoreReadsAvailable &exc) {
             break;
         }
