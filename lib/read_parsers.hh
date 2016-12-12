@@ -84,11 +84,13 @@ struct InvalidReadPair : public  khmer_value_exception {
 };
 
 struct Read {
-    std:: string name;
-    std:: string annotations;
-    std:: string sequence;
-    std:: string quality;
-    std:: string cleaned_seq;
+    std::string name;
+    std::string annotations;
+    std::string sequence;
+    std::string quality;
+    std::string cleaned_seq;
+
+    //Read() : name(), annotations(), sequence(), quality(), cleaned_seq() {}
 
     inline void reset( )
     {
@@ -96,6 +98,7 @@ struct Read {
         annotations.clear();
         sequence.clear();
         quality.clear();
+        cleaned_seq.clear();
     }
 
     void write_to(std::ostream&);
@@ -119,7 +122,7 @@ public:
 
     virtual bool is_complete( ) = 0;
     virtual Read get_next_read() = 0;
-    virtual void get_next_read_pair(uint8_t mode = PAIR_MODE_ERROR_ON_UNPAIRED);
+    virtual ReadPair get_next_read_pair(uint8_t mode = PAIR_MODE_ERROR_ON_UNPAIRED);
     size_t get_num_reads()
     {
         return _num_reads;

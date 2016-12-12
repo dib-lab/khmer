@@ -238,7 +238,7 @@ ReadPair IParser::_get_next_read_pair_in_ignore_mode()
         if (!regexec(
                     &_re_read_2, pair.second.name.c_str( ), 1, &match_2, 0
                 )) {
-            if (_is_valid_read_pair( the_read_pair, match_1, match_2 )) {
+            if (_is_valid_read_pair(pair, match_1, match_2)) {
                 break;
             }
         }
@@ -261,19 +261,19 @@ ReadPair IParser::_get_next_read_pair_in_error_mode()
 
     // Is the first read really the first member of a pair?
     if (REG_NOMATCH == regexec(
-                &_re_read_1, read_1.name.c_str( ), 1, &match_1, 0
+                &_re_read_1, pair.first.name.c_str( ), 1, &match_1, 0
             )) {
         throw InvalidReadPair( );
     }
     // Is the second read really the second member of a pair?
     if (REG_NOMATCH == regexec(
-                &_re_read_2, read_2.name.c_str( ), 1, &match_2, 0
+                &_re_read_2, pair.second.name.c_str( ), 1, &match_2, 0
             )) {
         throw InvalidReadPair( );
     }
 
     // Is the pair valid?
-    if (!_is_valid_read_pair( the_read_pair, match_1, match_2 )) {
+    if (!_is_valid_read_pair(pair, match_1, match_2)) {
         throw InvalidReadPair( );
     }
 
