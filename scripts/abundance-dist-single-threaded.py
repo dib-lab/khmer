@@ -139,8 +139,8 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     log_info('outputting to {output}', output=args.output_histogram_filename)
 
     # start loading
-    reads_queue = Queue(1000)
-    n_consumers = 4
+    reads_queue = Queue(maxsize=1000)
+    n_consumers = 1
 
     def _load_reads(fname, q, n_consumers):
         rparser = khmer.ReadParser(fname)
@@ -152,6 +152,8 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
                 chunk = []
         if chunk:
             q.put(chunk)
+        # Each consumer must only consume one sentinel otherwise things
+        # will hang.
         for _ in range(n_consumers):
             q.put(None)
 

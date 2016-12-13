@@ -1642,9 +1642,7 @@ hashtable_consume(khmer_KHashtable_Object * me, PyObject * args)
 
     unsigned int n_consumed;
 
-    Py_BEGIN_ALLOW_THREADS
     n_consumed = hashtable->consume_string(long_str);
-    Py_END_ALLOW_THREADS
 
     return PyLong_FromLong(n_consumed);
 }
@@ -1673,7 +1671,10 @@ hashtable_consume_chunk(khmer_KHashtable_Object * me, PyObject * args)
 
     Py_BEGIN_ALLOW_THREADS
     for (auto read : reads) {
-      n_consumed += hashtable->consume_string(read);
+      std::string rread(read);
+      if (hashtable->check_and_normalize_read(rread)) {
+        n_consumed += hashtable->consume_string(read);
+      }
     }
     Py_END_ALLOW_THREADS
 
