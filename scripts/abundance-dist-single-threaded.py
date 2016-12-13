@@ -48,6 +48,7 @@ import os
 import sys
 import csv
 import khmer
+from queue import Queue
 import threading
 import textwrap
 from khmer import khmer_args
@@ -138,21 +139,46 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     log_info('outputting to {output}', output=args.output_histogram_filename)
 
     # start loading
-    rparser = khmer.ReadParser(args.input_sequence_filename)
-    threads = []
+    reads_queue = Queue(1000)
+    n_consumers = 4
+
+    def _load_reads(fname, q, n_consumers):
+        rparser = khmer.ReadParser(fname)
+        chunk = []
+        for n, read in enumerate(rparser):
+            chunk.append(read.sequence)
+            if not n % 1000:
+                q.put(chunk)
+                chunk = []
+        if chunk:
+            q.put(chunk)
+        for _ in range(n_consumers):
+            q.put(None)
+
+    def _consume_reads(cg, q):
+        while True:
+            reads = q.get()
+            if reads is None:
+                break
+            cg.consume_chunk(reads)
+
+    loading_thread = threading.Thread(target=_load_reads,
+                                      args=(args.input_sequence_filename,
+                                            reads_queue,
+                                            n_consumers))
+    loading_thread.start()
+
+    consumers = [threading.Thread(target=_consume_reads,
+                                  args=(countgraph, reads_queue))
+                 for n in range(n_consumers)]
+    _ = [t.start() for t in consumers]
+
     log_info('consuming input, round 1 -- {input}',
              input=args.input_sequence_filename)
-    for _ in range(args.threads):
-        thread = \
-            threading.Thread(
-                target=countgraph.consume_fasta_with_reads_parser,
-                args=(rparser, )
-            )
-        threads.append(thread)
-        thread.start()
 
-    for thread in threads:
+    for thread in consumers:
         thread.join()
+    loading_thread.join()
 
     log_info('Total number of unique k-mers: {nk}',
              nk=countgraph.n_unique_kmers())
