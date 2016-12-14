@@ -107,8 +107,8 @@ const
 }
 
 template <>
-std::string LinearAssembler::_assemble_directed<LEFT>(AssemblerTraverser<LEFT>&
-        cursor)
+std::string LinearAssembler::
+_assemble_directed<LEFT>(AssemblerTraverser<LEFT>& cursor)
 const
 {
     std::string contig = cursor.cursor.get_string_rep(_ksize);
@@ -138,8 +138,8 @@ const
 }
 
 template<>
-std::string LinearAssembler::_assemble_directed<RIGHT>
-(AssemblerTraverser<RIGHT>& cursor)
+std::string LinearAssembler::
+_assemble_directed<RIGHT>(AssemblerTraverser<RIGHT>& cursor)
 const
 {
     std::string contig = cursor.cursor.get_string_rep(_ksize);
@@ -178,7 +178,7 @@ const
     }
 
     CompactingAT<RIGHT> cursor(graph, seed_kmer, node_filters);
-    return _assemble_directed<RIGHT>(cursor);
+    return LinearAssembler::_assemble_directed<RIGHT>(cursor);
 }
 
 
@@ -192,7 +192,7 @@ const
     }
 
     CompactingAT<LEFT> cursor(graph, seed_kmer, node_filters);
-    return _assemble_directed<LEFT>(cursor);
+    return LinearAssembler::_assemble_directed<LEFT>(cursor);
 }
 
 

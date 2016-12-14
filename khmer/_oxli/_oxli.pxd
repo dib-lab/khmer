@@ -126,7 +126,7 @@ cdef extern from "traversal.hh":
 ########################################################################
 
 
-cdef extern from "assembler.hh":
+cdef extern from "assembler.hh" namespace "khmer":
     cdef cppclass CpLinearAssembler "khmer::LinearAssembler":
         CpLinearAssembler(CpHashtable *)
     
@@ -137,6 +137,9 @@ cdef extern from "assembler.hh":
         string assemble(const CpKmer) const
         string assemble_left(const CpKmer) const     
         string assemble_right(const CpKmer) const
+
+    cdef cppclass CpCompactingAssembler(CpLinearAssembler):
+        CpCompactingAssembler(CpHashtable *)
 
 
 ########################################################################

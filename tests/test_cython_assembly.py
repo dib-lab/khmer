@@ -58,10 +58,9 @@ from .graph_features import K
 def teardown():
     utils.cleanup()
 
-
+@pytest.mark.parametrize("assembler", [LinearAssembler, CompactingAssembler])
 class TestNonBranching:
 
-    @pytest.mark.parametrize("assembler", [LinearAssembler, CompactingAssembler])
     def test_all_start_positions(self, linear_structure, assembler):
         # assemble entire contig, starting from wherever
         graph, contig = linear_structure
@@ -71,7 +70,6 @@ class TestNonBranching:
             path = asm.assemble(contig[start:start + K])
             assert utils._equals_rc(path, contig), start
 
-    @pytest.mark.parametrize("assembler", [LinearAssembler, CompactingAssembler])
     def test_all_left_to_beginning(self, linear_structure, assembler):
         # assemble directed left
         graph, contig = linear_structure
@@ -82,7 +80,6 @@ class TestNonBranching:
             print(path, ', ', contig[:start])
             assert utils._equals_rc(path, contig[:start+K]), start
 
-    @pytest.mark.parametrize("assembler", [LinearAssembler, CompactingAssembler])
     def test_all_right_to_end(self, linear_structure, assembler):
         # assemble directed right
         graph, contig = linear_structure
@@ -92,5 +89,28 @@ class TestNonBranching:
             path = asm.assemble_right(contig[start:start + K])
             print(path, ', ', contig[:start])
             assert utils._equals_rc(path, contig[start:]), start
+
+
+class TestCompactingAssembler:
+
+    def test_beginning_to_branch_right(self, right_tip_structure):
+        # assemble from beginning of contig, up until branch point
+        graph, contig, L, HDN, R, tip = right_tip_structure
+        asm = CompactingAssembler(graph)
+        path = asm.assemble(contig[0:K])
+
+        assert len(path) == HDN.pos + K
+        assert utils._equals_rc(path, contig[:len(path)])
+
+    def test_end_to_branch_right(self, right_tip_structure):
+        # in the LinearAsembler, this would continue all the way
+        # to the beginning. The CompactingAssembler does an extra
+        # check of the node degree in the reverse direction.
+        graph, contig, L, HDN, R, tip = right_tip_structure
+        asm = CompactingAssembler(graph)
+        path = asm.assemble(contig[-K:])
+
+        assert len(path) == len(contig) - HDN.pos
+        assert utils._equals_rc(path, contig[HDN.pos:])
 
 

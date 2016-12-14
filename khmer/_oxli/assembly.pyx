@@ -3,7 +3,7 @@ import cython
 from cython.operator cimport dereference as deref
 
 from _oxli import *
-from _oxli cimport CpHashtable, CpLinearAssembler, CpKmer, get_hashtable_ptr
+from _oxli cimport CpHashtable, CpLinearAssembler, CpCompactingAssembler, CpKmer, get_hashtable_ptr
 
 cdef class LinearAssembler:
 
@@ -11,8 +11,9 @@ cdef class LinearAssembler:
         self._graph_ptr = get_hashtable_ptr(graph)
         self.graph = graph
         self.set_stop_filter(stop_filter=stop_filter)
-
-        self._this.reset(new CpLinearAssembler(self._graph_ptr))
+        
+        if type(self) is LinearAssembler:
+            self._this.reset(new CpLinearAssembler(self._graph_ptr))
 
     def set_stop_filter(self, stop_filter=None):
         self.stop_filter = stop_filter
@@ -59,3 +60,16 @@ cdef class LinearAssembler:
             return self._assemble_right(seed)
         else:
             return self._assemble_right(Kmer(seed))
+
+cdef class CompactingAssembler(LinearAssembler):
+
+    def __cinit__(self, graph, stop_filter=None):
+        self._graph_ptr = get_hashtable_ptr(graph)
+        self.graph = graph
+        self.set_stop_filter(stop_filter=stop_filter)
+        
+        cdef CpCompactingAssembler* ptr = new CpCompactingAssembler(self._graph_ptr)
+        if type(self) is CompactingAssembler:
+            self._this.reset(<CpLinearAssembler*> ptr)
+
+

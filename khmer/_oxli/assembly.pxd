@@ -1,7 +1,7 @@
 from libcpp.memory cimport unique_ptr
 from libcpp.string import string
 
-from _oxli cimport CpLinearAssembler, CpHashtable, CpKmer
+from _oxli cimport CpLinearAssembler, CpCompactingAssembler, CpHashtable, CpKmer
 from hashing cimport Kmer
 
 cdef class LinearAssembler:
@@ -17,4 +17,8 @@ cdef class LinearAssembler:
     cdef str _assemble_left(self, Kmer start)
     cdef str _assemble_right(self, Kmer start)
 
+
+cdef class CompactingAssembler(LinearAssembler):
+    pass
+    #cdef unique_ptr[CpCompactingAssembler] _this
 

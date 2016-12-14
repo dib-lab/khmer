@@ -83,13 +83,13 @@ public:
 
     explicit LinearAssembler(const Hashtable * ht);
 
-    std::string assemble(const Kmer seed_kmer,
+    virtual std::string assemble(const Kmer seed_kmer,
                          const Hashtable * stop_bf = 0) const;
 
-    std::string assemble_right(const Kmer seed_kmer,
+    virtual std::string assemble_right(const Kmer seed_kmer,
                                const Hashtable * stop_bf = 0) const;
 
-    std::string assemble_left(const Kmer seed_kmer,
+    virtual std::string assemble_left(const Kmer seed_kmer,
                               const Hashtable * stop_bf = 0) const;
 
     template <bool direction>
@@ -109,6 +109,9 @@ std::string LinearAssembler::_assemble_directed<RIGHT>(AssemblerTraverser<RIGHT>
 
 class CompactingAssembler: public LinearAssembler
 {
+public:
+
+    explicit CompactingAssembler(const Hashtable * ht) : LinearAssembler(ht) {}
 
     std::string assemble_right(const Kmer seed_kmer,
                                const Hashtable * stop_bf = 0) const;
@@ -116,6 +119,7 @@ class CompactingAssembler: public LinearAssembler
     std::string assemble_left(const Kmer seed_kmer,
                               const Hashtable * stop_bf = 0) const;
 };
+typedef CompactingAssembler CpCompactingAssembler;
 
 
 /**
