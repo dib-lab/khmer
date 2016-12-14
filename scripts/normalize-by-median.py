@@ -254,7 +254,8 @@ def get_parser():
         tests/test-data/test-fastq-reads.fq"""
     parser = build_counting_args(
         descr="Do digital normalization (remove mostly redundant sequences)",
-        epilog=textwrap.dedent(epilog))
+        epilog=textwrap.dedent(epilog),
+        citations=['diginorm'])
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
     parser.add_argument('-C', '--cutoff', help="when the median "
@@ -299,9 +300,6 @@ def get_parser():
 def main():  # pylint: disable=too-many-branches,too-many-statements
     parser = sanitize_help(get_parser())
     args = parser.parse_args()
-
-    if not args.quiet:
-        info('normalize-by-median.py', ['diginorm'])
 
     configure_logging(args.quiet)
     report_on_config(args)
