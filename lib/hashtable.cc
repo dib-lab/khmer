@@ -156,8 +156,8 @@ consume_fasta(
 
 unsigned int Hashtable::consume_string(const std::string &s)
 {
-    MuxGuard g(this->m);
-std::cout << "locking " << std::this_thread::get_id() <<std::endl;
+    //MuxGuard g(m);
+//std::cout << "locking " << std::this_thread::get_id() <<std::endl;
     const char * sp = s.c_str();
     unsigned int n_consumed = 0;
 
@@ -169,7 +169,7 @@ std::cout << "locking " << std::this_thread::get_id() <<std::endl;
         count(kmer);
         n_consumed++;
     }
-std::cout << "unlocking " << std::this_thread::get_id() <<std::endl;
+//std::cout << "unlocking " << std::this_thread::get_id() <<std::endl;
     return n_consumed;
 }
 
