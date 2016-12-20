@@ -1659,7 +1659,7 @@ hashtable_consume_chunk(khmer_KHashtable_Object * me, PyObject * args)
         return NULL;
     }
 
-    std::vector<char*> reads;
+    std::vector<std::string> reads;
     reads.reserve(1000);
     std::vector<PyObject*> pyreads;
     pyreads.reserve(1000);
@@ -1674,8 +1674,8 @@ hashtable_consume_chunk(khmer_KHashtable_Object * me, PyObject * args)
 
     Py_BEGIN_ALLOW_THREADS
     for (auto read : reads) {
-      std::string rread(read);
-      if (hashtable->check_and_normalize_read(rread)) {
+      //std::string rread(read);
+      if (hashtable->check_and_normalize_read(read)) {
         n_consumed += hashtable->consume_string(read);
       }
     }

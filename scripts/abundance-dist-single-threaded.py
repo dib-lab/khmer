@@ -139,8 +139,8 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     log_info('outputting to {output}', output=args.output_histogram_filename)
 
     # start loading
-    reads_queue = Queue(maxsize=20)
-    n_consumers = 1
+    reads_queue = Queue(maxsize=2000)
+    n_consumers = 10
 
     def _load_reads(fname, q, n_consumers):
         rparser = khmer.ReadParser(fname)
