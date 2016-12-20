@@ -241,7 +241,7 @@ protected:
     size_t _n_tables;
     uint64_t _occupied_bins;
     uint64_t _n_unique_kmers;
-    uint8_t _max_count{15};
+    static constexpr uint8_t _max_count{15};
     Byte ** _counts;
 
     // Compute index into the table, this retrieves the correct byte
