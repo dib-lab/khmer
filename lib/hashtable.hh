@@ -50,6 +50,8 @@ Contact: khmer-project@idyll.org
 #include <set>
 #include <string>
 #include <vector>
+#include <mutex>
+using MuxGuard = std::lock_guard<std::mutex>;
 
 #include "khmer.hh"
 #include "khmer_exception.hh"
@@ -77,6 +79,7 @@ class Hashtable: public
     friend class LabelHash;
 
 protected:
+    std::mutex m;
     Storage * store;
     unsigned int    _max_count;
     unsigned int    _max_bigcount;
