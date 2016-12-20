@@ -1661,10 +1661,13 @@ hashtable_consume_chunk(khmer_KHashtable_Object * me, PyObject * args)
 
     std::vector<char*> reads;
     reads.reserve(1000);
+    std::vector<PyObject*> pyreads;
+    pyreads.reserve(1000);
     for (Py_ssize_t i = 0; i < PySequence_Fast_GET_SIZE(reads_list); i++) {
         PyObject * read_o = PyList_GET_ITEM(reads_list, i);
-        reads.push_back(PyBytes_AS_STRING(PyUnicode_AsEncodedString(
-                                             read_o, "ascii", "strict")));
+        PyObject * read_u = PyUnicode_AsASCIIString(read_o);
+        pyreads.push_back(read_u);
+        reads.push_back(PyBytes_AS_STRING(read_u));
     }
 
     unsigned int n_consumed = 0;
@@ -1677,6 +1680,10 @@ hashtable_consume_chunk(khmer_KHashtable_Object * me, PyObject * args)
       }
     }
     Py_END_ALLOW_THREADS
+
+    for (auto read : pyreads) {
+      Py_DECREF(read);
+    }
 
     return PyLong_FromLong(n_consumed);
 }

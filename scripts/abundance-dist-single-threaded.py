@@ -139,7 +139,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     log_info('outputting to {output}', output=args.output_histogram_filename)
 
     # start loading
-    reads_queue = Queue(maxsize=1000)
+    reads_queue = Queue(maxsize=20)
     n_consumers = 1
 
     def _load_reads(fname, q, n_consumers):
@@ -150,6 +150,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
             if not n % 1000:
                 q.put(chunk)
                 chunk = []
+        # Deal with any leftover reads
         if chunk:
             q.put(chunk)
         # Each consumer must only consume one sentinel otherwise things
@@ -157,9 +158,13 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         for _ in range(n_consumers):
             q.put(None)
 
-    def _consume_reads(cg, q):
+    def _consume_reads(cg, q, debug=False):
+        i = 0
         while True:
             reads = q.get()
+            i += 1
+            if debug and not i % 250:
+                print('qsize:', q.qsize())
             if reads is None:
                 break
             cg.consume_chunk(reads)
@@ -171,7 +176,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     loading_thread.start()
 
     consumers = [threading.Thread(target=_consume_reads,
-                                  args=(countgraph, reads_queue))
+                                  args=(countgraph, reads_queue, False))
                  for n in range(n_consumers)]
     _ = [t.start() for t in consumers]
 
