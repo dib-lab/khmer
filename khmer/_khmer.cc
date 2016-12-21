@@ -596,6 +596,9 @@ khmer_ReadPairIterator_dealloc(khmer_ReadPairIterator_Object * obj)
 {
     Py_DECREF(obj->parent);
     obj->parent = NULL;
+    if (obj->prev_read != nullptr) {
+        delete obj->prev_read;
+    }
     Py_TYPE(obj)->tp_free((PyObject*)obj);
 }
 
@@ -689,7 +692,57 @@ _ReadParser_iternext( PyObject * self )
 
 
 bool _is_pair(const Read& a, const Read& b) {
-    return a.name.back() == '1' && b.name.back() == '2';
+    // split read's name on ' ' if possible, creates a lhs and rhs
+    // string around the space.
+    auto lhs1_end = a.name.find_first_of(" ");
+    lhs1_end = lhs1_end == std::string::npos ? a.name.size() : lhs1_end;
+    const auto lhs1 = a.name.substr(0, lhs1_end);
+    std::string rhs1 = "";
+    if (lhs1_end != a.name.size()) {
+        rhs1 = a.name.substr(lhs1_end+1);
+    }
+
+    // split read's name on ' ' if possible
+    auto lhs2_end = b.name.find_first_of(" ");
+    lhs2_end = lhs2_end == std::string::npos ? b.name.size() : lhs2_end;
+    const auto lhs2 = b.name.substr(0, lhs2_end);
+    std::string rhs2 = "";
+    if (lhs2_end != b.name.size()) {
+        rhs2 = b.name.substr(lhs2_end+1);
+    }
+
+    if (lhs1_end >= 2 && lhs2_end >= 2) {
+        // handle 'name/1'
+        if (lhs1.substr(lhs1.size() - 2) == "/1" &&
+            lhs2.substr(lhs2.size() - 2) == "/2") {
+                auto lhs1_slash = lhs1.find_first_of("/");
+                auto lhs2_slash = lhs2.find_first_of("/");
+                if ((lhs1_slash < lhs1_end) && (lhs2_slash < lhs2_end) &&
+                    lhs1.substr(0, lhs1_slash) == lhs2.substr(0, lhs2_slash)) {
+                    return true;
+              }
+        }
+
+        // handle '@name 1:rst'
+        if ((lhs1 == lhs2) &&
+            rhs1.substr(0, 2) == "1:" && rhs2.substr(0, 2) == "2:") {
+            return true;
+        }
+
+        // handle @name seq/1
+        if (lhs1 == lhs2) {
+            if (rhs1.size() >= 2 && rhs2.size() >= 2 &&
+                rhs1.substr(rhs1.size() - 2) == "/1" &&
+                rhs2.substr(rhs2.size() - 2) == "/2") {
+                    auto rhs1_slash = rhs1.find_first_of("/");
+                    auto rhs2_slash = rhs2.find_first_of("/");
+                    if (rhs1.substr(0, rhs1_slash) == rhs2.substr(0, rhs2_slash)) {
+                        return true;
+                  }
+            }
+        }
+    }
+    return false;
 }
 
 static
@@ -712,7 +765,6 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
             if (!myself->has_prev_read) {
                 myself->has_prev_read = true;
                 try {
-                    //myself->prev_read = parser->get_next_read();
                     parser->imprint_next_read(*(myself->prev_read));
                 } catch (NoMoreReadsAvailable &exc) {
                     stop_iteration = true;
@@ -765,6 +817,20 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
             }
             Py_END_ALLOW_THREADS
         }
+    }
+    // Only one read in the file, return this first and on the next
+    // call we will stop iterating
+    if (stop_iteration && the_read_pair.first.sequence.size()>0) {
+        stop_iteration = false;
+        myself->has_prev_read = false;
+    }
+
+    // file ends on an unpaired read, return this read and on the next call
+    // we stop iterating
+    if (stop_iteration && myself->has_prev_read) {
+        the_read_pair.first = *(myself->prev_read);
+        stop_iteration = false;
+        myself->has_prev_read = false;
     }
 
     // Note: Can return NULL instead of setting the StopIteration exception.
