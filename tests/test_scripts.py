@@ -215,6 +215,8 @@ def test_load_into_counting_abundance_dist_squashing():
     assert lines[2].strip() == "1,83,83,1.0", lines[2]
 
 
+# note: if run as root, will fail b/c root can write to anything
+@pytest.mark.noroot
 def test_load_into_counting_nonwritable():
     script = 'load-into-counting.py'
     args = ['-x', '1e3', '-N', '2', '-k', '20']
