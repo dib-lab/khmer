@@ -127,6 +127,11 @@ void Hashtable::consume_fasta_bitsplit(
     unsigned int &total_reads, unsigned long long &n_consumed
 )
 {
+    bool powerof2 = !(num_bins == 0) && !(num_bins & (num_bins - 1));
+    if (!powerof2 || tag >= num_bins) {
+        return;
+    }
+
     Read read;
     IParser *parser = IParser::get_parser(filename);
     while (!parser->is_complete()) {
