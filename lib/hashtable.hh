@@ -219,6 +219,12 @@ public:
         unsigned long long  &n_consumed
     );
 
+    void consume_fasta_bitsplit(
+        std::string const &filename, unsigned int num_bins, unsigned int tag,
+        unsigned int &total_reads, unsigned long long &n_consumed
+    );
+
+
     void set_use_bigcount(bool b)
     {
         store->set_use_bigcount(b);

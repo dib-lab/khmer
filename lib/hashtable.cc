@@ -122,6 +122,58 @@ consume_fasta(
     delete parser;
 }
 
+void Hashtable::consume_fasta_bitsplit(
+    std::string const &filename, unsigned int num_bins, unsigned int tag,
+    unsigned int &total_reads, unsigned long long &n_consumed
+)
+{
+    Read read;
+    IParser *parser = IParser::get_parser(filename);
+    while (!parser->is_complete()) {
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable) {
+            break;
+        }
+
+        if (read.sequence.length() < _ksize) {
+            continue;
+        }
+
+        bool is_valid = true;
+        for (unsigned int i = 0; i < read.sequence.length(); i++) {
+            read.sequence[i] &= 0xdf; // upper case
+            if (!is_valid_dna(read.sequence[i])) {
+                is_valid = false;
+                break;
+            }
+        }
+        if (!is_valid) {
+            continue;
+        }
+
+        unsigned int this_n_consumed = 0;
+        KmerIterator kmers(read.sequence.c_str(), _ksize);
+        while (!kmers.done()) {
+            HashIntoType kmer = kmers.next();
+            // This is the sweet chocolate center of this function:
+            // for num_bins = 2^n and tag \in range(num_bins), store
+            // only k-mers whose n least significant bits encode the
+            // tag.
+            if ((kmer & (num_bins-1)) == tag) {
+                count(kmer);
+                this_n_consumed++;
+            }
+        }
+        
+        __sync_add_and_fetch(&n_consumed, this_n_consumed);
+        __sync_add_and_fetch(&total_reads, 1);
+
+    }
+
+    delete parser;
+} // consume_fasta_bitsplit
+
 void
 Hashtable::
 consume_fasta(
