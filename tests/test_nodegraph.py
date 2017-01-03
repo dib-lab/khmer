@@ -1103,3 +1103,48 @@ def test_assemble_linear_path_bad_seed():
 
     path = nodegraph.assemble_linear_path('GATTACA' * 3)
     assert path == ''
+
+
+@pytest.mark.parametrize('graphclass', [
+    (khmer.Nodegraph),
+    (khmer.Countgraph),
+])
+def test_bitsplit_bad_params(graphclass):
+    nodegraph = graphclass(31, 1e5, 4)
+
+    # Fails because 11 is not a power of 2
+    nreads, kmersconsumed = \
+        nodegraph.consume_fasta_bitsplit('file-not-touched.fa', 11, 1)
+    assert nreads == 0
+    assert kmersconsumed == 0
+
+    # Fails because 13 >= 11
+    nreads, kmersconsumed = \
+        nodegraph.consume_fasta_bitsplit('file-not-touched.fa', 11, 13)
+    assert nreads == 0
+    assert kmersconsumed == 0
+
+    # Fails because file does not exist
+    with pytest.raises(OSError) as ose:
+        nreads, kmersconsumed = \
+            nodegraph.consume_fasta_bitsplit('file-no-exist.fa', 16, 3)
+    assert 'Could not open' in str(ose)
+
+
+@pytest.mark.parametrize('graphclass', [
+    (khmer.Nodegraph),
+    (khmer.Countgraph),
+])
+def test_bitsplit(graphclass):
+    nodegraph = graphclass(31, 1e5, 4)
+    infile = utils.get_test_data('bogus.fa')
+    nreads, kmersconsumed = \
+        nodegraph.consume_fasta_bitsplit(infile, 8, 3)
+    assert nreads == 1
+    assert kmersconsumed == 3
+    assert nodegraph.get('ACGGCTATTATCTGAGCTCAAGACTAATACG') == 1
+    assert nodegraph.get('CTATTATCTGAGCTCAAGACTAATACGCGCT') == 1
+    assert nodegraph.get('CTGAGCTCAAGACTAATACGCGCTGGCCACT') == 1
+    assert nodegraph.get('GTACGGCTATTATCTGAGCTCAAGACTAATA') == 0
+    assert nodegraph.get('TCTGAGCTCAAGACTAATACGCGCTGGCCAC') == 0
+    assert nodegraph.get('AGCTCAAGACTAATACGCGCTGGCCACTGGT') == 0

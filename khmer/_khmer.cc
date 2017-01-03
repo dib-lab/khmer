@@ -1577,6 +1577,37 @@ hashtable_consume_fasta(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
+hashtable_consume_fasta_bitsplit(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable  = me->hashtable;
+
+    const char * filename;
+    unsigned int num_bins;
+    unsigned int tag;
+
+    if (!PyArg_ParseTuple(args, "sII", &filename, &num_bins, &tag)) {
+        return NULL;
+    }
+
+    // call the C++ function, and trap signals => Python
+    unsigned long long n_consumed = 0;
+    unsigned int total_reads = 0;
+    try {
+        hashtable->consume_fasta_bitsplit(filename, num_bins, tag,
+                                          total_reads, n_consumed);
+    } catch (khmer_file_exception &exc) {
+        PyErr_SetString(PyExc_OSError, exc.what());
+        return NULL;
+    } catch (khmer_value_exception &exc) {
+        PyErr_SetString(PyExc_ValueError, exc.what());
+        return NULL;
+    }
+
+    return Py_BuildValue("IK", total_reads, n_consumed);
+}
+
+static
+PyObject *
 hashtable_consume_fasta_with_reads_parser(khmer_KHashtable_Object * me,
         PyObject * args)
 {
@@ -2230,8 +2261,14 @@ static PyMethodDef khmer_hashtable_methods[] = {
     {
         "consume_fasta",
         (PyCFunction)hashtable_consume_fasta, METH_VARARGS,
-        "Incrment the counts of all the k-mers in the sequences in the "
+        "Increment the counts of all the k-mers in the sequences in the "
         "given file"
+    },
+    {
+        "consume_fasta_bitsplit",
+        (PyCFunction)hashtable_consume_fasta_bitsplit, METH_VARARGS,
+        "Increment the counts of a subset of the k-mers in the sequence "
+        "file"
     },
     {
         "consume_fasta_with_reads_parser",
