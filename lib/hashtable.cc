@@ -47,12 +47,13 @@ Contact: khmer-project@idyll.org
 
 #include "hashtable.hh"
 #include "khmer.hh"
+#include "khmer_exception.hh"
 #include "traversal.hh"
 #include "read_parsers.hh"
 
 using namespace std;
 using namespace khmer;
-using namespace khmer:: read_parsers;
+using namespace khmer::read_parsers;
 
 //
 // check_and_process_read: checks for non-ACGT characters before consuming
@@ -128,8 +129,13 @@ void Hashtable::consume_fasta_bitsplit(
 )
 {
     bool powerof2 = !(num_bins == 0) && !(num_bins & (num_bins - 1));
-    if (!powerof2 || tag >= num_bins) {
-        return;
+    if (!powerof2) {
+        std::string message = "num_bins must be a power of 2";
+        throw InvalidValue(message);
+    }
+    if (tag >= num_bins) {
+        std::string message = "tag must be less than num_bins";
+        throw InvalidValue(message);
     }
 
     Read read;

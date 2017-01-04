@@ -1113,16 +1113,14 @@ def test_bitsplit_bad_params(graphclass):
     nodegraph = graphclass(31, 1e5, 4)
 
     # Fails because 11 is not a power of 2
-    nreads, kmersconsumed = \
-        nodegraph.consume_fasta_bitsplit('file-not-touched.fa', 11, 1)
-    assert nreads == 0
-    assert kmersconsumed == 0
+    with pytest.raises(ValueError) as ve:
+        _ = nodegraph.consume_fasta_bitsplit('file-not-touched.fa', 11, 1)
+    assert 'must be a power of 2' in str(ve)
 
-    # Fails because 13 >= 11
-    nreads, kmersconsumed = \
-        nodegraph.consume_fasta_bitsplit('file-not-touched.fa', 11, 13)
-    assert nreads == 0
-    assert kmersconsumed == 0
+    # Fails because 13 >= 8
+    with pytest.raises(ValueError) as ve:
+        _ = nodegraph.consume_fasta_bitsplit('file-not-touched.fa', 8, 13)
+    assert 'must be less than num_bins' in str(ve)
 
     # Fails because file does not exist
     with pytest.raises(OSError) as ose:
