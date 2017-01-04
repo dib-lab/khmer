@@ -317,18 +317,21 @@ public:
             const uint64_t idx = _table_index(khash, _tablesizes[i]);
             const uint8_t current_count = (table[idx] & mask) >> shift;
 
+            if (!is_new_kmer) {
+                if (current_count == 0) {
+                    is_new_kmer = true;
+
+                    // track occupied bins in the first table only, as proxy
+                    // for all.
+                    if (i == 0) {
+                        __sync_add_and_fetch(&_occupied_bins, 1);
+                    }
+                }
+            }
             // if we have reached the maximum count stop incrementing the
             // counter. This avoids overflowing it.
             if (current_count == _max_count) {
                 continue;
-            }
-
-            // XXX make me more elegant
-            if (i == 0 && !is_new_kmer && current_count == 0) {
-                is_new_kmer = true;
-                // track occupied bins in the first table only, as proxy
-                // for all.
-                __sync_add_and_fetch(&_occupied_bins, 1);
             }
 
             // increase count, no checking for overflow
