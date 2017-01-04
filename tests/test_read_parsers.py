@@ -63,6 +63,11 @@ def test_read_type_basic():
         assert not hasattr(x, 'annotations'), x
 
 
+def test_read_quality_none():
+    r = Read(name="test", sequence="ACGT", quality=None)
+    assert not hasattr(r, 'quality')
+
+
 def test_read_type_attributes():
     r = Read(sequence='ACGT', quality='good', name='1234', annotations='ann')
     assert r.sequence == 'ACGT'

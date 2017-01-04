@@ -167,14 +167,17 @@ static bool ht_convert_PyObject_to_HashIntoType(PyObject * value,
     if (PyInt_Check(value) || PyLong_Check(value)) {
         return convert_PyLong_to_HashIntoType(value, hashval);
     } else if (PyUnicode_Check(value))  {
-        std::string s = PyBytes_AsString(PyUnicode_AsEncodedString(
-                                             value, "utf-8", "strict"));
+        PyObject* val_as_str = PyUnicode_AsEncodedString(value,
+           "utf-8", "strict");
+        std::string s = PyBytes_AsString(val_as_str);
         if (strlen(s.c_str()) != ht->ksize()) {
+            Py_DECREF(val_as_str);
             PyErr_SetString(PyExc_ValueError,
                             "k-mer length must equal the k-mer size");
             return false;
         }
         hashval = ht->hash_dna(s.c_str());
+        Py_DECREF(val_as_str);
         return true;
 
     } else if (PyBytes_Check(value)) {
@@ -878,21 +881,7 @@ void _init_ReadParser_Type_constants()
 
     // Place pair mode constants into class dictionary.
     int result;
-
-    PyObject * value = PyLong_FromLong( IParser:: PAIR_MODE_ALLOW_UNPAIRED );
-    if (value == NULL) {
-        Py_DECREF(cls_attrs_DICT);
-        return;
-    }
-    result = PyDict_SetItemString(cls_attrs_DICT,
-                                  "PAIR_MODE_ALLOW_UNPAIRED", value);
-    Py_XDECREF(value);
-    if (!result) {
-        Py_DECREF(cls_attrs_DICT);
-        return;
-    }
-
-    value = PyLong_FromLong( IParser:: PAIR_MODE_IGNORE_UNPAIRED );
+    PyObject *value = PyLong_FromLong( IParser:: PAIR_MODE_IGNORE_UNPAIRED );
     if (value == NULL) {
         Py_DECREF(cls_attrs_DICT);
         return;
