@@ -215,6 +215,8 @@ def test_load_into_counting_abundance_dist_squashing():
     assert lines[2].strip() == "1,83,83,1.0", lines[2]
 
 
+# note: if run as root, will fail b/c root can write to anything
+@pytest.mark.noroot
 def test_load_into_counting_nonwritable():
     script = 'load-into-counting.py'
     args = ['-x', '1e3', '-N', '2', '-k', '20']
@@ -2762,10 +2764,22 @@ def test_version_and_basic_citation(scriptname):
         line = script.readline()
         line = script.readline()
         if 'khmer' in line:
-            version = re.compile("^khmer .*$", re.MULTILINE)
-            status, out, err = utils.runscript(scriptname, ["--version"])
+            # check citation information appears when using --info
+            status, out, err = utils.runscript(scriptname, ["--info"])
             assert status == 0, status
             print(out)
             print(err)
-            # assert "publication" in err, err
-            assert version.search(err) is not None, err
+            assert "publication" in err, err
+            assert "usage:" not in err, err
+
+            # check citation information appears in --version
+            status, out, err = utils.runscript(scriptname, ["--version"])
+            assert status == 0, status
+            assert "publication" in err, err
+            assert "usage:" not in err, err
+
+            # check citation information appears in --help
+            status, out, err = utils.runscript(scriptname, ["--help"])
+            assert status == 0, status
+            assert "publication" in err, err
+            assert "usage:" in out, out

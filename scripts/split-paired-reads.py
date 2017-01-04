@@ -48,12 +48,11 @@ from __future__ import print_function
 import sys
 import os
 import textwrap
-import argparse
 
 from khmer import __version__
 from khmer import ReadParser
-from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
-                              _VersionStdErrAction)
+from khmer.khmer_args import sanitize_help, KhmerArgumentParser
+from khmer.khmer_args import FileType as khFileType
 from khmer.utils import (write_record, broken_paired_reader,
                          UnpairedReadsError)
 from khmer.kfile import (check_input_files, check_space,
@@ -91,10 +90,9 @@ def get_parser():
 
         split-paired-reads.py -1 reads.1 -2 reads.2 tests/test-data/paired.fq
     """
-    parser = argparse.ArgumentParser(
+    parser = KhmerArgumentParser(
         description='Split interleaved reads into two files, left and right.',
-        epilog=textwrap.dedent(epilog),
-        formatter_class=ComboFormatter)
+        epilog=textwrap.dedent(epilog))
 
     parser.add_argument('infile', nargs='?', default='/dev/stdin')
 
@@ -105,15 +103,13 @@ def get_parser():
     parser.add_argument('-0', '--output-orphaned', metavar='output_orphaned',
                         help='Allow "orphaned" reads and extract them to ' +
                         'this file',
-                        type=argparse.FileType('wb'))
+                        type=khFileType('wb'))
     parser.add_argument('-1', '--output-first', metavar='output_first',
                         default=None, help='Output "left" reads to this '
-                        'file', type=argparse.FileType('wb'))
+                        'file', type=khFileType('wb'))
     parser.add_argument('-2', '--output-second', metavar='output_second',
                         default=None, help='Output "right" reads to this '
-                        'file', type=argparse.FileType('wb'))
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
+                        'file', type=khFileType('wb'))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     add_output_compression_type(parser)
@@ -121,7 +117,6 @@ def get_parser():
 
 
 def main():
-    info('split-paired-reads.py')
     args = sanitize_help(get_parser()).parse_args()
 
     infile = args.infile
