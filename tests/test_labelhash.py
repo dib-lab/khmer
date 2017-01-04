@@ -169,6 +169,8 @@ def test_save_load_corrupted():
             print('expected failure for', i, ': ', str(err))
 
 
+# note: if run as root, will fail b/c root can write to anything
+@pytest.mark.noroot
 def test_save_fail_readonly():
     lb_pre = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
