@@ -230,11 +230,11 @@ def test_get_raw_tables_view():
 
 
 def test_get_raw_tables_view_smallcountgraph():
-    ht = khmer.SmallCountgraph(20, 1e5, 4)
+    ht = khmer.SmallCountgraph(4, 1e5, 4)
     tables = ht.get_raw_tables()
     for tab in tables:
         assert sum(tab.tolist()) == 0
-    ht.consume('AAAATTTTCCCCGGGGAAAA')
+    ht.consume('AAAA')
     # the actual count is 1 but stored in the first 4bits of a Byte
     # and so becomes 16
     for tab in tables:
@@ -665,7 +665,7 @@ def test_save_load_occupied_small(ctfile):
 
     orig_count = orig.n_occupied()
     loaded_count = loaded.n_occupied()
-    assert orig_count == 3881, orig_count
+    assert orig_count == 3886, orig_count
     assert loaded_count == orig_count, loaded_count
 
 

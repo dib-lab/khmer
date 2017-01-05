@@ -248,18 +248,17 @@ protected:
     // which you then need to select the correct nibble from
     uint64_t _table_index(const HashIntoType k, const uint64_t tablesize) const
     {
-        const uint64_t bins = tablesize / 2 + 1;
-        return (k / 2) % bins;
+        return (k % tablesize) / 2;
     }
     // Compute which half of the byte to use for this hash value
-    uint8_t _mask(const HashIntoType k) const
+    uint8_t _mask(const HashIntoType k, const uint64_t tablesize) const
     {
-        return k%2 ? 15 : 240;
+        return (k%tablesize)%2 ? 15 : 240;
     }
     // Compute which half of the byte to use for this hash value
-    uint8_t _shift(const HashIntoType k) const
+    uint8_t _shift(const HashIntoType k, const uint64_t tablesize) const
     {
-        return k%2 ? 0 : 4;
+        return (k%tablesize)%2 ? 0 : 4;
     }
 
 public:
@@ -309,12 +308,13 @@ public:
     {
         bool is_new_kmer = false;
 
-        const uint8_t mask = _mask(khash);
-        const uint8_t shift = _shift(khash);
+
 
         for (unsigned int i = 0; i < _n_tables; i++) {
             Byte* const table(_counts[i]);
             const uint64_t idx = _table_index(khash, _tablesizes[i]);
+            const uint8_t mask = _mask(khash, _tablesizes[i]);
+            const uint8_t shift = _shift(khash, _tablesizes[i]);
             const uint8_t current_count = (table[idx] & mask) >> shift;
 
             if (!is_new_kmer) {
@@ -349,13 +349,12 @@ public:
     {
         uint8_t min_count = _max_count; // bound count by maximum
 
-        const uint8_t mask = _mask(khash);
-        const uint8_t shift = _shift(khash);
-
         // get the minimum count across all tables
         for (unsigned int i = 0; i < _n_tables; i++) {
             const Byte* table(_counts[i]);
             const uint64_t idx = _table_index(khash, _tablesizes[i]);
+            const uint8_t mask = _mask(khash, _tablesizes[i]);
+            const uint8_t shift = _shift(khash, _tablesizes[i]);
             const uint8_t the_count = (table[idx] & mask) >> shift;
 
             if (the_count < min_count) {
@@ -511,6 +510,7 @@ public:
         for (unsigned int i = 0; i < _n_tables; i++) {
             const uint64_t bin = khash % _tablesizes[i];
             Byte current_count = _counts[ i ][ bin ];
+
             if (!is_new_kmer) {
                 if (current_count == 0) {
                     is_new_kmer = true;
