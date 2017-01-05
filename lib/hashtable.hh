@@ -62,7 +62,7 @@ namespace khmer
 {
 namespace read_parsers
 {
-struct IParser;
+class IParser;
 }  // namespace read_parsers
 }  // namespace khmer
 
@@ -314,7 +314,7 @@ public:
     explicit Counttable(WordLength ksize, std::vector<uint64_t> sizes)
         : Hashtable(ksize, new ByteStorage(sizes)) { } ;
 };
-    
+
 // Hashtable-derived class with BitStorage.
 class Nodetable : public Hashtable {
 public:
