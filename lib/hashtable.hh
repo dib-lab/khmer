@@ -38,7 +38,6 @@ Contact: khmer-project@idyll.org
 #ifndef HASHTABLE_HH
 #define HASHTABLE_HH
 
-
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -50,6 +49,8 @@ Contact: khmer-project@idyll.org
 #include <set>
 #include <string>
 #include <vector>
+#include <memory>
+#include "MurmurHash3.h"
 
 #include "khmer.hh"
 #include "khmer_exception.hh"
@@ -57,6 +58,8 @@ Contact: khmer-project@idyll.org
 #include "read_parsers.hh"
 #include "storage.hh"
 #include "subset.hh"
+
+using namespace std;
 
 namespace khmer
 {
@@ -109,6 +112,17 @@ protected:
 
     explicit Hashtable(const Hashtable&);
     Hashtable& operator=(const Hashtable&);
+
+    virtual unique_ptr<KmerHashIterator>
+    new_kmer_iterator(const char * sp) const {
+        KmerHashIterator * ki = new TwoBitKmerHashIterator(sp, _ksize);
+        return unique_ptr<KmerHashIterator>(ki);
+    }
+
+    virtual unique_ptr<KmerHashIterator>
+    new_kmer_iterator(const std::string& s) const {
+        return new_kmer_iterator(s.c_str());
+    }
 
 public:
     // accessor to get 'k'
@@ -319,6 +333,38 @@ class Counttable : public khmer::Hashtable
 public:
     explicit Counttable(WordLength ksize, std::vector<uint64_t> sizes)
         : Hashtable(ksize, new ByteStorage(sizes)) { } ;
+
+    inline
+    virtual
+    HashIntoType
+    hash_dna(const char * kmer) const {
+        if (!(strlen(kmer) >= _ksize)) {
+            throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
+        }
+        uint64_t out[2];
+        uint32_t seed = 0;
+        MurmurHash3_x64_128((void *)kmer, _ksize, seed, &out);
+
+        return out[0];
+    }
+
+    inline virtual HashIntoType
+    hash_dna_top_strand(const char * kmer) const {
+        throw khmer_exception("not implemented");
+    }
+
+    inline virtual HashIntoType
+    hash_dna_bottom_strand(const char * kmer) const {
+        throw khmer_exception("not implemented");
+    }
+
+    inline virtual std::string
+    unhash_dna(HashIntoType hashval) const {
+        throw khmer_exception("not implemented");
+    }
+
+    virtual unique_ptr<KmerHashIterator>
+        new_kmer_iterator(const char * sp) const;
 };
 
 // Hashtable-derived class with BitStorage.

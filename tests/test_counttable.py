@@ -42,30 +42,12 @@ import pytest
 from . import khmer_tst_utils as utils
 
 
-def test_countgraph_vs_table():
-    x = khmer.Counttable(4, 21, 3)
-    y = khmer.Countgraph(4, 21, 3)
+def test_get_kmer_hashes():
+    s = "ATGGATATGGAGGACAAGTATATGGAGGACAAGTATATGGAGGACAAGTAT"
+    a = khmer.Counttable(33, 1e6, 3)
+    assert a.get_kmer_hashes(s[:33]) == [48584371158645721]
+    assert a.get_kmer_hashes(s[:34]) == [48584371158645721,
+                                         12916831244904756973]
 
-    assert hasattr(x, 'add')
-    assert hasattr(y, 'add')
-
-    assert not hasattr(x, 'consume_and_tag')
-    assert hasattr(y, 'consume_and_tag')
-
-
-def test_nodegraph_vs_table():
-    x = khmer.Nodetable(4, 21, 3)
-    y = khmer.Nodegraph(4, 21, 3)
-
-    assert hasattr(x, 'add')
-    assert hasattr(y, 'add')
-
-    assert not hasattr(x, 'consume_and_tag')
-    assert hasattr(y, 'consume_and_tag')
-
-
-def test_counttable_no_unhash():
-    x = khmer.Counttable(4, 21, 3)
-
-    with pytest.raises(ValueError):
-        x.reverse_hash(1)
+    assert a.get_kmer_hashes(s[0:33]) == [48584371158645721]
+    assert a.get_kmer_hashes(s[1:34]) == [12916831244904756973]

@@ -348,7 +348,7 @@ public:
     }
 
     /// @return Whether or not the iterator has completed.
-    bool done()
+    bool done() const
     {
         return index >= length;
     }
@@ -363,6 +363,46 @@ public:
         return index;
     }
 }; // class KmerIterator
+
+//
+// KmerHashIterator - analogous to KmerIterator classes, but returns only
+// only HashIntoType hashes, not full Kmer objects.  This supports irreversible
+// hashing.
+//
+
+class KmerHashIterator {
+public:
+    virtual HashIntoType first() = 0;
+    virtual HashIntoType next() = 0;
+    virtual bool done() const = 0;
+    virtual unsigned int get_start_pos() const = 0;
+    virtual unsigned int get_end_pos() const = 0;
+    virtual ~KmerHashIterator() { };
+};
+
+// TwoBitKmerHashIterator -- just wrap KmerIterator.
+
+class TwoBitKmerHashIterator : public KmerHashIterator {
+protected:
+    KmerIterator iter;
+public:
+    TwoBitKmerHashIterator(const char * seq, WordLength k) :
+        iter(seq, k) { } ;
+
+    HashIntoType first() { return iter.first(); }
+
+    HashIntoType next() { return iter.next(); }
+
+    bool done() const { return iter.done(); }
+
+    virtual unsigned int get_start_pos() const {
+        return iter.get_start_pos();
+    }
+
+    virtual unsigned int get_end_pos() const {
+        return iter.get_end_pos();
+    }
+};
 
 }
 
