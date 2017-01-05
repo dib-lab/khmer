@@ -52,7 +52,7 @@ def test_single_add():
 
 def test_split_byte():
     # check the byte is correctly split
-    sct = SmallCounttable(4, 1e6, 4)
+    sct = SmallCounttable(4, 4, 1)
 
     a = "AAAA"
     b = "AAAT"
