@@ -65,7 +65,7 @@ namespace khmer
 {
 namespace read_parsers
 {
-struct IParser;
+class IParser;
 }  // namespace read_parsers
 }  // namespace khmer
 
