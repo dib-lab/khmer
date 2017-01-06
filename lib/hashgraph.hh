@@ -57,7 +57,7 @@ namespace khmer
 {
 namespace read_parsers
 {
-struct IParser;
+class IParser;
 }  // namespace read_parsers
 }  // namespace khmer
 
@@ -223,11 +223,11 @@ public:
                                       SeenSet &adjacencies,
                                       SeenSet &nodes, Hashtable& bf,
                                       SeenSet &high_degree_nodes) const;
-    
+
     //
     // for debugging/testing purposes only!
     //
-    
+
     // check partition map validity.
     void _validate_pmap()
     {
