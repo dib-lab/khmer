@@ -123,10 +123,7 @@ consume_fasta(
     delete parser;
 }
 
-void Hashtable::consume_fasta_banding(
-    std::string const &filename, unsigned int num_batches, unsigned int batch,
-    unsigned int &total_reads, unsigned long long &n_consumed
-)
+void Hashtable::_check_batches(unsigned int num_batches, unsigned int batch)
 {
     bool powerof2 = !(num_batches == 0) && !(num_batches & (num_batches - 1));
     if (!powerof2) {
@@ -137,9 +134,27 @@ void Hashtable::consume_fasta_banding(
         std::string message = "batch must be less than num_batches";
         throw InvalidValue(message);
     }
+}
+
+void Hashtable::consume_fasta_banding(
+    std::string const &filename, unsigned int num_batches, unsigned int batch,
+    unsigned int &total_reads, unsigned long long &n_consumed
+)
+{
+    _check_batches(num_batches, batch);
+    IParser *parser = IParser::get_parser(filename);
+    consume_fasta_banding(parser, num_batches, batch, total_reads, n_consumed);
+    delete parser;
+}
+
+void Hashtable::consume_fasta_banding(
+    IParser *parser, unsigned int num_batches, unsigned int batch,
+    unsigned int &total_reads, unsigned long long &n_consumed
+)
+{
+    _check_batches(num_batches, batch);
 
     Read read;
-    IParser *parser = IParser::get_parser(filename);
     while (!parser->is_complete()) {
         try {
             read = parser->get_next_read();
@@ -179,11 +194,8 @@ void Hashtable::consume_fasta_banding(
         
         __sync_add_and_fetch(&n_consumed, this_n_consumed);
         __sync_add_and_fetch(&total_reads, 1);
-
     }
-
-    delete parser;
-} // consume_fasta_bitsplit
+} // consume_fasta_banding
 
 void
 Hashtable::

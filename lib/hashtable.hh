@@ -107,6 +107,8 @@ protected:
         _nbits_sub_1 = (_ksize*2 - 2);
     }
 
+    void _check_batches(unsigned int num_batches, unsigned int batch);
+
     explicit Hashtable(const Hashtable&);
     Hashtable& operator=(const Hashtable&);
 
@@ -221,6 +223,12 @@ public:
 
     void consume_fasta_banding(
         std::string const &filename, unsigned int num_batches,
+        unsigned int batch, unsigned int &total_reads,
+        unsigned long long &n_consumed
+    );
+
+    void consume_fasta_banding(
+        read_parsers::IParser *parser, unsigned int num_batches,
         unsigned int batch, unsigned int &total_reads,
         unsigned long long &n_consumed
     );
