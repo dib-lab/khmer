@@ -1562,15 +1562,15 @@ hashtable_consume_fasta(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
-hashtable_consume_fasta_bitsplit(khmer_KHashtable_Object * me, PyObject * args)
+hashtable_consume_fasta_banding(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable  = me->hashtable;
 
     const char * filename;
-    unsigned int num_bins;
-    unsigned int tag;
+    unsigned int num_batches;
+    unsigned int batch;
 
-    if (!PyArg_ParseTuple(args, "sII", &filename, &num_bins, &tag)) {
+    if (!PyArg_ParseTuple(args, "sII", &filename, &num_batches, &batch)) {
         return NULL;
     }
 
@@ -1578,8 +1578,8 @@ hashtable_consume_fasta_bitsplit(khmer_KHashtable_Object * me, PyObject * args)
     unsigned long long n_consumed = 0;
     unsigned int total_reads = 0;
     try {
-        hashtable->consume_fasta_bitsplit(filename, num_bins, tag,
-                                          total_reads, n_consumed);
+        hashtable->consume_fasta_banding(filename, num_batches, batch,
+                                         total_reads, n_consumed);
     } catch (khmer_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;
@@ -2250,8 +2250,8 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "given file"
     },
     {
-        "consume_fasta_bitsplit",
-        (PyCFunction)hashtable_consume_fasta_bitsplit, METH_VARARGS,
+        "consume_fasta_banding",
+        (PyCFunction)hashtable_consume_fasta_banding, METH_VARARGS,
         "Increment the counts of a subset of the k-mers in the sequence "
         "file"
     },

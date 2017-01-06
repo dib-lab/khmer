@@ -124,23 +124,38 @@ consume_fasta(
     delete parser;
 }
 
-void Hashtable::consume_fasta_bitsplit(
-    std::string const &filename, unsigned int num_bins, unsigned int tag,
+void Hashtable::_check_batches(unsigned int num_batches, unsigned int batch)
+{
+    bool powerof2 = !(num_batches == 0) && !(num_batches & (num_batches - 1));
+    if (!powerof2) {
+        std::string message = "num_batches must be a power of 2";
+        throw InvalidValue(message);
+    }
+    if (batch >= num_batches) {
+        std::string message = "batch must be less than num_batches";
+        throw InvalidValue(message);
+    }
+}
+
+void Hashtable::consume_fasta_banding(
+    std::string const &filename, unsigned int num_batches, unsigned int batch,
     unsigned int &total_reads, unsigned long long &n_consumed
 )
 {
-    bool powerof2 = !(num_bins == 0) && !(num_bins & (num_bins - 1));
-    if (!powerof2) {
-        std::string message = "num_bins must be a power of 2";
-        throw InvalidValue(message);
-    }
-    if (tag >= num_bins) {
-        std::string message = "tag must be less than num_bins";
-        throw InvalidValue(message);
-    }
+    _check_batches(num_batches, batch);
+    IParser *parser = IParser::get_parser(filename);
+    consume_fasta_banding(parser, num_batches, batch, total_reads, n_consumed);
+    delete parser;
+}
+
+void Hashtable::consume_fasta_banding(
+    IParser *parser, unsigned int num_batches, unsigned int batch,
+    unsigned int &total_reads, unsigned long long &n_consumed
+)
+{
+    _check_batches(num_batches, batch);
 
     Read read;
-    IParser *parser = IParser::get_parser(filename);
     while (!parser->is_complete()) {
         try {
             read = parser->get_next_read();
@@ -169,10 +184,10 @@ void Hashtable::consume_fasta_bitsplit(
         while (!kmers.done()) {
             HashIntoType kmer = kmers.next();
             // This is the sweet chocolate center of this function:
-            // for num_bins = 2^n and tag \in range(num_bins), store
-            // only k-mers whose n least significant bits encode the
+            // for num_batches = 2^n and batch \in {0, 1, ..., num_batches - 1},
+            // store only k-mers whose n least significant bits encode the
             // tag.
-            if ((kmer & (num_bins-1)) == tag) {
+            if ((kmer & (num_batches-1)) == batch) {
                 count(kmer);
                 this_n_consumed++;
             }
@@ -180,11 +195,8 @@ void Hashtable::consume_fasta_bitsplit(
         
         __sync_add_and_fetch(&n_consumed, this_n_consumed);
         __sync_add_and_fetch(&total_reads, 1);
-
     }
-
-    delete parser;
-} // consume_fasta_bitsplit
+} // consume_fasta_banding
 
 void
 Hashtable::
