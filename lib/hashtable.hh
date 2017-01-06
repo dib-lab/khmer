@@ -219,9 +219,10 @@ public:
         unsigned long long  &n_consumed
     );
 
-    void consume_fasta_bitsplit(
-        std::string const &filename, unsigned int num_bins, unsigned int tag,
-        unsigned int &total_reads, unsigned long long &n_consumed
+    void consume_fasta_banding(
+        std::string const &filename, unsigned int num_batches,
+        unsigned int batch, unsigned int &total_reads,
+        unsigned long long &n_consumed
     );
 
 
