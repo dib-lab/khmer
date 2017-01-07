@@ -180,9 +180,9 @@ void Hashtable::consume_fasta_banding(
         }
 
         unsigned int this_n_consumed = 0;
-        KmerIterator kmers(read.sequence.c_str(), _ksize);
-        while (!kmers.done()) {
-            HashIntoType kmer = kmers.next();
+        unique_ptr<KmerHashIterator> kmers = new_kmer_iterator(read.sequence);
+        while (!kmers->done()) {
+            HashIntoType kmer = kmers->next();
             // This is the sweet chocolate center of this function:
             // for num_batches = 2^n and batch \in {0, 1, ..., num_batches - 1},
             // store only k-mers whose n least significant bits encode the
