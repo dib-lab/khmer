@@ -309,7 +309,6 @@ consume_fasta_and_tag(
 
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( )) {
-      { MuxGuard g(m);
         try {
             read = parser->get_next_read( );
         } catch (NoMoreReadsAvailable &e) {
@@ -324,7 +323,6 @@ consume_fasta_and_tag(
             __sync_add_and_fetch( &n_consumed, this_n_consumed );
             __sync_add_and_fetch( &total_reads, 1 );
         }
-      }
     } // while reads left for parser
 
 }
