@@ -38,6 +38,11 @@ Contact: khmer-project@idyll.org
 #ifndef STORAGE_HH
 #define STORAGE_HH
 
+#include <cassert>
+#include <array>
+#include <mutex>
+using MuxGuard = std::lock_guard<std::mutex>;
+
 namespace khmer
 {
 typedef std::map<HashIntoType, BoundedCounterType> KmerCountMap;
@@ -241,6 +246,7 @@ protected:
     size_t _n_tables;
     uint64_t _occupied_bins;
     uint64_t _n_unique_kmers;
+    std::array<std::mutex, 32> mutexes;
     static constexpr uint8_t _max_count{15};
     Byte ** _counts;
 
@@ -265,6 +271,8 @@ public:
     NibbleStorage(std::vector<uint64_t>& tablesizes) :
         _tablesizes{tablesizes}, _occupied_bins{0}, _n_unique_kmers{0}
     {
+        // to allow more than 32 tables increase the size of mutex pool
+        assert(_n_tables <= 32);
         _allocate_counters();
     }
 
@@ -308,9 +316,8 @@ public:
     {
         bool is_new_kmer = false;
 
-
-
         for (unsigned int i = 0; i < _n_tables; i++) {
+            MuxGuard g(mutexes[i]);
             Byte* const table(_counts[i]);
             const uint64_t idx = _table_index(khash, _tablesizes[i]);
             const uint8_t mask = _mask(khash, _tablesizes[i]);
