@@ -28,8 +28,8 @@ inline std::ostream& operator<< (std::ostream& stream, Component& comp) {
 }
 
 
-StreamingPartitioner::StreamingPartitioner(Hashtable * graph)  : 
-    graph(graph), _tag_density(DEFAULT_TAG_DENSITY), components_lock(0)
+StreamingPartitioner::StreamingPartitioner(Hashtable * graph, uint32_t tag_density)  : 
+    graph(graph), _tag_density(tag_density), components_lock(0), n_consumed(0)
 {
 
     //if (auto graphptr = graph.lock()) {
@@ -94,25 +94,27 @@ uint64_t StreamingPartitioner::consume_fasta(const std::string& filename)
 }
 
 
-void StreamingPartitioner::consume(const std::string& seq)
+uint64_t StreamingPartitioner::consume(const std::string& seq)
 {
     std::set<HashIntoType> tags;
-    consume_and_connect_tags(seq, tags);
-    acquire_components();
+    uint64_t n_new = consume_and_connect_tags(seq, tags);
+    //acquire_components();
     create_and_connect_components(tags);
-    release_components();
+    //release_components();
+    return n_new;
 }
 
 
-void StreamingPartitioner::consume_pair(const std::string& first,
+uint64_t StreamingPartitioner::consume_pair(const std::string& first,
                                         const std::string& second)
 {
     std::set<HashIntoType> tags;
-    consume_and_connect_tags(first, tags);
-    consume_and_connect_tags(second, tags);
-    acquire_components();
+    uint64_t n_new = consume_and_connect_tags(first, tags);
+    n_new += consume_and_connect_tags(second, tags);
+    //acquire_components();
     create_and_connect_components(tags);
-    release_components();
+    //release_components();
+    return n_new;
 }
 
 void StreamingPartitioner::add_component(ComponentPtr comp)
@@ -122,7 +124,7 @@ void StreamingPartitioner::add_component(ComponentPtr comp)
 }
 
 
-void StreamingPartitioner::consume_and_connect_tags(const std::string& seq,
+uint64_t StreamingPartitioner::consume_and_connect_tags(const std::string& seq,
                                                     std::set<HashIntoType>& tags)
 {
     /* For the following comments, let G be the set of k-mers
@@ -134,12 +136,15 @@ void StreamingPartitioner::consume_and_connect_tags(const std::string& seq,
 #if(SP_DEBUG)
     std::cout << "Consume sequence." << std::endl;
 #endif
+    uint64_t n_new = 0;
+    ++n_consumed;
+
     if(graph != NULL) {
         KmerIterator kmers(seq.c_str(), graph->ksize());
         unsigned int since = _tag_density / 2 + 1;
 
         std::set<HashIntoType> seen;
-        std::set<HashIntoType> intersection;
+        KmerSet intersection;
         KmerQueue search_from;
 
         bool in_known_territory = false;
@@ -158,13 +163,18 @@ void StreamingPartitioner::consume_and_connect_tags(const std::string& seq,
                     // If we had found a tag in the U&G component we just
                     // left, add the component to the seen set.
                     seen.insert(intersection.begin(), intersection.end());
-                }
+                } /*else {
+                    for (auto km : intersection) {
+                        search_from.push(km);
+                    }
+                }*/
                 intersection.clear();
 
                 search_from.push(kmer);
                 in_known_territory = false;
                 found_tag_in_territory = false;
                 ++since;
+                ++n_new;
             } else {
                 // Keep track of connected components in U&G: when we exit
                 // this component, if there is a tag, we will want to add its nodes
@@ -188,11 +198,14 @@ void StreamingPartitioner::consume_and_connect_tags(const std::string& seq,
         } while (!kmers.done());
 
         // always tag the last k-mer
-        tags.insert(kmer);
+        if (since >= _tag_density / 2) {
+            tags.insert(kmer);
+        }
+        search_from.push(kmer);
 
-        // now go back and make sure to tag the first k-mer
+        // now go back and make sure to search from the first k-mer
         kmer = kmers.first();
-        tags.insert(kmer);
+        search_from.push(kmer);
 
 #if(DEBUG_SP)
         std::cout << "Done iterating k-mers" << std::endl;
@@ -203,6 +216,8 @@ void StreamingPartitioner::consume_and_connect_tags(const std::string& seq,
     } else {
         throw khmer_ptr_exception("Hashtable has been deleted.");
     }
+
+    return n_new;
 }
 
 
@@ -330,7 +345,7 @@ void StreamingPartitioner::find_connected_tags(KmerQueue& node_q,
         std::queue<unsigned int> breadth_q(std::deque<unsigned int>(node_q.size(), 0));
 
         unsigned int cur_breadth = 0;
-        const unsigned int max_breadth = (2 * _tag_density) + 1;
+        const unsigned int max_breadth = _tag_density + 1;
 
         unsigned int total = 0;
         unsigned int nfound = 0;

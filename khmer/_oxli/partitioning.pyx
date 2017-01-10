@@ -116,7 +116,7 @@ cdef class Component:
 
 cdef class StreamingPartitioner:
 
-    def __cinit__(self, graph):
+    def __cinit__(self, graph, tag_density=None):
         if not (isinstance(graph, Countgraph) or isinstance(graph, Nodegraph)):
             raise ValueError('Must take an object with Hashtable *')
         
@@ -124,20 +124,24 @@ cdef class StreamingPartitioner:
         cdef CPyHashtable_Object* ptr = <CPyHashtable_Object*> graph
         self._graph_ptr = deref(ptr).hashtable
         
-        self._this.reset(new CpStreamingPartitioner(self._graph_ptr))
+        if tag_density is None:
+            self._this.reset(new CpStreamingPartitioner(self._graph_ptr))
+        else:
+            self._this.reset(new CpStreamingPartitioner(self._graph_ptr, tag_density))
 
         self._tag_component_map = deref(self._this).get_tag_component_map()
         self._components = deref(self._this).get_component_set()
         self.n_consumed = 0
 
     def consume(self, sequence):
-        deref(self._this).consume(sequence.encode('utf-8'))
         self.n_consumed += 1
+        return deref(self._this).consume(sequence.encode('utf-8'))
 
     def consume_pair(self, first, second):
-        deref(self._this).consume_pair(first.encode('utf-8'),
-                                       second.encode('utf-8'))
         self.n_consumed += 2
+        return deref(self._this).consume_pair(first.encode('utf-8'),
+                                              second.encode('utf-8'))
+
 
     def consume_fasta(self, filename):
         return deref(self._this).consume_fasta(filename.encode('utf-8'))

@@ -228,15 +228,17 @@ class StreamingPartitioner {
         std::shared_ptr<GuardedKmerCompMap> tag_component_map;
         std::shared_ptr<ComponentPtrSet> components;
         uint32_t components_lock;
+        uint64_t n_consumed;
 
     public:
 
-        explicit StreamingPartitioner(Hashtable * graph);
+        explicit StreamingPartitioner(Hashtable * graph, 
+                                      uint32_t tag_density=DEFAULT_TAG_DENSITY);
 
-        void consume(const std::string& seq);
-        void consume_pair(const std::string& first,
+        uint64_t consume(const std::string& seq);
+        uint64_t consume_pair(const std::string& first,
                           const std::string& second);
-        void consume_and_connect_tags(const std::string& seq,
+        uint64_t consume_and_connect_tags(const std::string& seq,
                                       std::set<HashIntoType>& tags);
         void create_and_connect_components(std::set<HashIntoType>& tags);
 
@@ -254,6 +256,10 @@ class StreamingPartitioner {
 
         uint64_t get_n_tags() const {
             return tag_component_map->size();
+        }
+
+        uint64_t get_n_consumed() const {
+            return n_consumed;
         }
 
         void merge_components(ComponentPtr& root, ComponentPtrSet& comps);

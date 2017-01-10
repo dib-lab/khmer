@@ -177,9 +177,10 @@ cdef extern from "partitioning.hh" namespace "khmer":
 
     cdef cppclass CpStreamingPartitioner "khmer::StreamingPartitioner":
         CpStreamingPartitioner(CpHashtable * ) except +MemoryError
+        CpStreamingPartitioner(CpHashtable *, uint32_t) except +MemoryError
 
-        void consume(string&) nogil except +MemoryError
-        void consume_pair(string&, string&) nogil except +MemoryError
+        uint64_t consume(string&) nogil except +MemoryError
+        uint64_t  consume_pair(string&, string&) nogil except +MemoryError
         uint64_t consume_fasta(string&) except +MemoryError
 
         void add_component(ComponentPtr comp)
@@ -189,6 +190,7 @@ cdef extern from "partitioning.hh" namespace "khmer":
                                  set[HashIntoType]&) except +MemoryError
         uint64_t get_n_components() const
         uint64_t get_n_tags() const
+        uint64_t get_n_consumed() const
 
         ComponentPtr get_tag_component(string&) const
         ComponentPtr get_nearest_component(string&) const

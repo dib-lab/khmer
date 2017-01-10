@@ -27,7 +27,7 @@ cdef class PartitioningApp:
         self.args.write_stats = self.args.stats_interval > 0
 
         self.graph = create_countgraph(self.args)
-        self.partitioner = StreamingPartitioner(self.graph)
+        self.partitioner = StreamingPartitioner(self.graph, tag_density=self.args.tag_density)
 
     def parse_args(self, args):
         parser = build_counting_args()
@@ -39,10 +39,11 @@ cdef class PartitioningApp:
                             default='split')
         parser.add_argument('-Z', dest='norm', default=10, type=int)
         parser.add_argument('--stats-interval', default=0, type=int)
+        parser.add_argument('--tag-density', default=None, type=int)
         
         return parser.parse_args(args)
 
-    def write_components(self, folder, n, sample):
+    def write_components(self, folder, n, sample, new_kmers):
         sample = os.path.basename(sample)
         filename = os.path.join(folder,
                                 '{0}.{1}.stats.csv'.format(n, sample))
@@ -50,6 +51,9 @@ cdef class PartitioningApp:
                                                         self.partitioner.n_components))
         print('  writing results to file -> {0}'.format(filename))
         self.partitioner.write_components(filename)
+        with open(os.path.join(folder, 'global-stats.csv'), 'a') as fp:
+            fp.write('{0}, {1}, {2}, {3}\n'.format(n, self.partitioner.n_components,
+                                                 self.partitioner.n_tags, new_kmers))
 
     def run(self):
 
@@ -70,6 +74,7 @@ cdef class PartitioningApp:
         cdef int n
         cdef bool paired
         cdef Sequence first, second
+        cdef int new_kmers = 0
         last = 0
         for group in samples:
             if self.args.pairing_mode == 'split':
@@ -84,19 +89,20 @@ cdef class PartitioningApp:
                 reader = BrokenPairedReader(FastxParser(group), min_length=self.args.ksize)
             for n, paired, first, second in reader:
 
-                if n % 1000 == 0:
-                    print (n, '...', sep='')
+                if n % 10000 == 0:
+                    print (n, self.partitioner.n_components, self.partitioner.n_tags)
                 if self.args.write_stats and n > 0 and n % self.args.stats_interval == 0:
-                    self.write_components(self.args.stats_dir, last+n, sample_name)
-
+                    self.write_components(self.args.stats_dir, last+n, sample_name, new_kmers)
+                    new_kmers = 0
                 if paired:
-                    self.partitioner.consume_pair(first.sequence,
+                    new_kmers += self.partitioner.consume_pair(first.sequence,
                                                   second.sequence)
                 else:
-                    self.partitioner.consume(first.sequence)
+                    new_kmers += self.partitioner.consume(first.sequence)
             last = n
             if self.args.write_stats:
-                self.write_components(self.args.stats_dir, last+n, sample_name)
+                self.write_components(self.args.stats_dir, last, sample_name, new_kmers)
+                new_kmers = 0
 
         if self.args.save is not None:
             self.partitioner.save(self.args.save)
