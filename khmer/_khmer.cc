@@ -765,7 +765,7 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
             if (!myself->has_prev_read) {
                 myself->has_prev_read = true;
                 try {
-                    parser->imprint_next_read(*(myself->prev_read));
+                    *(myself->prev_read) = parser->get_next_read();
                 } catch (NoMoreReadsAvailable &exc) {
                     stop_iteration = true;
                 } catch (khmer_file_exception &exc) {
