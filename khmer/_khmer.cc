@@ -691,6 +691,7 @@ _ReadParser_iternext( PyObject * self )
 }
 
 
+// Test if `a` and `b` form a pair of reads
 bool _is_pair(const Read& a, const Read& b) {
     // split read's name on ' ' if possible, creates a lhs and rhs
     // string around the space.
@@ -702,7 +703,7 @@ bool _is_pair(const Read& a, const Read& b) {
         rhs1 = a.name.substr(lhs1_end+1);
     }
 
-    // split read's name on ' ' if possible
+    // split the read's name on ' ' if possible
     auto lhs2_end = b.name.find_first_of(" ");
     lhs2_end = lhs2_end == std::string::npos ? b.name.size() : lhs2_end;
     const auto lhs2 = b.name.substr(0, lhs2_end);
@@ -745,18 +746,33 @@ bool _is_pair(const Read& a, const Read& b) {
     return false;
 }
 
+#define NEXT_READ(target)                                                      \
+  {                                                                            \
+    try {                                                                      \
+      target = parser->get_next_read();                                        \
+    } catch (NoMoreReadsAvailable & exc) {                                     \
+      stop_iteration = true;                                                   \
+    } catch (khmer_file_exception & exc) {                                     \
+      exc_string = exc.what();                                                 \
+      file_exception = exc_string.c_str();                                     \
+    } catch (khmer_value_exception & exc) {                                    \
+      exc_string = exc.what();                                                 \
+      value_exception = exc_string.c_str();                                    \
+    }                                                                          \
+  }
+
 static
 PyObject *
 _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
 {
     khmer_ReadParser_Object * parent = (khmer_ReadParser_Object*)myself->parent;
-    IParser    *parser    = parent->parser;
-    uint8_t     pair_mode = myself->pair_mode;
+    IParser *parser = parent->parser;
+    uint8_t pair_mode = myself->pair_mode;
 
     ReadPair the_read_pair;
-    bool        stop_iteration  = false;
+    bool stop_iteration = false;
     const char *value_exception = NULL;
-    const char *file_exception  = NULL;
+    const char *file_exception = NULL;
     std::string exc_string;
     stop_iteration = parser->is_complete();
 
@@ -764,31 +780,11 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
         if (pair_mode == IParser::PAIR_MODE_ALLOW_UNPAIRED) {
             if (!myself->has_prev_read) {
                 myself->has_prev_read = true;
-                try {
-                    *(myself->prev_read) = parser->get_next_read();
-                } catch (NoMoreReadsAvailable &exc) {
-                    stop_iteration = true;
-                } catch (khmer_file_exception &exc) {
-                    exc_string = exc.what();
-                    file_exception = exc_string.c_str();
-                } catch (khmer_value_exception &exc) {
-                    exc_string = exc.what();
-                    value_exception = exc_string.c_str();
-                }
+                NEXT_READ(*(myself->prev_read))
             }
             Read prev(*(myself->prev_read));
             Read next;
-            try {
-                next = parser->get_next_read();
-            } catch (NoMoreReadsAvailable &exc) {
-                stop_iteration = true;
-            } catch (khmer_file_exception &exc) {
-                exc_string = exc.what();
-                file_exception = exc_string.c_str();
-            } catch (khmer_value_exception &exc) {
-                exc_string = exc.what();
-                value_exception = exc_string.c_str();
-            }
+            NEXT_READ(next)
             if (_is_pair(prev, next)) {
                 myself->has_prev_read = false;
                 the_read_pair.first = prev;
@@ -797,8 +793,7 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
             else {
                 the_read_pair.first = prev;
                 the_read_pair.second.sequence = "";
-                delete myself->prev_read;
-                myself->prev_read = new Read(next);
+                *(myself->prev_read) = next;
                 myself->has_prev_read = true;
             }
         }
