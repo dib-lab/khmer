@@ -10,5 +10,7 @@ URL: http://khmer.readthedocs.io/
 Version: @VERSION@
 
 Requires:
+Requires.private: zlib
 Libs: -L${libdir} -L${sharedlibdir} -loxli
+Libs.private: -lbz2
 Cflags: -I${includedir}
