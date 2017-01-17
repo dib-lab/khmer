@@ -251,7 +251,7 @@ class TestStreamingPartitionerBasic:
         comps = list(sp.components())
         comp = comps[0]
         assert len(comps) == n_components
-        assert sp.n_components == (comp._n_created - comp._n_destroyed)
+        #assert sp.n_components == (comp._n_created - comp._n_destroyed)
         assert sp.n_consumed == len(seq_reads)
 
     @pytest.mark.parametrize("n_components", list(range(1,101, 20)))
