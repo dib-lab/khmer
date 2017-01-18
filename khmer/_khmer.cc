@@ -1641,10 +1641,53 @@ hashtable_consume(khmer_KHashtable_Object * me, PyObject * args)
     }
 
     unsigned int n_consumed;
+
     n_consumed = hashtable->consume_string(long_str);
 
     return PyLong_FromLong(n_consumed);
 }
+
+static
+PyObject *
+hashtable_consume_chunk(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    PyObject * reads_list = NULL;
+    if (!PyArg_ParseTuple(args, "O!", &PyList_Type, &reads_list)) {
+        Py_DECREF(me);
+        return NULL;
+    }
+
+    std::vector<char*> reads;
+    reads.reserve(1000);
+    std::vector<PyObject*> pyreads;
+    pyreads.reserve(1000);
+    for (Py_ssize_t i = 0; i < PySequence_Fast_GET_SIZE(reads_list); i++) {
+        PyObject * read_o = PyList_GET_ITEM(reads_list, i);
+        PyObject * read_u = PyUnicode_AsASCIIString(read_o);
+        pyreads.push_back(read_u);
+        reads.push_back(PyBytes_AS_STRING(read_u));
+    }
+
+    unsigned int n_consumed = 0;
+
+    Py_BEGIN_ALLOW_THREADS
+    for (auto read : reads) {
+      std::string rread(read);
+      if (hashtable->check_and_normalize_read(rread)) {
+        n_consumed += hashtable->consume_string(read);
+      }
+    }
+    Py_END_ALLOW_THREADS
+
+    for (auto read : pyreads) {
+      Py_DECREF(read);
+    }
+
+    return PyLong_FromLong(n_consumed);
+}
+
 
 static
 PyObject *
@@ -2226,6 +2269,11 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "consume",
         (PyCFunction)hashtable_consume, METH_VARARGS,
         "Increment the counts of all of the k-mers in the string."
+    },
+    {
+        "consume_chunk",
+        (PyCFunction)hashtable_consume_chunk, METH_VARARGS,
+        "Increment the counts of all of the k-mers in the strings."
     },
     {
         "consume_fasta",

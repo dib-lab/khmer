@@ -42,7 +42,6 @@ Build a graph from the given sequences, save in <ptname>.
 Use '-h' for parameter help.
 """
 
-import sys
 
 from khmer.khmer_args import build_nodegraph_args
 from oxli import build_graph

@@ -49,7 +49,7 @@ import sys
 
 import khmer
 from khmer import khmer_args
-from khmer.khmer_args import (report_on_config, info, add_threading_args,
+from khmer.khmer_args import (report_on_config, add_threading_args,
                               calculate_graphsize)
 from khmer.kfile import check_input_files
 from khmer.kfile import check_space_for_graph

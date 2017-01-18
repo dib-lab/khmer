@@ -50,6 +50,9 @@ Contact: khmer-project@idyll.org
 #include <set>
 #include <string>
 #include <vector>
+#include <thread>
+#include <mutex>
+using MuxGuard = std::lock_guard<std::mutex>;
 
 #include "khmer.hh"
 #include "khmer_exception.hh"
@@ -84,6 +87,7 @@ protected:
     //WordLength	    _ksize;
     HashIntoType    bitmask;
     unsigned int    _nbits_sub_1;
+    std::mutex m;
 
     explicit Hashtable( WordLength ksize, Storage * s)
         : KmerFactory( ksize ), store(s),
