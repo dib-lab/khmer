@@ -43,17 +43,7 @@ Contact: khmer-project@idyll.org
 // Must be first.
 #include <Python.h>
 
-#include <iostream>
-
-#include "khmer.hh"
-#include "kmer_hash.hh"
-#include "hashtable.hh"
-#include "hashgraph.hh"
-#include "assembler.hh"
-#include "read_aligner.hh"
-#include "labelhash.hh"
-#include "khmer_exception.hh"
-#include "hllcounter.hh"
+#include "_khmer.hh"
 
 using namespace khmer;
 using namespace read_parsers;
@@ -295,12 +285,6 @@ namespace khmer
 
 namespace python
 {
-
-typedef struct {
-    PyObject_HEAD
-    //! Pointer to the low-level genomic read object.
-    read_parsers:: Read *   read;
-} khmer_Read_Object;
 
 
 static
@@ -560,22 +544,6 @@ static PyTypeObject khmer_Read_Type = {
 // ReadParser object -- parse reads directly from streams
 // ReadPairIterator -- return pairs of Read objects
 //
-
-
-typedef struct {
-    PyObject_HEAD
-    //! Pointer to the low-level parser object.
-    read_parsers:: IParser *  parser;
-} khmer_ReadParser_Object;
-
-
-typedef struct {
-    PyObject_HEAD
-    //! Pointer to Python parser object for reference counting purposes.
-    PyObject *  parent;
-    //! Persistent value of pair mode across invocations.
-    int pair_mode;
-} khmer_ReadPairIterator_Object;
 
 
 static
@@ -944,10 +912,6 @@ _PyObject_to_khmer_ReadParser( PyObject * py_object )
     return ((python:: khmer_ReadParser_Object *)py_object)->parser;
 }
 
-typedef struct {
-    PyObject_HEAD
-    pre_partition_info *   PrePartitionInfo;
-} khmer_PrePartitionInfo_Object;
 
 static
 void
@@ -986,11 +950,6 @@ static PyTypeObject khmer_PrePartitionInfo_Type = {
 /***********************************************************************/
 /***********************************************************************/
 
-typedef struct {
-    PyObject_HEAD
-    SeenSet * hashes;
-    WordLength ksize;
-} khmer_HashSet_Object;
 
 static khmer_HashSet_Object * create_HashSet_Object(SeenSet * h, WordLength k);
 
@@ -1045,11 +1004,6 @@ static PyObject* khmer_HashSet_new(PyTypeObject * type, PyObject * args,
 
 /***********************************************************************/
 
-typedef struct {
-    PyObject_HEAD
-    khmer_HashSet_Object * parent;
-    SeenSet::iterator * it;
-} _HashSet_iterobj;
 
 static
 void
@@ -1349,21 +1303,6 @@ static khmer_HashSet_Object * create_HashSet_Object(SeenSet * h, WordLength k)
 
 /***********************************************************************/
 
-typedef struct {
-    PyObject_HEAD
-    Hashtable * hashtable;
-} khmer_KHashtable_Object;
-
-typedef struct {
-    khmer_KHashtable_Object khashtable;
-    Hashgraph * hashgraph;
-} khmer_KHashgraph_Object;
-
-typedef struct {
-    PyObject_HEAD
-    SubsetPartition * subset;
-} khmer_KSubsetPartition_Object;
-
 static void khmer_subset_dealloc(khmer_KSubsetPartition_Object * obj);
 
 static PyTypeObject khmer_KSubsetPartition_Type = {
@@ -1390,10 +1329,6 @@ static PyTypeObject khmer_KSubsetPartition_Type = {
     "subset object",                       /* tp_doc */
 };
 
-typedef struct {
-    khmer_KHashgraph_Object khashgraph;
-    Nodegraph * nodegraph;
-} khmer_KNodegraph_Object;
 
 static void khmer_nodegraph_dealloc(khmer_KNodegraph_Object * obj);
 static PyObject* khmer_nodegraph_new(PyTypeObject * type, PyObject * args,
@@ -2388,15 +2323,6 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashtable_Object")
 // KCountgraph object
 //
 
-typedef struct {
-    khmer_KHashgraph_Object khashgraph;
-    Countgraph * countgraph;
-} khmer_KCountgraph_Object;
-
-typedef struct {
-    PyObject_HEAD
-    ReadAligner * aligner;
-} khmer_ReadAligner_Object;
 
 static void khmer_countgraph_dealloc(khmer_KCountgraph_Object * obj);
 
@@ -2869,10 +2795,7 @@ static PyMethodDef khmer_subset_methods[] = {
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
-typedef struct {
-    PyObject_HEAD
-    LabelHash * labelhash;
-} khmer_KGraphLabels_Object;
+
 
 static PyObject * khmer_graphlabels_new(PyTypeObject * type, PyObject *args,
                                         PyObject *kwds);
@@ -3680,10 +3603,6 @@ static void khmer_subset_dealloc(khmer_KSubsetPartition_Object * obj)
 // KHLLCounter object
 //
 
-typedef struct {
-    PyObject_HEAD
-    HLLCounter * hllcounter;
-} khmer_KHLLCounter_Object;
 
 static PyObject* khmer_hllcounter_new(PyTypeObject * type, PyObject * args,
                                       PyObject * kwds)
@@ -4046,11 +3965,6 @@ static PyObject * hllcounter_merge(khmer_KHLLCounter_Object * me,
  ********************************/
 
 
-typedef struct {
-    PyObject_HEAD
-    LinearAssembler * assembler;
-} khmer_KLinearAssembler_Object;
-
 static void khmer_linearassembler_dealloc(khmer_KLinearAssembler_Object * obj)
 {
     delete obj->assembler;
@@ -4205,13 +4119,6 @@ static PyTypeObject khmer_KLinearAssembler_Type = {
 };
 
 
-
-typedef struct {
-    PyObject_HEAD
-    SimpleLabeledAssembler * assembler;
-} khmer_KSimpleLabeledAssembler_Object;
-
-
 static void khmer_simplelabeledassembler_dealloc(khmer_KLinearAssembler_Object *
         obj)
 {
@@ -4357,11 +4264,6 @@ static PyTypeObject khmer_KSimpleLabeledAssembler_Type = {
  * JunctionCountAssembler
  ********************************/
 
-
-typedef struct {
-    PyObject_HEAD
-    JunctionCountAssembler * assembler;
-} khmer_KJunctionCountAssembler_Object;
 
 static void khmer_junctioncountassembler_dealloc(
     khmer_KJunctionCountAssembler_Object * obj)
