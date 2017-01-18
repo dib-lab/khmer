@@ -24,9 +24,6 @@ cdef class Sequence:
         if create is True:
             self._this.reset(new CpSequence())
 
-    cdef void take(self, Sequence other):
-        move_cpsequence(deref(other._this), deref(self._this))
-
     def __str__(self):
         return self.sequence
 
@@ -74,6 +71,9 @@ cdef class Sequence:
             deref(seq._this).quality = quality.encode('UTF-8')
 
         return seq
+
+    cdef void take(self, Sequence other):
+        move_cpsequence(deref(other._this), deref(self._this))
 
 
 cdef class SequencePair:

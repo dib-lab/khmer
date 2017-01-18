@@ -2,7 +2,7 @@ from libcpp.memory cimport unique_ptr
 from libcpp cimport bool
 from libcpp.string cimport string
 
-from _oxli cimport CpSequence, CpFastxParser
+from _oxli cimport CpSequence, CpSequencePair, CpIParser, CpFastxParser
 
 cdef inline void move_cpsequence(CpSequence& move_from, CpSequence& move_to)
 cdef inline void move_sequence(Sequence move_from, Sequence move_to)
@@ -16,8 +16,7 @@ cdef class Sequence:
                           str annotations=*, str quality=*)
 
 cdef class SequencePair:
-    cdef Sequence first
-    cdef Sequence second
+    cdef CpSequencePair sequences
 
 
 cdef class ReadBundle:
@@ -27,8 +26,6 @@ cdef class ReadBundle:
 cdef class FastxParser:
     cdef unique_ptr[CpFastxParser] _this
 
-    cdef bool _imprint_next(self, Sequence seq)
-    cdef bool _cp_imprint_next(self, CpSequence& seq)
     cdef Sequence _next(self)
 
 
