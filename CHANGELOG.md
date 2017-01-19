@@ -26,6 +26,8 @@ under semantic versioning, but will be in future versions of khmer.
 - Support for assembling directly from k-mer graphs, and a new
   JunctionCountAssembler class.
 - Add --info flag for obtaining citation information.
+- Add a new storage class using half a byte per entry. Exposed as
+  SmallCounttable and SmallCountgraph.
 
 ### Changed
 - Switch from nose to py.test as the testing framework.
