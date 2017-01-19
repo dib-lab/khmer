@@ -366,7 +366,7 @@ public:
 
 //
 // KmerHashIterator - analogous to KmerIterator classes, but returns only
-// only HashIntoType hashes, not full Kmer objects.  This supports irreversible
+// HashIntoType hashes, not full Kmer objects.  This supports irreversible
 // hashing.
 //
 

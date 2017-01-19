@@ -238,7 +238,7 @@ static bool ht_convert_PyObject_to_Kmer(PyObject * value,
 
 
 static bool convert_Pytablesizes_to_vector(PyListObject * sizes_list_o,
-                                           std::vector<uint64_t>& sizes)
+        std::vector<uint64_t>& sizes)
 {
     Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
     if (sizes_list_o_length < 1) {
@@ -1377,7 +1377,7 @@ typedef struct {
 
 static void khmer_nodegraph_dealloc(khmer_KNodegraph_Object * obj);
 static PyObject* khmer_nodegraph_new(PyTypeObject * type, PyObject * args,
-                                    PyObject * kwds);
+                                     PyObject * kwds);
 
 static PyTypeObject khmer_KNodegraph_Type
 CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KNodegraph_Object")
@@ -2218,7 +2218,10 @@ static PyMethodDef khmer_hashtable_methods[] = {
         (PyCFunction)hashtable_reverse_hash, METH_VARARGS,
         "Turns a k-mer hash back into a DNA k-mer, if possible."
     },
-    { "hashsizes", (PyCFunction)hashtable_get_hashsizes, METH_VARARGS, "" },
+    {
+        "hashsizes",
+        (PyCFunction)hashtable_get_hashsizes, METH_VARARGS,
+        "" },
     {
         "n_unique_kmers",
         (PyCFunction)hashtable_n_unique_kmers, METH_VARARGS,
@@ -2274,12 +2277,6 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "save",
         (PyCFunction)hashtable_save, METH_VARARGS,
         "Save the graph to the specified file."
-    },
-    {
-        "get_median_count",
-        (PyCFunction)hashtable_get_median_count, METH_VARARGS,
-        "Get the median, average, and stddev of the k-mer counts "
-        " in the string"
     },
     {
         "get_kmers",
@@ -2348,13 +2345,15 @@ static PyMethodDef khmer_hashtable_methods[] = {
         METH_VARARGS,
         "Calculate the k-mer abundance distribution for a reads parser handle"
     },
-    { "get_median_count",
-      (PyCFunction)hashtable_get_median_count, METH_VARARGS,
-      "Get the median, average, and stddev of the k-mer counts in the string"
+    {
+        "get_median_count",
+        (PyCFunction)hashtable_get_median_count, METH_VARARGS,
+        "Get the median, average, and stddev of the k-mer counts in the string"
     },
-    { "median_at_least",
-      (PyCFunction)hashtable_median_at_least, METH_VARARGS,
-      "Return true if the median is at least the given cutoff"
+    {
+        "median_at_least",
+        (PyCFunction)hashtable_median_at_least, METH_VARARGS,
+        "Return true if the median is at least the given cutoff"
     },
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
@@ -2404,7 +2403,9 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashtable_Object")
 
 #include "_cpy_nodetable.hh"
 #include "_cpy_counttable.hh"
+#include "_cpy_smallcounttable.hh"
 #include "_cpy_hashgraph.hh"
+#include "_cpy_smallcountgraph.hh"
 
 //
 // KCountgraph object
@@ -2670,7 +2671,7 @@ static PyMethodDef khmer_nodegraph_methods[] = {
 // methods, we take our arguments here, because there's no "uninitialized" nodegraph
 // object; we have to have k and the table sizes before creating the new objects
 static PyObject* khmer_nodegraph_new(PyTypeObject * type, PyObject * args,
-                                    PyObject * kwds)
+                                     PyObject * kwds)
 {
     khmer_KNodegraph_Object * self;
     self = (khmer_KNodegraph_Object *)type->tp_alloc(type, 0);
@@ -4757,6 +4758,11 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
+    khmer_KSmallCounttable_Type.tp_base = &khmer_KHashtable_Type;
+    if (PyType_Ready(&khmer_KSmallCounttable_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
     khmer_KNodetable_Type.tp_base = &khmer_KHashtable_Type;
     if (PyType_Ready(&khmer_KNodetable_Type) < 0) {
         return MOD_ERROR_VAL;
@@ -4770,6 +4776,11 @@ MOD_INIT(_khmer)
 
     khmer_KCountgraph_Type.tp_base = &khmer_KHashgraph_Type;
     if (PyType_Ready(&khmer_KCountgraph_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    khmer_KSmallCountgraph_Type.tp_base = &khmer_KHashgraph_Type;
+    if (PyType_Ready(&khmer_KSmallCountgraph_Type) < 0) {
         return MOD_ERROR_VAL;
     }
 
@@ -4834,6 +4845,18 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
+    PyObject * filetype_dict = Py_BuildValue("{s,i,s,i,s,i,s,i,s,i,s,i,s,i}",
+                               "COUNTING_HT", SAVED_COUNTING_HT,
+                               "HASHBITS", SAVED_HASHBITS,
+                               "TAGS", SAVED_TAGS,
+                               "STOPTAGS", SAVED_STOPTAGS,
+                               "SUBSET", SAVED_SUBSET,
+                               "LABELSET", SAVED_LABELSET,
+                               "SMALLCOUNT", SAVED_SMALLCOUNT);
+    if (PyModule_AddObject( m, "FILETYPES", filetype_dict ) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
     Py_INCREF(&khmer_Read_Type);
     if (PyModule_AddObject( m, "Read",
                             (PyObject *)&khmer_Read_Type ) < 0) {
@@ -4852,6 +4875,12 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
+    Py_INCREF(&khmer_KSmallCounttable_Type);
+    if (PyModule_AddObject( m, "SmallCounttable",
+                            (PyObject *)&khmer_KSmallCounttable_Type ) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
     Py_INCREF(&khmer_KNodetable_Type);
     if (PyModule_AddObject( m, "Nodetable",
                             (PyObject *)&khmer_KNodetable_Type ) < 0) {
@@ -4861,6 +4890,12 @@ MOD_INIT(_khmer)
     Py_INCREF(&khmer_KCountgraph_Type);
     if (PyModule_AddObject( m, "Countgraph",
                             (PyObject *)&khmer_KCountgraph_Type ) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    Py_INCREF(&khmer_KSmallCountgraph_Type);
+    if (PyModule_AddObject( m, "SmallCountgraph",
+                            (PyObject *)&khmer_KSmallCountgraph_Type ) < 0) {
         return MOD_ERROR_VAL;
     }
 

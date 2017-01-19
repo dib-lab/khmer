@@ -80,6 +80,7 @@ ALGORITHMS = {
 class CitationAction(argparse.Action):
     # pylint: disable=too-few-public-methods
     """Output citation information and exit."""
+
     def __init__(self, *args, **kwargs):
         self.citations = kwargs.pop('citations')
         super(CitationAction, self).__init__(*args, nargs=0, **kwargs)
@@ -126,6 +127,7 @@ class KhmerArgumentParser(argparse.ArgumentParser):
 
     Take care of common arguments and setup printing of citation information.
     """
+
     def __init__(self, citations=None, formatter_class=ComboFormatter,
                  **kwargs):
         super(KhmerArgumentParser, self).__init__(
@@ -256,15 +258,17 @@ def check_conflicting_args(args, hashtype):
                 break  # no repeat warnings
 
         infoset = None
-        if hashtype == 'countgraph':
+        if hashtype in ('countgraph', 'smallcountgraph'):
             infoset = extract_countgraph_info(args.loadgraph)
-        if info:
-            ksize = infoset[0]
-            max_tablesize = infoset[1]
-            n_tables = infoset[2]
+        if infoset is not None:
+            ksize = infoset.ksize
+            max_tablesize = infoset.table_size
+            n_tables = infoset.n_tables
             args.ksize = ksize
             args.n_tables = n_tables
             args.max_tablesize = max_tablesize
+            if infoset.ht_type == khmer.FILETYPES['SMALLCOUNT']:
+                args.small_count = True
 
 
 def check_argument_range(low, high, parameter_name):
@@ -460,6 +464,10 @@ def build_counting_args(descr=None, epilog=None, citations=None):
     """Build an ArgumentParser with args for countgraph based scripts."""
     parser = build_graph_args(descr=descr, epilog=epilog, citations=citations)
 
+    parser.add_argument('--small-count', default=False, action='store_true',
+                        help='Reduce memory usage by using a smaller counter'
+                        ' for individual kmers.')
+
     return parser
 
 
@@ -479,12 +487,15 @@ def add_loadgraph_args(parser):
 
 def calculate_graphsize(args, graphtype, multiplier=1.0):
     """Transform the table parameters into a size."""
-    if graphtype not in ('countgraph', 'nodegraph'):
+    if graphtype not in ('countgraph', 'smallcountgraph', 'nodegraph'):
         raise ValueError("unknown graph type: %s" % (graphtype,))
 
     if args.max_memory_usage:
         if graphtype == 'countgraph':
             tablesize = args.max_memory_usage / args.n_tables / \
+                float(multiplier)
+        elif graphtype == 'smallcountgraph':
+            tablesize = 2 * args.max_memory_usage / args.n_tables / \
                 float(multiplier)
         elif graphtype == 'nodegraph':
             tablesize = 8. * args.max_memory_usage / args.n_tables / \
@@ -542,8 +553,14 @@ def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
         print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
         sys.exit(1)
 
-    tablesize = calculate_graphsize(args, 'countgraph', multiplier=multiplier)
-    return khmer.Countgraph(ksize, tablesize, args.n_tables)
+    if args.small_count:
+        tablesize = calculate_graphsize(args, 'smallcountgraph',
+                                        multiplier=multiplier)
+        return khmer.SmallCountgraph(ksize, tablesize, args.n_tables)
+    else:
+        tablesize = calculate_graphsize(args, 'countgraph',
+                                        multiplier=multiplier)
+        return khmer.Countgraph(ksize, tablesize, args.n_tables)
 
 
 def report_on_config(args, graphtype='countgraph'):
@@ -553,7 +570,7 @@ def report_on_config(args, graphtype='countgraph'):
     made available by this module.
     """
     check_conflicting_args(args, graphtype)
-    if graphtype not in ('countgraph', 'nodegraph'):
+    if graphtype not in ('countgraph', 'smallcountgraph', 'nodegraph'):
         raise ValueError("unknown graph type: %s" % (graphtype,))
 
     tablesize = calculate_graphsize(args, graphtype)
@@ -568,6 +585,11 @@ def report_on_config(args, graphtype='countgraph'):
             "Estimated memory usage is {0:.2g} bytes "
             "(n_tables x max_tablesize)".format(
                 args.n_tables * tablesize))
+    elif graphtype == 'smallcountgraph':
+        log_info(
+            "Estimated memory usage is {0:.2g} bytes "
+            "(n_tables x max_tablesize / 2)".format(
+                args.n_tables * tablesize / 2))
     elif graphtype == 'nodegraph':
         log_info(
             "Estimated memory usage is {0:.2g} bytes "
