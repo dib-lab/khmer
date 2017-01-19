@@ -19,7 +19,7 @@ cdef extern from "khmer.hh" namespace "khmer":
     ctypedef unsigned long long int HashIntoType
     ctypedef unsigned long long int Label
     ctypedef set[Label] LabelSet
-    ctypedef set[HashIntoType TagSet
+    ctypedef set[HashIntoType] TagSet
     ctypedef set[HashIntoType] HashIntoTypeSet
     ctypedef unsigned char WordLength
     ctypedef unsigned short int BoundedCounterType
@@ -73,13 +73,16 @@ cdef extern from  "read_parsers.hh":
 
     cdef cppclass CpIParser "khmer::read_parsers::IParser":
         CpIParser()
-        static CpIParser * const get_parser(string const &)
+
+        @staticmethod
+        CpIParser * const get_parser(const string &)
+
         bool is_complete()
         CpSequence get_next_read()
         CpSequencePair get_next_read_pair(uint8_t)
         size_t get_num_reads()
 
-    cdef cppclass CpFastxParser(CpIParser) "khmer::read_parsers::FastxParser":
+    cdef cppclass CpFastxParser "khmer::read_parsers::FastxParser" (CpIParser):
         CpFastxParser(const char *)
 
 
@@ -114,7 +117,7 @@ cdef extern from "hashtable.hh" namespace "khmer":
         const WordLength ksize() const
         HashIntoType hash_dna(const char *) const
         HashIntoType hash_dna_top_strand(const char *) const
-        HashIntpType hash_dna_bottom_strand(const char *) const
+        HashIntoType hash_dna_bottom_strand(const char *) const
         string unhash_dna(HashIntoType) const
         void count(const char *)
         void count(HashIntoType)
@@ -125,7 +128,7 @@ cdef extern from "hashtable.hh" namespace "khmer":
         uint32_t consume_string(const string &)
         bool check_and_normalize_read(string &) const
         uint32_t check_and_process_read(string &, bool &)
-        void consume_fasta(string const &, uint32_t &, uint64_t &)
+        void consume_fasta(const string &, uint32_t &, uint64_t &)
         void consume_fasta(CpIParser *, uint32_t &, uint64_t &)
         void set_use_bigcount(bool)
         bool get_use_bigcount()
@@ -151,14 +154,17 @@ cdef extern from "hashtable.hh" namespace "khmer":
         vector[uint32_t] find_spectral_error_positions(string, 
                                                        BoundedCounterType)
 
-    cdef cppclass CpCounttable(CpHashtable) "khmer::Counttable":
+cdef extern from "_cpy_counttable.hh" namespace "khmer":
+    cdef cppclass CpCounttable "khmer::Counttable" (CpHashtable):
         CpCounttable(WordLength, vector[uint64_t])
 
-    cdef cppclass CpNodetable(CpHashtable) "khmer::Nodetable":
+cdef extern from "_cpy_nodetable.hh" namespace "khmer":
+    cdef cppclass CpNodetable "khmer::Nodetable" (CpHashtable):
         CpNodetable(WordLength, vector[uint64_t])
 
+
 cdef extern from "hashgraph.hh" namespace "khmer":
-    cdef cppclass CpHashgraph(CpHashtable) "khmer::Hashgraph":
+    cdef cppclass CpHashgraph "khmer::Hashgraph" (CpHashtable):
         uint32_t traverse_from_kmer(CpKmer, uint32_t, KmerSet&, uint32_t)
         void extract_unique_paths(string, uint32_t, float, vector[string])
         void calc_connected_graph_size(CpKmer, uint64_t&, KmerSet&,
@@ -167,22 +173,23 @@ cdef extern from "hashgraph.hh" namespace "khmer":
         uint32_t kmer_degree(const char *)
         void find_high_degree_nodes(const char *, set[HashIntoType] &) const
 
-    cdef cppclass CpCountgraph(CpHashgraph) "khmer::Countgraph":
+    cdef cppclass CpCountgraph "khmer::Countgraph" (CpHashgraph):
         CpCountgraph(WordLength, vector[uint64_t])
 
-    cdef cppclass CpNodegraph(CpNodegraph) "khmer::Nodegraph":
+    cdef cppclass CpNodegraph "khmer::Nodegraph" (CpHashgraph):
         CpNodegraph(WordLength, vector[uint64_t])
+
 
 cdef extern from "labelhash.hh" namespace "khmer":
     cdef cppclass CpLabelHash "khmer::LabelHash":
         CpLabelHash(CpHashgraph *)
         size_t n_labels() const
-        void consume_fasta_and_tag_with_labels(string const &,
+        void consume_fasta_and_tag_with_labels(const string &,
                                                uint32_t &,
                                                uint64_t &,
                                                CallbackFn,
                                                void *)
-         void consume_fasta_and_tag_with_labels(string const &,
+        void consume_fasta_and_tag_with_labels(const string &,
                                                uint32_t &,
                                                uint64_t &)
         void consume_fasta_and_tag_with_labels(CpIParser *,
@@ -190,25 +197,25 @@ cdef extern from "labelhash.hh" namespace "khmer":
                                                uint64_t &,
                                                CallbackFn,
                                                void *)
-         void consume_fasta_and_tag_with_labels(CpIParser *,
+        void consume_fasta_and_tag_with_labels(CpIParser *,
                                                uint32_t &,
                                                uint64_t &)
-         void get_tag_labels(const HashIntoType, LabelSet &)
-         void get_tags_from_label(const Label,
+        void get_tag_labels(const HashIntoType, LabelSet &)
+        void get_tags_from_label(const Label,
                                   TagSet&)
-         void link_tag_and_label(const HashIntoType, const Label)
-         uint32_t sweep_label_neighborhood(const string &,
+        void link_tag_and_label(const HashIntoType, const Label)
+        uint32_t sweep_label_neighborhood(const string &,
                                            LabelSet &,
                                            uint32_t,
                                            bool,
                                            bool)
-         void save_labels_and_tags(string)
-         void load_labels_and_tags(string)
-         void label_across_high_degree_nodes(const char *,
+        void save_labels_and_tags(string)
+        void load_labels_and_tags(string)
+        void label_across_high_degree_nodes(const char *,
                                              set[HashIntoType] &,
                                              const Label)
 
-cdef CpHashtable * get_hashtable_ptr(object graph)
+cdef CpHashgraph * get_hashgraph_ptr(object graph)
 
 
 ########################################################################

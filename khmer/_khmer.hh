@@ -39,6 +39,8 @@ Contact: khmer-project@idyll.org
 //
 // A module for Python that exports khmer C++ library functions.
 //
+#ifndef _KHMER_HH
+#define _KHMER_HH
 
 #include <Python.h>
 
@@ -53,6 +55,46 @@ Contact: khmer-project@idyll.org
 #include "labelhash.hh"
 #include "khmer_exception.hh"
 #include "hllcounter.hh"
+
+
+//
+// Python 2/3 compatibility: PyInt and PyLong
+//
+
+#if (PY_MAJOR_VERSION >= 3)
+#define PyInt_Check(arg) PyLong_Check(arg)
+#define PyInt_AsLong(arg) PyLong_AsLong(arg)
+#define PyInt_FromLong(arg) PyLong_FromLong(arg)
+#define Py_TPFLAGS_HAVE_ITER 0
+#endif
+
+//
+// Python 2/3 compatibility: PyBytes and PyString
+// https://docs.python.org/2/howto/cporting.html#str-unicode-unification
+//
+
+#include "bytesobject.h"
+
+//
+// Python 2/3 compatibility: Module initialization
+// http://python3porting.com/cextensions.html#module-initialization
+//
+
+#if PY_MAJOR_VERSION >= 3
+#define MOD_ERROR_VAL NULL
+#define MOD_SUCCESS_VAL(val) val
+#define MOD_INIT(name) PyMODINIT_FUNC PyInit_##name(void)
+#define MOD_DEF(ob, name, doc, methods) \
+          static struct PyModuleDef moduledef = { \
+            PyModuleDef_HEAD_INIT, name, doc, -1, methods, }; \
+          ob = PyModule_Create(&moduledef);
+#else
+#define MOD_ERROR_VAL
+#define MOD_SUCCESS_VAL(val)
+#define MOD_INIT(name) void init##name(void)
+#define MOD_DEF(ob, name, doc, methods) \
+          ob = Py_InitModule3(name, methods, doc);
+#endif
 
 namespace khmer {
 namespace python {
@@ -80,7 +122,7 @@ typedef struct {
     int pair_mode;
 } khmer_ReadPairIterator_Object;
 
-}; //python
+} //python
 
 typedef struct {
     PyObject_HEAD
@@ -125,6 +167,17 @@ typedef struct {
     Countgraph * countgraph;
 } khmer_KCountgraph_Object;
 
+typedef struct {
+    khmer_KHashtable_Object khashtable;
+    Counttable * counttable;
+} khmer_KCounttable_Object;
+
+
+typedef struct {
+    khmer_KHashtable_Object khashtable;
+    Nodetable * nodetable;
+} khmer_KNodetable_Object;
+
 
 typedef struct {
     PyObject_HEAD
@@ -168,5 +221,31 @@ typedef struct {
 } khmer_KJunctionCountAssembler_Object;
 
 
+static bool convert_Pytablesizes_to_vector(PyListObject * sizes_list_o,
+                                           std::vector<uint64_t>& sizes)
+{
+    Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
+    if (sizes_list_o_length < 1) {
+        PyErr_SetString(PyExc_ValueError,
+                        "tablesizes needs to be one or more numbers");
+        return false;
+    }
+    for (Py_ssize_t i = 0; i < sizes_list_o_length; i++) {
+        PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
+        if (PyLong_Check(size_o)) {
+            sizes.push_back(PyLong_AsUnsignedLongLong(size_o));
+        } else if (PyInt_Check(size_o)) {
+            sizes.push_back(PyInt_AsLong(size_o));
+        } else if (PyFloat_Check(size_o)) {
+            sizes.push_back(PyFloat_AS_DOUBLE(size_o));
+        } else {
+            PyErr_SetString(PyExc_TypeError,
+                            "2nd argument must be a list of ints, longs, or floats");
+            return false;
+        }
+    }
+    return true;
+}
+}
 
-};
+#endif

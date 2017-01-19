@@ -6,10 +6,10 @@ from .._khmer import Countgraph
 from .._khmer import Nodegraph
 
 
-cdef CpHashtable * get_hashtable_ptr(object graph):
+cdef CpHashgraph * get_hashgraph_ptr(object graph):
     if not (isinstance(graph, Countgraph) or isinstance(graph, Nodegraph)):
         return NULL
     
-    cdef CPyHashtable_Object* ptr = <CPyHashtable_Object*> graph
-    return deref(ptr).hashtable
+    cdef CPyHashgraph_Object* ptr = <CPyHashgraph_Object*> graph
+    return deref(ptr).hashgraph
     

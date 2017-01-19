@@ -35,11 +35,12 @@ LICENSE (END)
 
 Contact: khmer-project@idyll.org
 */
+#ifndef _CPY_NODETABLE_HH
+#define _CPY_NODETABLE_HH
 
-typedef struct {
-    khmer_KHashtable_Object khashtable;
-    Nodetable * nodetable;
-} khmer_KNodetable_Object;
+#include "_khmer.hh"
+
+namespace khmer {
 
 static PyMethodDef khmer_nodetable_methods[] = {
     {NULL, NULL, 0, NULL}           /* sentinel */
@@ -129,3 +130,5 @@ static PyObject* khmer_nodetable_new(PyTypeObject * type, PyObject * args,
 
     return (PyObject *) self;
 }
+}
+#endif

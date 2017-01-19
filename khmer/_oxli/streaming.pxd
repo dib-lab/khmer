@@ -2,21 +2,18 @@ from libcpp.memory cimport unique_ptr
 from libcpp cimport bool
 from libcpp.string cimport string
 
-from _oxli cimport CpSequence, CpSequencePair, CpIParser, CpFastxParser
+from _oxli cimport CpSequence, CpIParser, CpFastxParser
 
-cdef inline void move_cpsequence(CpSequence& move_from, CpSequence& move_to)
-cdef inline void move_sequence(Sequence move_from, Sequence move_to)
 
 cdef class Sequence:
-    cdef unique_ptr[CpSequence] _this
+    cdef CpSequence _obj
 
-    cdef void take(self, Sequence other)
     @staticmethod
-    cdef Sequence _create(str name, str sequence, 
-                          str annotations=*, str quality=*)
+    cdef Sequence _new(str name, str sequence, 
+                       str annotations=*, str quality=*)
 
-cdef class SequencePair:
-    cdef CpSequencePair sequences
+    @staticmethod
+    cdef Sequence _wrap(CpSequence cseq)
 
 
 cdef class ReadBundle:

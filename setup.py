@@ -146,18 +146,20 @@ def build_dir():
 ZLIBDIR = 'third-party/zlib'
 BZIP2DIR = 'third-party/bzip2'
 
-BUILD_DEPENDS = ["khmer/_khmer.hh"]
+BUILD_DEPENDS = []
 BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
-    "khmer", "kmer_hash", "hashtable", "counting", "hashbits", "labelhash",
+    "khmer", "kmer_hash", "hashtable", "labelhash", "hashgraph",
     "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers",
-    "kmer_filters", "traversal", "assembler", "alphabets", "partitioning"])
+    "kmer_filters", "traversal", "assembler", "alphabets", "storage"])
+BUILD_DEPENDS.extend(path_join("khmer", bn + ".hh") for bn in [
+    "_cpy_counttable", "_cpy_hashgraph", "_cpy_nodetable"])
 
 SOURCES = ["khmer/_khmer.cc"]
 SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
-    "read_parsers", "kmer_hash", "hashtable",
-    "hashbits", "labelhash", "counting", "subset", "read_aligner",
+    "read_parsers", "kmer_hash", "hashtable", "hashgraph",
+    "labelhash", "subset", "read_aligner",
     "hllcounter", "traversal", "kmer_filters", "assembler", "alphabets",
-    "partitioning"])
+    "storage"])
 
 SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
@@ -187,7 +189,10 @@ CP_EXTENSION_MOD_DICT = \
 
 EXTENSION_MODS = [Extension("khmer._khmer", ** CP_EXTENSION_MOD_DICT)]
 
-for cython_ext in glob.glob(os.path.join("khmer", "_oxli", "*.pyx")):
+#for cython_ext in glob.glob(os.path.join("khmer", "_oxli", "_oxli.pyx")):
+for cython_ext in [os.path.join("khmer", "_oxli", f) for f in \
+    ["_oxli.pyx", "hashing.pyx", "traversal.pyx", "streaming.pyx"]]:
+
     CY_EXTENSION_MOD_DICT = \
         {
             "sources": [cython_ext],

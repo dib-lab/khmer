@@ -35,6 +35,12 @@ LICENSE (END)
 
 Contact: khmer-project@idyll.org
 */
+#ifndef _CPY_HASHGRAPH_HH
+#define _CPY_HASHGRAPH_HH
+
+#include "_khmer.hh"
+
+namespace khmer {
 
 static PyTypeObject khmer_KHashgraph_Type
 CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashgraph_Object")
@@ -302,9 +308,47 @@ hashgraph_save_stop_tags(khmer_KHashgraph_Object * me, PyObject * args)
     Py_RETURN_NONE;
 }
 
-static PyObject * hashgraph_repartition_largest_partition(
-    khmer_KHashgraph_Object * me,
-    PyObject * args);
+//static PyObject * hashgraph_repartition_largest_partition(
+//    khmer_KHashgraph_Object * me,
+//    PyObject * args);
+
+static
+PyObject *
+hashgraph_repartition_largest_partition(khmer_KHashgraph_Object * me,
+                                        PyObject * args)
+{
+    Hashgraph * hashgraph = me->hashgraph;
+    khmer_KCountgraph_Object * countgraph_o = NULL;
+    PyObject * subset_o = NULL;
+    SubsetPartition * subset_p;
+    unsigned int distance, threshold, frequency;
+
+    if (!PyArg_ParseTuple(args, "OO!III",
+                          &subset_o,
+                          &khmer_KCountgraph_Type, &countgraph_o,
+                          &distance, &threshold, &frequency)) {
+        return NULL;
+    }
+
+    if (PyObject_TypeCheck(subset_o, &khmer_KSubsetPartition_Type)) {
+        subset_p = ((khmer_KSubsetPartition_Object *) subset_o)->subset;
+    } else {
+        subset_p = hashgraph->partition;
+    }
+
+    Countgraph * countgraph = countgraph_o->countgraph;
+
+    unsigned long next_largest;
+    try {
+        next_largest = subset_p->repartition_largest_partition(distance,
+                       threshold, frequency, *countgraph);
+    } catch (khmer_exception &e) {
+        PyErr_SetString(PyExc_RuntimeError, e.what());
+        return NULL;
+    }
+
+    return PyLong_FromLong(next_largest);
+}
 
 static
 PyObject *
@@ -1585,3 +1629,7 @@ static PyMethodDef khmer_hashgraph_methods[] = {
     },
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
+
+}
+
+#endif

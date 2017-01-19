@@ -11,11 +11,9 @@ from hashing import Kmer
 cdef class Traverser:
 
     def __cinit__(self, graph):
-        if not (isinstance(graph, Countgraph) or isinstance(graph, Nodegraph)):
-            raise ValueError('Must take an object with Hashtable *')
-        
-        cdef CPyHashtable_Object* ptr = <CPyHashtable_Object*> graph
-        self._graph_ptr = deref(ptr).hashtable
+        self._graph_ptr = get_hashgraph_ptr(graph)
+        if self._graph_ptr == NULL:
+            raise ValueError('Must take an object with Hashgraph *')
         
         self._this.reset(new CpTraverser(self._graph_ptr))
 

@@ -35,11 +35,12 @@ LICENSE (END)
 
 Contact: khmer-project@idyll.org
 */
+#ifndef _CPY_COUNTTABLE_HH
+#define _CPY_COUNTTABLE_HH
 
-typedef struct {
-    khmer_KHashtable_Object khashtable;
-    Counttable * counttable;
-} khmer_KCounttable_Object;
+#include "_khmer.hh"
+
+namespace khmer {
 
 static PyObject* khmer_counttable_new(PyTypeObject * type, PyObject * args,
                                       PyObject * kwds);
@@ -126,3 +127,7 @@ static PyObject* khmer_counttable_new(PyTypeObject * type, PyObject * args,
 
     return (PyObject *) self;
 }
+
+}
+
+#endif

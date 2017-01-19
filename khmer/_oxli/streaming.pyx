@@ -6,81 +6,66 @@ from libcpp.string cimport string
 
 import sys
 
-from _oxli cimport CpSequence
-
-
-cdef inline void move_cpsequence(CpSequence& move_from, CpSequence& move_to):
-    move_to.name.assign(move_from.name)
-    move_to.sequence.assign(move_from.sequence)
-    move_to.annotations.assign(move_from.annotations)
-    move_to.quality.assign(move_from.quality)
-
-cdef inline void move_sequence(Sequence move_from, Sequence move_to):
-    move_cpsequence(deref(move_from._this), deref(move_to._this))
 
 cdef class Sequence:
 
-    def __cinit__(self, create=False):
-        if create is True:
-            self._this.reset(new CpSequence())
+    def __cinit__(self):
+        pass
 
     def __str__(self):
         return self.sequence
 
     def __len__(self):
-        return deref(self._this).sequence.length()
+        return self._obj.sequence.length()
 
     @property
     def name(self):
-        return deref(self._this).name
+        return self._obj.name
 
     @property
     def sequence(self):
-        return deref(self._this).sequence
+        return self._obj.sequence
 
     @property
     def annotations(self):
-        cdef str annotations = deref(self._this).annotations
+        cdef str annotations = self._this.annotations
         return annotations if annotations else None
 
     @property
     def quality(self):
-        cdef str quality = deref(self._this).quality
+        cdef str quality = self._this.quality
         return quality if quality else None
 
     @staticmethod
-    def create(str name, str sequence, str annotations=None, str quality=None):
-        cdef Sequence seq = Sequence(create=True)
-        deref(seq._this).sequence = sequence.encode('UTF-8')
-        deref(seq._this).name = name.encode('UTF-8')
+    def new(str name, str sequence, str annotations=None, str quality=None):
+        cdef Sequence seq = Sequence()
+        seq._obj.sequence = sequence.encode('UTF-8')
+        seq._obj.name = name.encode('UTF-8')
         if annotations is not None:
-            deref(seq._this).annotations = annotations.encode('UTF-8')
+            seq._obj.annotations = annotations.encode('UTF-8')
         if quality is not None:
-            deref(seq._this).quality = quality.encode('UTF-8')
+            seq._obj.quality = quality.encode('UTF-8')
 
         return seq
 
     @staticmethod
-    cdef Sequence _create(str name, str sequence, str annotations=None, str quality=None):
-        cdef Sequence seq = Sequence(create=True)
-        deref(seq._this).sequence = sequence.encode('UTF-8')
-        deref(seq._this).name = name.encode('UTF-8')
+    cdef Sequence _new(str name, str sequence, str annotations=None, str quality=None):
+        cdef Sequence seq = Sequence()
+        seq._obj.sequence = sequence.encode('UTF-8')
+        seq._obj.name = name.encode('UTF-8')
         if annotations is not None:
-            deref(seq._this).annotations = annotations.encode('UTF-8')
+            seq._obj.annotations = annotations.encode('UTF-8')
         if quality is not None:
-            deref(seq._this).quality = quality.encode('UTF-8')
+            seq._obj.quality = quality.encode('UTF-8')
 
         return seq
 
-    cdef void take(self, Sequence other):
-        move_cpsequence(deref(other._this), deref(self._this))
+    @staticmethod
+    cdef Sequence _wrap(CpSequence cseq):
+        cdef Sequence seq = Sequence()
+        seq._obj = cseq
+        return seq
 
-
-cdef class SequencePair:
-    
-    def __cinit__(self, Sequence first, Sequence second):
-        self.first = first
-        self.second = second
 
 
 cdef class ReadBundle:
@@ -141,25 +126,9 @@ cdef class FastxParser:
     def __cinit__(self, str filename):
         self._this.reset(new CpFastxParser(filename.encode()))
 
-    cdef bool _cp_imprint_next(self, CpSequence& seq):
-        if deref(self._this).is_complete():
-            return False
-        else:
-            deref(self._this).imprint_next_read(seq)
-            return True
-
-    cdef bool _imprint_next(self, Sequence seq):
-        if deref(self._this).is_complete():
-            return False
-        else:
-            deref(self._this).imprint_next_read(deref(seq._this))
-            return True
-
     cdef Sequence _next(self):
-        cdef Sequence seq = Sequence(create=True)
-        cdef bool res = self._imprint(seq)
-        if res:
-            return seq
+        if not deref(self._this).is_complete():
+            return Sequence._wrap(deref(self._this).get_next_read())
         else:
             return None
 
@@ -205,19 +174,16 @@ cdef class SplitPairedReader:
             found, first, second, err = self._next()
 
     cdef tuple _next(self):
-        cdef Sequence first = Sequence(create=True)
-        cdef Sequence second = Sequence(create=True)
-        cdef bool left_has_next, right_has_next
+        cdef Sequence first = self.left_parser._next()
+        cdef Sequence second = self.right_parser._next()
+        
 
-        left_has_next = self.left_parser._imprint_next(first)
-        right_has_next = self.right_parser._imprint_next(second)
-
-        if left_has_next != right_has_next:
+        if first is None and first is not second:
             err = UnpairedReadsError('Differing lengths of left '\
                                      'and right files!')
             return -1, None, None, err
 
-        if left_has_next == False:
+        if first is None:
             return 0, None, None, None
 
         if self.force_name_match:
@@ -228,6 +194,7 @@ cdef class SplitPairedReader:
                 return -1, None, None, err
         else:
             return 2, first, second, None
+
 
 cdef class BrokenPairedReader:
 
@@ -282,16 +249,14 @@ cdef class BrokenPairedReader:
 
         if self.record == None:
             # No previous sequence. Try to get one.
-            first = Sequence(create=True)
-            has_next = self.parser._imprint_next(first)
+            first = self.parser._next()
             # And none left? We're outta here.
-            if not has_next:
+            if first is None:
                 return 0, None, None, None
         else:
             first = self.record
         
-        second = Sequence(create=True)
-        has_next = self.parser._imprint_next(second)
+        second = self.parser_next()
         
         # check if paired
         if has_next:
@@ -372,8 +337,7 @@ cdef bool _check_is_pair(Sequence first, Sequence second):
 
 
 def check_is_pair(Sequence first, Sequence second):
-    cdef int res = _check_is_pair(first, second)
-    return res == 1
+    return _check_is_pair(first, second)
 
 
 cdef bool check_is_left(str name):
