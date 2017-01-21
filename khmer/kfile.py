@@ -34,7 +34,7 @@
 # Contact: khmer-project@idyll.org
 """File handling/checking utilities for command-line scripts."""
 
-from __future__ import print_function, unicode_literals
+from __future__ import print_function, unicode_literals, division
 
 import os
 import sys
@@ -151,7 +151,12 @@ def check_space(in_files, force, _testhook_free_space=None):
 
 def check_space_for_graph(outfile_name, hash_size, force,
                           _testhook_free_space=None):
-    """Check that we have enough size to write the specified graph."""
+    """
+    Check that we have enough size to write the specified graph.
+
+    The "hash_size" parameter should equal the total bytes required for the
+    entire data structure.
+    """
     dir_path = os.path.dirname(os.path.realpath(outfile_name))
     target = os.statvfs(dir_path)
 
@@ -162,18 +167,19 @@ def check_space_for_graph(outfile_name, hash_size, force,
 
     size_diff = hash_size - free_space
     if size_diff > 0:
-        print("ERROR: Not enough free space on disk "
-              "for saved graph files;"
-              "       Need at least %.1f GB more."
-              % (float(size_diff) / 1e9,), file=sys.stderr)
-        print("       Table size: %.1f GB"
-              % (float(hash_size) / 1e9,), file=sys.stderr)
-        print("       Free space: %.1f GB"
-              % (float(free_space) / 1e9,), file=sys.stderr)
-        if not force:
-            print("NOTE: This can be overridden using the --force argument",
-                  file=sys.stderr)
-            sys.exit(1)
+        mem_needed = '{:.1f} GB'.format(size_diff / 1e9)
+        mem_requested = '{:.1f} GB'.format(hash_size / 1e9)
+        mem_available = '{:.1f} GB'.format(free_space / 1e9)
+        message = 'Not enough free space on disk for saved graph files;'
+        message += '\n       Need at least {:s} more.'.format(mem_needed)
+        message += '\n       Table size: {:s}'.format(mem_requested)
+        message += '\n       Free space: {:s}'.format(mem_available)
+        if force:
+            print('WARNING:', message, file=sys.stderr)
+        else:
+            message = 'ERROR: ' + message + \
+                'NOTE: This can be overridden using the --force argument'
+            raise SystemExit(message)
 
 
 def check_valid_file_exists(in_files):
