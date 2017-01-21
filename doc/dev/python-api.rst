@@ -7,34 +7,37 @@ C++ class name:
 
 Python methods:
 
-* ksize
-* hash
-* reverse_hash (@CTB)
+* k = ksize() - return the k-mer size (a positive integer).
+
+* hashval = hash(dna_kmer) - return the result of hashing ``dna_kmer``, which will be a non-negative integer. ``len(dna_kmer)`` must be exactly the k-mer size.  Which hash function is used is dependent on the table type (@document).
+
+* dna_kmer reverse_hash(hashval) - return a DNA string that will hash to ``hashval``.  If there are multiple such strings, return only one.  May be unimplemented for particular table types in which case a ValueError will be returned.
+
 * hashsizes
 * n_unique_kmers
 * n_occupied
 * count
 * add (see count)
-* consume (should be consume string?)
-* consume_fasta
-* consume_fasta_with_reads_parser
 * get
-* load
 * save
 * get_kmers
 * get_kmer_hashes
 * get_kmer_hashes_as_hashset
 * get_kmer_counts
-* set_use_bigcount
-* get_use_bigcount
 * get_min_count
 * get_median_count
 * get_max_count
+* consume (should be consume string?)
+* consume_fasta
+* consume_fasta_with_reads_parser
+* load
+* set_use_bigcount
+* get_use_bigcount
+* abundance_distribution
+* abundance_distribution_with_reads_paresr
 * trim_on_abundance
 * trim_below_abundance
 * find_spectral_error_positions
-* abundance_distribution
-* abundance_distribution_with_reads_paresr
 
 Counting types
 --------------
