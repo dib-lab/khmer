@@ -178,7 +178,7 @@ def check_space_for_graph(outfile_name, hash_size, force,
             print('WARNING:', message, file=sys.stderr)
         else:
             message = 'ERROR: ' + message + \
-                'NOTE: This can be overridden using the --force argument'
+                '\nNOTE: This can be overridden using the --force argument'
             raise SystemExit(message)
 
 
