@@ -43,6 +43,7 @@ import sys
 import io
 import collections
 from . import khmer_tst_utils as utils
+import pytest
 
 import khmer.kfile
 from khmer import khmer_args
@@ -89,15 +90,18 @@ def test_check_tablespace():
         sys.stderr = save_stderr
 
 
-def test_check_tablespace_nodegraph():
-    outfile = utils.get_test_data('truncated.fq')
-    save_stderr, sys.stderr = sys.stderr, io.StringIO()
-
+@pytest.mark.parametrize('graph_type,num_tables,exp_buckets', [
+    ('countgraph', 4, '3.0 million buckets'),
+    ('smallcountgraph', 4, '6.0 million buckets'),
+    ('nodegraph', 4, '24.0 million buckets'),
+])
+def test_check_tablespace_nodegraph(graph_type, num_tables, exp_buckets):
     parser = khmer_args.build_counting_args()
-    args = parser.parse_args(['-M', '24e9'])
-    tablesize = khmer_args.calculate_graphsize(args, 'nodegraph')
-    sizestr = '{:.1f} GB'.format(float(tablesize) / 1e9)
-    assert sizestr == '24.0 GB'
+    args = parser.parse_args(['-M', '3G', '-N', str(num_tables)])
+    buckets_per_table = khmer_args.calculate_graphsize(args, graph_type)
+    total_buckets = buckets_per_table * num_tables
+    sizestr = '{:.1f} million buckets'.format(float(total_buckets) / 1e9)
+    assert sizestr == exp_buckets
 
 
 def test_check_space_force():
