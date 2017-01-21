@@ -309,7 +309,6 @@ consume_fasta_and_tag(
 
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( )) {
-
         try {
             read = parser->get_next_read( );
         } catch (NoMoreReadsAvailable &e) {
