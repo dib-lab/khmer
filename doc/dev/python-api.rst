@@ -11,14 +11,17 @@ Python methods:
 
 * hashval = hash(dna_kmer) - return the result of hashing ``dna_kmer``, which will be a non-negative integer. ``len(dna_kmer)`` must be exactly the k-mer size.  Which hash function is used is dependent on the table type (@document).
 
-* dna_kmer reverse_hash(hashval) - return a DNA string that will hash to ``hashval``.  If there are multiple such strings, return only one.  May be unimplemented for particular table types in which case a ValueError will be returned.
+* dna_kmer = reverse_hash(hashval) - return a DNA string that will hash to ``hashval``.  If there are multiple such strings, return only one.  May be unimplemented for particular table types in which case a ValueError will be returned.
 
-* hashsizes
-* n_unique_kmers
-* n_occupied
-* count
-* add (see count)
-* get
+* sizelist = hashsizes() - return the list of table sizes used in construction.
+
+* n_unique_kmers - foo.
+* n_occupied - foo.
+
+* add(dna_kmer_or_hashval) - increment the count associated with either a DNA k-mer or a hashval.  Depending on max count for the tabletype and bigcount settings, the count may top out at 1, 16, 255, or 65535. (@CTB add method for retrieving max_count)
+* count (synonym for count)
+* get(dna_kmer or hashval) - retrieve the count associated with a DNA k-mer or a hashval.
+
 * save
 * get_kmers
 * get_kmer_hashes

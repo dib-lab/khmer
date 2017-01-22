@@ -79,6 +79,53 @@ def test_reverse_hash(tabletype):
     assert type(x) == str
 
 
+def test_hashsizes(tabletype):
+    # hashsizes method.
+    kh = tabletype(5, PRIMES_1m)
+    assert kh.hashsizes() == PRIMES_1m
+
+
+def test_add_hashval(tabletype):
+    # test add(hashval)
+    kh = tabletype(5, PRIMES_1m)
+    x = kh.hash("ATGGC")
+    y = kh.add(x)
+    assert y
+
+    z = kh.get(x)
+    assert z == 1
+
+
+def test_add_dna_kmer(tabletype):
+    # test add(dna)
+    kh = tabletype(5, PRIMES_1m)
+    x = kh.add("ATGGC")
+    assert x
+
+    z = kh.get("ATGGC")
+    assert z == 1
+
+
+def test_get_hashval(tabletype):
+    # test get(hashval)
+    kh = tabletype(5, PRIMES_1m)
+    hashval = kh.hash("ATGGC")
+    kh.add(hashval)
+
+    z = kh.get(hashval)
+    assert z == 1
+
+
+def test_get_dna_kmer(tabletype):
+    # test get(dna)
+    kh = tabletype(5, PRIMES_1m)
+    hashval = kh.hash("ATGGC")
+    kh.add(hashval)
+
+    z = kh.get("ATGGC")
+    assert z == 1
+
+
 def test_get_kmer_counts(tabletype):
     hi = tabletype(6, PRIMES_1m)
 
