@@ -80,6 +80,7 @@ def main(args):
         check_input_files(fname, args.force)
 
     graphsize = calculate_graphsize(args, 'nodegraph')
+    space_needed = args.n_tables * graphsize / 8
     check_space_for_graph(args.output_filename, graphsize, args.force)
 
     print('Saving k-mer nodegraph to %s' % base, file=sys.stderr)
