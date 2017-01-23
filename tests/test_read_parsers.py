@@ -105,6 +105,20 @@ def test_read_properties():
         assert read.quality == """][aaX__aa[`ZUZ[NONNFNNNNNO_____^RQ_"""
 
 
+def test_read_properties_fa():
+
+    # Note: Using a data file with only one read.
+    rparser = ReadParser(utils.get_test_data("single-read.fa"))
+
+    # Check the properties of all one reads in data set.
+    for read in rparser:
+        print(read.name)
+        assert read.name == "895:1:1:1246:14654 1:N:0:NNNNN"
+        assert read.sequence == "CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT"
+        # if an attribute is empty it shouldn't exist
+        assert not hasattr(read, 'quality')
+
+
 def test_with_default_arguments():
 
     read_names = []
