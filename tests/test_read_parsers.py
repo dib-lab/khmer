@@ -60,7 +60,7 @@ def test_read_type_basic():
         assert x.name == name
         assert x.sequence == sequence
         assert not hasattr(x, 'quality'), x
-        assert not hasattr(x, 'annotations'), x
+        assert not hasattr(x, 'description'), x
 
 
 def test_read_quality_none():
@@ -69,11 +69,11 @@ def test_read_quality_none():
 
 
 def test_read_type_attributes():
-    r = Read(sequence='ACGT', quality='good', name='1234', annotations='ann')
+    r = Read(sequence='ACGT', quality='good', name='1234', description='desc')
     assert r.sequence == 'ACGT'
     assert r.quality == 'good'
     assert r.name == '1234'
-    assert r.annotations == 'ann'
+    assert r.description == 'desc'
     # test setting and deleting of cleaned_seq
 
     with pytest.raises(TypeError):
