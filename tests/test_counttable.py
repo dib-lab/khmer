@@ -45,9 +45,19 @@ from . import khmer_tst_utils as utils
 def test_get_kmer_hashes():
     s = "ATGGATATGGAGGACAAGTATATGGAGGACAAGTATATGGAGGACAAGTAT"
     a = khmer.Counttable(33, 1e6, 3)
-    assert a.get_kmer_hashes(s[:33]) == [48584371158645721]
-    assert a.get_kmer_hashes(s[:34]) == [48584371158645721,
-                                         12916831244904756973]
+    assert a.get_kmer_hashes(s[:33]) == [4743239192574154715]
+    assert a.get_kmer_hashes(s[:34]) == [4743239192574154715,
+                                         2122462908541313313]
 
-    assert a.get_kmer_hashes(s[0:33]) == [48584371158645721]
-    assert a.get_kmer_hashes(s[1:34]) == [12916831244904756973]
+    assert a.get_kmer_hashes(s[0:33]) == [4743239192574154715]
+    assert a.get_kmer_hashes(s[1:34]) == [2122462908541313313]
+
+
+@pytest.mark.parametrize('kmer', [
+    ('GATTACA' * 3),
+    ('ATG' * 7),
+    ('AGGACAAGTATATGGAGGACA'),
+])
+def test_kmer_revcom_hash(kmer):
+    a = khmer.Counttable(21, 1e4, 3)
+    assert a.hash(kmer) == a.hash(khmer.reverse_complement(kmer))

@@ -51,6 +51,7 @@ Contact: khmer-project@idyll.org
 #include "khmer_exception.hh"
 #include "traversal.hh"
 #include "read_parsers.hh"
+#include "kmer_hash.hh"
 
 using namespace std;
 using namespace khmer;
@@ -610,13 +611,11 @@ public:
         if (done()) {
             throw khmer_exception("past end of iterator");
         }
-        uint64_t out[2];
-        uint32_t seed = 0;
-        MurmurHash3_x64_128((void *)(_seq + index), _ksize, seed, &out);
 
+        std::string kmer;
+        kmer.assign(_seq + index, _ksize);
         index += 1;
-
-        return out[0];
+        return _hash_murmur(kmer);
     }
 
     bool done() const {
