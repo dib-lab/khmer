@@ -85,7 +85,7 @@ struct InvalidReadPair : public  khmer_value_exception {
 
 struct Read {
     std::string name;
-    std::string annotations;
+    std::string description;
     std::string sequence;
     std::string quality;
     std::string cleaned_seq;
@@ -95,7 +95,7 @@ struct Read {
     inline void reset( )
     {
         name.clear();
-        annotations.clear();
+        description.clear();
         sequence.clear();
         quality.clear();
         cleaned_seq.clear();
