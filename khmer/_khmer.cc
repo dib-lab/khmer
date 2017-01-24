@@ -445,40 +445,6 @@ Read_get_cleaned_seq(khmer_Read_Object * obj, void * closure)
 }
 
 
-static int
-Read_set_cleaned_seq(khmer_Read_Object *obj, PyObject *value, void *closure)
-{
-    if (value == NULL) {
-        obj->read->cleaned_seq = "";
-        return 0;
-    }
-
-    if (! (PyUnicode_Check(value) | PyBytes_Check(value))) {
-        PyErr_SetString(PyExc_TypeError,
-                        "The 'cleaned_seq' attribute value must be a string");
-        return -1;
-    }
-
-    if (PyUnicode_Check(value)) {
-        PyObject* temp = PyUnicode_AsASCIIString(value);
-        if (temp == NULL) {
-            PyErr_SetString(PyExc_TypeError,
-                            "Could not encode 'cleaned_seq' as ASCII.");
-            return -1;
-        }
-
-        obj->read->cleaned_seq = std::string(PyBytes_AS_STRING(temp));
-        Py_DECREF(temp);
-    }
-    // in python2 not everything is a unicode object
-    else {
-        obj->read->cleaned_seq = std::string(PyBytes_AS_STRING(value));
-    }
-
-    return 0;
-}
-
-
 // TODO? Implement setters.
 
 
@@ -505,7 +471,7 @@ static PyGetSetDef khmer_Read_accessors [ ] = {
     },
     {
         (char *)"cleaned_seq",
-        (getter)Read_get_cleaned_seq, (setter)Read_set_cleaned_seq,
+        (getter)Read_get_cleaned_seq, (setter)NULL,
         (char *)"Cleaned sequence.", NULL
     },
 
