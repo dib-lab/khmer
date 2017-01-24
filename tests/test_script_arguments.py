@@ -43,6 +43,7 @@ import sys
 import io
 import collections
 from . import khmer_tst_utils as utils
+import pytest
 
 import khmer.kfile
 from khmer import khmer_args
@@ -71,22 +72,54 @@ def test_check_space():
         sys.stderr = save_stderr
 
 
-def test_check_tablespace():
+@pytest.mark.parametrize('graph_type,buckets_per_byte', [
+    ('countgraph', 1),
+    ('smallcountgraph', 2),
+    ('nodegraph', 8),
+])
+def test_check_tablespace(graph_type, buckets_per_byte):
+    oldstderr = sys.stderr
+    sys.stderr = StringIO()
+
     outfile = utils.get_test_data('truncated.fq')
-    save_stderr, sys.stderr = sys.stderr, io.StringIO()
-
     parser = khmer_args.build_counting_args()
-    args = parser.parse_args(['-M', '1e9'])
+    args = parser.parse_args(['-M', '16G'])
 
-    try:
-        tablesize = khmer_args.calculate_graphsize(args, 'countgraph')
-        khmer.kfile.check_space_for_graph(outfile, tablesize,
-                                          False, _testhook_free_space=0)
-        assert 0, "this should fail"
-    except SystemExit as e:
-        print(str(e))
-    finally:
-        sys.stderr = save_stderr
+    buckets_per_table = khmer_args.calculate_graphsize(args, graph_type)
+    total_buckets = buckets_per_table * args.n_tables
+    space_needed = total_buckets / buckets_per_byte
+
+    # First, try with insufficient space
+    with pytest.raises(SystemExit) as se:
+        khmer.kfile.check_space_for_graph(outfile, space_needed, force=False,
+                                          _testhook_free_space=10e9)
+    assert 'ERROR: Not enough free space' in str(se)
+
+    # Now, try with insufficient space, but in force mode
+    khmer.kfile.check_space_for_graph(outfile, space_needed, force=True,
+                                      _testhook_free_space=10e9)
+    assert 'WARNING: Not enough free space' in sys.stderr.getvalue()
+
+    # Finally, try with sufficient space
+    sys.stderr = StringIO()
+    khmer.kfile.check_space_for_graph(outfile, space_needed, force=False,
+                                      _testhook_free_space=20e9)
+    assert sys.stderr.getvalue() == ''
+    sys.stderr = oldstderr
+
+
+@pytest.mark.parametrize('graph_type,exp_buckets', [
+    ('countgraph', '3.0 million buckets'),
+    ('smallcountgraph', '6.0 million buckets'),
+    ('nodegraph', '24.0 million buckets'),
+])
+def test_check_tablespace_nodegraph(graph_type, exp_buckets):
+    parser = khmer_args.build_counting_args()
+    args = parser.parse_args(['-M', '3G'])
+    buckets_per_table = khmer_args.calculate_graphsize(args, graph_type)
+    total_buckets = buckets_per_table * args.n_tables
+    sizestr = '{:.1f} million buckets'.format(float(total_buckets) / 1e9)
+    assert sizestr == exp_buckets
 
 
 def test_check_space_force():

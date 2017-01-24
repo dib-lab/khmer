@@ -86,6 +86,13 @@ __version__ = get_versions()['version']
 del get_versions
 
 
+buckets_per_byte = {
+    'countgraph': 1,
+    'smallcountgraph': 2,
+    'nodegraph': 8,
+}
+
+
 def load_nodegraph(filename):
     """Load a nodegraph object from the given filename and return it.
 
