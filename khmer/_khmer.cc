@@ -2180,7 +2180,9 @@ static PyMethodDef khmer_hashtable_methods[] = {
     {
         "hash",
         (PyCFunction)hashtable_hash, METH_VARARGS,
-        "Returns the hash of this k-mer."
+        "Returns the hash of this k-mer. For Nodetables and Counttables, this "
+        "function will fail if the supplied k-mer contains non-ACGT "
+        "characters."
     },
     {
         "reverse_hash",
@@ -2229,7 +2231,9 @@ static PyMethodDef khmer_hashtable_methods[] = {
     {
         "get",
         (PyCFunction)hashtable_get, METH_VARARGS,
-        "Retrieve the count for the given k-mer."
+        "Retrieve the count for the given k-mer. For Nodetables and "
+        "Counttables, this function will fail if the supplied k-mer contains "
+        "non-ACGT characters."
     },
     {
         "load",
