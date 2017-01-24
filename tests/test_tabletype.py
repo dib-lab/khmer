@@ -116,6 +116,15 @@ def test_get_hashval(tabletype):
     assert z == 1
 
 
+def test_get_hashval_rc(tabletype):
+    # test get(hashval)
+    kh = tabletype(4, PRIMES_1m)
+    hashval = kh.hash("ATGC")
+    rc = kh.hash("GCAT")
+
+    assert hashval == rc
+
+
 def test_get_dna_kmer(tabletype):
     # test get(dna)
     kh = tabletype(5, PRIMES_1m)
@@ -152,18 +161,12 @@ def test_get_kmer_counts(tabletype):
 def test_get_kmer_hashes(tabletype):
     hi = tabletype(6, PRIMES_1m)
 
-    hi.consume("AAAAAA")
-    hashes = hi.get_kmer_hashes("AAAAAA")
+    hashes = hi.get_kmer_hashes("ACGTGCGT")
     print(hashes)
-    assert len(hashes) == 1
-    assert hi.get(hashes[0]) == 1
-
-    hi.consume("AAAAAT")
-    hashes = hi.get_kmer_hashes("AAAAAAT")
-    print(hashes)
-    assert len(hashes) == 2
-    assert hi.get(hashes[0]) >= 1
-    assert hi.get(hashes[1]) == 1
+    assert len(hashes) == 3
+    assert hashes[0] == hi.hash("ACGTGC")
+    assert hashes[1] == hi.hash("CGTGCG")
+    assert hashes[2] == hi.hash("GTGCGT")
 
 
 def test_get_kmers(tabletype):
