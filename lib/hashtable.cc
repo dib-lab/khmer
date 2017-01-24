@@ -395,10 +395,6 @@ unsigned long Hashtable::trim_on_abundance(
     BoundedCounterType  min_abund)
 const
 {
-    if (!check_and_normalize_read(seq)) {
-        return 0;
-    }
-
     KmerIterator kmers(seq.c_str(), _ksize);
 
     HashIntoType kmer;
@@ -430,10 +426,6 @@ unsigned long Hashtable::trim_below_abundance(
     BoundedCounterType  max_abund)
 const
 {
-    if (!check_and_normalize_read(seq)) {
-        return 0;
-    }
-
     KmerIterator kmers(seq.c_str(), _ksize);
 
     HashIntoType kmer;
@@ -466,10 +458,6 @@ std::vector<unsigned int> Hashtable::find_spectral_error_positions(
 const
 {
     std::vector<unsigned int> posns;
-    if (!check_and_normalize_read(seq)) {
-        throw khmer_exception("invalid read");
-    }
-
     KmerIterator kmers(seq.c_str(), _ksize);
 
     HashIntoType kmer = kmers.next();
