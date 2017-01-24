@@ -495,14 +495,11 @@ def calculate_graphsize(args, graphtype, multiplier=1.0):
     if graphtype not in khmer.buckets_per_byte:
         raise ValueError('unknown graph type: ' + graphtype)
 
-    #tablesize, maxmem = 0, 0
     if args.max_memory_usage:
         tablesize = khmer.buckets_per_byte[graphtype] * args.max_memory_usage \
             / args.n_tables / float(multiplier)
     else:
         tablesize = args.max_tablesize
-        #maxmem = tablesize * args.n_tables * float(multiplier) \
-        #    / khmer.buckets_per_byte[graphtype]
 
     return tablesize
 
