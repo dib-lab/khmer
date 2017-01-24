@@ -60,7 +60,7 @@ def test_read_type_basic():
         assert x.name == name
         assert x.sequence == sequence
         assert not hasattr(x, 'quality'), x
-        assert not hasattr(x, 'annotations'), x
+        assert not hasattr(x, 'description'), x
 
 
 def test_read_quality_none():
@@ -69,11 +69,11 @@ def test_read_quality_none():
 
 
 def test_read_type_attributes():
-    r = Read(sequence='ACGT', quality='good', name='1234', annotations='ann')
+    r = Read(sequence='ACGT', quality='good', name='1234', description='desc')
     assert r.sequence == 'ACGT'
     assert r.quality == 'good'
     assert r.name == '1234'
-    assert r.annotations == 'ann'
+    assert r.description == 'desc'
     # test setting and deleting of cleaned_seq
 
     with pytest.raises(TypeError):
@@ -103,6 +103,20 @@ def test_read_properties():
         # if an attribute is empty it shouldn't exist
         assert not hasattr(read, 'annotations')
         assert read.quality == """][aaX__aa[`ZUZ[NONNFNNNNNO_____^RQ_"""
+
+
+def test_read_properties_fa():
+
+    # Note: Using a data file with only one read.
+    rparser = ReadParser(utils.get_test_data("single-read.fa"))
+
+    # Check the properties of all one reads in data set.
+    for read in rparser:
+        print(read.name)
+        assert read.name == "895:1:1:1246:14654 1:N:0:NNNNN"
+        assert read.sequence == "CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT"
+        # if an attribute is empty it shouldn't exist
+        assert not hasattr(read, 'quality')
 
 
 def test_with_default_arguments():
