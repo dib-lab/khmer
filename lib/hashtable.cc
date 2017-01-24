@@ -55,22 +55,6 @@ using namespace khmer;
 using namespace khmer:: read_parsers;
 
 //
-// check_and_process_read: checks for non-ACGT characters before consuming
-//
-
-unsigned int Hashtable::check_and_process_read(std::string &read,
-        bool &is_valid)
-{
-    is_valid = check_and_normalize_read(read);
-
-    if (!is_valid) {
-        return 0;
-    }
-
-    return consume_string(read);
-}
-
-//
 // check_and_normalize_read: checks for non-ACGT characters
 //			     converts lowercase characters to uppercase one
 // Note: Usually it is desirable to keep checks and mutations separate.
@@ -140,8 +124,7 @@ consume_fasta(
             break;
         }
 
-        unsigned int this_n_consumed =
-            check_and_process_read(read.sequence, is_valid);
+        unsigned int this_n_consumed = consume_string(read.sequence);
 
         __sync_add_and_fetch( &n_consumed, this_n_consumed );
         __sync_add_and_fetch( &total_reads, 1 );
