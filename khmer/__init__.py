@@ -86,7 +86,7 @@ __version__ = get_versions()['version']
 del get_versions
 
 
-buckets_per_byte = {
+_buckets_per_byte = {
     'countgraph': 1,
     'smallcountgraph': 2,
     'nodegraph': 8,

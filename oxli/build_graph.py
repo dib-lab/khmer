@@ -72,15 +72,17 @@ def build_parser(parser):
 
 
 def main(args):
-    report_on_config(args, graphtype='nodegraph')
+    graph_type = 'nodegraph'
+    report_on_config(args, graphtype=graph_type)
     base = args.output_filename
     filenames = args.input_filenames
 
     for fname in args.input_filenames:
         check_input_files(fname, args.force)
 
-    graphsize = calculate_graphsize(args, 'nodegraph')
-    space_needed = args.n_tables * graphsize / 8
+    graphsize = calculate_graphsize(args, graph_type)
+    space_needed = (args.n_tables * graphsize /
+                    khmer._buckets_per_byte[graph_type])
     check_space_for_graph(args.output_filename, space_needed, args.force)
 
     print('Saving k-mer nodegraph to %s' % base, file=sys.stderr)
