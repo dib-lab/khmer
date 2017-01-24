@@ -527,6 +527,11 @@ public:
     MurmurKmerHashIterator(const char * seq, unsigned char k) :
         _seq(seq), _ksize(k), index(0) {
         length = strlen(_seq);
+        /* NOTE: the following block will discard all k-mers from the given
+         * sequence if it contains any non-ACGT characters. Hopefully this
+         * will be handled with more finesse in the near future, but for now
+         * it's the best we've got.
+         */
         for (int i = 0; i < strlen(seq); i++) {
             if (!is_valid_dna(seq[i])) {
                 index = length;
