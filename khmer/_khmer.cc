@@ -343,6 +343,7 @@ khmer_Read_init(khmer_Read_Object *self, PyObject *args, PyObject *kwds)
     }
     if (sequence != NULL) {
         self->read->sequence = sequence;
+        self->read->set_clean_seq();
     }
     if (quality != NULL) {
         self->read->quality = quality;

@@ -49,6 +49,23 @@ namespace khmer
 namespace read_parsers
 {
 
+unsigned char _to_valid_dna(const unsigned char c) {
+    switch(c) {
+        case 'A':
+        case 'C':
+        case 'G':
+        case 'T':
+            return c;
+        case 'a':
+        case 'c':
+        case 'g':
+        case 't':
+            return toupper(c);
+        default:
+            return 'A';
+    }
+}
+
 void
 Read::write_to(std::ostream& output)
 {
@@ -101,6 +118,7 @@ Read FastxParser::get_next_read()
     if (!atEnd) {
         ret = seqan::readRecord(the_read.name, the_read.sequence,
                                 the_read.quality, _private->stream);
+        the_read.set_clean_seq();
         if (ret == 0) {
             // Detect if we're parsing something w/ qualities on the first read
             // only

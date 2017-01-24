@@ -41,6 +41,7 @@ Contact: khmer-project@idyll.org
 #include <regex.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <algorithm>
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -83,6 +84,8 @@ struct InvalidReadPair : public  khmer_value_exception {
         khmer_value_exception("Invalid read pair detected.") {}
 };
 
+unsigned char _to_valid_dna(const unsigned char c);
+
 struct Read {
     std::string name;
     std::string description;
@@ -99,6 +102,13 @@ struct Read {
         sequence.clear();
         quality.clear();
         cleaned_seq.clear();
+    }
+
+    // Compute cleaned_seq from sequence. Call this after changing sequence.
+    void set_clean_seq() {
+        cleaned_seq = std::string(sequence.size(), 0);
+        std::transform(sequence.begin(), sequence.end(), cleaned_seq.begin(),
+                       _to_valid_dna);
     }
 
     void write_to(std::ostream&);
