@@ -525,9 +525,14 @@ class MurmurKmerHashIterator : public KmerHashIterator
     unsigned int length;
 public:
     MurmurKmerHashIterator(const char * seq, unsigned char k) :
-        _seq(seq), _ksize(k) {
-        index = 0;
+        _seq(seq), _ksize(k), index(0) {
         length = strlen(_seq);
+        for (int i = 0; i < strlen(seq); i++) {
+            if (!is_valid_dna(seq[i])) {
+                index = length;
+                break;
+            }
+        }
     };
 
     HashIntoType first() { return next(); }
