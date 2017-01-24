@@ -325,16 +325,16 @@ int
 khmer_Read_init(khmer_Read_Object *self, PyObject *args, PyObject *kwds)
 {
     const char * name{};
-    const char * annotations{};
+    const char * description{};
     const char * sequence{};
     const char * quality{};
     char *kwlist[5] = {
         const_cast<char *>("name"), const_cast<char *>("sequence"),
-        const_cast<char *>("quality"), const_cast<char *>("annotations"), NULL
+        const_cast<char *>("quality"), const_cast<char *>("description"), NULL
     };
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "ss|zz", kwlist,
-                                     &name, &sequence, &quality, &annotations)) {
+                                     &name, &sequence, &quality, &description)) {
         return -1;
     }
 
@@ -347,8 +347,8 @@ khmer_Read_init(khmer_Read_Object *self, PyObject *args, PyObject *kwds)
     if (quality != NULL) {
         self->read->quality = quality;
     }
-    if (annotations != NULL) {
-        self->read->annotations = annotations;
+    if (description != NULL) {
+        self->read->description = description;
     }
     return 0;
 }
@@ -418,13 +418,13 @@ Read_get_quality(khmer_Read_Object * obj, void * closure)
 
 static
 PyObject *
-Read_get_annotations(khmer_Read_Object * obj, void * closure)
+Read_get_description(khmer_Read_Object * obj, void * closure)
 {
-    if (obj->read->annotations.size() > 0) {
-        return PyUnicode_FromString(obj->read->annotations.c_str());
+    if (obj->read->description.size() > 0) {
+        return PyUnicode_FromString(obj->read->description.c_str());
     } else {
         PyErr_SetString(PyExc_AttributeError,
-                        "'Read' object has no attribute 'annotations'.");
+                        "'Read' object has no attribute 'description'.");
         return NULL;
     }
 }
@@ -498,9 +498,9 @@ static PyGetSetDef khmer_Read_accessors [ ] = {
         (char *)"Quality scores.", NULL
     },
     {
-        (char *)"annotations",
-        (getter)Read_get_annotations, (setter)NULL,
-        (char *)"Annotations.", NULL
+        (char *)"description",
+        (getter)Read_get_description, (setter)NULL,
+        (char *)"Description.", NULL
     },
     {
         (char *)"cleaned_seq",
