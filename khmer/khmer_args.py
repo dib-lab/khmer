@@ -486,22 +486,23 @@ def add_loadgraph_args(parser):
 
 
 def calculate_graphsize(args, graphtype, multiplier=1.0):
-    """Transform the table parameters into a size."""
-    if graphtype not in ('countgraph', 'smallcountgraph', 'nodegraph'):
-        raise ValueError("unknown graph type: %s" % (graphtype,))
+    """
+    Transform the table parameters into a size.
 
+    The return value refers to the target size (in buckets, not bytes) of each
+    individual table in the graph.
+    """
+    if graphtype not in khmer.buckets_per_byte:
+        raise ValueError('unknown graph type: ' + graphtype)
+
+    #tablesize, maxmem = 0, 0
     if args.max_memory_usage:
-        if graphtype == 'countgraph':
-            tablesize = args.max_memory_usage / args.n_tables / \
-                float(multiplier)
-        elif graphtype == 'smallcountgraph':
-            tablesize = 2 * args.max_memory_usage / args.n_tables / \
-                float(multiplier)
-        elif graphtype == 'nodegraph':
-            tablesize = 8. * args.max_memory_usage / args.n_tables / \
-                float(multiplier)
+        tablesize = khmer.buckets_per_byte[graphtype] * args.max_memory_usage \
+            / args.n_tables / float(multiplier)
     else:
         tablesize = args.max_tablesize
+        #maxmem = tablesize * args.n_tables * float(multiplier) \
+        #    / khmer.buckets_per_byte[graphtype]
 
     return tablesize
 
@@ -570,36 +571,23 @@ def report_on_config(args, graphtype='countgraph'):
     made available by this module.
     """
     check_conflicting_args(args, graphtype)
-    if graphtype not in ('countgraph', 'smallcountgraph', 'nodegraph'):
-        raise ValueError("unknown graph type: %s" % (graphtype,))
+    if graphtype not in khmer.buckets_per_byte:
+        raise ValueError('unknown graph type: ' + graphtype)
 
     tablesize = calculate_graphsize(args, graphtype)
-
+    maxmem = args.n_tables * tablesize / khmer.buckets_per_byte[graphtype]
     log_info("\nPARAMETERS:")
-    log_info(" - kmer size =    {ksize} \t\t(-k)", ksize=args.ksize)
-    log_info(" - n tables =     {ntables} \t\t(-N)", ntables=args.n_tables)
+    log_info(" - kmer size =     {ksize} \t\t(-k)", ksize=args.ksize)
+    log_info(" - n tables =      {ntables} \t\t(-N)", ntables=args.n_tables)
     log_info(" - max tablesize = {tsize:5.2g} \t(-x)", tsize=tablesize)
-    log_info("")
-    if graphtype == 'countgraph':
-        log_info(
-            "Estimated memory usage is {0:.2g} bytes "
-            "(n_tables x max_tablesize)".format(
-                args.n_tables * tablesize))
-    elif graphtype == 'smallcountgraph':
-        log_info(
-            "Estimated memory usage is {0:.2g} bytes "
-            "(n_tables x max_tablesize / 2)".format(
-                args.n_tables * tablesize / 2))
-    elif graphtype == 'nodegraph':
-        log_info(
-            "Estimated memory usage is {0:.2g} bytes "
-            "(n_tables x max_tablesize / 8)".format(args.n_tables *
-                                                    tablesize / 8)
-        )
-
+    log_info("Estimated memory usage is {mem:.1f} Gb "
+             "({bytes:.2g} bytes = {ntables} bytes x {tsize:5.2g} entries "
+             "/ {div:d} entries per byte)", bytes=maxmem, mem=maxmem / 1e9,
+             div=khmer.buckets_per_byte[graphtype], ntables=args.n_tables,
+             tsize=tablesize)
     log_info("-" * 8)
 
-    if DEFAULT_MAX_TABLESIZE == tablesize and \
+    if tablesize == DEFAULT_MAX_TABLESIZE and \
        not getattr(args, 'loadgraph', None):
         log_warn('''\
 

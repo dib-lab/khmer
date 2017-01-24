@@ -81,7 +81,7 @@ def main(args):
 
     graphsize = calculate_graphsize(args, 'nodegraph')
     space_needed = args.n_tables * graphsize / 8
-    check_space_for_graph(args.output_filename, graphsize, args.force)
+    check_space_for_graph(args.output_filename, space_needed, args.force)
 
     print('Saving k-mer nodegraph to %s' % base, file=sys.stderr)
     print('Loading kmers from sequences in %s' %
