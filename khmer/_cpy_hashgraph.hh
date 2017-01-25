@@ -399,11 +399,11 @@ hashgraph_do_subset_partition(khmer_KHashgraph_Object * me, PyObject * args)
         return NULL;
     }
     if (!ht_convert_PyObject_to_HashIntoType(start_kmer_obj, start_kmer,
-                                             hashgraph)) {
+            hashgraph)) {
         return NULL;
     }
     if (!ht_convert_PyObject_to_HashIntoType(end_kmer_obj, end_kmer,
-                                             hashgraph)) {
+            hashgraph)) {
         return NULL;
     }
 
