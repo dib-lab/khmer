@@ -42,9 +42,9 @@ Guidelines for continued development
 The khmer :doc:`Getting Started <getting-started>` documentation is intended for
 first-time contributors, and is designed to make that first contribution as easy
 and as painless as possible. For those with an interest in making continued
-contributions (or a responsibility for maintaining the codebase), this document
-describes the coding guidelines we follow, as well as some tips that will
-improve the development process for everyone involved.
+contributions (or those with an obligation to maintain and contribute to the
+codebase), this document describes the coding guidelines we follow, as well as
+some tips that will improve the development process for everyone involved.
 
 Beyond your first contribution
 ------------------------------
