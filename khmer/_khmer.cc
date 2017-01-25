@@ -437,6 +437,9 @@ Read_get_cleaned_seq(khmer_Read_Object * obj, void * closure)
 {
     if (obj->read->cleaned_seq.size() > 0) {
         return PyUnicode_FromString(obj->read->cleaned_seq.c_str());
+    } else if (obj->read->sequence.size() > 0) {
+        obj->read->set_clean_seq();
+        return PyUnicode_FromString(obj->read->cleaned_seq.c_str());
     } else {
         PyErr_SetString(PyExc_AttributeError,
                         "'Read' object has no attribute 'cleaned_seq'.");
