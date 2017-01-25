@@ -67,7 +67,7 @@ def test_kmer_revcom_hash(kmer):
     (khmer.Nodetable),
     (khmer.Counttable),
 ])
-def test_table(tabletype):
+def test_table_basics(tabletype):
     """
     Test basic assumptions for khmer.Counttable and khmer.Nodetable
 

@@ -332,7 +332,7 @@ public:
     virtual
     HashIntoType
     hash_dna(const char * kmer) const {
-        // NOTE This function will fail if supplied k-mer contains non-ACGT symbols.
+        // NOTE: This function will fail if supplied k-mer contains non-ACGT symbols.
         if (!(strlen(kmer) >= _ksize)) {
             throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
         }
