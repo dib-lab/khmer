@@ -83,16 +83,15 @@ struct InvalidReadPair : public  khmer_value_exception {
         khmer_value_exception("Invalid read pair detected.") {}
 };
 
-struct Read {
+struct Read
+{
     std::string name;
     std::string description;
     std::string sequence;
     std::string quality;
     std::string cleaned_seq;
 
-    //Read() : name(), annotations(), sequence(), quality(), cleaned_seq() {}
-
-    inline void reset( )
+    inline void reset()
     {
         name.clear();
         description.clear();
@@ -101,61 +100,85 @@ struct Read {
         cleaned_seq.clear();
     }
 
+    inline void write_fastx(std::ostream& output)
+    {
+        if (quality.length() != 0) {
+            output << "@" << name << '\n'
+                   << sequence << '\n'
+                   << "+" << '\n'
+                   << quality << '\n';
+        } else {
+            output << ">" << name << '\n'
+                   << sequence << '\n';
+        }
+    }
+
     void write_to(std::ostream&);
 };
 typedef std::pair<Read, Read> ReadPair;
 
-class IParser
+
+template<typename ParseFunctor>
+class ReadParser
 {
+protected:
+    ParseFunctor _parser;
+    regex_t _re_read_2_nosub;
+    regex_t _re_read_1;
+    regex_t _re_read_2;
+    void _init();
+
+    ReadPair _get_next_read_pair_in_ignore_mode();
+    ReadPair _get_next_read_pair_in_error_mode();
+    bool _is_valid_read_pair(
+        ReadPair &the_read_pair,
+        regmatch_t &match_1,
+        regmatch_t &match_2
+    );
+
 public:
     enum {
         PAIR_MODE_IGNORE_UNPAIRED,
         PAIR_MODE_ERROR_ON_UNPAIRED
     };
 
+    explicit ReadParser(ParseFunctor pf);
+    explicit ReadParser(ReadParser& other);
+    virtual ~ReadParser();
+
+    Read get_next_read();
+    ReadPair get_next_read_pair(uint8_t mode = PAIR_MODE_ERROR_ON_UNPAIRED);
+
     static IParser * const get_parser(
         std::string const &ifile_name
     );
 
-    IParser();
-    virtual ~IParser();
+    size_t get_num_reads();
+    bool is_complete();
+}; // class ReadParser
 
-    virtual bool is_complete( ) = 0;
-    virtual Read get_next_read() = 0;
-    virtual ReadPair get_next_read_pair(uint8_t mode = PAIR_MODE_ERROR_ON_UNPAIRED);
-    size_t get_num_reads()
-    {
-        return _num_reads;
-    }
 
-protected:
+class FastxReader
+{
+private:
+    std::string _filename;
+    seqan::SequenceStream _stream;
+    uint32_t _spin_lock;
     size_t _num_reads;
     bool _have_qualities;
-    regex_t _re_read_2_nosub;
-    regex_t _re_read_1;
-    regex_t _re_read_2;
+    void _init();
 
-    ReadPair _get_next_read_pair_in_ignore_mode();
-    ReadPair _get_next_read_pair_in_error_mode();
-    bool _is_valid_read_pair(
-        ReadPair &the_read_pair, regmatch_t &match_1, regmatch_t &match_2
-    );
-
-}; // class IParser
-
-class FastxParser : public IParser
-{
 public:
-    explicit FastxParser(const char * filename);
-    ~FastxParser();
+    FastxReader();
+    FastxReader(std::string& infile);
+    FastxReader(FastxReader& other);
+    ~FastxReader();
 
+    void operator()(Read &read);
     bool is_complete();
-    Read get_next_read();
+    size_t get_num_reads();
+}; // class FastxReader
 
-private:
-    struct Handle;
-    Handle* _private;
-};
 
 inline PartitionID _parse_partition_id(std::string name)
 {
