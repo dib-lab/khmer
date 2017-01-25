@@ -1013,7 +1013,7 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_ReadParser_Object")
 
 void _init_ReadParser_Type_constants()
 {
-    PyObject * cls_attrs_DICT = PyDict_New( );
+    PyObject * cls_attrs_DICT = PyDict_New();
     if (cls_attrs_DICT == NULL) {
         return;
     }
@@ -1021,20 +1021,20 @@ void _init_ReadParser_Type_constants()
     // Place pair mode constants into class dictionary.
     int result;
 
-    PyObject * value = PyLong_FromLong( IParser:: PAIR_MODE_IGNORE_UNPAIRED );
+    PyObject * value = PyLong_FromLong(IParser::PAIR_MODE_IGNORE_UNPAIRED);
     if (value == NULL) {
         Py_DECREF(cls_attrs_DICT);
         return;
     }
     result = PyDict_SetItemString(cls_attrs_DICT,
-                                  "PAIR_MODE_IGNORE_UNPAIRED", value );
+                                  "PAIR_MODE_IGNORE_UNPAIRED", value);
     Py_XDECREF(value);
-    if (!result) {
+    if (result == -1) {
         Py_DECREF(cls_attrs_DICT);
         return;
     }
 
-    value = PyLong_FromLong( IParser:: PAIR_MODE_ERROR_ON_UNPAIRED );
+    value = PyLong_FromLong(IParser::PAIR_MODE_ERROR_ON_UNPAIRED);
     if (value == NULL) {
         Py_DECREF(cls_attrs_DICT);
         return;
@@ -1042,12 +1042,25 @@ void _init_ReadParser_Type_constants()
     result = PyDict_SetItemString(cls_attrs_DICT,
                                   "PAIR_MODE_ERROR_ON_UNPAIRED", value);
     Py_XDECREF(value);
-    if (!result) {
+    if (result == -1) {
         Py_DECREF(cls_attrs_DICT);
         return;
     }
 
-    khmer_ReadParser_Type.tp_dict     = cls_attrs_DICT;
+    value = PyLong_FromLong(IParser::PAIR_MODE_ALLOW_UNPAIRED);
+    if (value == NULL) {
+        Py_DECREF(cls_attrs_DICT);
+        return;
+    }
+    result = PyDict_SetItemString(cls_attrs_DICT,
+                                  "PAIR_MODE_ALLOW_UNPAIRED", value);
+    Py_XDECREF(value);
+    if (result == -1) {
+        Py_DECREF(cls_attrs_DICT);
+        return;
+    }
+
+    khmer_ReadParser_Type.tp_dict = cls_attrs_DICT;
 }
 
 } // namespace python

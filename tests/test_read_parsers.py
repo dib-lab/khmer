@@ -91,6 +91,12 @@ def test_read_type_attributes():
         r.cleaned_seq = u"some weird unicode \u2588"
 
 
+def test_readparser_constants():
+    assert hasattr(ReadParser, 'PAIR_MODE_ALLOW_UNPAIRED')
+    assert hasattr(ReadParser, 'PAIR_MODE_ERROR_ON_UNPAIRED')
+    assert hasattr(ReadParser, 'PAIR_MODE_IGNORE_UNPAIRED')
+
+
 def test_read_properties():
 
     # Note: Using a data file with only one read.
