@@ -62,7 +62,8 @@ import argparse
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
                          get_file_writer, is_block, describe_file_handle)
-from khmer.utils import (write_record, broken_paired_reader, ReadBundle)
+from khmer.utils import (write_record, broken_paired_reader, ReadBundle,
+                         clean_input_reads)
 from khmer.khmer_logger import (configure_logging, log_info, log_error)
 
 
@@ -380,7 +381,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         with catch_io_errors(filename, outfp, args.single_output_file,
                              args.force, corrupt_files):
 
-            screed_iter = screed.open(filename)
+            screed_iter = clean_input_reads(screed.open(filename))
             reader = broken_paired_reader(screed_iter, min_length=args.ksize,
                                           force_single=force_single,
                                           require_paired=require_paired)

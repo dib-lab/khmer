@@ -183,7 +183,7 @@ def broken_paired_reader(screed_iter, min_length=None,
         raise ValueError("force_single and require_paired cannot both be set!")
 
     # handle the majority of the stream.
-    for record in clean_input_reads(screed_iter):
+    for record in screed_iter:
         if prev_record:
             if check_is_pair(prev_record, record) and not force_single:
                 if min_length and (len(prev_record.sequence) < min_length or
