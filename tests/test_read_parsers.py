@@ -91,6 +91,12 @@ def test_read_type_attributes():
         r.cleaned_seq = u"some weird unicode \u2588"
 
 
+def test_readparser_constants():
+    assert hasattr(ReadParser, 'PAIR_MODE_ALLOW_UNPAIRED')
+    assert hasattr(ReadParser, 'PAIR_MODE_ERROR_ON_UNPAIRED')
+    assert hasattr(ReadParser, 'PAIR_MODE_IGNORE_UNPAIRED')
+
+
 def test_read_properties():
 
     # Note: Using a data file with only one read.
@@ -438,6 +444,32 @@ def test_read_pair_iterator_in_error_mode_xfail_osxsafe():
     except ValueError:
         pass
     assert failed
+
+
+def test_read_broken_pairs():
+    test_fname = utils.get_test_data("test-abund-read-impaired.fa")
+    rparser = ReadParser(test_fname)
+
+    for n, (r1, r2) in enumerate(rparser.iter_read_pairs(0)):
+        print(r1, r2)
+        print(r1.name, r1.sequence)
+        if r2 is not None:
+            print(r2.name, r2.sequence)
+
+    assert n == 3
+
+
+def test_broken_pair_single_read():
+    # Note: Using a data file with only one read.
+    rparser = ReadParser(utils.get_test_data("single-read.fq"))
+
+    # Check the properties of all reads in data set.
+    for r1, r2 in rparser.iter_read_pairs(0):
+        assert r1.name == "895:1:1:1246:14654 1:N:0:NNNNN"
+        assert r1.sequence == "CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT"
+        # if an attribute is empty it shouldn't exist
+        assert not hasattr(r1, 'annotations')
+        assert r1.quality == """][aaX__aa[`ZUZ[NONNFNNNNNO_____^RQ_"""
 
 
 @pytest.mark.known_failing

@@ -589,7 +589,6 @@ def test_extract_paired_reads_unpaired():
     # actual output files...
     outfile1 = utils.get_temp_filename('unpaired.pe.fa')
     in_dir = os.path.dirname(outfile1)
-    outfile2 = utils.get_temp_filename('unpaired.se.fa', in_dir)
 
     script = 'extract-paired-reads.py'
     args = [infile]

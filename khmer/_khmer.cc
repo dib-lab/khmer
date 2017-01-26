@@ -575,6 +575,8 @@ typedef struct {
     PyObject *  parent;
     //! Persistent value of pair mode across invocations.
     int pair_mode;
+    Read* prev_read;
+    bool has_prev_read = false;
 } khmer_ReadPairIterator_Object;
 
 
@@ -594,6 +596,9 @@ khmer_ReadPairIterator_dealloc(khmer_ReadPairIterator_Object * obj)
 {
     Py_DECREF(obj->parent);
     obj->parent = NULL;
+    if (obj->prev_read != nullptr) {
+        delete obj->prev_read;
+    }
     Py_TYPE(obj)->tp_free((PyObject*)obj);
 }
 
@@ -686,36 +691,142 @@ _ReadParser_iternext( PyObject * self )
 }
 
 
+// Test if `a` and `b` form a pair of reads
+bool _is_pair(const Read& a, const Read& b) {
+    // split read's name on ' ' if possible, creates a lhs and rhs
+    // string around the space.
+    auto lhs1_end = a.name.find_first_of(" ");
+    lhs1_end = lhs1_end == std::string::npos ? a.name.size() : lhs1_end;
+    const auto lhs1 = a.name.substr(0, lhs1_end);
+    std::string rhs1 = "";
+    if (lhs1_end != a.name.size()) {
+        rhs1 = a.name.substr(lhs1_end+1);
+    }
+
+    // split the read's name on ' ' if possible
+    auto lhs2_end = b.name.find_first_of(" ");
+    lhs2_end = lhs2_end == std::string::npos ? b.name.size() : lhs2_end;
+    const auto lhs2 = b.name.substr(0, lhs2_end);
+    std::string rhs2 = "";
+    if (lhs2_end != b.name.size()) {
+        rhs2 = b.name.substr(lhs2_end+1);
+    }
+
+    if (lhs1_end >= 2 && lhs2_end >= 2) {
+        // handle 'name/1'
+        if (lhs1.substr(lhs1.size() - 2) == "/1" &&
+            lhs2.substr(lhs2.size() - 2) == "/2") {
+                auto lhs1_slash = lhs1.find_first_of("/");
+                auto lhs2_slash = lhs2.find_first_of("/");
+                if ((lhs1_slash < lhs1_end) && (lhs2_slash < lhs2_end) &&
+                    lhs1.substr(0, lhs1_slash) == lhs2.substr(0, lhs2_slash)) {
+                    return true;
+              }
+        }
+
+        // handle '@name 1:rst'
+        if ((lhs1 == lhs2) &&
+            rhs1.substr(0, 2) == "1:" && rhs2.substr(0, 2) == "2:") {
+            return true;
+        }
+
+        // handle @name seq/1
+        if (lhs1 == lhs2) {
+            if (rhs1.size() >= 2 && rhs2.size() >= 2 &&
+                rhs1.substr(rhs1.size() - 2) == "/1" &&
+                rhs2.substr(rhs2.size() - 2) == "/2") {
+                    auto rhs1_slash = rhs1.find_first_of("/");
+                    auto rhs2_slash = rhs2.find_first_of("/");
+                    if (rhs1.substr(0, rhs1_slash) == rhs2.substr(0, rhs2_slash)) {
+                        return true;
+                  }
+            }
+        }
+    }
+    return false;
+}
+
+#define NEXT_READ(target)                                                      \
+  {                                                                            \
+    try {                                                                      \
+      target = parser->get_next_read();                                        \
+    } catch (NoMoreReadsAvailable & exc) {                                     \
+      stop_iteration = true;                                                   \
+    } catch (khmer_file_exception & exc) {                                     \
+      exc_string = exc.what();                                                 \
+      file_exception = exc_string.c_str();                                     \
+    } catch (khmer_value_exception & exc) {                                    \
+      exc_string = exc.what();                                                 \
+      value_exception = exc_string.c_str();                                    \
+    }                                                                          \
+  }
+
 static
 PyObject *
 _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
 {
     khmer_ReadParser_Object * parent = (khmer_ReadParser_Object*)myself->parent;
-    IParser    *parser    = parent->parser;
-    uint8_t     pair_mode = myself->pair_mode;
+    IParser *parser = parent->parser;
+    uint8_t pair_mode = myself->pair_mode;
 
-    ReadPair    the_read_pair;
-    bool        stop_iteration  = false;
+    ReadPair the_read_pair;
+    bool stop_iteration = false;
     const char *value_exception = NULL;
-    const char *file_exception  = NULL;
+    const char *file_exception = NULL;
     std::string exc_string;
+    stop_iteration = parser->is_complete();
 
-    Py_BEGIN_ALLOW_THREADS
-    stop_iteration = parser->is_complete( );
     if (!stop_iteration) {
-        try {
-            the_read_pair = parser->get_next_read_pair(pair_mode);
-        } catch (NoMoreReadsAvailable &exc) {
-            stop_iteration = true;
-        } catch (khmer_file_exception &exc) {
-            exc_string = exc.what();
-            file_exception = exc_string.c_str();
-        } catch (khmer_value_exception &exc) {
-            exc_string = exc.what();
-            value_exception = exc_string.c_str();
+        if (pair_mode == IParser::PAIR_MODE_ALLOW_UNPAIRED) {
+            if (!myself->has_prev_read) {
+                myself->has_prev_read = true;
+                NEXT_READ(*(myself->prev_read))
+            }
+            Read prev(*(myself->prev_read));
+            Read next;
+            NEXT_READ(next)
+            if (_is_pair(prev, next)) {
+                myself->has_prev_read = false;
+                the_read_pair.first = prev;
+                the_read_pair.second = next;
+            }
+            else {
+                the_read_pair.first = prev;
+                the_read_pair.second.sequence = "";
+                *(myself->prev_read) = next;
+                myself->has_prev_read = true;
+            }
+        }
+        else {
+            Py_BEGIN_ALLOW_THREADS
+            try {
+                the_read_pair = parser->get_next_read_pair(pair_mode);
+            } catch (NoMoreReadsAvailable &exc) {
+                stop_iteration = true;
+            } catch (khmer_file_exception &exc) {
+                exc_string = exc.what();
+                file_exception = exc_string.c_str();
+            } catch (khmer_value_exception &exc) {
+                exc_string = exc.what();
+                value_exception = exc_string.c_str();
+            }
+            Py_END_ALLOW_THREADS
         }
     }
-    Py_END_ALLOW_THREADS
+    // Only one read in the file, return this first and on the next
+    // call we will stop iterating
+    if (stop_iteration && the_read_pair.first.sequence.size()>0) {
+        stop_iteration = false;
+        myself->has_prev_read = false;
+    }
+
+    // file ends on an unpaired read, return this read and on the next call
+    // we stop iterating
+    if (stop_iteration && myself->has_prev_read) {
+        the_read_pair.first = *(myself->prev_read);
+        stop_iteration = false;
+        myself->has_prev_read = false;
+    }
 
     // Note: Can return NULL instead of setting the StopIteration exception.
     if (stop_iteration) {
@@ -738,12 +849,19 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
     } catch (std::bad_alloc &e) {
         return PyErr_NoMemory();
     }
-    PyObject * read_2_OBJECT = khmer_Read_Type.tp_alloc( &khmer_Read_Type, 1 );
-    try {
-        ((khmer_Read_Object *)read_2_OBJECT)->read = new Read( the_read_pair.second );
-    } catch (std::bad_alloc &e) {
-        delete ((khmer_Read_Object *)read_1_OBJECT)->read;
-        return PyErr_NoMemory();
+    PyObject * read_2_OBJECT = nullptr;
+    if (the_read_pair.second.sequence.size() > 0) {
+        read_2_OBJECT = khmer_Read_Type.tp_alloc( &khmer_Read_Type, 1 );
+        try {
+            ((khmer_Read_Object *)read_2_OBJECT)->read = new Read( the_read_pair.second );
+        } catch (std::bad_alloc &e) {
+            delete ((khmer_Read_Object *)read_1_OBJECT)->read;
+            return PyErr_NoMemory();
+        }
+    }
+    else {
+        Py_INCREF(Py_None);
+        read_2_OBJECT = Py_None;
     }
     PyObject * tup = PyTuple_Pack( 2, read_1_OBJECT, read_2_OBJECT );
     Py_XDECREF(read_1_OBJECT);
@@ -801,7 +919,7 @@ static
 PyObject *
 ReadParser_iter_read_pairs(PyObject * self, PyObject * args )
 {
-    int  pair_mode  = IParser:: PAIR_MODE_ERROR_ON_UNPAIRED;
+    int  pair_mode  = IParser::PAIR_MODE_ERROR_ON_UNPAIRED;
 
     if (!PyArg_ParseTuple( args, "|i", &pair_mode )) {
         return NULL;
@@ -817,6 +935,7 @@ ReadParser_iter_read_pairs(PyObject * self, PyObject * args )
     khmer_ReadPairIterator_Object * rpi   = (khmer_ReadPairIterator_Object *)obj;
     rpi->parent             = self;
     rpi->pair_mode          = pair_mode;
+    rpi->prev_read = new Read();
 
     // Increment reference count on existing ReadParser object so that it
     // will not go away until all ReadPairIterator instances have gone away.
@@ -894,27 +1013,28 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_ReadParser_Object")
 
 void _init_ReadParser_Type_constants()
 {
-    PyObject * cls_attrs_DICT = PyDict_New( );
+    PyObject * cls_attrs_DICT = PyDict_New();
     if (cls_attrs_DICT == NULL) {
         return;
     }
 
     // Place pair mode constants into class dictionary.
     int result;
-    PyObject *value = PyLong_FromLong( IParser:: PAIR_MODE_IGNORE_UNPAIRED );
+
+    PyObject * value = PyLong_FromLong(IParser::PAIR_MODE_IGNORE_UNPAIRED);
     if (value == NULL) {
         Py_DECREF(cls_attrs_DICT);
         return;
     }
     result = PyDict_SetItemString(cls_attrs_DICT,
-                                  "PAIR_MODE_IGNORE_UNPAIRED", value );
+                                  "PAIR_MODE_IGNORE_UNPAIRED", value);
     Py_XDECREF(value);
-    if (!result) {
+    if (result == -1) {
         Py_DECREF(cls_attrs_DICT);
         return;
     }
 
-    value = PyLong_FromLong( IParser:: PAIR_MODE_ERROR_ON_UNPAIRED );
+    value = PyLong_FromLong(IParser::PAIR_MODE_ERROR_ON_UNPAIRED);
     if (value == NULL) {
         Py_DECREF(cls_attrs_DICT);
         return;
@@ -922,12 +1042,25 @@ void _init_ReadParser_Type_constants()
     result = PyDict_SetItemString(cls_attrs_DICT,
                                   "PAIR_MODE_ERROR_ON_UNPAIRED", value);
     Py_XDECREF(value);
-    if (!result) {
+    if (result == -1) {
         Py_DECREF(cls_attrs_DICT);
         return;
     }
 
-    khmer_ReadParser_Type.tp_dict     = cls_attrs_DICT;
+    value = PyLong_FromLong(IParser::PAIR_MODE_ALLOW_UNPAIRED);
+    if (value == NULL) {
+        Py_DECREF(cls_attrs_DICT);
+        return;
+    }
+    result = PyDict_SetItemString(cls_attrs_DICT,
+                                  "PAIR_MODE_ALLOW_UNPAIRED", value);
+    Py_XDECREF(value);
+    if (result == -1) {
+        Py_DECREF(cls_attrs_DICT);
+        return;
+    }
+
+    khmer_ReadParser_Type.tp_dict = cls_attrs_DICT;
 }
 
 } // namespace python
