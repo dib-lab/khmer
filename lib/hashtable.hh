@@ -204,13 +204,13 @@ public:
 
     // Count every k-mer in a FASTA or FASTQ file.
     // Note: Yes, the name 'consume_fasta' is a bit misleading,
-    //	     but the FASTA format is effectively a subset of the FASTQ format
-    //	     and the FASTA portion is what we care about in this case.
+    //       but the FASTA format is effectively a subset of the FASTQ format
+    //       and the FASTA portion is what we care about in this case.
     template<typename ParseFunctor>
     void consume_fasta(
-        std::string const   &filename,
-        unsigned int	    &total_reads,
-        unsigned long long  &n_consumed
+        std::string const &filename,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
     );
 
     // Count every k-mer from a stream of FASTA or FASTQ reads,
@@ -218,8 +218,8 @@ public:
     template<typename ParseFunctor>
     void consume_fasta(
         read_parsers::ReadParser<ParseFunctor>* parser,
-        unsigned int	    &total_reads,
-        unsigned long long  &n_consumed
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
     );
 
     void set_use_bigcount(bool b)
@@ -291,8 +291,10 @@ public:
 
     // calculate the abundance distribution of kmers in the given file.
     template<typename ParseFunctor>
-    uint64_t * abundance_distribution(read_parsers::ReadParser<ParseFunctor>* parser,
-                                      Hashtable * tracking);
+    uint64_t * abundance_distribution(
+        read_parsers::ReadParser<ParseFunctor>* parser,
+        Hashtable * tracking
+    );
     template<typename ParseFunctor>
     uint64_t * abundance_distribution(std::string filename,
                                       Hashtable * tracking);

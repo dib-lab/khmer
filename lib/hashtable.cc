@@ -115,8 +115,8 @@ void Hashtable::consume_fasta(
 )
 {
     ParseFunctor reader((std::string&)filename);
-    ReadParser<ParseFunctor> parser(reader);
-    consume_fasta(&parser, total_reads, n_consumed);
+    read_parsers::ReadParser<ParseFunctor> parser(reader);
+    consume_fasta<ParseFunctor>(&parser, total_reads, n_consumed);
 }
 
 template<typename ParseFunctor>
@@ -510,5 +510,16 @@ const
 
     return posns;
 }
+
+template void Hashtable::consume_fasta<read_parsers::FastxReader>(
+    std::string const &filename,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+);
+template void Hashtable::consume_fasta<read_parsers::FastxReader>(
+    read_parsers::ReadParser<read_parsers::FastxReader> * parser,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+);
 
 } // namespace khmer

@@ -55,11 +55,12 @@ Contact: khmer-project@idyll.org
 
 namespace khmer
 {
-namespace read_parsers
-{
-class IParser;
-}  // namespace read_parsers
-}  // namespace khmer
+    namespace read_parsers
+    {
+        template<typename ParseFunctor> class ReadParser;
+        class FastxReader;
+    }
+}
 
 #define MAX_KEEPER_SIZE int(1e6)
 
@@ -170,6 +171,7 @@ public:
     }
 
     // Consume reads & build sparse graph.
+    template<typename ParseFunctor>
     void consume_fasta_and_tag(
         std::string const &filename,
         unsigned int &total_reads,
@@ -179,8 +181,9 @@ public:
     // Count every k-mer from a stream of FASTA or FASTQ reads,
     // using the supplied parser.
     // Tag certain ones on the connectivity graph.
+    template<typename ParseFunctor>
     void consume_fasta_and_tag(
-        read_parsers:: IParser * parser,
+        read_parsers::ReadParser<ParseFunctor> * parser,
         unsigned int &total_reads,
         unsigned long long &n_consumed
     );
@@ -192,6 +195,7 @@ public:
 
 
     // consume an already-partitioned file & load in the partition IDs
+    template<typename ParseFunctor>
     void consume_partitioned_fasta(const std::string &filename,
                                    unsigned int &total_reads,
                                    unsigned long long &n_consumed);
