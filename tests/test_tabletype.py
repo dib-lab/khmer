@@ -164,6 +164,28 @@ def test_get_bad_dna_kmer(tabletype):
     kh.hash("ATYGC")
 
 
+def test_consume_and_count(tabletype):
+    tt = tabletype(6, PRIMES_1m)
+
+    x = "ATGCCGATGCA"
+    tt.consume(x)
+
+    for start in range(len(x) - 6 + 1):
+        assert tt.get(x[start:start + 6]) == 1
+
+
+def test_consume_and_count_bad_dna(tabletype):
+    # while we don't specifically handle bad DNA, we should at least be
+    # consistent...
+    tt = tabletype(6, PRIMES_1m)
+
+    x = "ATGCCGNTGCA"
+    tt.consume(x)
+
+    for start in range(len(x) - 6 + 1):
+        assert tt.get(x[start:start + 6]) == 1
+
+
 def test_get_kmer_counts(tabletype):
     hi = tabletype(6, PRIMES_1m)
 
