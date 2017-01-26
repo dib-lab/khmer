@@ -332,7 +332,10 @@ public:
     virtual
     HashIntoType
     hash_dna(const char * kmer) const {
-        return _hash_murmur(kmer, _ksize);
+        if (!(strlen(kmer) >= _ksize)) {
+            throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
+        }
+        return _hash_murmur(kmer);
     }
 
     inline virtual HashIntoType
