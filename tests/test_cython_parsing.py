@@ -6,7 +6,7 @@ import itertools
 import random
 
 import khmer
-from khmer._oxli.streaming import Sequence, FastxParser, BrokenPairedReader
+from khmer._oxli.parsing import Sequence, FastxParser, BrokenPairedReader
 from khmer.khmer_args import estimate_optimal_with_K_and_f as optimal_fp
 from khmer import reverse_complement as revcomp
 from khmer import reverse_hash as revhash

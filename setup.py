@@ -193,7 +193,7 @@ EXTENSION_MODS = [Extension("khmer._khmer", ** CP_EXTENSION_MOD_DICT)]
 
 #for cython_ext in glob.glob(os.path.join("khmer", "_oxli", "_oxli.pyx")):
 for cython_ext in [os.path.join("khmer", "_oxli", f) for f in \
-    ["_oxli.pyx", "hashing.pyx", "traversal.pyx", "streaming.pyx"]]:
+    ["_oxli.pyx", "hashing.pyx", "traversal.pyx", "parsing.pyx"]]:
 
     CY_EXTENSION_MOD_DICT = \
         {
