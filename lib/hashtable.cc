@@ -532,7 +532,7 @@ public:
          * will be handled with more finesse in the near future, but for now
          * it's the best we've got.
          */
-        for (int i = 0; i < strlen(seq); i++) {
+        for (size_t i = 0; i < strlen(seq); i++) {
             if (!is_valid_dna(seq[i])) {
                 index = length;
                 break;
@@ -550,7 +550,7 @@ public:
         std::string kmer;
         kmer.assign(_seq + index, _ksize);
         index += 1;
-        return _hash_murmur(kmer);
+        return _hash_murmur(kmer, _ksize);
     }
 
     bool done() const {

@@ -59,8 +59,12 @@ HashIntoType _hash(const char * kmer, const WordLength k,
                    HashIntoType& _h, HashIntoType& _r)
 {
     // sizeof(HashIntoType) * 8 bits / 2 bits/base
-    if ((k > sizeof(HashIntoType)*4) || strlen(kmer) != k) {
+    if (k > sizeof(HashIntoType)*4) {
         throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
+    }
+
+    if (strlen(kmer) < k) {
+        throw khmer_exception("k-mer is too short to hash.");
     }
 
     HashIntoType h = 0, r = 0;
@@ -159,7 +163,7 @@ std::string _revcomp(const std::string& kmer)
             complement = 'A';
             break;
         default:
-            throw khmer::khmer_exception("Invalid base in read");
+            complement = kmer[i]; // leave alone.
             break;
         }
         out[ksize - i - 1] = complement;
@@ -167,20 +171,20 @@ std::string _revcomp(const std::string& kmer)
     return out;
 }
 
-HashIntoType _hash_murmur(const std::string& kmer)
+HashIntoType _hash_murmur(const std::string& kmer, const WordLength k)
 {
     HashIntoType h = 0;
     HashIntoType r = 0;
 
-    return khmer::_hash_murmur(kmer, h, r);
+    return khmer::_hash_murmur(kmer, k, h, r);
 }
 
-    HashIntoType _hash_murmur(const std::string& kmer, const WordLength k,
+HashIntoType _hash_murmur(const std::string& kmer, const WordLength k,
                           HashIntoType& h, HashIntoType& r)
 {
     uint64_t out[2];
     uint32_t seed = 0;
-    MurmurHash3_x64_128((void *)kmer.c_str(), k), seed, &out);
+    MurmurHash3_x64_128((void *)kmer.c_str(), k, seed, &out);
     h = out[0];
 
     std::string rev = khmer::_revcomp(kmer); // @CTB
@@ -190,12 +194,12 @@ HashIntoType _hash_murmur(const std::string& kmer)
     return h ^ r;
 }
 
-HashIntoType _hash_murmur_forward(const std::string& kmer)
+HashIntoType _hash_murmur_forward(const std::string& kmer, const WordLength k)
 {
     HashIntoType h = 0;
     HashIntoType r = 0;
 
-    khmer::_hash_murmur(kmer, h, r);
+    khmer::_hash_murmur(kmer, k, h, r);
     return h;
 }
 

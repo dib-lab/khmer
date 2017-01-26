@@ -68,11 +68,10 @@ def test_hash(tabletype):
 
 
 def test_hash_bad_dna(tabletype):
-    # hashing of bad dna -> error
+    # hashing of bad dna -> succeeds w/o complaint
     kh = tabletype(5, PRIMES_1m)
 
-    with pytest.raises(ValueError):
-        x = kh.hash("ATGYC")
+    x = kh.hash("ATGYC")
 
 
 def test_hash_bad_length(tabletype):
@@ -123,11 +122,10 @@ def test_add_dna_kmer(tabletype):
 
 
 def test_add_bad_dna_kmer(tabletype):
-    # test add(dna)
+    # even with 'bad' dna, should succeed.
     kh = tabletype(5, PRIMES_1m)
 
-    with pytest.raises(ValueError):
-        x = kh.add("ATYGC")
+    x = kh.add("ATYGC")
 
 
 def test_get_hashval(tabletype):
@@ -160,11 +158,10 @@ def test_get_dna_kmer(tabletype):
 
 
 def test_get_bad_dna_kmer(tabletype):
-    # test get(dna)
+    # test get(dna) with bad dna; should be fine.
     kh = tabletype(5, PRIMES_1m)
 
-    with pytest.raises(ValueError):
-        kh.hash("ATYGC")
+    kh.hash("ATYGC")
 
 
 def test_get_kmer_counts(tabletype):

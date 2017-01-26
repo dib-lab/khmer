@@ -186,12 +186,11 @@ def test_hll_cover_calc_alpha():
 
 
 def test_hll_invalid_base():
-    # this test should raise a ValueError,
-    # since there are invalid bases in read.
-
     hllcpp = khmer.HLLCounter(ERR_RATE, 5)
-    with pytest.raises(ValueError):
-        hllcpp.consume_string("ACGTTTCGNAATNNNNN")
+
+    # this should succeed; invalid bases need to be removed before
+    # hashing.
+    hllcpp.consume_string("ACGTTTCGNAATNNNNN")
 
 
 def test_hll_invalid_error_rate():

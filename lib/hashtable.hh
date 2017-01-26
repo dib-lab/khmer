@@ -332,13 +332,7 @@ public:
     virtual
     HashIntoType
     hash_dna(const char * kmer) const {
-        /* NOTE: this function currently does not handle non-ACGT characters
-         * gracefully. We should fix this.
-         */
-        if (strlen(kmer) != _ksize) {
-            throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
-        }
-        return _hash_murmur(kmer);
+        return _hash_murmur(kmer, _ksize);
     }
 
     inline virtual HashIntoType
