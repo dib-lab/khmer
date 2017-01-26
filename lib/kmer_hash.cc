@@ -40,6 +40,7 @@ Contact: khmer-project@idyll.org
 #include <string.h>
 #include <algorithm>
 #include <string>
+#include <assert.h>
 
 #include "MurmurHash3.h"
 #include "khmer.hh"
@@ -187,7 +188,8 @@ HashIntoType _hash_murmur(const std::string& kmer, const WordLength k,
     MurmurHash3_x64_128((void *)kmer.c_str(), k, seed, &out);
     h = out[0];
 
-    std::string rev = khmer::_revcomp(kmer); // @CTB
+    assert(kmer.length() == k); // an assumption of the below code
+    std::string rev = khmer::_revcomp(kmer);
     MurmurHash3_x64_128((void *)rev.c_str(), k, seed, &out);
     r = out[0];
 
