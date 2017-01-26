@@ -15,6 +15,7 @@ be tested separately.  We can use code coverage to identify that
 code...
 """
 
+import sys
 import pytest
 
 
@@ -23,13 +24,15 @@ from khmer import _Nodegraph, _Nodetable
 
 PRIMES_1m = [1000003, 1009837]
 
-
 # all the table types!
 @pytest.fixture(params=[_Countgraph, _Counttable, _SmallCountgraph,
                         _SmallCounttable, _Nodegraph, _Nodetable])
 def tabletype(request):
     return request.param
 
+# For map(long, [list of ints]) cross-version hackery
+if sys.version_info.major > 2:
+    long = int # pylint: disable=redefined-builtin
 
 def test_presence(tabletype):
     # basic get/add test
@@ -64,7 +67,7 @@ def test_hash(tabletype):
     # hashing of strings -> numbers.
     kh = tabletype(5, PRIMES_1m)
     x = kh.hash("ATGGC")
-    assert type(x) == int
+    assert type(x) == long
 
 
 def test_hash_bad_dna(tabletype):
@@ -91,7 +94,7 @@ def test_reverse_hash(tabletype):
     except ValueError:
         pytest.skip("reverse_hash not implemented on this table type")
 
-    assert type(x) == str
+    assert type(x) in (unicode, str)
 
 
 def test_hashsizes(tabletype):
