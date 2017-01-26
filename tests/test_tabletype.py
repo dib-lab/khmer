@@ -67,6 +67,22 @@ def test_hash(tabletype):
     assert type(x) == int
 
 
+def test_hash_bad_dna(tabletype):
+    # hashing of bad dna -> error
+    kh = tabletype(5, PRIMES_1m)
+
+    with pytest.raises(ValueError):
+        x = kh.hash("ATGYC")
+
+
+def test_hash_bad_length(tabletype):
+    # hashing of bad dna length -> error
+    kh = tabletype(5, PRIMES_1m)
+
+    with pytest.raises(ValueError):
+        x = kh.hash("ATGGGC")
+
+
 def test_reverse_hash(tabletype):
     # hashing of strings -> numbers.
     kh = tabletype(5, PRIMES_1m)
@@ -106,6 +122,14 @@ def test_add_dna_kmer(tabletype):
     assert z == 1
 
 
+def test_add_bad_dna_kmer(tabletype):
+    # test add(dna)
+    kh = tabletype(5, PRIMES_1m)
+
+    with pytest.raises(ValueError):
+        x = kh.add("ATYGC")
+
+
 def test_get_hashval(tabletype):
     # test get(hashval)
     kh = tabletype(5, PRIMES_1m)
@@ -133,6 +157,14 @@ def test_get_dna_kmer(tabletype):
 
     z = kh.get("ATGGC")
     assert z == 1
+
+
+def test_get_bad_dna_kmer(tabletype):
+    # test get(dna)
+    kh = tabletype(5, PRIMES_1m)
+
+    with pytest.raises(ValueError):
+        kh.hash("ATYGC")
 
 
 def test_get_kmer_counts(tabletype):
