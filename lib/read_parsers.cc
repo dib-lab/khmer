@@ -49,112 +49,8 @@ namespace khmer
 namespace read_parsers
 {
 
-void
-Read::write_to(std::ostream& output)
-{
-    if (quality.length() != 0) {
-        output << "@" << name << std::endl
-               << sequence << std::endl
-               << "+" << std::endl
-               << quality << std::endl;
-    } else {
-        output << ">" << name << std::endl
-               << sequence << std::endl;
-    }
-}
-
-
-struct FastxParser::Handle {
-    seqan::SequenceStream stream;
-    uint32_t seqan_spin_lock;
-};
-
-FastxParser::FastxParser( char const * filename ) : IParser( )
-{
-    _private = new FastxParser::Handle();
-    seqan::open(_private->stream, filename);
-    if (!seqan::isGood(_private->stream)) {
-        std::string message = "Could not open ";
-        message = message + filename + " for reading.";
-        throw InvalidStream(message);
-    } else if (seqan::atEnd(_private->stream)) {
-        std::string message = "File ";
-        message = message + filename + " does not contain any sequences!";
-        throw InvalidStream(message);
-    }
-    __asm__ __volatile__ ("" ::: "memory");
-    _private->seqan_spin_lock = 0;
-}
-
-bool FastxParser::is_complete()
-{
-    return !seqan::isGood(_private->stream) || seqan::atEnd(_private->stream);
-}
-
-Read FastxParser::get_next_read()
-{
-    Read the_read;
-    int ret = -1;
-    const char *invalid_read_exc = NULL;
-    while (!__sync_bool_compare_and_swap(& _private->seqan_spin_lock, 0, 1));
-    bool atEnd = seqan::atEnd(_private->stream);
-    if (!atEnd) {
-        ret = seqan::readRecord(the_read.name, the_read.sequence,
-                                the_read.quality, _private->stream);
-        if (ret == 0) {
-            // Detect if we're parsing something w/ qualities on the first read
-            // only
-            if (_num_reads == 0 && the_read.quality.length() != 0) {
-                _have_qualities = true;
-            }
-
-            // Handle error cases, or increment number of reads on success
-            if (the_read.sequence.length() == 0) {
-                invalid_read_exc = "Sequence is empty";
-            } else if (_have_qualities && (the_read.sequence.length() != \
-                                           the_read.quality.length())) {
-                invalid_read_exc = "Sequence and quality lengths differ";
-            } else {
-                _num_reads++;
-            }
-        }
-    }
-    __asm__ __volatile__ ("" ::: "memory");
-    _private->seqan_spin_lock = 0;
-    // Throw any error in the read, even if we're at the end
-    if (invalid_read_exc != NULL) {
-        throw InvalidRead(invalid_read_exc);
-    }
-    // Throw NoMoreReadsAvailable if none of the above errors were raised, even
-    // if ret == 0
-    if (atEnd) {
-        throw NoMoreReadsAvailable();
-    }
-    // Catch-all error in readRecord that isn't one of the above
-    if (ret != 0) {
-        throw StreamReadError();
-    }
-    return the_read;
-}
-
-FastxParser::~FastxParser()
-{
-    seqan::close(_private->stream);
-    delete _private;
-}
-
-IParser * const
-IParser::
-get_parser(
-    std:: string const &ifile_name
-)
-{
-    return new FastxParser(ifile_name.c_str());
-}
-
-IParser::
-IParser(
-)
+template<typename ParseFunctor>
+void ReadParser<ParseFunctor>::_init()
 {
     int regex_rc =
         regcomp(
@@ -182,35 +78,10 @@ IParser(
     if (regex_rc) {
         throw khmer_exception("Could not compile R2 regex");
     }
-    _num_reads = 0;
-    _have_qualities = false;
 }
 
-IParser::
-~IParser( )
-{
-    regfree( &_re_read_2_nosub );
-    regfree( &_re_read_1 );
-    regfree( &_re_read_2 );
-}
-
-ReadPair IParser::get_next_read_pair(uint8_t mode)
-{
-    switch (mode) {
-    case IParser::PAIR_MODE_IGNORE_UNPAIRED:
-        return _get_next_read_pair_in_ignore_mode();
-        break;
-    case IParser::PAIR_MODE_ERROR_ON_UNPAIRED:
-        return _get_next_read_pair_in_error_mode();
-        break;
-    default:
-        std::ostringstream oss;
-        oss << "Unknown pair reading mode: " << mode;
-        throw UnknownPairReadingMode(oss.str());
-    }
-}
-
-ReadPair IParser::_get_next_read_pair_in_ignore_mode()
+template<typename ParseFunctor>
+ReadPair ReadParser<ParseFunctor>::_get_next_read_pair_in_ignore_mode()
 {
     ReadPair pair;
     regmatch_t match_1, match_2;
@@ -249,7 +120,7 @@ ReadPair IParser::_get_next_read_pair_in_ignore_mode()
 } // _get_next_read_pair_in_ignore_mode
 
 
-ReadPair IParser::_get_next_read_pair_in_error_mode()
+ReadPair ReadParser<ParseFunctor>::_get_next_read_pair_in_error_mode()
 {
     ReadPair pair;
     regmatch_t match_1, match_2;
@@ -281,9 +152,7 @@ ReadPair IParser::_get_next_read_pair_in_error_mode()
 } // _get_next_read_pair_in_error_mode
 
 
-bool
-IParser::
-_is_valid_read_pair(
+bool ReadParser<ParseFunctor>::_is_valid_read_pair(
     ReadPair &the_read_pair, regmatch_t &match_1, regmatch_t &match_2
 )
 {
@@ -293,8 +162,132 @@ _is_valid_read_pair(
                     ==	the_read_pair.second.name.substr( 0, match_1.rm_so ));
 }
 
-} // namespace read_parsers
+template<typename ParseFunctor>
+ReadParser<ParseFunctor>::ReadParser(ParseFunctor pf) : _parser(pf)
+{
+    _init();
+}
 
+template<typename ParseFunctor>
+ReadParser<ParseFunctor>::ReadParser(ReadParser& other) : _parser(other._parser)
+{
+    _init();
+}
+
+template<typename ParseFunctor>
+ReadParser<ParseFunctor>::~ReadParser()
+{
+    regfree(&_re_read_2_nosub);
+    regfree(&_re_read_1);
+    regfree(&_re_read_2);
+}
+
+template<typename ParseFunctor>
+bool ReadParser<ParseFunctor>::is_complete()
+{
+    return _parser.is_complete();
+}
+
+template<typename ParseFunctor>
+size_t ReadParser<ParseFunctor>::get_num_reads()
+{
+    return _parser.get_num_reads();
+}
+
+void FastxReader::_init()
+{
+    seqan::open(_stream, _filename.c_str());
+    if (!seqan::isGood(_stream)) {
+        std::string message = "Could not open ";
+        message = message + _filename + " for reading.";
+        throw InvalidStream(message);
+    } else if (seqan::atEnd(_stream)) {
+        std::string message = "File ";
+        message = message + _filename + " does not contain any sequences!";
+        throw InvalidStream(message);
+    }
+    __asm__ __volatile__ ("" ::: "memory");
+}
+
+FastxReader::FastxReader()
+        : _filename("-"), _spin_lock(0), _num_reads(0), _have_qualities(false)
+{
+    _init();
+}
+
+FastxReader::FastxReader(std::string& infile)
+        : _filename(infile),
+          _spin_lock(0),
+          _num_reads(0),
+          _have_qualities(false)
+{
+    _init();
+}
+
+FastxReader::~FastxReader()
+{
+    seqan::close(_stream);
+}
+
+bool FastxReader::is_complete()
+{
+    return !seqan::isGood(_stream) || seqan::atEnd(_stream);
+}
+
+size_t FastxReader::get_num_reads()
+{
+    return _num_reads;
+}
+
+void FastxReader::operator()()
+{
+    Read read;
+    int ret = -1;
+    const char *invalid_read_exc = NULL;
+    while (!__sync_bool_compare_and_swap(&_spin_lock, 0, 1));
+    bool atEnd = seqan::atEnd(_stream);
+    if (!atEnd) {
+        ret = seqan::readRecord(read.name, read.sequence, read.quality, _stream);
+        if (ret == 0) {
+            // Detect if we're parsing something w/ qualities on the first read
+            // only
+            if (_num_reads == 0 && read.quality.length() != 0) {
+                _have_qualities = true;
+            }
+
+            // Handle error cases, or increment number of reads on success
+            if (read.sequence.length() == 0) {
+                invalid_read_exc = "Sequence is empty";
+            } else if (_have_qualities && (read.sequence.length() != \
+                                           read.quality.length())) {
+                invalid_read_exc = "Sequence and quality lengths differ";
+            } else {
+                _num_reads++;
+            }
+        }
+    }
+    __asm__ __volatile__ ("" ::: "memory");
+    _spin_lock = 0;
+    // Throw any error in the read, even if we're at the end
+    if (invalid_read_exc != NULL) {
+        throw InvalidRead(invalid_read_exc);
+    }
+    // Throw NoMoreReadsAvailable if none of the above errors were raised, even
+    // if ret == 0
+    if (atEnd) {
+        throw NoMoreReadsAvailable();
+    }
+    // Catch-all error in readRecord that isn't one of the above
+    if (ret != 0) {
+        throw StreamReadError();
+    }
+    return read;
+}
+
+// All template instantiations used in the codebase must be declared here.
+template class ReadParser<FastxReader>;
+
+} // namespace read_parsers
 
 } // namespace khmer
 

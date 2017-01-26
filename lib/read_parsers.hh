@@ -83,6 +83,7 @@ struct InvalidReadPair : public  khmer_value_exception {
         khmer_value_exception("Invalid read pair detected.") {}
 };
 
+
 struct Read
 {
     std::string name;
@@ -112,8 +113,6 @@ struct Read
                    << sequence << '\n';
         }
     }
-
-    void write_to(std::ostream&);
 };
 typedef std::pair<Read, Read> ReadPair;
 
