@@ -898,3 +898,8 @@ template void Hashgraph::consume_fasta_and_tag<read_parsers::FastxReader>(
     unsigned int &total_reads,
     unsigned long long &n_consumed
 );
+template void Hashgraph::consume_partitioned_fasta<read_parsers::FastxReader>(
+    const std::string &filename,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+);

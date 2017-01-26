@@ -564,15 +564,14 @@ static PyTypeObject khmer_Read_Type = {
 
 typedef struct {
     PyObject_HEAD
-    //! Pointer to the low-level parser object.
-    read_parsers:: IParser *  parser;
+    read_parsers::ReadParser<read_parsers::FastxReader>* parser;
 } khmer_ReadParser_Object;
 
 
 typedef struct {
     PyObject_HEAD
     //! Pointer to Python parser object for reference counting purposes.
-    PyObject *  parent;
+    PyObject * parent;
     //! Persistent value of pair mode across invocations.
     int pair_mode;
 } khmer_ReadPairIterator_Object;
@@ -598,8 +597,7 @@ khmer_ReadPairIterator_dealloc(khmer_ReadPairIterator_Object * obj)
 }
 
 
-static
-PyObject *
+static PyObject *
 _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
 {
     const char *      ifile_name_CSTR;
@@ -617,8 +615,7 @@ _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
 
     // Wrap the low-level parser object.
     try {
-        myself->parser =
-            IParser:: get_parser( ifile_name );
+        myself->parser = read_parsers::get_fastx_parser(ifile_name);
     } catch (khmer_file_exception &exc) {
         PyErr_SetString( PyExc_OSError, exc.what() );
         return NULL;
@@ -632,7 +629,7 @@ PyObject *
 _ReadParser_iternext( PyObject * self )
 {
     khmer_ReadParser_Object * myself  = (khmer_ReadParser_Object *)self;
-    IParser *       parser  = myself->parser;
+    read_parsers::ReadParser<read_parsers::FastxReader>* parser  = myself->parser;
     std::string exc_string;
 
     bool        stop_iteration  = false;
@@ -691,7 +688,7 @@ PyObject *
 _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
 {
     khmer_ReadParser_Object * parent = (khmer_ReadParser_Object*)myself->parent;
-    IParser    *parser    = parent->parser;
+    read_parsers::ReadParser<read_parsers::FastxReader>* parser = parent->parser;
     uint8_t     pair_mode = myself->pair_mode;
 
     ReadPair    the_read_pair;
@@ -801,7 +798,7 @@ static
 PyObject *
 ReadParser_iter_read_pairs(PyObject * self, PyObject * args )
 {
-    int  pair_mode  = IParser:: PAIR_MODE_ERROR_ON_UNPAIRED;
+    int pair_mode = ReadParser<FastxReader>::PAIR_MODE_ERROR_ON_UNPAIRED;
 
     if (!PyArg_ParseTuple( args, "|i", &pair_mode )) {
         return NULL;
@@ -901,7 +898,7 @@ void _init_ReadParser_Type_constants()
 
     // Place pair mode constants into class dictionary.
     int result;
-    PyObject *value = PyLong_FromLong( IParser:: PAIR_MODE_IGNORE_UNPAIRED );
+    PyObject *value = PyLong_FromLong(ReadParser<FastxReader>::PAIR_MODE_IGNORE_UNPAIRED);
     if (value == NULL) {
         Py_DECREF(cls_attrs_DICT);
         return;
@@ -914,7 +911,7 @@ void _init_ReadParser_Type_constants()
         return;
     }
 
-    value = PyLong_FromLong( IParser:: PAIR_MODE_ERROR_ON_UNPAIRED );
+    value = PyLong_FromLong(ReadParser<FastxReader>::PAIR_MODE_ERROR_ON_UNPAIRED);
     if (value == NULL) {
         Py_DECREF(cls_attrs_DICT);
         return;
@@ -936,8 +933,8 @@ void _init_ReadParser_Type_constants()
 
 
 static
-read_parsers:: IParser *
-_PyObject_to_khmer_ReadParser( PyObject * py_object )
+read_parsers::ReadParser<read_parsers::FastxReader> *
+_PyObject_to_khmer_ReadParser(PyObject * py_object)
 {
     // TODO: Add type-checking.
 
@@ -1563,7 +1560,7 @@ hashtable_consume_fasta(khmer_KHashtable_Object * me, PyObject * args)
     unsigned long long  n_consumed    = 0;
     unsigned int          total_reads   = 0;
     try {
-        hashtable->consume_fasta(filename, total_reads, n_consumed);
+        hashtable->consume_fasta<FastxReader>(filename, total_reads, n_consumed);
     } catch (khmer_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;
@@ -1588,7 +1585,7 @@ hashtable_consume_fasta_with_reads_parser(khmer_KHashtable_Object * me,
         return NULL;
     }
 
-    read_parsers:: IParser * rparser =
+    read_parsers::ReadParser<read_parsers::FastxReader> * rparser =
         _PyObject_to_khmer_ReadParser( rparser_obj );
 
     // call the C++ function, and trap signals => Python
@@ -1600,7 +1597,7 @@ hashtable_consume_fasta_with_reads_parser(khmer_KHashtable_Object * me,
 
     Py_BEGIN_ALLOW_THREADS
     try {
-        hashtable->consume_fasta(rparser, total_reads, n_consumed);
+        hashtable->consume_fasta<FastxReader>(rparser, total_reads, n_consumed);
     } catch (khmer_file_exception &exc) {
         exc_string = exc.what();
         file_exception = exc_string.c_str();
@@ -1765,7 +1762,7 @@ hashtable_abundance_distribution_with_reads_parser(khmer_KHashtable_Object * me,
         return NULL;
     }
 
-    read_parsers::IParser *rparser      = rparser_obj->parser;
+    read_parsers::ReadParser<read_parsers::FastxReader> *rparser = rparser_obj->parser;
     Nodegraph           *nodegraph        = tracking_obj->nodegraph;
     uint64_t           *dist            = NULL;
     const char         *value_exception = NULL;
@@ -1774,7 +1771,7 @@ hashtable_abundance_distribution_with_reads_parser(khmer_KHashtable_Object * me,
 
     Py_BEGIN_ALLOW_THREADS
     try {
-        dist = hashtable->abundance_distribution(rparser, nodegraph);
+        dist = hashtable->abundance_distribution<FastxReader>(rparser, nodegraph);
     } catch (khmer_file_exception &exc) {
         exc_string = exc.what();
         file_exception = exc_string.c_str();
@@ -1927,7 +1924,7 @@ hashtable_abundance_distribution(khmer_KHashtable_Object * me, PyObject * args)
 
     Py_BEGIN_ALLOW_THREADS
     try {
-        dist = hashtable->abundance_distribution(filename, nodegraph);
+        dist = hashtable->abundance_distribution<FastxReader>(filename, nodegraph);
     } catch (khmer_file_exception &exc) {
         exc_string = exc.what();
         file_exception = exc_string.c_str();
@@ -2973,8 +2970,8 @@ labelhash_consume_fasta_and_tag_with_labels(khmer_KGraphLabels_Object * me,
 
     //Py_BEGIN_ALLOW_THREADS
     try {
-        hb->consume_fasta_and_tag_with_labels(filename, total_reads,
-                                              n_consumed);
+        hb->consume_fasta_and_tag_with_labels<FastxReader>(filename, total_reads,
+                                                           n_consumed);
     } catch (khmer_file_exception &exc) {
         exc_string = exc.what();
         file_exception = exc_string.c_str();
@@ -3015,7 +3012,7 @@ labelhash_consume_partitioned_fasta_and_tag_with_labels(
     unsigned int        total_reads = 0;
 
     try {
-        labelhash->consume_partitioned_fasta_and_tag_with_labels(filename,
+        labelhash->consume_partitioned_fasta_and_tag_with_labels<FastxReader>(filename,
                 total_reads, n_consumed);
     } catch (khmer_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
@@ -3804,7 +3801,7 @@ static PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
     unsigned long long  n_consumed    = 0;
     unsigned int        total_reads   = 0;
     try {
-        me->hllcounter->consume_fasta(filename, stream_records, total_reads,
+        me->hllcounter->consume_fasta<FastxReader>(filename, stream_records, total_reads,
                                       n_consumed);
     } catch (khmer_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());

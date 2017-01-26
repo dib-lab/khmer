@@ -202,6 +202,8 @@ inline PartitionID _parse_partition_id(std::string name)
     return p;
 }
 
+ReadParser<FastxReader> * get_fastx_parser(std::string& filename);
+
 } // namespace read_parsers
 
 } // namespace khmer

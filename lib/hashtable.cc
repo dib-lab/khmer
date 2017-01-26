@@ -521,5 +521,13 @@ template void Hashtable::consume_fasta<read_parsers::FastxReader>(
     unsigned int &total_reads,
     unsigned long long &n_consumed
 );
+template uint64_t * Hashtable::abundance_distribution<read_parsers::FastxReader>(
+    read_parsers::ReadParser<read_parsers::FastxReader>* parser,
+    Hashtable * tracking
+);
+template uint64_t * Hashtable::abundance_distribution<read_parsers::FastxReader>(
+    std::string filename,
+    Hashtable * tracking
+);
 
 } // namespace khmer

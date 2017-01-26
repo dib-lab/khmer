@@ -309,7 +309,12 @@ void FastxReader::operator()(Read& read)
     if (ret != 0) {
         throw StreamReadError();
     }
-    read;
+}
+
+ReadParser<FastxReader> * get_fastx_parser(std::string& filename)
+{
+    FastxReader reader(filename);
+    return new ReadParser<FastxReader>(reader);
 }
 
 // All template instantiations used in the codebase must be declared here.
