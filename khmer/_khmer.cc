@@ -564,7 +564,7 @@ static PyTypeObject khmer_Read_Type = {
 
 typedef struct {
     PyObject_HEAD
-    read_parsers::ReadParser<read_parsers::FastxReader>* parser;
+    FastxParserPtr& parser;
 } khmer_ReadParser_Object;
 
 
@@ -581,8 +581,6 @@ static
 void
 _ReadParser_dealloc(khmer_ReadParser_Object * obj)
 {
-    Py_DECREF(obj->parser);
-    obj->parser = NULL;
     Py_TYPE(obj)->tp_free((PyObject*)obj);
 }
 
@@ -615,7 +613,7 @@ _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
 
     // Wrap the low-level parser object.
     try {
-        myself->parser = read_parsers::get_fastx_parser(ifile_name);
+        myself->parser = get_parser<FastxReader>(ifile_name);
     } catch (khmer_file_exception &exc) {
         PyErr_SetString( PyExc_OSError, exc.what() );
         return NULL;
@@ -629,7 +627,7 @@ PyObject *
 _ReadParser_iternext( PyObject * self )
 {
     khmer_ReadParser_Object * myself  = (khmer_ReadParser_Object *)self;
-    read_parsers::ReadParser<read_parsers::FastxReader>* parser  = myself->parser;
+    FastxParserPtr& parser = myself->parser;
     std::string exc_string;
 
     bool        stop_iteration  = false;
@@ -688,7 +686,7 @@ PyObject *
 _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
 {
     khmer_ReadParser_Object * parent = (khmer_ReadParser_Object*)myself->parent;
-    read_parsers::ReadParser<read_parsers::FastxReader>* parser = parent->parser;
+    FastxParserPtr& parser = parent->parser;
     uint8_t     pair_mode = myself->pair_mode;
 
     ReadPair    the_read_pair;
@@ -932,9 +930,7 @@ void _init_ReadParser_Type_constants()
 } // namespace khmer
 
 
-static
-read_parsers::ReadParser<read_parsers::FastxReader> *
-_PyObject_to_khmer_ReadParser(PyObject * py_object)
+static FastxParserPtr& _PyObject_to_khmer_ReadParser(PyObject * py_object)
 {
     // TODO: Add type-checking.
 
@@ -1585,8 +1581,7 @@ hashtable_consume_fasta_with_reads_parser(khmer_KHashtable_Object * me,
         return NULL;
     }
 
-    read_parsers::ReadParser<read_parsers::FastxReader> * rparser =
-        _PyObject_to_khmer_ReadParser( rparser_obj );
+    FastxParserPtr& rparser = _PyObject_to_khmer_ReadParser( rparser_obj );
 
     // call the C++ function, and trap signals => Python
     unsigned long long  n_consumed      = 0;
@@ -1762,7 +1757,7 @@ hashtable_abundance_distribution_with_reads_parser(khmer_KHashtable_Object * me,
         return NULL;
     }
 
-    read_parsers::ReadParser<read_parsers::FastxReader> *rparser = rparser_obj->parser;
+    FastxParserPtr& rparser = rparser_obj->parser;
     Nodegraph           *nodegraph        = tracking_obj->nodegraph;
     uint64_t           *dist            = NULL;
     const char         *value_exception = NULL;

@@ -495,7 +495,7 @@ hashgraph_consume_fasta_and_tag_with_reads_parser(khmer_KHashgraph_Object * me,
         return NULL;
     }
 
-    read_parsers::ReadParser<FastxReader> * rparser = rparser_obj-> parser;
+    FastxParserPtr& rparser = rparser_obj->parser;
 
     // call the C++ function, and trap signals => Python
     const char         *value_exception = NULL;
