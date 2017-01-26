@@ -187,9 +187,9 @@ public:
     );
     // Count every k-mer from a stream of FASTA or FASTQ reads,
     // using the supplied parser.
-    template<typename ReadFunctor>
+    template<typename ParseFunctor>
     void consume_fasta(
-        read_parsers::ReadParser<ReadFunctor>* parser,
+        read_parsers::ReadParser<ParseFunctor>* parser,
         unsigned int	    &total_reads,
         unsigned long long  &n_consumed
     );
