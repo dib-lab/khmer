@@ -380,7 +380,6 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         # failsafe context manager in case an input file breaks
         with catch_io_errors(filename, outfp, args.single_output_file,
                              args.force, corrupt_files):
-
             screed_iter = clean_input_reads(screed.open(filename))
             reader = broken_paired_reader(screed_iter, min_length=args.ksize,
                                           force_single=force_single,
