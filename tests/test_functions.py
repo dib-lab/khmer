@@ -540,3 +540,26 @@ def test_BrokenPairedReader_lowercase():
     assert c.sequence == 'aCgTn'
     assert c.cleaned_seq == 'ACGTA'
     assert d is None
+
+
+def test_BrokenPairedReader_lowercase_khmer_Read():
+    # use khmer.Read objects which should automatically have a `cleaned_seq`
+    # attribute
+    stream = [khmer.Read(name='seq1/1', sequence='acgtn'),
+              khmer.Read(name='seq1/2', sequence='AcGtN'),
+              khmer.Read(name='seq1/2', sequence='aCgTn')]
+
+    results = []
+    for num, is_pair, read1, read2 in broken_paired_reader(stream):
+        results.append((read1, read2))
+
+    a, b = results[0]
+    assert a.sequence == 'acgtn'
+    assert a.cleaned_seq == 'ACGTA'
+    assert b.sequence == 'AcGtN'
+    assert b.cleaned_seq == 'ACGTA'
+
+    c, d = results[1]
+    assert c.sequence == 'aCgTn'
+    assert c.cleaned_seq == 'ACGTA'
+    assert d is None
