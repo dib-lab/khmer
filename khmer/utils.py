@@ -265,11 +265,11 @@ def clean_input_reads(records):
 
     Use this to convert a stream of records that might not have a
     `cleaned_seq` attribute to one that does. Use this to extend
-    Records loaded by `screed.open()`.
+    Records loaded by `screed.open()`. It is a mistake to apply
+    this to a `ReadParser` stream.
     """
     for record in records:
-        if not hasattr(record, 'cleaned_seq'):
-            record.cleaned_seq = record.sequence.upper().replace('N', 'A')
+        record.cleaned_seq = record.sequence.upper().replace('N', 'A')
         yield record
 
 

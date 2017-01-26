@@ -563,3 +563,10 @@ def test_BrokenPairedReader_lowercase_khmer_Read():
     assert c.sequence == 'aCgTn'
     assert c.cleaned_seq == 'ACGTA'
     assert d is None
+
+
+def test_clean_input_reads():
+    # all Read attributes are read only
+    stream = [khmer.Read(name='seq1/1', sequence='ACGT')]
+    with pytest.raises(AttributeError):
+        next(clean_input_reads(stream))
