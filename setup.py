@@ -151,8 +151,7 @@ BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
     "khmer", "kmer_hash", "hashtable", "labelhash", "hashgraph",
     "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers",
     "kmer_filters", "traversal", "assembler", "alphabets", "storage"])
-BUILD_DEPENDS.extend(path_join("khmer", bn + ".hh") for bn in [
-    "_cpy_counttable", "_cpy_hashgraph", "_cpy_nodetable"])
+BUILD_DEPENDS.extend(glob.glob(path_join("khmer", "_cpy_*.hh")))
 
 SOURCES = ["khmer/_khmer.cc"]
 SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
@@ -160,6 +159,7 @@ SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
     "labelhash", "subset", "read_aligner",
     "hllcounter", "traversal", "kmer_filters", "assembler", "alphabets",
     "storage"])
+SOURCES.extend(glob.glob(path_join("khmer", "_cpy_*.cc")))
 
 SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
@@ -172,6 +172,8 @@ if sys.platform == 'darwin' and 'clang' in os.getenv('CC', 'cc'):
     # force 64bit only builds
     EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64', '-mmacosx-version-min=10.7',
                                '-stdlib=libc++'])
+else:
+    EXTRA_COMPILE_ARGS.append('-fdiagnostics-color')
 
 if check_for_openmp():
     EXTRA_COMPILE_ARGS.extend(['-fopenmp'])
@@ -208,7 +210,6 @@ for cython_ext in [os.path.join("khmer", "_oxli", f) for f in \
     ext_name = "khmer._oxli.{0}".format(splitext(os.path.basename(cython_ext))[0])
     CY_EXTENSION_MOD = Extension(ext_name, ** CY_EXTENSION_MOD_DICT)
     EXTENSION_MODS.append(CY_EXTENSION_MOD)
-
 
 SCRIPTS = []
 SCRIPTS.extend([path_join("scripts", script)

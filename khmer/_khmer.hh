@@ -46,34 +46,8 @@ Contact: khmer-project@idyll.org
 
 #include <iostream>
 
-#include "khmer.hh"
-#include "kmer_hash.hh"
-#include "hashtable.hh"
-#include "hashgraph.hh"
-#include "assembler.hh"
-#include "read_aligner.hh"
-#include "labelhash.hh"
-#include "khmer_exception.hh"
-#include "hllcounter.hh"
+#include "_cpy_utils.hh"
 
-
-//
-// Python 2/3 compatibility: PyInt and PyLong
-//
-
-#if (PY_MAJOR_VERSION >= 3)
-#define PyInt_Check(arg) PyLong_Check(arg)
-#define PyInt_AsLong(arg) PyLong_AsLong(arg)
-#define PyInt_FromLong(arg) PyLong_FromLong(arg)
-#define Py_TPFLAGS_HAVE_ITER 0
-#endif
-
-//
-// Python 2/3 compatibility: PyBytes and PyString
-// https://docs.python.org/2/howto/cporting.html#str-unicode-unification
-//
-
-#include "bytesobject.h"
 
 //
 // Python 2/3 compatibility: Module initialization
@@ -96,156 +70,47 @@ Contact: khmer-project@idyll.org
           ob = Py_InitModule3(name, methods, doc);
 #endif
 
+
+
+#include "_cpy_readparsers.hh"
+
+#include "_cpy_hashtable.hh" 
+#include "_cpy_nodetable.hh"
+#include "_cpy_counttable.hh"
+
+#include "_cpy_hashgraph.hh"
+#include "_cpy_subsetpartition.hh"
+#include "_cpy_countgraph.hh"
+#include "_cpy_nodegraph.hh"
+
+#include "_cpy_assembly.hh"
+
+#include "_cpy_graphlabels.hh" 
+#include "_cpy_hashset.hh" 
+#include "_cpy_hllcounter.hh" 
+#include "_cpy_readaligner.hh"
+ 
+
+
+
 namespace khmer {
-namespace python {
 
+PyObject * forward_hash(PyObject * self, PyObject * args);
 
-typedef struct {
-    PyObject_HEAD
-    //! Pointer to the low-level genomic read object.
-    read_parsers:: Read *   read;
-} khmer_Read_Object;
+PyObject * forward_hash_no_rc(PyObject * self, PyObject * args);
 
+PyObject * reverse_hash(PyObject * self, PyObject * args);
 
-typedef struct {
-    PyObject_HEAD
-    //! Pointer to the low-level parser object.
-    read_parsers:: IParser *  parser;
-} khmer_ReadParser_Object;
+PyObject * murmur3_forward_hash(PyObject * self, PyObject * args);
 
+PyObject * murmur3_forward_hash_no_rc(PyObject * self, PyObject * args);
 
-typedef struct {
-    PyObject_HEAD
-    //! Pointer to Python parser object for reference counting purposes.
-    PyObject *  parent;
-    //! Persistent value of pair mode across invocations.
-    int pair_mode;
-} khmer_ReadPairIterator_Object;
+PyObject * reverse_complement(PyObject * self, PyObject * args);
 
-} //python
+PyObject * get_version_cpp( PyObject * self, PyObject * args );
 
-typedef struct {
-    PyObject_HEAD
-    pre_partition_info *   PrePartitionInfo;
-} khmer_PrePartitionInfo_Object;
+extern PyMethodDef KhmerMethods[];
 
-
-typedef struct {
-    PyObject_HEAD
-    SeenSet * hashes;
-    WordLength ksize;
-} khmer_HashSet_Object;
-
-
-typedef struct {
-    PyObject_HEAD
-    khmer_HashSet_Object * parent;
-    SeenSet::iterator * it;
-} _HashSet_iterobj;
-
-
-typedef struct {
-    PyObject_HEAD
-    Hashtable * hashtable;
-} khmer_KHashtable_Object;
-
-
-typedef struct {
-    khmer_KHashtable_Object khashtable;
-    Hashgraph * hashgraph;
-} khmer_KHashgraph_Object;
-
-
-typedef struct {
-    khmer_KHashgraph_Object khashgraph;
-    Nodegraph * nodegraph;
-} khmer_KNodegraph_Object;
-
-
-typedef struct {
-    khmer_KHashgraph_Object khashgraph;
-    Countgraph * countgraph;
-} khmer_KCountgraph_Object;
-
-typedef struct {
-    khmer_KHashtable_Object khashtable;
-    Counttable * counttable;
-} khmer_KCounttable_Object;
-
-
-typedef struct {
-    khmer_KHashtable_Object khashtable;
-    Nodetable * nodetable;
-} khmer_KNodetable_Object;
-
-
-typedef struct {
-    PyObject_HEAD
-    SubsetPartition * subset;
-} khmer_KSubsetPartition_Object;
-
-
-typedef struct {
-    PyObject_HEAD
-    ReadAligner * aligner;
-} khmer_ReadAligner_Object;
-
-
-typedef struct {
-    PyObject_HEAD
-    LabelHash * labelhash;
-} khmer_KGraphLabels_Object;
-
-
-typedef struct {
-    PyObject_HEAD
-    HLLCounter * hllcounter;
-} khmer_KHLLCounter_Object;
-
-
-typedef struct {
-    PyObject_HEAD
-    LinearAssembler * assembler;
-} khmer_KLinearAssembler_Object;
-
-
-typedef struct {
-    PyObject_HEAD
-    SimpleLabeledAssembler * assembler;
-} khmer_KSimpleLabeledAssembler_Object;
-
-
-typedef struct {
-    PyObject_HEAD
-    JunctionCountAssembler * assembler;
-} khmer_KJunctionCountAssembler_Object;
-
-
-static bool convert_Pytablesizes_to_vector(PyListObject * sizes_list_o,
-                                           std::vector<uint64_t>& sizes)
-{
-    Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
-    if (sizes_list_o_length < 1) {
-        PyErr_SetString(PyExc_ValueError,
-                        "tablesizes needs to be one or more numbers");
-        return false;
-    }
-    for (Py_ssize_t i = 0; i < sizes_list_o_length; i++) {
-        PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
-        if (PyLong_Check(size_o)) {
-            sizes.push_back(PyLong_AsUnsignedLongLong(size_o));
-        } else if (PyInt_Check(size_o)) {
-            sizes.push_back(PyInt_AsLong(size_o));
-        } else if (PyFloat_Check(size_o)) {
-            sizes.push_back(PyFloat_AS_DOUBLE(size_o));
-        } else {
-            PyErr_SetString(PyExc_TypeError,
-                            "2nd argument must be a list of ints, longs, or floats");
-            return false;
-        }
-    }
-    return true;
-}
 }
 
 #endif

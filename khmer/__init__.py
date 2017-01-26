@@ -47,7 +47,6 @@ from khmer._khmer import Nodegraph as _Nodegraph
 from khmer._khmer import Nodetable as _Nodetable
 from khmer._khmer import HLLCounter as _HLLCounter
 from khmer._khmer import ReadAligner as _ReadAligner
-from khmer._khmer import LinearAssembler
 from khmer._khmer import SimpleLabeledAssembler
 from khmer._khmer import JunctionCountAssembler
 from khmer._khmer import HashSet
