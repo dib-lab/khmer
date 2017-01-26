@@ -176,7 +176,15 @@ static bool ht_convert_PyObject_to_HashIntoType(PyObject * value,
                             "k-mer length must equal the k-mer size");
             return false;
         }
-        hashval = ht->hash_dna(s.c_str());
+
+        try {
+            hashval = ht->hash_dna(s.c_str());
+        } catch (khmer_exception &e) {
+            PyErr_SetString(PyExc_ValueError, e.what());
+            Py_DECREF(val_as_str);
+            return false;
+        }
+
         Py_DECREF(val_as_str);
         return true;
 
@@ -187,7 +195,12 @@ static bool ht_convert_PyObject_to_HashIntoType(PyObject * value,
                             "k-mer length must equal the k-mer size");
             return false;
         }
-        hashval = ht->hash_dna(s.c_str());
+        try {
+            hashval = ht->hash_dna(s.c_str());
+        } catch (khmer_exception &e) {
+            PyErr_SetString(PyExc_ValueError, e.what());
+            return false;
+        }
         return true;
     } else {
         PyErr_SetString(PyExc_ValueError,
@@ -1455,7 +1468,7 @@ hashtable_hash(khmer_KHashtable_Object * me, PyObject * args)
         convert_HashIntoType_to_PyObject(h, &hash);
         return hash;
     } catch (khmer_exception &e) {
-        PyErr_SetString(PyExc_RuntimeError, e.what());
+        PyErr_SetString(PyExc_ValueError, e.what());
         return NULL;
     }
 }
@@ -2108,7 +2121,12 @@ hashtable_get_kmer_counts(khmer_KHashtable_Object * me, PyObject * args)
     }
 
     std::vector<BoundedCounterType> counts;
-    hashtable->get_kmer_counts(sequence, counts);
+    try {
+        hashtable->get_kmer_counts(sequence, counts);
+    } catch (khmer_exception &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return NULL;
+    }
 
     PyObject * x = PyList_New(counts.size());
     for (unsigned int i = 0; i <counts.size(); i++) {
@@ -2132,7 +2150,12 @@ hashtable_get_kmer_hashes(khmer_KHashtable_Object * me, PyObject * args)
     }
 
     std::vector<HashIntoType> hashes;
-    hashtable->get_kmer_hashes(sequence, hashes);
+    try {
+        hashtable->get_kmer_hashes(sequence, hashes);
+    } catch (khmer_exception &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return NULL;
+    }
 
     PyObject * x = PyList_New(hashes.size());
     for (unsigned int i = 0; i < hashes.size(); i++) {
@@ -2158,7 +2181,12 @@ hashtable_get_kmer_hashes_as_hashset(khmer_KHashtable_Object * me,
     }
 
     SeenSet * hashes = new SeenSet;
-    hashtable->get_kmer_hashes_as_hashset(sequence, *hashes);
+    try {
+        hashtable->get_kmer_hashes_as_hashset(sequence, *hashes);
+    } catch (khmer_exception &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return NULL;
+    }
 
     PyObject * x = (PyObject *) create_HashSet_Object(hashes,
                    hashtable->ksize());
@@ -4543,7 +4571,7 @@ static PyObject * forward_hash(PyObject * self, PyObject * args)
         convert_HashIntoType_to_PyObject(h, &hash);
         return hash;
     } catch (khmer_exception &e) {
-        PyErr_SetString(PyExc_RuntimeError, e.what());
+        PyErr_SetString(PyExc_ValueError, e.what());
         return NULL;
     }
 

@@ -59,7 +59,7 @@ HashIntoType _hash(const char * kmer, const WordLength k,
                    HashIntoType& _h, HashIntoType& _r)
 {
     // sizeof(HashIntoType) * 8 bits / 2 bits/base
-    if (!(k <= sizeof(HashIntoType)*4) || !(strlen(kmer) >= k)) {
+    if ((k > sizeof(HashIntoType)*4) || strlen(kmer) != k) {
         throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
     }
 
@@ -175,16 +175,16 @@ HashIntoType _hash_murmur(const std::string& kmer)
     return khmer::_hash_murmur(kmer, h, r);
 }
 
-HashIntoType _hash_murmur(const std::string& kmer,
+    HashIntoType _hash_murmur(const std::string& kmer, const WordLength k,
                           HashIntoType& h, HashIntoType& r)
 {
     uint64_t out[2];
     uint32_t seed = 0;
-    MurmurHash3_x64_128((void *)kmer.c_str(), kmer.size(), seed, &out);
+    MurmurHash3_x64_128((void *)kmer.c_str(), k), seed, &out);
     h = out[0];
 
-    std::string rev = khmer::_revcomp(kmer);
-    MurmurHash3_x64_128((void *)rev.c_str(), rev.size(), seed, &out);
+    std::string rev = khmer::_revcomp(kmer); // @CTB
+    MurmurHash3_x64_128((void *)rev.c_str(), k, seed, &out);
     r = out[0];
 
     return h ^ r;
