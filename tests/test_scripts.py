@@ -885,6 +885,21 @@ def test_partition_graph_nojoin_k21():
     assert x == (99, 0), x          # should be 99 partitions at K=21
 
 
+def test_partition_load_empty_pmap():
+    graphbase = _make_graph(utils.get_test_data('random-20-a.fa'), ksize=24)
+
+    script = 'partition-graph.py'
+    args = [graphbase, '-s', '10']
+
+    utils.runscript(script, args)
+
+    script = 'merge-partitions.py'
+    args = [graphbase, '-k', '24']
+    status, out, err = utils.runscript(script, args, fail_ok=True)
+    assert status == -1
+    assert 'only a header and no partition IDs' in err
+
+
 def test_partition_graph_nojoin_stoptags():
     # test with stoptags
     graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
