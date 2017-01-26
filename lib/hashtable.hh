@@ -217,7 +217,7 @@ public:
     // using the supplied parser.
     template<typename ParseFunctor>
     void consume_fasta(
-        read_parsers::ReadParser<ParseFunctor>* parser,
+        read_parsers::ReadParserPtr<ParseFunctor>& parser,
         unsigned int &total_reads,
         unsigned long long &n_consumed
     );
@@ -292,7 +292,7 @@ public:
     // calculate the abundance distribution of kmers in the given file.
     template<typename ParseFunctor>
     uint64_t * abundance_distribution(
-        read_parsers::ReadParser<ParseFunctor>* parser,
+        read_parsers::ReadParserPtr<ParseFunctor>& parser,
         Hashtable * tracking
     );
     template<typename ParseFunctor>

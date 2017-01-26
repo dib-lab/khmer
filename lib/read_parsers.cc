@@ -316,13 +316,12 @@ Read FastxReader::get_next_read()
 template<typename ParseFunctor>
 ReadParserPtr<ParseFunctor> get_parser(std::string& filename)
 {
-    return ReadParserPtr(
+    return ReadParserPtr<ParseFunctor>(
         new ReadParser<ParseFunctor>(
             std::unique_ptr<ParseFunctor>(new ParseFunctor(filename))
         )
     );
 }
-auto get_fastx_parser = get_parser<FastxReader>;
 
 // All template instantiations used in the codebase must be declared here.
 template class ReadParser<FastxReader>;

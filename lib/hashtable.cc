@@ -114,14 +114,13 @@ void Hashtable::consume_fasta(
     unsigned long long &n_consumed
 )
 {
-    ParseFunctor reader((std::string&)filename);
-    read_parsers::ReadParser<ParseFunctor> parser(reader);
-    consume_fasta<ParseFunctor>(&parser, total_reads, n_consumed);
+    ReadParserPtr<ParseFunctor> parser = get_parser<ParseFunctor>((std::string&)filename);
+    consume_fasta<ParseFunctor>(parser, total_reads, n_consumed);
 }
 
 template<typename ParseFunctor>
 void Hashtable::consume_fasta(
-    read_parsers::ReadParser<ParseFunctor> * parser,
+    ReadParserPtr<ParseFunctor>& parser,
     unsigned int &total_reads,
     unsigned long long &n_consumed
 )
@@ -325,7 +324,7 @@ BoundedCounterType Hashtable::get_max_count(const std::string &s)
 
 template<typename ParseFunctor>
 uint64_t * Hashtable::abundance_distribution(
-    read_parsers::ReadParser<ParseFunctor>* parser,
+    ReadParserPtr<ParseFunctor>& parser,
     Hashtable *          tracking)
 {
     uint64_t * dist = new uint64_t[MAX_BIGCOUNT + 1];
@@ -380,9 +379,8 @@ uint64_t * Hashtable::abundance_distribution(
     std::string filename,
     Hashtable *  tracking)
 {
-    ParseFunctor reader((std::string&)filename);
-    ReadParser<ParseFunctor> parser(reader);
-    return abundance_distribution(&parser, tracking);
+    ReadParserPtr<ParseFunctor> parser = get_parser<ParseFunctor>((std::string&)filename);
+    return abundance_distribution(parser, tracking);
 }
 
 unsigned long Hashtable::trim_on_abundance(
@@ -511,21 +509,21 @@ const
     return posns;
 }
 
-template void Hashtable::consume_fasta<read_parsers::FastxReader>(
+template void Hashtable::consume_fasta<FastxReader>(
     std::string const &filename,
     unsigned int &total_reads,
     unsigned long long &n_consumed
 );
-template void Hashtable::consume_fasta<read_parsers::FastxReader>(
-    read_parsers::ReadParser<read_parsers::FastxReader> * parser,
+template void Hashtable::consume_fasta<FastxReader>(
+    ReadParserPtr<FastxReader>& parser,
     unsigned int &total_reads,
     unsigned long long &n_consumed
 );
-template uint64_t * Hashtable::abundance_distribution<read_parsers::FastxReader>(
-    read_parsers::ReadParser<read_parsers::FastxReader>* parser,
+template uint64_t * Hashtable::abundance_distribution<FastxReader>(
+    ReadParserPtr<FastxReader>& parser,
     Hashtable * tracking
 );
-template uint64_t * Hashtable::abundance_distribution<read_parsers::FastxReader>(
+template uint64_t * Hashtable::abundance_distribution<FastxReader>(
     std::string filename,
     Hashtable * tracking
 );

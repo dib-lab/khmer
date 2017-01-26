@@ -58,6 +58,7 @@ Contact: khmer-project@idyll.org
 #define arr_len(a) (a + sizeof a / sizeof a[0])
 
 using namespace khmer;
+using namespace khmer::read_parsers;
 
 std::map<int, std::vector<double> > rawEstimateData;
 std::map<int, std::vector<double> > biasData;
@@ -382,14 +383,13 @@ void HLLCounter::consume_fasta(
     unsigned int &total_reads,
     unsigned long long &n_consumed)
 {
-    ParseFunctor reader((std::string&)filename);
-    read_parsers::ReadParser<ParseFunctor> parser(reader);
-    consume_fasta<ParseFunctor>(&parser, stream_records, total_reads, n_consumed);
+    ReadParserPtr<ParseFunctor> parser = get_parser<ParseFunctor>((std::string&)filename);
+    consume_fasta<ParseFunctor>(parser, stream_records, total_reads, n_consumed);
 }
 
 template<typename ParseFunctor>
 void HLLCounter::consume_fasta(
-    read_parsers::ReadParser<ParseFunctor> *parser,
+    ReadParserPtr<ParseFunctor>& parser,
     bool stream_records,
     unsigned int &      total_reads,
     unsigned long long &    n_consumed)
@@ -509,14 +509,14 @@ void HLLCounter::merge(HLLCounter &other)
     }
 }
 
-template void HLLCounter::consume_fasta<read_parsers::FastxReader>(
+template void HLLCounter::consume_fasta<FastxReader>(
     std::string const &,
     bool,
     unsigned int &,
     unsigned long long &
 );
-template void HLLCounter::consume_fasta<read_parsers::FastxReader>(
-    read_parsers::ReadParser<read_parsers::FastxReader> *,
+template void HLLCounter::consume_fasta<FastxReader>(
+    ReadParserPtr<FastxReader>&,
     bool,
     unsigned int &,
     unsigned long long &

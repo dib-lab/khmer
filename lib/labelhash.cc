@@ -74,10 +74,9 @@ void LabelHash::consume_fasta_and_tag_with_labels(
     CallbackFn	      callback,	    void *		callback_data
 )
 {
-    ParseFunctor pf((std::string&)filename);
-    ReadParser<ParseFunctor> parser(pf);
+    ReadParserPtr<ParseFunctor> parser = get_parser<ParseFunctor>((std::string&)filename);
     consume_fasta_and_tag_with_labels<ParseFunctor>(
-        &parser,
+        parser,
         total_reads, n_consumed,
         callback, callback_data
     );
@@ -85,7 +84,7 @@ void LabelHash::consume_fasta_and_tag_with_labels(
 
 template<typename ParseFunctor>
 void LabelHash::consume_fasta_and_tag_with_labels(
-    read_parsers::ReadParser<ParseFunctor> * parser,
+    ReadParserPtr<ParseFunctor>& parser,
     unsigned int		    &total_reads,   unsigned long long	&n_consumed,
     CallbackFn		    callback,	    void *		callback_data
 )
@@ -157,8 +156,7 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
     total_reads = 0;
     n_consumed = 0;
 
-    ParseFunctor pf((std::string&)filename);
-    ReadParser<ParseFunctor> parser(pf);
+    ReadParserPtr<ParseFunctor> parser = get_parser<ParseFunctor>((std::string&)filename);
     Read read;
 
     std::string seq = "";
@@ -171,8 +169,8 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
     // iterate through the FASTA file & consume the reads.
     //
     PartitionID p;
-    while(!parser.is_complete())  {
-        read = parser.get_next_read();
+    while(!parser->is_complete())  {
+        read = parser->get_next_read();
         seq = read.sequence;
 
         if (graph->check_and_normalize_read(seq)) {
@@ -614,21 +612,21 @@ void LabelHash::label_across_high_degree_nodes(const char * s,
     }
 }
 
-template void LabelHash::consume_fasta_and_tag_with_labels<read_parsers::FastxReader>(
+template void LabelHash::consume_fasta_and_tag_with_labels<FastxReader>(
     std:: string const &filename,
     unsigned int &total_reads,
     unsigned long long &n_consumed,
     CallbackFn callback,
     void * callback_data
 );
-template void LabelHash::consume_fasta_and_tag_with_labels<read_parsers::FastxReader>(
-    read_parsers::ReadParser<read_parsers::FastxReader> * parser,
+template void LabelHash::consume_fasta_and_tag_with_labels<FastxReader>(
+    ReadParserPtr<FastxReader>& parser,
     unsigned int &total_reads,
     unsigned long long &n_consumed,
     CallbackFn callback,
     void * callback_data
 );
-template void LabelHash::consume_partitioned_fasta_and_tag_with_labels<read_parsers::FastxReader>(
+template void LabelHash::consume_partitioned_fasta_and_tag_with_labels<FastxReader>(
     const std::string &filename,
     unsigned int &total_reads,
     unsigned long long &n_consumed,

@@ -152,7 +152,7 @@ public:
 
     template<typename ParseFunctor>
     void consume_fasta_and_tag_with_labels(
-        read_parsers::ReadParser<ParseFunctor> * parser,
+        read_parsers::ReadParserPtr<ParseFunctor>& parser,
         unsigned int	    &total_reads,
         unsigned long long  &n_consumed,
         CallbackFn	    callback	    = NULL,

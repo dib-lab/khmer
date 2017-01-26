@@ -67,7 +67,7 @@ public:
                        unsigned int &,
                        unsigned long long &);
     template<typename ParseFunctor>
-    void consume_fasta(read_parsers::ReadParser<ParseFunctor> *,
+    void consume_fasta(read_parsers::ReadParserPtr<ParseFunctor>&,
                        bool,
                        unsigned int &,
                        unsigned long long &);
