@@ -564,7 +564,7 @@ static PyTypeObject khmer_Read_Type = {
 
 typedef struct {
     PyObject_HEAD
-    FastxParserPtr& parser;
+    FastxParserPtr parser;
 } khmer_ReadParser_Object;
 
 
