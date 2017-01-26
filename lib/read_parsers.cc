@@ -159,14 +159,16 @@ bool ReadParser<ParseFunctor>::_is_valid_read_pair(
 }
 
 template<typename ParseFunctor>
-ReadParser<ParseFunctor>::ReadParser(ParseFunctor pf) : _parser(pf)
+ReadParser<ParseFunctor>::ReadParser(std::unique_ptr<ParseFunctor> pf)
 {
+    _parser = std::move(pf);
     _init();
 }
 
 template<typename ParseFunctor>
-ReadParser<ParseFunctor>::ReadParser(ReadParser& other) : _parser(other._parser)
+ReadParser<ParseFunctor>::ReadParser(ReadParser& other)
 {
+    _parser = std::move(other._parser);
     _init();
 }
 
@@ -181,9 +183,7 @@ ReadParser<ParseFunctor>::~ReadParser()
 template<typename ParseFunctor>
 Read ReadParser<ParseFunctor>::get_next_read()
 {
-    Read read;
-    _parser(read);
-    return read;
+    return _parser->get_next_read();
 }
 
 template<typename ParseFunctor>
@@ -205,13 +205,13 @@ ReadPair ReadParser<ParseFunctor>::get_next_read_pair(uint8_t mode)
 template<typename ParseFunctor>
 size_t ReadParser<ParseFunctor>::get_num_reads()
 {
-    return _parser.get_num_reads();
+    return _parser->get_num_reads();
 }
 
 template<typename ParseFunctor>
 bool ReadParser<ParseFunctor>::is_complete()
 {
-    return _parser.is_complete();
+    return _parser->is_complete();
 }
 
 void FastxReader::_init()
@@ -268,8 +268,9 @@ size_t FastxReader::get_num_reads()
     return _num_reads;
 }
 
-void FastxReader::operator()(Read& read)
+Read FastxReader::get_next_read()
 {
+    Read read;
     int ret = -1;
     const char *invalid_read_exc = NULL;
     while (!__sync_bool_compare_and_swap(&_spin_lock, 0, 1));
@@ -309,16 +310,23 @@ void FastxReader::operator()(Read& read)
     if (ret != 0) {
         throw StreamReadError();
     }
+    return read;
 }
 
-ReadParser<FastxReader> * get_fastx_parser(std::string& filename)
+template<typename ParseFunctor>
+ReadParserPtr<ParseFunctor> get_parser(std::string& filename)
 {
-    FastxReader reader(filename);
-    return new ReadParser<FastxReader>(reader);
+    return ReadParserPtr(
+        new ReadParser<ParseFunctor>(
+            std::unique_ptr<ParseFunctor>(new ParseFunctor(filename))
+        )
+    );
 }
+auto get_fastx_parser = get_parser<FastxReader>;
 
 // All template instantiations used in the codebase must be declared here.
 template class ReadParser<FastxReader>;
+template FastxParserPtr get_parser<FastxReader>(std::string& filename);
 
 } // namespace read_parsers
 

@@ -49,6 +49,7 @@ Contact: khmer-project@idyll.org
 #include <iostream>
 #include <string>
 #include <utility>
+#include <memory>
 
 #include "khmer.hh"
 #include "khmer_exception.hh"
@@ -125,7 +126,7 @@ template<typename ParseFunctor>
 class ReadParser
 {
 protected:
-    ParseFunctor _parser;
+    std::unique_ptr<ParseFunctor> _parser;
     regex_t _re_read_2_nosub;
     regex_t _re_read_1;
     regex_t _re_read_2;
@@ -145,7 +146,7 @@ public:
         PAIR_MODE_ERROR_ON_UNPAIRED
     };
 
-    explicit ReadParser(ParseFunctor pf);
+    explicit ReadParser(std::unique_ptr<ParseFunctor> pf);
     explicit ReadParser(ReadParser& other);
     virtual ~ReadParser();
 
@@ -173,7 +174,7 @@ public:
     FastxReader(FastxReader& other);
     ~FastxReader();
 
-    void operator()(Read &read);
+    Read get_next_read();
     bool is_complete();
     size_t get_num_reads();
 }; // class FastxReader
@@ -202,7 +203,15 @@ inline PartitionID _parse_partition_id(std::string name)
     return p;
 }
 
-ReadParser<FastxReader> * get_fastx_parser(std::string& filename);
+// Alias for generic/templated ReadParser pointer
+template<typename T> using ReadParserPtr = std::unique_ptr<ReadParser<T>>;
+
+// Convenience function
+template<typename ParseFunctor>
+ReadParserPtr<ParseFunctor> get_parser(std::string& filename);
+
+// Alias for instantiated ReadParsers
+typedef std::unique_ptr<ReadParser<FastxReader>> FastxParserPtr;
 
 } // namespace read_parsers
 
