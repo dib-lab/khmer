@@ -375,21 +375,21 @@ unsigned int HLLCounter::consume_string(const std::string &inp)
     return n_consumed;
 }
 
+template<typename ParseFunctor>
 void HLLCounter::consume_fasta(
     std::string const &filename,
     bool stream_records,
     unsigned int &total_reads,
     unsigned long long &n_consumed)
 {
-    read_parsers::IParser * parser = read_parsers::IParser::get_parser(filename);
-
-    consume_fasta(parser, stream_records, total_reads, n_consumed);
-
-    delete parser;
+    ParseFunctor reader((std::string&)filename);
+    read_parsers::ReadParser<ParseFunctor> parser(reader);
+    consume_fasta<ParseFunctor>(&parser, stream_records, total_reads, n_consumed);
 }
 
+template<typename ParseFunctor>
 void HLLCounter::consume_fasta(
-    read_parsers::IParser *parser,
+    read_parsers::ReadParser<ParseFunctor> *parser,
     bool stream_records,
     unsigned int &      total_reads,
     unsigned long long &    n_consumed)
@@ -429,7 +429,7 @@ void HLLCounter::consume_fasta(
                 }
 
                 if (stream_records) {
-                    read.write_to(std::cout);
+                    read.write_fastx(std::cout);
                 }
 
                 #pragma omp task default(none) firstprivate(read) \
@@ -508,3 +508,16 @@ void HLLCounter::merge(HLLCounter &other)
         this->M[i] = std::max(other.M[i], this->M[i]);
     }
 }
+
+template void HLLCounter::consume_fasta<read_parsers::FastxReader>(
+    std::string const &,
+    bool,
+    unsigned int &,
+    unsigned long long &
+);
+template void HLLCounter::consume_fasta<read_parsers::FastxReader>(
+    read_parsers::ReadParser<read_parsers::FastxReader> *,
+    bool,
+    unsigned int &,
+    unsigned long long &
+);

@@ -244,6 +244,15 @@ FastxReader::FastxReader(std::string& infile)
     _init();
 }
 
+FastxReader::FastxReader(FastxReader& other)
+        : _filename(other._filename),
+          _spin_lock(other._spin_lock),
+          _num_reads(other._num_reads),
+          _have_qualities(other._have_qualities)
+{
+    _stream = std::move(other._stream);
+}
+
 FastxReader::~FastxReader()
 {
     seqan::close(_stream);

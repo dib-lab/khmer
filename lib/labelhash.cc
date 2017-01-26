@@ -76,14 +76,11 @@ void LabelHash::consume_fasta_and_tag_with_labels(
 {
     ParseFunctor pf((std::string&)filename);
     ReadParser<ParseFunctor> parser(pf);
-
-    consume_fasta_and_tag_with_labels(
+    consume_fasta_and_tag_with_labels<ParseFunctor>(
         &parser,
         total_reads, n_consumed,
         callback, callback_data
     );
-
-    delete parser;
 }
 
 template<typename ParseFunctor>
@@ -630,6 +627,13 @@ template void LabelHash::consume_fasta_and_tag_with_labels<read_parsers::FastxRe
     unsigned long long &n_consumed,
     CallbackFn callback,
     void * callback_data
+);
+template void LabelHash::consume_partitioned_fasta_and_tag_with_labels<read_parsers::FastxReader>(
+    const std::string &filename,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed,
+    CallbackFn callback = NULL,
+    void * callback_datac = NULL
 );
 
 } // namespace khmer

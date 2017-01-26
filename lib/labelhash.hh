@@ -159,11 +159,12 @@ public:
         void *		    callback_data   = NULL);
 
     template<typename ParseFunctor>
-    void consume_partitioned_fasta_and_tag_with_labels(const std::string &filename,
-            unsigned int &total_reads,
-            unsigned long long &n_consumed,
-            CallbackFn callback = NULL,
-            void * callback_datac = NULL);
+    void consume_partitioned_fasta_and_tag_with_labels(
+        const std::string &filename,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed,
+        CallbackFn callback = NULL,
+        void * callback_datac = NULL);
 
     void consume_sequence_and_tag_with_labels(const std::string& seq,
             unsigned long long& n_consumed,
