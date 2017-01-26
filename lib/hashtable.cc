@@ -52,7 +52,10 @@ Contact: khmer-project@idyll.org
 
 using namespace std;
 using namespace khmer;
-using namespace khmer:: read_parsers;
+using namespace khmer::read_parsers;
+
+namespace khmer
+{
 
 //
 // check_and_process_read: checks for non-ACGT characters before consuming
@@ -104,29 +107,23 @@ bool Hashtable::check_and_normalize_read(std::string &read) const
 //
 
 // TODO? Inline in header.
-void
-Hashtable::
-consume_fasta(
-    std:: string const  &filename,
-    unsigned int	      &total_reads, unsigned long long	&n_consumed
+template<typename ParseFunctor>
+void Hashtable::consume_fasta(
+    std::string const &filename,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
 )
 {
-    IParser *	  parser =
-        IParser::get_parser( filename );
-
-    consume_fasta(
-        parser,
-        total_reads, n_consumed
-    );
-
-    delete parser;
+    ParseFunctor reader((std::string&)filename);
+    ReadParser<ParseFunctor> parser(reader);
+    consume_fasta(&parser, total_reads, n_consumed);
 }
 
-void
-Hashtable::
-consume_fasta(
-    read_parsers:: IParser *  parser,
-    unsigned int		    &total_reads, unsigned long long  &n_consumed
+template<typename ParseFunctor>
+void Hashtable::consume_fasta(
+    read_parsers::ReadParser<ParseFunctor> * parser,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
 )
 {
     Read			  read;
@@ -326,9 +323,9 @@ BoundedCounterType Hashtable::get_max_count(const std::string &s)
     return max_count;
 }
 
-uint64_t *
-Hashtable::abundance_distribution(
-    read_parsers::IParser * parser,
+template<typename ParseFunctor>
+uint64_t * Hashtable::abundance_distribution(
+    read_parsers::ReadParser<ParseFunctor>* parser,
     Hashtable *          tracking)
 {
     uint64_t * dist = new uint64_t[MAX_BIGCOUNT + 1];
@@ -378,16 +375,14 @@ Hashtable::abundance_distribution(
     return dist;
 }
 
-
+template<typename ParseFunctor>
 uint64_t * Hashtable::abundance_distribution(
     std::string filename,
     Hashtable *  tracking)
 {
-    IParser* parser = IParser::get_parser(filename.c_str());
-
-    uint64_t * distribution = abundance_distribution(parser, tracking);
-    delete parser;
-    return distribution;
+    ParseFunctor reader((std::string&)filename);
+    ReadParser<ParseFunctor> parser(reader);
+    return abundance_distribution(&parser, tracking);
 }
 
 unsigned long Hashtable::trim_on_abundance(
@@ -516,4 +511,4 @@ const
     return posns;
 }
 
-// vim: set sts=2 sw=2:
+} // namespace khmer

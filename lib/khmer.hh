@@ -96,8 +96,8 @@ private:\
 #   define SAVED_SMALLCOUNT 7
 
 
-#   define LEFT 0
-#   define RIGHT 1
+#   define TRAVERSE_LEFT 0
+#   define TRAVERSE_RIGHT 1
 
 #   define VERBOSE_REPARTITION 0
 
