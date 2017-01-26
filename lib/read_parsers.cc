@@ -35,11 +35,7 @@ LICENSE (END)
 
 Contact: khmer-project@idyll.org
 */
-#include <seqan/seq_io.h> // IWYU pragma: keep
-#include <seqan/sequence.h> // IWYU pragma: keep
-#include <seqan/stream.h> // IWYU pragma: keep
 #include <fstream>
-
 #include "khmer_exception.hh"
 #include "read_parsers.hh"
 
@@ -119,7 +115,7 @@ ReadPair ReadParser<ParseFunctor>::_get_next_read_pair_in_ignore_mode()
     return pair;
 } // _get_next_read_pair_in_ignore_mode
 
-
+template<typename ParseFunctor>
 ReadPair ReadParser<ParseFunctor>::_get_next_read_pair_in_error_mode()
 {
     ReadPair pair;
@@ -151,7 +147,7 @@ ReadPair ReadParser<ParseFunctor>::_get_next_read_pair_in_error_mode()
     return pair;
 } // _get_next_read_pair_in_error_mode
 
-
+template<typename ParseFunctor>
 bool ReadParser<ParseFunctor>::_is_valid_read_pair(
     ReadPair &the_read_pair, regmatch_t &match_1, regmatch_t &match_2
 )
@@ -183,15 +179,39 @@ ReadParser<ParseFunctor>::~ReadParser()
 }
 
 template<typename ParseFunctor>
-bool ReadParser<ParseFunctor>::is_complete()
+Read ReadParser<ParseFunctor>::get_next_read()
 {
-    return _parser.is_complete();
+    Read read;
+    _parser(read);
+    return read;
+}
+
+template<typename ParseFunctor>
+ReadPair ReadParser<ParseFunctor>::get_next_read_pair(uint8_t mode)
+{
+    if (mode == ReadParser<ParseFunctor>::PAIR_MODE_IGNORE_UNPAIRED) {
+        return _get_next_read_pair_in_ignore_mode();
+    }
+    else if (mode == ReadParser<ParseFunctor>::PAIR_MODE_ERROR_ON_UNPAIRED) {
+        return _get_next_read_pair_in_error_mode();
+    }
+    else {
+        std::ostringstream oss;
+        oss << "Unknown pair reading mode: " << mode;
+        throw UnknownPairReadingMode(oss.str());
+    }
 }
 
 template<typename ParseFunctor>
 size_t ReadParser<ParseFunctor>::get_num_reads()
 {
     return _parser.get_num_reads();
+}
+
+template<typename ParseFunctor>
+bool ReadParser<ParseFunctor>::is_complete()
+{
+    return _parser.is_complete();
 }
 
 void FastxReader::_init()
@@ -239,9 +259,8 @@ size_t FastxReader::get_num_reads()
     return _num_reads;
 }
 
-void FastxReader::operator()()
+void FastxReader::operator()(Read& read)
 {
-    Read read;
     int ret = -1;
     const char *invalid_read_exc = NULL;
     while (!__sync_bool_compare_and_swap(&_spin_lock, 0, 1));
@@ -281,7 +300,7 @@ void FastxReader::operator()()
     if (ret != 0) {
         throw StreamReadError();
     }
-    return read;
+    read;
 }
 
 // All template instantiations used in the codebase must be declared here.
@@ -290,5 +309,3 @@ template class ReadParser<FastxReader>;
 } // namespace read_parsers
 
 } // namespace khmer
-
-// vim: set ft=cpp sts=4 sw=4 tw=80:

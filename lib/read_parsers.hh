@@ -38,6 +38,10 @@ Contact: khmer-project@idyll.org
 #ifndef READ_PARSERS_HH
 #define READ_PARSERS_HH
 
+#include <seqan/seq_io.h> // IWYU pragma: keep
+#include <seqan/sequence.h> // IWYU pragma: keep
+#include <seqan/stream.h> // IWYU pragma: keep
+
 #include <regex.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -147,10 +151,6 @@ public:
 
     Read get_next_read();
     ReadPair get_next_read_pair(uint8_t mode = PAIR_MODE_ERROR_ON_UNPAIRED);
-
-    static IParser * const get_parser(
-        std::string const &ifile_name
-    );
 
     size_t get_num_reads();
     bool is_complete();
