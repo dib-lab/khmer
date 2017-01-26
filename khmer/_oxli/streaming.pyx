@@ -244,7 +244,6 @@ cdef class BrokenPairedReader:
             passed_length = True
 
     cdef tuple _next(self):
-        cdef bool has_next
         cdef Sequence first, second
 
         if self.record == None:
@@ -256,10 +255,10 @@ cdef class BrokenPairedReader:
         else:
             first = self.record
         
-        second = self.parser_next()
+        second = self.parser._next()
         
         # check if paired
-        if has_next:
+        if second is not None:
             if _check_is_pair(first, second) and not self.force_single:
                 self.record = None
                 return 2, first, second, None    # found 2 proper records

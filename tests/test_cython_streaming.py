@@ -19,8 +19,18 @@ import screed
 def teardown():
     utils.cleanup()
 
-
 def gather(filename, **kw):
+    stream = FastxParser(str(filename))
+
+    x = []
+    m = 0
+    for read in stream:
+        x.append((read.name, None))
+        m += 1
+
+    return x,m
+
+def gather_paired(filename, **kw):
     stream = FastxParser(str(filename))
     itr = BrokenPairedReader(stream, **kw)
 
@@ -57,14 +67,30 @@ def create_fastx(tmpdir):
     return func
 
 
-def test_BrokenPairedReader_force_single(create_fastx):
-    reads = [Sequence.create('seq1/1', 'A' * 5),
-              Sequence.create('seq1/2', 'A' * 4),
-              Sequence.create('seq2/1', 'A' * 5),
-              Sequence.create('seq3/1', 'A' * 3),
-              Sequence.create('seq3/2', 'A' * 5)]
+def test_FastxParser(create_fastx):
+    reads = [Sequence.new('seq1/1', 'A' * 5),
+              Sequence.new('seq1/2', 'A' * 4),
+              Sequence.new('seq2/1', 'A' * 5),
+              Sequence.new('seq3/1', 'A' * 3),
+              Sequence.new('seq3/2', 'A' * 5)]
+    x, m = gather(create_fastx(reads))
 
-    x, n, m = gather(create_fastx(reads), force_single=True)
+    expected = [('seq1/1', None),
+                ('seq1/2', None),
+                ('seq2/1', None),
+                ('seq3/1', None),
+                ('seq3/2', None)]
+
+    assert x == expected, x
+
+def test_BrokenPairedReader_force_single(create_fastx):
+    reads = [Sequence.new('seq1/1', 'A' * 5),
+              Sequence.new('seq1/2', 'A' * 4),
+              Sequence.new('seq2/1', 'A' * 5),
+              Sequence.new('seq3/1', 'A' * 3),
+              Sequence.new('seq3/2', 'A' * 5)]
+
+    x, n, m = gather_paired(create_fastx(reads), force_single=True)
 
     expected = [('seq1/1', None),
                 ('seq1/2', None),
@@ -77,13 +103,13 @@ def test_BrokenPairedReader_force_single(create_fastx):
 
 
 def test_BrokenPairedReader_OnPairs_filter_length_require_paired(create_fastx):
-    reads = [Sequence.create('seq1/1', 'A' * 5),
-              Sequence.create('seq1/2', 'A' * 4),
-              Sequence.create('seq3/1', 'A' * 3),
-              Sequence.create('seq3/2', 'A' * 5)]
+    reads = [Sequence.new('seq1/1', 'A' * 5),
+              Sequence.new('seq1/2', 'A' * 4),
+              Sequence.new('seq3/1', 'A' * 3),
+              Sequence.new('seq3/2', 'A' * 5)]
 
 
-    x, n, m = gather(create_fastx(reads), min_length=4, require_paired=True)
+    x, n, m = gather_paired(create_fastx(reads), min_length=4, require_paired=True)
 
     expected = [('seq1/1', 'seq1/2')]
     assert x == expected, x
@@ -92,11 +118,11 @@ def test_BrokenPairedReader_OnPairs_filter_length_require_paired(create_fastx):
 
 
 def test_BrokenPairedReader_OnPairs_filter_length_require_paired_2(create_fastx):
-    reads = [Sequence.create('seq1/1', 'A' * 5),
-              Sequence.create('seq1/2', 'A' * 4),
-              Sequence.create('seq3/1', 'A' * 5),
-              Sequence.create('seq3/2', 'A' * 3)]
-    x, n, m = gather(create_fastx(reads), min_length=4, require_paired=True)
+    reads = [Sequence.new('seq1/1', 'A' * 5),
+              Sequence.new('seq1/2', 'A' * 4),
+              Sequence.new('seq3/1', 'A' * 5),
+              Sequence.new('seq3/2', 'A' * 3)]
+    x, n, m = gather_paired(create_fastx(reads), min_length=4, require_paired=True)
 
     expected = [('seq1/1', 'seq1/2')]
     assert x == expected, x
@@ -105,11 +131,11 @@ def test_BrokenPairedReader_OnPairs_filter_length_require_paired_2(create_fastx)
 
 
 def test_BrokenPairedReader_OnPairs_filter_length_required_paired_3(create_fastx):
-    reads = [Sequence.create('seq1/1', 'A' * 5),
-              Sequence.create('seq1/2', 'A' * 4),
-              Sequence.create('seq3/1', 'A' * 3),
-              Sequence.create('seq3/2', 'A' * 3)]
-    x, n, m = gather(create_fastx(reads), min_length=4, require_paired=True)
+    reads = [Sequence.new('seq1/1', 'A' * 5),
+              Sequence.new('seq1/2', 'A' * 4),
+              Sequence.new('seq3/1', 'A' * 3),
+              Sequence.new('seq3/2', 'A' * 3)]
+    x, n, m = gather_paired(create_fastx(reads), min_length=4, require_paired=True)
 
     expected = [('seq1/1', 'seq1/2')]
     assert x == expected, x
@@ -118,12 +144,12 @@ def test_BrokenPairedReader_OnPairs_filter_length_required_paired_3(create_fastx
 
 
 def test_BrokenPairedReader_OnPairs_filter_length_require_paired_4(create_fastx):
-    reads = [Sequence.create('seq1/1', 'A' * 3),
-              Sequence.create('seq1/2', 'A' * 3),
-              Sequence.create('seq3/1', 'A' * 5),
-              Sequence.create('seq3/2', 'A' * 5)]
+    reads = [Sequence.new('seq1/1', 'A' * 3),
+              Sequence.new('seq1/2', 'A' * 3),
+              Sequence.new('seq3/1', 'A' * 5),
+              Sequence.new('seq3/2', 'A' * 5)]
 
-    x, n, m = gather(create_fastx(reads), min_length=4, require_paired=True)
+    x, n, m = gather_paired(create_fastx(reads), min_length=4, require_paired=True)
 
     expected = [('seq3/1', 'seq3/2')]
     assert x == expected, x
@@ -132,9 +158,9 @@ def test_BrokenPairedReader_OnPairs_filter_length_require_paired_4(create_fastx)
 
 '''
 def test_BrokenPairedReader_lowercase():
-    reads = [Sequence.create('seq1/1', 'acgtn'),
-              Sequence.create('seq1/2', 'AcGtN'),
-              Sequence.create('seq1/2', 'aCgTn')]
+    reads = [Sequence.new('seq1/1', 'acgtn'),
+              Sequence.new('seq1/2', 'AcGtN'),
+              Sequence.new('seq1/2', 'aCgTn')]
 
     results = []
     parser = FastxParser(create_fastx(reads))
