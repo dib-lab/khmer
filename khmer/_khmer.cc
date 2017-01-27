@@ -188,7 +188,7 @@ static bool ht_convert_PyObject_to_HashIntoType(PyObject * value,
         return convert_PyLong_to_HashIntoType(value, hashval);
     } else if (PyUnicode_Check(value))  {
         PyObject* val_as_str = PyUnicode_AsEncodedString(value,
-           "utf-8", "strict");
+                               "utf-8", "strict");
         std::string s = PyBytes_AsString(val_as_str);
         if (strlen(s.c_str()) != ht->ksize()) {
             Py_DECREF(val_as_str);
