@@ -45,8 +45,8 @@ namespace khmer
 namespace read_parsers
 {
 
-template<typename ParseFunctor>
-void ReadParser<ParseFunctor>::_init()
+template<typename SeqIO>
+void ReadParser<SeqIO>::_init()
 {
     int regex_rc =
         regcomp(
@@ -76,8 +76,8 @@ void ReadParser<ParseFunctor>::_init()
     }
 }
 
-template<typename ParseFunctor>
-ReadPair ReadParser<ParseFunctor>::_get_next_read_pair_in_ignore_mode()
+template<typename SeqIO>
+ReadPair ReadParser<SeqIO>::_get_next_read_pair_in_ignore_mode()
 {
     ReadPair pair;
     regmatch_t match_1, match_2;
@@ -115,8 +115,8 @@ ReadPair ReadParser<ParseFunctor>::_get_next_read_pair_in_ignore_mode()
     return pair;
 } // _get_next_read_pair_in_ignore_mode
 
-template<typename ParseFunctor>
-ReadPair ReadParser<ParseFunctor>::_get_next_read_pair_in_error_mode()
+template<typename SeqIO>
+ReadPair ReadParser<SeqIO>::_get_next_read_pair_in_error_mode()
 {
     ReadPair pair;
     regmatch_t match_1, match_2;
@@ -147,8 +147,8 @@ ReadPair ReadParser<ParseFunctor>::_get_next_read_pair_in_error_mode()
     return pair;
 } // _get_next_read_pair_in_error_mode
 
-template<typename ParseFunctor>
-bool ReadParser<ParseFunctor>::_is_valid_read_pair(
+template<typename SeqIO>
+bool ReadParser<SeqIO>::_is_valid_read_pair(
     ReadPair &the_read_pair, regmatch_t &match_1, regmatch_t &match_2
 )
 {
@@ -158,41 +158,41 @@ bool ReadParser<ParseFunctor>::_is_valid_read_pair(
                     ==	the_read_pair.second.name.substr( 0, match_1.rm_so ));
 }
 
-template<typename ParseFunctor>
-ReadParser<ParseFunctor>::ReadParser(std::unique_ptr<ParseFunctor> pf)
+template<typename SeqIO>
+ReadParser<SeqIO>::ReadParser(std::unique_ptr<SeqIO> pf)
 {
     _parser = std::move(pf);
     _init();
 }
 
-template<typename ParseFunctor>
-ReadParser<ParseFunctor>::ReadParser(ReadParser& other)
+template<typename SeqIO>
+ReadParser<SeqIO>::ReadParser(ReadParser& other)
 {
     _parser = std::move(other._parser);
     _init();
 }
 
-template<typename ParseFunctor>
-ReadParser<ParseFunctor>::~ReadParser()
+template<typename SeqIO>
+ReadParser<SeqIO>::~ReadParser()
 {
     regfree(&_re_read_2_nosub);
     regfree(&_re_read_1);
     regfree(&_re_read_2);
 }
 
-template<typename ParseFunctor>
-Read ReadParser<ParseFunctor>::get_next_read()
+template<typename SeqIO>
+Read ReadParser<SeqIO>::get_next_read()
 {
     return _parser->get_next_read();
 }
 
-template<typename ParseFunctor>
-ReadPair ReadParser<ParseFunctor>::get_next_read_pair(uint8_t mode)
+template<typename SeqIO>
+ReadPair ReadParser<SeqIO>::get_next_read_pair(uint8_t mode)
 {
-    if (mode == ReadParser<ParseFunctor>::PAIR_MODE_IGNORE_UNPAIRED) {
+    if (mode == ReadParser<SeqIO>::PAIR_MODE_IGNORE_UNPAIRED) {
         return _get_next_read_pair_in_ignore_mode();
     }
-    else if (mode == ReadParser<ParseFunctor>::PAIR_MODE_ERROR_ON_UNPAIRED) {
+    else if (mode == ReadParser<SeqIO>::PAIR_MODE_ERROR_ON_UNPAIRED) {
         return _get_next_read_pair_in_error_mode();
     }
     else {
@@ -202,14 +202,14 @@ ReadPair ReadParser<ParseFunctor>::get_next_read_pair(uint8_t mode)
     }
 }
 
-template<typename ParseFunctor>
-size_t ReadParser<ParseFunctor>::get_num_reads()
+template<typename SeqIO>
+size_t ReadParser<SeqIO>::get_num_reads()
 {
     return _parser->get_num_reads();
 }
 
-template<typename ParseFunctor>
-bool ReadParser<ParseFunctor>::is_complete()
+template<typename SeqIO>
+bool ReadParser<SeqIO>::is_complete()
 {
     return _parser->is_complete();
 }
@@ -313,12 +313,12 @@ Read FastxReader::get_next_read()
     return read;
 }
 
-template<typename ParseFunctor>
-ReadParserPtr<ParseFunctor> get_parser(std::string& filename)
+template<typename SeqIO>
+ReadParserPtr<SeqIO> get_parser(std::string& filename)
 {
-    return ReadParserPtr<ParseFunctor>(
-        new ReadParser<ParseFunctor>(
-            std::unique_ptr<ParseFunctor>(new ParseFunctor(filename))
+    return ReadParserPtr<SeqIO>(
+        new ReadParser<SeqIO>(
+            std::unique_ptr<SeqIO>(new SeqIO(filename))
         )
     );
 }

@@ -49,7 +49,7 @@ namespace khmer
 
 namespace read_parsers
 {
-    template<typename ParseFunctor> class ReadParser;
+    template<typename SeqIO> class ReadParser;
     class FastxReader;
 }
 
@@ -61,13 +61,13 @@ public:
 
     void add(const std::string &);
     unsigned int consume_string(const std::string &);
-    template<typename ParseFunctor>
+    template<typename SeqIO>
     void consume_fasta(std::string const &,
                        bool,
                        unsigned int &,
                        unsigned long long &);
-    template<typename ParseFunctor>
-    void consume_fasta(read_parsers::ReadParserPtr<ParseFunctor>&,
+    template<typename SeqIO>
+    void consume_fasta(read_parsers::ReadParserPtr<SeqIO>&,
                        bool,
                        unsigned int &,
                        unsigned long long &);

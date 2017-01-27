@@ -55,7 +55,7 @@ namespace khmer
     using read_parsers::ReadParser;
     namespace read_parsers
     {
-        template<typename ParseFunctor> class ReadParser;
+        template<typename SeqIO> class ReadParser;
         class FastxReader;
     }
 
@@ -142,7 +142,7 @@ public:
         return all_labels.size();
     }
 
-    template<typename ParseFunctor>
+    template<typename SeqIO>
     void consume_fasta_and_tag_with_labels(
         std::string const	  &filename,
         unsigned int	  &total_reads,
@@ -150,15 +150,15 @@ public:
         CallbackFn	  callback	  = NULL,
         void *		  callback_data	  = NULL);
 
-    template<typename ParseFunctor>
+    template<typename SeqIO>
     void consume_fasta_and_tag_with_labels(
-        read_parsers::ReadParserPtr<ParseFunctor>& parser,
+        read_parsers::ReadParserPtr<SeqIO>& parser,
         unsigned int	    &total_reads,
         unsigned long long  &n_consumed,
         CallbackFn	    callback	    = NULL,
         void *		    callback_data   = NULL);
 
-    template<typename ParseFunctor>
+    template<typename SeqIO>
     void consume_partitioned_fasta_and_tag_with_labels(
         const std::string &filename,
         unsigned int &total_reads,

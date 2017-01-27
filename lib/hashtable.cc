@@ -107,20 +107,20 @@ bool Hashtable::check_and_normalize_read(std::string &read) const
 //
 
 // TODO? Inline in header.
-template<typename ParseFunctor>
+template<typename SeqIO>
 void Hashtable::consume_fasta(
     std::string const &filename,
     unsigned int &total_reads,
     unsigned long long &n_consumed
 )
 {
-    ReadParserPtr<ParseFunctor> parser = get_parser<ParseFunctor>((std::string&)filename);
-    consume_fasta<ParseFunctor>(parser, total_reads, n_consumed);
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>((std::string&)filename);
+    consume_fasta<SeqIO>(parser, total_reads, n_consumed);
 }
 
-template<typename ParseFunctor>
+template<typename SeqIO>
 void Hashtable::consume_fasta(
-    ReadParserPtr<ParseFunctor>& parser,
+    ReadParserPtr<SeqIO>& parser,
     unsigned int &total_reads,
     unsigned long long &n_consumed
 )
@@ -322,9 +322,9 @@ BoundedCounterType Hashtable::get_max_count(const std::string &s)
     return max_count;
 }
 
-template<typename ParseFunctor>
+template<typename SeqIO>
 uint64_t * Hashtable::abundance_distribution(
-    ReadParserPtr<ParseFunctor>& parser,
+    ReadParserPtr<SeqIO>& parser,
     Hashtable *          tracking)
 {
     uint64_t * dist = new uint64_t[MAX_BIGCOUNT + 1];
@@ -374,12 +374,12 @@ uint64_t * Hashtable::abundance_distribution(
     return dist;
 }
 
-template<typename ParseFunctor>
+template<typename SeqIO>
 uint64_t * Hashtable::abundance_distribution(
     std::string filename,
     Hashtable *  tracking)
 {
-    ReadParserPtr<ParseFunctor> parser = get_parser<ParseFunctor>((std::string&)filename);
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>((std::string&)filename);
     return abundance_distribution(parser, tracking);
 }
 

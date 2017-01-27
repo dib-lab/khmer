@@ -67,24 +67,24 @@ namespace khmer
  * function which accepts a consume_sequence function pointer as a parameter
  */
 
-template<typename ParseFunctor>
+template<typename SeqIO>
 void LabelHash::consume_fasta_and_tag_with_labels(
     std:: string const  &filename,
     unsigned int	      &total_reads, unsigned long long	&n_consumed,
     CallbackFn	      callback,	    void *		callback_data
 )
 {
-    ReadParserPtr<ParseFunctor> parser = get_parser<ParseFunctor>((std::string&)filename);
-    consume_fasta_and_tag_with_labels<ParseFunctor>(
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>((std::string&)filename);
+    consume_fasta_and_tag_with_labels<SeqIO>(
         parser,
         total_reads, n_consumed,
         callback, callback_data
     );
 }
 
-template<typename ParseFunctor>
+template<typename SeqIO>
 void LabelHash::consume_fasta_and_tag_with_labels(
-    ReadParserPtr<ParseFunctor>& parser,
+    ReadParserPtr<SeqIO>& parser,
     unsigned int		    &total_reads,   unsigned long long	&n_consumed,
     CallbackFn		    callback,	    void *		callback_data
 )
@@ -145,7 +145,7 @@ void LabelHash::consume_fasta_and_tag_with_labels(
 
 }
 
-template<typename ParseFunctor>
+template<typename SeqIO>
 void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
     const std::string &filename,
     unsigned int &total_reads,
@@ -156,7 +156,7 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
     total_reads = 0;
     n_consumed = 0;
 
-    ReadParserPtr<ParseFunctor> parser = get_parser<ParseFunctor>((std::string&)filename);
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>((std::string&)filename);
     Read read;
 
     std::string seq = "";

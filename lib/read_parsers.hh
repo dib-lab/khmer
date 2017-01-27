@@ -122,11 +122,11 @@ struct Read
 typedef std::pair<Read, Read> ReadPair;
 
 
-template<typename ParseFunctor>
+template<typename SeqIO>
 class ReadParser
 {
 protected:
-    std::unique_ptr<ParseFunctor> _parser;
+    std::unique_ptr<SeqIO> _parser;
     regex_t _re_read_2_nosub;
     regex_t _re_read_1;
     regex_t _re_read_2;
@@ -146,7 +146,7 @@ public:
         PAIR_MODE_ERROR_ON_UNPAIRED
     };
 
-    explicit ReadParser(std::unique_ptr<ParseFunctor> pf);
+    explicit ReadParser(std::unique_ptr<SeqIO> pf);
     explicit ReadParser(ReadParser& other);
     virtual ~ReadParser();
 
@@ -207,8 +207,8 @@ inline PartitionID _parse_partition_id(std::string name)
 template<typename T> using ReadParserPtr = std::unique_ptr<ReadParser<T>>;
 
 // Convenience function
-template<typename ParseFunctor>
-ReadParserPtr<ParseFunctor> get_parser(std::string& filename);
+template<typename SeqIO>
+ReadParserPtr<SeqIO> get_parser(std::string& filename);
 
 // Alias for instantiated ReadParsers
 typedef std::unique_ptr<ReadParser<FastxReader>> FastxParserPtr;

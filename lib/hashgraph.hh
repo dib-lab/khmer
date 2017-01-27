@@ -57,7 +57,7 @@ namespace khmer
 {
     namespace read_parsers
     {
-        template<typename ParseFunctor> class ReadParser;
+        template<typename SeqIO> class ReadParser;
         class FastxReader;
     }
 }
@@ -171,7 +171,7 @@ public:
     }
 
     // Consume reads & build sparse graph.
-    template<typename ParseFunctor>
+    template<typename SeqIO>
     void consume_fasta_and_tag(
         std::string const &filename,
         unsigned int &total_reads,
@@ -181,9 +181,9 @@ public:
     // Count every k-mer from a stream of FASTA or FASTQ reads,
     // using the supplied parser.
     // Tag certain ones on the connectivity graph.
-    template<typename ParseFunctor>
+    template<typename SeqIO>
     void consume_fasta_and_tag(
-        read_parsers::ReadParserPtr<ParseFunctor>& parser,
+        read_parsers::ReadParserPtr<SeqIO>& parser,
         unsigned int &total_reads,
         unsigned long long &n_consumed
     );
@@ -195,7 +195,7 @@ public:
 
 
     // consume an already-partitioned file & load in the partition IDs
-    template<typename ParseFunctor>
+    template<typename SeqIO>
     void consume_partitioned_fasta(const std::string &filename,
                                    unsigned int &total_reads,
                                    unsigned long long &n_consumed);

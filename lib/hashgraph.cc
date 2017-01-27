@@ -276,20 +276,20 @@ void Hashgraph::consume_sequence_and_tag(const std::string& seq,
 //
 
 // TODO? Inline in header.
-template<typename ParseFunctor>
+template<typename SeqIO>
 void Hashgraph::consume_fasta_and_tag(
         std::string const &filename,
         unsigned int &total_reads,
         unsigned long long &n_consumed
 )
 {
-    ReadParserPtr<ParseFunctor> parser = get_parser<ParseFunctor>((std::string&)filename);
-    consume_fasta_and_tag<ParseFunctor>(parser, total_reads, n_consumed);
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>((std::string&)filename);
+    consume_fasta_and_tag<SeqIO>(parser, total_reads, n_consumed);
 }
 
-template<typename ParseFunctor>
+template<typename SeqIO>
 void Hashgraph::consume_fasta_and_tag(
-        ReadParserPtr<ParseFunctor>& parser,
+        ReadParserPtr<SeqIO>& parser,
         unsigned int &total_reads,
         unsigned long long &n_consumed
 )
@@ -344,7 +344,7 @@ void Hashgraph::divide_tags_into_subsets(unsigned int subset_size,
 // consume_partitioned_fasta: consume a FASTA file of reads
 //
 
-template<typename ParseFunctor>
+template<typename SeqIO>
 void Hashgraph::consume_partitioned_fasta(
         const std::string &filename,
         unsigned int &total_reads,
@@ -354,7 +354,7 @@ void Hashgraph::consume_partitioned_fasta(
     total_reads = 0;
     n_consumed = 0;
 
-    ReadParserPtr<ParseFunctor> parser = get_parser<ParseFunctor>((std::string&)filename);
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>((std::string&)filename);
     Read read;
 
     string seq = "";
