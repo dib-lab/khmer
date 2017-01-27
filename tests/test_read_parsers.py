@@ -71,24 +71,16 @@ def test_read_quality_none():
 def test_read_type_attributes():
     r = Read(sequence='ACGT', quality='good', name='1234', description='desc')
     assert r.sequence == 'ACGT'
+    assert r.cleaned_seq == 'ACGT'
     assert r.quality == 'good'
     assert r.name == '1234'
     assert r.description == 'desc'
-    # test setting and deleting of cleaned_seq
 
-    with pytest.raises(TypeError):
-        r.cleaned_seq = 12
 
-    assert not hasattr(r, 'cleaned_seq')
-    r.cleaned_seq = "ACGT"
-    r.cleaned_seq = u"ACGT"
-
-    assert hasattr(r, 'cleaned_seq')
-    del r.cleaned_seq
-    assert not hasattr(r, 'cleaned_seq')
-
-    with pytest.raises(TypeError):
-        r.cleaned_seq = u"some weird unicode \u2588"
+def test_read_type_cleaned_seq():
+    r = Read(sequence='acgtnN', name='1234')
+    assert r.sequence == 'acgtnN'
+    assert r.cleaned_seq == 'ACGTAA'
 
 
 def test_read_properties():
@@ -484,5 +476,12 @@ def test_iternext():
         print(str(err))
     except ValueError as err:
         print(str(err))
+
+
+def test_clean_seq():
+    for read in ReadParser(utils.get_test_data("test-abund-read-3.fa")):
+        clean = read.sequence.upper().replace("N", "A")
+        assert clean == read.cleaned_seq
+
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
 # vim: set textwidth=79:
