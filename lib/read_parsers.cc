@@ -45,6 +45,24 @@ namespace khmer
 namespace read_parsers
 {
 
+unsigned char _to_valid_dna(const unsigned char c)
+{
+    switch(c) {
+    case 'A':
+    case 'C':
+    case 'G':
+    case 'T':
+        return c;
+    case 'a':
+    case 'c':
+    case 'g':
+    case 't':
+        return toupper(c);
+    default:
+        return 'A';
+    }
+}
+
 template<typename SeqIO>
 void ReadParser<SeqIO>::_init()
 {
