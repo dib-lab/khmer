@@ -347,7 +347,7 @@ uint64_t HLLCounter::estimate_cardinality()
 
 void HLLCounter::add(const std::string &value)
 {
-    HashIntoType x = khmer::_hash_murmur(value);
+    HashIntoType x = khmer::_hash_murmur(value, value.length());
     uint64_t j = x & (this->m - 1);
     this->M[j] = std::max(this->M[j], get_rho(x >> this->p, 64 - this->p));
 }

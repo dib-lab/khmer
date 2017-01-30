@@ -1,7 +1,34 @@
 Types --
 
+Some programming guidelines
+---------------------------
+
+Valid and invalid DNA
+~~~~~~~~~~~~~~~~~~~~~
+
+Generally speaking, the Python API for khmer and oxli assume that
+they are receiving valid DNA (ACGT).  Low-level hash functions like
+``hash(kmer)`` and mid-level hash functions like ``hash_kmer_hashes(str)``
+will neither check for correct DNA nor is their output with respect to
+incorrect DNA characters specified.
+
+However, bulk loading functions provide a ``cleaned_seq`` attribute that
+will ... document me here.
+
 Table types
 -----------
+
+Type names consist of two parts. The first part indicates how far the type
+can count and the second part whether it is a table or a graph.
+
+Possible choices for the first part:
+* Node, uses 1bit counter
+* SmallCount, uses a 4bit counter
+* Count, uses a 8bit counter
+
+Possible choices for the second part:
+* Table, keep track of kmers
+* Graph, navigate, tag, etc the de Bruijn graph formed by the khmers
 
 C++ class name:
 
@@ -18,8 +45,8 @@ Python methods:
 * n_unique_kmers - foo.
 * n_occupied - foo.
 
-* add(dna_kmer_or_hashval) - increment the count associated with either a DNA k-mer or a hashval.  Depending on max count for the tabletype and bigcount settings, the count may top out at 1, 16, 255, or 65535. (@CTB add method for retrieving max_count)
-* count (synonym for count)
+* add(dna_kmer_or_hashval) - increment the count associated with either a DNA k-mer or a hashval.  Depending on max count for the tabletype and bigcount settings, the count may top out at 1, 15, 255, or 65535. (@CTB add method for retrieving max_count)
+* count (synonym for add)
 * get(dna_kmer or hashval) - retrieve the count associated with a DNA k-mer or a hashval.
 
 * save
