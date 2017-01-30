@@ -84,11 +84,9 @@ def test_count_1():
     assert hi.get(hashval) == 2
 
     kmer = 'G' * 11
-    try:
+
+    with pytest.raises(ValueError):
         hi.hash(kmer)
-        assert 0, "incorrect kmer size should fail"
-    except RuntimeError:
-        pass
 
 
 def test_count_2():

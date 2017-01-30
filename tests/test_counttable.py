@@ -61,26 +61,3 @@ def test_get_kmer_hashes():
 def test_kmer_revcom_hash(kmer):
     a = khmer.Counttable(21, 1e4, 3)
     assert a.hash(kmer) == a.hash(khmer.reverse_complement(kmer))
-
-
-@pytest.mark.parametrize('tabletype', [
-    (khmer.Nodetable),
-    (khmer.Counttable),
-])
-def test_table_basics(tabletype):
-    """
-    Test basic assumptions for khmer.Counttable and khmer.Nodetable
-
-    - presence/abundance queries work
-    - non-ACGT characters cause an exception
-    """
-    table = tabletype(15, 1e6, 3)
-
-    table.consume('TTGACTTGACTTCAG')
-    table.consume('TTGACTTGACTTCAG')
-    table.get('TTGACTTGACTTCAG') > 0
-
-    n_kmers_consumed = table.consume('TTCAGNNNNNTTCAG')
-    assert n_kmers_consumed == 0
-    with pytest.raises(ValueError) as ve:
-        _ = table.get('TTCAGNNNNNTTCAG')

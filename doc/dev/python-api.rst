@@ -1,5 +1,23 @@
 Types --
 
+Some programming guidelines
+---------------------------
+
+Valid and invalid DNA
+~~~~~~~~~~~~~~~~~~~~~
+
+Generally speaking, the Python API for khmer and oxli assume that
+they are receiving valid DNA (ACGT).  Low-level hash functions like
+``hash(kmer)`` and mid-level hash functions like ``hash_kmer_hashes(str)``
+will neither check for correct DNA nor is their output with respect to
+incorrect DNA characters specified.
+
+However, bulk loading functions provide a ``cleaned_seq`` attribute that
+will ... document me here.
+
+Table types
+-----------
+
 Type names consist of two parts. The first part indicates how far the type
 can count and the second part whether it is a table or a graph.
 
@@ -11,10 +29,6 @@ Possible choices for the first part:
 Possible choices for the second part:
 * Table, keep track of kmers
 * Graph, navigate, tag, etc the de Bruijn graph formed by the khmers
-
-
-Table types
------------
 
 C++ class name:
 

@@ -492,12 +492,12 @@ def calculate_graphsize(args, graphtype, multiplier=1.0):
     The return value refers to the target size (in buckets, not bytes) of each
     individual table in the graph.
     """
-    if graphtype not in khmer.buckets_per_byte:
+    if graphtype not in khmer._buckets_per_byte:
         raise ValueError('unknown graph type: ' + graphtype)
 
     if args.max_memory_usage:
-        tablesize = khmer.buckets_per_byte[graphtype] * args.max_memory_usage \
-            / args.n_tables / float(multiplier)
+        tablesize = (khmer._buckets_per_byte[graphtype] *
+                     args.max_memory_usage / args.n_tables / float(multiplier))
     else:
         tablesize = args.max_tablesize
 
@@ -568,11 +568,11 @@ def report_on_config(args, graphtype='countgraph'):
     made available by this module.
     """
     check_conflicting_args(args, graphtype)
-    if graphtype not in khmer.buckets_per_byte:
+    if graphtype not in khmer._buckets_per_byte:
         raise ValueError('unknown graph type: ' + graphtype)
 
     tablesize = calculate_graphsize(args, graphtype)
-    maxmem = args.n_tables * tablesize / khmer.buckets_per_byte[graphtype]
+    maxmem = args.n_tables * tablesize / khmer._buckets_per_byte[graphtype]
     log_info("\nPARAMETERS:")
     log_info(" - kmer size =     {ksize} \t\t(-k)", ksize=args.ksize)
     log_info(" - n tables =      {ntables} \t\t(-N)", ntables=args.n_tables)
@@ -580,7 +580,7 @@ def report_on_config(args, graphtype='countgraph'):
     log_info("Estimated memory usage is {mem:.1f} Gb "
              "({bytes:.2g} bytes = {ntables} bytes x {tsize:5.2g} entries "
              "/ {div:d} entries per byte)", bytes=maxmem, mem=maxmem / 1e9,
-             div=khmer.buckets_per_byte[graphtype], ntables=args.n_tables,
+             div=khmer._buckets_per_byte[graphtype], ntables=args.n_tables,
              tsize=tablesize)
     log_info("-" * 8)
 
