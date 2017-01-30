@@ -99,7 +99,7 @@ def test_reverse_hash(tabletype):
     except ValueError:
         pytest.skip("reverse_hash not implemented on this table type")
 
-    assert type(x) in (unicode, str)
+    assert isinstance(x, (unicode, str))
 
 
 def test_hashsizes(tabletype):
