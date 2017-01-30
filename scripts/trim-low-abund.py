@@ -136,6 +136,8 @@ def get_parser():
     parser.add_argument('--tempdir', '-T', type=str, default='./',
                         help="Set location of temporary directory for "
                         "second pass")
+    parser.add_argument('--keep-temp', action='store_true', help='do not '
+                        'delete temporary files or directories')
     add_output_compression_type(parser)
 
     parser.add_argument('--diginorm', default=False, action='store_true',
@@ -439,8 +441,12 @@ def main():
         if not args.output:
             trimfp.close()
 
-    log_info('removing temp directory & contents ({temp})', temp=tempdir)
-    shutil.rmtree(tempdir)
+    if args.keep_temp:
+        log_info('--keep-temp mode, not removing temp directory "{temp}"',
+                 temp=tempdir)
+    else:
+        log_info('removing temp directory & contents ({temp})', temp=tempdir)
+        shutil.rmtree(tempdir)
 
     trimmed_reads = trimmer.trimmed_reads
 
