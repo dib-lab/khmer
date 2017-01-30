@@ -33,6 +33,8 @@ def tabletype(request):
 # For map(long, [list of ints]) cross-version hackery
 if sys.version_info.major > 2:
     long = int # pylint: disable=redefined-builtin
+    unicode = str
+
 
 def test_presence(tabletype):
     # basic get/add test
