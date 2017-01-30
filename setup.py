@@ -62,8 +62,6 @@ ez_setup.use_setuptools(version="3.4.1")
 
 CMDCLASS = versioneer.get_cmdclass()
 
-from Cython.Build import cythonize
-
 try:
     from Cython.Distutils import build_ext as _build_ext
 except ImportError:
@@ -270,7 +268,8 @@ SETUP_METADATA = \
         "packages": ['khmer', 'khmer.tests', 'oxli'],
         "package_dir": {'khmer.tests': 'tests'},
         "install_requires": ['screed >= 0.9', 'bz2file'],
-        "setup_requires": ["pytest-runner>=2.0,<3dev"],
+        "setup_requires": ["pytest-runner>=2.0,<3dev",
+                           'Cython>=0.25.2', "setuptools>=18.0"],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
                            'tests': ['pytest>=2.9'],
