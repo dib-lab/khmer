@@ -86,6 +86,9 @@ def test_hash_bad_length(tabletype):
     with pytest.raises(ValueError):
         x = kh.hash("ATGGGC")
 
+    with pytest.raises(ValueError):
+        x = kh.hash("ATGG")
+
 
 def test_reverse_hash(tabletype):
     # hashing of strings -> numbers.
