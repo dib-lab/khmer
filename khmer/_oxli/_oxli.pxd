@@ -53,6 +53,15 @@ cdef extern from "kmer_hash.hh" namespace "khmer":
     string _revcomp(const string&)
 
 
+cdef extern from "alphabets.hh" namespace "khmer":
+    cdef string DNA_SIMPLE "khmer::alphabets::DNA_SIMPLE"
+    cdef string DNAN_SIMPLE "khmer::alphabets::DNAN_SIMPLE"
+    cdef string RNA_SIMPLE "khmer::alphabets::RNA_SIMPLE"
+    cdef string RNAN_SIMPLE "khmer::alphabets::RNAN_SIMPLE"
+    cdef string IUPAC_NUCL "khmer::alphabets::IUPAC_NUCL"
+    cdef string IUPAC_AA "khmer::alphabets::IUPAC_AA"
+
+
 ########################################################################
 #
 # ReadParser: read parsing stuff, Read object

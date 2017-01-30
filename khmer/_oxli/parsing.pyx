@@ -1,12 +1,41 @@
 # cython: c_string_type=unicode, c_string_encoding=utf8
 from __future__ import print_function
 from cython.operator cimport dereference as deref
+cimport cython
 from libcpp cimport bool
 from libcpp.string cimport string
 
 import sys
 
 
+cdef class Alphabets:
+    
+    @staticmethod
+    def get(str name):
+        cdef str alphabet = Alphabets._get(name.encode('UTF-8'))
+        if not alphabet:
+            raise ValueError('No alphabet with name {0}'.format(name))
+        return alphabet
+
+    @staticmethod
+    cdef string _get(string name):
+        if name == 'DNA_SIMPLE':
+            return DNA_SIMPLE
+        elif name == 'DNAN_SIMPLE':
+            return DNAN_SIMPLE
+        elif name == 'RNA_SIMPLE':
+            return RNA_SIMPLE
+        elif name == 'RNAN_SIMPLE':
+            return RNAN_SIMPLE
+        elif name == 'IUPAC_NUCL':
+            return IUPAC_NUCL
+        elif name == 'IUPAC_AA':
+            return IUPAC_AA
+        else:
+            return string()
+
+
+@cython.freelist(100)
 cdef class Sequence:
 
     def __cinit__(self):
@@ -105,16 +134,28 @@ class UnpairedReadsError(ValueError):
         self.read2 = r2
 
 
-cdef inline bool is_valid_dna(const char base):
-    return base == 'A' or base == 'C' or base == 'G'\
-           or base == 'T' or base == 'N'
+cdef inline bool is_valid(const char base, string& alphabet):
+    cdef char b
+    for b in alphabet:
+        if b == base:
+            return True
+    return False
 
 
-cdef inline bool sanitize_sequence(string& sequence):
+cdef inline bool is_valid_dnan(const char base):
+    return is_valid(base, DNAN_SIMPLE)
+
+
+cdef inline bool is_valid_rnan(const char base):
+    return is_valid(base, RNAN_SIMPLE)
+
+
+cdef inline bool sanitize_sequence(string& sequence,
+                                   string& alphabet):
     cdef int i = 0
     for i in range(sequence.length()):
         sequence[i] &= 0xdf
-        if not is_valid_dna(sequence[i]):
+        if not is_valid(sequence[i], alphabet):
             return False
         if sequence[i] == 'N':
             sequence[i] = 'A'
@@ -123,8 +164,12 @@ cdef inline bool sanitize_sequence(string& sequence):
 
 cdef class FastxParser:
 
-    def __cinit__(self, str filename):
+    def __cinit__(self, str filename, bool sanitize=True, 
+                        str alphabet='DNAN_SIMPLE'):
         self._this.reset(new CpFastxParser(filename.encode()))
+        self.sanitize = sanitize
+        self.n_bad = 0
+        self._alphabet = Alphabets.get(alphabet).encode('UTF-8')
 
     cdef Sequence _next(self):
         if not deref(self._this).is_complete():
@@ -133,9 +178,29 @@ cdef class FastxParser:
             return None
 
     def __iter__(self):
+        if self.sanitize:
+            for seq in self._iter_sanitize():
+                yield seq
+        else:
+            for seq in self._iter_no_sanitize():
+                yield seq
+
+    def _iter_no_sanitize(self):
         cdef Sequence seq = self._next()
         while seq is not None:
             yield seq
+            seq = self._next()
+
+    def _iter_sanitize(self):
+        cdef bool sane
+        cdef Sequence seq = self._next()
+        while seq is not None:
+            sane = sanitize_sequence(seq._obj.sequence,
+                                     self._alphabet)
+            if sane is False:
+                self.n_bad += 1
+            else:
+                yield seq
             seq = self._next()
 
 

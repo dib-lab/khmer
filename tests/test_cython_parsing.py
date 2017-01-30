@@ -7,6 +7,7 @@ import random
 
 import khmer
 from khmer._oxli.parsing import Sequence, FastxParser, BrokenPairedReader
+from khmer._oxli.parsing import Alphabets
 from khmer.khmer_args import estimate_optimal_with_K_and_f as optimal_fp
 from khmer import reverse_complement as revcomp
 from khmer import reverse_hash as revhash
@@ -19,6 +20,7 @@ import screed
 def teardown():
     utils.cleanup()
 
+
 def gather(filename, **kw):
     stream = FastxParser(str(filename))
 
@@ -29,6 +31,7 @@ def gather(filename, **kw):
         m += 1
 
     return x,m
+
 
 def gather_paired(filename, **kw):
     stream = FastxParser(str(filename))
@@ -62,7 +65,6 @@ def create_fastx(tmpdir):
                                                         record.sequence,
                                                         record.quality),
                                mode='a')
-        print(fastx_fn.read())
         return fastx_fn
     return func
 
@@ -82,6 +84,50 @@ def test_FastxParser(create_fastx):
                 ('seq3/2', None)]
 
     assert x == expected, x
+
+def test_FastxParser_sanitize(create_fastx):
+    '''Test that A's are converted to N's when sanitize is True'''
+    reads = [Sequence.new('seq1/1', 'N' * 5),
+              Sequence.new('seq1/2', 'N' * 4)]
+    parser = FastxParser(str(create_fastx(reads)), sanitize=True)
+
+    parsed = [read for read in parser]
+    assert parser.n_bad == 0
+    assert parsed[0].sequence == 'A' * 5
+    assert parsed[1].sequence == 'A' * 4
+
+def test_FastxParser_no_sanitize(create_fastx):
+    '''Test that N's remain when sanitize is False'''
+    reads = [Sequence.new('seq1/1', 'N' * 5),
+              Sequence.new('seq1/2', 'N' * 4)]
+    parser = FastxParser(str(create_fastx(reads)), sanitize=False)
+
+    parsed = [read for read in parser]
+    assert parser.n_bad == 0
+    assert parsed[0].sequence == 'N' * 5
+    assert parsed[1].sequence == 'N' * 4
+
+def test_FastxParser_on_invalid_sequence(create_fastx):
+    '''Test that parser detects invalid sequence'''
+    reads = [Sequence.new('seq1/1', 'XXX'),
+              Sequence.new('seq1/2', 'A' * 4)]
+    parser = FastxParser(str(create_fastx(reads)), sanitize=True)
+    parsed = [read for read in parser]
+
+    assert parser.n_bad == 1
+    assert len(parsed) == 1
+    assert parsed[0].sequence == 'A' * 4
+
+
+def test_alphabet_wrapper():
+    dna_simple = Alphabets.get('DNA_SIMPLE')
+    assert len(dna_simple) == 4
+    for b in 'ACGT':
+        assert b in dna_simple
+
+    with pytest.raises(ValueError):
+        Alphabets.get('TEST')
+
 
 def test_BrokenPairedReader_force_single(create_fastx):
     reads = [Sequence.new('seq1/1', 'A' * 5),
