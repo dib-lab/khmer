@@ -19,6 +19,8 @@ import sys
 import pytest
 
 
+import khmer_tst_utils as utils
+import khmer
 from khmer import _Countgraph, _Counttable, _SmallCountgraph, _SmallCounttable
 from khmer import _Nodegraph, _Nodetable
 
@@ -239,3 +241,28 @@ def test_get_kmers(tabletype):
 
     kmers = hi.get_kmers("AGCTTTTC")
     assert kmers == ['AGCTTT', 'GCTTTT', 'CTTTTC']
+
+
+def test_save_load(tabletype):
+    kh = tabletype(5, PRIMES_1m)
+    savefile = utils.get_temp_filename('tablesave.out')
+
+    # test add(dna)
+    x = kh.add("ATGGC")
+    z = kh.get("ATGGC")
+    assert z == 1
+
+    kh.save(savefile)
+
+    # should we provide a single load function here? yes, probably. @CTB
+    if tabletype in (_Countgraph, _Counttable):
+        loaded = khmer.load_countgraph(savefile)
+    elif tabletype in (_SmallCountgraph, _SmallCounttable):
+        loaded = khmer.load_countgraph(savefile, small=True)
+    elif tabletype in (_Nodegraph, _Nodetable):
+        loaded = khmer.load_nodegraph(savefile)
+    else:
+        raise Exception("unknown tabletype")
+
+    z = kh.get('ATGGC')
+    assert z == 1
