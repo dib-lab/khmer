@@ -320,7 +320,8 @@ public:
             const uint64_t idx = _table_index(khash, _tablesizes[i]);
             const uint8_t mask = _mask(khash, _tablesizes[i]);
             const uint8_t shift = _shift(khash, _tablesizes[i]);
-            const uint8_t current_count = (table[idx] & mask) >> shift;
+            uint8_t current_tbl = table[idx];
+            uint8_t current_count = (current_tbl & mask) >> shift;
 
             if (!is_new_kmer) {
                 if (current_count == 0) {
@@ -340,8 +341,18 @@ public:
             }
 
             // increase count, no checking for overflow
-            const uint8_t new_count = (current_count + 1) << shift;
-            table[idx] = (table[idx] & ~mask) | (new_count & mask);
+            uint8_t new_count = (current_count + 1) << shift;
+            uint8_t new_tbl = (current_tbl & ~mask) | (new_count & mask);
+
+            while(!table[idx].compare_exchange_weak(current_tbl, new_tbl)) {
+                current_count = (current_tbl & mask) >> shift;
+                new_count = (current_count + 1);
+                if (new_count > _max_count) {
+                  break;
+                }
+                new_count <<= shift;
+                new_tbl = (current_tbl & ~mask) | (new_count & mask);
+            }
         }
 
         if (is_new_kmer) {
