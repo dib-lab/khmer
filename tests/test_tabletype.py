@@ -26,6 +26,7 @@ from khmer import _Nodegraph, _Nodetable
 
 PRIMES_1m = [1000003, 1009837]
 
+
 # all the table types!
 @pytest.fixture(params=[_Countgraph, _Counttable, _SmallCountgraph,
                         _SmallCounttable, _Nodegraph, _Nodetable])
@@ -34,7 +35,7 @@ def tabletype(request):
 
 # For map(long, [list of ints]) cross-version hackery
 if sys.version_info.major > 2:
-    long = int # pylint: disable=redefined-builtin
+    long = int  # pylint: disable=redefined-builtin
     unicode = str
 
 
