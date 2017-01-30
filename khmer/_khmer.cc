@@ -336,6 +336,7 @@ khmer_Read_init(khmer_Read_Object *self, PyObject *args, PyObject *kwds)
     }
     if (sequence != NULL) {
         self->read->sequence = sequence;
+        self->read->set_clean_seq();
     }
     if (quality != NULL) {
         self->read->quality = quality;
@@ -429,45 +430,14 @@ Read_get_cleaned_seq(khmer_Read_Object * obj, void * closure)
 {
     if (obj->read->cleaned_seq.size() > 0) {
         return PyUnicode_FromString(obj->read->cleaned_seq.c_str());
+    } else if (obj->read->sequence.size() > 0) {
+        obj->read->set_clean_seq();
+        return PyUnicode_FromString(obj->read->cleaned_seq.c_str());
     } else {
         PyErr_SetString(PyExc_AttributeError,
                         "'Read' object has no attribute 'cleaned_seq'.");
         return NULL;
     }
-}
-
-
-static int
-Read_set_cleaned_seq(khmer_Read_Object *obj, PyObject *value, void *closure)
-{
-    if (value == NULL) {
-        obj->read->cleaned_seq = "";
-        return 0;
-    }
-
-    if (! (PyUnicode_Check(value) | PyBytes_Check(value))) {
-        PyErr_SetString(PyExc_TypeError,
-                        "The 'cleaned_seq' attribute value must be a string");
-        return -1;
-    }
-
-    if (PyUnicode_Check(value)) {
-        PyObject* temp = PyUnicode_AsASCIIString(value);
-        if (temp == NULL) {
-            PyErr_SetString(PyExc_TypeError,
-                            "Could not encode 'cleaned_seq' as ASCII.");
-            return -1;
-        }
-
-        obj->read->cleaned_seq = std::string(PyBytes_AS_STRING(temp));
-        Py_DECREF(temp);
-    }
-    // in python2 not everything is a unicode object
-    else {
-        obj->read->cleaned_seq = std::string(PyBytes_AS_STRING(value));
-    }
-
-    return 0;
 }
 
 
@@ -497,7 +467,7 @@ static PyGetSetDef khmer_Read_accessors [ ] = {
     },
     {
         (char *)"cleaned_seq",
-        (getter)Read_get_cleaned_seq, (setter)Read_set_cleaned_seq,
+        (getter)Read_get_cleaned_seq, (setter)NULL,
         (char *)"Cleaned sequence.", NULL
     },
 
