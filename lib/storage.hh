@@ -246,9 +246,8 @@ protected:
     size_t _n_tables;
     uint64_t _occupied_bins;
     uint64_t _n_unique_kmers;
-    std::array<std::mutex, 32> mutexes;
     static constexpr uint8_t _max_count{15};
-    Byte ** _counts;
+    AtomicByte ** _counts;
 
     // Compute index into the table, this retrieves the correct byte
     // which you then need to select the correct nibble from
@@ -293,13 +292,13 @@ public:
     {
         _n_tables = _tablesizes.size();
 
-        _counts = new Byte*[_n_tables];
+        _counts = new AtomicByte*[_n_tables];
 
         for (size_t i = 0; i < _n_tables; i++) {
             const uint64_t tablesize = _tablesizes[i];
             const uint64_t tablebytes = tablesize / 2 + 1;
 
-            _counts[i] = new Byte[tablebytes];
+            _counts[i] = new AtomicByte[tablebytes];
             memset(_counts[i], 0, tablebytes);
         }
     }
@@ -317,8 +316,7 @@ public:
         bool is_new_kmer = false;
 
         for (unsigned int i = 0; i < _n_tables; i++) {
-            MuxGuard g(mutexes[i]);
-            Byte* const table(_counts[i]);
+            AtomicByte* const table(_counts[i]);
             const uint64_t idx = _table_index(khash, _tablesizes[i]);
             const uint8_t mask = _mask(khash, _tablesizes[i]);
             const uint8_t shift = _shift(khash, _tablesizes[i]);
@@ -358,7 +356,7 @@ public:
 
         // get the minimum count across all tables
         for (unsigned int i = 0; i < _n_tables; i++) {
-            const Byte* table(_counts[i]);
+            const AtomicByte* table(_counts[i]);
             const uint64_t idx = _table_index(khash, _tablesizes[i]);
             const uint8_t mask = _mask(khash, _tablesizes[i]);
             const uint8_t shift = _shift(khash, _tablesizes[i]);
@@ -393,7 +391,7 @@ public:
 
     Byte ** get_raw_tables()
     {
-        return _counts;
+        return (Byte **)_counts;
     }
 };
 
