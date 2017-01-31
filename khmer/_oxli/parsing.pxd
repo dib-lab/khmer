@@ -15,10 +15,6 @@ cdef class Sequence:
     cdef CpSequence _obj
 
     @staticmethod
-    cdef Sequence _new(str name, str sequence, 
-                       str annotations=*, str quality=*)
-
-    @staticmethod
     cdef Sequence _wrap(CpSequence cseq)
 
 
@@ -58,11 +54,11 @@ cdef class BrokenPairedReader:
 
 cdef tuple _split_left_right(str name)
 
-cdef bool _check_is_pair(Sequence first, Sequence second)
+cdef int _check_is_pair(Sequence first, Sequence second)
 
-cdef bool check_is_left(str name)
+cdef bool _check_is_left(str name)
 
-cdef bool check_is_right(str name)
+cdef bool _check_is_right(str name)
 
 cdef inline bool is_valid(const char base, string& alphabet)
 

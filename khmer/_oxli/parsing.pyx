@@ -38,8 +38,16 @@ cdef class Alphabets:
 @cython.freelist(100)
 cdef class Sequence:
 
-    def __cinit__(self):
-        pass
+    def __cinit__(self, str name=None, str sequence=None,
+                        str quality=None, str annotations=None):
+
+        if name is not None and sequence is not None:
+            self._obj.sequence = sequence.encode('UTF-8')
+            self._obj.name = name.encode('UTF-8')
+            if annotations is not None:
+                self._obj.annotations = annotations.encode('UTF-8')
+            if quality is not None:
+                self._obj.quality = quality.encode('UTF-8')
 
     def __str__(self):
         return self.sequence
@@ -66,35 +74,10 @@ cdef class Sequence:
         return quality if quality else None
 
     @staticmethod
-    def new(str name, str sequence, str annotations=None, str quality=None):
-        cdef Sequence seq = Sequence()
-        seq._obj.sequence = sequence.encode('UTF-8')
-        seq._obj.name = name.encode('UTF-8')
-        if annotations is not None:
-            seq._obj.annotations = annotations.encode('UTF-8')
-        if quality is not None:
-            seq._obj.quality = quality.encode('UTF-8')
-
-        return seq
-
-    @staticmethod
-    cdef Sequence _new(str name, str sequence, str annotations=None, str quality=None):
-        cdef Sequence seq = Sequence()
-        seq._obj.sequence = sequence.encode('UTF-8')
-        seq._obj.name = name.encode('UTF-8')
-        if annotations is not None:
-            seq._obj.annotations = annotations.encode('UTF-8')
-        if quality is not None:
-            seq._obj.quality = quality.encode('UTF-8')
-
-        return seq
-
-    @staticmethod
     cdef Sequence _wrap(CpSequence cseq):
         cdef Sequence seq = Sequence()
         seq._obj = cseq
         return seq
-
 
 
 cdef class ReadBundle:
@@ -310,6 +293,7 @@ cdef class BrokenPairedReader:
 
     cdef tuple _next(self):
         cdef Sequence first, second
+        cdef int is_pair
 
         if self.record == None:
             # No previous sequence. Try to get one.
@@ -324,7 +308,9 @@ cdef class BrokenPairedReader:
         
         # check if paired
         if second is not None:
-            if _check_is_pair(first, second) and not self.force_single:
+            is_pair = _check_is_pair(first, second) and not self.force_single:
+            if is_pair == -1:
+                return -1, None, None, 
                 self.record = None
                 return 2, first, second, None    # found 2 proper records
             else:                                   # orphan.
@@ -356,7 +342,7 @@ cdef tuple _split_left_right(str name):
     return lhs, rhs
 
 
-cdef bool _check_is_pair(Sequence first, Sequence second):
+cdef int _check_is_pair(Sequence first, Sequence second):
     """Check if the two sequence records belong to the same fragment.
 
     In an matching pair the records are left and right pairs
@@ -368,9 +354,9 @@ cdef bool _check_is_pair(Sequence first, Sequence second):
     Also handles the default format of the SRA toolkit's fastq-dump:
     'Accession seq/1'
     """
-    #if hasattr(first, 'quality') or hasattr(second, 'quality'):
-    #    if not (hasattr(first, 'quality') and hasattr(first, 'quality')):
-    #        raise ValueError("both records must be same type (FASTA or FASTQ)")
+    if first.quality is None or second.quality is None:
+        if first.quality is not second.quality:
+            return -1
 
     cdef str lhs1, rhs1, lhs2, rhs2
     lhs1, rhs1 = _split_left_right(first.name)
@@ -383,11 +369,11 @@ cdef bool _check_is_pair(Sequence first, Sequence second):
         subpart2 = lhs2.split('/', 1)[0]
 
         if subpart1 and subpart1 == subpart2:
-            return True
+            return 1
 
     # handle '@name 1:rst'
     elif lhs1 == lhs2 and rhs1.startswith('1:') and rhs2.startswith('2:'):
-        return True
+        return 1
 
     # handle @name seq/1
     elif lhs1 == lhs2 and rhs1.endswith('/1') and rhs2.endswith('/2'):
@@ -395,16 +381,19 @@ cdef bool _check_is_pair(Sequence first, Sequence second):
         subpart2 = rhs2.split('/', 1)[0]
 
         if subpart1 and subpart1 == subpart2:
-            return True
+            return 1
 
-    return False
+    return 0
 
 
 def check_is_pair(Sequence first, Sequence second):
-    return _check_is_pair(first, second)
+    cdef int ret = _check_is_pair(first, second)
+    if ret == -1:
+        raise ValueError("both records must be same type (FASTA or FASTQ)")
+    return ret == 1
 
 
-cdef bool check_is_left(str name):
+cdef bool _check_is_left(str name):
     """Check if the name belongs to a 'left' sequence (/1).
 
     Returns True or False.
@@ -424,7 +413,7 @@ cdef bool check_is_left(str name):
     return False
 
 
-cdef bool check_is_right(str name):
+cdef bool _check_is_right(str name):
     """Check if the name belongs to a 'right' sequence (/2).
 
     Returns True or False.
