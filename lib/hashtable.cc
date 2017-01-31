@@ -114,7 +114,7 @@ void Hashtable::consume_fasta(
     unsigned long long &n_consumed
 )
 {
-    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>((std::string&)filename);
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
     consume_fasta<SeqIO>(parser, total_reads, n_consumed);
 }
 
@@ -379,7 +379,7 @@ uint64_t * Hashtable::abundance_distribution(
     std::string filename,
     Hashtable *  tracking)
 {
-    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>((std::string&)filename);
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
     return abundance_distribution(parser, tracking);
 }
 

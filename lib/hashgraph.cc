@@ -283,7 +283,7 @@ void Hashgraph::consume_fasta_and_tag(
         unsigned long long &n_consumed
 )
 {
-    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>((std::string&)filename);
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
     consume_fasta_and_tag<SeqIO>(parser, total_reads, n_consumed);
 }
 
@@ -354,7 +354,7 @@ void Hashgraph::consume_partitioned_fasta(
     total_reads = 0;
     n_consumed = 0;
 
-    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>((std::string&)filename);
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
     Read read;
 
     string seq = "";

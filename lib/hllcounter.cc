@@ -383,7 +383,7 @@ void HLLCounter::consume_fasta(
     unsigned int &total_reads,
     unsigned long long &n_consumed)
 {
-    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>((std::string&)filename);
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
     consume_fasta<SeqIO>(parser, stream_records, total_reads, n_consumed);
 }
 

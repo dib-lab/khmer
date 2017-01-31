@@ -74,7 +74,7 @@ void LabelHash::consume_fasta_and_tag_with_labels(
     CallbackFn	      callback,	    void *		callback_data
 )
 {
-    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>((std::string&)filename);
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
     consume_fasta_and_tag_with_labels<SeqIO>(
         parser,
         total_reads, n_consumed,
@@ -156,7 +156,7 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
     total_reads = 0;
     n_consumed = 0;
 
-    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>((std::string&)filename);
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
     Read read;
 
     std::string seq = "";

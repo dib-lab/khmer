@@ -119,7 +119,7 @@ size_t SubsetPartition::output_partitioned_file(
     CallbackFn		callback,
     void *		callback_data)
 {
-    auto parser = read_parsers::get_parser<FastxReader>((std::string&)infilename);
+    auto parser = read_parsers::get_parser<FastxReader>(infilename);
     ofstream outfile(outputfile.c_str());
 
     unsigned int total_reads = 0;
