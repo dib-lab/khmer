@@ -4004,7 +4004,7 @@ linearassembler_assemble(khmer_KLinearAssembler_Object * me,
     khmer_KNodegraph_Object * nodegraph_o = NULL;
     Nodegraph * stop_bf = NULL;
     const char * dir_str = NULL;
-    char dir = NULL;
+    char dir = '\0';
 
     const char *kwnames[] = {"seed_kmer", "stop_filter", "direction", NULL};
 
