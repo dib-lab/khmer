@@ -119,7 +119,7 @@ size_t SubsetPartition::output_partitioned_file(
     CallbackFn		callback,
     void *		callback_data)
 {
-    IParser* parser = IParser::get_parser(infilename);
+    auto parser = read_parsers::get_parser<FastxReader>(infilename);
     ofstream outfile(outputfile.c_str());
 
     unsigned int total_reads = 0;
@@ -199,17 +199,12 @@ size_t SubsetPartition::output_partitioned_file(
                     callback("output_partitions", callback_data,
                              total_reads, reads_kept);
                 } catch (...) {
-                    delete parser;
-                    parser = NULL;
                     outfile.close();
                     throw;
                 }
             }
         }
     }
-
-    delete parser;
-    parser = NULL;
 
     return partitions.size() + n_singletons;
 }

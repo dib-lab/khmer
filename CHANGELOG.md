@@ -37,6 +37,9 @@ under semantic versioning, but will be in future versions of khmer.
   integration testing.
 - Renamed core data structures: CountingHash --> Countgraph,
   Hashbits --> Nodegraph.
+- Replaced the IParser and FastxParser classes with a single ReadParser class.
+  Different input formats are supported by templating ReadParser with a reader
+  class.
 
 ### Fixed
 - Bug in compressed(gzip) streaming output from scripts
