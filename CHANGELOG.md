@@ -28,6 +28,8 @@ under semantic versioning, but will be in future versions of khmer.
 - Add --info flag for obtaining citation information.
 - Add a new storage class using half a byte per entry. Exposed as
   SmallCounttable and SmallCountgraph.
+- Added `cleaned_seq` attribute to `khmer.Read` class which provides a cleaned
+  version of the sequence of each read.
 
 ### Changed
 - Switch from nose to py.test as the testing framework.
@@ -35,6 +37,9 @@ under semantic versioning, but will be in future versions of khmer.
   integration testing.
 - Renamed core data structures: CountingHash --> Countgraph,
   Hashbits --> Nodegraph.
+- Replaced the IParser and FastxParser classes with a single ReadParser class.
+  Different input formats are supported by templating ReadParser with a reader
+  class.
 
 ### Fixed
 - Bug in compressed(gzip) streaming output from scripts
