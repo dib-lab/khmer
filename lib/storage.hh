@@ -67,7 +67,6 @@ public:
     virtual BoundedCounterType test_and_set_bits( HashIntoType khash ) = 0;
     virtual void add(HashIntoType khash) = 0;
     virtual const BoundedCounterType get_count(HashIntoType khash) const = 0;
-    virtual Byte ** get_raw_tables() = 0;
 
     void set_use_bigcount(bool b);
     bool get_use_bigcount();
@@ -212,13 +211,6 @@ public:
             }
         }
         return 1;
-    }
-
-    // Writing to the tables outside of defined methods has undefined behavior!
-    // As such, this should only be used to return read-only interfaces
-    Byte ** get_raw_tables()
-    {
-        return _counts;
     }
 
     void update_from(const BitStorage&);
@@ -400,10 +392,6 @@ public:
     void save(std::string outfilename, WordLength ksize);
     void load(std::string infilename, WordLength& ksize);
 
-    Byte ** get_raw_tables()
-    {
-        return (Byte **)_counts;
-    }
 };
 
 

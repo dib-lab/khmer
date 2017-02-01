@@ -46,40 +46,7 @@ typedef struct {
 
 static void khmer_smallcountgraph_dealloc(khmer_KSmallCountgraph_Object * obj);
 
-static
-PyObject *
-smallcount_get_raw_tables(khmer_KSmallCountgraph_Object * self, PyObject * args)
-{
-    SmallCountgraph * countgraph = self->countgraph;
-
-    khmer::Byte ** table_ptrs = countgraph->get_raw_tables();
-    std::vector<uint64_t> sizes = countgraph->get_tablesizes();
-
-    PyObject * raw_tables = PyList_New(sizes.size());
-    for (unsigned int i=0; i<sizes.size(); ++i) {
-        Py_buffer buffer;
-        int res = PyBuffer_FillInfo(&buffer, NULL, table_ptrs[i],
-                                    sizes[i] / 2 +1, 0,
-                                    PyBUF_FULL_RO);
-        if (res == -1) {
-            return NULL;
-        }
-        PyObject * buf = PyMemoryView_FromBuffer(&buffer);
-        if(!PyMemoryView_Check(buf)) {
-            return NULL;
-        }
-        PyList_SET_ITEM(raw_tables, i, buf);
-    }
-
-    return raw_tables;
-}
-
 static PyMethodDef khmer_smallcountgraph_methods[] = {
-    {
-        "get_raw_tables",
-        (PyCFunction)smallcount_get_raw_tables, METH_VARARGS,
-        "Get a list of the raw storage tables as memoryview objects."
-    },
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
 

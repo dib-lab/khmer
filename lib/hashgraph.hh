@@ -267,6 +267,12 @@ class Countgraph : public khmer::Hashgraph
 public:
     explicit Countgraph(WordLength ksize, std::vector<uint64_t> sizes)
         : Hashgraph(ksize, new ByteStorage(sizes)) { } ;
+
+    // get access to raw tables.
+    Byte ** get_raw_tables()
+    {
+        return ((ByteStorage*)store)->get_raw_tables();
+    }
 };
 
 // Hashgraph-derived class with NibbleStorage.
