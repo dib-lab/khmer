@@ -212,9 +212,6 @@ def test_get_raw_tables_smallcountgraph():
     # smallcountgraphs store individual counts packed into a byte, the raw tables
     # probably do not give users what they expect (something that can be
     # given to numpy.frombuffer)
-
-    # for the same number of entries a SmallCountgraph uses ~half the memory
-    # of a normal Countgraph
     ht = khmer.SmallCountgraph(20, 1e5, 4)
     assert not hasattr(ht, 'get_raw_tables')
 

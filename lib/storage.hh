@@ -38,10 +38,6 @@ Contact: khmer-project@idyll.org
 #ifndef STORAGE_HH
 #define STORAGE_HH
 
-#include <cassert>
-#include <array>
-#include <mutex>
-using MuxGuard = std::lock_guard<std::mutex>;
 
 namespace khmer
 {
@@ -262,8 +258,6 @@ public:
     NibbleStorage(std::vector<uint64_t>& tablesizes) :
         _tablesizes{tablesizes}, _occupied_bins{0}, _n_unique_kmers{0}
     {
-        // to allow more than 32 tables increase the size of mutex pool
-        assert(_n_tables <= 32);
         _allocate_counters();
     }
 

@@ -122,7 +122,7 @@ typedef unsigned short int BoundedCounterType;
 
 // A single-byte type.
 typedef unsigned char Byte;
-typedef std::atomic<uint8_t> AtomicByte;
+using AtomicByte = std::atomic<uint8_t>;
 
 
 typedef void (*CallbackFn)(const char * info, void * callback_data,
