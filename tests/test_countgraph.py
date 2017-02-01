@@ -209,8 +209,8 @@ def test_get_raw_tables():
 
 
 def test_get_raw_tables_smallcountgraph():
-    # smallcountgraphs store individual counts packed into a byte, the raw tables
-    # probably do not give users what they expect (something that can be
+    # smallcountgraphs store individual counts packed into a byte, the raw
+    # tables probably do not give users what they expect (something that can be
     # given to numpy.frombuffer)
     ht = khmer.SmallCountgraph(20, 1e5, 4)
     assert not hasattr(ht, 'get_raw_tables')

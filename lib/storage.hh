@@ -327,6 +327,13 @@ public:
             }
 
             // increase count, no checking for overflow
+            // current_tbl and new_tbl are the current and new bit packed values
+            // for the idx'th byte of the table.
+            // compare_exchange_weak will update the value of table[idx] if
+            // current_tbl is the current value (hasn't been changed by a
+            // different thread) if they differ the value actually stored
+            // in table[idx] is written to current_tbl so this is a
+            // compare-and-swap loop
             uint8_t new_count = (current_count + 1) << shift;
             uint8_t new_tbl = (current_tbl & ~mask) | (new_count & mask);
 
