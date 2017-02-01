@@ -414,7 +414,8 @@ def main():
         # so pairs will stay together if not orphaned.  This is in contrast
         # to the first loop.  Hence, force_single=True below.
 
-        paired_iter = broken_paired_reader(ReadParser(pass2filename),
+        read_parser = ReadParser(pass2filename)
+        paired_iter = broken_paired_reader(read_parser,
                                            min_length=K,
                                            force_single=True)
 
@@ -431,6 +432,8 @@ def main():
             write_record(read, trimfp)
             written_reads += 1
             written_bp += len(read)
+
+        read_parser.close()
 
         log_info('removing {pass2}', pass2=pass2filename)
         os.unlink(pass2filename)

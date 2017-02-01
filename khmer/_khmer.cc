@@ -284,6 +284,10 @@ static bool convert_Pytablesizes_to_vector(PyListObject * sizes_list_o,
 }
 
 
+static
+read_parsers::IParser *
+_PyObject_to_khmer_ReadParser(PyObject * py_object);
+
 /***********************************************************************/
 
 //
@@ -791,6 +795,16 @@ ReadParser_iter_read_pairs(PyObject * self, PyObject * args )
 }
 
 
+PyObject *
+ReadParser_close(PyObject * self, PyObject * args)
+{
+    read_parsers::IParser* rparser = _PyObject_to_khmer_ReadParser(self);
+    rparser->close();
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 static PyMethodDef _ReadParser_methods [ ] = {
     {
         "iter_reads",       (PyCFunction)ReadParser_iter_reads,
@@ -799,6 +813,10 @@ static PyMethodDef _ReadParser_methods [ ] = {
     {
         "iter_read_pairs",  (PyCFunction)ReadParser_iter_read_pairs,
         METH_VARARGS,       "Iterates over paired reads as pairs."
+    },
+    {
+        "close",  (PyCFunction)ReadParser_close,
+        METH_NOARGS,       "Close associated files."
     },
     { NULL, NULL, 0, NULL } // sentinel
 };

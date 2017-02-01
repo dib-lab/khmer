@@ -167,6 +167,7 @@ public:
 
     size_t get_num_reads();
     bool is_complete();
+    void close();
 }; // class ReadParser
 
 
@@ -189,6 +190,7 @@ public:
     Read get_next_read();
     bool is_complete();
     size_t get_num_reads();
+    void close();
 }; // class FastxReader
 
 
