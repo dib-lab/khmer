@@ -15,9 +15,12 @@ be tested separately.  We can use code coverage to identify that
 code...
 """
 
+import sys
 import pytest
 
 
+import khmer_tst_utils as utils
+import khmer
 from khmer import _Countgraph, _Counttable, _SmallCountgraph, _SmallCounttable
 from khmer import _Nodegraph, _Nodetable
 
@@ -29,6 +32,11 @@ PRIMES_1m = [1000003, 1009837]
                         _SmallCounttable, _Nodegraph, _Nodetable])
 def tabletype(request):
     return request.param
+
+# For map(long, [list of ints]) cross-version hackery
+if sys.version_info.major > 2:
+    long = int  # pylint: disable=redefined-builtin
+    unicode = str
 
 
 def test_presence(tabletype):
@@ -64,7 +72,25 @@ def test_hash(tabletype):
     # hashing of strings -> numbers.
     kh = tabletype(5, PRIMES_1m)
     x = kh.hash("ATGGC")
-    assert type(x) == int
+    assert type(x) == long
+
+
+def test_hash_bad_dna(tabletype):
+    # hashing of bad dna -> succeeds w/o complaint
+    kh = tabletype(5, PRIMES_1m)
+
+    x = kh.hash("ATGYC")
+
+
+def test_hash_bad_length(tabletype):
+    # hashing of bad dna length -> error
+    kh = tabletype(5, PRIMES_1m)
+
+    with pytest.raises(ValueError):
+        x = kh.hash("ATGGGC")
+
+    with pytest.raises(ValueError):
+        x = kh.hash("ATGG")
 
 
 def test_reverse_hash(tabletype):
@@ -76,7 +102,7 @@ def test_reverse_hash(tabletype):
     except ValueError:
         pytest.skip("reverse_hash not implemented on this table type")
 
-    assert type(x) == str
+    assert isinstance(x, (unicode, str))
 
 
 def test_hashsizes(tabletype):
@@ -106,6 +132,13 @@ def test_add_dna_kmer(tabletype):
     assert z == 1
 
 
+def test_add_bad_dna_kmer(tabletype):
+    # even with 'bad' dna, should succeed.
+    kh = tabletype(5, PRIMES_1m)
+
+    x = kh.add("ATYGC")
+
+
 def test_get_hashval(tabletype):
     # test get(hashval)
     kh = tabletype(5, PRIMES_1m)
@@ -133,6 +166,35 @@ def test_get_dna_kmer(tabletype):
 
     z = kh.get("ATGGC")
     assert z == 1
+
+
+def test_get_bad_dna_kmer(tabletype):
+    # test get(dna) with bad dna; should be fine.
+    kh = tabletype(5, PRIMES_1m)
+
+    kh.hash("ATYGC")
+
+
+def test_consume_and_count(tabletype):
+    tt = tabletype(6, PRIMES_1m)
+
+    x = "ATGCCGATGCA"
+    tt.consume(x)
+
+    for start in range(len(x) - 6 + 1):
+        assert tt.get(x[start:start + 6]) == 1
+
+
+def test_consume_and_count_bad_dna(tabletype):
+    # while we don't specifically handle bad DNA, we should at least be
+    # consistent...
+    tt = tabletype(6, PRIMES_1m)
+
+    x = "ATGCCGNTGCA"
+    tt.consume(x)
+
+    for start in range(len(x) - 6 + 1):
+        assert tt.get(x[start:start + 6]) == 1
 
 
 def test_get_kmer_counts(tabletype):
@@ -180,3 +242,28 @@ def test_get_kmers(tabletype):
 
     kmers = hi.get_kmers("AGCTTTTC")
     assert kmers == ['AGCTTT', 'GCTTTT', 'CTTTTC']
+
+
+def test_save_load(tabletype):
+    kh = tabletype(5, PRIMES_1m)
+    savefile = utils.get_temp_filename('tablesave.out')
+
+    # test add(dna)
+    x = kh.add("ATGGC")
+    z = kh.get("ATGGC")
+    assert z == 1
+
+    kh.save(savefile)
+
+    # should we provide a single load function here? yes, probably. @CTB
+    if tabletype in (_Countgraph, _Counttable):
+        loaded = khmer.load_countgraph(savefile)
+    elif tabletype in (_SmallCountgraph, _SmallCounttable):
+        loaded = khmer.load_countgraph(savefile, small=True)
+    elif tabletype in (_Nodegraph, _Nodetable):
+        loaded = khmer.load_nodegraph(savefile)
+    else:
+        raise Exception("unknown tabletype")
+
+    z = kh.get('ATGGC')
+    assert z == 1

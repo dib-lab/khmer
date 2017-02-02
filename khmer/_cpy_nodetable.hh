@@ -52,7 +52,7 @@ static PyTypeObject khmer_KNodetable_Type
 CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KNodetable_Object")
 = {
     PyVarObject_HEAD_INIT(NULL, 0) /* init & ob_size */
-    "_khmer.Notetable",             /* tp_name */
+    "_khmer.Nodetable",             /* tp_name */
     sizeof(khmer_KNodetable_Object), /* tp_basicsize */
     0,                             /* tp_itemsize */
     0,                             /*tp_dealloc*/

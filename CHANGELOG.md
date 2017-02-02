@@ -28,6 +28,8 @@ under semantic versioning, but will be in future versions of khmer.
 - Add --info flag for obtaining citation information.
 - Add a new storage class using half a byte per entry. Exposed as
   SmallCounttable and SmallCountgraph.
+- Added `cleaned_seq` attribute to `khmer.Read` class which provides a cleaned
+  version of the sequence of each read.
 
 ### Changed
 - Switch from nose to py.test as the testing framework.
@@ -48,6 +50,7 @@ under semantic versioning, but will be in future versions of khmer.
   `require_paired` is set.
 - Bug related to handling lowercase [acgtn] characters in input data.
 - Bug in `load-graph.py` that calculated required graph space incorrectly.
+- Fix loading of empty partion map files
 
 ## [2.0] - 2015-10-08
 

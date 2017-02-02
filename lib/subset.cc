@@ -913,6 +913,15 @@ void SubsetPartition::merge_from_disk(string other_filename)
                           + strerror(errno);
         throw khmer_file_exception(err);
     }
+    infile.seekg(0, infile.end);
+    const int length = infile.tellg();
+    infile.seekg(0, infile.beg);
+    if (length == 18) {
+        std::string err;
+        err = other_filename + " contains only a header and no partition IDs.";
+        throw khmer_file_exception(err);
+    }
+
 
     try {
         unsigned int save_ksize = 0;
