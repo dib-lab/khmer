@@ -97,11 +97,11 @@ public:
 // The explicit specializations need to be declared in the same translation unit
 // as their unspecialized declaration.
 template<>
-std::string LinearAssembler::_assemble_directed<LEFT>(AssemblerTraverser<LEFT>
+std::string LinearAssembler::_assemble_directed<TRAVERSAL_LEFT>(AssemblerTraverser<TRAVERSAL_LEFT>
         &cursor) const;
 
 template<>
-std::string LinearAssembler::_assemble_directed<RIGHT>(AssemblerTraverser<RIGHT>
+std::string LinearAssembler::_assemble_directed<TRAVERSAL_RIGHT>(AssemblerTraverser<TRAVERSAL_RIGHT>
         &cursor) const;
 
 

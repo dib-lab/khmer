@@ -15,11 +15,12 @@ be tested separately.  We can use code coverage to identify that
 code...
 """
 
+from __future__ import absolute_import
 import sys
 import pytest
 
 
-import khmer_tst_utils as utils
+from . import khmer_tst_utils as utils
 import khmer
 from khmer import _Countgraph, _Counttable, _SmallCountgraph, _SmallCounttable
 from khmer import _Nodegraph, _Nodetable

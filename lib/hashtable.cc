@@ -57,6 +57,9 @@ using namespace std;
 using namespace khmer;
 using namespace khmer::read_parsers;
 
+namespace khmer
+{
+
 //
 // check_and_process_read: checks for non-ACGT characters before consuming
 //
@@ -107,22 +110,15 @@ bool Hashtable::check_and_normalize_read(std::string &read) const
 //
 
 // TODO? Inline in header.
-void
-Hashtable::
-consume_fasta(
-    std:: string const  &filename,
-    unsigned int	      &total_reads, unsigned long long	&n_consumed
+template<typename SeqIO>
+void Hashtable::consume_fasta(
+    std::string const &filename,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
 )
 {
-    IParser *	  parser =
-        IParser::get_parser( filename );
-
-    consume_fasta(
-        parser,
-        total_reads, n_consumed
-    );
-
-    delete parser;
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
+    consume_fasta<SeqIO>(parser, total_reads, n_consumed);
 }
 
 void Hashtable::_check_batches(unsigned int num_batches, unsigned int batch)
@@ -138,19 +134,21 @@ void Hashtable::_check_batches(unsigned int num_batches, unsigned int batch)
     }
 }
 
+template<typename SeqIO>
 void Hashtable::consume_fasta_banding(
     std::string const &filename, unsigned int num_batches, unsigned int batch,
     unsigned int &total_reads, unsigned long long &n_consumed
 )
 {
     _check_batches(num_batches, batch);
-    IParser *parser = IParser::get_parser(filename);
-    consume_fasta_banding(parser, num_batches, batch, total_reads, n_consumed);
-    delete parser;
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
+    consume_fasta_banding<SeqIO>(parser, num_batches, batch, total_reads,
+                                 n_consumed);
 }
 
+template<typename SeqIO>
 void Hashtable::consume_fasta_banding(
-    IParser *parser, unsigned int num_batches, unsigned int batch,
+    ReadParserPtr<SeqIO>& parser, unsigned int num_batches, unsigned int batch,
     unsigned int &total_reads, unsigned long long &n_consumed
 )
 {
@@ -193,17 +191,17 @@ void Hashtable::consume_fasta_banding(
                 this_n_consumed++;
             }
         }
-        
+
         __sync_add_and_fetch(&n_consumed, this_n_consumed);
         __sync_add_and_fetch(&total_reads, 1);
     }
 } // consume_fasta_banding
 
-void
-Hashtable::
-consume_fasta(
-    read_parsers:: IParser *  parser,
-    unsigned int		    &total_reads, unsigned long long  &n_consumed
+template<typename SeqIO>
+void Hashtable::consume_fasta(
+    ReadParserPtr<SeqIO>& parser,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
 )
 {
     Read			  read;
@@ -402,9 +400,9 @@ BoundedCounterType Hashtable::get_max_count(const std::string &s)
     return max_count;
 }
 
-uint64_t *
-Hashtable::abundance_distribution(
-    read_parsers::IParser * parser,
+template<typename SeqIO>
+uint64_t * Hashtable::abundance_distribution(
+    ReadParserPtr<SeqIO>& parser,
     Hashtable *          tracking)
 {
     uint64_t * dist = new uint64_t[MAX_BIGCOUNT + 1];
@@ -454,16 +452,13 @@ Hashtable::abundance_distribution(
     return dist;
 }
 
-
+template<typename SeqIO>
 uint64_t * Hashtable::abundance_distribution(
     std::string filename,
     Hashtable *  tracking)
 {
-    IParser* parser = IParser::get_parser(filename.c_str());
-
-    uint64_t * distribution = abundance_distribution(parser, tracking);
-    delete parser;
-    return distribution;
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
+    return abundance_distribution(parser, tracking);
 }
 
 unsigned long Hashtable::trim_on_abundance(
@@ -630,4 +625,37 @@ unique_ptr<KmerHashIterator> Counttable::new_kmer_iterator(const char * sp) cons
     return unique_ptr<KmerHashIterator>(ki);
 }
 
-// vim: set sts=2 sw=2:
+template void Hashtable::consume_fasta<FastxReader>(
+    std::string const &filename,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+);
+template void Hashtable::consume_fasta<FastxReader>(
+    ReadParserPtr<FastxReader>& parser,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+);
+template void Hashtable::consume_fasta_banding<FastxReader>(
+    std::string const &filename,
+    unsigned int num_batches,
+    unsigned int batch,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+);
+template void Hashtable::consume_fasta_banding<FastxReader>(
+    ReadParserPtr<FastxReader>& parser,
+    unsigned int num_batches,
+    unsigned int batch,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+);
+template uint64_t * Hashtable::abundance_distribution<FastxReader>(
+    ReadParserPtr<FastxReader>& parser,
+    Hashtable * tracking
+);
+template uint64_t * Hashtable::abundance_distribution<FastxReader>(
+    std::string filename,
+    Hashtable * tracking
+);
+
+} // namespace khmer
