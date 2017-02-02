@@ -83,6 +83,14 @@ cdef class Sequence:
         return quality if quality else None
 
     @staticmethod
+    def from_screed_record(record):
+        cdef Sequence seq = Sequence(name=record.name,
+                                     sequence=record.sequence)
+        if hasattr(record, 'quality'):
+            seq._obj.quality = record.quality.encode('UTF-8')
+        return seq
+
+    @staticmethod
     cdef Sequence _wrap(CpSequence cseq):
         cdef Sequence seq = Sequence()
         seq._obj = cseq
@@ -368,8 +376,7 @@ cdef class BrokenPairedReader:
             return 1, first, second, None
 
 
-
-cdef tuple _split_left_right(str name):
+cpdef tuple _split_left_right(str name):
     """Split record name at the first whitespace and return both parts.
 
     RHS is set to an empty string if not present.
@@ -424,7 +431,11 @@ cdef int _check_is_pair(Sequence first, Sequence second):
     return 0
 
 
-def check_is_pair(Sequence first, Sequence second):
+def check_is_pair(first, second):
+    if type(first) is not Sequence:
+        first = Sequence.from_screed_record(first)
+    if type(second) is not Sequence:
+        second = Sequence.from_screed_record(second)
     cdef int ret = _check_is_pair(first, second)
     if ret == -1:
         raise ValueError("both records must be same type (FASTA or FASTQ)")

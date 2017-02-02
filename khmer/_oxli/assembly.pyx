@@ -21,7 +21,7 @@ cdef class LinearAssembler:
     def set_stop_filter(self, stop_filter=None):
         self.stop_filter = stop_filter
         if stop_filter is not None:
-            self._stop_filter_ptr = get_hashtable_ptr(stop_filter)
+            self._stop_filter_ptr = get_hashgraph_ptr(stop_filter)
             if self._stop_filter_ptr == NULL:
                 raise ValueError('Must take an object with Hashgraph *')
         else:

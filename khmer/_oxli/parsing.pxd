@@ -59,7 +59,7 @@ cdef class BrokenPairedReader:
     cdef tuple _next(self)
 
 
-cdef tuple _split_left_right(str name)
+cpdef tuple _split_left_right(str name)
 
 cdef int _check_is_pair(Sequence first, Sequence second)
 
