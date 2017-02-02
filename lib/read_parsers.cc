@@ -209,11 +209,9 @@ ReadPair ReadParser<SeqIO>::get_next_read_pair(uint8_t mode)
 {
     if (mode == ReadParser<SeqIO>::PAIR_MODE_IGNORE_UNPAIRED) {
         return _get_next_read_pair_in_ignore_mode();
-    }
-    else if (mode == ReadParser<SeqIO>::PAIR_MODE_ERROR_ON_UNPAIRED) {
+    } else if (mode == ReadParser<SeqIO>::PAIR_MODE_ERROR_ON_UNPAIRED) {
         return _get_next_read_pair_in_error_mode();
-    }
-    else {
+    } else {
         std::ostringstream oss;
         oss << "Unknown pair reading mode: " << mode;
         throw UnknownPairReadingMode(oss.str());
@@ -254,25 +252,25 @@ void FastxReader::_init()
 }
 
 FastxReader::FastxReader()
-        : _filename("-"), _spin_lock(0), _num_reads(0), _have_qualities(false)
+    : _filename("-"), _spin_lock(0), _num_reads(0), _have_qualities(false)
 {
     _init();
 }
 
 FastxReader::FastxReader(const std::string& infile)
-        : _filename(infile),
-          _spin_lock(0),
-          _num_reads(0),
-          _have_qualities(false)
+    : _filename(infile),
+      _spin_lock(0),
+      _num_reads(0),
+      _have_qualities(false)
 {
     _init();
 }
 
 FastxReader::FastxReader(FastxReader& other)
-        : _filename(other._filename),
-          _spin_lock(other._spin_lock),
-          _num_reads(other._num_reads),
-          _have_qualities(other._have_qualities)
+    : _filename(other._filename),
+      _spin_lock(other._spin_lock),
+      _num_reads(other._num_reads),
+      _have_qualities(other._have_qualities)
 {
     _stream = std::move(other._stream);
 }
@@ -292,7 +290,8 @@ size_t FastxReader::get_num_reads()
     return _num_reads;
 }
 
-void FastxParser::close() {
+void FastxReader::close()
+{
     seqan::close(_stream);
 }
 
@@ -345,10 +344,10 @@ template<typename SeqIO>
 ReadParserPtr<SeqIO> get_parser(const std::string& filename)
 {
     return ReadParserPtr<SeqIO>(
-        new ReadParser<SeqIO>(
-            std::unique_ptr<SeqIO>(new SeqIO(filename))
-        )
-    );
+               new ReadParser<SeqIO>(
+                   std::unique_ptr<SeqIO>(new SeqIO(filename))
+               )
+           );
 }
 
 // All template instantiations used in the codebase must be declared here.

@@ -93,8 +93,7 @@ struct InvalidReadPair : public  khmer_value_exception {
 unsigned char _to_valid_dna(const unsigned char c);
 
 
-struct Read
-{
+struct Read {
     std::string name;
     std::string description;
     std::string sequence;

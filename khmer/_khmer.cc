@@ -284,9 +284,7 @@ static bool convert_Pytablesizes_to_vector(PyListObject * sizes_list_o,
 }
 
 
-static
-read_parsers::IParser *
-_PyObject_to_khmer_ReadParser(PyObject * py_object);
+static FastxParserPtr& _PyObject_to_khmer_ReadParser(PyObject * py_object);
 
 /***********************************************************************/
 
@@ -798,7 +796,7 @@ ReadParser_iter_read_pairs(PyObject * self, PyObject * args )
 PyObject *
 ReadParser_close(PyObject * self, PyObject * args)
 {
-    read_parsers::IParser* rparser = _PyObject_to_khmer_ReadParser(self);
+    FastxParserPtr& rparser = _PyObject_to_khmer_ReadParser(self);
     rparser->close();
 
     Py_INCREF(Py_None);
@@ -884,7 +882,8 @@ void _init_ReadParser_Type_constants()
 
     // Place pair mode constants into class dictionary.
     int result;
-    PyObject *value = PyLong_FromLong(ReadParser<FastxReader>::PAIR_MODE_IGNORE_UNPAIRED);
+    PyObject *value = PyLong_FromLong(
+                          ReadParser<FastxReader>::PAIR_MODE_IGNORE_UNPAIRED);
     if (value == NULL) {
         Py_DECREF(cls_attrs_DICT);
         return;
@@ -2324,7 +2323,7 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashtable_Object")
 = {
     PyVarObject_HEAD_INIT(NULL, 0)       /* init & ob_size */
     "_khmer.KHashtable   ",              /*tp_name*/
-    sizeof(khmer_KHashtable_Object)   ,  /*tp_basicsize*/
+    sizeof(khmer_KHashtable_Object),     /*tp_basicsize*/
     0,                                   /*tp_itemsize*/
     0,                                   /*tp_dealloc*/
     0,                                   /*tp_print*/
@@ -2954,7 +2953,7 @@ labelhash_consume_fasta_and_tag_with_labels(khmer_KGraphLabels_Object * me,
     //Py_BEGIN_ALLOW_THREADS
     try {
         hb->consume_fasta_and_tag_with_labels<FastxReader>(filename, total_reads,
-                                                           n_consumed);
+                n_consumed);
     } catch (khmer_file_exception &exc) {
         exc_string = exc.what();
         file_exception = exc_string.c_str();
@@ -3784,8 +3783,9 @@ static PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
     unsigned long long  n_consumed    = 0;
     unsigned int        total_reads   = 0;
     try {
-        me->hllcounter->consume_fasta<FastxReader>(filename, stream_records, total_reads,
-                                      n_consumed);
+        me->hllcounter->consume_fasta<FastxReader>(filename, stream_records,
+                total_reads,
+                n_consumed);
     } catch (khmer_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;
