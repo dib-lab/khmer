@@ -50,10 +50,19 @@ cdef class Sequence:
                 self._obj.quality = quality.encode('UTF-8')
 
     def __str__(self):
-        return self.sequence
+        return repr(self)
+
+    def __repr__(self):
+        return 'Sequence(name="{0}", sequence="{1}")'.format(self.name, self.sequence)
 
     def __len__(self):
         return self._obj.sequence.length()
+
+    def __richcmp__(x, y, op):
+        if op == 2:
+            return x.name == y.name and x.sequence == y.sequence
+        else:
+            raise NotImplementedError('Operator not available')
 
     @property
     def name(self):
@@ -65,12 +74,12 @@ cdef class Sequence:
 
     @property
     def annotations(self):
-        cdef str annotations = self._this.annotations
+        cdef str annotations = self._obj.annotations
         return annotations if annotations else None
 
     @property
     def quality(self):
-        cdef str quality = self._this.quality
+        cdef str quality = self._obj.quality
         return quality if quality else None
 
     @staticmethod
@@ -125,66 +134,71 @@ cdef inline bool is_valid(const char base, string& alphabet):
     return False
 
 
-cdef inline bool is_valid_dnan(const char base):
-    return is_valid(base, DNAN_SIMPLE)
-
-
-cdef inline bool is_valid_rnan(const char base):
-    return is_valid(base, RNAN_SIMPLE)
-
-
 cdef inline bool sanitize_sequence(string& sequence,
-                                   string& alphabet):
+                                   string& alphabet,
+                                   bool convert_n):
     cdef int i = 0
     for i in range(sequence.length()):
         sequence[i] &= 0xdf
         if not is_valid(sequence[i], alphabet):
             return False
-        if sequence[i] == 'N':
+        if convert_n and sequence[i] == 'N':
             sequence[i] = 'A'
     return True
 
 
 cdef class FastxParser:
 
-    def __cinit__(self, str filename, bool sanitize=True, 
-                        str alphabet='DNAN_SIMPLE'):
+    def __cinit__(self, str filename, *args, **kwargs):
         self._this.reset(new CpFastxParser(filename.encode()))
-        self.sanitize = sanitize
-        self.n_bad = 0
-        self._alphabet = Alphabets.get(alphabet).encode('UTF-8')
 
     cdef Sequence _next(self):
-        if not deref(self._this).is_complete():
+        if not self.is_complete():
             return Sequence._wrap(deref(self._this).get_next_read())
         else:
             return None
 
+    cpdef bool is_complete(self):
+        return deref(self._this).is_complete()
+
     def __iter__(self):
-        if self.sanitize:
-            for seq in self._iter_sanitize():
-                yield seq
-        else:
-            for seq in self._iter_no_sanitize():
-                yield seq
-
-    def _iter_no_sanitize(self):
-        cdef Sequence seq = self._next()
-        while seq is not None:
+        cdef Sequence seq
+        while not self.is_complete():
+            seq = self._next()
             yield seq
-            seq = self._next()
 
-    def _iter_sanitize(self):
-        cdef bool sane
-        cdef Sequence seq = self._next()
-        while seq is not None:
-            sane = sanitize_sequence(seq._obj.sequence,
-                                     self._alphabet)
-            if sane is False:
+
+cdef class SanitizedFastxParser(FastxParser):
+
+    def __cinit__(self, str filename, str alphabet='DNAN_SIMPLE',
+                        bool convert_n=True):
+        self.n_bad = 0
+        self.convert_n = convert_n
+        self._alphabet = Alphabets.get(alphabet).encode('UTF-8')
+
+    cdef Sequence _next(self):
+        cdef Sequence seq
+        cdef bool good
+
+        if not self.is_complete():
+            seq = FastxParser._next(self)
+            good = sanitize_sequence(seq._obj.sequence,
+                                     self._alphabet,
+                                     self.convert_n)
+            if not good:
                 self.n_bad += 1
+                return None
             else:
-                yield seq
+                return seq
+        else:
+            return None
+
+    def __iter__(self):
+        cdef Sequence seq
+        while not self.is_complete():
             seq = self._next()
+            if seq is not None:
+                yield seq
 
 
 cdef class SplitPairedReader:
@@ -218,21 +232,27 @@ cdef class SplitPairedReader:
             else:
                 yield read_num, True, first, second
 
-            read_num += 2
+            read_num += found
             found, first, second, err = self._next()
 
     cdef tuple _next(self):
         cdef Sequence first = self.left_parser._next()
+        cdef bool first_complete = self.left_parser.is_complete()
+
         cdef Sequence second = self.right_parser._next()
+        cdef bool second_complete = self.right_parser.is_complete()
         
 
-        if first is None and first is not second:
+        if first_complete is not second_complete:
             err = UnpairedReadsError('Differing lengths of left '\
                                      'and right files!')
             return -1, None, None, err
 
-        if first is None:
+        if first_complete:
             return 0, None, None, None
+
+        if first is None or second is None:
+            return 1, first, second, None
 
         if self.force_name_match:
             if _check_is_pair(first, second):
@@ -267,7 +287,6 @@ cdef class BrokenPairedReader:
         cdef object err
         cdef int found
         cdef int read_num = 0
-        cdef bool passed_length = True
 
         found, first, second, err = self._next()
         while (found != 0):
@@ -275,45 +294,61 @@ cdef class BrokenPairedReader:
                 raise err
 
             if self.min_length > 0:
-                if found == 1:
-                    if len(first) < self.min_length:
-                        passed_length = False
-                else:
-                    if len(first) < self.min_length or len(second) < self.min_length:
-                        passed_length = False
+                if first is not None and len(first) < self.min_length:
+                    first = None
+                    found -= 1
+                if second is not None and len(second) < self.min_length:
+                    second = None
+                    found -= 1
 
-                if passed_length:
+            if self.force_single:
+                if first is not None:
+                    yield read_num, found == 2, first, None
+                    read_num += found
+                if second is not None:
+                    yield read_num, found == 2, second, None
+                    read_num += found
+            elif self.require_paired:
+                if first is not None and second is not None:
                     yield read_num, found == 2, first, second
                     read_num += found
             else:
-                yield read_num, found == 2, first, second
-                read_num += found
+                if first is not None or second is not None:
+                    yield read_num, found == 2, first, second
+                    read_num += found
             found, first, second, err = self._next()
-            passed_length = True
 
     cdef tuple _next(self):
         cdef Sequence first, second
         cdef int is_pair
 
-        if self.record == None:
-            # No previous sequence. Try to get one.
+        if self.record is None:
             first = self.parser._next()
-            # And none left? We're outta here.
             if first is None:
-                return 0, None, None, None
+                if self.parser.is_complete():
+                    return 0, None, None, None
+                else:
+                    if self.require_paired:
+                        err = UnpairedReadsError(
+                            "Uneven number of reads when require_paired is set!",
+                            first)
+                        return -1, None, None, err
+                    return 1, first, None, None
         else:
             first = self.record
         
         second = self.parser._next()
         
         # check if paired
-        if second is not None:
-            is_pair = _check_is_pair(first, second) and not self.force_single:
+        if second is not None and first is not None:
+            is_pair = _check_is_pair(first, second)
             if is_pair == -1:
-                return -1, None, None, 
+                err = ValueError("records must be same type (FASTA or FASTQ)")
+                return -1, None, None, err
+            if is_pair and not self.force_single:
                 self.record = None
                 return 2, first, second, None    # found 2 proper records
-            else:                                   # orphan.
+            else:   # orphan.
                 if self.require_paired:
                     err = UnpairedReadsError(
                         "Unpaired reads when require_paired is set!",
@@ -321,14 +356,17 @@ cdef class BrokenPairedReader:
                     return -1, None, None, err
                 self.record = second
                 return 1, first, None, None
-        else:
-            # ran out of reads, handle last record
+        elif self.parser.is_complete():
+            # ran out of reads getting second, handle last record
             if self.require_paired:
                 err =  UnpairedReadsError("Unpaired reads when require_paired "
                                           "is set!", first, None)
                 return -1, None, None, err
             self.record = None
-            return 1, first, None, None
+            return 1, first, second, None
+        else: # one read was invalid, but that doesn't mean they were unpaired
+            return 1, first, second, None
+
 
 
 cdef tuple _split_left_right(str name):
@@ -393,7 +431,7 @@ def check_is_pair(Sequence first, Sequence second):
     return ret == 1
 
 
-cdef bool _check_is_left(str name):
+cpdef bool check_is_left(str name):
     """Check if the name belongs to a 'left' sequence (/1).
 
     Returns True or False.
@@ -413,7 +451,7 @@ cdef bool _check_is_left(str name):
     return False
 
 
-cdef bool _check_is_right(str name):
+cpdef bool check_is_right(str name):
     """Check if the name belongs to a 'right' sequence (/2).
 
     Returns True or False.
