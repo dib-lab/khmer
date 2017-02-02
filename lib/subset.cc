@@ -119,7 +119,7 @@ size_t SubsetPartition::output_partitioned_file(
     CallbackFn		callback,
     void *		callback_data)
 {
-    IParser* parser = IParser::get_parser(infilename);
+    auto parser = read_parsers::get_parser<FastxReader>(infilename);
     ofstream outfile(outputfile.c_str());
 
     unsigned int total_reads = 0;
@@ -199,17 +199,12 @@ size_t SubsetPartition::output_partitioned_file(
                     callback("output_partitions", callback_data,
                              total_reads, reads_kept);
                 } catch (...) {
-                    delete parser;
-                    parser = NULL;
                     outfile.close();
                     throw;
                 }
             }
         }
     }
-
-    delete parser;
-    parser = NULL;
 
     return partitions.size() + n_singletons;
 }
@@ -913,6 +908,15 @@ void SubsetPartition::merge_from_disk(string other_filename)
                           + strerror(errno);
         throw khmer_file_exception(err);
     }
+    infile.seekg(0, infile.end);
+    const int length = infile.tellg();
+    infile.seekg(0, infile.beg);
+    if (length == 18) {
+        std::string err;
+        err = other_filename + " contains only a header and no partition IDs.";
+        throw khmer_file_exception(err);
+    }
+
 
     try {
         unsigned int save_ksize = 0;
