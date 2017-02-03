@@ -55,8 +55,10 @@ import screed
 from .graph_features import *
 from .graph_features import K
 
+
 def teardown():
     utils.cleanup()
+
 
 @pytest.mark.parametrize("assembler", [LinearAssembler])
 class TestNonBranching:
@@ -89,5 +91,157 @@ class TestNonBranching:
             path = asm.assemble_right(contig[start:start + K])
             print(path, ', ', contig[:start])
             assert utils._equals_rc(path, contig[start:]), start
+
+
+class TestLinearAssembler_RightBranching:
+
+    def test_branch_point(self, right_tip_structure):
+        graph, contig, L, HDN, R, tip = right_tip_structure
+
+        assert graph.kmer_degree(HDN) == 3
+
+    def test_beginning_to_branch(self, right_tip_structure):
+        # assemble from beginning of contig, up until branch point
+        graph, contig, L, HDN, R, tip = right_tip_structure
+        asm = khmer.LinearAssembler(graph)
+        path = asm.assemble(contig[0:K])
+
+        assert len(path) == HDN.pos + K
+        assert utils._equals_rc(path, contig[:len(path)])
+
+    def test_beginning_to_branch_revcomp(self, right_tip_structure):
+        # assemble from beginning of contig, up until branch point
+        # starting from rev comp
+        graph, contig, L, HDN, R, tip = right_tip_structure
+        asm = khmer.LinearAssembler(graph)
+        path = asm.assemble(revcomp(contig[0:K]))
+
+
+        assert len(path) == HDN.pos + K
+        assert utils._equals_rc(path, contig[:len(path)])
+
+    def test_left_of_branch_to_beginning(self, right_tip_structure):
+        # start from HDN (left of branch)
+        graph, contig, L, HDN, R, tip = right_tip_structure
+        asm = khmer.LinearAssembler(graph)
+        path = asm.assemble(L)
+
+        assert len(path) == HDN.pos + K
+        assert utils._equals_rc(path, contig[:len(path)])
+
+    def test_left_of_branch_to_beginning_revcomp(self, right_tip_structure):
+        # start from revcomp of HDN (left of branch)
+        graph, contig, L, HDN, R, tip = right_tip_structure
+        asm = khmer.LinearAssembler(graph)
+        path = asm.assemble(revcomp(L))
+
+        assert len(path) == HDN.pos + K
+        assert utils._equals_rc(path, contig[:len(path)])
+
+    def test_right_of_branch_outwards_to_ends(self, right_tip_structure):
+        # assemble from right of branch point (at R)
+        # Should get the *entire* original contig, as the assembler
+        # will move left relative to the branch, and not consider it
+        # as a high degree node
+        graph, contig, L, HDN, R, tip = right_tip_structure
+        asm = khmer.LinearAssembler(graph)
+        path = asm.assemble(R)
+
+        assert len(path) == len(contig)
+        assert utils._equals_rc(path, contig)
+
+    def test_end_to_beginning(self, right_tip_structure):
+        # should have exact same behavior as right_of_branch_outwards
+        graph, contig, L, HDN, R, tip = right_tip_structure
+        asm = khmer.LinearAssembler(graph)
+        path = asm.assemble(contig[-K:])
+
+        assert len(path) == len(contig)
+        assert utils._equals_rc(path, contig)
+
+
+class TestLinearAssembler_LeftBranching:
+
+    def test_branch_point(self, left_tip_structure):
+        graph, contig, L, HDN, R, tip = left_tip_structure
+
+        assert graph.kmer_degree(HDN) == 3
+
+    def test_end_to_branch(self, left_tip_structure):
+        # assemble from end until branch point
+        # should include HDN
+        graph, contig, L, HDN, R, tip = left_tip_structure
+        asm = khmer.LinearAssembler(graph)
+        path = asm.assemble(contig[-K:])
+
+        assert len(path) == len(contig) - HDN.pos
+        assert utils._equals_rc(path, contig[HDN.pos:])
+
+    def test_branch_to_end(self, left_tip_structure):
+        # assemble from branch point until end
+        graph, contig, L, HDN, R, tip = left_tip_structure
+        asm = khmer.LinearAssembler(graph)
+        path = asm.assemble(HDN)
+
+        assert len(path) == len(contig) - HDN.pos
+        assert utils._equals_rc(path, contig[HDN.pos:])
+
+    def test_from_branch_to_ends_with_stopbf(self, left_tip_structure):
+        # block the tip with the stop_filter. should return a full length contig.
+        graph, contig, L, HDN, R, tip = left_tip_structure
+
+        stop_filter = khmer.Nodegraph(K, 1e5, 4)
+        stop_filter.count(tip)
+
+        asm = khmer.LinearAssembler(graph, stop_filter=stop_filter)
+
+        path = asm.assemble(HDN)
+
+        assert len(path) == len(contig)
+        assert utils._equals_rc(path, contig)
+
+    def test_from_branch_to_ends_with_stopbf_revcomp(self, left_tip_structure):
+        # block the tip with the stop_filter. should return a full length contig.
+        graph, contig, L, HDN, R, tip = left_tip_structure
+
+        stop_filter = khmer.Nodegraph(K, 1e5, 4)
+        stop_filter.count(tip)
+        asm = khmer.LinearAssembler(graph, stop_filter=stop_filter)
+
+        path = asm.assemble(revcomp(HDN))
+
+        assert len(path) == len(contig)
+        assert utils._equals_rc(path, contig)
+
+    def test_end_thru_tip_with_stopbf(self, left_tip_structure):
+        # assemble up to branch point, and include introduced branch b/c
+        # of stop bf
+        graph, contig, L, HDN, R, tip = left_tip_structure
+
+        stop_filter = khmer.Nodegraph(K, 1e5, 4)
+        stop_filter.count(L)          # ...and block original path
+        asm = khmer.LinearAssembler(graph, stop_filter=stop_filter)
+
+
+        path = asm.assemble(contig[-K:])
+        assert len(path) == len(contig) - HDN.pos + 1
+
+
+        # should be the tip k-kmer, plus the last base of the HDN thru
+        # the end of the contig
+        assert utils._equals_rc(path, tip + contig[HDN.pos + K - 1:])
+
+    def test_single_node_flanked_by_hdns(self, left_tip_structure):
+        # assemble single node flanked by high-degree nodes
+        # we'll copy the main nodegraph before mutating it
+        graph, contig, L, HDN, R, tip = left_tip_structure
+        asm = khmer.LinearAssembler(graph)
+
+        graph.consume(mutate_position(contig, HDN.pos + K))
+
+        path = asm.assemble(HDN)
+
+        assert len(path) == K
+        assert utils._equals_rc(path, HDN)
 
 
