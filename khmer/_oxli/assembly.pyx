@@ -37,7 +37,7 @@ cdef class LinearAssembler:
         if isinstance(seed, Kmer):
             return self._assemble(seed)
         else:
-            return self._assemble(Kmer(seed))
+            return self._assemble(Kmer(str(seed)))
 
 
     cdef str _assemble_left(self, Kmer kmer):
@@ -50,7 +50,7 @@ cdef class LinearAssembler:
         if isinstance(seed, Kmer):
             return self._assemble_left(seed)
         else:
-            return self._assemble_left(Kmer(seed))
+            return self._assemble_left(Kmer(str(seed)))
 
 
     cdef str _assemble_right(self, Kmer kmer):
@@ -63,6 +63,6 @@ cdef class LinearAssembler:
         if isinstance(seed, Kmer):
             return self._assemble_right(seed)
         else:
-            return self._assemble_right(Kmer(seed))
+            return self._assemble_right(Kmer(str(seed)))
 
 
