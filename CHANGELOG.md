@@ -8,9 +8,6 @@ under semantic versioning, but will be in future versions of khmer.
 
 ## [Unreleased]
 ### Added
-- New `--keep-temp` option for `trim-low-abund.py` that does not delete the
-  temporary directory created by the script. This sidesteps NFS-related issues
-  we've seen on multiple HPC file systems.
 - New `--no-reformat` option for `interleave-reads.py` script disables default
   read name correction behavior.
 - New `HashSet` data structure for managing collections of k-mer hashes and
