@@ -79,7 +79,7 @@ NodeGatherer<direction>::NodeGatherer(const Hashgraph * ht,
 
 
 template<>
-Kmer NodeGatherer<LEFT>::get_neighbor(const Kmer& node, const char ch)
+Kmer NodeGatherer<TRAVERSAL_LEFT>::get_neighbor(const Kmer& node, const char ch)
 const
 {
     // optimized bit-foo to check for LEFT neighbors in both forward and
@@ -92,7 +92,7 @@ const
 
 
 template<>
-Kmer NodeGatherer<RIGHT>::get_neighbor(const Kmer& node,
+Kmer NodeGatherer<TRAVERSAL_RIGHT>::get_neighbor(const Kmer& node,
                                        const char ch)
 const
 {
@@ -261,7 +261,7 @@ unsigned int Traverser::degree_right(const Kmer& node) const
  ******************************************/
 
 template <>
-std::string AssemblerTraverser<RIGHT>::join_contigs(std::string& contig_a,
+std::string AssemblerTraverser<TRAVERSAL_RIGHT>::join_contigs(std::string& contig_a,
         std::string& contig_b, WordLength offset)
 const
 {
@@ -269,7 +269,7 @@ const
 }
 
 template <>
-std::string AssemblerTraverser<LEFT>::join_contigs(std::string& contig_a,
+std::string AssemblerTraverser<TRAVERSAL_LEFT>::join_contigs(std::string& contig_a,
         std::string& contig_b, WordLength offset)
 const
 {
@@ -334,14 +334,14 @@ char NonLoopingAT<direction>::next_symbol()
     return AssemblerTraverser<direction>::next_symbol();
 }
 
-template class NodeGatherer<LEFT>;
-template class NodeGatherer<RIGHT>;
-template class NodeCursor<LEFT>;
-template class NodeCursor<RIGHT>;
-template class AssemblerTraverser<RIGHT>;
-template class AssemblerTraverser<LEFT>;
-template class NonLoopingAT<RIGHT>;
-template class NonLoopingAT<LEFT>;
+template class NodeGatherer<TRAVERSAL_LEFT>;
+template class NodeGatherer<TRAVERSAL_RIGHT>;
+template class NodeCursor<TRAVERSAL_LEFT>;
+template class NodeCursor<TRAVERSAL_RIGHT>;
+template class AssemblerTraverser<TRAVERSAL_RIGHT>;
+template class AssemblerTraverser<TRAVERSAL_LEFT>;
+template class NonLoopingAT<TRAVERSAL_RIGHT>;
+template class NonLoopingAT<TRAVERSAL_LEFT>;
 
 
 } // namespace khmer
