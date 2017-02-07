@@ -19,7 +19,7 @@ import sys
 import pytest
 
 
-import khmer_tst_utils as utils
+from . import khmer_tst_utils as utils
 import khmer
 from khmer import _Countgraph, _Counttable, _SmallCountgraph, _SmallCounttable
 from khmer import _Nodegraph, _Nodetable
