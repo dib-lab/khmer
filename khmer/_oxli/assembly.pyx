@@ -3,12 +3,15 @@ import cython
 from cython.operator cimport dereference as deref
 
 from _oxli import *
-from _oxli cimport CpHashtable, CpLinearAssembler, CpCompactingAssembler, CpKmer, get_hashtable_ptr
+from _oxli cimport CpHashtable, CpLinearAssembler, CpCompactingAssembler, CpKmer, get_hashgraph_ptr
+
 
 cdef class LinearAssembler:
 
     def __cinit__(self, graph, stop_filter=None):
-        self._graph_ptr = get_hashtable_ptr(graph)
+        self._graph_ptr = get_hashgraph_ptr(graph)
+        if self._graph_ptr == NULL:
+            raise ValueError('Must take an object with Hashgraph *')
         self.graph = graph
         self.set_stop_filter(stop_filter=stop_filter)
         
@@ -18,10 +21,11 @@ cdef class LinearAssembler:
     def set_stop_filter(self, stop_filter=None):
         self.stop_filter = stop_filter
         if stop_filter is not None:
-            self._stop_filter_ptr = get_hashtable_ptr(stop_filter)
+            self._stop_filter_ptr = get_hashgraph_ptr(stop_filter)
+            if self._stop_filter_ptr == NULL:
+                raise ValueError('Must take an object with Hashgraph *')
         else:
             self._stop_filter_ptr = NULL
-
 
     cdef str _assemble(self, Kmer kmer):
         if self.stop_filter is None:
@@ -33,7 +37,7 @@ cdef class LinearAssembler:
         if isinstance(seed, Kmer):
             return self._assemble(seed)
         else:
-            return self._assemble(Kmer(seed))
+            return self._assemble(Kmer(str(seed)))
 
 
     cdef str _assemble_left(self, Kmer kmer):
@@ -46,8 +50,7 @@ cdef class LinearAssembler:
         if isinstance(seed, Kmer):
             return self._assemble_left(seed)
         else:
-            return self._assemble_left(Kmer(seed))
-
+            return self._assemble_left(Kmer(str(seed)))
 
     cdef str _assemble_right(self, Kmer kmer):
         if self.stop_filter is None:
@@ -59,12 +62,14 @@ cdef class LinearAssembler:
         if isinstance(seed, Kmer):
             return self._assemble_right(seed)
         else:
-            return self._assemble_right(Kmer(seed))
+            return self._assemble_right(Kmer(str(seed)))
 
 cdef class CompactingAssembler(LinearAssembler):
 
     def __cinit__(self, graph, stop_filter=None):
-        self._graph_ptr = get_hashtable_ptr(graph)
+        self._graph_ptr = get_hashgraph_ptr(graph)
+        if self._graph_ptr == NULL:
+            raise ValueError('Must take an object with Hashgraph *')
         self.graph = graph
         self.set_stop_filter(stop_filter=stop_filter)
         

@@ -49,7 +49,7 @@ namespace khmer
  * Simple Linear Assembly
  ********************************/
 
-LinearAssembler::LinearAssembler(const Hashtable * ht) :
+LinearAssembler::LinearAssembler(const Hashgraph * ht) :
     graph(ht), _ksize(ht->ksize())
 {
 
@@ -58,7 +58,7 @@ LinearAssembler::LinearAssembler(const Hashtable * ht) :
 // Starting from the given seed k-mer, assemble the maximal linear path in
 // both directions.
 std::string LinearAssembler::assemble(const Kmer seed_kmer,
-                                      const Hashtable * stop_bf)
+                                      const Hashgraph * stop_bf)
 const
 {
     if (graph->get_count(seed_kmer) == 0) {
@@ -80,7 +80,7 @@ const
 
 
 std::string LinearAssembler::assemble_right(const Kmer seed_kmer,
-        const Hashtable * stop_bf)
+        const Hashgraph * stop_bf)
 const
 {
     std::list<KmerFilter> node_filters;
@@ -94,7 +94,7 @@ const
 
 
 std::string LinearAssembler::assemble_left(const Kmer seed_kmer,
-        const Hashtable * stop_bf)
+        const Hashgraph * stop_bf)
 const
 {
     std::list<KmerFilter> node_filters;
@@ -169,7 +169,7 @@ const
 
 
 std::string CompactingAssembler::assemble_right(const Kmer seed_kmer,
-                                                const Hashtable * stop_bf)
+                                                const Hashgraph * stop_bf)
 const
 {
     std::list<KmerFilter> node_filters;
@@ -183,7 +183,7 @@ const
 
 
 std::string CompactingAssembler::assemble_left(const Kmer seed_kmer,
-                                               const Hashtable * stop_bf)
+                                               const Hashgraph * stop_bf)
 const
 {
     std::list<KmerFilter> node_filters;
@@ -215,7 +215,7 @@ SimpleLabeledAssembler::~SimpleLabeledAssembler()
 // Starting from the given seed k-mer, assemble all maximal linear paths in
 // both directions, using labels to skip over tricky bits.
 StringVector SimpleLabeledAssembler::assemble(const Kmer seed_kmer,
-        const Hashtable * stop_bf)
+        const Hashgraph * stop_bf)
 const
 {
 #if DEBUG_ASSEMBLY
@@ -365,11 +365,11 @@ const
  * Junction-counting assembler
  ***************************************/
 
-JunctionCountAssembler::JunctionCountAssembler(Hashtable * ht) :
+JunctionCountAssembler::JunctionCountAssembler(Hashgraph * ht) :
     graph(ht), _ksize(ht->ksize()), traverser(ht), linear_asm(ht)
 {
     std::vector<uint64_t> table_sizes = graph->get_tablesizes();
-    junctions = new CountingHash(_ksize, table_sizes);
+    junctions = new Countgraph(_ksize, table_sizes);
 }
 
 
@@ -402,8 +402,10 @@ uint16_t JunctionCountAssembler::consume(std::string sequence)
             count_junction(kmer, next_kmer);
             n_junctions++;
 #if DEBUG_ASSEMBLY
-            std::cout << "Junction: " << kmer.repr(_ksize) << ", " << next_kmer.repr(_ksize) << std::endl;
-            std::cout << "Junction Count: " << get_junction_count(kmer, next_kmer) << std::endl;
+            std::cout << "Junction: " << kmer.repr(_ksize) << ", " << next_kmer.repr(
+                          _ksize) << std::endl;
+            std::cout << "Junction Count: " << get_junction_count(kmer,
+                      next_kmer) << std::endl;
 #endif
         }
         kmer = next_kmer;
@@ -412,7 +414,7 @@ uint16_t JunctionCountAssembler::consume(std::string sequence)
         next_d = this->traverser.degree(next_kmer);
     }
 
-    return n_junctions / 2; 
+    return n_junctions / 2;
 }
 
 void JunctionCountAssembler::count_junction(Kmer kmer_a, Kmer kmer_b)
@@ -420,16 +422,17 @@ void JunctionCountAssembler::count_junction(Kmer kmer_a, Kmer kmer_b)
     junctions->count(kmer_a.kmer_u ^ kmer_b.kmer_u);
 }
 
-BoundedCounterType JunctionCountAssembler::get_junction_count(Kmer kmer_a, Kmer kmer_b)
+BoundedCounterType JunctionCountAssembler::get_junction_count(Kmer kmer_a,
+        Kmer kmer_b)
 const
 {
     return junctions->get_count(kmer_a.kmer_u ^ kmer_b.kmer_u);
 }
 
 // Starting from the given seed k-mer, assemble all maximal linear paths in
-// both directions, using labels to skip over tricky bits.
+// both directions, using junction counts to skip over tricky bits.
 StringVector JunctionCountAssembler::assemble(const Kmer seed_kmer,
-        const Hashtable * stop_bf)
+        const Hashgraph * stop_bf)
 const
 {
 #if DEBUG_ASSEMBLY
@@ -444,7 +447,8 @@ const
     SeenSet visited;
 
 #if DEBUG_ASSEMBLY
-    std::cout << "Assemble Junctions RIGHT: " << seed_kmer.repr(_ksize) << std::endl;
+    std::cout << "Assemble Junctions RIGHT: " << seed_kmer.repr(
+                  _ksize) << std::endl;
 #endif
     StringVector right_paths;
     NonLoopingAT<RIGHT> rcursor(graph, seed_kmer, node_filters, &visited);
@@ -478,16 +482,17 @@ void JunctionCountAssembler::_assemble_directed(NonLoopingAT<direction>&
 const
 {
 #if DEBUG_ASSEMBLY
-    std::cout << "## assemble_junctions_directed_" << direction << " [start] at " << 
-        start_cursor.cursor.repr(_ksize) << std::endl;
+    std::cout << "## assemble_junctions_directed_" << direction << " [start] at " <<
+              start_cursor.cursor.repr(_ksize) << std::endl;
 #endif
 
     // prime the traversal with the first linear segment
-    std::string root_contig = linear_asm._assemble_directed<direction>(start_cursor);
+    std::string root_contig = linear_asm._assemble_directed<direction>
+                              (start_cursor);
 #if DEBUG_ASSEMBLY
     std::cout << "Primed: " << root_contig << std::endl;
     std::cout << "Cursor: " << start_cursor.cursor.repr(_ksize) << std::endl;
-#endif 
+#endif
     StringVector segments;
     std::vector< NonLoopingAT<direction> > cursors;
 
@@ -495,7 +500,7 @@ const
     cursors.push_back(start_cursor);
 
     while(segments.size() != 0) {
-        
+
         std::string segment = segments.back();
         NonLoopingAT<direction> cursor = cursors.back();
 #if DEBUG_ASSEMBLY
@@ -503,12 +508,12 @@ const
         std::cout << "Segment: " << segment << std::endl;
         std::cout << "Cursor: " << cursor.cursor.repr(_ksize) << std::endl;
         std::cout << "n_filters: " << cursor.n_filters() << std::endl;
-#endif 
+#endif
         segments.pop_back();
         cursors.pop_back();
 
         // check if the cursor has hit a HDN or reached a dead end
-        if (cursor.cursor_degree() > 1) { 
+        if (cursor.cursor_degree() > 1) {
 
             cursor.push_filter(get_junction_count_filter(cursor.cursor, this->junctions));
             KmerQueue branch_starts;
@@ -522,7 +527,7 @@ const
                 paths.push_back(segment);
                 continue;
             }
-            
+
             // found some neighbors; extend them
             while(!branch_starts.empty()) {
                 // spin off a cursor for the new branch

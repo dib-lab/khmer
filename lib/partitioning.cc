@@ -6,8 +6,7 @@
 #include <algorithm>
 
 #include "hashtable.hh"
-#include "hashbits.hh"
-#include "counting.hh"
+#include "hashgraph.hh"
 #include "partitioning.hh"
 
 using namespace khmer;
@@ -28,7 +27,7 @@ inline std::ostream& operator<< (std::ostream& stream, Component& comp) {
 }
 
 
-StreamingPartitioner::StreamingPartitioner(Hashtable * graph, uint32_t tag_density)  : 
+StreamingPartitioner::StreamingPartitioner(Hashgraph * graph, uint32_t tag_density)  : 
     graph(graph), _tag_density(tag_density), components_lock(0), n_consumed(0)
 {
 
@@ -49,7 +48,7 @@ StreamingPartitioner::StreamingPartitioner(Hashtable * graph, uint32_t tag_densi
                                                        graph_max_table_size / (_tag_density-2)));
         components = std::make_shared<ComponentPtrSet>();
     } else {
-        throw khmer_ptr_exception("Hashtable has been deleted.");
+        throw khmer_ptr_exception("Hashgraph has been deleted.");
     }
 }
 
@@ -153,7 +152,7 @@ uint64_t StreamingPartitioner::consume_and_connect_tags(const std::string& seq,
         Kmer kmer;
         do {
             kmer = kmers.next();
-            bool is_new_kmer = graph->test_and_set_bits(kmer);
+            bool is_new_kmer = graph->add(kmer);
             bool kmer_tagged = false;
 
             if (is_new_kmer) {
@@ -214,7 +213,7 @@ uint64_t StreamingPartitioner::consume_and_connect_tags(const std::string& seq,
         // Now search for tagged nodes connected to U.
         find_connected_tags(search_from, tags, seen, false);
     } else {
-        throw khmer_ptr_exception("Hashtable has been deleted.");
+        throw khmer_ptr_exception("Hashgraph has been deleted.");
     }
 
     return n_new;
@@ -396,7 +395,7 @@ void StreamingPartitioner::find_connected_tags(KmerQueue& node_q,
             total += nfound;
         }
     } else {
-        throw khmer_ptr_exception("Hashtable has been deleted.");
+        throw khmer_ptr_exception("Hashgraph has been deleted.");
     }
 }
 

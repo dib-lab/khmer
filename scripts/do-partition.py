@@ -51,7 +51,7 @@ import os
 import gc
 import textwrap
 from khmer import khmer_args
-from khmer.khmer_args import (build_nodegraph_args, report_on_config, info,
+from khmer.khmer_args import (build_nodegraph_args, report_on_config,
                               add_threading_args, sanitize_help)
 import glob
 from khmer.kfile import check_input_files, check_space
@@ -86,7 +86,7 @@ def get_parser():
     """
     parser = build_nodegraph_args(
         descr='Load, partition, and annotate FAST[AQ] sequences',
-        epilog=textwrap.dedent(epilog))
+        epilog=textwrap.dedent(epilog), citations=['graph'])
     add_threading_args(parser)
     parser.add_argument('--subset-size', '-s', default=DEFAULT_SUBSET_SIZE,
                         dest='subset_size', type=float,
@@ -107,7 +107,6 @@ def get_parser():
 
 # pylint: disable=too-many-branches
 def main():  # pylint: disable=too-many-locals,too-many-statements
-    info('do-partition.py', ['graph'])
     args = sanitize_help(get_parser()).parse_args()
 
     report_on_config(args, graphtype='nodegraph')

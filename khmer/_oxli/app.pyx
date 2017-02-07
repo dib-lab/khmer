@@ -13,8 +13,8 @@ from libcpp cimport bool
 from partitioning cimport StreamingPartitioner, Component
 from partitioning import StreamingPartitioner, Component
 
-from streaming cimport BrokenPairedReader, SplitPairedReader, FastxParser, Sequence
-from streaming import BrokenPairedReader, SplitPairedReader, FastxParser, Sequence
+from parsing cimport BrokenPairedReader, SplitPairedReader, FastxParser, Sequence
+from parsing import BrokenPairedReader, SplitPairedReader, FastxParser, Sequence
 
 def grouper(n, iterable):
     iterable = iter(iterable)

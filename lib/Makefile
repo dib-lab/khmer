@@ -222,9 +222,8 @@ BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 #### oxli proper below here ####
 
 LIBKHMER_OBJS= \
-	counting.o \
-	hashbits.o \
 	hashtable.o \
+	hashgraph.o \
 	hllcounter.o \
 	kmer_hash.o \
 	labelhash.o \
@@ -235,7 +234,8 @@ LIBKHMER_OBJS= \
 	kmer_filters.o \
 	assembler.o \
 	alphabets.o \
-	murmur3.o
+	murmur3.o \
+	storage.o
 
 PRECOMILE_OBJS ?=
 PRECLEAN_TARGS ?=
@@ -253,9 +253,8 @@ PRECLEAN_TARGS += libbz2clean
 endif
 
 KHMER_HEADERS= \
-	counting.hh \
-	hashbits.hh \
 	hashtable.hh \
+	hllcounter.hh \
 	khmer_exception.hh \
 	khmer.hh \
 	kmer_hash.hh \
@@ -266,7 +265,8 @@ KHMER_HEADERS= \
 	subset.hh \
 	kmer_filters.hh \
 	assembler.hh \
-	alphabets.hh
+	alphabets.hh \
+	storage.hh
 
 # START OF RULES #
 

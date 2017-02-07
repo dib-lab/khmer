@@ -120,7 +120,7 @@ KmerFilter get_simple_label_intersect_filter(const LabelSet& src_labels,
 
 
 KmerFilter get_junction_count_filter(const Kmer& src_node,
-                                     CountingHash * junctions,
+                                     Countgraph * junctions,
                                      const unsigned int min_cov)
 {
     KmerFilter filter = [=] (const Kmer& dst_node) {
@@ -133,7 +133,7 @@ KmerFilter get_junction_count_filter(const Kmer& src_node,
 
     return filter;
 }
-                                      
+
 
 KmerFilter get_stop_bf_filter(const Hashtable * stop_bf)
 {

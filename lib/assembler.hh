@@ -41,7 +41,7 @@ Contact: khmer-project@idyll.org
 
 #include "khmer.hh"
 #include "kmer_hash.hh"
-#include "counting.hh"
+#include "hashgraph.hh"
 #include "kmer_filters.hh"
 #include "traversal.hh"
 #include "labelhash.hh"
@@ -50,7 +50,7 @@ Contact: khmer-project@idyll.org
 namespace khmer
 {
 
-class Hashtable;
+class Hashgraph;
 class LabelHash;
 
 
@@ -75,22 +75,21 @@ class LabelHash;
  */
 class LinearAssembler
 {
-
 public:
 
     WordLength _ksize;
-    const Hashtable * graph;
+    const Hashgraph * graph;
 
-    explicit LinearAssembler(const Hashtable * ht);
+    explicit LinearAssembler(const Hashgraph * ht);
 
-    virtual std::string assemble(const Kmer seed_kmer,
-                         const Hashtable * stop_bf = 0) const;
+    std::string assemble(const Kmer seed_kmer,
+                         const Hashgraph * stop_bf = 0) const;
 
-    virtual std::string assemble_right(const Kmer seed_kmer,
-                               const Hashtable * stop_bf = 0) const;
+    std::string assemble_right(const Kmer seed_kmer,
+                               const Hashgraph * stop_bf = 0) const;
 
-    virtual std::string assemble_left(const Kmer seed_kmer,
-                              const Hashtable * stop_bf = 0) const;
+    std::string assemble_left(const Kmer seed_kmer,
+                              const Hashgraph * stop_bf = 0) const;
 
     template <bool direction>
     std::string _assemble_directed(AssemblerTraverser<direction>& cursor) const;
@@ -111,13 +110,13 @@ class CompactingAssembler: public LinearAssembler
 {
 public:
 
-    explicit CompactingAssembler(const Hashtable * ht) : LinearAssembler(ht) {}
+    explicit CompactingAssembler(const Hashgraph* ht) : LinearAssembler(ht) {}
 
     std::string assemble_right(const Kmer seed_kmer,
-                               const Hashtable * stop_bf = 0) const;
+                               const Hashgraph * stop_bf = 0) const;
 
     std::string assemble_left(const Kmer seed_kmer,
-                              const Hashtable * stop_bf = 0) const;
+                              const Hashgraph * stop_bf = 0) const;
 };
 typedef CompactingAssembler CpCompactingAssembler;
 
@@ -146,7 +145,7 @@ class SimpleLabeledAssembler
 
 public:
 
-    const Hashtable * graph;
+    const Hashgraph * graph;
     const LabelHash * lh;
     WordLength _ksize;
 
@@ -154,7 +153,7 @@ public:
     ~SimpleLabeledAssembler();
 
     StringVector assemble(const Kmer seed_kmer,
-                          const Hashtable * stop_bf=0) const;
+                          const Hashgraph * stop_bf=0) const;
 
     template <bool direction>
     void _assemble_directed(NonLoopingAT<direction>& start_cursor,
@@ -166,20 +165,20 @@ public:
 class JunctionCountAssembler
 {
     LinearAssembler linear_asm;
-    CountingHash * junctions;
+    Countgraph * junctions;
     Traverser traverser;
 
 public:
 
-    Hashtable * graph;
+    Hashgraph * graph;
     WordLength _ksize;
 
-    explicit JunctionCountAssembler(Hashtable * ht);
+    explicit JunctionCountAssembler(Hashgraph * ht);
     ~JunctionCountAssembler();
 
 
     StringVector assemble(const Kmer seed_kmer,
-                          const Hashtable * stop_bf=0) const;
+                          const Hashgraph * stop_bf=0) const;
 
     uint16_t consume(std::string sequence);
     void count_junction(Kmer kmer_a, Kmer kmer_b);

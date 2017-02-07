@@ -55,7 +55,7 @@ namespace khmer
 #define RIGHT 1
 #endif
 
-class Hashtable;
+class Hashgraph;
 class LabelHash;
 
 /**
@@ -69,28 +69,25 @@ class LabelHash;
 template<bool direction>
 class NodeGatherer: public KmerFactory
 {
-    friend class Hashtable;
+    friend class Hashgraph;
 
 protected:
 
     KmerFilterList filters;
     HashIntoType bitmask;
     unsigned int rc_left_shift;
-    const Hashtable * graph;
+    const Hashgraph * graph;
 
 public:
 
-    explicit NodeGatherer(const Hashtable * ht,
+    explicit NodeGatherer(const Hashgraph * ht,
                           KmerFilterList filters);
 
-    explicit NodeGatherer(const Hashtable * ht);
+    explicit NodeGatherer(const Hashgraph * ht);
 
-    explicit NodeGatherer(const Hashtable * ht, KmerFilter filter);
+    explicit NodeGatherer(const Hashgraph * ht, KmerFilter filter);
 
-    WordLength ksize()
-    {
-        return graph->ksize();
-    }
+    WordLength ksize();
 
     /**
      * @brief Push a new filter on to the filter stack.
@@ -168,14 +165,14 @@ public:
     Kmer cursor;
     using NodeGatherer<direction>::push_filter;
 
-    explicit NodeCursor(const Hashtable * ht,
+    explicit NodeCursor(const Hashgraph * ht,
                         Kmer start_kmer,
                         KmerFilterList filters);
 
-    explicit NodeCursor(const Hashtable * ht,
+    explicit NodeCursor(const Hashgraph * ht,
                         Kmer start_kmer);
 
-    explicit NodeCursor(const Hashtable * ht,
+    explicit NodeCursor(const Hashgraph * ht,
                         Kmer start_kmer,
                         KmerFilter filter);
 
@@ -208,18 +205,18 @@ class Traverser: public KmerFactory
 
 protected:
 
-    const Hashtable * graph;
+    const Hashgraph * graph;
     NodeGatherer<LEFT> left_gatherer;
     NodeGatherer<RIGHT> right_gatherer;
 
 public:
 
-    explicit Traverser(const Hashtable * ht,
+    explicit Traverser(const Hashgraph * ht,
                        KmerFilterList filters);
 
-    explicit Traverser(const Hashtable * ht) : Traverser(ht, KmerFilterList()) {}
+    explicit Traverser(const Hashgraph * ht) : Traverser(ht, KmerFilterList()) {}
 
-    explicit Traverser(const Hashtable * ht,
+    explicit Traverser(const Hashgraph * ht,
                        KmerFilter filter);
 
     void push_filter(KmerFilter filter);
@@ -298,7 +295,7 @@ protected:
 
 public:
 
-    explicit NonLoopingAT(const Hashtable * ht,
+    explicit NonLoopingAT(const Hashgraph * ht,
                           Kmer start_kmer,
                           KmerFilterList filters,
                           SeenSet * visited);
@@ -316,7 +313,7 @@ protected:
 
 public:
 
-    explicit CompactingAT(const Hashtable * ht,
+    explicit CompactingAT(const Hashgraph * ht,
                           Kmer start_kmer,
                           KmerFilterList filters);
 

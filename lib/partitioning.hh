@@ -43,8 +43,7 @@ Contact: khmer-project@idyll.org
 #include "khmer.hh"
 #include "kmer_hash.hh"
 #include "hashtable.hh"
-#include "hashbits.hh"
-#include "counting.hh"
+#include "hashgraph.hh"
 #include "kmer_filters.hh"
 #include "traversal.hh"
 
@@ -66,7 +65,7 @@ class GuardedKmerMap {
     public:
 
         // Filter should be owned exclusively by GuardedKmerMap
-        std::unique_ptr<Hashbits> filter;
+        std::unique_ptr<Nodegraph> filter;
         std::map<HashIntoType, T> data;
         
         explicit GuardedKmerMap(WordLength ksize,
@@ -74,7 +73,7 @@ class GuardedKmerMap {
                                 uint64_t max_table_size): lock(0)
         {
             std::vector<uint64_t> table_sizes = get_n_primes_near_x(n_tables, max_table_size);
-            filter = std::unique_ptr<Hashbits>(new Hashbits(ksize, table_sizes));
+            filter = std::unique_ptr<Nodegraph>(new Nodegraph(ksize, table_sizes));
         }
 
         T get(HashIntoType kmer) const {
@@ -222,8 +221,8 @@ class StreamingPartitioner {
 
         // We're not graph's owner, simply an observer.
         // Unforunately our ownership policies elsewhere are a mess
-        Hashtable * graph;
-        //std::weak_ptr<Hashtable> graph;
+        Hashgraph * graph;
+        //std::weak_ptr<Hashgraph> graph;
         // We should exclusively own tag_component_map.
         std::shared_ptr<GuardedKmerCompMap> tag_component_map;
         std::shared_ptr<ComponentPtrSet> components;
@@ -232,7 +231,7 @@ class StreamingPartitioner {
 
     public:
 
-        explicit StreamingPartitioner(Hashtable * graph, 
+        explicit StreamingPartitioner(Hashgraph * graph, 
                                       uint32_t tag_density=DEFAULT_TAG_DENSITY);
 
         uint64_t consume(const std::string& seq);

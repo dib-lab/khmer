@@ -1,10 +1,10 @@
 from libcpp.memory cimport unique_ptr
 
-from _oxli cimport CpTraverser, CpHashtable
+from _oxli cimport CpTraverser, CpHashgraph
 
 cdef class Traverser:
     cdef unique_ptr[CpTraverser] _this
-    cdef CpHashtable * _graph_ptr
+    cdef CpHashgraph * _graph_ptr
 
 
 

@@ -37,8 +37,8 @@
 
 # `SHELL=bash` Will break Titus's laptop, so don't use BASH-isms like
 # `[[` conditional expressions.
-CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc) setup.py
-CYSOURCES=$(wildcard khmer/_oxli/*.pyx khmer/_oxli/*.pxd)
+
+CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc khmer/*.hh) setup.py
 PYSOURCES=$(filter-out khmer/_version.py, \
 	  $(wildcard khmer/*.py scripts/*.py oxli/*.py) )
 SOURCES=$(PYSOURCES) $(CPPSOURCES) $(CYSOURCES) setup.py
@@ -100,7 +100,7 @@ install-dep: install-dependencies
 
 install-dependencies:
 	pip install git+https://github.com/dib-lab/screed.git
-	pip install --upgrade $(DEVPKGS)
+	pip install --upgrade --ignore-installed $(DEVPKGS)
 	pip install --upgrade --requirement doc/requirements.txt
 
 ## sharedobj   : build khmer shared object file
@@ -131,6 +131,7 @@ dist/khmer-$(VERSION).tar.gz: $(SOURCES)
 clean: FORCE
 	cd lib && $(MAKE) clean || true
 	cd tests && rm -rf khmertest_* || true
+	rm -f pytest_runner-*.egg pytests.xml
 	rm -f $(EXTENSION_MODULE)
 	@find ./ -type d -name __pycache__ -exec rm -rf {} +
 	@find ./khmer/ -type f -name *$(MODEXT) -exec rm -f {} +
@@ -138,14 +139,17 @@ clean: FORCE
 		sandbox/*.pyc khmer/_oxli/*.cpp
 	./setup.py clean --all || true
 	rm -f coverage-debug
-	rm -Rf .coverage
+	rm -Rf .coverage coverage-gcovr.xml coverage.xml
 	rm -f diff-cover.html
 	rm -Rf build dist
+	rm -rf __pycache__/ .eggs/ khmer.egg-info/
+	@find ./ -type d -name __pycache__ -exec rm -rf {} +
+	@find ./khmer/ -type f -name *$(MODEXT) -exec rm -f {} +
 
 debug: FORCE
 	export CFLAGS="-pg -fprofile-arcs -D_GLIBCXX_DEBUG_PEDANTIC \
 		-D_GLIBCXX_DEBUG -DDEBUG_ASSEMBLY=1 -DDEBUG_FILTERS=1"; python setup.py build_ext --debug \
-		--inplace 
+		--inplace
 
 ## doc         : render documentation in HTML
 doc: build/sphinx/html/index.html
@@ -180,11 +184,10 @@ cppcheck-long: FORCE
 
 ## pep8        : check Python code style
 pep8: $(PYSOURCES) $(wildcard tests/*.py)
-	pep8 --exclude=_version.py  --show-source setup.py khmer/ \
-		scripts/ tests/ oxli/ || true
+	pep8 setup.py khmer/*.py scripts/*.py tests/*.py oxli/*.py
 
 pep8_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
-	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ oxli/ \
+	pep8 setup.py khmer/ scripts/ tests/ oxli/ \
 		> pep8_report.txt || true
 
 diff_pep8_report: pep8_report.txt

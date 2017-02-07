@@ -44,13 +44,13 @@ Contact: khmer-project@idyll.org
 #include <string>
 #include <utility>
 
-#include "hashtable.hh"
+#include "hashgraph.hh"
 #include "khmer.hh"
 #include "read_parsers.hh"
 
 namespace khmer
 {
-class Hashtable;
+class Hashgraph;
 
 using read_parsers::IParser;
 
@@ -118,9 +118,9 @@ protected:
     uint32_t _tag_labels_spin_lock;
 
 public:
-    khmer::Hashtable * graph;
+    khmer::Hashgraph * graph;
 
-    explicit LabelHash(Hashtable * ht) : graph(ht)
+    explicit LabelHash(Hashgraph * ht) : graph(ht)
     {
         _tag_labels_spin_lock = 0;
 

@@ -1,126 +1,115 @@
+/*
+This file is part of khmer, https://github.com/dib-lab/khmer/, and is
+Copyright (C) 2010-2015, Michigan State University.
+Copyright (C) 2015-2016, The Regents of the University of California.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of the Michigan State University nor the names
+      of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written
+      permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+LICENSE (END)
+
+Contact: khmer-project@idyll.org
+*/
+
+//
+// A module for Python that exports khmer C++ library functions.
+//
+#ifndef _KHMER_HH
+#define _KHMER_HH
+
 #include <Python.h>
 
-#include <iostream>
 
-#include "khmer.hh"
-#include "kmer_hash.hh"
-#include "hashtable.hh"
-#include "hashbits.hh"
-#include "counting.hh"
-#include "assembler.hh"
-#include "read_aligner.hh"
-#include "labelhash.hh"
-#include "khmer_exception.hh"
-#include "hllcounter.hh"
+#include "_cpy_utils.hh"
+
+
+//
+// Python 2/3 compatibility: Module initialization
+// http://python3porting.com/cextensions.html#module-initialization
+//
+
+#if PY_MAJOR_VERSION >= 3
+#define MOD_ERROR_VAL NULL
+#define MOD_SUCCESS_VAL(val) val
+#define MOD_INIT(name) PyMODINIT_FUNC PyInit_##name(void)
+#define MOD_DEF(ob, name, doc, methods) \
+          static struct PyModuleDef moduledef = { \
+            PyModuleDef_HEAD_INIT, name, doc, -1, methods, }; \
+          ob = PyModule_Create(&moduledef);
+#else
+#define MOD_ERROR_VAL
+#define MOD_SUCCESS_VAL(val)
+#define MOD_INIT(name) void init##name(void)
+#define MOD_DEF(ob, name, doc, methods) \
+          ob = Py_InitModule3(name, methods, doc);
+#endif
+
+
+
+#include "_cpy_readparsers.hh"
+
+#include "_cpy_hashtable.hh" 
+#include "_cpy_nodetable.hh"
+#include "_cpy_counttable.hh"
+
+#include "_cpy_hashgraph.hh"
+#include "_cpy_subsetpartition.hh"
+#include "_cpy_countgraph.hh"
+#include "_cpy_nodegraph.hh"
+
+#include "_cpy_assembly.hh"
+
+#include "_cpy_graphlabels.hh" 
+#include "_cpy_hashset.hh" 
+#include "_cpy_hllcounter.hh" 
+#include "_cpy_readaligner.hh"
+ 
+
 
 
 namespace khmer {
-namespace python {
 
+PyObject * forward_hash(PyObject * self, PyObject * args);
 
-typedef struct {
-    PyObject_HEAD
-    //! Pointer to the low-level genomic read object.
-    read_parsers:: Read *   read;
-} khmer_Read_Object;
+PyObject * forward_hash_no_rc(PyObject * self, PyObject * args);
 
+PyObject * reverse_hash(PyObject * self, PyObject * args);
 
-typedef struct {
-    PyObject_HEAD
-    //! Pointer to the low-level parser object.
-    read_parsers:: IParser *  parser;
-} khmer_ReadParser_Object;
+PyObject * murmur3_forward_hash(PyObject * self, PyObject * args);
 
+PyObject * murmur3_forward_hash_no_rc(PyObject * self, PyObject * args);
 
-typedef struct {
-    PyObject_HEAD
-    //! Pointer to Python parser object for reference counting purposes.
-    PyObject *  parent;
-    //! Persistent value of pair mode across invocations.
-    int pair_mode;
-} khmer_ReadPairIterator_Object;
+PyObject * reverse_complement(PyObject * self, PyObject * args);
 
-}; //python
+PyObject * get_version_cpp( PyObject * self, PyObject * args );
 
-typedef struct {
-    PyObject_HEAD
-    pre_partition_info *   PrePartitionInfo;
-} khmer_PrePartitionInfo_Object;
+extern PyMethodDef KhmerMethods[];
 
+}
 
-
-typedef struct {
-    PyObject_HEAD
-    SeenSet * hashes;
-    WordLength ksize;
-} khmer_HashSet_Object;
-
-
-typedef struct {
-    PyObject_HEAD
-    khmer_HashSet_Object * parent;
-    SeenSet::iterator * it;
-} _HashSet_iterobj;
-
-
-typedef struct {
-    PyObject_HEAD
-    Hashtable * hashtable;
-} khmer_KHashtable_Object;
-
-
-typedef struct {
-    PyObject_HEAD
-    SubsetPartition * subset;
-} khmer_KSubsetPartition_Object;
-
-
-typedef struct {
-    khmer_KHashtable_Object khashtable;
-    Hashbits * hashbits;
-} khmer_KHashbits_Object;
-
-
-typedef struct {
-    khmer_KHashtable_Object khashtable;
-    CountingHash * counting;
-} khmer_KCountingHash_Object;
-
-typedef struct {
-    PyObject_HEAD
-    ReadAligner * aligner;
-} khmer_ReadAligner_Object;
-
-
-typedef struct {
-    PyObject_HEAD
-    LabelHash * labelhash;
-} khmer_KGraphLabels_Object;
-
-
-typedef struct {
-    PyObject_HEAD
-    HLLCounter * hllcounter;
-} khmer_KHLLCounter_Object;
-
-
-typedef struct {
-    PyObject_HEAD
-    LinearAssembler * assembler;
-} khmer_KLinearAssembler_Object;
-
-
-typedef struct {
-    PyObject_HEAD
-    SimpleLabeledAssembler * assembler;
-} khmer_KSimpleLabeledAssembler_Object;
-
-
-typedef struct {
-    PyObject_HEAD
-    JunctionCountAssembler * assembler;
-} khmer_KJunctionCountAssembler_Object;
-
-
-
-};
+#endif

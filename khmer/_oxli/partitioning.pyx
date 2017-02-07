@@ -61,7 +61,7 @@ cdef class Component:
             raise NotImplementedError('Operator not available.')
 
     @staticmethod
-    cdef vector[BoundedCounterType] _tag_counts(ComponentPtr comp, CpHashtable * graph):
+    cdef vector[BoundedCounterType] _tag_counts(ComponentPtr comp, CpHashgraph* graph):
         cdef uint64_t n_tags = deref(comp).get_n_tags()
         cdef vector[BoundedCounterType] counts
         counts = vector[BoundedCounterType](n_tags)
@@ -73,11 +73,11 @@ cdef class Component:
 
     @staticmethod
     def tag_counts(Component component, graph):
-        cdef CPyHashtable_Object* graph_ptr = <CPyHashtable_Object*> graph
-        return Component._tag_counts(component._this, deref(graph_ptr).hashtable)
+        cdef CpHashgraph* graph_ptr = get_hashgraph_ptr(graph)
+        return Component._tag_counts(component._this, graph_ptr)
 
     @staticmethod
-    cdef float _mean_tag_count(ComponentPtr comp, CpHashtable * graph):
+    cdef float _mean_tag_count(ComponentPtr comp, CpHashgraph * graph):
         cdef uint64_t n_tags = deref(comp).get_n_tags()
         cdef float acc = 0
         cdef uint64_t tag
@@ -117,13 +117,11 @@ cdef class Component:
 cdef class StreamingPartitioner:
 
     def __cinit__(self, graph, tag_density=None):
-        if not (isinstance(graph, Countgraph) or isinstance(graph, Nodegraph)):
-            raise ValueError('Must take an object with Hashtable *')
-        
+        self._graph_ptr =  get_hashgraph_ptr(graph)
+        if self._graph_ptr == NULL:
+            raise ValueError('Must take an object with Hashgraph *')
         self.graph = graph
-        cdef CPyHashtable_Object* ptr = <CPyHashtable_Object*> graph
-        self._graph_ptr = deref(ptr).hashtable
-        
+
         if tag_density is None:
             self._this.reset(new CpStreamingPartitioner(self._graph_ptr))
         else:
@@ -141,7 +139,6 @@ cdef class StreamingPartitioner:
         self.n_consumed += 2
         return deref(self._this).consume_pair(first.encode('utf-8'),
                                               second.encode('utf-8'))
-
 
     def consume_fasta(self, filename):
         return deref(self._this).consume_fasta(filename.encode('utf-8'))

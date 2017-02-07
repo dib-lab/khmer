@@ -62,7 +62,6 @@ ez_setup.use_setuptools(version="3.4.1")
 
 CMDCLASS = versioneer.get_cmdclass()
 
-from Cython.Build import cythonize
 
 try:
     from Cython.Distutils import build_ext as _build_ext
@@ -148,16 +147,19 @@ BZIP2DIR = 'third-party/bzip2'
 
 BUILD_DEPENDS = ["khmer/_khmer.hh"]
 BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
-    "khmer", "kmer_hash", "hashtable", "counting", "hashbits", "labelhash",
+    "khmer", "kmer_hash", "hashtable", "labelhash", "hashgraph",
     "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers",
-    "kmer_filters", "traversal", "assembler", "alphabets", "partitioning"])
+    "kmer_filters", "traversal", "assembler", "alphabets", "storage",
+    "partitioning"])
+BUILD_DEPENDS.extend(glob.glob(path_join("khmer", "_cpy_*.hh")))
 
 SOURCES = ["khmer/_khmer.cc"]
 SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
-    "read_parsers", "kmer_hash", "hashtable",
-    "hashbits", "labelhash", "counting", "subset", "read_aligner",
+    "read_parsers", "kmer_hash", "hashtable", "hashgraph",
+    "labelhash", "subset", "read_aligner",
     "hllcounter", "traversal", "kmer_filters", "assembler", "alphabets",
-    "partitioning"])
+    "storage", "partitioning"])
+SOURCES.extend(glob.glob(path_join("khmer", "_cpy_*.cc")))
 
 SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
@@ -170,6 +172,8 @@ if sys.platform == 'darwin' and 'clang' in os.getenv('CC', 'cc'):
     # force 64bit only builds
     EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64', '-mmacosx-version-min=10.7',
                                '-stdlib=libc++'])
+else:
+    EXTRA_COMPILE_ARGS.append('-fdiagnostics-color')
 
 if check_for_openmp():
     EXTRA_COMPILE_ARGS.extend(['-fopenmp'])
@@ -188,6 +192,7 @@ CP_EXTENSION_MOD_DICT = \
 EXTENSION_MODS = [Extension("khmer._khmer", ** CP_EXTENSION_MOD_DICT)]
 
 for cython_ext in glob.glob(os.path.join("khmer", "_oxli", "*.pyx")):
+
     CY_EXTENSION_MOD_DICT = \
         {
             "sources": [cython_ext],
@@ -195,7 +200,7 @@ for cython_ext in glob.glob(os.path.join("khmer", "_oxli", "*.pyx")):
             "extra_link_args": EXTRA_LINK_ARGS,
             "extra_objects": [path_join(build_dir(), splitext(p)[0]+'.o')  for p in SOURCES],
             "depends": [],
-            "include_dirs": ["khmer", "lib"],
+            "include_dirs": ["khmer", "lib", "."],
             "language": "c++",
             "define_macros": [("VERSION", versioneer.get_version()), ],
         }
@@ -203,7 +208,6 @@ for cython_ext in glob.glob(os.path.join("khmer", "_oxli", "*.pyx")):
     ext_name = "khmer._oxli.{0}".format(splitext(os.path.basename(cython_ext))[0])
     CY_EXTENSION_MOD = Extension(ext_name, ** CY_EXTENSION_MOD_DICT)
     EXTENSION_MODS.append(CY_EXTENSION_MOD)
-
 
 SCRIPTS = []
 SCRIPTS.extend([path_join("scripts", script)
@@ -261,10 +265,12 @@ SETUP_METADATA = \
         # http://docs.python.org/2/distutils/setupscript.html
         # additional-meta-data note #3
         "url": 'https://khmer.readthedocs.io/',
-        "packages": ['khmer', 'khmer.tests', 'oxli'],
+        "packages": ['khmer', 'khmer.tests', 'oxli', 'khmer._oxli'],
+        "package_data": {'khmer/_oxli': ['*.pxd']},
         "package_dir": {'khmer.tests': 'tests'},
         "install_requires": ['screed >= 0.9', 'bz2file'],
-        "setup_requires": ["pytest-runner>=2.0,<3dev"],
+        "setup_requires": ["pytest-runner>=2.0,<3dev",
+                           'Cython>=0.25.2', "setuptools>=18.0"],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
                            'tests': ['pytest>=2.9'],
