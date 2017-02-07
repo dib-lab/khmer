@@ -83,7 +83,7 @@ inline bool is_prime(uint64_t n)
     if (n % 2 == 0) {
         return false;
     }
-    for (unsigned long long i=3; i < sqrt(n); i += 2) {
+    for (unsigned long long i=3; i < sqrt(n) + 1; i += 2) {
         if (n % i == 0) {
             return false;
         }
@@ -107,6 +107,9 @@ inline std::vector<uint64_t> get_n_primes_near_x(uint32_t n, uint64_t x)
     while (primes.size() != n && i > 0) {
         if (is_prime(i)) {
             primes.push_back(i);
+        }
+        if (i == 1) {
+            break;
         }
         i -= 2;
     }
