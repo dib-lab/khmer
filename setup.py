@@ -200,7 +200,7 @@ for cython_ext in [os.path.join("khmer", "_oxli", f) for f in \
             "extra_link_args": EXTRA_LINK_ARGS,
             "extra_objects": [path_join(build_dir(), splitext(p)[0]+'.o')  for p in SOURCES],
             "depends": [],
-            "include_dirs": ["khmer", "lib"],
+            "include_dirs": ["khmer", "lib", "."],
             "language": "c++",
             "define_macros": [("VERSION", versioneer.get_version()), ],
         }
@@ -265,7 +265,8 @@ SETUP_METADATA = \
         # http://docs.python.org/2/distutils/setupscript.html
         # additional-meta-data note #3
         "url": 'https://khmer.readthedocs.io/',
-        "packages": ['khmer', 'khmer.tests', 'oxli'],
+        "packages": ['khmer', 'khmer.tests', 'oxli', 'khmer._oxli'],
+        "package_data": {'khmer/_oxli': ['*.pxd']},
         "package_dir": {'khmer.tests': 'tests'},
         "install_requires": ['screed >= 0.9', 'bz2file'],
         "setup_requires": ["pytest-runner>=2.0,<3dev",
