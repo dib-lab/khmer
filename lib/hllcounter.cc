@@ -58,6 +58,7 @@ Contact: khmer-project@idyll.org
 #define arr_len(a) (a + sizeof a / sizeof a[0])
 
 using namespace khmer;
+using namespace khmer::read_parsers;
 
 std::map<int, std::vector<double> > rawEstimateData;
 std::map<int, std::vector<double> > biasData;
@@ -375,21 +376,20 @@ unsigned int HLLCounter::consume_string(const std::string &inp)
     return n_consumed;
 }
 
+template<typename SeqIO>
 void HLLCounter::consume_fasta(
     std::string const &filename,
     bool stream_records,
     unsigned int &total_reads,
     unsigned long long &n_consumed)
 {
-    read_parsers::IParser * parser = read_parsers::IParser::get_parser(filename);
-
-    consume_fasta(parser, stream_records, total_reads, n_consumed);
-
-    delete parser;
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
+    consume_fasta<SeqIO>(parser, stream_records, total_reads, n_consumed);
 }
 
+template<typename SeqIO>
 void HLLCounter::consume_fasta(
-    read_parsers::IParser *parser,
+    ReadParserPtr<SeqIO>& parser,
     bool stream_records,
     unsigned int &      total_reads,
     unsigned long long &    n_consumed)
@@ -429,7 +429,7 @@ void HLLCounter::consume_fasta(
                 }
 
                 if (stream_records) {
-                    read.write_to(std::cout);
+                    read.write_fastx(std::cout);
                 }
 
                 #pragma omp task default(none) firstprivate(read) \
@@ -508,3 +508,16 @@ void HLLCounter::merge(HLLCounter &other)
         this->M[i] = std::max(other.M[i], this->M[i]);
     }
 }
+
+template void HLLCounter::consume_fasta<FastxReader>(
+    std::string const &,
+    bool,
+    unsigned int &,
+    unsigned long long &
+);
+template void HLLCounter::consume_fasta<FastxReader>(
+    ReadParserPtr<FastxReader>&,
+    bool,
+    unsigned int &,
+    unsigned long long &
+);

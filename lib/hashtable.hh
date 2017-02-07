@@ -63,11 +63,12 @@ using namespace std;
 
 namespace khmer
 {
-namespace read_parsers
-{
-class IParser;
-}  // namespace read_parsers
-}  // namespace khmer
+    namespace read_parsers
+    {
+        template<typename SeqIO> class ReadParser;
+        class FastxReader;
+    }
+}
 
 #define CALLBACK_PERIOD 100000
 
@@ -217,20 +218,22 @@ public:
 
     // Count every k-mer in a FASTA or FASTQ file.
     // Note: Yes, the name 'consume_fasta' is a bit misleading,
-    //	     but the FASTA format is effectively a subset of the FASTQ format
-    //	     and the FASTA portion is what we care about in this case.
+    //       but the FASTA format is effectively a subset of the FASTQ format
+    //       and the FASTA portion is what we care about in this case.
+    template<typename SeqIO>
     void consume_fasta(
-        std::string const   &filename,
-        unsigned int	    &total_reads,
-        unsigned long long  &n_consumed
+        std::string const &filename,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
     );
 
     // Count every k-mer from a stream of FASTA or FASTQ reads,
     // using the supplied parser.
+    template<typename SeqIO>
     void consume_fasta(
-        read_parsers:: IParser *	    parser,
-        unsigned int	    &total_reads,
-        unsigned long long  &n_consumed
+        read_parsers::ReadParserPtr<SeqIO>& parser,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
     );
 
     void set_use_bigcount(bool b)
@@ -301,8 +304,12 @@ public:
     BoundedCounterType get_max_count(const std::string &s);
 
     // calculate the abundance distribution of kmers in the given file.
-    uint64_t * abundance_distribution(read_parsers::IParser * parser,
-                                      Hashtable * tracking);
+    template<typename SeqIO>
+    uint64_t * abundance_distribution(
+        read_parsers::ReadParserPtr<SeqIO>& parser,
+        Hashtable * tracking
+    );
+    template<typename SeqIO>
     uint64_t * abundance_distribution(std::string filename,
                                       Hashtable * tracking);
 
