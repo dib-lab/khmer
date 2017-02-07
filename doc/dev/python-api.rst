@@ -43,29 +43,33 @@ Python methods:
 
 * sizelist = hashsizes() - return the list of table sizes used in construction.
 
-* n_unique_kmers - foo.
-* n_occupied - foo.
+* n = n_unique_kmers() - retrieve an estimate for the number of unique k-mers inserted into the table. Note, this may be order dependent.
+  
+* n = n_occupied() - retrieve the fraction of bins occupied in the table.
 
 * add(dna_kmer_or_hashval) - increment the count associated with either a DNA k-mer or a hashval.  Depending on max count for the tabletype and bigcount settings, the count may top out at 1, 15, 255, or 65535. (@CTB add method for retrieving max_count)
+  
 * count (synonym for add)
+  
 * get(dna_kmer or hashval) - retrieve the count associated with a DNA k-mer or a hashval.
 
-* get_kmers
-* get_kmer_hashes
-* get_kmer_hashes_as_hashset
+* list_of_strings = get_kmers(seq) - return the list of k-mer strings in the given sequence.
+* list_of_hashes = get_kmer_hashes(seq) - return the list of the hashed k-mers in the given sequence.
+* hashset = get_kmer_hashes_as_hashset(seq) - return the hashset of hashed k-mers in the given sequence.
+
+* list_of_counts = get_kmer_counts(seq) - return the list of the counts of the k-mers in the given sequence.
 
 * save(filename) - save the data to a file on disk.
 * load(filename) - load the data from a file on disk.
 
-* get_kmer_counts
 * get_min_count
 * get_median_count
 * get_max_count
-* consume (should be consume string?)
+* consume - @CTB should be consume string
 * consume_fasta
 * consume_fasta_with_reads_parser
-* set_use_bigcount
-* get_use_bigcount
+* set_use_bigcount - @CTB
+* get_use_bigcount - @CTB
 * abundance_distribution
 * abundance_distribution_with_reads_paresr
 * trim_on_abundance
