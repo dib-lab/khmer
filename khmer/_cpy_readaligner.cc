@@ -1,6 +1,7 @@
-#include <string>
 #include "_cpy_countgraph.hh"
 #include "_cpy_readaligner.hh"
+#include <string>
+
 
 namespace khmer {
 

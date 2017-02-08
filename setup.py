@@ -166,8 +166,9 @@ SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
 EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11', '-pedantic']
 EXTRA_LINK_ARGS = []
 
-if sys.platform == 'darwin' and 'clang' in os.getenv('CC', 'cc'):
+if sys.platform == 'darwin':
     # force 64bit only builds
+    print('OSX')
     EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64', '-mmacosx-version-min=10.7',
                                '-stdlib=libc++'])
 else:

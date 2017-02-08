@@ -1,6 +1,5 @@
-
-#include <vector>
 #include "_cpy_nodetable.hh"
+#include <vector>
 
 namespace khmer {
 
