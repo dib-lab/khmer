@@ -34,6 +34,8 @@
 # Contact: khmer-project@idyll.org
 """Helpful methods for performing common argument-checking tasks in scripts."""
 from __future__ import print_function, unicode_literals
+from khmer._oxli.parsing import (check_is_left, check_is_right, check_is_pair,
+                           UnpairedReadsError, _split_left_right)
 
 
 def print_error(msg):
@@ -41,113 +43,6 @@ def print_error(msg):
     import sys
 
     print(msg, file=sys.stderr)
-
-
-def _split_left_right(name):
-    """Split record name at the first whitespace and return both parts.
-
-    RHS is set to an empty string if not present.
-    """
-    parts = name.split(None, 1)
-    lhs, rhs = [parts[0], parts[1] if len(parts) > 1 else '']
-    return lhs, rhs
-
-
-def check_is_pair(record1, record2):
-    """Check if the two sequence records belong to the same fragment.
-
-    In an matching pair the records are left and right pairs
-    of each other, respectively.  Returns True or False as appropriate.
-
-    Handles both Casava formats: seq/1 and seq/2, and 'seq::... 1::...'
-    and 'seq::... 2::...'.
-
-    Also handles the default format of the SRA toolkit's fastq-dump:
-    'Accession seq/1'
-    """
-    if hasattr(record1, 'quality') or hasattr(record2, 'quality'):
-        if not (hasattr(record1, 'quality') and hasattr(record2, 'quality')):
-            raise ValueError("both records must be same type (FASTA or FASTQ)")
-
-    lhs1, rhs1 = _split_left_right(record1.name)
-    lhs2, rhs2 = _split_left_right(record2.name)
-
-    # handle 'name/1'
-    if lhs1.endswith('/1') and lhs2.endswith('/2'):
-        subpart1 = lhs1.split('/', 1)[0]
-        subpart2 = lhs2.split('/', 1)[0]
-
-        if subpart1 and subpart1 == subpart2:
-            return True
-
-    # handle '@name 1:rst'
-    elif lhs1 == lhs2 and rhs1.startswith('1:') and rhs2.startswith('2:'):
-        return True
-
-    # handle @name seq/1
-    elif lhs1 == lhs2 and rhs1.endswith('/1') and rhs2.endswith('/2'):
-        subpart1 = rhs1.split('/', 1)[0]
-        subpart2 = rhs2.split('/', 1)[0]
-
-        if subpart1 and subpart1 == subpart2:
-            return True
-
-    return False
-
-
-def check_is_left(name):
-    """Check if the name belongs to a 'left' sequence (/1).
-
-    Returns True or False.
-
-    Handles both Casava formats: seq/1 and 'seq::... 1::...'
-    """
-    lhs, rhs = _split_left_right(name)
-    if lhs.endswith('/1'):              # handle 'name/1'
-        return True
-    elif rhs.startswith('1:'):          # handle '@name 1:rst'
-        return True
-
-    elif rhs.endswith('/1'):            # handles '@name seq/1'
-        return True
-
-    return False
-
-
-def check_is_right(name):
-    """Check if the name belongs to a 'right' sequence (/2).
-
-    Returns True or False.
-
-    Handles both Casava formats: seq/2 and 'seq::... 2::...'
-    """
-    lhs, rhs = _split_left_right(name)
-    if lhs.endswith('/2'):              # handle 'name/2'
-        return True
-    elif rhs.startswith('2:'):          # handle '@name 2:rst'
-        return True
-
-    elif rhs.endswith('/2'):            # handles '@name seq/2'
-        return True
-
-    return False
-
-
-class UnpairedReadsError(ValueError):
-    """ValueError with refs to the read pair in question."""
-
-    def __init__(self, msg, r1, r2):
-        r1_name = "<no read>"
-        r2_name = "<no read>"
-        if r1:
-            r1_name = r1.name
-        if r2:
-            r2_name = r2.name
-
-        msg = msg + '\n"{0}"\n"{1}"'.format(r1_name, r2_name)
-        ValueError.__init__(self, msg)
-        self.read1 = r1
-        self.read2 = r2
 
 
 def broken_paired_reader(screed_iter, min_length=None,

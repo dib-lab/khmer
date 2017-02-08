@@ -21,7 +21,7 @@ cdef class LinearAssembler:
     def set_stop_filter(self, stop_filter=None):
         self.stop_filter = stop_filter
         if stop_filter is not None:
-            self._stop_filter_ptr = get_hashtable_ptr(stop_filter)
+            self._stop_filter_ptr = get_hashgraph_ptr(stop_filter)
             if self._stop_filter_ptr == NULL:
                 raise ValueError('Must take an object with Hashgraph *')
         else:
@@ -37,7 +37,7 @@ cdef class LinearAssembler:
         if isinstance(seed, Kmer):
             return self._assemble(seed)
         else:
-            return self._assemble(Kmer(seed))
+            return self._assemble(Kmer(str(seed)))
 
 
     cdef str _assemble_left(self, Kmer kmer):
@@ -50,7 +50,7 @@ cdef class LinearAssembler:
         if isinstance(seed, Kmer):
             return self._assemble_left(seed)
         else:
-            return self._assemble_left(Kmer(seed))
+            return self._assemble_left(Kmer(str(seed)))
 
 
     cdef str _assemble_right(self, Kmer kmer):
@@ -63,6 +63,6 @@ cdef class LinearAssembler:
         if isinstance(seed, Kmer):
             return self._assemble_right(seed)
         else:
-            return self._assemble_right(Kmer(seed))
+            return self._assemble_right(Kmer(str(seed)))
 
 

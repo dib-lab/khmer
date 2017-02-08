@@ -6,8 +6,9 @@ import itertools
 import random
 
 import khmer
-from khmer._oxli.parsing import Sequence, FastxParser, BrokenPairedReader
-from khmer._oxli.parsing import Alphabets, check_is_pair
+from khmer._oxli.parsing import Sequence, FastxParser, SanitizedFastxParser
+from khmer._oxli.parsing import BrokenPairedReader, Alphabets, check_is_pair
+from khmer._oxli.parsing import check_is_right, check_is_left
 from khmer.khmer_args import estimate_optimal_with_K_and_f as optimal_fp
 from khmer import reverse_complement as revcomp
 from khmer import reverse_hash as revhash
@@ -21,37 +22,8 @@ def teardown():
     utils.cleanup()
 
 
-def gather(filename, **kw):
-    stream = FastxParser(str(filename))
-
-    x = []
-    m = 0
-    for read in stream:
-        x.append((read.name, None))
-        m += 1
-
-    return x,m
-
-
-def gather_paired(filename, **kw):
-    stream = FastxParser(str(filename))
-    itr = BrokenPairedReader(stream, **kw)
-
-    x = []
-    m = 0
-    num = 0
-    for num, is_pair, read1, read2 in itr:
-        if is_pair:
-            x.append((read1.name, read2.name))
-        else:
-            x.append((read1.name, None))
-        m += 1
-
-    return x, num, m
-
-
 @pytest.fixture
-def create_fastx(tmpdir):
+def create_fastx(tmpdir, as_str=True):
     def func(reads, fmt='fa'):
         assert fmt in ['fa','fq']
         fastx_fn = tmpdir.join('test.'+fmt)
@@ -65,58 +37,84 @@ def create_fastx(tmpdir):
                                                         record.sequence,
                                                         record.quality),
                                mode='a')
-        return fastx_fn
+        return str(fastx_fn) if as_str else fastx_fn
     return func
 
 
+def sequences_eq(seqs_A, seqs_B):
+    for seq1, seq2 in zip(seqs_A, seqs_B):
+        if seq1 is None:
+            assert seq1 is seq2
+        else:
+            assert seq1.name == seq2.name
+            assert seq1.sequence == seq2.sequence
+
+
 def test_FastxParser(create_fastx):
-    reads = [Sequence('seq1/1', 'A' * 5),
+    expected = [Sequence('seq1/1', 'A' * 5),
               Sequence('seq1/2', 'A' * 4),
               Sequence('seq2/1', 'A' * 5),
               Sequence('seq3/1', 'A' * 3),
               Sequence('seq3/2', 'A' * 5)]
-    x, m = gather(create_fastx(reads))
+    parser = FastxParser(create_fastx(expected))
+    result = list(parser)
 
-    expected = [('seq1/1', None),
-                ('seq1/2', None),
-                ('seq2/1', None),
-                ('seq3/1', None),
-                ('seq3/2', None)]
+    assert len(expected) == len(result)
+    assert all((x == y) for x, y in zip(expected, result))
 
-    assert x == expected, x
 
-def test_FastxParser_sanitize(create_fastx):
-    '''Test that A's are converted to N's when sanitize is True'''
-    reads = [Sequence('seq1/1', 'N' * 5),
+def test_SanitizedFastxParser_convert_Ns(create_fastx):
+    '''Test that A's are converted to N's'''
+    expected= [Sequence('seq1/1', 'N' * 5),
               Sequence('seq1/2', 'N' * 4)]
-    parser = FastxParser(str(create_fastx(reads)), sanitize=True)
+    parser = SanitizedFastxParser(create_fastx(expected),
+                                  alphabet='DNAN_SIMPLE')
+    result = list(parser)
 
-    parsed = [read for read in parser]
     assert parser.n_bad == 0
-    assert parsed[0].sequence == 'A' * 5
-    assert parsed[1].sequence == 'A' * 4
+    assert len(result) == 2
+    assert result[0].sequence == 'A' * 5
+    assert result[1].sequence == 'A' * 4
 
-def test_FastxParser_no_sanitize(create_fastx):
-    '''Test that N's remain when sanitize is False'''
-    reads = [Sequence('seq1/1', 'N' * 5),
+
+def test_SanitizedFastxParser_no_convert_Ns(create_fastx):
+    expected= [Sequence('seq1/1', 'N' * 5),
               Sequence('seq1/2', 'N' * 4)]
-    parser = FastxParser(str(create_fastx(reads)), sanitize=False)
+    parser = SanitizedFastxParser(create_fastx(expected),
+                                  alphabet='DNAN_SIMPLE',
+                                  convert_n=False)
+    result = list(parser)
 
-    parsed = [read for read in parser]
     assert parser.n_bad == 0
-    assert parsed[0].sequence == 'N' * 5
-    assert parsed[1].sequence == 'N' * 4
+    assert len(result) == 2
+    assert result[0].sequence == 'N' * 5
+    assert result[1].sequence == 'N' * 4
 
-def test_FastxParser_on_invalid_sequence(create_fastx):
+
+
+def test_SanitizedFastxParser_invalid(create_fastx):
     '''Test that parser detects invalid sequence'''
-    reads = [Sequence('seq1/1', 'XXX'),
+    expected = [Sequence('seq1/1', 'XXX'),
               Sequence('seq1/2', 'A' * 4)]
-    parser = FastxParser(str(create_fastx(reads)), sanitize=True)
-    parsed = [read for read in parser]
+    parser = SanitizedFastxParser(create_fastx(expected))
+    result = list(parser)
 
     assert parser.n_bad == 1
-    assert len(parsed) == 1
-    assert parsed[0].sequence == 'A' * 4
+    assert len(result) == 1
+    assert result[0].sequence == 'A' * 4
+
+
+def test_SanitizedFastxParser_lowercase(create_fastx):
+    reads = [Sequence('seq1/1', 'acgtn'),
+              Sequence('seq1/2', 'AcGtN'),
+              Sequence('seq1/2', 'aCgTn')]
+
+    parser = SanitizedFastxParser(create_fastx(reads), convert_n=False)
+    result = list(parser)
+
+    assert result[0].sequence == 'ACGTN'
+    assert result[1].sequence == 'ACGTN'
+    assert result[2].sequence == 'ACGTN'
 
 
 def test_alphabet_wrapper():
@@ -128,102 +126,168 @@ def test_alphabet_wrapper():
     with pytest.raises(ValueError):
         Alphabets.get('TEST')
 
+def gather_paired(stream, **kw):
+    itr = BrokenPairedReader(stream, **kw)
 
-def test_BrokenPairedReader_force_single(create_fastx):
-    reads = [Sequence('seq1/1', 'A' * 5),
-              Sequence('seq1/2', 'A' * 4),
-              Sequence('seq2/1', 'A' * 5),
-              Sequence('seq3/1', 'A' * 3),
-              Sequence('seq3/2', 'A' * 5)]
+    x = []
+    m = 0
+    num = 0
+    for num, is_pair, read1, read2 in itr:
+        #print(num, is_pair, read1, read2)
+        x.append((read1.name if read1 is not None else None, \
+                  read2.name if read2 is not None else None))
+        m += 1
 
-    x, n, m = gather_paired(create_fastx(reads), force_single=True)
+    return x, num, m
 
-    expected = [('seq1/1', None),
-                ('seq1/2', None),
-                ('seq2/1', None),
-                ('seq3/1', None),
-                ('seq3/2', None)]
-    assert x == expected, x
-    assert m == 5
-    assert n == 4, n
+class Test_BrokenPairedReader(object):
+    reads = [Sequence(name='seq1/1', sequence='A' * 5),
+              Sequence(name='seq1/2', sequence='A' * 4),
+              Sequence(name='seq2/1', sequence='A' * 5),
+              Sequence(name='seq3/1', sequence='A' * 3),
+              Sequence(name='seq3/2', sequence='A' * 5)]
+    
+    @pytest.mark.parametrize("parser", [FastxParser, SanitizedFastxParser])
+    def testDefault(self, parser, create_fastx):
+        x, n, m = gather_paired(parser(create_fastx(self.reads)), 
+                                min_length=1)
 
+        expected = [('seq1/1', 'seq1/2'),
+                    ('seq2/1', None),
+                    ('seq3/1', 'seq3/2')]
+        assert x == expected, x
+        assert m == 3
+        assert n == 3, n
 
-def test_BrokenPairedReader_OnPairs_filter_length_require_paired(create_fastx):
-    reads = [Sequence('seq1/1', 'A' * 5),
-              Sequence('seq1/2', 'A' * 4),
-              Sequence('seq3/1', 'A' * 3),
-              Sequence('seq3/2', 'A' * 5)]
+    @pytest.mark.parametrize("parser", [FastxParser, SanitizedFastxParser])
+    def testMinLength(self, parser, create_fastx):
+        x, n, m = gather_paired(parser(create_fastx(self.reads)), 
+                                min_length=3)
 
+        expected = [('seq1/1', 'seq1/2'),
+                    ('seq2/1', None),
+                    ('seq3/1', 'seq3/2')]
+        assert x == expected, x
+        assert m == 3
+        assert n == 3, n
 
-    x, n, m = gather_paired(create_fastx(reads), min_length=4, require_paired=True)
+    @pytest.mark.parametrize("parser", [FastxParser, SanitizedFastxParser])
+    def testMinLength_2(self, parser, create_fastx):
+        x, n, m = gather_paired(parser(create_fastx(self.reads)), 
+                                min_length=4)
 
-    expected = [('seq1/1', 'seq1/2')]
-    assert x == expected, x
-    assert m == 1
-    assert n == 0, n
+        expected = [('seq1/1', 'seq1/2'),
+                    ('seq2/1', None),
+                    (None, 'seq3/2')]
+        assert x == expected, x
+        assert m == 3
+        assert n == 3, n
 
+    @pytest.mark.parametrize("parser", [FastxParser, SanitizedFastxParser])
+    def testForceSingle(self, parser, create_fastx):
+        x, n, m = gather_paired(parser(create_fastx(self.reads)), 
+                                force_single=True)
 
-def test_BrokenPairedReader_OnPairs_filter_length_require_paired_2(create_fastx):
-    reads = [Sequence('seq1/1', 'A' * 5),
-              Sequence('seq1/2', 'A' * 4),
-              Sequence('seq3/1', 'A' * 5),
-              Sequence('seq3/2', 'A' * 3)]
-    x, n, m = gather_paired(create_fastx(reads), min_length=4, require_paired=True)
+        expected = [('seq1/1', None),
+                    ('seq1/2', None),
+                    ('seq2/1', None),
+                    ('seq3/1', None),
+                    ('seq3/2', None)]
+        assert x == expected, x
+        assert m == 5
+        assert n == 4, n
 
-    expected = [('seq1/1', 'seq1/2')]
-    assert x == expected, x
-    assert m == 1
-    assert n == 0, n
+    @pytest.mark.parametrize("parser", [FastxParser, SanitizedFastxParser])
+    def testForceSingleAndMinLength(self, parser, create_fastx):
+        x, n, m = gather_paired(parser(create_fastx(self.reads)), 
+                                min_length=5, force_single=True)
 
+        expected = [('seq1/1', None),
+                    ('seq2/1', None),
+                    ('seq3/2', None)]
+        assert x == expected, x
+        assert m == 3, m
+        assert n == 2, n
 
-def test_BrokenPairedReader_OnPairs_filter_length_required_paired_3(create_fastx):
-    reads = [Sequence('seq1/1', 'A' * 5),
-              Sequence('seq1/2', 'A' * 4),
-              Sequence('seq3/1', 'A' * 3),
-              Sequence('seq3/2', 'A' * 3)]
-    x, n, m = gather_paired(create_fastx(reads), min_length=4, require_paired=True)
+    @pytest.mark.parametrize("parser", [FastxParser, SanitizedFastxParser])
+    def testRequirePairedAndMinLength_HalfPass(self, parser, create_fastx):
+        reads = [Sequence('seq1/1', 'A' * 5),
+                  Sequence('seq1/2', 'A' * 4),
+                  Sequence('seq3/1', 'A' * 3),
+                  Sequence('seq3/2', 'A' * 5)]
 
-    expected = [('seq1/1', 'seq1/2')]
-    assert x == expected, x
-    assert m == 1
-    assert n == 0, n
+        reader = BrokenPairedReader(parser(create_fastx(reads)), 
+                                    min_length=4, require_paired=True)
 
+        result = []
+        for n, paired, first, second in reader:
+            result.append((first, second))
 
-def test_BrokenPairedReader_OnPairs_filter_length_require_paired_4(create_fastx):
-    reads = [Sequence('seq1/1', 'A' * 3),
-              Sequence('seq1/2', 'A' * 3),
-              Sequence('seq3/1', 'A' * 5),
-              Sequence('seq3/2', 'A' * 5)]
+        assert len(result) == 1
+        assert n == 0
+        l, r = result[0]
+        assert l == reads[0]
+        assert r == reads[1]
 
-    x, n, m = gather_paired(create_fastx(reads), min_length=4, require_paired=True)
+    @pytest.mark.parametrize("parser", [FastxParser, SanitizedFastxParser])
+    def testRequirePairedAndMinLength_SwappedHalfPass(self, parser, create_fastx):
+        reads = [Sequence('seq1/1', 'A' * 5),
+                  Sequence('seq1/2', 'A' * 4),
+                  Sequence('seq3/1', 'A' * 5),
+                  Sequence('seq3/2', 'A' * 3)]
 
-    expected = [('seq3/1', 'seq3/2')]
-    assert x == expected, x
-    assert m == 1
-    assert n == 0, n
+        reader = BrokenPairedReader(parser(create_fastx(reads)), 
+                                    min_length=4, require_paired=True)
 
-'''
-def test_BrokenPairedReader_lowercase():
-    reads = [Sequence('seq1/1', 'acgtn'),
-              Sequence('seq1/2', 'AcGtN'),
-              Sequence('seq1/2', 'aCgTn')]
+        result = []
+        for n, paired, first, second in reader:
+            result.append((first, second))
 
-    results = []
-    parser = FastxParser(create_fastx(reads))
-    for num, is_pair, read1, read2 in broken_paired_reader(parser):
-        results.append((read1, read2))
+        assert n == 0
+        assert len(result) == 1
+        l, r = result[0]
+        assert l == reads[0]
+        assert r == reads[1]
 
-    a, b = results[0]
-    assert a.sequence == 'acgtn'
-    assert a.cleaned_seq == 'ACGTA'
-    assert b.sequence == 'AcGtN'
-    assert b.cleaned_seq == 'ACGTA'
+    @pytest.mark.parametrize("parser", [FastxParser, SanitizedFastxParser])
+    def testRequirePairedAndMinLength_NeitherPass(self, parser, create_fastx):
+        reads = [Sequence('seq1/1', 'A' * 5),
+                  Sequence('seq1/2', 'A' * 4),
+                  Sequence('seq3/1', 'A' * 3),
+                  Sequence('seq3/2', 'A' * 3)]
 
-    c, d = results[1]
-    assert c.sequence == 'aCgTn'
-    assert c.cleaned_seq == 'ACGTA'
-    assert d is None
-'''
+        reader = BrokenPairedReader(parser(create_fastx(reads)), 
+                                    min_length=4, require_paired=True)
+
+        result = []
+        for n, paired, first, second in reader:
+            result.append((first, second))
+
+        assert n == 0
+        assert len(result) == 1
+        l, r = result[0]
+        assert l == reads[0]
+        assert r == reads[1]
+
+    @pytest.mark.parametrize("parser", [FastxParser, SanitizedFastxParser])
+    def testRequirePairedAndMinLength_SwappedNeitherPass(self, parser, create_fastx):
+        reads = [Sequence('seq1/1', 'A' * 3),
+                  Sequence('seq1/2', 'A' * 3),
+                  Sequence('seq3/1', 'A' * 5),
+                  Sequence('seq3/2', 'A' * 5)]
+
+        reader = BrokenPairedReader(parser(create_fastx(reads)), 
+                                    min_length=4, require_paired=True)
+
+        result = []
+        for n, paired, first, second in reader:
+            result.append((first, second))
+
+        assert n == 0
+        assert len(result) == 1
+        l, r = result[0]
+        assert l == reads[2]
+        assert r == reads[3]
 
 
 def test_check_is_pair_1():
