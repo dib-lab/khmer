@@ -1,3 +1,9 @@
+#include "_cpy_hashset.hh"
+#include "_cpy_hashgraph.hh"
+#include "_cpy_nodegraph.hh"
+#include "_cpy_countgraph.hh"
+#include "_cpy_subsetpartition.hh"
+#include "_cpy_readparsers.hh"
 
 #include <vector>
 #include "khmer.hh"
@@ -5,13 +11,6 @@
 #include "read_parsers.hh"
 #include "assembler.hh"
 #include "traversal.hh"
-
-#include "_cpy_hashset.hh"
-#include "_cpy_hashgraph.hh"
-#include "_cpy_nodegraph.hh"
-#include "_cpy_countgraph.hh"
-#include "_cpy_subsetpartition.hh"
-#include "_cpy_readparsers.hh"
 
 namespace khmer {
 

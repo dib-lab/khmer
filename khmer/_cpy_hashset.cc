@@ -1,5 +1,5 @@
-#include "hashgraph.hh"
 #include "_cpy_hashset.hh"
+#include "hashgraph.hh"
 
 
 namespace khmer {

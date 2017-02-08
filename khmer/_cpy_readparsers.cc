@@ -1,5 +1,5 @@
-#include <string>
 #include "_cpy_readparsers.hh"
+#include <string>
 
 namespace khmer {
 
