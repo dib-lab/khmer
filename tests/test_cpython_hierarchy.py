@@ -62,3 +62,14 @@ def test_nodegraph_vs_table():
 
     assert not hasattr(x, 'consume_and_tag')
     assert hasattr(y, 'consume_and_tag')
+
+
+def test_smallcountgraph_vs_table():
+    x = khmer.SmallCounttable(4, 21, 3)
+    y = khmer.SmallCountgraph(4, 21, 3)
+
+    assert hasattr(x, 'add')
+    assert hasattr(y, 'add')
+
+    assert not hasattr(x, 'consume_and_tag')
+    assert hasattr(y, 'consume_and_tag')

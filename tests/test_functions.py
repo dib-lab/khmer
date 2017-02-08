@@ -40,18 +40,15 @@ import screed
 import khmer
 import os
 import sys
-import collections
 import pytest
 from . import khmer_tst_utils as utils
 from khmer.utils import (check_is_pair, broken_paired_reader, check_is_left,
-                         check_is_right)
+                         check_is_right, clean_input_reads)
 from khmer.kfile import check_input_files, get_file_writer
 try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
-
-import pytest
 
 
 def test_forward_hash():
@@ -210,7 +207,7 @@ def test_extract_countgraph_info():
             info = khmer.extract_countgraph_info(fn)
         except ValueError as err:
             assert 0, 'Should not throw a ValueErorr: ' + str(err)
-        ksize, table_size, n_tables, _, _, _, _ = info
+        ksize, n_tables, table_size, _, _, _, _ = info
         print(ksize, table_size, n_tables)
 
         assert(ksize) == 25
@@ -527,6 +524,7 @@ def test_BrokenPairedReader_lowercase():
     stream = [screed.Record(name='seq1/1', sequence='acgtn'),
               screed.Record(name='seq1/2', sequence='AcGtN'),
               screed.Record(name='seq1/2', sequence='aCgTn')]
+    stream = clean_input_reads(stream)
 
     results = []
     for num, is_pair, read1, read2 in broken_paired_reader(stream):
@@ -542,3 +540,33 @@ def test_BrokenPairedReader_lowercase():
     assert c.sequence == 'aCgTn'
     assert c.cleaned_seq == 'ACGTA'
     assert d is None
+
+
+def test_BrokenPairedReader_lowercase_khmer_Read():
+    # use khmer.Read objects which should automatically have a `cleaned_seq`
+    # attribute
+    stream = [khmer.Read(name='seq1/1', sequence='acgtn'),
+              khmer.Read(name='seq1/2', sequence='AcGtN'),
+              khmer.Read(name='seq1/2', sequence='aCgTn')]
+
+    results = []
+    for num, is_pair, read1, read2 in broken_paired_reader(stream):
+        results.append((read1, read2))
+
+    a, b = results[0]
+    assert a.sequence == 'acgtn'
+    assert a.cleaned_seq == 'ACGTA'
+    assert b.sequence == 'AcGtN'
+    assert b.cleaned_seq == 'ACGTA'
+
+    c, d = results[1]
+    assert c.sequence == 'aCgTn'
+    assert c.cleaned_seq == 'ACGTA'
+    assert d is None
+
+
+def test_clean_input_reads():
+    # all Read attributes are read only
+    stream = [khmer.Read(name='seq1/1', sequence='ACGT')]
+    with pytest.raises(AttributeError):
+        next(clean_input_reads(stream))
