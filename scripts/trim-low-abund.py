@@ -442,8 +442,12 @@ def main():
         if not args.output:
             trimfp.close()
 
-    log_info('removing temp directory & contents ({temp})', temp=tempdir)
-    shutil.rmtree(tempdir)
+    try:
+        log_info('removing temp directory & contents ({temp})', temp=tempdir)
+        shutil.rmtree(tempdir)
+    except OSError as oe:
+        log_info('WARNING: unable to remove {temp} (probably an NFS issue); '
+                 'please remove manually', temp=tempdir)
 
     trimmed_reads = trimmer.trimmed_reads
 
