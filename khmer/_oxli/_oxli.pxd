@@ -128,6 +128,8 @@ cdef extern from "hashtable.hh" namespace "khmer":
         HashIntoType hash_dna_top_strand(const char *) const
         HashIntoType hash_dna_bottom_strand(const char *) const
         string unhash_dna(HashIntoType) const
+        bool add(const char *)
+        bool add(HashIntoType)
         void count(const char *)
         void count(HashIntoType)
         const BoundedCounterType get_count(const char *) const
