@@ -221,8 +221,9 @@ PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
     unsigned long long  n_consumed    = 0;
     unsigned int        total_reads   = 0;
     try {
-        me->hllcounter->consume_fasta(filename, stream_records, total_reads,
-                                      n_consumed);
+        me->hllcounter->consume_fasta<FastxReader>(
+            filename, stream_records, total_reads, n_consumed
+        );
     } catch (khmer_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;

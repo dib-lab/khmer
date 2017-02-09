@@ -778,7 +778,7 @@ hashgraph_consume_fasta_and_tag_with_reads_parser(khmer_KHashgraph_Object * me,
         return NULL;
     }
 
-    read_parsers:: IParser * rparser = rparser_obj-> parser;
+    FastxParserPtr rparser = rparser_obj->parser;
 
     // call the C++ function, and trap signals => Python
     const char         *value_exception = NULL;
@@ -789,7 +789,9 @@ hashgraph_consume_fasta_and_tag_with_reads_parser(khmer_KHashgraph_Object * me,
 
     Py_BEGIN_ALLOW_THREADS
     try {
-        hashgraph->consume_fasta_and_tag(rparser, total_reads, n_consumed);
+        hashgraph->consume_fasta_and_tag<FastxReader>(
+            rparser, total_reads, n_consumed
+        );
     } catch (khmer_file_exception &exc) {
         exc_string = exc.what();
         file_exception = exc_string.c_str();
@@ -829,7 +831,9 @@ hashgraph_consume_partitioned_fasta(khmer_KHashgraph_Object * me,
     unsigned int total_reads;
 
     try {
-        hashgraph->consume_partitioned_fasta(filename, total_reads, n_consumed);
+        hashgraph->consume_partitioned_fasta<FastxReader>(
+            filename, total_reads, n_consumed
+        );
     } catch (khmer_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;
@@ -1589,7 +1593,9 @@ hashgraph_consume_fasta_and_tag(khmer_KHashgraph_Object * me, PyObject * args)
     unsigned int total_reads;
 
     try {
-        hashgraph->consume_fasta_and_tag(filename, total_reads, n_consumed);
+        hashgraph->consume_fasta_and_tag<FastxReader>(
+            filename, total_reads, n_consumed
+        );
     } catch (khmer_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;

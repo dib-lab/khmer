@@ -107,13 +107,14 @@ def get_parser():
 
 def main():  # pylint: disable=too-many-locals,too-many-branches
     args = sanitize_help(get_parser()).parse_args()
+    graph_type = 'smallcountgraph' if args.small_count else 'countgraph'
 
     configure_logging(args.quiet)
-    report_on_config(args)
+    report_on_config(args, graph_type)
 
     check_input_files(args.input_sequence_filename, args.force)
     if args.savegraph:
-        graphsize = calculate_graphsize(args, 'countgraph')
+        graphsize = calculate_graphsize(args, graph_type)
         check_space_for_graph(args.savegraph, graphsize, args.force)
     if (not args.squash_output and
             os.path.exists(args.output_histogram_filename)):

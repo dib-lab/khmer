@@ -399,8 +399,7 @@ _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
 
     // Wrap the low-level parser object.
     try {
-        myself->parser =
-            IParser:: get_parser( ifile_name );
+        myself->parser = get_parser<FastxReader>(ifile_name);
     } catch (khmer_file_exception &exc) {
         PyErr_SetString( PyExc_OSError, exc.what() );
         return NULL;
@@ -412,7 +411,7 @@ PyObject *
 _ReadParser_iternext( PyObject * self )
 {
     khmer_ReadParser_Object * myself  = (khmer_ReadParser_Object *)self;
-    IParser *       parser  = myself->parser;
+    FastxParserPtr parser  = myself->parser;
     std::string exc_string;
 
     bool        stop_iteration  = false;
@@ -470,7 +469,7 @@ PyObject *
 _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
 {
     khmer_ReadParser_Object * parent = (khmer_ReadParser_Object*)myself->parent;
-    IParser    *parser    = parent->parser;
+    FastxParserPtr parser    = parent->parser;
     uint8_t     pair_mode = myself->pair_mode;
 
     ReadPair    the_read_pair;
@@ -546,7 +545,7 @@ ReadParser_get_num_reads(khmer_ReadParser_Object * me)
 PyObject *
 ReadParser_iter_read_pairs(PyObject * self, PyObject * args )
 {
-    int  pair_mode  = IParser:: PAIR_MODE_ERROR_ON_UNPAIRED;
+    int pair_mode = PAIR_MODE_ERROR_ON_UNPAIRED;
 
     if (!PyArg_ParseTuple( args, "|i", &pair_mode )) {
         return NULL;
@@ -580,7 +579,7 @@ void _init_ReadParser_Type_constants()
 
     // Place pair mode constants into class dictionary.
     int result;
-    PyObject *value = PyLong_FromLong( IParser:: PAIR_MODE_IGNORE_UNPAIRED );
+    PyObject *value = PyLong_FromLong(PAIR_MODE_IGNORE_UNPAIRED);
     if (value == NULL) {
         Py_DECREF(cls_attrs_DICT);
         return;
@@ -593,7 +592,7 @@ void _init_ReadParser_Type_constants()
         return;
     }
 
-    value = PyLong_FromLong( IParser:: PAIR_MODE_ERROR_ON_UNPAIRED );
+    value = PyLong_FromLong(PAIR_MODE_ERROR_ON_UNPAIRED);
     if (value == NULL) {
         Py_DECREF(cls_attrs_DICT);
         return;
@@ -609,7 +608,7 @@ void _init_ReadParser_Type_constants()
     khmer_ReadParser_Type.tp_dict     = cls_attrs_DICT;
 }
 
-IParser *
+FastxParserPtr
 _PyObject_to_khmer_ReadParser( PyObject * py_object )
 {
     return ((khmer_ReadParser_Object *)py_object)->parser;

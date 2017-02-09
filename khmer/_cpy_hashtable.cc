@@ -326,7 +326,7 @@ hashtable_consume_fasta(khmer_KHashtable_Object * me, PyObject * args)
     unsigned long long  n_consumed    = 0;
     unsigned int          total_reads   = 0;
     try {
-        hashtable->consume_fasta(filename, total_reads, n_consumed);
+        hashtable->consume_fasta<FastxReader>(filename, total_reads, n_consumed);
     } catch (khmer_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;
@@ -351,8 +351,7 @@ hashtable_consume_fasta_with_reads_parser(khmer_KHashtable_Object * me,
         return NULL;
     }
 
-    read_parsers:: IParser * rparser =
-        _PyObject_to_khmer_ReadParser( rparser_obj );
+    FastxParserPtr rparser = _PyObject_to_khmer_ReadParser(rparser_obj);
 
     // call the C++ function, and trap signals => Python
     unsigned long long  n_consumed      = 0;
@@ -363,7 +362,7 @@ hashtable_consume_fasta_with_reads_parser(khmer_KHashtable_Object * me,
 
     Py_BEGIN_ALLOW_THREADS
     try {
-        hashtable->consume_fasta(rparser, total_reads, n_consumed);
+        hashtable->consume_fasta<FastxReader>(rparser, total_reads, n_consumed);
     } catch (khmer_file_exception &exc) {
         exc_string = exc.what();
         file_exception = exc_string.c_str();
@@ -528,7 +527,7 @@ hashtable_abundance_distribution_with_reads_parser(khmer_KHashtable_Object * me,
         return NULL;
     }
 
-    read_parsers::IParser *rparser      = rparser_obj->parser;
+    FastxParserPtr rparser = rparser_obj->parser;
     Nodegraph           *nodegraph        = tracking_obj->nodegraph;
     uint64_t           *dist            = NULL;
     const char         *value_exception = NULL;

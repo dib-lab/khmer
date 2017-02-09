@@ -37,11 +37,14 @@
 
 
 from __future__ import print_function
+from collections import namedtuple
 from math import log
 import json
 
 from khmer._khmer import Countgraph as _Countgraph
+from khmer._khmer import SmallCountgraph as _SmallCountgraph
 from khmer._khmer import Counttable as _Counttable
+from khmer._khmer import SmallCounttable as _SmallCounttable
 from khmer._khmer import GraphLabels as _GraphLabels
 from khmer._khmer import Nodegraph as _Nodegraph
 from khmer._khmer import Nodetable as _Nodetable
@@ -72,6 +75,8 @@ from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 # tests/test_read_parsers.py,scripts/{filter-abund-single,load-graph}.py
 # scripts/{abundance-dist-single,load-into-counting}.py
 
+from khmer._khmer import FILETYPES
+
 import sys
 
 from struct import pack, unpack
@@ -79,6 +84,13 @@ from struct import pack, unpack
 from ._version import get_versions
 __version__ = get_versions()['version']
 del get_versions
+
+
+_buckets_per_byte = {
+    'countgraph': 1,
+    'smallcountgraph': 2,
+    'nodegraph': 8,
+}
 
 
 def load_nodegraph(filename):
@@ -93,14 +105,20 @@ def load_nodegraph(filename):
     return nodegraph
 
 
-def load_countgraph(filename):
+def load_countgraph(filename, small=False):
     """Load a countgraph object from the given filename and return it.
 
     Keyword argument:
     filename -- the name of the countgraph file
+    small -- set this to load a SmallCountgraph instance
     """
-    countgraph = _Countgraph(1, [1])
-    countgraph.load(filename)
+    if small:
+        countgraph = _SmallCountgraph(1, [1])
+        countgraph.load(filename)
+
+    else:
+        countgraph = _Countgraph(1, [1])
+        countgraph.load(filename)
 
     return countgraph
 
@@ -153,6 +171,9 @@ def extract_countgraph_info(filename):
     Keyword argument:
     filename -- the name of the countgraph file to inspect
     """
+    CgInfo = namedtuple("CgInfo", ['ksize', 'n_tables', 'table_size',
+                                   'use_bigcount', 'version', 'ht_type',
+                                   'n_occupied'])
     ksize = None
     n_tables = None
     table_size = None
@@ -170,7 +191,10 @@ def extract_countgraph_info(filename):
             signature, = unpack('4s', countgraph.read(4))
             version, = unpack('B', countgraph.read(1))
             ht_type, = unpack('B', countgraph.read(1))
-            use_bigcount, = unpack('B', countgraph.read(1))
+            if ht_type != FILETYPES['SMALLCOUNT']:
+                use_bigcount, = unpack('B', countgraph.read(1))
+            else:
+                use_bigcount = None
             ksize, = unpack('I', countgraph.read(uint_size))
             n_tables, = unpack('B', countgraph.read(1))
             occupied, = unpack('Q', countgraph.read(ulonglong_size))
@@ -181,8 +205,8 @@ def extract_countgraph_info(filename):
     except:
         raise ValueError("Count graph file '{}' is corrupt ".format(filename))
 
-    return ksize, round(table_size, -2), n_tables, use_bigcount, version, \
-        ht_type, occupied
+    return CgInfo(ksize, n_tables, round(table_size, -2), use_bigcount,
+                  version, ht_type, occupied)
 
 
 def calc_expected_collisions(graph, force=False, max_false_pos=.2):
@@ -280,11 +304,28 @@ class Countgraph(_Countgraph):
         return countgraph
 
 
+class SmallCountgraph(_SmallCountgraph):
+
+    def __new__(cls, k, starting_size, n_tables):
+        primes = get_n_primes_near_x(n_tables, starting_size)
+        countgraph = _SmallCountgraph.__new__(cls, k, primes)
+        countgraph.primes = primes
+        return countgraph
+
+
 class Counttable(_Counttable):
 
     def __new__(cls, k, starting_size, n_tables):
         primes = get_n_primes_near_x(n_tables, starting_size)
         counttable = _Counttable.__new__(cls, k, primes)
+        counttable.primes = primes
+        return counttable
+
+
+class SmallCounttable(_SmallCounttable):
+    def __new__(cls, k, starting_size, n_tables):
+        primes = get_n_primes_near_x(n_tables, starting_size)
+        counttable = _SmallCounttable.__new__(cls, k, primes)
         counttable.primes = primes
         return counttable
 

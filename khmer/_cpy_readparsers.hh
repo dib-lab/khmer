@@ -12,14 +12,14 @@ namespace khmer
 typedef struct {
     PyObject_HEAD
     //! Pointer to the low-level genomic read object.
-    read_parsers:: Read *   read;
+    read_parsers::Read *   read;
 } khmer_Read_Object;
 
 
 typedef struct {
     PyObject_HEAD
     //! Pointer to the low-level parser object.
-    read_parsers:: IParser *  parser;
+    read_parsers::FastxParserPtr parser;
 } khmer_ReadParser_Object;
 
 
@@ -32,7 +32,7 @@ typedef struct {
 } khmer_ReadPairIterator_Object;
 
 
-PyObject* 
+PyObject*
 khmer_Read_new(PyTypeObject * type, PyObject * args, PyObject * kwds);
 
 
@@ -129,7 +129,7 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_ReadParser_Object");
 void _init_ReadParser_Type_constants();
 
 
-read_parsers:: IParser *
+read_parsers::FastxParserPtr
 _PyObject_to_khmer_ReadParser( PyObject * py_object );
 
 

@@ -689,6 +689,21 @@ def test_oxli_build_graph_fail():
     assert "** ERROR: the graph structure is too small" in err
 
 
+@pytest.mark.known_failing
+def test_oxli_build_graph_yuge():
+    script = 'oxli'
+    args = ['build-graph', '-M', '800T', '-k', '20']
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args, fail_ok=True)
+    assert status != 0, status
+    assert 'ERROR: Not enough free space on disk' in err
+
+
 def test_load_graph_write_fp():
     script = 'load-graph.py'
     args = ['-x', '1e5', '-N', '2', '-k', '20']  # use small HT
@@ -868,6 +883,21 @@ def test_partition_graph_nojoin_k21():
 
     x = ht.count_partitions()
     assert x == (99, 0), x          # should be 99 partitions at K=21
+
+
+def test_partition_load_empty_pmap():
+    graphbase = _make_graph(utils.get_test_data('random-20-a.fa'), ksize=24)
+
+    script = 'partition-graph.py'
+    args = [graphbase, '-s', '10']
+
+    utils.runscript(script, args)
+
+    script = 'merge-partitions.py'
+    args = [graphbase, '-k', '24']
+    status, out, err = utils.runscript(script, args, fail_ok=True)
+    assert status == -1
+    assert 'only a header and no partition IDs' in err
 
 
 def test_partition_graph_nojoin_stoptags():
