@@ -48,6 +48,13 @@ import pytest
     (21, 5e7, 2, 16),
 ])
 def test_banding_in_memory(ksize, memory, epsilon, numbands):
+    """
+    Test accuracy of banding functionally.
+
+    Tests whether k-mer counts loaded into separate counttables in bands gives
+    reasonable behavior compared to k-mer counts computed in the normal
+    fashion.
+    """
     infile = utils.get_test_data('test-reads.fa')
 
     ct_normal = khmer.Counttable(ksize, memory / 4, 4)
@@ -84,6 +91,13 @@ def test_banding_in_memory(ksize, memory, epsilon, numbands):
     (21, 5e7, 16),
 ])
 def test_banding_to_disk(ksize, memory, numbands):
+    """
+    Test accuracy of banding in terms of the data structure contents.
+
+    Stronger than the functional in-memory test, this function tests whether
+    a computing k-mer abundances in banding mode produces the same data
+    structure as counting k-mer abundances in the normal fashion.
+    """
     infile = utils.get_test_data('test-reads.fa')
     path1 = utils.get_temp_filename('normal.ct')
     path2 = utils.get_temp_filename('banding.ct')
