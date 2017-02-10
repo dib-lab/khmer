@@ -93,8 +93,7 @@ struct InvalidReadPair : public  khmer_value_exception {
 unsigned char _to_valid_dna(const unsigned char c);
 
 
-struct Read
-{
+struct Read {
     std::string name;
     std::string description;
     std::string sequence;
@@ -167,6 +166,7 @@ public:
 
     size_t get_num_reads();
     bool is_complete();
+    void close();
 }; // class ReadParser
 
 
@@ -189,6 +189,7 @@ public:
     Read get_next_read();
     bool is_complete();
     size_t get_num_reads();
+    void close();
 }; // class FastxReader
 
 
