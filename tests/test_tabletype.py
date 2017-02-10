@@ -23,6 +23,9 @@ from . import khmer_tst_utils as utils
 import khmer
 from khmer import _Countgraph, _Counttable, _SmallCountgraph, _SmallCounttable
 from khmer import _Nodegraph, _Nodetable
+from khmer import ReadParser
+import screed
+
 
 PRIMES_1m = [1000003, 1009837]
 
@@ -179,7 +182,8 @@ def test_consume_and_count(tabletype):
     tt = tabletype(6, PRIMES_1m)
 
     x = "ATGCCGATGCA"
-    tt.consume(x)
+    num_kmers = tt.consume(x)
+    assert num_kmers == len(x) - tt.ksize() + 1   # num k-mers consumed
 
     for start in range(len(x) - 6 + 1):
         assert tt.get(x[start:start + 6]) == 1
@@ -191,10 +195,19 @@ def test_consume_and_count_bad_dna(tabletype):
     tt = tabletype(6, PRIMES_1m)
 
     x = "ATGCCGNTGCA"
-    tt.consume(x)
+    num_kmers = tt.consume(x)
 
     for start in range(len(x) - 6 + 1):
         assert tt.get(x[start:start + 6]) == 1
+
+
+def test_consume_short(tabletype):
+    # raise error on too short when consume is run
+    tt = tabletype(6, PRIMES_1m)
+
+    x = "ATGCA"
+    with pytest.raises(ValueError):
+        tt.consume(x)
 
 
 def test_get_kmer_counts(tabletype):
@@ -231,6 +244,28 @@ def test_get_kmer_hashes(tabletype):
     assert hashes[2] == hi.hash("GTGCGT")
 
 
+def test_get_min_count(tabletype):
+    hi = tabletype(6, PRIMES_1m)
+
+    # master string, 3 k-mers
+    x = "ACGTGCGT"
+
+    hi.add("ACGTGC") # 3
+    hi.add("ACGTGC")
+    hi.add("ACGTGC")
+
+    hi.add("CGTGCG") # 1
+
+    hi.add("GTGCGT") # 2
+    hi.add("GTGCGT")
+
+    counts = hi.get_kmer_counts(x)
+    assert hi.get_min_count(x) == min(counts)
+    assert hi.get_max_count(x) == max(counts)
+    med, _, _ = hi.get_median_count(x)
+    assert med == list(sorted(counts))[len(counts) // 2]
+
+
 def test_get_kmers(tabletype):
     hi = tabletype(6, PRIMES_1m)
 
@@ -242,6 +277,30 @@ def test_get_kmers(tabletype):
 
     kmers = hi.get_kmers("AGCTTTTC")
     assert kmers == ['AGCTTT', 'GCTTTT', 'CTTTTC']
+
+
+def test_consume_fasta_reads_parser(tabletype):
+    kh = tabletype(5, PRIMES_1m)
+    rparser = ReadParser(utils.get_test_data('test-fastq-reads.fq'))
+
+    kh.consume_fasta_with_reads_parser(rparser)
+
+    kh2 = tabletype(5, PRIMES_1m)
+    for record in screed.open(utils.get_test_data('test-fastq-reads.fq')):
+        kh2.consume(record.sequence)
+
+    assert kh.get('CCGGC') == kh2.get('CCGGC')
+
+
+def test_consume_fasta(tabletype):
+    kh = tabletype(5, PRIMES_1m)
+    kh.consume_fasta(utils.get_test_data('test-fastq-reads.fq'))
+
+    kh2 = tabletype(5, PRIMES_1m)
+    for record in screed.open(utils.get_test_data('test-fastq-reads.fq')):
+        kh2.consume(record.sequence)
+
+    assert kh.get('CCGGC') == kh2.get('CCGGC')
 
 
 def test_save_load(tabletype):

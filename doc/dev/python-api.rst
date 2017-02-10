@@ -62,16 +62,21 @@ Python methods:
 * save(filename) - save the data to a file on disk.
 * load(filename) - load the data from a file on disk.
 
-* get_min_count
-* get_median_count
-* get_max_count
-* consume - @CTB should be consume string
-* consume_fasta
-* consume_fasta_with_reads_parser
+* min_count = get_min_count(seq) - return the minimum count for k-mers in seq
+* med_count, avg_count, stddev_count = get_median_count(seq) - return the median, average, and stddev of the counts for k-mers in the sequence.
+  
+* max_count = get_max_count(seq) - return the maximum count for k-mers in the sequence.
+  
+* num_kmers = consume(seq) - count all the k-mers in the given DNA string. @CTB should be consume string
+* consume_fasta(filename) - count all the k-mers in a (DNA) FASTA/FASTQ file.
+* consume_fasta_with_reads_parser(khmer.ReadParser object) - count all the k-mers in (DNA) sequences returned from a ReadParser object.  This can be used to ensure various forms of pairing are present, etc.
+
 * set_use_bigcount - @CTB
 * get_use_bigcount - @CTB
+
 * abundance_distribution
 * abundance_distribution_with_reads_paresr
+
 * trim_on_abundance
 * trim_below_abundance
 * find_spectral_error_positions
