@@ -279,6 +279,31 @@ def test_get_kmers(tabletype):
     assert kmers == ['AGCTTT', 'GCTTTT', 'CTTTTC']
 
 
+def test_trim_on_abundance(tabletype):
+    hi = tabletype(6, PRIMES_1m)
+
+    x = "ATGGCAGTAGCAGTGAGC"
+    hi.consume(x[:10])
+
+    (y, pos) = hi.trim_on_abundance(x, 1)
+    assert pos == 10
+    assert x[:pos] == y
+
+
+def test_trim_below_abundance(tabletype):
+    hi = tabletype(6, PRIMES_1m)
+
+    x = "ATGGCAGTAGCAGTGAGC"
+    x_rc = screed.rc(x)
+    hi.consume(x_rc[:10])
+
+    print(len(x))
+
+    (y, pos) = hi.trim_below_abundance(x, 0)
+    assert pos == len(x) - hi.ksize() + 1
+    assert x[:pos] == y
+
+
 def test_consume_fasta_reads_parser(tabletype):
     kh = tabletype(5, PRIMES_1m)
     rparser = ReadParser(utils.get_test_data('test-fastq-reads.fq'))
