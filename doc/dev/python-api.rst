@@ -1,8 +1,10 @@
-
-Types --
+Some notes on the Python API
+============================
 
 Some programming guidelines
 ---------------------------
+
+...
 
 Valid and invalid DNA
 ~~~~~~~~~~~~~~~~~~~~~

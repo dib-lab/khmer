@@ -304,6 +304,42 @@ def test_trim_below_abundance(tabletype):
     assert x[:pos] == y
 
 
+DNA = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC"
+
+def test_find_spectral_error_positions(tabletype):
+    kh = tabletype(8, PRIMES_1m)
+
+    kh.consume(DNA[:30])
+
+    for n in range(len(DNA) - 8 + 1):
+        print(n, kh.get(DNA[n:n + 8]))
+
+    posns = kh.find_spectral_error_positions(DNA, 0)
+    assert posns == [30], posns
+
+
+def test_find_spectral_error_positions_6(tabletype):
+    kh = tabletype(8, PRIMES_1m)
+
+    kh.consume(DNA[1:])
+
+    for n in range(len(DNA) - 8 + 1):
+        print(n, kh.get(DNA[n:n + 8]))
+
+    posns = kh.find_spectral_error_positions(DNA, 0)
+    assert posns == [0], posns
+
+
+def test_find_spectral_error_positions_5(tabletype):
+    kh = tabletype(8, PRIMES_1m)
+
+    kh.consume(DNA[:10])
+    kh.consume(DNA[11:])
+
+    posns = kh.find_spectral_error_positions(DNA, 0)
+    assert posns == [10], posns
+
+
 def test_consume_fasta_reads_parser(tabletype):
     kh = tabletype(5, PRIMES_1m)
     rparser = ReadParser(utils.get_test_data('test-fastq-reads.fq'))

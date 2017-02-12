@@ -485,10 +485,7 @@ const
 
     // did we bypass some erroneous k-mers? call the last one.
     if (kmers->get_start_pos() > 0) {
-        // if we are well past the first k, forget the whole thing (!? @CTB)
-        if (kmers->get_start_pos() >= _ksize && 0) {
-            return posns;
-        }
+        // if this is not the *first* k-mer, save.
         posns.push_back(kmers->get_start_pos() - 1);
     }
 
@@ -516,15 +513,18 @@ class MurmurKmerHashIterator : public KmerHashIterator
     const char _ksize;
     unsigned int index;
     unsigned int length;
+    bool _initialized;
 public:
     MurmurKmerHashIterator(const char * seq, unsigned char k) :
-        _seq(seq), _ksize(k), index(0) {
+        _seq(seq), _ksize(k), index(0), _initialized(false) {
         length = strlen(_seq);
     };
 
-    HashIntoType first() { return next(); }
+    HashIntoType first() { _initialized = true; return next(); }
 
     HashIntoType next() {
+        if (!_initialized) { _initialized = true; }
+
         if (done()) {
             throw khmer_exception("past end of iterator");
         }
@@ -539,8 +539,14 @@ public:
         return (index + _ksize > length);
     }
 
-    unsigned int get_start_pos() const { return index; }
-    unsigned int get_end_pos() const { return index + _ksize; }
+    unsigned int get_start_pos() const {
+        if (!_initialized) { return 0; }
+        return index - 1;
+    }
+    unsigned int get_end_pos() const {
+        if (!_initialized) { return _ksize; }
+        return index + _ksize - 1;
+    }
 };
 
 unique_ptr<KmerHashIterator> Counttable::new_kmer_iterator(const char * sp) const {
