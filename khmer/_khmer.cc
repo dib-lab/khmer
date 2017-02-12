@@ -1738,61 +1738,9 @@ hashtable_get_max_count(khmer_KHashtable_Object * me, PyObject * args)
     return PyLong_FromLong(N);
 }
 
-static
-PyObject *
-hashtable_abundance_distribution_with_reads_parser(khmer_KHashtable_Object * me,
-        PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    khmer :: python :: khmer_ReadParser_Object * rparser_obj = NULL;
-    khmer_KNodegraph_Object *tracking_obj = NULL;
-
-    if (!PyArg_ParseTuple(args, "O!O!", &python::khmer_ReadParser_Type,
-                          &rparser_obj, &khmer_KNodegraph_Type, &tracking_obj)) {
-        return NULL;
-    }
-
-    FastxParserPtr& rparser = rparser_obj->parser;
-    Nodegraph           *nodegraph        = tracking_obj->nodegraph;
-    uint64_t           *dist            = NULL;
-    const char         *value_exception = NULL;
-    const char         *file_exception  = NULL;
-    std::string exc_string;
-
-    Py_BEGIN_ALLOW_THREADS
-    try {
-        dist = hashtable->abundance_distribution<FastxReader>(rparser, nodegraph);
-    } catch (khmer_file_exception &exc) {
-        exc_string = exc.what();
-        file_exception = exc_string.c_str();
-    } catch (khmer_value_exception &exc) {
-        exc_string = exc.what();
-        value_exception = exc_string.c_str();
-    }
-    Py_END_ALLOW_THREADS
-
-    if (file_exception != NULL) {
-        PyErr_SetString(PyExc_OSError, file_exception);
-        return NULL;
-    }
-    if (value_exception != NULL) {
-        PyErr_SetString(PyExc_ValueError, value_exception);
-        return NULL;
-    }
-
-    PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
-    if (x == NULL) {
-        delete[] dist;
-        return NULL;
-    }
-    for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
-        PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(dist[i]));
-    }
-
-    delete[] dist;
-    return x;
-}
+// fwd decls to replace function definitions
+static PyObject * hashtable_abundance_distribution_with_reads_parser(khmer_KHashtable_Object * me, PyObject * args);
+static PyObject * hashtable_abundance_distribution(khmer_KHashtable_Object * me, PyObject * args);
 
 static
 PyObject *
@@ -1889,70 +1837,6 @@ hashtable_find_spectral_error_positions(khmer_KHashtable_Object * me,
     }
     for (Py_ssize_t i = 0; i < posns_size; i++) {
         PyList_SET_ITEM(x, i, PyLong_FromLong(posns[i]));
-    }
-
-    return x;
-}
-
-static
-PyObject *
-hashtable_abundance_distribution(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable = me->hashtable;
-
-    const char * filename = NULL;
-    khmer_KNodegraph_Object * tracking_obj = NULL;
-    if (!PyArg_ParseTuple(args, "sO!", &filename, &khmer_KNodegraph_Type,
-                          &tracking_obj)) {
-        return NULL;
-    }
-
-    Nodegraph           *nodegraph        = tracking_obj->nodegraph;
-    uint64_t           *dist            = NULL;
-    const char         *value_exception = NULL;
-    const char         *file_exception  = NULL;
-    std::string exc_string;
-
-    Py_BEGIN_ALLOW_THREADS
-    try {
-        dist = hashtable->abundance_distribution<FastxReader>(filename, nodegraph);
-    } catch (khmer_file_exception &exc) {
-        exc_string = exc.what();
-        file_exception = exc_string.c_str();
-    } catch (khmer_value_exception &exc) {
-        exc_string = exc.what();
-        value_exception = exc_string.c_str();
-    }
-    Py_END_ALLOW_THREADS
-
-    if (file_exception != NULL) {
-        PyErr_SetString(PyExc_OSError, file_exception);
-        if (dist != NULL) {
-            delete []dist;
-        }
-        return NULL;
-    }
-    if (value_exception != NULL) {
-        PyErr_SetString(PyExc_ValueError, value_exception);
-        if (dist != NULL) {
-            delete []dist;
-        }
-        return NULL;
-    }
-
-    PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
-    if (x == NULL) {
-        if (dist != NULL) {
-            delete []dist;
-        }
-        return NULL;
-    }
-    for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
-        PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(dist[i]));
-    }
-
-    if (dist != NULL) {
-        delete []dist;
     }
 
     return x;
@@ -4542,6 +4426,127 @@ static PyTypeObject khmer_KJunctionCountAssembler_Type = {
     khmer_junctioncountassembler_new,      /* tp_new */
 };
 
+////
+
+static
+PyObject *
+hashtable_abundance_distribution_with_reads_parser(khmer_KHashtable_Object * me,
+        PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    khmer :: python :: khmer_ReadParser_Object * rparser_obj = NULL;
+    khmer_KHashtable_Object * tracking_obj = NULL;
+
+    if (!PyArg_ParseTuple(args, "O!O!", &python::khmer_ReadParser_Type,
+                          &rparser_obj, &khmer_KHashtable_Type, &tracking_obj)) {
+        return NULL;
+    }
+
+    FastxParserPtr& rparser = rparser_obj->parser;
+    Hashtable          *tracking        = tracking_obj->hashtable;
+    uint64_t           *dist            = NULL;
+    const char         *value_exception = NULL;
+    const char         *file_exception  = NULL;
+    std::string exc_string;
+
+    Py_BEGIN_ALLOW_THREADS
+    try {
+        dist = hashtable->abundance_distribution<FastxReader>(rparser, tracking);
+    } catch (khmer_file_exception &exc) {
+        exc_string = exc.what();
+        file_exception = exc_string.c_str();
+    } catch (khmer_value_exception &exc) {
+        exc_string = exc.what();
+        value_exception = exc_string.c_str();
+    }
+    Py_END_ALLOW_THREADS
+
+    if (file_exception != NULL) {
+        PyErr_SetString(PyExc_OSError, file_exception);
+        return NULL;
+    }
+    if (value_exception != NULL) {
+        PyErr_SetString(PyExc_ValueError, value_exception);
+        return NULL;
+    }
+
+    PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
+    if (x == NULL) {
+        delete[] dist;
+        return NULL;
+    }
+    for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
+        PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(dist[i]));
+    }
+
+    delete[] dist;
+    return x;
+}
+
+static
+PyObject *
+hashtable_abundance_distribution(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable = me->hashtable;
+
+    const char * filename = NULL;
+    khmer_KHashtable_Object * tracking_obj = NULL;
+    if (!PyArg_ParseTuple(args, "sO!", &filename, &khmer_KHashtable_Type,
+                          &tracking_obj)) {
+        return NULL;
+    }
+
+    Hashtable          *tracking       = tracking_obj->hashtable;
+    uint64_t           *dist            = NULL;
+    const char         *value_exception = NULL;
+    const char         *file_exception  = NULL;
+    std::string exc_string;
+
+    Py_BEGIN_ALLOW_THREADS
+    try {
+        dist = hashtable->abundance_distribution<FastxReader>(filename, tracking);
+    } catch (khmer_file_exception &exc) {
+        exc_string = exc.what();
+        file_exception = exc_string.c_str();
+    } catch (khmer_value_exception &exc) {
+        exc_string = exc.what();
+        value_exception = exc_string.c_str();
+    }
+    Py_END_ALLOW_THREADS
+
+    if (file_exception != NULL) {
+        PyErr_SetString(PyExc_OSError, file_exception);
+        if (dist != NULL) {
+            delete []dist;
+        }
+        return NULL;
+    }
+    if (value_exception != NULL) {
+        PyErr_SetString(PyExc_ValueError, value_exception);
+        if (dist != NULL) {
+            delete []dist;
+        }
+        return NULL;
+    }
+
+    PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
+    if (x == NULL) {
+        if (dist != NULL) {
+            delete []dist;
+        }
+        return NULL;
+    }
+    for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
+        PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(dist[i]));
+    }
+
+    if (dist != NULL) {
+        delete []dist;
+    }
+
+    return x;
+}
 
 //////////////////////////////
 // standalone functions

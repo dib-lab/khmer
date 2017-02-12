@@ -80,8 +80,8 @@ Python methods:
 * set_use_bigcount(bool) - some table types (Counttable and Countgraph) support counting past their max value, using a (memory intensive) C++ stl::map. That turns on this "bigcount" behavior.  This will raise a ValueError when called on a table type that does not support it.
 * get_use_bigcount - return the bigcount value (False by default).
 
-* abundance_distribution
-* abundance_distribution_with_reads_parser
+* dist = abundance_distribution(filename, tracking_obj) - generate an abundance distribution for the k-mers in the given file, using the tracking_obj to avoid double-counting identical k-mers.
+* dist = abundance_distribution_with_reads_parser(readparser_obj, tracking_obj) - generate an abundance distribution for the k-mers loaded from the given readparser, using the tracking_obj to avoid double-counting identical k-mers.
 
 Counting types
 --------------

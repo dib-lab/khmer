@@ -410,3 +410,32 @@ def test_set_bigcount(tabletype):
     else:
         with pytest.raises(ValueError):
             tt.set_use_bigcount(True)
+
+
+def test_abund_dist_A(tabletype):
+    A_filename = utils.get_test_data('all-A.fa')
+
+    kh = tabletype(4, PRIMES_1m)
+    tracking = khmer._Nodegraph(4, PRIMES_1m)
+
+    kh.consume_fasta(A_filename)
+    dist = kh.abundance_distribution(A_filename, tracking)
+
+    print(dist[:10])
+    assert sum(dist) == 1
+    assert dist[0] == 0
+
+
+def test_abund_dist_A_readparser(tabletype):
+    A_filename = utils.get_test_data('all-A.fa')
+    rparser = ReadParser(A_filename)
+
+    kh = tabletype(4, PRIMES_1m)
+    tracking = khmer._Nodetable(4, PRIMES_1m)
+
+    kh.consume_fasta(A_filename)
+    dist = kh.abundance_distribution(A_filename, tracking)
+
+    print(dist[:10])
+    assert sum(dist) == 1
+    assert dist[0] == 0
