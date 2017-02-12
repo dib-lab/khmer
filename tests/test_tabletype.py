@@ -250,13 +250,13 @@ def test_get_min_count(tabletype):
     # master string, 3 k-mers
     x = "ACGTGCGT"
 
-    hi.add("ACGTGC") # 3
+    hi.add("ACGTGC")  # 3
     hi.add("ACGTGC")
     hi.add("ACGTGC")
 
-    hi.add("CGTGCG") # 1
+    hi.add("CGTGCG")  # 1
 
-    hi.add("GTGCGT") # 2
+    hi.add("GTGCGT")  # 2
     hi.add("GTGCGT")
 
     counts = hi.get_kmer_counts(x)
@@ -305,6 +305,7 @@ def test_trim_below_abundance(tabletype):
 
 
 DNA = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC"
+
 
 def test_find_spectral_error_positions(tabletype):
     kh = tabletype(8, PRIMES_1m)

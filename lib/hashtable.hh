@@ -74,6 +74,9 @@ namespace khmer
 
 namespace khmer
 {
+
+typedef std::unique_ptr<KmerHashIterator> KmerHashIteratorPtr;
+    
 class Hashtable: public
     KmerFactory  		// Base class implementation of a Bloom ht.
 {
@@ -114,14 +117,12 @@ protected:
     explicit Hashtable(const Hashtable&);
     Hashtable& operator=(const Hashtable&);
 
-    virtual unique_ptr<KmerHashIterator>
-    new_kmer_iterator(const char * sp) const {
+    virtual KmerHashIteratorPtr new_kmer_iterator(const char * sp) const {
         KmerHashIterator * ki = new TwoBitKmerHashIterator(sp, _ksize);
         return unique_ptr<KmerHashIterator>(ki);
     }
 
-    virtual unique_ptr<KmerHashIterator>
-    new_kmer_iterator(const std::string& s) const {
+    virtual KmerHashIteratorPtr new_kmer_iterator(const std::string& s) const {
         return new_kmer_iterator(s.c_str());
     }
 
@@ -360,8 +361,7 @@ public:
         throw khmer_exception("not implemented");
     }
 
-    virtual unique_ptr<KmerHashIterator>
-        new_kmer_iterator(const char * sp) const;
+    virtual KmerHashIteratorPtr new_kmer_iterator(const char * sp) const;
 };
 
 // Hashtable-derived class with NibbleStorage.
