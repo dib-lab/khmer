@@ -75,7 +75,7 @@ Python methods:
 
 * (trim_seq, trim_pos) = trim_on_abundance(seq, abund) - trim the sequence at the first k-mer with an abundance strictly below (<) the provided abundance.
 * (trim_seq, trim_pos) = trim_below_abundance(seq, abund) - trim the sequence at the first k-mer with an abundance strictly above (>) the provided abundance.
-* find_spectral_error_positions
+* list_of_posns = find_spectral_error_positions(seq, abund) - find potential locations of errors in input sequence, where k-mers are below given abundance.
 
 * set_use_bigcount(bool) - some table types (Counttable and Countgraph) support counting past their max value, using a (memory intensive) C++ stl::map. That turns on this "bigcount" behavior.  This will raise a ValueError when called on a table type that does not support it.
 * get_use_bigcount - return the bigcount value (False by default).
