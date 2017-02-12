@@ -1665,7 +1665,12 @@ hashtable_set_use_bigcount(khmer_KHashtable_Object * me, PyObject * args)
     if (setme < 0) {
         return NULL;
     }
-    hashtable->set_use_bigcount((bool)setme);
+    try {
+        hashtable->set_use_bigcount((bool)setme);
+    } catch (khmer_exception &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return NULL;
+    }
 
     Py_RETURN_NONE;
 }

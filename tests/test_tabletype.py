@@ -351,3 +351,26 @@ def test_save_load(tabletype):
 
     z = kh.get('ATGGC')
     assert z == 1
+
+
+def test_get_bigcount(tabletype):
+    # get_bigcount should return false by default
+    tt = tabletype(12, PRIMES_1m)
+
+    assert not tt.get_use_bigcount()
+
+
+def test_set_bigcount(tabletype):
+    supports_bigcount = [_Countgraph, _Counttable]
+    tt = tabletype(12, PRIMES_1m)
+
+    if tabletype in supports_bigcount:
+        tt.set_use_bigcount(True)
+
+        for i in range(300):
+            tt.add('G'*12)
+        assert tt.get('G'*12) == 300
+
+    else:
+        with pytest.raises(ValueError):
+            tt.set_use_bigcount(True)
