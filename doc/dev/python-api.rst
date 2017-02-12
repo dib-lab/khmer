@@ -29,7 +29,7 @@ Possible choices for the first part:
 
 Possible choices for the second part:
 * Table, keep track of kmers
-* Graph, navigate, tag, etc the de Bruijn graph formed by the khmers
+* Graph, navigate, tag, etc the de Bruijn graph formed by the k-mers
 
 C++ class name:
 
@@ -72,14 +72,14 @@ Python methods:
 * consume_fasta_with_reads_parser(khmer.ReadParser object) - count all the k-mers in (DNA) sequences returned from a ReadParser object.  This can be used to ensure various forms of pairing are present, etc.
 
 * (trim_seq, trim_pos) = trim_on_abundance(seq, abund) - trim the sequence at the first k-mer with an abundance strictly below (<) the provided abundance.
-* (trim_seq, tirm_pos) = trim_below_abundance(seq, abund) - trim the sequence at the first k-mer with an abundance strictly above (>) the provided abundance.
+* (trim_seq, trim_pos) = trim_below_abundance(seq, abund) - trim the sequence at the first k-mer with an abundance strictly above (>) the provided abundance.
 * find_spectral_error_positions
 
 * set_use_bigcount(bool) - some table types (Counttable and Countgraph) support counting past their max value, using a (memory intensive) C++ stl::map. That turns on this "bigcount" behavior.  This will raise a ValueError when called on a table type that does not support it.
 * get_use_bigcount - return the bigcount value (False by default).
 
 * abundance_distribution
-* abundance_distribution_with_reads_paresr
+* abundance_distribution_with_reads_parser
 
 Counting types
 --------------
