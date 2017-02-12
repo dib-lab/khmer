@@ -75,8 +75,8 @@ Python methods:
 * (trim_seq, tirm_pos) = trim_below_abundance(seq, abund) - trim the sequence at the first k-mer with an abundance strictly above (>) the provided abundance.
 * find_spectral_error_positions
 
-* set_use_bigcount - @CTB
-* get_use_bigcount - @CTB
+* set_use_bigcount(bool) - some table types (Counttable and Countgraph) support counting past their max value, using a (memory intensive) C++ stl::map. That turns on this "bigcount" behavior.  This will raise a ValueError when called on a table type that does not support it.
+* get_use_bigcount - return the bigcount value (False by default).
 
 * abundance_distribution
 * abundance_distribution_with_reads_paresr
