@@ -377,16 +377,20 @@ def test_save_load(tabletype):
     kh.save(savefile)
 
     # should we provide a single load function here? yes, probably. @CTB
-    if tabletype in (_Countgraph, _Counttable):
+    if tabletype == _Countgraph:
         loaded = khmer.load_countgraph(savefile)
-    elif tabletype in (_SmallCountgraph, _SmallCounttable):
+    elif tabletype == _Counttable:
+        loaded = khmer.load_counttable(savefile)
+    elif tabletype == _SmallCountgraph:
         loaded = khmer.load_countgraph(savefile, small=True)
+    elif tabletype == _SmallCounttable:
+        loaded = khmer.load_counttable(savefile, small=True)
     elif tabletype in (_Nodegraph, _Nodetable):
         loaded = khmer.load_nodegraph(savefile)
     else:
         raise Exception("unknown tabletype")
 
-    z = kh.get('ATGGC')
+    z = loaded.get('ATGGC')
     assert z == 1
 
 
