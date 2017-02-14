@@ -83,19 +83,6 @@ Python methods:
 * dist = abundance_distribution(filename, tracking_obj) - generate an abundance distribution for the k-mers in the given file, using the tracking_obj to avoid double-counting identical k-mers.
 * dist = abundance_distribution_with_reads_parser(readparser_obj, tracking_obj) - generate an abundance distribution for the k-mers loaded from the given readparser, using the tracking_obj to avoid double-counting identical k-mers.
 
-Counting types
---------------
-
-Countgraph:
-
-* get_raw_tables
-* do_subset_partition_with_abundance
-
-Nodegraph:
-
-* update
-* get_raw_tables
-
 Graph types
 -----------
 
@@ -152,4 +139,14 @@ All the methods of table types, and in addition:
 
 Smallcountgraph:
 
+* get_raw_tables
+
+Countgraph:
+
+* get_raw_tables
+* do_subset_partition_with_abundance
+
+Nodegraph:
+
+* update
 * get_raw_tables
