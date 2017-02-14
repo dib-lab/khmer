@@ -68,6 +68,12 @@ def test_estimate_functions_1():
     assert res[2] == 850, res[2]
     assert abs(.7 - res[3]) < 0.0022, abs(.7 - res[3])
 
+    res = estimate_optimal_with_K_and_M(0, 0)
+    assert res[0:3] == (1, 1, 1)
+
+    res = estimate_optimal_with_K_and_f(0, 0.01)
+    assert res == (6, 1, 6, 0.0)
+
 
 def test_estimate_functions_namedtup():
     res = estimate_optimal_with_K_and_M(99, 1024)
