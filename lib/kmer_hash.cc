@@ -184,6 +184,12 @@ HashIntoType _hash_murmur(const std::string& kmer,
     h = out[0];
 
     std::string rev = khmer::_revcomp(kmer);
+    if (rev == kmer) {
+        // self complement kmer, can't use bitwise XOR
+        r = out[0];
+        return h;
+    }
+
     MurmurHash3_x64_128((void *)rev.c_str(), rev.size(), seed, &out);
     r = out[0];
 

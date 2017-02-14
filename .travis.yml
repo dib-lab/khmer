@@ -12,7 +12,7 @@ notifications:
 # for a PR. So we disable build-on-push for all branches
 # except the ones whitelisted here.
 branches:
-  only: 
+  only:
     - master
 
 matrix:
@@ -69,6 +69,7 @@ script:
 
 # generate all the diagnostic reports
 after_success:
+  - make clean
   - PYTEST_ADDOPTS=-qqq make coverage-gcovr.xml coverage.xml
   # Fix suggested by http://diff-cover.readthedocs.io/en/latest/#troubleshooting
   - git fetch origin master:refs/remotes/origin/master

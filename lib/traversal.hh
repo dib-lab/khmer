@@ -48,11 +48,11 @@ Contact: khmer-project@idyll.org
 namespace khmer
 {
 
-#ifndef LEFT
-#define LEFT 0
+#ifndef TRAVERSAL_LEFT
+#define TRAVERSAL_LEFT 0
 #endif
-#ifndef RIGHT
-#define RIGHT 1
+#ifndef TRAVERSAL_RIGHT
+#define TRAVERSAL_RIGHT 1
 #endif
 
 class Hashgraph;
@@ -204,8 +204,8 @@ class Traverser: public KmerFactory
 protected:
 
     const Hashgraph * graph;
-    NodeGatherer<LEFT> left_gatherer;
-    NodeGatherer<RIGHT> right_gatherer;
+    NodeGatherer<TRAVERSAL_LEFT> left_gatherer;
+    NodeGatherer<TRAVERSAL_RIGHT> right_gatherer;
 
 public:
 

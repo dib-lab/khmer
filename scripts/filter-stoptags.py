@@ -92,8 +92,8 @@ def main():
     nodegraph.load_stop_tags(stoptags)
 
     def process_fn(record):
-        name = record['name']
-        seq = record['sequence']
+        name = record.name
+        seq = record.sequence
         if 'N' in seq:
             return None, None
 
