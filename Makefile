@@ -136,7 +136,7 @@ clean: FORCE
 	rm -f diff-cover.html
 	rm -Rf build dist
 	rm -rf __pycache__/ .eggs/ khmer.egg-info/
-	-rm *.gcov
+	-rm -f *.gcov
 
 debug: FORCE
 	export CFLAGS="-pg -fprofile-arcs -D_GLIBCXX_DEBUG_PEDANTIC \
