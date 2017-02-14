@@ -38,9 +38,10 @@
 # `SHELL=bash` Will break Titus's laptop, so don't use BASH-isms like
 # `[[` conditional expressions.
 CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc khmer/*.hh) setup.py
+CYSOURCES=$(wildcard khmer/_oxli/*.pxd khmer/_oxli/*.pyx) setup.py
 PYSOURCES=$(filter-out khmer/_version.py, \
 	  $(wildcard khmer/*.py scripts/*.py oxli/*.py) )
-SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
+SOURCES=$(PYSOURCES) $(CPPSOURCES) $(CYSOURCES) setup.py
 
 DEVPKGS=pep8==1.6.2 diff_cover autopep8 pylint coverage gcovr pytest \
 	pydocstyle screed pyenchant
@@ -83,6 +84,7 @@ endif
 MODEXT=$(shell python -c \
        "import sysconfig;print(sysconfig.get_config_var('SO'))")
 EXTENSION_MODULE = khmer/_khmer$(MODEXT)
+CY_MODULES = $($(wildcard khmer/_oxli/*.pyx): .pyx=.$(MODEXT))
 
 PYLINT_TEMPLATE="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"
 
@@ -104,7 +106,7 @@ install-dependencies:
 ## sharedobj   : build khmer shared object file
 sharedobj: $(EXTENSION_MODULE)
 
-$(EXTENSION_MODULE): $(CPPSOURCES)
+$(EXTENSION_MODULE): $(CPPSOURCES) $(CYSOURCES)
 	./setup.py build_ext --inplace
 
 coverage-debug: $(CPPSOURCES)
@@ -129,7 +131,8 @@ clean: FORCE
 	rm -f pytest_runner-*.egg pytests.xml
 	rm -f $(EXTENSION_MODULE)
 	rm -f khmer/*.pyc lib/*.pyc scripts/*.pyc tests/*.pyc oxli/*.pyc \
-		sandbox/*.pyc khmer/__pycache__/* sandbox/__pycache__/*
+		sandbox/*.pyc khmer/__pycache__/* sandbox/__pycache__/* \
+		khmer/_oxli/*.cpp
 	./setup.py clean --all || true
 	rm -f coverage-debug
 	rm -Rf .coverage coverage-gcovr.xml coverage.xml
