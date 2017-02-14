@@ -123,6 +123,24 @@ def load_countgraph(filename, small=False):
     return countgraph
 
 
+def load_counttable(filename, small=False):
+    """Load a counttable object from the given filename and return it.
+
+    Keyword argument:
+    filename -- the name of the counttable file
+    small -- set this to load a SmallCounttable instance
+    """
+    if small:
+        counttable = _SmallCounttable(1, [1])
+        counttable.load(filename)
+
+    else:
+        counttable = _Counttable(1, [1])
+        counttable.load(filename)
+
+    return counttable
+
+
 def extract_nodegraph_info(filename):
     """Open the given nodegraph file and return a tuple of information.
 

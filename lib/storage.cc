@@ -49,6 +49,9 @@ using namespace std;
 
 void Storage::set_use_bigcount(bool b)
 {
+    if (!_supports_bigcount) {
+        throw khmer_exception("bigcount is not supported for this storage.");
+    }
     _use_bigcount = b;
 }
 

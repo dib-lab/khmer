@@ -117,8 +117,8 @@ def test_reverse_complement():
 
 
 def test_reverse_complement_exception():
-    with pytest.raises(RuntimeError):
-        khmer.reverse_complement('FGF')
+    # deal with DNA, ignore rest
+    assert khmer.reverse_complement('FGF') == 'FCF'
 
 
 def test_reverse_hash_longs():
