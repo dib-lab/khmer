@@ -232,6 +232,7 @@ LIBKHMER_OBJS= \
 	read_parsers.o \
 	subset.o \
 	kmer_filters.o \
+	partitioning.o \
 	assembler.o \
 	alphabets.o \
 	murmur3.o \
@@ -264,6 +265,7 @@ KHMER_HEADERS= \
 	read_parsers.hh \
 	subset.hh \
 	kmer_filters.hh \
+	partitioning.hh \
 	assembler.hh \
 	alphabets.hh \
 	storage.hh
@@ -287,7 +289,7 @@ install: $(LIBKHMERSO) liboxli.a oxli.pc $(KHMER_HEADERS)
 		../third-party/smhasher/MurmurHash3.h 	\
 		$(PREFIX)/include/oxli/
 	cp oxli.pc $(PREFIX)/lib/pkgconfig/
-	cp $(LIBKHMERSO) liboxli.a $(PREFIX)/lib
+	cp $(LIBKHMERSO) liboxli.a $(PREFIX)/lib/
 	ln -sf $(PREFIX)/lib/$(LIBKHMERSO) $(PREFIX)/lib/liboxli.$(SHARED_EXT)
 
 oxli.pc: oxli.pc.in

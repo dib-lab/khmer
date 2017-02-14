@@ -205,8 +205,7 @@ for cython_ext in glob.glob(os.path.join("khmer", "_oxli", "*.pyx")):
         }
     
     ext_name = "khmer._oxli.{0}".format(splitext(os.path.basename(cython_ext))[0])
-    CY_EXTENSION_MOD = Extension(ext_name, ** CY_EXTENSION_MOD_DICT)
-    EXTENSION_MODS.append(CY_EXTENSION_MOD)
+    EXTENSION_MODS.append(Extension(ext_name, ** CY_EXTENSION_MOD_DICT))
 
 SCRIPTS = []
 SCRIPTS.extend([path_join("scripts", script)

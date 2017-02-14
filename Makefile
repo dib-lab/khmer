@@ -37,6 +37,8 @@
 
 # `SHELL=bash` Will break Titus's laptop, so don't use BASH-isms like
 # `[[` conditional expressions.
+#
+PREFIX=/usr/local
 CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc khmer/*.hh) setup.py
 CYSOURCES=$(wildcard khmer/_oxli/*.pxd khmer/_oxli/*.pyx) setup.py
 PYSOURCES=$(filter-out khmer/_version.py, \
@@ -276,6 +278,10 @@ doc/doxygen/html/index.html: $(CPPSOURCES) $(PYSOURCES)
 lib: FORCE
 	cd lib && \
 	$(MAKE)
+
+install-lib: lib
+	cd lib && $(MAKE) install PREFIX=$(PREFIX)
+	cp -r khmer/_cpy_*.hh khmer/_khmer.hh $(PREFIX)/include/oxli/
 
 # Runs a test of ./lib
 libtest: FORCE
