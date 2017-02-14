@@ -38,7 +38,6 @@ Contact: khmer-project@idyll.org
 #ifndef HASHTABLE_HH
 #define HASHTABLE_HH
 
-
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -50,6 +49,8 @@ Contact: khmer-project@idyll.org
 #include <set>
 #include <string>
 #include <vector>
+#include <memory>
+#include "MurmurHash3.h"
 
 #include "khmer.hh"
 #include "khmer_exception.hh"
@@ -57,6 +58,8 @@ Contact: khmer-project@idyll.org
 #include "read_parsers.hh"
 #include "storage.hh"
 #include "subset.hh"
+
+using namespace std;
 
 namespace khmer
 {
@@ -71,6 +74,9 @@ namespace khmer
 
 namespace khmer
 {
+
+typedef std::unique_ptr<KmerHashIterator> KmerHashIteratorPtr;
+    
 class Hashtable: public
     KmerFactory  		// Base class implementation of a Bloom ht.
 {
@@ -110,6 +116,15 @@ protected:
 
     explicit Hashtable(const Hashtable&);
     Hashtable& operator=(const Hashtable&);
+
+    virtual KmerHashIteratorPtr new_kmer_iterator(const char * sp) const {
+        KmerHashIterator * ki = new TwoBitKmerHashIterator(sp, _ksize);
+        return unique_ptr<KmerHashIterator>(ki);
+    }
+
+    virtual KmerHashIteratorPtr new_kmer_iterator(const std::string& s) const {
+        return new_kmer_iterator(s.c_str());
+    }
 
 public:
     // accessor to get 'k'
@@ -320,6 +335,33 @@ class Counttable : public khmer::Hashtable
 public:
     explicit Counttable(WordLength ksize, std::vector<uint64_t> sizes)
         : Hashtable(ksize, new ByteStorage(sizes)) { } ;
+
+    inline
+    virtual
+    HashIntoType
+    hash_dna(const char * kmer) const {
+        if (!(strlen(kmer) >= _ksize)) {
+            throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
+        }
+        return _hash_murmur(kmer, _ksize);
+    }
+
+    inline virtual HashIntoType
+    hash_dna_top_strand(const char * kmer) const {
+        throw khmer_exception("not implemented");
+    }
+
+    inline virtual HashIntoType
+    hash_dna_bottom_strand(const char * kmer) const {
+        throw khmer_exception("not implemented");
+    }
+
+    inline virtual std::string
+    unhash_dna(HashIntoType hashval) const {
+        throw khmer_exception("not implemented");
+    }
+
+    virtual KmerHashIteratorPtr new_kmer_iterator(const char * sp) const;
 };
 
 // Hashtable-derived class with NibbleStorage.
