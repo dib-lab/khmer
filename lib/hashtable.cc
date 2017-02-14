@@ -335,20 +335,19 @@ uint64_t * Hashtable::abundance_distribution(
         } catch (NoMoreReadsAvailable &exc) {
             break;
         }
-        seq = read.sequence;
+        read.set_clean_seq();
+        seq = read.cleaned_seq;
 
-        if (check_and_normalize_read(seq)) {
-            KmerHashIteratorPtr kmers = new_kmer_iterator(seq);
+        KmerHashIteratorPtr kmers = new_kmer_iterator(seq);
 
-            while(!kmers->done()) {
-                HashIntoType kmer = kmers->next();
+        while(!kmers->done()) {
+            HashIntoType kmer = kmers->next();
 
-                if (!tracking->get_count(kmer)) {
-                    tracking->count(kmer);
+            if (!tracking->get_count(kmer)) {
+                tracking->count(kmer);
 
-                    BoundedCounterType n = get_count(kmer);
-                    dist[n]++;
-                }
+                BoundedCounterType n = get_count(kmer);
+                dist[n]++;
             }
 
             name.clear();
