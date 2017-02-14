@@ -42,41 +42,22 @@ import pytest
 from . import khmer_tst_utils as utils
 
 
-def test_countgraph_vs_table():
-    x = khmer.Counttable(4, 21, 3)
-    y = khmer.Countgraph(4, 21, 3)
+def test_get_kmer_hashes():
+    s = "ATGGATATGGAGGACAAGTATATGGAGGACAAGTATATGGAGGACAAGTAT"
+    a = khmer.Counttable(33, 1e6, 3)
+    assert a.get_kmer_hashes(s[:33]) == [4743239192574154715]
+    assert a.get_kmer_hashes(s[:34]) == [4743239192574154715,
+                                         2122462908541313313]
 
-    assert hasattr(x, 'add')
-    assert hasattr(y, 'add')
-
-    assert not hasattr(x, 'consume_and_tag')
-    assert hasattr(y, 'consume_and_tag')
-
-
-def test_nodegraph_vs_table():
-    x = khmer.Nodetable(4, 21, 3)
-    y = khmer.Nodegraph(4, 21, 3)
-
-    assert hasattr(x, 'add')
-    assert hasattr(y, 'add')
-
-    assert not hasattr(x, 'consume_and_tag')
-    assert hasattr(y, 'consume_and_tag')
+    assert a.get_kmer_hashes(s[0:33]) == [4743239192574154715]
+    assert a.get_kmer_hashes(s[1:34]) == [2122462908541313313]
 
 
-def test_counttable_no_unhash():
-    x = khmer.Counttable(4, 21, 3)
-
-    with pytest.raises(ValueError):
-        x.reverse_hash(1)
-
-
-def test_smallcountgraph_vs_table():
-    x = khmer.SmallCounttable(4, 21, 3)
-    y = khmer.SmallCountgraph(4, 21, 3)
-
-    assert hasattr(x, 'add')
-    assert hasattr(y, 'add')
-
-    assert not hasattr(x, 'consume_and_tag')
-    assert hasattr(y, 'consume_and_tag')
+@pytest.mark.parametrize('kmer', [
+    ('GATTACA' * 3),
+    ('ATG' * 7),
+    ('AGGACAAGTATATGGAGGACA'),
+])
+def test_kmer_revcom_hash(kmer):
+    a = khmer.Counttable(21, 1e4, 3)
+    assert a.hash(kmer) == a.hash(khmer.reverse_complement(kmer))
