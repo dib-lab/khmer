@@ -32,6 +32,9 @@ under semantic versioning, but will be in future versions of khmer.
   SmallCounttable and SmallCountgraph.
 - Added `cleaned_seq` attribute to `khmer.Read` class which provides a cleaned
   version of the sequence of each read.
+- New function `consume_fasta_banding` for bulk loading of sequences into
+  hashtables. Only k-mers whose hashed values fall within a specified range are
+  counted.
 
 ### Changed
 - Switch from nose to py.test as the testing framework.
