@@ -130,6 +130,8 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
         string unhash_dna(HashIntoType) const
         void count(const char *)
         void count(HashIntoType)
+        void add(const char *)
+        void add(HashIntoType)
         const BoundedCounterType get_count(const char *) const
         const BoundedCounterType get_count(HashIntoType) const
         void save(string)
