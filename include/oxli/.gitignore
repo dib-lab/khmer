@@ -1,0 +1,11 @@
+test-Parser
+test-HashTables
+test-read-aligner
+ht-diff
+chkomp
+*.pc
+*.swp
+*.so
+*.so.*
+*.a
+*.dylib*
