@@ -58,7 +58,7 @@ def main():
 
     # load contigs, connect into N partitions
     print('loading contigs from', contigfile)
-    ht.consume_fasta_and_tag(contigfile)
+    ht.consume_seqfile_and_tag(contigfile)
     subset = ht.do_subset_partition(0, 0)
     ht.merge_subset(subset)
 

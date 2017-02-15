@@ -75,7 +75,7 @@ def test_error_create():
 def test_n_labels():
     lh = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
-    lh.consume_fasta_and_tag_with_labels(filename)
+    lh.consume_seqfile_and_tag_with_labels(filename)
 
     print(lh.n_labels())
     assert lh.n_labels() == 4
@@ -84,7 +84,7 @@ def test_n_labels():
 def test_get_all_labels():
     lb = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
-    lb.consume_fasta_and_tag_with_labels(filename)
+    lb.consume_seqfile_and_tag_with_labels(filename)
 
     labels = lb.get_all_labels()
     expected = [0, 1, 2, 3]
@@ -97,7 +97,7 @@ def test_get_all_labels():
 def test_get_labels_save_load():
     lb_pre = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
-    lb_pre.consume_fasta_and_tag_with_labels(filename)
+    lb_pre.consume_seqfile_and_tag_with_labels(filename)
 
     # save labels to a file
     savepath = utils.get_temp_filename('saved.labels')
@@ -121,7 +121,7 @@ def test_get_labels_save_load():
 def test_get_labels_save_load_wrong_ksize():
     lb_pre = GraphLabels(19, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
-    lb_pre.consume_fasta_and_tag_with_labels(filename)
+    lb_pre.consume_seqfile_and_tag_with_labels(filename)
 
     # save labels to a file
     savepath = utils.get_temp_filename('saved.labels')
@@ -143,7 +143,7 @@ def test_get_labels_save_load_wrong_ksize():
 def test_save_load_corrupted():
     lb_pre = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
-    lb_pre.consume_fasta_and_tag_with_labels(filename)
+    lb_pre.consume_seqfile_and_tag_with_labels(filename)
 
     # save labels to a file
     savepath = utils.get_temp_filename('saved.labels')
@@ -174,7 +174,7 @@ def test_save_load_corrupted():
 def test_save_fail_readonly():
     lb_pre = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
-    lb_pre.consume_fasta_and_tag_with_labels(filename)
+    lb_pre.consume_seqfile_and_tag_with_labels(filename)
 
     # save labels to a file
     savepath = utils.get_temp_filename('saved.labels')
@@ -193,7 +193,7 @@ def test_save_fail_readonly():
 def test_get_tag_labels():
     lb = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('single-read.fq')
-    lb.consume_fasta_and_tag_with_labels(filename)
+    lb.consume_seqfile_and_tag_with_labels(filename)
     tag = 173473779682
 
     labels = lb.get_tag_labels(tag)
@@ -201,12 +201,12 @@ def test_get_tag_labels():
     assert labels.pop() == 0
 
 
-def test_consume_fasta_and_tag_with_labels():
+def test_consume_seqfile_and_tag_with_labels():
     lb = GraphLabels(20, 1e7, 4)
     read_1 = 'ACGTAACCGGTTAAACCCGGGTTTAAAACCCCGGGGTTTT'
     filename = utils.get_test_data('test-transcript.fa')
 
-    total_reads, _ = lb.consume_fasta_and_tag_with_labels(filename)
+    total_reads, _ = lb.consume_seqfile_and_tag_with_labels(filename)
     print("doing get")
     assert lb.graph.get(read_1[:20])
     assert total_reads == 3
@@ -259,7 +259,7 @@ def test_consume_sequence_and_tag_with_labels():
 def test_sweep_tag_neighborhood():
     lb = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('single-read.fq')
-    lb.graph.consume_fasta_and_tag(filename)
+    lb.graph.consume_seqfile_and_tag(filename)
 
     tags = lb.sweep_tag_neighborhood('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
     assert len(tags) == 1
@@ -269,7 +269,7 @@ def test_sweep_tag_neighborhood():
 def test_sweep_label_neighborhood():
     lb = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('single-read.fq')
-    lb.consume_fasta_and_tag_with_labels(filename)
+    lb.consume_seqfile_and_tag_with_labels(filename)
 
     labels = lb.sweep_label_neighborhood('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
     assert len(labels) == 1
@@ -286,7 +286,7 @@ def test_sweep_label_neighborhood():
 def test_label_tag_correctness():
     lb = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
-    lb.consume_fasta_and_tag_with_labels(filename)
+    lb.consume_seqfile_and_tag_with_labels(filename)
 
     # read A
     labels = lb.sweep_label_neighborhood(
@@ -332,7 +332,7 @@ def test_label_tag_correctness():
 def test_counting_label_tag_correctness():
     lb = CountingGraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
-    lb.consume_fasta_and_tag_with_labels(filename)
+    lb.consume_seqfile_and_tag_with_labels(filename)
 
     # read A
     labels = lb.sweep_label_neighborhood(
@@ -378,7 +378,7 @@ def test_counting_label_tag_correctness():
 def test_label_tag_correctness_save_load():
     lb_pre = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
-    lb_pre.consume_fasta_and_tag_with_labels(filename)
+    lb_pre.consume_seqfile_and_tag_with_labels(filename)
 
     # save labels to a file
     savepath = utils.get_temp_filename('saved.labels')

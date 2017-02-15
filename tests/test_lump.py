@@ -47,7 +47,7 @@ def test_fakelump_together():
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
     ht = khmer.Nodegraph(32, 1e5, 4)
-    ht.consume_fasta_and_tag(fakelump_fa)
+    ht.consume_seqfile_and_tag(fakelump_fa)
 
     subset = ht.do_subset_partition(0, 0)
     ht.merge_subset(subset)
@@ -63,7 +63,7 @@ def test_fakelump_stop():
     fakelump_stoptags_txt = utils.get_test_data('fakelump.fa.stoptags.txt')
 
     ht = khmer.Nodegraph(32, 1e5, 4)
-    ht.consume_fasta_and_tag(fakelump_fa)
+    ht.consume_seqfile_and_tag(fakelump_fa)
 
     for line in open(fakelump_stoptags_txt):
         ht.add_stop_tag(line.strip())
@@ -81,7 +81,7 @@ def test_fakelump_stop2():
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
     ht = khmer.Nodegraph(32, 1e5, 4)
-    ht.consume_fasta_and_tag(fakelump_fa)
+    ht.consume_seqfile_and_tag(fakelump_fa)
 
     ht.add_stop_tag('GGGGAGGGGTGCAGTTGTGACTTGCTCGAGAG')
 
@@ -99,7 +99,7 @@ def test_fakelump_repartitioning():
     fakelump_fa_foo = utils.get_temp_filename('fakelump.fa.stopfoo')
 
     ht = khmer.Nodegraph(32, 1e5, 4)
-    ht.consume_fasta_and_tag(fakelump_fa)
+    ht.consume_seqfile_and_tag(fakelump_fa)
 
     subset = ht.do_subset_partition(0, 0)
     ht.merge_subset(subset)
@@ -127,7 +127,7 @@ def test_fakelump_repartitioning():
     # ok, now re-do everything with these stop tags, specifically.
 
     ht = khmer.Nodegraph(32, 1e5, 4)
-    ht.consume_fasta_and_tag(fakelump_fa)
+    ht.consume_seqfile_and_tag(fakelump_fa)
     ht.load_stop_tags(fakelump_fa_foo)
 
     subset = ht.do_subset_partition(0, 0, True)
@@ -142,7 +142,7 @@ def test_fakelump_load_stop_tags_trunc():
     fakelump_fa_foo = utils.get_temp_filename('fakelump.fa.stopfoo')
 
     ht = khmer.Nodegraph(32, 1e5, 4)
-    ht.consume_fasta_and_tag(fakelump_fa)
+    ht.consume_seqfile_and_tag(fakelump_fa)
 
     subset = ht.do_subset_partition(0, 0)
     ht.merge_subset(subset)
@@ -174,7 +174,7 @@ def test_fakelump_load_stop_tags_trunc():
 
     # ok, now try loading these stop tags; should fail.
     ht = khmer._Nodegraph(32, [5, 7, 11, 13])
-    ht.consume_fasta_and_tag(fakelump_fa)
+    ht.consume_seqfile_and_tag(fakelump_fa)
 
     try:
         ht.load_stop_tags(fakelump_fa_foo)

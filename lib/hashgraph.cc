@@ -277,18 +277,18 @@ void Hashgraph::consume_sequence_and_tag(const std::string& seq,
 
 // TODO? Inline in header.
 template<typename SeqIO>
-void Hashgraph::consume_fasta_and_tag(
+void Hashgraph::consume_seqfile_and_tag(
         std::string const &filename,
         unsigned int &total_reads,
         unsigned long long &n_consumed
 )
 {
     ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
-    consume_fasta_and_tag<SeqIO>(parser, total_reads, n_consumed);
+    consume_seqfile_and_tag<SeqIO>(parser, total_reads, n_consumed);
 }
 
 template<typename SeqIO>
-void Hashgraph::consume_fasta_and_tag(
+void Hashgraph::consume_seqfile_and_tag(
         ReadParserPtr<SeqIO>& parser,
         unsigned int &total_reads,
         unsigned long long &n_consumed
@@ -889,13 +889,13 @@ void Nodegraph::update_from(const Nodegraph &otherBASE)
     }
 }
 
-template void Hashgraph::consume_fasta_and_tag<read_parsers::FastxReader>(
+template void Hashgraph::consume_seqfile_and_tag<read_parsers::FastxReader>(
     std::string const &filename,
     unsigned int &total_reads,
     unsigned long long &n_consumed
 );
 
-template void Hashgraph::consume_fasta_and_tag<read_parsers::FastxReader>(
+template void Hashgraph::consume_seqfile_and_tag<read_parsers::FastxReader>(
     FastxParserPtr& parser,
     unsigned int &total_reads,
     unsigned long long &n_consumed

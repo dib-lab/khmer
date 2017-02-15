@@ -68,14 +68,14 @@ namespace khmer
  */
 
 template<typename SeqIO>
-void LabelHash::consume_fasta_and_tag_with_labels(
+void LabelHash::consume_seqfile_and_tag_with_labels(
     std:: string const  &filename,
     unsigned int	      &total_reads, unsigned long long	&n_consumed,
     CallbackFn	      callback,	    void *		callback_data
 )
 {
     ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
-    consume_fasta_and_tag_with_labels<SeqIO>(
+    consume_seqfile_and_tag_with_labels<SeqIO>(
         parser,
         total_reads, n_consumed,
         callback, callback_data
@@ -83,7 +83,7 @@ void LabelHash::consume_fasta_and_tag_with_labels(
 }
 
 template<typename SeqIO>
-void LabelHash::consume_fasta_and_tag_with_labels(
+void LabelHash::consume_seqfile_and_tag_with_labels(
     ReadParserPtr<SeqIO>& parser,
     unsigned int		    &total_reads,   unsigned long long	&n_consumed,
     CallbackFn		    callback,	    void *		callback_data
@@ -131,7 +131,7 @@ void LabelHash::consume_fasta_and_tag_with_labels(
         if (total_reads_TL % CALLBACK_PERIOD == 0 && callback) {
             std::cout << "n tags: " << graph->all_tags.size() << "\n";
             try {
-                callback("consume_fasta_and_tag_with_labels", callback_data,
+                callback("consume_seqfile_and_tag_with_labels", callback_data,
                          total_reads_TL,
                          n_consumed);
             } catch (...) {
@@ -612,14 +612,14 @@ void LabelHash::label_across_high_degree_nodes(const char * s,
     }
 }
 
-template void LabelHash::consume_fasta_and_tag_with_labels<FastxReader>(
+template void LabelHash::consume_seqfile_and_tag_with_labels<FastxReader>(
     std:: string const &filename,
     unsigned int &total_reads,
     unsigned long long &n_consumed,
     CallbackFn callback,
     void * callback_data
 );
-template void LabelHash::consume_fasta_and_tag_with_labels<FastxReader>(
+template void LabelHash::consume_seqfile_and_tag_with_labels<FastxReader>(
     ReadParserPtr<FastxReader>& parser,
     unsigned int &total_reads,
     unsigned long long &n_consumed,
