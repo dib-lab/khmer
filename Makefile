@@ -39,8 +39,8 @@
 # `[[` conditional expressions.
 #
 PREFIX=/usr/local
-CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc khmer/*.hh) setup.py
-CYSOURCES=$(wildcard khmer/_oxli/*.pxd khmer/_oxli/*.pyx) setup.py
+CPPSOURCES=$(wildcard src/oxli/*.cc include/oxli/*.hh src/khmer/_cpy_*.cc include/khmer/_cpy_*.hh) setup.py
+CYSOURCES=$(wildcard khmer/_oxli/*.pxd khmer/_oxli/*.pyx)
 PYSOURCES=$(filter-out khmer/_version.py, \
 	  $(wildcard khmer/*.py scripts/*.py oxli/*.py) )
 SOURCES=$(PYSOURCES) $(CPPSOURCES) $(CYSOURCES) setup.py
@@ -128,11 +128,11 @@ dist/khmer-$(VERSION).tar.gz: $(SOURCES)
 
 ## clean       : clean up all temporary / machine-generated files
 clean: FORCE
-	cd lib && $(MAKE) clean || true
+	cd src/oxli && $(MAKE) clean || true
 	cd tests && rm -rf khmertest_* || true
 	rm -f pytest_runner-*.egg pytests.xml
 	rm -f $(EXTENSION_MODULE)
-	rm -f khmer/*.pyc lib/*.pyc scripts/*.pyc tests/*.pyc oxli/*.pyc \
+	rm -f khmer/*.pyc scripts/*.pyc tests/*.pyc oxli/*.pyc \
 		sandbox/*.pyc khmer/__pycache__/* sandbox/__pycache__/* \
 		khmer/_oxli/*.cpp
 	./setup.py clean --all || true
@@ -275,19 +275,19 @@ doc/doxygen/html/index.html: $(CPPSOURCES) $(PYSOURCES)
 		sed "s=\$${INCLUDES}=$(INCLUDESTRING)=" > Doxyfile
 	doxygen
 
-lib: FORCE
-	cd lib && \
+liboxli: FORCE
+	cd src/oxli && \
 	$(MAKE)
 
-install-lib: lib
-	cd lib && $(MAKE) install PREFIX=$(PREFIX)
-	cp -r khmer/_cpy_*.hh khmer/_khmer.hh $(PREFIX)/include/oxli/
+install-liboxli: liboxli
+	cd src/oxli && $(MAKE) install PREFIX=$(PREFIX)
+	cp -r include/khmer/_cpy_*.hh $(PREFIX)/include/oxli/
 
 # Runs a test of ./lib
 libtest: FORCE
 	rm -rf install_target
 	mkdir -p install_target
-	cd lib && \
+	cd src/oxli && \
 	 $(MAKE) clean && \
 	 $(MAKE) all && \
 	 $(MAKE) install PREFIX=../install_target
