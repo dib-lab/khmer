@@ -166,7 +166,6 @@ EXTRA_LINK_ARGS = []
 
 if sys.platform == 'darwin':
     # force 64bit only builds
-    print('OSX')
     EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64', '-mmacosx-version-min=10.7',
                                '-stdlib=libc++'])
     EXTRA_LINK_ARGS.append('-mmacosx-version-min=10.7')
