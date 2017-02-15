@@ -38,13 +38,13 @@
 #
 # Example:
 #
-# $ file --magic-file lib/magic tests/test-data/normC20k20.ct
+# $ file --magic-file include/oxli/magic tests/test-data/normC20k20.ct
 # tests/test-data/normC20k20.ct: Binary from the khmer project, file format version 4, k-mer countgraph
 #
-# $ file --magic-file lib/magic --mime-type tests/test-data/normC20k20.ct
+# $ file --magic-file include/oxli/magic --mime-type tests/test-data/normC20k20.ct
 # tests/test-data/normC20k20.ct: application/vnd.oxli.countgraph
 #
-# $ file --magic-file lib/magic --extension tests/test-data/normC20k20.ct
+# $ file --magic-file include/oxli/magic --extension tests/test-data/normC20k20.ct
 # tests/test-data/normC20k20.ct: oxlicg
 #
 # See also:
