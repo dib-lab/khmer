@@ -68,11 +68,11 @@ INCLUDEOPTS=$(shell gcc -E -x c++ - -v < /dev/null 2>&1 >/dev/null \
 PYINCLUDE=$(shell python -c \
 	  "import sysconfig;print(sysconfig.get_path('include'))")
 
-CPPCHECK=ls lib/*.cc khmer/_khmer.cc | grep -v test | cppcheck -DNDEBUG \
+CPPCHECK=ls src/oxli/*.cc src/khmer/*.cc | grep -v test | cppcheck -DNDEBUG \
 	 -DVERSION=0.0.cppcheck -DSEQAN_HAS_BZIP2=1 -DSEQAN_HAS_ZLIB=1 \
 	 -UNO_UNIQUE_RC --enable=all --suppress='*:/usr/*' \
 	 --suppress='*:$(PYINCLUDE)/*' --file-list=- --platform=unix64 \
-	 --std=c++11 --inline-suppr --quiet -Ilib -Ithird-party/bzip2 \
+	 --std=c++11 --inline-suppr --quiet --verbose -Iinclude -Ithird-party/bzip2 \
 	 -Ithird-party/zlib -Ithird-party/smhasher -I$(PYINCLUDE) \
 	 $(DEFINES) $(INCLUDEOPTS)
 
@@ -271,7 +271,7 @@ doxygen: doc/doxygen/html/index.html
 
 doc/doxygen/html/index.html: $(CPPSOURCES) $(PYSOURCES)
 	mkdir -p doc/doxygen
-	sed "s=\$${VERSION}=$$(python ./lib/get_version.py)=" Doxyfile.in | \
+	sed "s=\$${VERSION}=$(VERSION)=" Doxyfile.in | \
 		sed "s=\$${INCLUDES}=$(INCLUDESTRING)=" > Doxyfile
 	doxygen
 
@@ -283,7 +283,7 @@ install-liboxli: liboxli
 	cd src/oxli && $(MAKE) install PREFIX=$(PREFIX)
 	cp -r include/khmer/_cpy_*.hh $(PREFIX)/include/oxli/
 
-# Runs a test of ./lib
+# Runs a test of liboxli
 libtest: FORCE
 	rm -rf install_target
 	mkdir -p install_target
@@ -292,15 +292,15 @@ libtest: FORCE
 	 $(MAKE) all && \
 	 $(MAKE) install PREFIX=../install_target
 	test -d install_target/include
-	test -f install_target/include/oxli/khmer.hh
+	test -f install_target/include/oxli/oxli.hh
 	test -d install_target/lib
 	test -f install_target/lib/liboxli.a
 	$(CXX) -std=c++11 -o install_target/test-prog-static \
-		-I install_target/include lib/test-compile.cc \
+		-I install_target/include src/oxli/test-compile.cc \
 		install_target/lib/liboxli.a
 	$(CXX) -std=c++11 -o install_target/test-prog-dynamic \
 		-I install_target/include -L install_target/lib \
-		lib/test-compile.cc -loxli
+		src/oxli/test-compile.cc -loxli
 	rm -rf install_target
 
 ## test        : run the khmer test suite
@@ -309,12 +309,12 @@ test: FORCE
 	py.test -m ${TESTATTR}
 
 sloccount.sc: $(CPPSOURCES) $(PYSOURCES) $(wildcard tests/*.py) Makefile
-	sloccount --duplicates --wide --details lib khmer scripts tests \
+	sloccount --duplicates --wide --details include src khmer scripts tests \
 		setup.py Makefile > sloccount.sc
 
 ## sloccount   : count lines of code
 sloccount:
-	sloccount lib khmer scripts tests setup.py Makefile
+	sloccount src include khmer scripts tests setup.py Makefile
 
 coverity-build:
 	if [ -x "${cov_analysis_dir}/bin/cov-build" ]; \
