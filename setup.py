@@ -169,6 +169,7 @@ if sys.platform == 'darwin':
     print('OSX')
     EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64', '-mmacosx-version-min=10.7',
                                '-stdlib=libc++'])
+    EXTRA_LINK_ARGS.append('-mmacosx-version-min=10.7')
 else:
     EXTRA_COMPILE_ARGS.append('-fdiagnostics-color')
 
