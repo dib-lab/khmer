@@ -133,6 +133,8 @@ BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
 BUILD_DEPENDS.extend(path_join("khmer", bn + ".hh") for bn in [
     "_cpy_counttable", "_cpy_hashgraph", "_cpy_nodetable",
     "_cpy_smallcounttable", "_cpy_smallcountgraph"])
+BUILD_DEPENDS += [path_join("lib", "rabinkarphash.h"),
+                  path_join("lib", "characterhash.h")]
 
 SOURCES = ["khmer/_khmer.cc"]
 SOURCES.extend(path_join("lib", bn + ".cc") for bn in [

@@ -46,6 +46,9 @@ Contact: khmer-project@idyll.org
 
 #include "khmer.hh"
 
+#include "rabinkarphash.h"
+
+
 // test validity
 #ifdef KHMER_EXTRA_SANITY_CHECKS
 #   define is_valid_dna(ch) ((toupper(ch)) == 'A' || (toupper(ch)) == 'C' || \
@@ -402,6 +405,98 @@ public:
 
     virtual unsigned int get_end_pos() const {
         return iter.get_end_pos();
+    }
+};
+
+class MurmurKmerHashIterator : public KmerHashIterator
+{
+    const char * _seq;
+    const char _ksize;
+    unsigned int index;
+    unsigned int length;
+    bool _initialized;
+public:
+    MurmurKmerHashIterator(const char * seq, unsigned char k) :
+        _seq(seq), _ksize(k), index(0), _initialized(false) {
+        length = strlen(_seq);
+    };
+
+    HashIntoType first() { _initialized = true; return next(); }
+
+    HashIntoType next() {
+        if (!_initialized) { _initialized = true; }
+
+        if (done()) {
+            throw khmer_exception("past end of iterator");
+        }
+
+        std::string kmer;
+        kmer.assign(_seq + index, _ksize);
+        index += 1;
+        return _hash_murmur(kmer, _ksize);
+    }
+
+    bool done() const {
+        return (index + _ksize > length);
+    }
+
+    unsigned int get_start_pos() const {
+        if (!_initialized) { return 0; }
+        return index - 1;
+    }
+    unsigned int get_end_pos() const {
+        if (!_initialized) { return _ksize; }
+        return index + _ksize - 1;
+    }
+};
+
+
+class KarpRabinKmerHashIterator : public KmerHashIterator
+{
+    const char * _seq;
+    const char _ksize;
+    unsigned int index;
+    unsigned int length;
+    bool _initialized;
+    KarpRabinHash<uint64_t> hasher;
+public:
+    KarpRabinKmerHashIterator(const char * seq, unsigned char k) :
+        _seq(seq), _ksize(k), index(0), _initialized(false), hasher(k, 64) {
+        length = strlen(_seq);
+    };
+
+    HashIntoType first() {
+        _initialized = true;
+        char i = 0;
+        for (; i < _ksize; ++i) {
+            hasher.eat(*(_seq + i));
+        }
+        index = i;
+        return hasher.hashvalue;
+    }
+
+    HashIntoType next() {
+        if (!_initialized) { _initialized = true; }
+
+        if (done()) {
+            throw khmer_exception("past end of iterator");
+        }
+
+        hasher.update(*(_seq + index), *(_seq + index + 1));
+        index += 1;
+        return hasher.hashvalue;
+    }
+
+    bool done() const {
+        return (index + _ksize > length);
+    }
+    unsigned int get_start_pos() const {
+        if (!_initialized) { return 0; }
+        return index - 1;
+    }
+    unsigned int get_end_pos() const {
+        if (!_initialized) { return _ksize; }
+        return index + _ksize - 1;
     }
 };
 
