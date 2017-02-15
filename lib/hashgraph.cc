@@ -271,8 +271,8 @@ void Hashgraph::consume_sequence_and_tag(const std::string& seq,
 }
 
 //
-// consume_fasta_and_tag: consume a FASTA file of reads, tagging reads every
-//     so often.
+// consume_seqfile_and_tag: consume a file containing reads, tagging reads every
+//                          so often
 //
 
 // TODO? Inline in header.

@@ -217,10 +217,7 @@ public:
     unsigned int check_and_process_read(std::string &read,
                                         bool &is_valid);
 
-    // Count every k-mer in a FASTA or FASTQ file.
-    // Note: Yes, the name 'consume_fasta' is a bit misleading,
-    //       but the FASTA format is effectively a subset of the FASTQ format
-    //       and the FASTA portion is what we care about in this case.
+    // Count every k-mer in a file containing nucleotide sequences.
     template<typename SeqIO>
     void consume_seqfile(
         std::string const &filename,
@@ -228,7 +225,7 @@ public:
         unsigned long long &n_consumed
     );
 
-    // Count every k-mer from a stream of FASTA or FASTQ reads,
+    // Count every k-mer in a file containing nucleotide sequences,
     // using the supplied parser.
     template<typename SeqIO>
     void consume_seqfile(

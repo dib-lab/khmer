@@ -63,7 +63,7 @@ namespace khmer
 
 /*
  * @camillescott
- * Might be time for a refactor: could do a general consume_fasta
+ * Might be time for a refactor: could do a general consume_seqfile
  * function which accepts a consume_sequence function pointer as a parameter
  */
 

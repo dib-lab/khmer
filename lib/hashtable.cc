@@ -105,7 +105,7 @@ bool Hashtable::check_and_normalize_read(std::string &read) const
 }
 
 //
-// consume_fasta: consume a FASTA file of reads
+// consume_seqfile: consume a file of reads
 //
 
 // TODO? Inline in header.
