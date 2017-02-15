@@ -39,7 +39,7 @@ Contact: khmer-project@idyll.org
 
 #include <functional>
 
-#include "khmer.hh"
+#include "oxli.hh"
 #include "kmer_hash.hh"
 #include "hashgraph.hh"
 #include "kmer_filters.hh"
@@ -47,7 +47,7 @@ Contact: khmer-project@idyll.org
 #include "labelhash.hh"
 
 
-namespace khmer
+namespace oxli
 {
 
 class Hashgraph;
@@ -173,5 +173,5 @@ public:
                             StringVector& paths) const;
 
 };
-} //namespace khmer
+} //namespace oxli
 #endif

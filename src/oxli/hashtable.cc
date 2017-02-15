@@ -45,14 +45,14 @@ Contact: khmer-project@idyll.org
 #include <queue>
 #include <set>
 
-#include "hashtable.hh"
-#include "khmer.hh"
-#include "traversal.hh"
-#include "read_parsers.hh"
+#include "oxli/hashtable.hh"
+#include "oxli/oxli.hh"
+#include "oxli/traversal.hh"
+#include "oxli/read_parsers.hh"
 
 using namespace std;
-using namespace khmer;
-using namespace khmer:: read_parsers;
+using namespace oxli;
+using namespace oxli:: read_parsers;
 
 //
 // check_and_process_read: checks for non-ACGT characters before consuming
@@ -183,7 +183,7 @@ void Hashtable::get_median_count(const std::string &s,
     this->get_kmer_counts(s, counts);
 
     if (!counts.size()) {
-        throw khmer_exception("no k-mer counts for this string; too short?");
+        throw oxli_exception("no k-mer counts for this string; too short?");
     }
 
     average = 0;
@@ -346,7 +346,7 @@ Hashtable::abundance_distribution(
     // if not, could lead to overflow.
     if (sizeof(BoundedCounterType) != 2) {
         delete[] dist;
-        throw khmer_exception();
+        throw oxli_exception();
     }
 
     while(!parser->is_complete()) {
@@ -467,7 +467,7 @@ const
 {
     std::vector<unsigned int> posns;
     if (!check_and_normalize_read(seq)) {
-        throw khmer_exception("invalid read");
+        throw oxli_exception("invalid read");
     }
 
     KmerIterator kmers(seq.c_str(), _ksize);

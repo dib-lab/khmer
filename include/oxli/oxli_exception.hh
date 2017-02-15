@@ -41,7 +41,7 @@ Contact: khmer-project@idyll.org
 #include <exception>
 #include <string>
 
-namespace khmer
+namespace oxli
 {
 
 ///
@@ -49,13 +49,13 @@ namespace khmer
 //
 // All exceptions should be derived from this base class or a sub-class
 //
-class khmer_exception : public std::exception
+class oxli_exception : public std::exception
 {
 public:
-    explicit khmer_exception(const std::string& msg = "Generic khmer exception")
+    explicit oxli_exception(const std::string& msg = "Generic oxli exception")
         : _msg(msg) { }
 
-    virtual ~khmer_exception() throw() { }
+    virtual ~oxli_exception() throw() { }
     virtual const char* what() const throw ()
     {
         return _msg.c_str();
@@ -71,39 +71,39 @@ protected:
 ///
 // A base class for file exceptions.
 //
-class khmer_file_exception : public khmer_exception
+class oxli_file_exception : public oxli_exception
 {
 public:
-    explicit khmer_file_exception(const std::string& msg)
-        : khmer_exception(msg) { }
+    explicit oxli_file_exception(const std::string& msg)
+        : oxli_exception(msg) { }
 };
 
 // A base exception for value exceptions
-class khmer_value_exception : public khmer_exception
+class oxli_value_exception : public oxli_exception
 {
 public:
-    explicit khmer_value_exception(const std::string& msg)
-        : khmer_exception(msg) { }
+    explicit oxli_value_exception(const std::string& msg)
+        : oxli_exception(msg) { }
 };
 
 /////// Specialised Exceptions /////
 
-class InvalidStream : public khmer_file_exception
+class InvalidStream : public oxli_file_exception
 {
 public:
     InvalidStream()
-        : khmer_file_exception("Generic InvalidStream error") {}
+        : oxli_file_exception("Generic InvalidStream error") {}
     explicit InvalidStream(const std::string& msg)
-        : khmer_file_exception(msg) {}
+        : oxli_file_exception(msg) {}
 };
 
-class StreamReadError : public khmer_file_exception
+class StreamReadError : public oxli_file_exception
 {
 public:
     StreamReadError()
-        : khmer_file_exception("Generic StreamReadError error") {}
+        : oxli_file_exception("Generic StreamReadError error") {}
     explicit StreamReadError(const std::string& msg)
-        : khmer_file_exception(msg) {}
+        : oxli_file_exception(msg) {}
 };
 
 
@@ -111,25 +111,25 @@ public:
 // An exception for invalid arguments to functions
 //
 
-class InvalidValue : public khmer_value_exception
+class InvalidValue : public oxli_value_exception
 {
 public:
     explicit InvalidValue(const std::string& msg)
-        : khmer_value_exception(msg) { }
+        : oxli_value_exception(msg) { }
 };
 
 ///
 // An exception for trying to change a read-only attributes
 //
 
-class ReadOnlyAttribute : public khmer_exception
+class ReadOnlyAttribute : public oxli_exception
 {
 public:
     explicit ReadOnlyAttribute(const std::string& msg)
-        : khmer_exception(msg) { }
+        : oxli_exception(msg) { }
 };
 
-} // end namespace khmer
+} // end namespace oxli
 
 #endif // KHMER_EXCEPTION_HH
 

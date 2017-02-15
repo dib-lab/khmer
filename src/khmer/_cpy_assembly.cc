@@ -1,7 +1,9 @@
-#include "_cpy_assembly.hh"
-#include "_cpy_nodegraph.hh"
-#include "_cpy_countgraph.hh"
-#include "_cpy_graphlabels.hh"
+#include "khmer/_cpy_assembly.hh"
+#include "khmer/_cpy_nodegraph.hh"
+#include "khmer/_cpy_countgraph.hh"
+#include "khmer/_cpy_graphlabels.hh"
+
+using namespace oxli;
 
 namespace khmer {
 

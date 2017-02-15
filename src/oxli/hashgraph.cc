@@ -44,13 +44,13 @@ Contact: khmer-project@idyll.org
 #include <queue>
 #include <set>
 
-#include "hashgraph.hh"
-#include "khmer.hh"
-#include "read_parsers.hh"
+#include "oxli/hashgraph.hh"
+#include "oxli/oxli.hh"
+#include "oxli/read_parsers.hh"
 
 using namespace std;
-using namespace khmer;
-using namespace khmer:: read_parsers;
+using namespace oxli;
+using namespace oxli:: read_parsers;
 
 void Hashgraph::save_tagset(std::string outfilename)
 {
@@ -80,7 +80,7 @@ void Hashgraph::save_tagset(std::string outfilename)
     outfile.write((const char *) buf, sizeof(HashIntoType) * tagset_size);
     if (outfile.fail()) {
         delete[] buf;
-        throw khmer_file_exception(strerror(errno));
+        throw oxli_file_exception(strerror(errno));
     }
     outfile.close();
 
@@ -104,13 +104,13 @@ void Hashgraph::load_tagset(std::string infilename, bool clear_tags)
         } else {
             err = "Unknown error in opening file: " + infilename;
         }
-        throw khmer_file_exception(err);
+        throw oxli_file_exception(err);
     } catch (const std::exception &e) {
         // Catching std::exception is a stopgap for
         // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
         std::string err = "Unknown error opening file: " + infilename + " "
                           + strerror(errno);
-        throw khmer_file_exception(err);
+        throw oxli_file_exception(err);
     }
 
     if (clear_tags) {
@@ -136,18 +136,18 @@ void Hashgraph::load_tagset(std::string infilename, bool clear_tags)
             }
             err << " while reading tagset from " << infilename
                 << "; should be " << SAVED_SIGNATURE;
-            throw khmer_file_exception(err.str());
+            throw oxli_file_exception(err.str());
         } else if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
             err << "Incorrect file format version " << (int) version
                 << " while reading tagset from " << infilename
                 << "; should be " << (int) SAVED_FORMAT_VERSION;
-            throw khmer_file_exception(err.str());
+            throw oxli_file_exception(err.str());
         } else if (!(ht_type == SAVED_TAGS)) {
             std::ostringstream err;
             err << "Incorrect file format type " << (int) ht_type
                 << " while reading tagset from " << infilename;
-            throw khmer_file_exception(err.str());
+            throw oxli_file_exception(err.str());
         }
 
         infile.read((char *) &save_ksize, sizeof(save_ksize));
@@ -155,7 +155,7 @@ void Hashgraph::load_tagset(std::string infilename, bool clear_tags)
             std::ostringstream err;
             err << "Incorrect k-mer size " << save_ksize
                 << " while reading tagset from " << infilename;
-            throw khmer_file_exception(err.str());
+            throw oxli_file_exception(err.str());
         }
 
         infile.read((char *) &tagset_size, sizeof(tagset_size));
@@ -175,25 +175,25 @@ void Hashgraph::load_tagset(std::string infilename, bool clear_tags)
         if (buf != NULL) {
             delete[] buf;
         }
-        throw khmer_file_exception(err);
+        throw oxli_file_exception(err);
         /* Yes, this is boneheaded. Unfortunately, there is a bug in gcc > 5
          * regarding the basic_ios::failure that makes it impossible to catch
          * with more specificty. So, we catch *all* exceptions after trying to
          * get the ifstream::failure, and assume it must have been the buggy one.
          * Unfortunately, this would also cause us to catch the
-         * khmer_file_exceptions thrown above, so we catch them again first and
+         * oxli_file_exceptions thrown above, so we catch them again first and
          * rethrow them :) If this is understandably irritating to you, please
          * bother the gcc devs at:
          *     https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
          *
          * See also: http://media4.giphy.com/media/3o6UBpHgaXFDNAuttm/giphy.gif
          */
-    } catch (khmer_file_exception &e) {
+    } catch (oxli_file_exception &e) {
         throw e;
     } catch (const std::exception &e) {
         std::string err = "Unknown error opening file: " + infilename + " "
                           + strerror(errno);
-        throw khmer_file_exception(err);
+        throw oxli_file_exception(err);
     }
 }
 
@@ -541,7 +541,7 @@ const
         total++;
 
         if (!(breadth >= cur_breadth)) { // keep track of watermark, for debugging.
-            throw khmer_exception();
+            throw oxli_exception();
         }
         if (breadth > cur_breadth) {
             cur_breadth = breadth;
@@ -578,13 +578,13 @@ void Hashgraph::load_stop_tags(std::string infilename, bool clear_tags)
         } else {
             err = "Unknown error in opening file: " + infilename;
         }
-        throw khmer_file_exception(err);
+        throw oxli_file_exception(err);
     } catch (const std::exception &e) {
         // Catching std::exception is a stopgap for
         // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
         std::string err = "Unknown error opening file: " + infilename + " "
                           + strerror(errno);
-        throw khmer_file_exception(err);
+        throw oxli_file_exception(err);
     }
 
     if (clear_tags) {
@@ -609,18 +609,18 @@ void Hashgraph::load_stop_tags(std::string infilename, bool clear_tags)
             }
             err << " while reading stoptags from " << infilename
                 << "; should be " << SAVED_SIGNATURE;
-            throw khmer_file_exception(err.str());
+            throw oxli_file_exception(err.str());
         } else if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
             err << "Incorrect file format version " << (int) version
                 << " while reading stoptags from " << infilename
                 << "; should be " << (int) SAVED_FORMAT_VERSION;
-            throw khmer_file_exception(err.str());
+            throw oxli_file_exception(err.str());
         } else if (!(ht_type == SAVED_STOPTAGS)) {
             std::ostringstream err;
             err << "Incorrect file format type " << (int) ht_type
                 << " while reading stoptags from " << infilename;
-            throw khmer_file_exception(err.str());
+            throw oxli_file_exception(err.str());
         }
 
         infile.read((char *) &save_ksize, sizeof(save_ksize));
@@ -628,7 +628,7 @@ void Hashgraph::load_stop_tags(std::string infilename, bool clear_tags)
             std::ostringstream err;
             err << "Incorrect k-mer size " << save_ksize
                 << " while reading stoptags from " << infilename;
-            throw khmer_file_exception(err.str());
+            throw oxli_file_exception(err.str());
         }
         infile.read((char *) &tagset_size, sizeof(tagset_size));
 
@@ -642,15 +642,15 @@ void Hashgraph::load_stop_tags(std::string infilename, bool clear_tags)
         delete[] buf;
     } catch (std::ifstream::failure &e) {
         std::string err = "Error reading stoptags from: " + infilename;
-        throw khmer_file_exception(err);
-    } catch (khmer_file_exception &e) {
+        throw oxli_file_exception(err);
+    } catch (oxli_file_exception &e) {
         throw e;
     } catch (const std::exception &e) {
         // Catching std::exception is a stopgap for
         // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
         std::string err = "Unknown error opening file: " + infilename + " "
                           + strerror(errno);
-        throw khmer_file_exception(err);
+        throw oxli_file_exception(err);
     }
 }
 
@@ -766,7 +766,7 @@ void Hashgraph::extract_unique_paths(std::string seq,
         // then extract.
 
         if (!(j == min_length)) {
-            throw khmer_exception();
+            throw oxli_exception();
         }
         if ( ((float)seen_counter / (float) j) <= max_seen) {
             unsigned int start = i;
@@ -882,7 +882,7 @@ const
 void Nodegraph::update_from(const Nodegraph &otherBASE)
 {
     if (_ksize != otherBASE._ksize) {
-        throw khmer_exception("both nodegraphs must have same k size");
+        throw oxli_exception("both nodegraphs must have same k size");
     }
     BitStorage * myself = dynamic_cast<BitStorage *>(this->store);
     const BitStorage * other;
@@ -892,7 +892,7 @@ void Nodegraph::update_from(const Nodegraph &otherBASE)
     if (myself && other) {
         myself->update_from(*other);
     } else {
-        throw khmer_exception("update_from failed with incompatible objects");
+        throw oxli_exception("update_from failed with incompatible objects");
     }
 }
 

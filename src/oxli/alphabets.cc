@@ -37,7 +37,7 @@ Contact: khmer-project@idyll.org
 
 #include <string>
 
-namespace khmer
+namespace oxli
 {
 namespace alphabets
 {

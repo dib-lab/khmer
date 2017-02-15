@@ -36,13 +36,13 @@ Contact: khmer-project@idyll.org
 */
 #include <algorithm>
 
-#include "khmer.hh"
-#include "hashtable.hh"
-#include "labelhash.hh"
-#include "kmer_filters.hh"
+#include "oxli/oxli.hh"
+#include "oxli/hashtable.hh"
+#include "oxli/labelhash.hh"
+#include "oxli/kmer_filters.hh"
 
 
-namespace khmer
+namespace oxli
 {
 
 bool apply_kmer_filters(const Kmer& node, const std::list<KmerFilter>& filters)

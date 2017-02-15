@@ -1,7 +1,9 @@
-#include "_cpy_countgraph.hh"
-#include "_cpy_subsetpartition.hh"
-#include "khmer.hh"
-#include "hashgraph.hh"
+#include "khmer/_cpy_countgraph.hh"
+#include "khmer/_cpy_subsetpartition.hh"
+#include "oxli/oxli.hh"
+#include "oxli/hashgraph.hh"
+
+using namespace oxli;
 
 namespace khmer {
 
@@ -73,7 +75,7 @@ count_get_raw_tables(khmer_KCountgraph_Object * self, PyObject * args)
 {
     Countgraph * countgraph = self->countgraph;
 
-    khmer::Byte ** table_ptrs = countgraph->get_raw_tables();
+    Byte ** table_ptrs = countgraph->get_raw_tables();
     std::vector<uint64_t> sizes = countgraph->get_tablesizes();
 
     PyObject * raw_tables = PyList_New(sizes.size());

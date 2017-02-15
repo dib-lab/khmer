@@ -40,12 +40,12 @@ Contact: khmer-project@idyll.org
 #include <queue>
 #include <functional>
 
-#include "khmer.hh"
+#include "oxli.hh"
 #include "hashtable.hh"
 #include "kmer_hash.hh"
 #include "kmer_filters.hh"
 
-namespace khmer
+namespace oxli
 {
 
 #ifndef LEFT

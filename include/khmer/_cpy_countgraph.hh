@@ -5,11 +5,12 @@
 #include "_cpy_utils.hh"
 #include "_cpy_hashgraph.hh"
 
+
 namespace khmer {
 
 typedef struct {
     khmer_KHashgraph_Object khashgraph;
-    Countgraph * countgraph;
+    oxli::Countgraph * countgraph;
 } khmer_KCountgraph_Object;
 
 extern PyTypeObject khmer_KCountgraph_Type

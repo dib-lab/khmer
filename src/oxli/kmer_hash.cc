@@ -42,9 +42,9 @@ Contact: khmer-project@idyll.org
 #include <string>
 
 #include "MurmurHash3.h"
-#include "khmer.hh"
-#include "khmer_exception.hh"
-#include "kmer_hash.hh"
+#include "oxli/oxli.hh"
+#include "oxli/oxli_exception.hh"
+#include "oxli/kmer_hash.hh"
 
 using namespace std;
 
@@ -52,7 +52,7 @@ using namespace std;
 // _hash: hash a k-length DNA sequence into a 64-bit number.
 //
 
-namespace khmer
+namespace oxli
 {
 
 HashIntoType _hash(const char * kmer, const WordLength k,
@@ -60,7 +60,7 @@ HashIntoType _hash(const char * kmer, const WordLength k,
 {
     // sizeof(HashIntoType) * 8 bits / 2 bits/base
     if (!(k <= sizeof(HashIntoType)*4) || !(strlen(kmer) >= k)) {
-        throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
+        throw oxli_exception("Supplied kmer string doesn't match the underlying k-size.");
     }
 
     HashIntoType h = 0, r = 0;
@@ -89,7 +89,7 @@ HashIntoType _hash(const char * kmer, const WordLength k)
     HashIntoType h = 0;
     HashIntoType r = 0;
 
-    return khmer::_hash(kmer, k, h, r);
+    return oxli::_hash(kmer, k, h, r);
 }
 
 // _hash_forward: return the hash from the forward direction only.
@@ -100,7 +100,7 @@ HashIntoType _hash_forward(const char * kmer, WordLength k)
     HashIntoType r = 0;
 
 
-    khmer::_hash(kmer, k, h, r);
+    oxli::_hash(kmer, k, h, r);
     return h;			// return forward only
 }
 
@@ -159,7 +159,7 @@ std::string _revcomp(const std::string& kmer)
             complement = 'A';
             break;
         default:
-            throw khmer::khmer_exception("Invalid base in read");
+            throw oxli::oxli_exception("Invalid base in read");
             break;
         }
         out[ksize - i - 1] = complement;
@@ -172,7 +172,7 @@ HashIntoType _hash_murmur(const std::string& kmer)
     HashIntoType h = 0;
     HashIntoType r = 0;
 
-    return khmer::_hash_murmur(kmer, h, r);
+    return oxli::_hash_murmur(kmer, h, r);
 }
 
 HashIntoType _hash_murmur(const std::string& kmer,
@@ -183,7 +183,7 @@ HashIntoType _hash_murmur(const std::string& kmer,
     MurmurHash3_x64_128((void *)kmer.c_str(), kmer.size(), seed, &out);
     h = out[0];
 
-    std::string rev = khmer::_revcomp(kmer);
+    std::string rev = oxli::_revcomp(kmer);
     MurmurHash3_x64_128((void *)rev.c_str(), rev.size(), seed, &out);
     r = out[0];
 
@@ -195,7 +195,7 @@ HashIntoType _hash_murmur_forward(const std::string& kmer)
     HashIntoType h = 0;
     HashIntoType r = 0;
 
-    khmer::_hash_murmur(kmer, h, r);
+    oxli::_hash_murmur(kmer, h, r);
     return h;
 }
 
@@ -233,7 +233,7 @@ Kmer KmerIterator::first(HashIntoType& f, HashIntoType& r)
 Kmer KmerIterator::next(HashIntoType& f, HashIntoType& r)
 {
     if (done()) {
-        throw khmer_exception();
+        throw oxli_exception();
     }
 
     if (!initialized) {
@@ -244,7 +244,7 @@ Kmer KmerIterator::next(HashIntoType& f, HashIntoType& r)
     unsigned char ch = _seq[index];
     index++;
     if (!(index <= length)) {
-        throw khmer_exception();
+        throw oxli_exception();
     }
 
     // left-shift the previous hash over

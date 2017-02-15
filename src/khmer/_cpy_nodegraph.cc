@@ -1,8 +1,9 @@
-#include "_cpy_nodegraph.hh"
-#include "hashgraph.hh"
+#include "khmer/_cpy_nodegraph.hh"
+#include "oxli/hashgraph.hh"
+
+using namespace oxli;
 
 namespace khmer {
-
 
 PyTypeObject khmer_KNodegraph_Type
 CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KNodegraph_Object")
@@ -85,7 +86,7 @@ nodegraph_update(khmer_KNodegraph_Object * me, PyObject * args)
 
     try {
         nodegraph->update_from(*other);
-    } catch (khmer_exception &e) {
+    } catch (oxli_exception &e) {
         PyErr_SetString(PyExc_ValueError, e.what());
         return NULL;
     }
@@ -98,7 +99,7 @@ nodegraph_get_raw_tables(khmer_KNodegraph_Object * self, PyObject * args)
 {
     Nodegraph * countgraph = self->nodegraph;
 
-    khmer::Byte ** table_ptrs = countgraph->get_raw_tables();
+    Byte ** table_ptrs = countgraph->get_raw_tables();
     std::vector<uint64_t> sizes = countgraph->get_tablesizes();
 
     PyObject * raw_tables = PyList_New(sizes.size());

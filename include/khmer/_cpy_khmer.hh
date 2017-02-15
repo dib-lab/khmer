@@ -39,8 +39,8 @@ Contact: khmer-project@idyll.org
 //
 // A module for Python that exports khmer C++ library functions.
 //
-#ifndef _KHMER_HH
-#define _KHMER_HH
+#ifndef _CPY_KHMER_HH
+#define _CPY_KHMER_HH
 
 #include <Python.h>
 
@@ -90,8 +90,6 @@ Contact: khmer-project@idyll.org
 #include "_cpy_hllcounter.hh" 
 #include "_cpy_readaligner.hh"
  
-
-
 
 namespace khmer {
 

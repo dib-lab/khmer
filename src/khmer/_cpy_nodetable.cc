@@ -1,5 +1,7 @@
-#include "_cpy_nodetable.hh"
+#include "khmer/_cpy_nodetable.hh"
 #include <vector>
+
+using namespace oxli;
 
 namespace khmer {
 

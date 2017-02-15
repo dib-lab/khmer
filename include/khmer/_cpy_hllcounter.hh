@@ -3,14 +3,13 @@
 
 #include <Python.h>
 #include "_cpy_utils.hh"
-#include "hllcounter.hh"
+#include "oxli/hllcounter.hh"
 
 namespace khmer {
 
-
 typedef struct {
     PyObject_HEAD
-    HLLCounter * hllcounter;
+    oxli::HLLCounter * hllcounter;
 } khmer_KHLLCounter_Object;
 
 
@@ -25,26 +24,18 @@ extern PyGetSetDef khmer_hllcounter_getseters[];
 extern PyTypeObject khmer_KHLLCounter_Type;
 
 
-
-
 PyObject* khmer_hllcounter_new(PyTypeObject * type, PyObject * args,
                                       PyObject * kwds);
-
 
 
 void khmer_hllcounter_dealloc(khmer_KHLLCounter_Object * obj);
 
 
-
 PyObject *
 hllcounter_add(khmer_KHLLCounter_Object * me, PyObject * args);
 
-
-
 PyObject *
 hllcounter_estimate_cardinality(khmer_KHLLCounter_Object * me, PyObject * args);
-
-
 
 PyObject *
 hllcounter_consume_string(khmer_KHLLCounter_Object * me, PyObject * args);
@@ -56,15 +47,12 @@ PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
 PyObject * hllcounter_merge(khmer_KHLLCounter_Object * me,
                                    PyObject * args);
 
-
 PyObject *
 hllcounter_get_erate(khmer_KHLLCounter_Object * me);
 
 
-
 PyObject *
 hllcounter_get_ksize(khmer_KHLLCounter_Object * me);
-
 
 
 int
@@ -87,8 +75,6 @@ hllcounter_getcounters(khmer_KHLLCounter_Object * me);
 
 PyObject * hllcounter_merge(khmer_KHLLCounter_Object * me,
                                    PyObject * args);
-
-
 
 }
 

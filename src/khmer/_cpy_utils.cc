@@ -1,5 +1,7 @@
-#include "_cpy_utils.hh"
-#include "khmer.hh"
+#include "khmer/_cpy_utils.hh"
+#include "oxli/oxli.hh"
+
+using namespace oxli;
 
 namespace khmer {
 
@@ -109,7 +111,7 @@ bool ht_convert_PyObject_to_HashIntoType(PyObject * value,
     }
 }
 
-// Take a Python object and (try to) convert it to a khmer::Kmer.
+// Take a Python object and (try to) convert it to a oxli::Kmer.
 // Note: will set error condition and return false if cannot do.
 
 bool ht_convert_PyObject_to_Kmer(PyObject * value,

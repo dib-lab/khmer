@@ -41,11 +41,11 @@ Contact: khmer-project@idyll.org
 #include <sstream> // IWYU pragma: keep
 #include <set>
 
-#include "hashgraph.hh"
-#include "khmer_exception.hh"
-#include "labelhash.hh"
-#include "read_parsers.hh"
-#include "subset.hh"
+#include "oxli/hashgraph.hh"
+#include "oxli/oxli_exception.hh"
+#include "oxli/labelhash.hh"
+#include "oxli/read_parsers.hh"
+#include "oxli/subset.hh"
 
 #define IO_BUF_SIZE 250*1000*1000
 
@@ -55,8 +55,8 @@ Contact: khmer-project@idyll.org
 #define DEBUG 0
 
 using namespace std;
-using namespace khmer;
-using namespace khmer:: read_parsers;
+using namespace oxli;
+using namespace oxli:: read_parsers;
 
 /*
  * @camillescott
@@ -328,7 +328,7 @@ unsigned int LabelHash::sweep_label_neighborhood(const std::string& seq,
     //printf("range=%u ", range);
     if (range == 0) {
         if (!(num_traversed == seq.length()-graph->ksize()+1)) {
-            throw khmer_exception();
+            throw oxli_exception();
         }
     }
     tagged_kmers.clear();
@@ -424,7 +424,7 @@ void LabelHash::save_labels_and_tags(std::string filename)
 
     if (outfile.fail()) {
         delete[] buf;
-        throw khmer_file_exception(strerror(errno));
+        throw oxli_file_exception(strerror(errno));
     }
     outfile.close();
 
@@ -447,13 +447,13 @@ void LabelHash::load_labels_and_tags(std::string filename)
         } else {
             err = "Unknown error in opening file: " + filename;
         }
-        throw khmer_file_exception(err);
+        throw oxli_file_exception(err);
     } catch (const std::exception &e) {
         // Catching std::exception is a stopgap for
         // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
         std::string err = "Unknown error opening file: " + filename + " "
                           + strerror(errno);
-        throw khmer_file_exception(err);
+        throw oxli_file_exception(err);
     }
 
     unsigned long n_labeltags = 1;
@@ -473,17 +473,17 @@ void LabelHash::load_labels_and_tags(std::string filename)
             }
             err << " while reading labels/tags from " << filename
                 << " Should be: " << SAVED_SIGNATURE;
-            throw khmer_file_exception(err.str());
+            throw oxli_file_exception(err.str());
         } else if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
             err << "Incorrect file format version " << (int) version
                 << " while reading labels/tags from " << filename;
-            throw khmer_file_exception(err.str());
+            throw oxli_file_exception(err.str());
         } else if (!(ht_type == SAVED_LABELSET)) {
             std::ostringstream err;
             err << "Incorrect file format type " << (int) ht_type
                 << " while reading labels/tags from " << filename;
-            throw khmer_file_exception(err.str());
+            throw oxli_file_exception(err.str());
         }
 
         infile.read((char *) &save_ksize, sizeof(save_ksize));
@@ -491,20 +491,20 @@ void LabelHash::load_labels_and_tags(std::string filename)
             std::ostringstream err;
             err << "Incorrect k-mer size " << save_ksize
                 << " while reading labels/tags from " << filename;
-            throw khmer_file_exception(err.str());
+            throw oxli_file_exception(err.str());
         }
 
         infile.read((char *) &n_labeltags, sizeof(n_labeltags));
     } catch (std::ifstream::failure &e) {
         std::string err;
         err = "Unknown error reading header info from: " + filename;
-        throw khmer_file_exception(err);
-    } catch (khmer_file_exception &e) {
+        throw oxli_file_exception(err);
+    } catch (oxli_file_exception &e) {
         throw e;
     } catch (const std::exception &e) {
         std::string err = "Unknown error opening file: " + filename + " "
                           + strerror(errno);
-        throw khmer_file_exception(err);
+        throw oxli_file_exception(err);
     }
 
     char * buf = new char[IO_BUF_SIZE];
@@ -534,7 +534,7 @@ void LabelHash::load_labels_and_tags(std::string filename)
 
                 std::string err;
                 err = "Unknown error reading data from: " + filename;
-                throw khmer_file_exception(err);
+                throw oxli_file_exception(err);
             }
         }
 
@@ -559,19 +559,19 @@ void LabelHash::load_labels_and_tags(std::string filename)
         }
         if (!(i == n_bytes)) {
             delete[] buf;
-            throw khmer_file_exception("unknown error reading labels and tags");
+            throw oxli_file_exception("unknown error reading labels and tags");
         }
         memcpy(buf, buf + n_bytes, remainder);
     }
 
     if (remainder != 0) {
         delete[] buf;
-        throw khmer_file_exception("unknown error reading labels and tags");
+        throw oxli_file_exception("unknown error reading labels and tags");
     }
 
     if (loaded != n_labeltags) {
         delete[] buf;
-        throw khmer_file_exception("error loading labels: too few loaded");
+        throw oxli_file_exception("error loading labels: too few loaded");
     }
 
     delete[] buf;

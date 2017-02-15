@@ -3,18 +3,18 @@
 
 #include <Python.h>
 #include "_cpy_utils.hh"
-#include "subset.hh"
+#include "oxli/subset.hh"
 
 namespace khmer {
 
 typedef struct {
     PyObject_HEAD
-    pre_partition_info *   PrePartitionInfo;
+    oxli::pre_partition_info *   PrePartitionInfo;
 } khmer_PrePartitionInfo_Object;
 
 typedef struct {
     PyObject_HEAD
-    SubsetPartition * subset;
+    oxli::SubsetPartition * subset;
 } khmer_KSubsetPartition_Object;
 
 

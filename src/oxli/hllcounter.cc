@@ -42,11 +42,11 @@ Contact: khmer-project@idyll.org
 #include <numeric>
 #include <utility>
 
-#include "hllcounter.hh"
-#include "khmer.hh"
-#include "khmer_exception.hh"
-#include "kmer_hash.hh"
-#include "read_parsers.hh"
+#include "oxli/hllcounter.hh"
+#include "oxli/oxli.hh"
+#include "oxli/oxli_exception.hh"
+#include "oxli/kmer_hash.hh"
+#include "oxli/read_parsers.hh"
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -57,7 +57,7 @@ Contact: khmer-project@idyll.org
 
 #define arr_len(a) (a + sizeof a / sizeof a[0])
 
-using namespace khmer;
+using namespace oxli;
 
 std::map<int, std::vector<double> > rawEstimateData;
 std::map<int, std::vector<double> > biasData;
@@ -347,7 +347,7 @@ uint64_t HLLCounter::estimate_cardinality()
 
 void HLLCounter::add(const std::string &value)
 {
-    HashIntoType x = khmer::_hash_murmur(value);
+    HashIntoType x = oxli::_hash_murmur(value);
     uint64_t j = x & (this->m - 1);
     this->M[j] = std::max(this->M[j], get_rho(x >> this->p, 64 - this->p));
 }
@@ -502,7 +502,7 @@ bool HLLCounter::check_and_normalize_read(std::string &read) const
 void HLLCounter::merge(HLLCounter &other)
 {
     if (this->p != other.p || this->_ksize != other._ksize) {
-        throw khmer_exception("HLLCounters to be merged must be created with same parameters");
+        throw oxli_exception("HLLCounters to be merged must be created with same parameters");
     }
     for(unsigned int i=0; i < this->M.size(); ++i) {
         this->M[i] = std::max(other.M[i], this->M[i]);

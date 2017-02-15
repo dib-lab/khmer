@@ -2,13 +2,13 @@
 #define _CPY_READALIGNER_HH
 
 #include <Python.h>
-#include "read_aligner.hh"
+#include "oxli/read_aligner.hh"
 
 namespace khmer {
 
 typedef struct {
     PyObject_HEAD
-    ReadAligner * aligner;
+    oxli::ReadAligner * aligner;
 } khmer_ReadAligner_Object;
 
 extern PyTypeObject khmer_ReadAlignerType;

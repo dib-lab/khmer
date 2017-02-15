@@ -41,10 +41,10 @@ Contact: khmer-project@idyll.org
 #include <string>
 #include <vector>
 
-#include "khmer.hh"
+#include "oxli.hh"
 #include "read_parsers.hh"
 
-namespace khmer
+namespace oxli
 {
 
 using read_parsers::IParser;

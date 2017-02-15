@@ -40,10 +40,10 @@ Contact: khmer-project@idyll.org
 #include <seqan/stream.h> // IWYU pragma: keep
 #include <fstream>
 
-#include "khmer_exception.hh"
-#include "read_parsers.hh"
+#include "oxli/oxli_exception.hh"
+#include "oxli/read_parsers.hh"
 
-namespace khmer
+namespace oxli
 {
 
 namespace read_parsers
@@ -164,7 +164,7 @@ IParser(
             REG_EXTENDED | REG_NOSUB
         );
     if (regex_rc) {
-        throw khmer_exception("Could not compile R2 nosub regex");
+        throw oxli_exception("Could not compile R2 nosub regex");
     }
     regex_rc =
         regcomp(
@@ -172,7 +172,7 @@ IParser(
             "^.+(/1| 1:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}", REG_EXTENDED
         );
     if (regex_rc) {
-        throw khmer_exception("Could not compile R1 regex");
+        throw oxli_exception("Could not compile R1 regex");
     }
     regex_rc =
         regcomp(
@@ -180,7 +180,7 @@ IParser(
             "^.+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}", REG_EXTENDED
         );
     if (regex_rc) {
-        throw khmer_exception("Could not compile R2 regex");
+        throw oxli_exception("Could not compile R2 regex");
     }
     _num_reads = 0;
     _have_qualities = false;
@@ -296,6 +296,6 @@ _is_valid_read_pair(
 } // namespace read_parsers
 
 
-} // namespace khmer
+} // namespace oxli
 
 // vim: set ft=cpp sts=4 sw=4 tw=80:

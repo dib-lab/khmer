@@ -3,14 +3,15 @@
 
 #include <Python.h>
 #include "_cpy_utils.hh"
-#include "khmer.hh"
-#include "hashtable.hh"
+#include "oxli/oxli.hh"
+#include "oxli/hashtable.hh"
+
 
 namespace khmer {
 
 typedef struct {
     PyObject_HEAD
-    Hashtable * hashtable;
+    oxli::Hashtable * hashtable;
 } khmer_KHashtable_Object;
 
 extern PyMethodDef khmer_hashtable_methods[];

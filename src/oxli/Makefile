@@ -67,15 +67,15 @@ PREFIX=/usr/local
 
 ### NOTE: No user-serviceable parts below this line! ###
 
-INCLUDES= -I ../third-party/seqan/core/include/ 	\
-	  -I ../third-party/smhasher/
+INCLUDES= -I ../../include/ -I ../../third-party/seqan/core/include/ 	\
+	      -I ../../third-party/smhasher/
 
 ifeq ($(USE_SYSTEM_ZLIB), false)
-INCLUDES += -I ../third-party/zlib/
+INCLUDES += -I ../../third-party/zlib/
 endif
 
 ifeq ($(USE_SYSTEM_LIBBZ2), false)
-INCLUDES += -I ../third-party/bzip2/
+INCLUDES += -I ../../third-party/bzip2/
 endif
 
 # Warnings in common to C and C++
@@ -115,9 +115,9 @@ CFLAGS   += $(DEBUG_FLAGS)
 endif
 
 ifeq ($(WANT_EXTRA_SANITY_CHECKING), true)
-DEFINE_KHMER_EXTRA_SANITY_CHECKS=-DKHMER_EXTRA_SANITY_CHECKS
-CXXFLAGS += $(DEFINE_KHMER_EXTRA_SANITY_CHECKS)
-CFLAGS   += $(DEFINE_KHMER_EXTRA_SANITY_CHECKS)
+DEFINE_OXLI_EXTRA_SANITY_CHECKS=-DOXLI_EXTRA_SANITY_CHECKS
+CXXFLAGS += $(DEFINE_OXLI_EXTRA_SANITY_CHECKS)
+CFLAGS   += $(DEFINE_OXLI_EXTRA_SANITY_CHECKS)
 endif
 
 ifeq ($(WANT_PROFILING), true)
@@ -168,7 +168,7 @@ SONAME       = liboxli.$(SHARED_EXT).$(LIB_VERSION)
 SONAME_FLAGS = -Wl,-soname=$(SONAME)
 endif
 
-LIBKHMERSO=$(SONAME)
+LIBOXLISO=$(SONAME)
 
 CXXFLAGS += -DVERSION=$(VERSION)
 
@@ -185,7 +185,7 @@ export VERSION
 
 #### Third party dependencies ####
 # ZLIB, use .lo not .o, so we get -fPIC and other library-related flags
-ZLIB_DIR=../third-party/zlib
+ZLIB_DIR=../../third-party/zlib
 ZLIB_OBJS_BASE=\
 	adler32.lo \
 	crc32.lo \
@@ -206,7 +206,7 @@ ZLIB_OBJS_BASE=\
 ZLIB_OBJS=$(addprefix $(ZLIB_DIR)/, $(ZLIB_OBJS_BASE))
 
 # BZ2
-BZIP2_DIR=../third-party/bzip2
+BZIP2_DIR=../../third-party/bzip2
 BZIP2_OBJS_BASE= \
 	blocksort.o \
 	huffman.o \
@@ -221,7 +221,7 @@ BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 
 #### oxli proper below here ####
 
-LIBKHMER_OBJS= \
+LIBOXLI_OBJS= \
 	hashtable.o \
 	hashgraph.o \
 	hllcounter.o \
@@ -235,29 +235,29 @@ LIBKHMER_OBJS= \
 	partitioning.o \
 	assembler.o \
 	alphabets.o \
-	murmur3.o \
+	murmur3.o 
 	storage.o
 
 PRECOMILE_OBJS ?=
 PRECLEAN_TARGS ?=
 
 ifeq ($(USE_SYSTEM_ZLIB), false)
-LIBKHMER_OBJS  += $(ZLIB_OBJS)
+LIBOXLI_OBJS  += $(ZLIB_OBJS)
 PRECOMILE_OBJS += $(ZLIB_OBJS)
 PRECLEAN_TARGS += zlibclean
 endif
 
 ifeq ($(USE_SYSTEM_LIBBZ2), false)
-LIBKHMER_OBJS  += $(BZIP2_OBJS)
+LIBOXLI_OBJS  += $(BZIP2_OBJS)
 PRECOMILE_OBJS += $(BZIP2_OBJS)
 PRECLEAN_TARGS += libbz2clean
 endif
 
-KHMER_HEADERS= \
+OXLI_HEADERS= \
 	hashtable.hh \
 	hllcounter.hh \
-	khmer_exception.hh \
-	khmer.hh \
+	oxli_exception.hh \
+	oxli.hh \
 	kmer_hash.hh \
 	labelhash.hh \
 	traversal.hh \
@@ -273,7 +273,7 @@ KHMER_HEADERS= \
 # START OF RULES #
 
 # The all rule comes first!
-all: $(LIBKHMERSO) liboxli.a oxli.pc
+all: $(LIBOXLISO) liboxli.a oxli.pc
 
 zlibclean:
 	(cd $(ZLIB_DIR) && make distclean)
@@ -283,14 +283,14 @@ libbz2clean:
 clean: $(PRECLEAN_TARGS)
 	rm -f *.o *.a *.$(SHARED_EXT)* oxli.pc $(TEST_PROGS)
 
-install: $(LIBKHMERSO) liboxli.a oxli.pc $(KHMER_HEADERS)
+install: $(LIBOXLISO) liboxli.a oxli.pc $(OXLI_HEADERS)
 	mkdir -p $(PREFIX)/lib $(PREFIX)/lib/pkgconfig $(PREFIX)/include/oxli
-	cp -r $(KHMER_HEADERS) 				\
+	cp -r $(OXLI_HEADERS) 				\
 		../third-party/smhasher/MurmurHash3.h 	\
 		$(PREFIX)/include/oxli/
 	cp oxli.pc $(PREFIX)/lib/pkgconfig/
-	cp $(LIBKHMERSO) liboxli.a $(PREFIX)/lib/
-	ln -sf $(PREFIX)/lib/$(LIBKHMERSO) $(PREFIX)/lib/liboxli.$(SHARED_EXT)
+	cp $(LIBOXLISO) liboxli.a $(PREFIX)/lib/
+	ln -sf $(PREFIX)/lib/$(LIBOXLISO) $(PREFIX)/lib/liboxli.$(SHARED_EXT)
 
 oxli.pc: oxli.pc.in
 	sed -e 's,@prefix@,$(PREFIX),'  -e 's,@VERSION@,$(VERSION),' $< >$@
@@ -305,13 +305,13 @@ $(BZIP2_OBJS):
 murmur3.o: ../third-party/smhasher/MurmurHash3.cc
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-%.o: %.cc $(PRECOMILE_OBJS) $(KHMER_HEADERS)
+%.o: %.cc $(PRECOMILE_OBJS) $(OXLI_HEADERS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c -o $@ $<
 
-$(LIBKHMERSO): $(LIBKHMER_OBJS)
+$(LIBOXLISO): $(LIBOXLI_OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(SONAME_FLAGS) -shared -o $@ $^
 	ln -sf $(SONAME) liboxli.$(SHARED_EXT)
 
-liboxli.a: $(LIBKHMER_OBJS)
+liboxli.a: $(LIBOXLI_OBJS)
 	ar rcs $@ $^
 	ranlib $@

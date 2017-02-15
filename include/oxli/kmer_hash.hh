@@ -44,7 +44,7 @@ Contact: khmer-project@idyll.org
 #include <string.h>
 #include <string>
 
-#include "khmer.hh"
+#include "oxli.hh"
 
 // test validity
 #ifdef KHMER_EXTRA_SANITY_CHECKS
@@ -94,7 +94,7 @@ Contact: khmer-project@idyll.org
 #endif
 
 
-namespace khmer
+namespace oxli
 {
 // two-way hash functions.
 HashIntoType _hash(const char * kmer, const WordLength k);

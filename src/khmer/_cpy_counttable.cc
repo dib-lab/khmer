@@ -1,4 +1,6 @@
-#include "_cpy_counttable.hh"
+#include "khmer/_cpy_counttable.hh"
+
+using namespace oxli;
 
 namespace khmer {
 

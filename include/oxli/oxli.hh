@@ -35,8 +35,8 @@ LICENSE (END)
 
 Contact: khmer-project@idyll.org
 */
-#ifndef KHMER_HH
-#   define KHMER_HH
+#ifndef OXLI_HH
+#   define OXLI_HH
 
 // C standard integer types are used almost ubiquitously.
 #   if (__cplusplus >= 201103L)
@@ -75,7 +75,7 @@ private:\
 #include <list>
 #include <functional>
 
-#include "khmer_exception.hh"
+#include "oxli_exception.hh"
 
 #   define MAX_KCOUNT 255
 #   define MAX_BIGCOUNT 65535
@@ -102,7 +102,7 @@ private:\
 #   define MIN( a, b )	(((a) > (b)) ? (b) : (a))
 #   define MAX( a, b )	(((a) < (b)) ? (b) : (a))
 
-namespace khmer
+namespace oxli
 {
 
 // largest number we can count up to, exactly. (8 bytes)
@@ -168,4 +168,4 @@ typedef std::list<KmerFilter> KmerFilterList;
 typedef std::vector<std::string> StringVector;
 }
 
-#endif // KHMER_HH
+#endif // OXLI_HH

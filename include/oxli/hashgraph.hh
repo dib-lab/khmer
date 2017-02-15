@@ -53,13 +53,13 @@ Contact: khmer-project@idyll.org
 #include "traversal.hh"
 #include "subset.hh"
 
-namespace khmer
+namespace oxli
 {
 namespace read_parsers
 {
 class IParser;
 }  // namespace read_parsers
-}  // namespace khmer
+}  // namespace oxli
 
 #define MAX_KEEPER_SIZE int(1e6)
 
@@ -73,7 +73,7 @@ class IParser;
 
 #define CALLBACK_PERIOD 100000
 
-namespace khmer
+namespace oxli
 {
 //
 // Hashgraph: Extension of Hashtable to support graph operations.
@@ -93,7 +93,7 @@ protected:
     {
         _tag_density = DEFAULT_TAG_DENSITY;
         if (!(_tag_density % 2 == 0)) {
-            throw khmer_exception();
+            throw oxli_exception();
         }
         partition = new SubsetPartition(this);
         _all_tags_spin_lock = 0;
@@ -132,7 +132,7 @@ public:
     {
         // must be odd; can't be set if tags exist.
         if (!(d % 2 == 0) || !all_tags.empty()) {
-            throw khmer_exception();
+            throw oxli_exception();
         }
         _tag_density = d;
     }
@@ -239,7 +239,7 @@ public:
 };
 
 // Hashgraph-derived class with ByteStorage.
-class Countgraph : public khmer::Hashgraph
+class Countgraph : public oxli::Hashgraph
 {
 public:
     explicit Countgraph(WordLength ksize, std::vector<uint64_t> sizes)

@@ -1,4 +1,6 @@
-#include "_cpy_hllcounter.hh"
+#include "khmer/_cpy_hllcounter.hh"
+
+using namespace oxli;
 
 namespace khmer {
 
@@ -157,7 +159,7 @@ hllcounter_add(khmer_KHLLCounter_Object * me, PyObject * args)
 
     try {
         me->hllcounter->add(kmer_str);
-    } catch (khmer_exception &e) {
+    } catch (oxli_exception &e) {
         PyErr_SetString(PyExc_ValueError, e.what());
         return NULL;
     }
@@ -189,7 +191,7 @@ hllcounter_consume_string(khmer_KHLLCounter_Object * me, PyObject * args)
 
     try {
         n_consumed = me->hllcounter->consume_string(kmer_str);
-    } catch (khmer_exception &e) {
+    } catch (oxli_exception &e) {
         PyErr_SetString(PyExc_ValueError, e.what());
         return NULL;
     }
@@ -223,10 +225,10 @@ PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
     try {
         me->hllcounter->consume_fasta(filename, stream_records, total_reads,
                                       n_consumed);
-    } catch (khmer_file_exception &exc) {
+    } catch (oxli_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;
-    } catch (khmer_value_exception &exc) {
+    } catch (oxli_value_exception &exc) {
         PyErr_SetString(PyExc_ValueError, exc.what());
         return NULL;
     }
@@ -349,7 +351,7 @@ PyObject * hllcounter_merge(khmer_KHLLCounter_Object * me,
 
     try {
         me->hllcounter->merge(*(other->hllcounter));
-    } catch (khmer_exception &e) {
+    } catch (oxli_exception &e) {
         PyErr_SetString(PyExc_ValueError, e.what());
         return NULL;
     }

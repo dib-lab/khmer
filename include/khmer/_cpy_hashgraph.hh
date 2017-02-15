@@ -41,14 +41,15 @@ Contact: khmer-project@idyll.org
 #include <Python.h>
 #include "_cpy_utils.hh"
 #include "_cpy_hashtable.hh"
-#include "hashgraph.hh"
+#include "oxli/hashgraph.hh"
+
 
 namespace khmer {
 
 
 typedef struct {
     khmer_KHashtable_Object khashtable;
-    Hashgraph * hashgraph;
+    oxli::Hashgraph * hashgraph;
 } khmer_KHashgraph_Object;
 
 

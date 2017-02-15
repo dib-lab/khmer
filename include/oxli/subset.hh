@@ -42,9 +42,9 @@ Contact: khmer-project@idyll.org
 #include <queue>
 #include <string>
 
-#include "khmer.hh"
+#include "oxli.hh"
 
-namespace khmer
+namespace oxli
 {
 class Countgraph;
 class Hashgraph;

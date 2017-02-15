@@ -3,13 +3,14 @@
 
 #include <Python.h>
 #include "_cpy_utils.hh"
-#include "labelhash.hh"
+#include "oxli/labelhash.hh"
+
 
 namespace khmer {
 
 typedef struct {
     PyObject_HEAD
-    LabelHash * labelhash;
+    oxli::LabelHash * labelhash;
 } khmer_KGraphLabels_Object;
 
 

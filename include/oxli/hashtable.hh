@@ -51,24 +51,24 @@ Contact: khmer-project@idyll.org
 #include <string>
 #include <vector>
 
-#include "khmer.hh"
-#include "khmer_exception.hh"
+#include "oxli.hh"
+#include "oxli_exception.hh"
 #include "kmer_hash.hh"
 #include "read_parsers.hh"
 #include "storage.hh"
 #include "subset.hh"
 
-namespace khmer
+namespace oxli
 {
 namespace read_parsers
 {
 class IParser;
 }  // namespace read_parsers
-}  // namespace khmer
+}  // namespace oxli
 
 #define CALLBACK_PERIOD 100000
 
-namespace khmer
+namespace oxli
 {
 class Hashtable: public
     KmerFactory  		// Base class implementation of a Bloom ht.
@@ -308,7 +308,7 @@ public:
 };
 
 // Hashtable-derived class with ByteStorage.
-class Counttable : public khmer::Hashtable
+class Counttable : public oxli::Hashtable
 {
 public:
     explicit Counttable(WordLength ksize, std::vector<uint64_t> sizes)

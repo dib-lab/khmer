@@ -35,13 +35,13 @@ LICENSE (END)
 
 Contact: khmer-project@idyll.org
 */
-#include "khmer.hh"
-#include "hashtable.hh"
-#include "hashbits.hh"
-#include "labelhash.hh"
+#include "oxli/oxli.hh"
+#include "oxli/hashtable.hh"
+#include "oxli/hashbits.hh"
+#include "oxli/labelhash.hh"
 #include <iostream>
 
-using namespace khmer;
+using namespace oxli;
 
 int main()
 {
@@ -49,8 +49,8 @@ int main()
     std::vector<HashIntoType> sizes_vec (sizes,
                                          sizes + sizeof(sizes) / sizeof(HashIntoType) );
 
-    khmer::LabelHash * lh_pointer = new khmer::LabelHash(20, sizes_vec);
-    khmer::Nodegraph * hb_pointer = (khmer::Hashbits *)lh_pointer;
+    oxli::LabelHash * lh_pointer = new oxli::LabelHash(20, sizes_vec);
+    oxli::Nodegraph * hb_pointer = (oxli::Hashbits *)lh_pointer;
 
     std::cout << "lh_pointer n_tags: " << lh_pointer->n_tags() << std::endl;
     std::cout << "hb_pointer n_tags: " << hb_pointer->n_tags() << std::endl;

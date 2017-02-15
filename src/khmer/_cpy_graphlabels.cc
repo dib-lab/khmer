@@ -1,9 +1,11 @@
-#include "_cpy_graphlabels.hh"
-#include "_cpy_nodegraph.hh"
-#include "_cpy_countgraph.hh"
-#include "_cpy_hashset.hh"
-#include "khmer.hh"
-#include "assembler.hh"
+#include "khmer/_cpy_graphlabels.hh"
+#include "khmer/_cpy_nodegraph.hh"
+#include "khmer/_cpy_countgraph.hh"
+#include "khmer/_cpy_hashset.hh"
+#include "oxli/oxli.hh"
+#include "oxli/assembler.hh"
+
+using namespace oxli;
 
 namespace khmer {
 
@@ -89,7 +91,7 @@ void khmer_graphlabels_dealloc(khmer_KGraphLabels_Object * obj)
 
     if (self != NULL) {
         PyObject * hashgraph_o;
-        khmer::Hashgraph * hashgraph = NULL; // @CTB
+        Hashgraph * hashgraph = NULL; // @CTB
 
         if (!PyArg_ParseTuple(args, "O", &hashgraph_o)) {
             Py_DECREF(self);
@@ -167,10 +169,10 @@ labelhash_consume_fasta_and_tag_with_labels(khmer_KGraphLabels_Object * me,
     try {
         hb->consume_fasta_and_tag_with_labels(filename, total_reads,
                                               n_consumed);
-    } catch (khmer_file_exception &exc) {
+    } catch (oxli_file_exception &exc) {
         exc_string = exc.what();
         file_exception = exc_string.c_str();
-    } catch (khmer_value_exception &exc) {
+    } catch (oxli_value_exception &exc) {
         exc_string = exc.what();
         value_exception = exc_string.c_str();
     }
@@ -209,10 +211,10 @@ labelhash_consume_partitioned_fasta_and_tag_with_labels(
     try {
         labelhash->consume_partitioned_fasta_and_tag_with_labels(filename,
                 total_reads, n_consumed);
-    } catch (khmer_file_exception &exc) {
+    } catch (oxli_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;
-    } catch (khmer_value_exception &exc) {
+    } catch (oxli_value_exception &exc) {
         PyErr_SetString(PyExc_ValueError, exc.what());
         return NULL;
     }
@@ -475,7 +477,7 @@ labelhash_save_labels_and_tags(khmer_KGraphLabels_Object * me, PyObject * args)
 
     try {
         labelhash->save_labels_and_tags(filename);
-    } catch (khmer_file_exception &e) {
+    } catch (oxli_file_exception &e) {
         PyErr_SetString(PyExc_OSError, e.what());
         return NULL;
     }
@@ -496,7 +498,7 @@ labelhash_load_labels_and_tags(khmer_KGraphLabels_Object * me, PyObject * args)
 
     try {
         labelhash->load_labels_and_tags(filename);
-    } catch (khmer_file_exception &e) {
+    } catch (oxli_file_exception &e) {
         PyErr_SetString(PyExc_OSError, e.what());
         return NULL;
     }

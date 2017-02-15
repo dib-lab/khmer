@@ -5,7 +5,7 @@ from libcpp.memory cimport make_shared
 from libc.stdint cimport uint64_t
 from cython.operator cimport dereference as deref
 
-from _oxli cimport _revhash, HashIntoType, _revcomp
+from wrapper cimport _revhash, HashIntoType, _revcomp
 
 cdef class Kmer:
 

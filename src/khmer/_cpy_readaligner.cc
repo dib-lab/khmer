@@ -1,7 +1,8 @@
-#include "_cpy_countgraph.hh"
-#include "_cpy_readaligner.hh"
+#include "khmer/_cpy_countgraph.hh"
+#include "khmer/_cpy_readaligner.hh"
 #include <string>
 
+using namespace oxli;
 
 namespace khmer {
 

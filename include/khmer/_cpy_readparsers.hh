@@ -4,7 +4,7 @@
 
 #include <Python.h>
 #include "_cpy_utils.hh"
-#include "read_parsers.hh"
+#include "oxli/read_parsers.hh"
 
 namespace khmer
 {
@@ -12,14 +12,14 @@ namespace khmer
 typedef struct {
     PyObject_HEAD
     //! Pointer to the low-level genomic read object.
-    read_parsers:: Read *   read;
+    oxli::read_parsers:: Read *   read;
 } khmer_Read_Object;
 
 
 typedef struct {
     PyObject_HEAD
     //! Pointer to the low-level parser object.
-    read_parsers:: IParser *  parser;
+    oxli::read_parsers:: IParser *  parser;
 } khmer_ReadParser_Object;
 
 
@@ -129,7 +129,7 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_ReadParser_Object");
 void _init_ReadParser_Type_constants();
 
 
-read_parsers:: IParser *
+oxli::read_parsers:: IParser *
 _PyObject_to_khmer_ReadParser( PyObject * py_object );
 
 

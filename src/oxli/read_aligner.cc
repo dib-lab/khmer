@@ -43,11 +43,11 @@ Contact: khmer-project@idyll.org
 #include <set>
 #include <utility>
 
-#include "hashtable.hh"
-#include "khmer_exception.hh"
-#include "read_aligner.hh"
+#include "oxli/hashtable.hh"
+#include "oxli/oxli_exception.hh"
+#include "oxli/read_aligner.hh"
 
-namespace khmer
+namespace oxli
 {
 
 Alignment * _empty_alignment()
@@ -417,7 +417,7 @@ Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node,
 
     if (!(node->seq_idx < read.length())) {
         delete ret;
-        throw khmer_exception();
+        throw oxli_exception();
     }
     std::string read_alignment = "";
     std::string graph_alignment = "";

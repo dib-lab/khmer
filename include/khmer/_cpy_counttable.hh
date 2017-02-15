@@ -39,13 +39,13 @@ Contact: khmer-project@idyll.org
 #define _CPY_COUNTTABLE_HH
 
 #include <Python.h>
-#include "_khmer.hh"
+#include "_cpy_khmer.hh"
 
 namespace khmer {
 
 typedef struct {
     khmer_KHashtable_Object khashtable;
-    Counttable * counttable;
+    oxli::Counttable * counttable;
 } khmer_KCounttable_Object;
 
 extern PyTypeObject khmer_KCounttable_Type

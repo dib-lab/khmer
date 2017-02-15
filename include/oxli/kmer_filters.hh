@@ -39,12 +39,12 @@ Contact: khmer-project@idyll.org
 
 #include <functional>
 
-#include "khmer.hh"
+#include "oxli.hh"
 #include "kmer_hash.hh"
 #include "labelhash.hh"
 
 
-namespace khmer
+namespace oxli
 {
 
 class Hashtable;

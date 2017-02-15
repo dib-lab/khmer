@@ -3,22 +3,23 @@
 #define _CPY_HASHSET_HH
 
 #include <Python.h>
-#include "khmer.hh"
+#include "oxli/oxli.hh"
 #include "_cpy_utils.hh"
+
 
 namespace khmer {
 
 typedef struct {
     PyObject_HEAD
-    SeenSet * hashes;
-    WordLength ksize;
+    oxli::SeenSet * hashes;
+    oxli::WordLength ksize;
 } khmer_HashSet_Object;
 
 
 typedef struct {
     PyObject_HEAD
     khmer_HashSet_Object * parent;
-    SeenSet::iterator * it;
+    oxli::SeenSet::iterator * it;
 } _HashSet_iterobj;
 
 extern PyMethodDef khmer_HashSet_methods[]; 
@@ -30,7 +31,8 @@ extern PyTypeObject khmer_HashSet_Type;
 extern PyTypeObject _HashSet_iter_Type;
 
 
-khmer_HashSet_Object * create_HashSet_Object(SeenSet * h, WordLength k);
+khmer_HashSet_Object * create_HashSet_Object(oxli::SeenSet * h, 
+                                             oxli::WordLength k);
 
 void
 khmer_HashSet_dealloc(khmer_HashSet_Object * obj);

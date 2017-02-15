@@ -1,8 +1,10 @@
-#include "_cpy_hashtable.hh"
-#include "_cpy_nodegraph.hh"
-#include "_cpy_countgraph.hh"
-#include "_cpy_hashset.hh"
-#include "_cpy_readparsers.hh"
+#include "khmer/_cpy_hashtable.hh"
+#include "khmer/_cpy_nodegraph.hh"
+#include "khmer/_cpy_countgraph.hh"
+#include "khmer/_cpy_hashset.hh"
+#include "khmer/_cpy_readparsers.hh"
+
+using namespace oxli;
 
 namespace khmer {
 
@@ -237,7 +239,7 @@ hashtable_hash(khmer_KHashtable_Object * me, PyObject * args)
         const HashIntoType h(hashtable->hash_dna(kmer));
         convert_HashIntoType_to_PyObject(h, &hash);
         return hash;
-    } catch (khmer_exception &e) {
+    } catch (oxli_exception &e) {
         PyErr_SetString(PyExc_RuntimeError, e.what());
         return NULL;
     }
@@ -327,10 +329,10 @@ hashtable_consume_fasta(khmer_KHashtable_Object * me, PyObject * args)
     unsigned int          total_reads   = 0;
     try {
         hashtable->consume_fasta(filename, total_reads, n_consumed);
-    } catch (khmer_file_exception &exc) {
+    } catch (oxli_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;
-    } catch (khmer_value_exception &exc) {
+    } catch (oxli_value_exception &exc) {
         PyErr_SetString(PyExc_ValueError, exc.what());
         return NULL;
     }
@@ -364,10 +366,10 @@ hashtable_consume_fasta_with_reads_parser(khmer_KHashtable_Object * me,
     Py_BEGIN_ALLOW_THREADS
     try {
         hashtable->consume_fasta(rparser, total_reads, n_consumed);
-    } catch (khmer_file_exception &exc) {
+    } catch (oxli_file_exception &exc) {
         exc_string = exc.what();
         file_exception = exc_string.c_str();
-    } catch (khmer_value_exception &exc) {
+    } catch (oxli_value_exception &exc) {
         exc_string = exc.what();
         value_exception = exc_string.c_str();
     }
@@ -538,10 +540,10 @@ hashtable_abundance_distribution_with_reads_parser(khmer_KHashtable_Object * me,
     Py_BEGIN_ALLOW_THREADS
     try {
         dist = hashtable->abundance_distribution(rparser, nodegraph);
-    } catch (khmer_file_exception &exc) {
+    } catch (oxli_file_exception &exc) {
         exc_string = exc.what();
         file_exception = exc_string.c_str();
-    } catch (khmer_value_exception &exc) {
+    } catch (oxli_value_exception &exc) {
         exc_string = exc.what();
         value_exception = exc_string.c_str();
     }
@@ -651,7 +653,7 @@ hashtable_find_spectral_error_positions(khmer_KHashtable_Object * me,
 
     try {
         posns = hashtable->find_spectral_error_positions(seq, max_count);
-    } catch (khmer_exception &e) {
+    } catch (oxli_exception &e) {
         PyErr_SetString(PyExc_ValueError, e.what());
         return NULL;
     }
@@ -691,10 +693,10 @@ hashtable_abundance_distribution(khmer_KHashtable_Object * me, PyObject * args)
     Py_BEGIN_ALLOW_THREADS
     try {
         dist = hashtable->abundance_distribution(filename, nodegraph);
-    } catch (khmer_file_exception &exc) {
+    } catch (oxli_file_exception &exc) {
         exc_string = exc.what();
         file_exception = exc_string.c_str();
-    } catch (khmer_value_exception &exc) {
+    } catch (oxli_value_exception &exc) {
         exc_string = exc.what();
         value_exception = exc_string.c_str();
     }
@@ -747,7 +749,7 @@ hashtable_load(khmer_KHashtable_Object * me, PyObject * args)
 
     try {
         hashtable->load(filename);
-    } catch (khmer_file_exception &e) {
+    } catch (oxli_file_exception &e) {
         PyErr_SetString(PyExc_OSError, e.what());
         return NULL;
     }
@@ -769,7 +771,7 @@ hashtable_save(khmer_KHashtable_Object * me, PyObject * args)
 
     try {
         hashtable->save(filename);
-    } catch (khmer_file_exception &e) {
+    } catch (oxli_file_exception &e) {
         PyErr_SetString(PyExc_OSError, e.what());
         return NULL;
     }

@@ -2,8 +2,7 @@
 import cython
 from cython.operator cimport dereference as deref
 
-from _oxli import *
-from _oxli cimport CpHashgraph, CpLinearAssembler, CpKmer, get_hashgraph_ptr
+from wrapper cimport CpHashgraph, CpLinearAssembler, CpKmer, get_hashgraph_ptr
 
 
 cdef class LinearAssembler:

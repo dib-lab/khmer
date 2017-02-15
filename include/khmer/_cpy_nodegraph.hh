@@ -4,13 +4,14 @@
 #include <Python.h>
 #include "_cpy_utils.hh"
 #include "_cpy_hashgraph.hh"
-#include "hashgraph.hh"
+#include "oxli/hashgraph.hh"
+
 
 namespace khmer {
 
 typedef struct {
     khmer_KHashgraph_Object khashgraph;
-    Nodegraph * nodegraph;
+    oxli::Nodegraph * nodegraph;
 } khmer_KNodegraph_Object;
 
 void khmer_nodegraph_dealloc(khmer_KNodegraph_Object * obj);

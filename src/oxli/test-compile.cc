@@ -36,13 +36,13 @@ LICENSE (END)
 Contact: khmer-project@idyll.org
 */
 
-// This file is used to test compilation with libkhmer.a/libkhmer.so, after
+// This file is used to test compilation with liboxli.a/liboxli.so, after
 // installation
 
 #include <oxli/hashtable.hh>
 
 int main()
 {
-    khmer::Countgraph test(1,1);
+    oxli::Countgraph test(1,1);
     return 0;
 }

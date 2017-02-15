@@ -37,7 +37,7 @@ Contact: khmer-project@idyll.org
 #ifndef SYMBOLS_HH
 #define SYMBOLS_HH
 
-namespace khmer
+namespace oxli
 {
 namespace alphabets
 {

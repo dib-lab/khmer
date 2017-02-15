@@ -44,19 +44,19 @@ Contact: khmer-project@idyll.org
 #include <set>
 #include <utility>
 
-#include "hashgraph.hh"
-#include "khmer_exception.hh"
-#include "read_parsers.hh"
-#include "subset.hh"
-#include "traversal.hh"
+#include "oxli/hashgraph.hh"
+#include "oxli/oxli_exception.hh"
+#include "oxli/read_parsers.hh"
+#include "oxli/subset.hh"
+#include "oxli/traversal.hh"
 
 #define IO_BUF_SIZE 250*1000*1000
 #define BIG_TRAVERSALS_ARE 200
 
 // #define VALIDATE_PARTITIONS
 
-using namespace khmer;
-using namespace khmer:: read_parsers;
+using namespace oxli;
+using namespace oxli:: read_parsers;
 using namespace std;
 
 #if 0
@@ -279,7 +279,7 @@ void SubsetPartition::find_all_tags(
 
         if (!(breadth >= cur_breadth)) { // keep track of watermark, for
             // debugging
-            throw khmer_exception("Desynchonization between traversal "
+            throw oxli_exception("Desynchonization between traversal "
                                   "and breadth tracking. Did you forget "
                                   "to pop the node or breadth queue?");
         }
@@ -477,7 +477,7 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(
         // @cswelcher Do these lines actually do anything?
         if (!(breadth >= cur_breadth)) { // keep track of watermark, for
             // debugging.
-            throw khmer_exception("Desynchonization between traversal "
+            throw oxli_exception("Desynchonization between traversal "
                                   "and breadth tracking. Did you forget "
                                   "to pop the node or breadth queue?");
         }
@@ -628,7 +628,7 @@ void SubsetPartition::set_partition_id(
 {
     HashIntoType kmer;
     if (!(kmer_s.length() >= _ht->ksize())) {
-        throw khmer_exception();
+        throw oxli_exception();
     }
     kmer = _ht->hash_dna(kmer_s.c_str());
 
@@ -798,7 +798,7 @@ PartitionID SubsetPartition::get_partition_id(std::string kmer_s)
 {
     HashIntoType kmer;
     if (!(kmer_s.length() >= _ht->ksize())) {
-        throw khmer_exception();
+        throw oxli_exception();
     }
     kmer = _ht->hash_dna(kmer_s.c_str());
 
@@ -905,13 +905,13 @@ void SubsetPartition::merge_from_disk(string other_filename)
         } else {
             err = "Unknown error in opening file: " + other_filename;
         }
-        throw khmer_file_exception(err);
+        throw oxli_file_exception(err);
     } catch (const std::exception &e) {
         // Catching std::exception is a stopgap for
         // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
         std::string err = "Unknown error opening file: " + other_filename + " "
                           + strerror(errno);
-        throw khmer_file_exception(err);
+        throw oxli_file_exception(err);
     }
 
     try {
@@ -930,17 +930,17 @@ void SubsetPartition::merge_from_disk(string other_filename)
             }
             err << " while reading subset pmap from " << other_filename
                 << " Should be: " << SAVED_SIGNATURE;
-            throw khmer_file_exception(err.str());
+            throw oxli_file_exception(err.str());
         } else if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
             err << "Incorrect file format version " << (int) version
                 << " while reading subset pmap from " << other_filename;
-            throw khmer_file_exception(err.str());
+            throw oxli_file_exception(err.str());
         } else if (!(ht_type == SAVED_SUBSET)) {
             std::ostringstream err;
             err << "Incorrect file format type " << (int) ht_type
                 << " while reading subset pmap from " << other_filename;
-            throw khmer_file_exception(err.str());
+            throw oxli_file_exception(err.str());
         }
 
         infile.read((char *) &save_ksize, sizeof(save_ksize));
@@ -948,20 +948,20 @@ void SubsetPartition::merge_from_disk(string other_filename)
             std::ostringstream err;
             err << "Incorrect k-mer size " << save_ksize
                 << " while reading subset pmap from " << other_filename;
-            throw khmer_file_exception(err.str());
+            throw oxli_file_exception(err.str());
         }
 
         infile.read((char *) &expected_pmap_size, sizeof(expected_pmap_size));
     } catch (std::ifstream::failure &e) {
         std::string err;
         err = "Unknown error reading header info from: " + other_filename;
-        throw khmer_file_exception(err);
-    } catch (khmer_file_exception &e) {
+        throw oxli_file_exception(err);
+    } catch (oxli_file_exception &e) {
         throw e;
     } catch (const std::exception &e) {
         std::string err = "Unknown error opening file: " + other_filename + " "
                           + strerror(errno);
-        throw khmer_file_exception(err);
+        throw oxli_file_exception(err);
     }
     char * buf = new char[IO_BUF_SIZE];
 
@@ -996,7 +996,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
                 delete[] buf;
                 std::string err;
                 err = "Unknown error reading data from: " + other_filename;
-                throw khmer_file_exception(err);
+                throw oxli_file_exception(err);
             }
         }
 
@@ -1024,7 +1024,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
     delete[] buf;
 
     if (loaded != expected_pmap_size) {
-        throw khmer_file_exception("error loading partitionmap - "
+        throw oxli_file_exception("error loading partitionmap - "
                                    "invalid # of items");
     }
 }
@@ -1087,7 +1087,7 @@ void SubsetPartition::save_partitionmap(string pmap_filename)
     }
     if (outfile.fail()) {
         delete[] buf;
-        throw khmer_file_exception(strerror(errno));
+        throw oxli_file_exception(strerror(errno));
     }
     outfile.close();
 
@@ -1112,7 +1112,7 @@ void SubsetPartition::_validate_pmap()
 
         if (pp_id != NULL) {
             if (!(*pp_id >= 1) || !(*pp_id < next_partition_id)) {
-                throw khmer_exception();
+                throw oxli_exception();
             }
         }
     }
@@ -1123,7 +1123,7 @@ void SubsetPartition::_validate_pmap()
         PartitionPtrSet *s = (*ri).second;
 
         if (!(s != NULL)) {
-            throw khmer_exception();
+            throw oxli_exception();
         }
 
         for (PartitionPtrSet::const_iterator si = s->begin(); si != s->end();
@@ -1132,7 +1132,7 @@ void SubsetPartition::_validate_pmap()
             pp = *si;
 
             if (!(p == *pp)) {
-                throw khmer_exception();
+                throw oxli_exception();
             }
         }
     }
@@ -1250,7 +1250,7 @@ unsigned long long SubsetPartition::repartition_largest_partition(
     PartitionCountDistribution::const_iterator di = d.end();
 
     if (d.empty()) {
-        throw khmer_exception();
+        throw oxli_exception();
     }
     --di;
 
@@ -1261,7 +1261,7 @@ unsigned long long SubsetPartition::repartition_largest_partition(
         }
     }
     if (!(biggest_p != 0)) {
-        throw khmer_exception();
+        throw oxli_exception();
     }
 
 #if VERBOSE_REPARTITION

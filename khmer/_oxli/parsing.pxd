@@ -2,7 +2,7 @@ from libcpp.memory cimport unique_ptr
 from libcpp cimport bool
 from libcpp.string cimport string
 
-from _oxli cimport *
+from wrapper cimport *
 
 
 cdef class Alphabets:

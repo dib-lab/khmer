@@ -4,10 +4,10 @@
 
 #include <Python.h>
 #include <vector>
-#include "khmer.hh"
-#include "kmer_hash.hh"
-#include "hashtable.hh"
-#include "khmer_exception.hh"
+#include "oxli/oxli.hh"
+#include "oxli/kmer_hash.hh"
+#include "oxli/hashtable.hh"
+#include "oxli/oxli_exception.hh"
 
 //
 // Python 2/3 compatibility: PyInt and PyLong
@@ -32,34 +32,35 @@ namespace khmer {
 
 
 bool 
-convert_HashIntoType_to_PyObject(const HashIntoType &hashval, 
+convert_HashIntoType_to_PyObject(const oxli::HashIntoType &hashval, 
                                  PyObject **value);
 
 
 bool 
-convert_PyLong_to_HashIntoType(PyObject * value, HashIntoType &hashval);
+convert_PyLong_to_HashIntoType(PyObject * value,
+                               oxli::HashIntoType &hashval);
 
 
 bool 
 convert_PyObject_to_HashIntoType(PyObject * value, 
-                                 HashIntoType& hashval, 
-                                 WordLength ksize);
+                                 oxli::HashIntoType& hashval, 
+                                 oxli::WordLength ksize);
 
 
 bool 
 ht_convert_PyObject_to_HashIntoType(PyObject * value, 
-                                    HashIntoType& hashval, 
-                                    const Hashtable * ht);
+                                    oxli::HashIntoType& hashval, 
+                                    const oxli::Hashtable * ht);
 
 
 bool 
 ht_convert_PyObject_to_Kmer(PyObject * value, 
-                            Kmer& kmer, 
-                            const Hashtable * ht);
+                            oxli::Kmer& kmer, 
+                            const oxli::Hashtable * ht);
 
 
 bool convert_Pytablesizes_to_vector(PyListObject * sizes_list_o,
-                                           std::vector<uint64_t>& sizes);
+                                    std::vector<uint64_t>& sizes);
 
 }
 

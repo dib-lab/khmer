@@ -1,5 +1,7 @@
-#include "_cpy_subsetpartition.hh"
-#include "_cpy_countgraph.hh"
+#include "khmer/_cpy_subsetpartition.hh"
+#include "khmer/_cpy_countgraph.hh"
+
+using namespace oxli;
 
 namespace khmer {
 
@@ -167,7 +169,7 @@ subset_partition_size_distribution(khmer_KSubsetPartition_Object * me,
         Py_XDECREF(tup);
     }
     if (!(i == d.size())) {
-        throw khmer_exception();
+        throw oxli_exception();
     }
 
     PyObject * ret = Py_BuildValue("OI", x, n_unassigned);

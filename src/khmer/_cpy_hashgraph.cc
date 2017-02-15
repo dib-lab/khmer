@@ -1,16 +1,18 @@
-#include "_cpy_hashset.hh"
-#include "_cpy_hashgraph.hh"
-#include "_cpy_nodegraph.hh"
-#include "_cpy_countgraph.hh"
-#include "_cpy_subsetpartition.hh"
-#include "_cpy_readparsers.hh"
+#include "khmer/_cpy_hashset.hh"
+#include "khmer/_cpy_hashgraph.hh"
+#include "khmer/_cpy_nodegraph.hh"
+#include "khmer/_cpy_countgraph.hh"
+#include "khmer/_cpy_subsetpartition.hh"
+#include "khmer/_cpy_readparsers.hh"
 
 #include <vector>
-#include "khmer.hh"
-#include "kmer_hash.hh"
-#include "read_parsers.hh"
-#include "assembler.hh"
-#include "traversal.hh"
+#include "oxli/oxli.hh"
+#include "oxli/kmer_hash.hh"
+#include "oxli/read_parsers.hh"
+#include "oxli/assembler.hh"
+#include "oxli/traversal.hh"
+
+using namespace oxli;
 
 namespace khmer {
 
@@ -516,7 +518,7 @@ hashgraph_load_stop_tags(khmer_KHashgraph_Object * me, PyObject * args)
 
     try {
         hashgraph->load_stop_tags(filename, clear_tags);
-    } catch (khmer_file_exception &e) {
+    } catch (oxli_file_exception &e) {
         PyErr_SetString(PyExc_OSError, e.what());
         return NULL;
     }
@@ -539,7 +541,7 @@ hashgraph_save_stop_tags(khmer_KHashgraph_Object * me, PyObject * args)
 
     try {
         hashgraph->save_stop_tags(filename);
-    } catch (khmer_file_exception &e) {
+    } catch (oxli_file_exception &e) {
         PyErr_SetString(PyExc_OSError, e.what());
         return NULL;
     }
@@ -581,7 +583,7 @@ hashgraph_repartition_largest_partition(khmer_KHashgraph_Object * me,
     try {
         next_largest = subset_p->repartition_largest_partition(distance,
                        threshold, frequency, *countgraph);
-    } catch (khmer_exception &e) {
+    } catch (oxli_exception &e) {
         PyErr_SetString(PyExc_RuntimeError, e.what());
         return NULL;
     }
@@ -756,7 +758,7 @@ hashgraph_merge_from_disk(khmer_KHashgraph_Object * me, PyObject * args)
 
     try {
         hashgraph->partition->merge_from_disk(filename);
-    } catch (khmer_file_exception &e) {
+    } catch (oxli_file_exception &e) {
         PyErr_SetString(PyExc_OSError, e.what());
         return NULL;
     }
@@ -790,10 +792,10 @@ hashgraph_consume_fasta_and_tag_with_reads_parser(khmer_KHashgraph_Object * me,
     Py_BEGIN_ALLOW_THREADS
     try {
         hashgraph->consume_fasta_and_tag(rparser, total_reads, n_consumed);
-    } catch (khmer_file_exception &exc) {
+    } catch (oxli_file_exception &exc) {
         exc_string = exc.what();
         file_exception = exc_string.c_str();
-    } catch (khmer_value_exception &exc) {
+    } catch (oxli_value_exception &exc) {
         exc_string = exc.what();
         value_exception = exc_string.c_str();
     }
@@ -830,10 +832,10 @@ hashgraph_consume_partitioned_fasta(khmer_KHashgraph_Object * me,
 
     try {
         hashgraph->consume_partitioned_fasta(filename, total_reads, n_consumed);
-    } catch (khmer_file_exception &exc) {
+    } catch (oxli_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;
-    } catch (khmer_value_exception &exc) {
+    } catch (oxli_value_exception &exc) {
         PyErr_SetString(PyExc_ValueError, exc.what());
         return NULL;
     }
@@ -1014,10 +1016,10 @@ hashgraph_output_partitions(khmer_KHashgraph_Object * me, PyObject * args)
         n_partitions = subset_p->output_partitioned_file(filename,
                        output,
                        output_unassigned);
-    } catch (khmer_file_exception &e) {
+    } catch (oxli_file_exception &e) {
         PyErr_SetString(PyExc_OSError, e.what());
         return NULL;
-    } catch (khmer_value_exception &exc) {
+    } catch (oxli_value_exception &exc) {
         PyErr_SetString(PyExc_ValueError, exc.what());
         return NULL;
     }
@@ -1039,7 +1041,7 @@ hashgraph_save_partitionmap(khmer_KHashgraph_Object * me, PyObject * args)
 
     try {
         hashgraph->partition->save_partitionmap(filename);
-    } catch (khmer_file_exception &e) {
+    } catch (oxli_file_exception &e) {
         PyErr_SetString(PyExc_OSError, e.what());
         return NULL;
     }
@@ -1061,7 +1063,7 @@ hashgraph_load_partitionmap(khmer_KHashgraph_Object * me, PyObject * args)
 
     try {
         hashgraph->partition->load_partitionmap(filename);
-    } catch (khmer_file_exception &e) {
+    } catch (oxli_file_exception &e) {
         PyErr_SetString(PyExc_OSError, e.what());
         return NULL;
     }
@@ -1154,7 +1156,7 @@ hashgraph_subset_partition_size_distribution(khmer_KHashgraph_Object * me,
         PyList_SET_ITEM(x, i, value);
     }
     if (!(i == d.size())) {
-        throw khmer_exception();
+        throw oxli_exception();
     }
 
     PyObject * returnValue = Py_BuildValue("NI", x, n_unassigned);
@@ -1185,7 +1187,7 @@ hashgraph_load_tagset(khmer_KHashgraph_Object * me, PyObject * args)
 
     try {
         hashgraph->load_tagset(filename, clear_tags);
-    } catch (khmer_file_exception &e) {
+    } catch (oxli_file_exception &e) {
         PyErr_SetString(PyExc_OSError, e.what());
         return NULL;
     }
@@ -1207,7 +1209,7 @@ hashgraph_save_tagset(khmer_KHashgraph_Object * me, PyObject * args)
 
     try {
         hashgraph->save_tagset(filename);
-    } catch (khmer_file_exception &e) {
+    } catch (oxli_file_exception &e) {
         PyErr_SetString(PyExc_OSError, e.what());
         return NULL;
     }
@@ -1234,7 +1236,7 @@ hashgraph_save_subset_partitionmap(khmer_KHashgraph_Object * me,
 
     try {
         subset_p->save_partitionmap(filename);
-    } catch (khmer_file_exception &e) {
+    } catch (oxli_file_exception &e) {
         PyErr_SetString(PyExc_OSError, e.what());
         return NULL;
     }
@@ -1270,7 +1272,7 @@ hashgraph_load_subset_partitionmap(khmer_KHashgraph_Object * me,
     Py_BEGIN_ALLOW_THREADS
     try {
         subset_p->load_partitionmap(filename);
-    } catch (khmer_file_exception &exc) {
+    } catch (oxli_file_exception &exc) {
         exc_string = exc.what();
         file_exception = exc_string.c_str();
     }
@@ -1590,10 +1592,10 @@ hashgraph_consume_fasta_and_tag(khmer_KHashgraph_Object * me, PyObject * args)
 
     try {
         hashgraph->consume_fasta_and_tag(filename, total_reads, n_consumed);
-    } catch (khmer_file_exception &exc) {
+    } catch (oxli_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;
-    } catch (khmer_value_exception &exc) {
+    } catch (oxli_value_exception &exc) {
         PyErr_SetString(PyExc_ValueError, exc.what());
         return NULL;
     }

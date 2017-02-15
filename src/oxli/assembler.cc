@@ -35,14 +35,14 @@ LICENSE (END)
 Contact: khmer-project@idyll.org
 */
 
-#include "assembler.hh"
+#include "oxli/assembler.hh"
 
 #include <algorithm>
 #include <iostream>
 
 using namespace std;
 
-namespace khmer
+namespace oxli
 {
 
 /********************************

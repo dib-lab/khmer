@@ -1,6 +1,7 @@
-#include "_cpy_hashset.hh"
-#include "hashgraph.hh"
+#include "khmer/_cpy_hashset.hh"
+#include "oxli/hashgraph.hh"
 
+using namespace oxli;
 
 namespace khmer {
 

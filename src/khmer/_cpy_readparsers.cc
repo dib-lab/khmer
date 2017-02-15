@@ -1,9 +1,10 @@
-#include "_cpy_readparsers.hh"
+#include "khmer/_cpy_readparsers.hh"
 #include <string>
 
-namespace khmer {
+using namespace oxli;
+using namespace oxli::read_parsers;
 
-using namespace read_parsers;
+namespace khmer {
 
 PyTypeObject khmer_Read_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)        /* init & ob_size */
@@ -401,7 +402,7 @@ _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
     try {
         myself->parser =
             IParser:: get_parser( ifile_name );
-    } catch (khmer_file_exception &exc) {
+    } catch (oxli_file_exception &exc) {
         PyErr_SetString( PyExc_OSError, exc.what() );
         return NULL;
     }
@@ -432,10 +433,10 @@ _ReadParser_iternext( PyObject * self )
             *the_read_PTR = parser->get_next_read();
         } catch (NoMoreReadsAvailable &exc) {
             stop_iteration = true;
-        } catch (khmer_file_exception &exc) {
+        } catch (oxli_file_exception &exc) {
             exc_string = exc.what();
             file_exception = exc_string.c_str();
-        } catch (khmer_value_exception &exc) {
+        } catch (oxli_value_exception &exc) {
             exc_string = exc.what();
             value_exception = exc_string.c_str();
         }
@@ -486,10 +487,10 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
             the_read_pair = parser->get_next_read_pair(pair_mode);
         } catch (NoMoreReadsAvailable &exc) {
             stop_iteration = true;
-        } catch (khmer_file_exception &exc) {
+        } catch (oxli_file_exception &exc) {
             exc_string = exc.what();
             file_exception = exc_string.c_str();
-        } catch (khmer_value_exception &exc) {
+        } catch (oxli_value_exception &exc) {
             exc_string = exc.what();
             value_exception = exc_string.c_str();
         }

@@ -3,13 +3,14 @@
 
 #include <Python.h>
 #include "_cpy_utils.hh"
-#include "assembler.hh"
+#include "oxli/assembler.hh"
+
 
 namespace khmer {
 
 typedef struct {
     PyObject_HEAD
-    SimpleLabeledAssembler * assembler;
+    oxli::SimpleLabeledAssembler * assembler;
 } khmer_KSimpleLabeledAssembler_Object;
 
 extern PyTypeObject khmer_KSimpleLabeledAssembler_Type;
@@ -35,7 +36,7 @@ simplelabeledassembler_assemble(khmer_KSimpleLabeledAssembler_Object * me,
 
 typedef struct {
     PyObject_HEAD
-    JunctionCountAssembler * assembler;
+    oxli::JunctionCountAssembler * assembler;
 } khmer_KJunctionCountAssembler_Object;
 
 
