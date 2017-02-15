@@ -281,7 +281,8 @@ liboxli: FORCE
 
 install-liboxli: liboxli
 	cd src/oxli && $(MAKE) install PREFIX=$(PREFIX)
-	cp -r include/khmer/_cpy_*.hh $(PREFIX)/include/oxli/
+	mkdir -p $(PREFIX)/include/khmer
+	cp -r include/khmer/_cpy_*.hh $(PREFIX)/include/khmer/
 
 # Runs a test of liboxli
 libtest: FORCE

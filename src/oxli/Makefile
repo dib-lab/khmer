@@ -67,7 +67,7 @@ PREFIX=/usr/local
 
 ### NOTE: No user-serviceable parts below this line! ###
 
-INCLUDES= -I ../../include/ -I ../../third-party/seqan/core/include/ 	\
+INCLUDES= -I ../../include/ -I ../../third-party/seqan/core/include/ \
 	      -I ../../third-party/smhasher/
 
 ifeq ($(USE_SYSTEM_ZLIB), false)
@@ -232,10 +232,9 @@ LIBOXLI_OBJS= \
 	read_parsers.o \
 	subset.o \
 	kmer_filters.o \
-	partitioning.o \
 	assembler.o \
 	alphabets.o \
-	murmur3.o 
+	murmur3.o \
 	storage.o
 
 PRECOMILE_OBJS ?=
@@ -253,8 +252,9 @@ PRECOMILE_OBJS += $(BZIP2_OBJS)
 PRECLEAN_TARGS += libbz2clean
 endif
 
-OXLI_HEADERS= \
+HEADERS= \
 	hashtable.hh \
+	hashgraph.hh \
 	hllcounter.hh \
 	oxli_exception.hh \
 	oxli.hh \
@@ -265,10 +265,10 @@ OXLI_HEADERS= \
 	read_parsers.hh \
 	subset.hh \
 	kmer_filters.hh \
-	partitioning.hh \
 	assembler.hh \
 	alphabets.hh \
 	storage.hh
+OXLI_HEADERS = $(addprefix ../../include/oxli/,$(HEADERS))
 
 # START OF RULES #
 
@@ -286,7 +286,7 @@ clean: $(PRECLEAN_TARGS)
 install: $(LIBOXLISO) liboxli.a oxli.pc $(OXLI_HEADERS)
 	mkdir -p $(PREFIX)/lib $(PREFIX)/lib/pkgconfig $(PREFIX)/include/oxli
 	cp -r $(OXLI_HEADERS) 				\
-		../third-party/smhasher/MurmurHash3.h 	\
+		../../third-party/smhasher/MurmurHash3.h 	\
 		$(PREFIX)/include/oxli/
 	cp oxli.pc $(PREFIX)/lib/pkgconfig/
 	cp $(LIBOXLISO) liboxli.a $(PREFIX)/lib/
@@ -302,7 +302,7 @@ $(BZIP2_OBJS):
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so $(BZIP2_OBJS_BASE))
 
 # MurMur3
-murmur3.o: ../third-party/smhasher/MurmurHash3.cc
+murmur3.o: ../../third-party/smhasher/MurmurHash3.cc
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 %.o: %.cc $(PRECOMILE_OBJS) $(OXLI_HEADERS)
