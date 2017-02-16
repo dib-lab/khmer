@@ -36,8 +36,8 @@
 
    Contact: khmer-project@idyll.org
 
-Development miscellany
-======================
+Development Nuts and Bolts
+==========================
 
 Third-party use
 ---------------
@@ -187,6 +187,42 @@ with the function signature used later.
 
 "I" for unsigned int
 "K" for unsigned long long a.k.a oxli::HashIntoType.
+
+Linking Against liboxli
+-----------------------
+
+The C++ library can be installed as a shared library and linked against from external projects.
+To build and install it, run: ::
+
+    make install-liboxli
+
+This command can be given an optional ``PREFIX`` variable to control where the library and headers are
+installed (by default, in ``/usr/local``. Code can then include the headers by prefixing their paths 
+with ``oxli/``. For example, to use ``Hashgraph``, use ``#include "oxli/hashgraph.hh"``. To compile,
+add ``-Ioxli`` to your compiler invocation.
+    
+
+Experimental Cython Bindings
+----------------------------
+
+khmer includes experimental Cython bindings in ``khmer/_oxli``. ``wrapper.pxd`` contains all the C++
+library declarations. To use extension classes in regular Python code, simply ``import`` them: for
+example, to get the wrapped ``ReadParser``, use ``from khmer._oxli.parsing import FastxParser``.
+Extension classes can all be used in external Cython code by using `cimport`; the declarations in
+``wrapper.pxd`` can also be used, meaning you have access to liboxli. Note that for any ``cimport``'ed code
+to work, you'll need to install liboxli and include ``oxli`` in your Cython project's ``Extension``
+class. This is done by adding ``oxli`` to the ``libraries`` argument of your ``Extension`` object in
+``setup.py``, which instructs setuptools to add ``-Ioxli`` to its compiler invocation.
+
+ An example: ::
+
+   
+    cy_ext = Extension('mypackage.example',
+                       sources = 'mypackage/example.pyx',
+                       extra_compile_args = ['-arch', 'x86_64', '-stdlib=libc++'],
+                       libraries = ['oxli'],
+                       include_dirs = [],
+                       language = 'c++')
 
 Read handling
 -------------
