@@ -284,6 +284,7 @@ clean: $(PRECLEAN_TARGS)
 	rm -f *.o *.a *.$(SHARED_EXT)* oxli.pc $(TEST_PROGS)
 
 install: $(LIBOXLISO) liboxli.a oxli.pc $(OXLI_HEADERS)
+	rm -rf $(PREFIX)/include/oxli $(PREFIX)/include/khmer
 	mkdir -p $(PREFIX)/lib $(PREFIX)/lib/pkgconfig $(PREFIX)/include/oxli
 	cp -r $(OXLI_HEADERS) 				\
 		../../third-party/smhasher/MurmurHash3.h 	\
