@@ -576,15 +576,17 @@ def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
     else:
         if args.hash_function == 'murmur':
             tabletype = 'counttable'
+            tableclass = khmer.Counttable
         elif args.hash_function == 'twobit-exact':
             tabletype = 'countgraph'
+            tableclass = khmer.Countgraph
         else:
             print_error("\n** Error, unknown hash function")
             # @CTB be sure to catch unknown hash functions earlier, too :)
             sys.exit(1)
 
         tablesize = calculate_graphsize(args, tabletype, multiplier=multiplier)
-        return khmer.Countgraph(ksize, tablesize, args.n_tables)
+        return tableclass(ksize, tablesize, args.n_tables)
 
 
 def report_on_config(args, graphtype='countgraph'):
