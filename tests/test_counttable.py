@@ -1,7 +1,5 @@
-#! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) 2011-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -15,7 +13,7 @@
 #       disclaimer in the documentation and/or other materials provided
 #       with the distribution.
 #
-#     * Neither the name of the Michigan State University nor the names
+#     * Neither the name of the University of California nor the names
 #       of its contributors may be used to endorse or promote products
 #       derived from this software without specific prior written
 #       permission.
@@ -33,38 +31,33 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
+# pylint: disable=C0111,C0103,missing-docstring,no-member,protected-access
 
 from __future__ import print_function
-import sys
+from __future__ import absolute_import
+
 import khmer
-import os.path
-import screed
 
-K = 20
-
-
-def main():
-    readsfile = sys.argv[1]
-    contigfile = sys.argv[2]
-    outfile = os.path.basename(readsfile) + '.sweep'
-    if len(sys.argv) == 4:
-        outfile = sys.argv[3]
-
-    # create a nodegraph data structure
-    ht = khmer.Nodegraph(K, 1, 1)
-
-    # tag every k-mer in the contigs
-    ht._set_tag_density(0)
-
-    # load contigs, connect into N partitions
-    print('loading contigs from', contigfile)
-    ht.consume_seqfile_and_tag(contigfile)
-    subset = ht.do_subset_partition(0, 0)
-    ht.merge_subset(subset)
-
-    print('outputting contig-partitioned reads to', outfile)
-    ht.output_partitions(readsfile, outfile, True)
+import pytest
+from . import khmer_tst_utils as utils
 
 
-if __name__ == '__main__':
-    main()
+def test_get_kmer_hashes():
+    s = "ATGGATATGGAGGACAAGTATATGGAGGACAAGTATATGGAGGACAAGTAT"
+    a = khmer.Counttable(33, 1e6, 3)
+    assert a.get_kmer_hashes(s[:33]) == [4743239192574154715]
+    assert a.get_kmer_hashes(s[:34]) == [4743239192574154715,
+                                         2122462908541313313]
+
+    assert a.get_kmer_hashes(s[0:33]) == [4743239192574154715]
+    assert a.get_kmer_hashes(s[1:34]) == [2122462908541313313]
+
+
+@pytest.mark.parametrize('kmer', [
+    ('GATTACA' * 3),
+    ('ATG' * 7),
+    ('AGGACAAGTATATGGAGGACA'),
+])
+def test_kmer_revcom_hash(kmer):
+    a = khmer.Counttable(21, 1e4, 3)
+    assert a.hash(kmer) == a.hash(khmer.reverse_complement(kmer))

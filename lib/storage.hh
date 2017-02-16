@@ -53,10 +53,12 @@ typedef std::map<HashIntoType, BoundedCounterType> KmerCountMap;
 
 class Storage
 {
-public:
+protected:
+    bool _supports_bigcount;
     bool _use_bigcount;
 
-    Storage() : _use_bigcount(false) { } ;
+public:
+    Storage() : _supports_bigcount(false), _use_bigcount(false) { } ;
     virtual ~Storage() { }
     virtual std::vector<uint64_t> get_tablesizes() const = 0;
     virtual const size_t n_tables() const = 0;
@@ -269,7 +271,8 @@ protected:
 
 public:
     NibbleStorage(std::vector<uint64_t>& tablesizes) :
-        _tablesizes{tablesizes}, _occupied_bins{0}, _n_unique_kmers{0}
+        _tablesizes{tablesizes},
+        _occupied_bins{0}, _n_unique_kmers{0}
     {
         // to allow more than 32 tables increase the size of mutex pool
         assert(_n_tables <= 32);
@@ -458,7 +461,7 @@ public:
         _bigcount_spin_lock(false), _tablesizes(tablesizes),
         _n_unique_kmers(0), _occupied_bins(0)
     {
-
+        _supports_bigcount = true;
         _allocate_counters();
     }
 

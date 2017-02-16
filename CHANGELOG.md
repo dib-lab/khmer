@@ -26,6 +26,8 @@ under semantic versioning, but will be in future versions of khmer.
 - Support for assembling directly from k-mer graphs, and a new
   JunctionCountAssembler class.
 - Add --info flag for obtaining citation information.
+- Added Counttable and Nodetable to support non-reversible hashing
+  functionality and k > 32.
 - Add a new storage class using half a byte per entry. Exposed as
   SmallCounttable and SmallCountgraph.
 - Added `cleaned_seq` attribute to `khmer.Read` class which provides a cleaned
@@ -40,6 +42,8 @@ under semantic versioning, but will be in future versions of khmer.
 - Replaced the IParser and FastxParser classes with a single ReadParser class.
   Different input formats are supported by templating ReadParser with a reader
   class.
+- Renamed `consume_fasta` and related functions to `consume_seqfile`, with
+  support for reading sequences from additional formats pending.
 
 ### Fixed
 - Bug in compressed(gzip) streaming output from scripts

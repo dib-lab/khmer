@@ -84,11 +84,9 @@ def test_count_1():
     assert hi.get(hashval) == 2
 
     kmer = 'G' * 11
-    try:
+
+    with pytest.raises(ValueError):
         hi.hash(kmer)
-        assert 0, "incorrect kmer size should fail"
-    except RuntimeError:
-        pass
 
 
 def test_count_2():
@@ -622,7 +620,7 @@ def test_save_load_large(ctfile):
     sizes = khmer.get_n_primes_near_x(1, 2 ** 31 + 1000)
 
     orig = khmer._Countgraph(12, sizes)
-    orig.consume_fasta(inpath)
+    orig.consume_seqfile(inpath)
     orig.save(savepath)
 
     loaded = khmer.load_countgraph(savepath)
@@ -640,7 +638,7 @@ def test_save_load_occupied(ctfile):
     savepath = utils.get_temp_filename(ctfile)
 
     orig = khmer.Countgraph(12, 1e5, 4)
-    orig.consume_fasta(inpath)
+    orig.consume_seqfile(inpath)
     orig.save(savepath)
 
     loaded = khmer.load_countgraph(savepath)
@@ -658,7 +656,7 @@ def test_save_load_occupied_small(ctfile):
     savepath = utils.get_temp_filename(ctfile)
 
     orig = khmer.SmallCountgraph(12, 1e5, 4)
-    orig.consume_fasta(inpath)
+    orig.consume_seqfile(inpath)
     orig.save(savepath)
 
     loaded = khmer.load_countgraph(savepath, small=True)
@@ -677,7 +675,7 @@ def test_save_load():
     sizes.append(1000005)
 
     hi = khmer._Countgraph(12, sizes)
-    hi.consume_fasta(inpath)
+    hi.consume_seqfile(inpath)
     hi.save(savepath)
 
     try:
@@ -703,7 +701,7 @@ def test_load_truncated():
     sizes = khmer.get_n_primes_near_x(3, 200)
 
     hi = khmer._Countgraph(12, sizes)
-    hi.consume_fasta(inpath)
+    hi.consume_seqfile(inpath)
     hi.save(savepath)
 
     data = open(savepath, 'rb').read()
@@ -730,7 +728,7 @@ def test_load_gz():
 
     # save uncompressed hashtable.
     hi = khmer._Countgraph(12, sizes)
-    hi.consume_fasta(inpath)
+    hi.consume_seqfile(inpath)
     hi.save(savepath)
 
     # compress.
@@ -764,7 +762,7 @@ def test_save_load_gz():
     sizes.append(1000005)
 
     hi = khmer._Countgraph(12, sizes)
-    hi.consume_fasta(inpath)
+    hi.consume_seqfile(inpath)
     hi.save(savepath)
 
     try:
@@ -1010,7 +1008,7 @@ def test_bigcount_abund_dist():
 
     seqpath = utils.get_test_data('test-abund-read-2.fa')
 
-    kh.consume_fasta(seqpath)
+    kh.consume_seqfile(seqpath)
 
     dist = kh.abundance_distribution(seqpath, tracking)
     print(kh.get('GGTTGACGGGGCTCAGGG'))
@@ -1026,7 +1024,7 @@ def test_bigcount_abund_dist_2():
 
     seqpath = utils.get_test_data('test-abund-read.fa')
 
-    kh.consume_fasta(seqpath)
+    kh.consume_seqfile(seqpath)
     for i in range(1000):
         kh.count('GGTTGACGGGGCTCAGGG')
 
@@ -1075,7 +1073,7 @@ def test_load_truncated_should_fail():
     savepath = utils.get_temp_filename('tempcountingsave0.ht')
 
     hi = khmer.Countgraph(12, 1000, 2)
-    hi.consume_fasta(inpath)
+    hi.consume_seqfile(inpath)
     hi.save(savepath)
 
     fp = open(savepath, 'rb')
@@ -1108,7 +1106,7 @@ def test_load_gz_truncated_should_fail():
     savepath = utils.get_temp_filename('tempcountingsave0.ht.gz')
 
     hi = khmer.Countgraph(12, 1000, 2)
-    hi.consume_fasta(inpath)
+    hi.consume_seqfile(inpath)
     hi.save(savepath)
 
     fp = open(savepath, 'rb')
@@ -1191,7 +1189,7 @@ def test_bad_use_bigcount():
 def test_consume_absentfasta():
     countgraph = khmer.Countgraph(4, 4 ** 4, 4)
     try:
-        countgraph.consume_fasta("absent_file.fa")
+        countgraph.consume_seqfile("absent_file.fa")
         assert 0, "This should fail"
     except OSError as err:
         print(str(err))
@@ -1200,13 +1198,13 @@ def test_consume_absentfasta():
 def test_consume_absentfasta_with_reads_parser():
     countgraph = khmer.Countgraph(4, 4 ** 4, 4)
     try:
-        countgraph.consume_fasta_with_reads_parser()
+        countgraph.consume_seqfile_with_reads_parser()
         assert 0, "this should fail"
     except TypeError as err:
         print(str(err))
     try:
         readparser = ReadParser(utils.get_test_data('empty-file'))
-        countgraph.consume_fasta_with_reads_parser(readparser)
+        countgraph.consume_seqfile_with_reads_parser(readparser)
         assert 0, "this should fail"
     except OSError as err:
         print(str(err))
@@ -1352,14 +1350,14 @@ def test_badconsume_and_tag():
         print(str(err))
 
 
-def test_consume_fasta_and_tag():
+def test_consume_seqfile_and_tag():
     countgraph = khmer.Countgraph(4, 4 ** 4, 4)
     try:
-        countgraph.consume_fasta_and_tag()
+        countgraph.consume_seqfile_and_tag()
         assert 0, "this should fail"
     except TypeError as err:
         print(str(err))
-    countgraph.consume_fasta_and_tag(utils.get_test_data("test-graph2.fa"))
+    countgraph.consume_seqfile_and_tag(utils.get_test_data("test-graph2.fa"))
 
 
 def test_consume_and_retrieve_tags_1():
