@@ -144,7 +144,7 @@ Python / C integration
 ----------------------
 
 The Python extension that wraps the C++ core of khmer lives in
-``khmer/_khmer.cc``
+``src/khmer/_cpy_khmer.cc``
 
 This wrapper code is tedious and annoying so we use a static analysis tool to
 check for correctness.
@@ -168,13 +168,13 @@ Errors to ignore: "Unhandled Python exception raised calling 'execute' method",
 
 Warnings to address: ::
 
-        khmer/_khmer.cc:3109:1: note: this function is too complicated
+        src/khmer/_cpy_khmer.cc:3109:1: note: this function is too complicated
         for the reference-count checker to fully analyze: not all paths were
         analyzed
 
 Adjust --maxtrans and re-run. ::
 
-	khmer/_khmer.cc:2191:61: warning: Mismatching type in call to
+	src/khmer/_cpy_khmer.cc:2191:61: warning: Mismatching type in call to
 	Py_BuildValue with format code "i" [enabled by default]
 	  argument 2 ("D.68937") had type
 	    "long long unsigned int"
@@ -186,7 +186,7 @@ See below for a format string cheat sheet One also benefits by matching C type
 with the function signature used later.
 
 "I" for unsigned int
-"K" for unsigned long long a.k.a khmer::HashIntoType.
+"K" for unsigned long long a.k.a oxli::HashIntoType.
 
 Read handling
 -------------
