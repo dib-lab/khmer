@@ -106,19 +106,19 @@ bool Hashtable::check_and_normalize_read(std::string &read) const
 }
 
 //
-// consume_fasta: consume a FASTA file of reads
+// consume_seqfile: consume a file of reads
 //
 
 // TODO? Inline in header.
 template<typename SeqIO>
-void Hashtable::consume_fasta(
+void Hashtable::consume_seqfile(
     std::string const &filename,
     unsigned int &total_reads,
     unsigned long long &n_consumed
 )
 {
     ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
-    consume_fasta<SeqIO>(parser, total_reads, n_consumed);
+    consume_seqfile<SeqIO>(parser, total_reads, n_consumed);
 }
 
 void Hashtable::_check_batches(unsigned int num_batches, unsigned int batch)
@@ -135,19 +135,19 @@ void Hashtable::_check_batches(unsigned int num_batches, unsigned int batch)
 }
 
 template<typename SeqIO>
-void Hashtable::consume_fasta_banding(
+void Hashtable::consume_seqfile_banding(
     std::string const &filename, unsigned int num_batches, unsigned int batch,
     unsigned int &total_reads, unsigned long long &n_consumed
 )
 {
     _check_batches(num_batches, batch);
     ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
-    consume_fasta_banding<SeqIO>(parser, num_batches, batch, total_reads,
+    consume_seqfile_banding<SeqIO>(parser, num_batches, batch, total_reads,
                                  n_consumed);
 }
 
 template<typename SeqIO>
-void Hashtable::consume_fasta_banding(
+void Hashtable::consume_seqfile_banding(
     ReadParserPtr<SeqIO>& parser, unsigned int num_batches, unsigned int batch,
     unsigned int &total_reads, unsigned long long &n_consumed
 )
@@ -195,10 +195,10 @@ void Hashtable::consume_fasta_banding(
         __sync_add_and_fetch(&n_consumed, this_n_consumed);
         __sync_add_and_fetch(&total_reads, 1);
     }
-} // consume_fasta_banding
+} // consume_seqfile_banding
 
 template<typename SeqIO>
-void Hashtable::consume_fasta(
+void Hashtable::consume_seqfile(
     ReadParserPtr<SeqIO>& parser,
     unsigned int &total_reads,
     unsigned long long &n_consumed
@@ -223,7 +223,7 @@ void Hashtable::consume_fasta(
 
     } // while reads left for parser
 
-} // consume_fasta
+} // consume_seqfile
 
 //
 // consume_string: run through every k-mer in the given string, & hash it.
@@ -631,24 +631,24 @@ KmerHashIteratorPtr Counttable::new_kmer_iterator(const char * sp) const {
     return unique_ptr<KmerHashIterator>(ki);
 }
 
-template void Hashtable::consume_fasta<FastxReader>(
+template void Hashtable::consume_seqfile<FastxReader>(
     std::string const &filename,
     unsigned int &total_reads,
     unsigned long long &n_consumed
 );
-template void Hashtable::consume_fasta<FastxReader>(
+template void Hashtable::consume_seqfile<FastxReader>(
     ReadParserPtr<FastxReader>& parser,
     unsigned int &total_reads,
     unsigned long long &n_consumed
 );
-template void Hashtable::consume_fasta_banding<FastxReader>(
+template void Hashtable::consume_seqfile_banding<FastxReader>(
     std::string const &filename,
     unsigned int num_batches,
     unsigned int batch,
     unsigned int &total_reads,
     unsigned long long &n_consumed
 );
-template void Hashtable::consume_fasta_banding<FastxReader>(
+template void Hashtable::consume_seqfile_banding<FastxReader>(
     ReadParserPtr<FastxReader>& parser,
     unsigned int num_batches,
     unsigned int batch,

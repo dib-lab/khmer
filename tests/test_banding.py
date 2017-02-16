@@ -58,12 +58,12 @@ def test_banding_in_memory(ksize, memory, epsilon, numbands):
     infile = utils.get_test_data('test-reads.fa')
 
     ct_normal = khmer.Counttable(ksize, memory / 4, 4)
-    ct_normal.consume_fasta(infile)
+    ct_normal.consume_seqfile(infile)
 
     ct_banded = list()
     for band in range(numbands):
         ct = khmer.Counttable(ksize, memory / 4 / numbands, 4)
-        ct.consume_fasta_banding(infile, numbands, band)
+        ct.consume_seqfile_banding(infile, numbands, band)
         ct_banded.append(ct)
 
     for n, record in enumerate(screed.open(infile)):
@@ -103,14 +103,14 @@ def test_banding_to_disk(ksize, memory, numbands):
     path2 = utils.get_temp_filename('banding.ct')
 
     ct = khmer.Counttable(ksize, memory / 4, 4)
-    ct.consume_fasta(infile)
+    ct.consume_seqfile(infile)
     ct.save(path1)
     fpr = khmer.calc_expected_collisions(ct)
     print('FPR', fpr)
 
     ct = khmer.Counttable(ksize, memory / 4, 4)
     for band in range(numbands):
-        ct.consume_fasta_banding(infile, numbands, band)
+        ct.consume_seqfile_banding(infile, numbands, band)
     ct.save(path2)
     fpr = khmer.calc_expected_collisions(ct)
     print('FPR', fpr)

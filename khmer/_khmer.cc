@@ -1533,7 +1533,7 @@ hashtable_count(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
-hashtable_consume_fasta(khmer_KHashtable_Object * me, PyObject * args)
+hashtable_consume_seqfile(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable  = me->hashtable;
 
@@ -1547,7 +1547,7 @@ hashtable_consume_fasta(khmer_KHashtable_Object * me, PyObject * args)
     unsigned long long  n_consumed    = 0;
     unsigned int          total_reads   = 0;
     try {
-        hashtable->consume_fasta<FastxReader>(filename, total_reads, n_consumed);
+        hashtable->consume_seqfile<FastxReader>(filename, total_reads, n_consumed);
     } catch (khmer_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;
@@ -1561,7 +1561,7 @@ hashtable_consume_fasta(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
-hashtable_consume_fasta_banding(khmer_KHashtable_Object * me, PyObject * args)
+hashtable_consume_seqfile_banding(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable  = me->hashtable;
 
@@ -1577,7 +1577,7 @@ hashtable_consume_fasta_banding(khmer_KHashtable_Object * me, PyObject * args)
     unsigned long long n_consumed = 0;
     unsigned int total_reads = 0;
     try {
-        hashtable->consume_fasta_banding<FastxReader>(filename, num_batches,
+        hashtable->consume_seqfile_banding<FastxReader>(filename, num_batches,
             batch, total_reads, n_consumed);
     } catch (khmer_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
@@ -1592,7 +1592,7 @@ hashtable_consume_fasta_banding(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
-hashtable_consume_fasta_with_reads_parser(khmer_KHashtable_Object * me,
+hashtable_consume_seqfile_with_reads_parser(khmer_KHashtable_Object * me,
         PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
@@ -1614,7 +1614,7 @@ hashtable_consume_fasta_with_reads_parser(khmer_KHashtable_Object * me,
 
     Py_BEGIN_ALLOW_THREADS
     try {
-        hashtable->consume_fasta<FastxReader>(rparser, total_reads, n_consumed);
+        hashtable->consume_seqfile<FastxReader>(rparser, total_reads, n_consumed);
     } catch (khmer_file_exception &exc) {
         exc_string = exc.what();
         file_exception = exc_string.c_str();
@@ -2151,20 +2151,20 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "Increment the counts of all of the k-mers in the string."
     },
     {
-        "consume_fasta",
-        (PyCFunction)hashtable_consume_fasta, METH_VARARGS,
-        "Increment the counts of all the k-mers in the sequences in the "
+        "consume_seqfile",
+        (PyCFunction)hashtable_consume_seqfile, METH_VARARGS,
+        "Incrment the counts of all the k-mers in the sequences in the "
         "given file"
     },
     {
-        "consume_fasta_banding",
-        (PyCFunction)hashtable_consume_fasta_banding, METH_VARARGS,
+        "consume_seqfile_banding",
+        (PyCFunction)hashtable_consume_seqfile_banding, METH_VARARGS,
         "Increment the counts of a subset of the k-mers in the sequence "
         "file"
     },
     {
-        "consume_fasta_with_reads_parser",
-        (PyCFunction)hashtable_consume_fasta_with_reads_parser, METH_VARARGS,
+        "consume_seqfile_with_reads_parser",
+        (PyCFunction)hashtable_consume_seqfile_with_reads_parser, METH_VARARGS,
         "Count all k-mers retrieved with this reads parser object."
     },
     {
@@ -2879,7 +2879,7 @@ labelhash_get_all_labels(khmer_KGraphLabels_Object * me, PyObject * args)
 
 static
 PyObject *
-labelhash_consume_fasta_and_tag_with_labels(khmer_KGraphLabels_Object * me,
+labelhash_consume_seqfile_and_tag_with_labels(khmer_KGraphLabels_Object * me,
         PyObject * args)
 {
     LabelHash * hb = me->labelhash;
@@ -2898,7 +2898,7 @@ labelhash_consume_fasta_and_tag_with_labels(khmer_KGraphLabels_Object * me,
 
     //Py_BEGIN_ALLOW_THREADS
     try {
-        hb->consume_fasta_and_tag_with_labels<FastxReader>(filename, total_reads,
+        hb->consume_seqfile_and_tag_with_labels<FastxReader>(filename, total_reads,
                 n_consumed);
     } catch (khmer_file_exception &exc) {
         exc_string = exc.what();
@@ -3238,7 +3238,7 @@ labelhash_load_labels_and_tags(khmer_KGraphLabels_Object * me, PyObject * args)
 }
 
 static PyMethodDef khmer_graphlabels_methods[] = {
-    { "consume_fasta_and_tag_with_labels", (PyCFunction)labelhash_consume_fasta_and_tag_with_labels, METH_VARARGS, "" },
+    { "consume_seqfile_and_tag_with_labels", (PyCFunction)labelhash_consume_seqfile_and_tag_with_labels, METH_VARARGS, "" },
     { "sweep_label_neighborhood", (PyCFunction)labelhash_sweep_label_neighborhood, METH_VARARGS, "" },
     {"consume_partitioned_fasta_and_tag_with_labels", (PyCFunction)labelhash_consume_partitioned_fasta_and_tag_with_labels, METH_VARARGS, "" },
     {"sweep_tag_neighborhood", (PyCFunction)labelhash_sweep_tag_neighborhood, METH_VARARGS, "" },
@@ -3705,7 +3705,7 @@ hllcounter_consume_string(khmer_KHLLCounter_Object * me, PyObject * args)
     return PyLong_FromLong(n_consumed);
 }
 
-static PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
+static PyObject * hllcounter_consume_seqfile(khmer_KHLLCounter_Object * me,
         PyObject * args, PyObject * kwds)
 {
     const char * filename;
@@ -3729,7 +3729,7 @@ static PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
     unsigned long long  n_consumed    = 0;
     unsigned int        total_reads   = 0;
     try {
-        me->hllcounter->consume_fasta<FastxReader>(filename, stream_records,
+        me->hllcounter->consume_seqfile<FastxReader>(filename, stream_records,
                 total_reads,
                 n_consumed);
     } catch (khmer_file_exception &exc) {
@@ -3865,7 +3865,7 @@ static PyMethodDef khmer_hllcounter_methods[] = {
         "Break a sequence into k-mers and add each k-mer to the counter."
     },
     {
-        "consume_fasta", (PyCFunction)hllcounter_consume_fasta,
+        "consume_seqfile", (PyCFunction)hllcounter_consume_seqfile,
         METH_VARARGS | METH_KEYWORDS,
         "Read sequences from file, break into k-mers, "
         "and add each k-mer to the counter. If optional keyword 'stream_out' "

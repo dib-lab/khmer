@@ -76,7 +76,7 @@ namespace khmer
 {
 
 typedef std::unique_ptr<KmerHashIterator> KmerHashIteratorPtr;
-    
+
 class Hashtable: public
     KmerFactory  		// Base class implementation of a Bloom ht.
 {
@@ -219,35 +219,32 @@ public:
     unsigned int check_and_process_read(std::string &read,
                                         bool &is_valid);
 
-    // Count every k-mer in a FASTA or FASTQ file.
-    // Note: Yes, the name 'consume_fasta' is a bit misleading,
-    //       but the FASTA format is effectively a subset of the FASTQ format
-    //       and the FASTA portion is what we care about in this case.
+    // Count every k-mer in a file containing nucleotide sequences.
     template<typename SeqIO>
-    void consume_fasta(
+    void consume_seqfile(
         std::string const &filename,
         unsigned int &total_reads,
         unsigned long long &n_consumed
     );
 
-    // Count every k-mer from a stream of FASTA or FASTQ reads,
+    // Count every k-mer in a file containing nucleotide sequences,
     // using the supplied parser.
     template<typename SeqIO>
-    void consume_fasta(
+    void consume_seqfile(
         read_parsers::ReadParserPtr<SeqIO>& parser,
         unsigned int &total_reads,
         unsigned long long &n_consumed
     );
 
     template<typename SeqIO>
-    void consume_fasta_banding(
+    void consume_seqfile_banding(
         std::string const &filename, unsigned int num_batches,
         unsigned int batch, unsigned int &total_reads,
         unsigned long long &n_consumed
     );
 
     template<typename SeqIO>
-    void consume_fasta_banding(
+    void consume_seqfile_banding(
         read_parsers::ReadParserPtr<SeqIO>& parser, unsigned int num_batches,
         unsigned int batch, unsigned int &total_reads,
         unsigned long long &n_consumed

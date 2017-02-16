@@ -132,7 +132,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
 
     for _, filename in enumerate(args.input_filenames):
         print('consuming input', filename, file=sys.stderr)
-        nodegraph.consume_fasta_and_tag(filename)
+        nodegraph.consume_seqfile_and_tag(filename)
 
     # 0.18 is ACTUAL MAX. Do not change.
     fp_rate = \
