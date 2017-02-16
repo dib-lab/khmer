@@ -4,9 +4,10 @@ from libcpp.vector cimport vector
 from libcpp.map cimport map
 from libcpp.set cimport set
 from libcpp.queue cimport queue
+from libcpp.list cimport list
 from libcpp.memory cimport unique_ptr, weak_ptr, shared_ptr
 from libcpp.utility cimport pair
-from libc.stdint cimport uint32_t, uint8_t, uint64_t
+from libc.stdint cimport uint32_t, uint8_t, uint16_t, uint64_t, uintptr_t 
 
 
 ########################################################################
@@ -48,9 +49,37 @@ cdef extern from "oxli/kmer_hash.hh" namespace "oxli":
         bool is_forward() const
         void set_from_unique_hash(HashIntoType, WordLength)
 
+    cdef cppclass CpKmerFactory "oxli:KmerFactory":
+        KmerFactory(WordLength)
+
+        CpKmer build_kmer(HashIntoType) const
+        CpKmer build_kmer(HashIntoType, HashIntoType) const
+        CpKmer build_kmer(string &) const
+        CpKmer build_kmer(const char *) const
+
+    cdef cppclass CpKmerIterator "oxli:KmerIterator" (CpKmerFactory):
+        CpKmerIterator(const char *, unsigned char)
+        CpKmer first(HashIntoType &, HashIntoType &)
+        CpKmer next(HashIntoType &, HashIntoType &)
+        CpKmer first()
+        CpKmer next()
+        bool done()
+        unsigned int get_start_pos() const
+        unsigned int get_end_pos() const
+
+
     HashIntoType _hash(const string, const WordLength)
+    HashIntoType _hash(const string, const WordLength, 
+                       HashIntoType &, HashIntoType &)
+    HashIntoType _hash(const char *, const WordLength)
+    HashIntoType _hash(const char *, const WordLength,
+                       HashIntoType &, HashIntoType &)
+    HashIntoType _hash_forward(const char *, WordLength)
     string _revhash(HashIntoType, WordLength)
     string _revcomp(const string&)
+    HashIntoType _hash_murmur(const string&,
+                              HashIntoType&, HashIntoType&)
+    HashIntoType _hash_murmur_forward(const string&)
 
 
 cdef extern from "oxli/alphabets.hh" namespace "oxli":
@@ -78,7 +107,8 @@ cdef extern from  "oxli/read_parsers.hh":
 
         void reset()
 
-    ctypedef pair[CpSequence,CpSequence] CpSequencePair "oxli::read_parsers::ReadPair"
+    ctypedef pair[CpSequence,CpSequence] CpSequencePair \
+        "oxli::read_parsers::ReadPair"
 
     cdef cppclass CpIParser "oxli::read_parsers::IParser":
         CpIParser()
@@ -89,17 +119,15 @@ cdef extern from  "oxli/read_parsers.hh":
         bool is_complete()
         CpSequence get_next_read()
         CpSequencePair get_next_read_pair(uint8_t)
-        size_t get_num_reads()
+        uintptr_t get_num_reads()
 
     cdef cppclass CpFastxParser "oxli::read_parsers::FastxParser" (CpIParser):
         CpFastxParser(const char *)
 
 
-########################################################################
 #
 # Hashtable: Bindings for the existing CPython Hashtable wrapper.
 #
-########################################################################
 
 # All we really need are the PyObject struct definitions
 # for our extension objects.
@@ -149,13 +177,14 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
         const uint64_t n_unique_kmers() const
         const uint64_t n_occupied() const
         vector[uint64_t] get_tablesizes() const
-        const size_t n_tables() const
+        const uintptr_t n_tables() const
         void get_kmers(const string &, vector[string] &)
         void get_kmer_hashes(const string &, vector[HashIntoType] &) const
         void get_kmer_hashes_as_hashset(const string &, 
                                         set[HashIntoType]) const
         void get_kmer_counts(const string &, 
                              vector[BoundedCounterType] &) const
+        uint8_t ** get_raw_tables()
         BoundedCounterType get_min_count(const string &)
         BoundedCounterType get_max_count(const string &)
         uint64_t * abundance_distribution(CpIParser *, CpHashtable *)
@@ -176,13 +205,50 @@ cdef extern from "khmer/_cpy_nodetable.hh" namespace "khmer":
 
 cdef extern from "oxli/hashgraph.hh" namespace "oxli":
     cdef cppclass CpHashgraph "oxli::Hashgraph" (CpHashtable):
-        uint32_t traverse_from_kmer(CpKmer, uint32_t, KmerSet&, uint32_t)
+        void _set_tag_density(unsigned int)
+        unsigned int _get_tag_density() const
+        void add_tag(HashIntoType)
+        void add_stop_tag(HashIntoType)
+        uintptr_t n_tags() const
+        void divide_tags_into_subsets(unsigned int, set[HashIntoType] &)
+        void add_kmer_to_tags(HashIntoType)
+        void clear_tags()
+        void consume_fasta_and_tag(CpIParser *, 
+                                   unsigned int &, 
+                                   unsigned long long)
+        void consume_fasta_and_tag(const string &,
+                                   unsigned int &,
+                                   unsigned long long &)
+        void consume_sequence_and_tag(const string &,
+                                      unsigned long long &,
+                                      set[HashIntoType] &)
+        void consume_partitioned_fasta(const string &,
+                                       unsigned int &,
+                                       unsigned long long &)
+        uintptr_t trim_on_stoptags(string) const
+        unsigned int traverse_from_kmer(CpKmer, 
+                                        uint32_t, 
+                                        KmerSet&, 
+                                        uint32_t) const
+        void print_tagset(string)
+        void save_tagset(string)
+        void load_tagset(string)
+        void print_stop_tags(string)
+        void save_stop_tags(string)
+        void load_stop_tags(string)
+        void load_stop_tags(string, bool)
         void extract_unique_paths(string, uint32_t, float, vector[string])
         void calc_connected_graph_size(CpKmer, uint64_t&, KmerSet&,
                                        const uint64_t, bool) const
         uint32_t kmer_degree(HashIntoType, HashIntoType)
         uint32_t kmer_degree(const char *)
         void find_high_degree_nodes(const char *, set[HashIntoType] &) const
+        unsigned int traverse_linear_path(const CpKmer,
+                                          set[HashIntoType] &,
+                                          set[HashIntoType] &,
+                                          CpHashtable &,
+                                          set[HashIntoType] &) const
+        void _validate_pmap()
 
     cdef cppclass CpCountgraph "oxli::Countgraph" (CpHashgraph):
         CpCountgraph(WordLength, vector[uint64_t])
@@ -194,7 +260,7 @@ cdef extern from "oxli/hashgraph.hh" namespace "oxli":
 cdef extern from "oxli/labelhash.hh" namespace "oxli":
     cdef cppclass CpLabelHash "oxli::LabelHash":
         CpLabelHash(CpHashgraph *)
-        size_t n_labels() const
+        uintptr_t n_labels() const
         void consume_fasta_and_tag_with_labels(const string &,
                                                uint32_t &,
                                                uint64_t &,
@@ -269,4 +335,50 @@ cdef extern from "oxli/assembler.hh" namespace "oxli":
         string assemble(const CpKmer) const
         string assemble_left(const CpKmer) const     
         string assemble_right(const CpKmer) const
+
+    cdef cppclass CpSimpleLabeledAsssembler "oxli::SimpleLabeledAsssembler":
+        CpSimpleLabeledAssembler(const CpLabelHash *)
+
+        vector[string] assemble(const CpKmer)
+        vector[string] assemble(const CpKmer, const CpHashgraph *) const
+
+    cdef cppclass CpJunctionCountAssembler "oxli::JunctionCountAssembler":
+        CpJunctionCountAssembler(CpHashgraph *)
+
+        vector[string] assemble(const CpKmer) const
+        vector[string] assemble(const CpKmer, const CpHashtable *) const
+        uint16_t consume(string)
+        void count_junction(CpKmer, CpKmer)
+        BoundedCounterType get_junction_count(CpKmer, CpKmer) const
+
+
+cdef extern from "oxli/hllcounter.hh" namespace "oxli":
+    cdef cppclass CpHLLCounter "oxli::HLLCounter":
+        CpHLLCounter(double, WordLength)
+        CpHLLCounter(int, WordLength)
+
+        void add(const string &)
+        unsigned int consume_string(const string &)
+        void consume_fasta(const string &,
+                           bool,
+                           unsigned int &,
+                           unsigned long long &)
+
+        void consume_fasta(CpIParser *,
+                           bool,
+                           unsigned int &,
+                           unsigned long long &)
+        unsigned int check_and_process_read(string &, bool &)
+        bool check_and_normalize_read(string &) const
+        uint64_t estimate_cardinality()
+        void merge(CpHLLCounter &)
+        double get_alpha()
+        int get_p()
+        int get_m()
+        void set_ksize(WordLegth)
+        int get_ksize()
+        vector[int] get_M()
+        double get_erate()
+        void set_erate(double)
+
 
