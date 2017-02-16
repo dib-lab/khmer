@@ -47,6 +47,8 @@ Contact: khmer-project@idyll.org
 #include "khmer_exception.hh"
 #include "kmer_hash.hh"
 
+#define MURMURHASH_SEED 0
+
 using namespace std;
 
 //
@@ -184,7 +186,7 @@ HashIntoType _hash_murmur(const std::string& kmer, const WordLength k,
                           HashIntoType& h, HashIntoType& r)
 {
     uint64_t out[2];
-    uint32_t seed = 0;
+    uint32_t seed = MURMURHASH_SEED;
     MurmurHash3_x64_128((void *)kmer.c_str(), k, seed, &out);
     h = out[0];
 
@@ -204,11 +206,10 @@ HashIntoType _hash_murmur(const std::string& kmer, const WordLength k,
 
 HashIntoType _hash_murmur_forward(const std::string& kmer, const WordLength k)
 {
-    HashIntoType h = 0;
-    HashIntoType r = 0;
-
-    khmer::_hash_murmur(kmer, k, h, r);
-    return h;
+    uint64_t out[2];
+    uint32_t seed = MURMURHASH_SEED;
+    MurmurHash3_x64_128((void *)kmer.c_str(), k, seed, &out);
+    return out[0];
 }
 
 KmerIterator::KmerIterator(const char * seq,
@@ -276,6 +277,54 @@ Kmer KmerIterator::next(HashIntoType& f, HashIntoType& r)
     r = _kmer_r;
 
     return build_kmer(_kmer_f, _kmer_r);
+}
+
+HashIntoType MurmurKmerHashIterator::next() {
+
+    if (not _initialized) { _initialized = true; }
+
+    if (done()) {
+        throw khmer_exception("past end of iterator");
+    }
+
+//        std::cout << current_kmer << ", " << current_rc << std::endl << std::flush;
+
+    HashIntoType h = _hash_murmur_forward(current_kmer, _ksize);
+    HashIntoType r = _hash_murmur_forward(current_rc, _ksize);
+
+    std::string kmer;
+    kmer.assign(_seq, index, _ksize);
+
+    if (kmer != current_kmer) {
+        exit(1);
+    }
+
+    if (current_rc != _revcomp(kmer)) {
+        exit(1);
+    }
+
+    HashIntoType ho, ro;
+    _hash_murmur(current_kmer, _ksize, ho, ro);
+    if (ho != h) {
+        exit(1);
+    }
+    if (ro != r) {
+        exit(1);
+    }
+
+    index += 1;
+    current_kmer.erase(0, 1);
+    current_kmer.push_back(_seq[index + _ksize]);
+
+    current_rc.pop_back();
+    current_rc.insert(0, _revcomp(_seq.substr(index + _ksize, 1)));
+
+    if (h == r) {
+        // self complement kmer, can't use bitwise XOR
+        return h;
+    }
+
+    return h ^ r;
 }
 
 }

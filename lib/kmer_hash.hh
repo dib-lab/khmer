@@ -405,6 +405,42 @@ public:
     }
 };
 
+class MurmurKmerHashIterator : public KmerHashIterator
+{
+    const std::string _seq;
+    const uint8_t _ksize;
+    unsigned int index;
+    unsigned int length;
+    bool _initialized;
+    std::string current_kmer;
+    std::string current_rc;
+public:
+    MurmurKmerHashIterator(const char * seq, uint8_t k) :
+        _seq(seq), _ksize(k), index(0), _initialized(false) {
+        length = _seq.length();
+//        std::cout << _seq << ", " << length << std::endl << std::flush;
+        current_kmer.assign(_seq, index, _ksize - 1);
+        current_rc = _revcomp(current_kmer);
+    };
+
+    HashIntoType first() { _initialized = true; return next(); }
+
+    HashIntoType next();
+
+    bool done() const {
+        return (index + _ksize > length);
+    }
+
+    unsigned int get_start_pos() const {
+        if (not _initialized) { return 0; }
+        return index;
+    }
+    unsigned int get_end_pos() const {
+        if (not _initialized) { return _ksize; }
+        return index + _ksize - 1;
+    }
+};
+
 }
 
 #endif // KMER_HASH_HH
