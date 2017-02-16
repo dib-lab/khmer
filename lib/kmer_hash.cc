@@ -237,7 +237,7 @@ HashIntoType _hash_karprabin(const std::string& kmer, const WordLength k,
 
     KarpRabinHash<uint64_t> rev_hasher(k);
     for (WordLength i = 0; i < k; ++i) {
-        rev_hasher.eat(kmer[i]);
+        rev_hasher.eat(rev[i]);
     }
     r = rev_hasher.hashvalue;
 

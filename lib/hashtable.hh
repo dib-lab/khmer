@@ -76,7 +76,7 @@ namespace khmer
 {
 
 typedef std::unique_ptr<KmerHashIterator> KmerHashIteratorPtr;
-    
+
 class Hashtable: public
     KmerFactory  		// Base class implementation of a Bloom ht.
 {
@@ -343,7 +343,7 @@ public:
         if (!(strlen(kmer) >= _ksize)) {
             throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
         }
-        return _hash_murmur(kmer, _ksize);
+        return _hash_karprabin(kmer, _ksize);
     }
 
     inline virtual HashIntoType
