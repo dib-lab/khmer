@@ -118,6 +118,13 @@ HashIntoType _hash_murmur(const std::string& kmer, const WordLength k,
 HashIntoType _hash_murmur_forward(const std::string& kmer,
                                   const WordLength k);
 
+// KarpRabin hash, a rolling hash that is irreversible
+HashIntoType _hash_karprabin(const std::string& kmer, const WordLength k);
+HashIntoType _hash_karprabin(const std::string& kmer, const WordLength k,
+                             HashIntoType& h, HashIntoType& r);
+HashIntoType _hash_karprabin_forward(const std::string& kmer, const WordLength k);
+
+
 /**
  * \class Kmer
  *
@@ -461,7 +468,7 @@ class KarpRabinKmerHashIterator : public KmerHashIterator
     KarpRabinHash<uint64_t> hasher;
 public:
     KarpRabinKmerHashIterator(const char * seq, unsigned char k) :
-        _seq(seq), _ksize(k), index(0), _initialized(false), hasher(k, 64) {
+        _seq(seq), _ksize(k), index(0), _initialized(false), hasher(k) {
         length = strlen(_seq);
     };
 

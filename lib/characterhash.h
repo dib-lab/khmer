@@ -1,9 +1,8 @@
+// XXX insert copyright notice
+// XXX move to third-party/rollinghash/
+//
 #ifndef CHARACTERHASH
 #define CHARACTERHASH
-
-typedef unsigned long long uint64;
-typedef unsigned int uint32;
-typedef unsigned int uint;
 
 #include <cassert>
 #include <iostream>
@@ -13,24 +12,21 @@ typedef unsigned int uint;
 using namespace std;
 
 
-
-
 class mersenneRNG {
 public:
-    mersenneRNG(uint32 maxval) : dist(0, maxval), n(maxval) {
-        std::random_device rd;
-        mtr = std::mt19937(rd());
+    mersenneRNG(uint32_t maxval, uint32_t seed) : dist(0, maxval), n(maxval) {
+        mtr = std::mt19937(seed);
     }
-    uint32 operator()() {
+    uint32_t operator()() {
         return dist(mtr);
     }
-    void seed(uint32 seedval) {
+    void seed(uint32_t seedval) {
         mtr.seed(seedval);
     }
     void seed() {
         mtr.seed();
     }
-    uint32 rand_max() {
+    uint32_t rand_max() {
         return n;
     }
 private:
@@ -47,17 +43,18 @@ hashvaluetype maskfnc(int bits) {
     return x ^ (x - 1);
 }
 
-template <typename hashvaluetype = uint32, typename chartype =  unsigned char>
+template <typename hashvaluetype = uint32_t, typename chartype =  unsigned char>
 class CharacterHash {
 public:
-    CharacterHash(hashvaluetype maxval) {
+    CharacterHash(hashvaluetype maxval, hashvaluetype seed) {
         if(sizeof(hashvaluetype) <=4) {
-            mersenneRNG randomgenerator(maxval);
+            mersenneRNG randomgenerator(maxval, seed);
             for(size_t k =0; k<nbrofchars; ++k)
                 hashvalues[k] = static_cast<hashvaluetype>(randomgenerator());
         } else if (sizeof(hashvaluetype) == 8) {
-            mersenneRNG randomgenerator(maxval>>32);
-            mersenneRNG randomgeneratorbase((maxval>>32) ==0 ? maxval : 0xFFFFFFFFU);
+            mersenneRNG randomgenerator(maxval>>32, seed);
+            mersenneRNG randomgeneratorbase(
+              (maxval>>32) ==0 ? maxval : 0xFFFFFFFFU, seed+1);
             for(size_t k =0; k<nbrofchars; ++k)
                 hashvalues[k] = static_cast<hashvaluetype>(randomgeneratorbase())
                                 | (static_cast<hashvaluetype>(randomgenerator()) << 32);

@@ -1,3 +1,6 @@
+// XXX insert copyright notice
+// XXX move to third-party/rollinghash/
+//
 #ifndef KARPRABINHASH
 #define KARPRABINHASH
 
@@ -23,15 +26,17 @@
 *           hf.update(out,c); // update hash value
 *        }
 */
-template <typename hashvaluetype = uint32, typename chartype =  unsigned char>
+template <typename hashvaluetype = uint32_t, typename chartype =  unsigned char>
 class KarpRabinHash {
 
 public:
-    // myn is the length of the sequences, e.g., 3 means that you want to hash sequences of 3 characters
-    // mywordsize is the number of bits you which to receive as hash values, e.g., 19 means that the hash values are 19-bit integers
-    KarpRabinHash(int myn, int mywordsize=19) :  hashvalue(0),n(myn),
+    // `myn` is the length of the sequences, e.g., 3 means that you want to
+    // hash sequences of 3 characters
+    // `mywordsize` is the number of bits you which to receive as hash
+    // values, e.g., 19 means that the hash values are 19-bit integers
+    KarpRabinHash(int myn, int mywordsize=64, hashvaluetype seed=42) :  hashvalue(0),n(myn),
         wordsize(mywordsize),
-        hasher( maskfnc<hashvaluetype>(wordsize)),
+        hasher( maskfnc<hashvaluetype>(wordsize), seed),
         HASHMASK(maskfnc<hashvaluetype>(wordsize)),BtoN(1) {
         for (int i=0; i < n ; ++i) {
             BtoN *= B;
@@ -80,5 +85,3 @@ public:
 
 
 #endif
-
-
