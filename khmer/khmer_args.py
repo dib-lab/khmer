@@ -456,6 +456,10 @@ def build_graph_args(descr=None, epilog=None, parser=None, citations=None):
     group.add_argument('-M', '--max-memory-usage', type=memory_setting,
                        help='maximum amount of memory to use for data ' +
                        'structure')
+    group.add_argument('-H', '--hash-function', type=str,
+                       default='twobit-exact',
+                       help='choose hash function to use: twobit-exact, ' +
+                       'murmur')
 
     return parser
 
@@ -508,6 +512,11 @@ def create_nodegraph(args, ksize=None, multiplier=1.0, fp_rate=0.01):
     """Create and return a nodegraph."""
     args = _check_fp_rate(args, fp_rate)
 
+    if args.hash_function != 'twobit-exact':
+        print_error("\n** ERROR: we only support hash function " +
+                    "twobit-exact' in this script.")
+
+
     if hasattr(args, 'force'):
         if args.n_tables > 20:
             if not args.force:
@@ -547,17 +556,34 @@ def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
 
     if ksize is None:
         ksize = args.ksize
-    if ksize > 32:
-        print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
-        sys.exit(1)
+
+    if args.hash_function == 'twobit-exact':
+        if ksize > 32:
+            print_error("\n** ERROR: hash function 'twobit-exact' only " +
+                        "supports k-mer sizes <= 32.")
+            print_error("** See -H/--hash-function for alternatives.")
+            sys.exit(1)
 
     if args.small_count:
+        if args.hash_function == 'murmur':
+            print_error("\n** ERROR: hash function 'murmur' does not " +
+                        "support small counts yet.")
+            sys.exit(1)
+
         tablesize = calculate_graphsize(args, 'smallcountgraph',
                                         multiplier=multiplier)
         return khmer.SmallCountgraph(ksize, tablesize, args.n_tables)
     else:
-        tablesize = calculate_graphsize(args, 'countgraph',
-                                        multiplier=multiplier)
+        if args.hash_function == 'murmur':
+            tabletype = 'counttable'
+        elif args.hash_function == 'twobit-exact':
+            tabletype = 'countgraph'
+        else:
+            print_error("\n** Error, unknown hash function")
+            # @CTB be sure to catch unknown hash functions earlier, too :)
+            sys.exit(1)
+
+        tablesize = calculate_graphsize(args, tabletype, multiplier=multiplier)
         return khmer.Countgraph(ksize, tablesize, args.n_tables)
 
 
