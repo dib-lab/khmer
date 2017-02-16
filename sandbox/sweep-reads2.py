@@ -76,7 +76,7 @@ def main():
 
     # load contigs, connect into N partitions
     print('loading input reads from', inp)
-    ht.consume_fasta(inp)
+    ht.consume_seqfile(inp)
 
     print('starting sweep.')
 

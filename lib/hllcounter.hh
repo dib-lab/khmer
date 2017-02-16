@@ -62,15 +62,15 @@ public:
     void add(const std::string &);
     unsigned int consume_string(const std::string &);
     template<typename SeqIO>
-    void consume_fasta(std::string const &,
-                       bool,
-                       unsigned int &,
-                       unsigned long long &);
+    void consume_seqfile(std::string const &,
+                         bool,
+                         unsigned int &,
+                         unsigned long long &);
     template<typename SeqIO>
-    void consume_fasta(read_parsers::ReadParserPtr<SeqIO>&,
-                       bool,
-                       unsigned int &,
-                       unsigned long long &);
+    void consume_seqfile(read_parsers::ReadParserPtr<SeqIO>&,
+                         bool,
+                         unsigned int &,
+                         unsigned long long &);
     unsigned int check_and_process_read(std::string &,
                                         bool &);
     bool check_and_normalize_read(std::string &) const;

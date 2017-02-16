@@ -483,7 +483,7 @@ hashgraph_merge_from_disk(khmer_KHashgraph_Object * me, PyObject * args)
 
 static
 PyObject *
-hashgraph_consume_fasta_and_tag_with_reads_parser(khmer_KHashgraph_Object * me,
+hashgraph_consume_seqfile_and_tag_with_reads_parser(khmer_KHashgraph_Object * me,
         PyObject * args)
 {
     Hashgraph * hashgraph = me->hashgraph;
@@ -506,7 +506,7 @@ hashgraph_consume_fasta_and_tag_with_reads_parser(khmer_KHashgraph_Object * me,
 
     Py_BEGIN_ALLOW_THREADS
     try {
-        hashgraph->consume_fasta_and_tag<FastxReader>(rparser, total_reads, n_consumed);
+        hashgraph->consume_seqfile_and_tag<FastxReader>(rparser, total_reads, n_consumed);
     } catch (khmer_file_exception &exc) {
         exc_string = exc.what();
         file_exception = exc_string.c_str();
@@ -1290,7 +1290,7 @@ hashgraph_find_all_tags_list(khmer_KHashgraph_Object * me, PyObject * args)
 
 static
 PyObject *
-hashgraph_consume_fasta_and_tag(khmer_KHashgraph_Object * me, PyObject * args)
+hashgraph_consume_seqfile_and_tag(khmer_KHashgraph_Object * me, PyObject * args)
 {
     Hashgraph * hashgraph = me->hashgraph;
 
@@ -1306,7 +1306,7 @@ hashgraph_consume_fasta_and_tag(khmer_KHashgraph_Object * me, PyObject * args)
     unsigned int total_reads;
 
     try {
-        hashgraph->consume_fasta_and_tag<FastxReader>(filename, total_reads, n_consumed);
+        hashgraph->consume_seqfile_and_tag<FastxReader>(filename, total_reads, n_consumed);
     } catch (khmer_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;
@@ -1384,8 +1384,8 @@ static PyMethodDef khmer_hashgraph_methods[] = {
         "Find all tags within range of the given k-mer, return as list"
     },
     {
-        "consume_fasta_and_tag",
-        (PyCFunction)hashgraph_consume_fasta_and_tag, METH_VARARGS,
+        "consume_seqfile_and_tag",
+        (PyCFunction)hashgraph_consume_seqfile_and_tag, METH_VARARGS,
         "Consume all sequences in a FASTA/FASTQ file and tag the resulting "
         "graph."
     },
@@ -1480,8 +1480,8 @@ static PyMethodDef khmer_hashgraph_methods[] = {
         "Run internal validation checks."
     },
     {
-        "consume_fasta_and_tag_with_reads_parser",
-        (PyCFunction)hashgraph_consume_fasta_and_tag_with_reads_parser,
+        "consume_seqfile_and_tag_with_reads_parser",
+        (PyCFunction)hashgraph_consume_seqfile_and_tag_with_reads_parser,
         METH_VARARGS,
         "Count all k-mers using the given reads parser"
     },

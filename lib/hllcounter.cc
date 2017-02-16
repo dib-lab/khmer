@@ -377,18 +377,18 @@ unsigned int HLLCounter::consume_string(const std::string &inp)
 }
 
 template<typename SeqIO>
-void HLLCounter::consume_fasta(
+void HLLCounter::consume_seqfile(
     std::string const &filename,
     bool stream_records,
     unsigned int &total_reads,
     unsigned long long &n_consumed)
 {
     ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
-    consume_fasta<SeqIO>(parser, stream_records, total_reads, n_consumed);
+    consume_seqfile<SeqIO>(parser, stream_records, total_reads, n_consumed);
 }
 
 template<typename SeqIO>
-void HLLCounter::consume_fasta(
+void HLLCounter::consume_seqfile(
     ReadParserPtr<SeqIO>& parser,
     bool stream_records,
     unsigned int &      total_reads,
@@ -509,13 +509,13 @@ void HLLCounter::merge(HLLCounter &other)
     }
 }
 
-template void HLLCounter::consume_fasta<FastxReader>(
+template void HLLCounter::consume_seqfile<FastxReader>(
     std::string const &,
     bool,
     unsigned int &,
     unsigned long long &
 );
-template void HLLCounter::consume_fasta<FastxReader>(
+template void HLLCounter::consume_seqfile<FastxReader>(
     ReadParserPtr<FastxReader>&,
     bool,
     unsigned int &,

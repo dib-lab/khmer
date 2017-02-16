@@ -42,6 +42,8 @@ under semantic versioning, but will be in future versions of khmer.
 - Replaced the IParser and FastxParser classes with a single ReadParser class.
   Different input formats are supported by templating ReadParser with a reader
   class.
+- Renamed `consume_fasta` and related functions to `consume_seqfile`, with
+  support for reading sequences from additional formats pending.
 
 ### Fixed
 - Bug in compressed(gzip) streaming output from scripts
