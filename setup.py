@@ -65,7 +65,6 @@ CMDCLASS = versioneer.get_cmdclass()
 try:
     from Cython.Distutils import build_ext as _build_ext
 except ImportError:
-    print('Cython not found.', file=sys.stderr)
     from setuptools.command.build_ext import build_ext as _build_ext
 
 # strip out -Wstrict-prototypes; a hack suggested by
