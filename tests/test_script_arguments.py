@@ -242,7 +242,7 @@ def test_create_countgraph_3():
         assert 0, "should not reach this"
     except SystemExit:
         err = capture.getvalue()
-        assert 'only supports k-mer sizes <= 32.' in err, err
+        assert 'only supports k-mer sizes <= 32' in err, err
     finally:
         sys.stderr = old_stderr
 

@@ -557,6 +557,11 @@ def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
     if ksize is None:
         ksize = args.ksize
 
+    if ksize > 32:
+        print_error("\n** ERROR: khmer only supports k-mer sizes <= 32 for "
+                    "graphs.\n")
+        sys.exit(1)
+
     if args.hash_function != 'twobit-exact':
         print_error("\n** ERROR: graphs only support hash function (-H) "
                     "'twobit-exact'.")
