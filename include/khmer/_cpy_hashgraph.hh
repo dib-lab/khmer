@@ -135,7 +135,7 @@ hashgraph_merge_from_disk(khmer_KHashgraph_Object * me, PyObject * args);
 
 
 PyObject *
-hashgraph_consume_fasta_and_tag_with_reads_parser(khmer_KHashgraph_Object * me,
+hashgraph_consume_seqfile_and_tag_with_reads_parser(khmer_KHashgraph_Object * me,
         PyObject * args);
 
 
@@ -267,7 +267,7 @@ hashgraph_find_all_tags_list(khmer_KHashgraph_Object * me, PyObject * args);
 
 
 PyObject *
-hashgraph_consume_fasta_and_tag(khmer_KHashgraph_Object * me, PyObject * args);
+hashgraph_consume_seqfile_and_tag(khmer_KHashgraph_Object * me, PyObject * args);
 
 }
 

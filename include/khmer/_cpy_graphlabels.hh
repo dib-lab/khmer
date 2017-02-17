@@ -29,7 +29,7 @@ labelhash_get_all_labels(khmer_KGraphLabels_Object * me, PyObject * args);
 
 
 PyObject *
-labelhash_consume_fasta_and_tag_with_labels(khmer_KGraphLabels_Object * me,
+labelhash_consume_seqfile_and_tag_with_labels(khmer_KGraphLabels_Object * me,
         PyObject * args);
 
 

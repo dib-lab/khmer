@@ -271,34 +271,27 @@ void Hashgraph::consume_sequence_and_tag(const std::string& seq,
 }
 
 //
-// consume_fasta_and_tag: consume a FASTA file of reads, tagging reads every
-//     so often.
+// consume_seqfile_and_tag: consume a file containing reads, tagging reads every
+//                          so often
 //
 
 // TODO? Inline in header.
-void
-Hashgraph::
-consume_fasta_and_tag(
-    std:: string const  &filename,
-    unsigned int	      &total_reads, unsigned long long	&n_consumed
+template<typename SeqIO>
+void Hashgraph::consume_seqfile_and_tag(
+        std::string const &filename,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
 )
 {
-    IParser *	  parser =
-        IParser::get_parser( filename );
-
-    consume_fasta_and_tag(
-        parser,
-        total_reads, n_consumed
-    );
-
-    delete parser;
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
+    consume_seqfile_and_tag<SeqIO>(parser, total_reads, n_consumed);
 }
 
-void
-Hashgraph::
-consume_fasta_and_tag(
-    read_parsers:: IParser *  parser,
-    unsigned int		    &total_reads,   unsigned long long	&n_consumed
+template<typename SeqIO>
+void Hashgraph::consume_seqfile_and_tag(
+        ReadParserPtr<SeqIO>& parser,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
 )
 {
     Read			  read;
@@ -309,7 +302,6 @@ consume_fasta_and_tag(
 
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( )) {
-
         try {
             read = parser->get_next_read( );
         } catch (NoMoreReadsAvailable &e) {
@@ -352,14 +344,17 @@ void Hashgraph::divide_tags_into_subsets(unsigned int subset_size,
 // consume_partitioned_fasta: consume a FASTA file of reads
 //
 
-void Hashgraph::consume_partitioned_fasta(const std::string &filename,
+template<typename SeqIO>
+void Hashgraph::consume_partitioned_fasta(
+        const std::string &filename,
         unsigned int &total_reads,
-        unsigned long long &n_consumed)
+        unsigned long long &n_consumed
+)
 {
     total_reads = 0;
     n_consumed = 0;
 
-    IParser* parser = IParser::get_parser(filename.c_str());
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
     Read read;
 
     string seq = "";
@@ -398,8 +393,6 @@ void Hashgraph::consume_partitioned_fasta(const std::string &filename,
         // reset the sequence info, increment read number
         total_reads++;
     }
-
-    delete parser;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -896,4 +889,20 @@ void Nodegraph::update_from(const Nodegraph &otherBASE)
     }
 }
 
-// vim: set sts=2 sw=2:
+template void Hashgraph::consume_seqfile_and_tag<read_parsers::FastxReader>(
+    std::string const &filename,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+);
+
+template void Hashgraph::consume_seqfile_and_tag<read_parsers::FastxReader>(
+    FastxParserPtr& parser,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+);
+
+template void Hashgraph::consume_partitioned_fasta<read_parsers::FastxReader>(
+    const std::string &filename,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+);

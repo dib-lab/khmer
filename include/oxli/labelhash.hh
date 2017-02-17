@@ -50,9 +50,14 @@ Contact: khmer-project@idyll.org
 
 namespace oxli
 {
-class Hashgraph;
+    class Hashgraph;
 
-using read_parsers::IParser;
+    using read_parsers::ReadParser;
+    namespace read_parsers
+    {
+        template<typename SeqIO> class ReadParser;
+        class FastxReader;
+    }
 
 class LabelHash
 {
@@ -137,26 +142,29 @@ public:
         return all_labels.size();
     }
 
-
-    void consume_fasta_and_tag_with_labels(
+    template<typename SeqIO>
+    void consume_seqfile_and_tag_with_labels(
         std::string const	  &filename,
         unsigned int	  &total_reads,
         unsigned long long  &n_consumed,
         CallbackFn	  callback	  = NULL,
         void *		  callback_data	  = NULL);
 
-    void consume_fasta_and_tag_with_labels(
-        read_parsers:: IParser *	    parser,
+    template<typename SeqIO>
+    void consume_seqfile_and_tag_with_labels(
+        read_parsers::ReadParserPtr<SeqIO>& parser,
         unsigned int	    &total_reads,
         unsigned long long  &n_consumed,
         CallbackFn	    callback	    = NULL,
         void *		    callback_data   = NULL);
 
-    void consume_partitioned_fasta_and_tag_with_labels(const std::string &filename,
-            unsigned int &total_reads,
-            unsigned long long &n_consumed,
-            CallbackFn callback = NULL,
-            void * callback_datac = NULL);
+    template<typename SeqIO>
+    void consume_partitioned_fasta_and_tag_with_labels(
+        const std::string &filename,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed,
+        CallbackFn callback = NULL,
+        void * callback_datac = NULL);
 
     void consume_sequence_and_tag_with_labels(const std::string& seq,
             unsigned long long& n_consumed,
@@ -186,7 +194,8 @@ public:
                                         SeenSet& high_degree_nodes,
                                         const Label label);
 };
-}
+
+} // namespace oxli
 
 #define ACQUIRE_TAG_COLORS_SPIN_LOCK \
   while(!__sync_bool_compare_and_swap( &_tag_labels_spin_lock, 0, 1));

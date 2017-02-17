@@ -58,34 +58,31 @@ using namespace std;
 using namespace oxli;
 using namespace oxli:: read_parsers;
 
+
 /*
  * @camillescott
- * Might be time for a refactor: could do a general consume_fasta
+ * Might be time for a refactor: could do a general consume_seqfile
  * function which accepts a consume_sequence function pointer as a parameter
  */
 
-void
-LabelHash::consume_fasta_and_tag_with_labels(
+template<typename SeqIO>
+void LabelHash::consume_seqfile_and_tag_with_labels(
     std:: string const  &filename,
     unsigned int	      &total_reads, unsigned long long	&n_consumed,
     CallbackFn	      callback,	    void *		callback_data
 )
 {
-    IParser *	  parser =
-        IParser::get_parser( filename );
-
-    consume_fasta_and_tag_with_labels(
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
+    consume_seqfile_and_tag_with_labels<SeqIO>(
         parser,
         total_reads, n_consumed,
         callback, callback_data
     );
-
-    delete parser;
 }
 
-void
-LabelHash::consume_fasta_and_tag_with_labels(
-    read_parsers:: IParser *  parser,
+template<typename SeqIO>
+void LabelHash::consume_seqfile_and_tag_with_labels(
+    ReadParserPtr<SeqIO>& parser,
     unsigned int		    &total_reads,   unsigned long long	&n_consumed,
     CallbackFn		    callback,	    void *		callback_data
 )
@@ -132,7 +129,7 @@ LabelHash::consume_fasta_and_tag_with_labels(
         if (total_reads_TL % CALLBACK_PERIOD == 0 && callback) {
             std::cout << "n tags: " << graph->all_tags.size() << "\n";
             try {
-                callback("consume_fasta_and_tag_with_labels", callback_data,
+                callback("consume_seqfile_and_tag_with_labels", callback_data,
                          total_reads_TL,
                          n_consumed);
             } catch (...) {
@@ -146,6 +143,7 @@ LabelHash::consume_fasta_and_tag_with_labels(
 
 }
 
+template<typename SeqIO>
 void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
     const std::string &filename,
     unsigned int &total_reads,
@@ -156,7 +154,7 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
     total_reads = 0;
     n_consumed = 0;
 
-    IParser* parser = IParser::get_parser(filename.c_str());
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
     Read read;
 
     std::string seq = "";
@@ -194,17 +192,11 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
                 callback("consume_partitioned_fasta_and_tag_with_labels", callback_data,
                          total_reads, n_consumed);
             } catch (...) {
-                delete parser;
                 throw;
             }
         }
     }
     printdbg(done with while loop in consume_partitioned)
-
-        // @cswelcher TODO: check that deallocate LabelPtrMap is correct
-    {
-        delete parser;
-    }
     printdbg(deleted parser and exiting)
 }
 
@@ -618,4 +610,25 @@ void LabelHash::label_across_high_degree_nodes(const char * s,
     }
 }
 
-// vim: set sts=2 sw=2:
+template void LabelHash::consume_seqfile_and_tag_with_labels<FastxReader>(
+    std:: string const &filename,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed,
+    CallbackFn callback,
+    void * callback_data
+);
+template void LabelHash::consume_seqfile_and_tag_with_labels<FastxReader>(
+    ReadParserPtr<FastxReader>& parser,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed,
+    CallbackFn callback,
+    void * callback_data
+);
+template void LabelHash::consume_partitioned_fasta_and_tag_with_labels<FastxReader>(
+    const std::string &filename,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed,
+    CallbackFn callback = NULL,
+    void * callback_datac = NULL
+);
+

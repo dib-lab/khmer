@@ -74,16 +74,20 @@ PyObject * forward_hash(PyObject * self, PyObject * args)
         return NULL;
     }
 
+    if (strlen(kmer) != ksize) {
+        PyErr_Format(PyExc_ValueError, "k-mer size different from ksize");
+        return NULL;
+    }
+
     try {
         PyObject * hash = nullptr;
         const HashIntoType h(_hash(kmer, ksize));
         convert_HashIntoType_to_PyObject(h, &hash);
         return hash;
     } catch (oxli_exception &e) {
-        PyErr_SetString(PyExc_RuntimeError, e.what());
+        PyErr_SetString(PyExc_ValueError, e.what());
         return NULL;
     }
-
 }
 
 PyObject * forward_hash_no_rc(PyObject * self, PyObject * args)
@@ -121,6 +125,7 @@ PyObject * reverse_hash(PyObject * self, PyObject * args)
     if (!PyArg_ParseTuple(args, "Ob", &val, &ksize)) {
         return NULL;
     }
+
     if (PyLong_Check(val) || PyInt_Check(val)) {
         if (!convert_PyLong_to_HashIntoType(val, hash)) {
             return NULL;
@@ -148,7 +153,7 @@ PyObject * murmur3_forward_hash(PyObject * self, PyObject * args)
     }
 
     PyObject * hash = nullptr;
-    const HashIntoType h(_hash_murmur(kmer));
+    const HashIntoType h(_hash_murmur(kmer, strlen(kmer)));
     convert_HashIntoType_to_PyObject(h, &hash);
     return hash;
 }
@@ -162,7 +167,7 @@ PyObject * murmur3_forward_hash_no_rc(PyObject * self, PyObject * args)
     }
 
     PyObject * hash = nullptr;
-    const HashIntoType h(_hash_murmur_forward(kmer));
+    const HashIntoType h(_hash_murmur_forward(kmer, strlen(kmer)));
     convert_HashIntoType_to_PyObject(h, &hash);
     return hash;
 }
@@ -247,11 +252,9 @@ PyMethodDef KhmerMethods[] = {
 
 MOD_INIT(_khmer)
 {
-
     using namespace khmer;
     using namespace oxli;
     using namespace oxli::read_parsers;
-
 
     if (PyType_Ready(&khmer_KHashtable_Type) < 0) {
         return MOD_ERROR_VAL;
@@ -259,6 +262,11 @@ MOD_INIT(_khmer)
 
     khmer_KCounttable_Type.tp_base = &khmer_KHashtable_Type;
     if (PyType_Ready(&khmer_KCounttable_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    khmer_KSmallCounttable_Type.tp_base = &khmer_KHashtable_Type;
+    if (PyType_Ready(&khmer_KSmallCounttable_Type) < 0) {
         return MOD_ERROR_VAL;
     }
 
@@ -275,6 +283,11 @@ MOD_INIT(_khmer)
 
     khmer_KCountgraph_Type.tp_base = &khmer_KHashgraph_Type;
     if (PyType_Ready(&khmer_KCountgraph_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    khmer_KSmallCountgraph_Type.tp_base = &khmer_KHashgraph_Type;
+    if (PyType_Ready(&khmer_KSmallCountgraph_Type) < 0) {
         return MOD_ERROR_VAL;
     }
 
@@ -336,6 +349,18 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
+    PyObject * filetype_dict = Py_BuildValue("{s,i,s,i,s,i,s,i,s,i,s,i,s,i}",
+                               "COUNTING_HT", SAVED_COUNTING_HT,
+                               "HASHBITS", SAVED_HASHBITS,
+                               "TAGS", SAVED_TAGS,
+                               "STOPTAGS", SAVED_STOPTAGS,
+                               "SUBSET", SAVED_SUBSET,
+                               "LABELSET", SAVED_LABELSET,
+                               "SMALLCOUNT", SAVED_SMALLCOUNT);
+    if (PyModule_AddObject( m, "FILETYPES", filetype_dict ) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
     Py_INCREF(&khmer_Read_Type);
     if (PyModule_AddObject( m, "Read",
                             (PyObject *)&khmer_Read_Type ) < 0) {
@@ -354,6 +379,12 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
+    Py_INCREF(&khmer_KSmallCounttable_Type);
+    if (PyModule_AddObject( m, "SmallCounttable",
+                            (PyObject *)&khmer_KSmallCounttable_Type ) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
     Py_INCREF(&khmer_KNodetable_Type);
     if (PyModule_AddObject( m, "Nodetable",
                             (PyObject *)&khmer_KNodetable_Type ) < 0) {
@@ -363,6 +394,12 @@ MOD_INIT(_khmer)
     Py_INCREF(&khmer_KCountgraph_Type);
     if (PyModule_AddObject( m, "Countgraph",
                             (PyObject *)&khmer_KCountgraph_Type ) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    Py_INCREF(&khmer_KSmallCountgraph_Type);
+    if (PyModule_AddObject( m, "SmallCountgraph",
+                            (PyObject *)&khmer_KSmallCountgraph_Type ) < 0) {
         return MOD_ERROR_VAL;
     }
 

@@ -472,6 +472,27 @@ def test_trim_low_abund_1():
     assert 'GGTTGACGGGGCTCAGGG' in seqs
 
 
+def test_trim_low_abund_smallcount():
+    in1 = utils.get_test_data('test-abund-read-2.fa')
+    out1 = utils.get_temp_filename('out.abundtrim')
+
+    cmd = """
+       cat {in1} |
+       {scripts}/trim-low-abund.py --small-count \
+         -k 17 -x 1e7 -N 2 - -o - > {out1}
+    """
+
+    cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1)
+
+    run_shell_cmd(cmd)
+
+    assert os.path.exists(out1)
+    seqs = set([r.sequence for r in screed.open(out1)])
+
+    assert len(seqs) == 1, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+
 def test_trim_low_abund_1_gzip_o():
     in1 = utils.get_test_data('test-abund-read-2.fa')
     out1 = utils.get_temp_filename('out.abundtrim.gz')

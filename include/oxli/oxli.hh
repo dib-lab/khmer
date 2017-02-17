@@ -93,9 +93,11 @@ private:\
 #   define SAVED_STOPTAGS 4
 #   define SAVED_SUBSET 5
 #   define SAVED_LABELSET 6
+#   define SAVED_SMALLCOUNT 7
 
-#   define LEFT 0
-#   define RIGHT 1
+
+#   define TRAVERSAL_LEFT 0
+#   define TRAVERSAL_RIGHT 1
 
 #   define VERBOSE_REPARTITION 0
 

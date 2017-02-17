@@ -23,7 +23,7 @@ cdef class ReadBundle:
 
 
 cdef class FastxParser:
-    cdef unique_ptr[CpFastxParser] _this
+    cdef unique_ptr[CpReadParser[CpFastxReader]] _this
 
     cpdef bool is_complete(self)
     cdef Sequence _next(self)

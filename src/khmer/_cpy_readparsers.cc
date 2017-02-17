@@ -64,13 +64,13 @@ PyGetSetDef khmer_Read_accessors [ ] = {
         (char *)"Quality scores.", NULL
     },
     {
-        (char *)"annotations",
-        (getter)Read_get_annotations, (setter)NULL,
-        (char *)"Annotations.", NULL
+        (char *)"description",
+        (getter)Read_get_description, (setter)NULL,
+        (char *)"Description.", NULL
     },
     {
         (char *)"cleaned_seq",
-        (getter)Read_get_cleaned_seq, (setter)Read_set_cleaned_seq,
+        (getter)Read_get_cleaned_seq, (setter)NULL,
         (char *)"Cleaned sequence.", NULL
     },
 
@@ -121,6 +121,10 @@ PyMethodDef _ReadParser_methods [ ] = {
     {
         "iter_read_pairs",  (PyCFunction)ReadParser_iter_read_pairs,
         METH_VARARGS,       "Iterates over paired reads as pairs."
+    },
+    {
+        "close",  (PyCFunction)ReadParser_close,
+        METH_NOARGS,       "Close associated files."
     },
     { NULL, NULL, 0, NULL } // sentinel
 };
@@ -209,16 +213,16 @@ int
 khmer_Read_init(khmer_Read_Object *self, PyObject *args, PyObject *kwds)
 {
     const char * name{};
-    const char * annotations{};
+    const char * description{};
     const char * sequence{};
     const char * quality{};
     char *kwlist[5] = {
         const_cast<char *>("name"), const_cast<char *>("sequence"),
-        const_cast<char *>("quality"), const_cast<char *>("annotations"), NULL
+        const_cast<char *>("quality"), const_cast<char *>("description"), NULL
     };
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "ss|zz", kwlist,
-                                     &name, &sequence, &quality, &annotations)) {
+                                     &name, &sequence, &quality, &description)) {
         return -1;
     }
 
@@ -227,12 +231,13 @@ khmer_Read_init(khmer_Read_Object *self, PyObject *args, PyObject *kwds)
     }
     if (sequence != NULL) {
         self->read->sequence = sequence;
+        self->read->set_clean_seq();
     }
     if (quality != NULL) {
         self->read->quality = quality;
     }
-    if (annotations != NULL) {
-        self->read->annotations = annotations;
+    if (description != NULL) {
+        self->read->description = description;
     }
     return 0;
 }
@@ -293,13 +298,13 @@ Read_get_quality(khmer_Read_Object * obj, void * closure)
 
 
 PyObject *
-Read_get_annotations(khmer_Read_Object * obj, void * closure)
+Read_get_description(khmer_Read_Object * obj, void * closure)
 {
-    if (obj->read->annotations.size() > 0) {
-        return PyUnicode_FromString(obj->read->annotations.c_str());
+    if (obj->read->description.size() > 0) {
+        return PyUnicode_FromString(obj->read->description.c_str());
     } else {
         PyErr_SetString(PyExc_AttributeError,
-                        "'Read' object has no attribute 'annotations'.");
+                        "'Read' object has no attribute 'description'.");
         return NULL;
     }
 }
@@ -309,6 +314,9 @@ PyObject *
 Read_get_cleaned_seq(khmer_Read_Object * obj, void * closure)
 {
     if (obj->read->cleaned_seq.size() > 0) {
+        return PyUnicode_FromString(obj->read->cleaned_seq.c_str());
+    } else if (obj->read->sequence.size() > 0) {
+        obj->read->set_clean_seq();
         return PyUnicode_FromString(obj->read->cleaned_seq.c_str());
     } else {
         PyErr_SetString(PyExc_AttributeError,
@@ -367,8 +375,6 @@ Read_set_cleaned_seq(khmer_Read_Object *obj, PyObject *value, void *closure)
 void
 _ReadParser_dealloc(khmer_ReadParser_Object * obj)
 {
-    Py_DECREF(obj->parser);
-    obj->parser = NULL;
     Py_TYPE(obj)->tp_free((PyObject*)obj);
 }
 
@@ -400,8 +406,7 @@ _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
 
     // Wrap the low-level parser object.
     try {
-        myself->parser =
-            IParser:: get_parser( ifile_name );
+        myself->parser = get_parser<FastxReader>(ifile_name);
     } catch (oxli_file_exception &exc) {
         PyErr_SetString( PyExc_OSError, exc.what() );
         return NULL;
@@ -413,7 +418,7 @@ PyObject *
 _ReadParser_iternext( PyObject * self )
 {
     khmer_ReadParser_Object * myself  = (khmer_ReadParser_Object *)self;
-    IParser *       parser  = myself->parser;
+    FastxParserPtr&       parser  = myself->parser;
     std::string exc_string;
 
     bool        stop_iteration  = false;
@@ -471,7 +476,7 @@ PyObject *
 _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
 {
     khmer_ReadParser_Object * parent = (khmer_ReadParser_Object*)myself->parent;
-    IParser    *parser    = parent->parser;
+    FastxParserPtr& parser = parent->parser;
     uint8_t     pair_mode = myself->pair_mode;
 
     ReadPair    the_read_pair;
@@ -547,7 +552,7 @@ ReadParser_get_num_reads(khmer_ReadParser_Object * me)
 PyObject *
 ReadParser_iter_read_pairs(PyObject * self, PyObject * args )
 {
-    int  pair_mode  = IParser:: PAIR_MODE_ERROR_ON_UNPAIRED;
+    int pair_mode = ReadParser<FastxReader>::PAIR_MODE_ERROR_ON_UNPAIRED;
 
     if (!PyArg_ParseTuple( args, "|i", &pair_mode )) {
         return NULL;
@@ -572,6 +577,17 @@ ReadParser_iter_read_pairs(PyObject * self, PyObject * args )
 }
 
 
+PyObject *
+ReadParser_close(PyObject * self, PyObject * args)
+{
+    FastxParserPtr& rparser = _PyObject_to_khmer_ReadParser(self);
+    rparser->close();
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+
 void _init_ReadParser_Type_constants()
 {
     PyObject * cls_attrs_DICT = PyDict_New( );
@@ -581,7 +597,8 @@ void _init_ReadParser_Type_constants()
 
     // Place pair mode constants into class dictionary.
     int result;
-    PyObject *value = PyLong_FromLong( IParser:: PAIR_MODE_IGNORE_UNPAIRED );
+    PyObject *value = PyLong_FromLong(
+                          ReadParser<FastxReader>::PAIR_MODE_IGNORE_UNPAIRED);
     if (value == NULL) {
         Py_DECREF(cls_attrs_DICT);
         return;
@@ -594,7 +611,7 @@ void _init_ReadParser_Type_constants()
         return;
     }
 
-    value = PyLong_FromLong( IParser:: PAIR_MODE_ERROR_ON_UNPAIRED );
+    value = PyLong_FromLong(ReadParser<FastxReader>::PAIR_MODE_ERROR_ON_UNPAIRED);
     if (value == NULL) {
         Py_DECREF(cls_attrs_DICT);
         return;
@@ -610,9 +627,11 @@ void _init_ReadParser_Type_constants()
     khmer_ReadParser_Type.tp_dict     = cls_attrs_DICT;
 }
 
-IParser *
-_PyObject_to_khmer_ReadParser( PyObject * py_object )
+
+FastxParserPtr& _PyObject_to_khmer_ReadParser(PyObject * py_object)
 {
+    // TODO: Add type-checking.
+
     return ((khmer_ReadParser_Object *)py_object)->parser;
 }
 

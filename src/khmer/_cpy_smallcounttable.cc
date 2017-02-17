@@ -1,16 +1,16 @@
-#include "khmer/_cpy_nodetable.hh"
-#include <vector>
+#include "khmer/_cpy_smallcounttable.hh"
+#include "oxli/hashtable.hh"
 
 using namespace oxli;
 
 namespace khmer {
 
-PyTypeObject khmer_KNodetable_Type
-CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KNodetable_Object")
+PyTypeObject khmer_KSmallCounttable_Type
+CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KSmallCounttable_Object")
 = {
     PyVarObject_HEAD_INIT(NULL, 0) /* init & ob_size */
-    "_khmer.Nodetable",             /* tp_name */
-    sizeof(khmer_KNodetable_Object), /* tp_basicsize */
+    "_khmer.SmallCounttable",             /* tp_name */
+    sizeof(khmer_KSmallCounttable_Object), /* tp_basicsize */
     0,                             /* tp_itemsize */
     0,                             /*tp_dealloc*/
     0,              /*tp_print*/
@@ -28,14 +28,14 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KNodetable_Object")
     0,              /*tp_setattro*/
     0,              /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,       /*tp_flags*/
-    "nodetable object",           /* tp_doc */
+    "SmallCounttable object",           /* tp_doc */
     0,                       /* tp_traverse */
     0,                       /* tp_clear */
     0,                       /* tp_richcompare */
     0,                       /* tp_weaklistoffset */
     0,                       /* tp_iter */
     0,                       /* tp_iternext */
-    khmer_nodetable_methods, /* tp_methods */
+    0,                       /* tp_methods */
     0,                       /* tp_members */
     0,                       /* tp_getset */
     0,                       /* tp_base */
@@ -45,20 +45,20 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KNodetable_Object")
     0,                       /* tp_dictoffset */
     0,                       /* tp_init */
     0,                       /* tp_alloc */
-    khmer_nodetable_new,     /* tp_new */
+    khmer_smallcounttable_new,    /* tp_new */
 };
 
 
-PyMethodDef khmer_nodetable_methods[] = {
-    {NULL, NULL, 0, NULL}           /* sentinel */
-};
+//
+// khmer_smallcounttable_new
+//
 
-PyObject* khmer_nodetable_new(PyTypeObject * type, PyObject * args,
-                                     PyObject * kwds)
+PyObject* khmer_smallcounttable_new(PyTypeObject * type, PyObject * args,
+        PyObject * kwds)
 {
-    khmer_KNodetable_Object * self;
+    khmer_KSmallCounttable_Object * self;
 
-    self = (khmer_KNodetable_Object *)type->tp_alloc(type, 0);
+    self = (khmer_KSmallCounttable_Object *)type->tp_alloc(type, 0);
 
     if (self != NULL) {
         WordLength k = 0;
@@ -76,17 +76,16 @@ PyObject* khmer_nodetable_new(PyTypeObject * type, PyObject * args,
         }
 
         try {
-            self->nodetable = new Nodetable(k, sizes);
+            self->counttable = new SmallCounttable(k, sizes);
         } catch (std::bad_alloc &e) {
             Py_DECREF(self);
             return PyErr_NoMemory();
         }
         self->khashtable.hashtable =
-            dynamic_cast<Hashtable*>(self->nodetable);
+            dynamic_cast<Hashtable*>(self->counttable);
     }
 
     return (PyObject *) self;
-
 }
 
 }

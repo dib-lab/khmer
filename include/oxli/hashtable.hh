@@ -38,7 +38,6 @@ Contact: khmer-project@idyll.org
 #ifndef HASHTABLE_HH
 #define HASHTABLE_HH
 
-
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -50,6 +49,8 @@ Contact: khmer-project@idyll.org
 #include <set>
 #include <string>
 #include <vector>
+#include <memory>
+#include "MurmurHash3.h"
 
 #include "oxli.hh"
 #include "oxli_exception.hh"
@@ -58,18 +59,25 @@ Contact: khmer-project@idyll.org
 #include "storage.hh"
 #include "subset.hh"
 
+
+using namespace std;
+
 namespace oxli
 {
-namespace read_parsers
-{
-class IParser;
-}  // namespace read_parsers
-}  // namespace oxli
+    namespace read_parsers
+    {
+        template<typename SeqIO> class ReadParser;
+        class FastxReader;
+    }
+}
 
 #define CALLBACK_PERIOD 100000
 
 namespace oxli
 {
+
+typedef std::unique_ptr<KmerHashIterator> KmerHashIteratorPtr;
+
 class Hashtable: public
     KmerFactory  		// Base class implementation of a Bloom ht.
 {
@@ -109,6 +117,15 @@ protected:
 
     explicit Hashtable(const Hashtable&);
     Hashtable& operator=(const Hashtable&);
+
+    virtual KmerHashIteratorPtr new_kmer_iterator(const char * sp) const {
+        KmerHashIterator * ki = new TwoBitKmerHashIterator(sp, _ksize);
+        return unique_ptr<KmerHashIterator>(ki);
+    }
+
+    virtual KmerHashIteratorPtr new_kmer_iterator(const std::string& s) const {
+        return new_kmer_iterator(s.c_str());
+    }
 
 public:
     // accessor to get 'k'
@@ -201,22 +218,21 @@ public:
     unsigned int check_and_process_read(std::string &read,
                                         bool &is_valid);
 
-    // Count every k-mer in a FASTA or FASTQ file.
-    // Note: Yes, the name 'consume_fasta' is a bit misleading,
-    //	     but the FASTA format is effectively a subset of the FASTQ format
-    //	     and the FASTA portion is what we care about in this case.
-    void consume_fasta(
-        std::string const   &filename,
-        unsigned int	    &total_reads,
-        unsigned long long  &n_consumed
+    // Count every k-mer in a file containing nucleotide sequences.
+    template<typename SeqIO>
+    void consume_seqfile(
+        std::string const &filename,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
     );
 
-    // Count every k-mer from a stream of FASTA or FASTQ reads,
+    // Count every k-mer in a file containing nucleotide sequences,
     // using the supplied parser.
-    void consume_fasta(
-        read_parsers:: IParser *	    parser,
-        unsigned int	    &total_reads,
-        unsigned long long  &n_consumed
+    template<typename SeqIO>
+    void consume_seqfile(
+        read_parsers::ReadParserPtr<SeqIO>& parser,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
     );
 
     void set_use_bigcount(bool b)
@@ -287,8 +303,12 @@ public:
     BoundedCounterType get_max_count(const std::string &s);
 
     // calculate the abundance distribution of kmers in the given file.
-    uint64_t * abundance_distribution(read_parsers::IParser * parser,
-                                      Hashtable * tracking);
+    template<typename SeqIO>
+    uint64_t * abundance_distribution(
+        read_parsers::ReadParserPtr<SeqIO>& parser,
+        Hashtable * tracking
+    );
+    template<typename SeqIO>
     uint64_t * abundance_distribution(std::string filename,
                                       Hashtable * tracking);
 
@@ -313,10 +333,46 @@ class Counttable : public oxli::Hashtable
 public:
     explicit Counttable(WordLength ksize, std::vector<uint64_t> sizes)
         : Hashtable(ksize, new ByteStorage(sizes)) { } ;
+
+    inline
+    virtual
+    HashIntoType
+    hash_dna(const char * kmer) const {
+        if (!(strlen(kmer) >= _ksize)) {
+            throw oxli_exception("Supplied kmer string doesn't match the underlying k-size.");
+        }
+        return _hash_murmur(kmer, _ksize);
+    }
+
+    inline virtual HashIntoType
+    hash_dna_top_strand(const char * kmer) const {
+        throw oxli_exception("not implemented");
+    }
+
+    inline virtual HashIntoType
+    hash_dna_bottom_strand(const char * kmer) const {
+        throw oxli_exception("not implemented");
+    }
+
+    inline virtual std::string
+    unhash_dna(HashIntoType hashval) const {
+        throw oxli_exception("not implemented");
+    }
+
+    virtual KmerHashIteratorPtr new_kmer_iterator(const char * sp) const;
+};
+
+// Hashtable-derived class with NibbleStorage.
+class SmallCounttable : public oxli::Hashtable
+{
+public:
+    explicit SmallCounttable(WordLength ksize, std::vector<uint64_t> sizes)
+        : Hashtable(ksize, new NibbleStorage(sizes)) { } ;
 };
 
 // Hashtable-derived class with BitStorage.
-class Nodetable : public Hashtable {
+class Nodetable : public Hashtable
+{
 public:
     explicit Nodetable(WordLength ksize, std::vector<uint64_t> sizes)
         : Hashtable(ksize, new BitStorage(sizes)) { } ;

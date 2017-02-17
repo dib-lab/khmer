@@ -39,13 +39,13 @@ cdef class Alphabets:
 cdef class Sequence:
 
     def __cinit__(self, str name=None, str sequence=None,
-                        str quality=None, str annotations=None):
+                        str quality=None, str description=None):
 
         if name is not None and sequence is not None:
             self._obj.sequence = sequence.encode('UTF-8')
             self._obj.name = name.encode('UTF-8')
-            if annotations is not None:
-                self._obj.annotations = annotations.encode('UTF-8')
+            if description is not None:
+                self._obj.description = description.encode('UTF-8')
             if quality is not None:
                 self._obj.quality = quality.encode('UTF-8')
 
@@ -73,9 +73,9 @@ cdef class Sequence:
         return self._obj.sequence
 
     @property
-    def annotations(self):
-        cdef str annotations = self._obj.annotations
-        return annotations if annotations else None
+    def description(self):
+        cdef str description = self._obj.description
+        return description if description else None
 
     @property
     def quality(self):
@@ -158,7 +158,7 @@ cdef inline bool sanitize_sequence(string& sequence,
 cdef class FastxParser:
 
     def __cinit__(self, str filename, *args, **kwargs):
-        self._this.reset(new CpFastxParser(filename.encode()))
+        self._this = get_parser[CpFastxReader](filename.encode())
 
     cdef Sequence _next(self):
         if not self.is_complete():

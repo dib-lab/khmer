@@ -1,6 +1,7 @@
 #include "khmer/_cpy_hllcounter.hh"
 
 using namespace oxli;
+using namespace oxli::read_parsers;
 
 namespace khmer {
 
@@ -64,7 +65,7 @@ PyMethodDef khmer_hllcounter_methods[] = {
         "Break a sequence into k-mers and add each k-mer to the counter."
     },
     {
-        "consume_fasta", (PyCFunction)hllcounter_consume_fasta,
+        "consume_seqfile", (PyCFunction)hllcounter_consume_seqfile,
         METH_VARARGS | METH_KEYWORDS,
         "Read sequences from file, break into k-mers, "
         "and add each k-mer to the counter. If optional keyword 'stream_out' "
@@ -199,7 +200,7 @@ hllcounter_consume_string(khmer_KHLLCounter_Object * me, PyObject * args)
     return PyLong_FromLong(n_consumed);
 }
 
-PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
+PyObject * hllcounter_consume_seqfile(khmer_KHLLCounter_Object * me,
         PyObject * args, PyObject * kwds)
 {
     const char * filename;
@@ -223,8 +224,9 @@ PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
     unsigned long long  n_consumed    = 0;
     unsigned int        total_reads   = 0;
     try {
-        me->hllcounter->consume_fasta(filename, stream_records, total_reads,
-                                      n_consumed);
+        me->hllcounter->consume_seqfile<FastxReader>(filename, stream_records,
+                total_reads,
+                n_consumed);
     } catch (oxli_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;

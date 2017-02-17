@@ -45,11 +45,11 @@ hashtable_count(khmer_KHashtable_Object * me, PyObject * args);
 
 
 PyObject *
-hashtable_consume_fasta(khmer_KHashtable_Object * me, PyObject * args);
+hashtable_consume_seqfile(khmer_KHashtable_Object * me, PyObject * args);
 
 
 PyObject *
-hashtable_consume_fasta_with_reads_parser(khmer_KHashtable_Object * me,
+hashtable_consume_seqfile_with_reads_parser(khmer_KHashtable_Object * me,
         PyObject * args);
 
 
@@ -77,9 +77,8 @@ PyObject *
 hashtable_get_max_count(khmer_KHashtable_Object * me, PyObject * args);
 
 
-PyObject *
-hashtable_abundance_distribution_with_reads_parser(khmer_KHashtable_Object * me,
-        PyObject * args);
+PyObject * hashtable_abundance_distribution_with_reads_parser(khmer_KHashtable_Object * me, PyObject * args);
+PyObject * hashtable_abundance_distribution(khmer_KHashtable_Object * me, PyObject * args);
 
 
 PyObject *

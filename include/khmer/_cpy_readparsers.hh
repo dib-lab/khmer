@@ -12,24 +12,24 @@ namespace khmer
 typedef struct {
     PyObject_HEAD
     //! Pointer to the low-level genomic read object.
-    oxli::read_parsers:: Read *   read;
+    oxli::read_parsers::Read *   read;
 } khmer_Read_Object;
 
 
 typedef struct {
     PyObject_HEAD
-    //! Pointer to the low-level parser object.
-    oxli::read_parsers:: IParser *  parser;
+    oxli::read_parsers::FastxParserPtr parser;
 } khmer_ReadParser_Object;
 
 
 typedef struct {
     PyObject_HEAD
     //! Pointer to Python parser object for reference counting purposes.
-    PyObject *  parent;
+    PyObject * parent;
     //! Persistent value of pair mode across invocations.
     int pair_mode;
 } khmer_ReadPairIterator_Object;
+
 
 
 PyObject* 
@@ -64,7 +64,7 @@ Read_get_quality(khmer_Read_Object * obj, void * closure);
 
 
 PyObject *
-Read_get_annotations(khmer_Read_Object * obj, void * closure);
+Read_get_description(khmer_Read_Object * obj, void * closure);
 
 
 PyObject *
@@ -116,6 +116,10 @@ PyObject *
 ReadParser_iter_read_pairs(PyObject * self, PyObject * args );
 
 
+PyObject *
+ReadParser_close(PyObject * self, PyObject * args);
+
+
 extern PyMethodDef _ReadParser_methods [];
 
 
@@ -129,9 +133,7 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_ReadParser_Object");
 void _init_ReadParser_Type_constants();
 
 
-oxli::read_parsers:: IParser *
-_PyObject_to_khmer_ReadParser( PyObject * py_object );
-
+oxli::read_parsers::FastxParserPtr& _PyObject_to_khmer_ReadParser(PyObject * py_object);
 
 } // namespace khmer
 

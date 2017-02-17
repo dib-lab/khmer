@@ -77,11 +77,13 @@ Contact: khmer-project@idyll.org
 #include "_cpy_hashtable.hh" 
 #include "_cpy_nodetable.hh"
 #include "_cpy_counttable.hh"
+#include "_cpy_smallcounttable.hh"
 
 #include "_cpy_hashgraph.hh"
 #include "_cpy_subsetpartition.hh"
 #include "_cpy_countgraph.hh"
 #include "_cpy_nodegraph.hh"
+#include "_cpy_smallcountgraph.hh"
 
 #include "_cpy_assembly.hh"
 

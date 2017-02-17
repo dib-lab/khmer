@@ -41,8 +41,8 @@ PyObject *
 hllcounter_consume_string(khmer_KHLLCounter_Object * me, PyObject * args);
 
 
-PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
-        PyObject * args, PyObject * kwds);
+PyObject * hllcounter_consume_seqfile(khmer_KHLLCounter_Object * me,
+                                      PyObject * args, PyObject * kwds);
 
 PyObject * hllcounter_merge(khmer_KHLLCounter_Object * me,
                                    PyObject * args);

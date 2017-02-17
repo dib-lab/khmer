@@ -103,7 +103,7 @@ def main():
     for _ in range(args.threads):
         thread = \
             threading.Thread(
-                target=countgraph.consume_fasta_with_reads_parser,
+                target=countgraph.consume_seqfile_with_reads_parser,
                 args=(rparser, )
             )
         threads.append(thread)

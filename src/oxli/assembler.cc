@@ -88,8 +88,8 @@ const
         node_filters.push_back(get_stop_bf_filter(stop_bf));
     }
 
-    AssemblerTraverser<RIGHT> cursor(graph, seed_kmer, node_filters);
-    return _assemble_directed<RIGHT>(cursor);
+    AssemblerTraverser<TRAVERSAL_RIGHT> cursor(graph, seed_kmer, node_filters);
+    return _assemble_directed<TRAVERSAL_RIGHT>(cursor);
 }
 
 
@@ -102,12 +102,12 @@ const
         node_filters.push_back(get_stop_bf_filter(stop_bf));
     }
 
-    AssemblerTraverser<LEFT> cursor(graph, seed_kmer, node_filters);
-    return _assemble_directed<LEFT>(cursor);
+    AssemblerTraverser<TRAVERSAL_LEFT> cursor(graph, seed_kmer, node_filters);
+    return _assemble_directed<TRAVERSAL_LEFT>(cursor);
 }
 
 template <>
-std::string LinearAssembler::_assemble_directed<LEFT>(AssemblerTraverser<LEFT>&
+std::string LinearAssembler::_assemble_directed<TRAVERSAL_LEFT>(AssemblerTraverser<TRAVERSAL_LEFT>&
         cursor)
 const
 {
@@ -138,8 +138,8 @@ const
 }
 
 template<>
-std::string LinearAssembler::_assemble_directed<RIGHT>
-(AssemblerTraverser<RIGHT>& cursor)
+std::string LinearAssembler::_assemble_directed<TRAVERSAL_RIGHT>
+(AssemblerTraverser<TRAVERSAL_RIGHT>& cursor)
 const
 {
     std::string contig = cursor.cursor.get_string_rep(_ksize);
@@ -201,15 +201,15 @@ const
     std::cout << "Assemble Labeled RIGHT: " << seed_kmer.repr(_ksize) << std::endl;
 #endif
     StringVector right_paths;
-    NonLoopingAT<RIGHT> rcursor(graph, seed_kmer, node_filters, &visited);
-    _assemble_directed<RIGHT>(rcursor, right_paths);
+    NonLoopingAT<TRAVERSAL_RIGHT> rcursor(graph, seed_kmer, node_filters, &visited);
+    _assemble_directed<TRAVERSAL_RIGHT>(rcursor, right_paths);
 
 #if DEBUG_ASSEMBLY
     std::cout << "Assemble Labeled LEFT: " << seed_kmer.repr(_ksize) << std::endl;
 #endif
     StringVector left_paths;
-    NonLoopingAT<LEFT> lcursor(graph, seed_kmer, node_filters, &visited);
-    _assemble_directed<LEFT>(lcursor, left_paths);
+    NonLoopingAT<TRAVERSAL_LEFT> lcursor(graph, seed_kmer, node_filters, &visited);
+    _assemble_directed<TRAVERSAL_LEFT>(lcursor, left_paths);
 
     StringVector paths;
     for (unsigned int i = 0; i < left_paths.size(); i++) {
@@ -419,15 +419,15 @@ const
                   _ksize) << std::endl;
 #endif
     StringVector right_paths;
-    NonLoopingAT<RIGHT> rcursor(graph, seed_kmer, node_filters, &visited);
-    _assemble_directed<RIGHT>(rcursor, right_paths);
+    NonLoopingAT<TRAVERSAL_RIGHT> rcursor(graph, seed_kmer, node_filters, &visited);
+    _assemble_directed<TRAVERSAL_RIGHT>(rcursor, right_paths);
 
 #if DEBUG_ASSEMBLY
     std::cout << "Assemble Junctions LEFT: " << seed_kmer.repr(_ksize) << std::endl;
 #endif
     StringVector left_paths;
-    NonLoopingAT<LEFT> lcursor(graph, seed_kmer, node_filters, &visited);
-    _assemble_directed<LEFT>(lcursor, left_paths);
+    NonLoopingAT<TRAVERSAL_LEFT> lcursor(graph, seed_kmer, node_filters, &visited);
+    _assemble_directed<TRAVERSAL_LEFT>(lcursor, left_paths);
 
     StringVector paths;
     for (unsigned int i = 0; i < left_paths.size(); i++) {

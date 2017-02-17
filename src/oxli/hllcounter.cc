@@ -58,6 +58,8 @@ Contact: khmer-project@idyll.org
 #define arr_len(a) (a + sizeof a / sizeof a[0])
 
 using namespace oxli;
+using namespace oxli::read_parsers;
+
 
 std::map<int, std::vector<double> > rawEstimateData;
 std::map<int, std::vector<double> > biasData;
@@ -347,7 +349,7 @@ uint64_t HLLCounter::estimate_cardinality()
 
 void HLLCounter::add(const std::string &value)
 {
-    HashIntoType x = oxli::_hash_murmur(value);
+    HashIntoType x = oxli::_hash_murmur(value, value.length());
     uint64_t j = x & (this->m - 1);
     this->M[j] = std::max(this->M[j], get_rho(x >> this->p, 64 - this->p));
 }
@@ -375,21 +377,20 @@ unsigned int HLLCounter::consume_string(const std::string &inp)
     return n_consumed;
 }
 
-void HLLCounter::consume_fasta(
+template<typename SeqIO>
+void HLLCounter::consume_seqfile(
     std::string const &filename,
     bool stream_records,
     unsigned int &total_reads,
     unsigned long long &n_consumed)
 {
-    read_parsers::IParser * parser = read_parsers::IParser::get_parser(filename);
-
-    consume_fasta(parser, stream_records, total_reads, n_consumed);
-
-    delete parser;
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
+    consume_seqfile<SeqIO>(parser, stream_records, total_reads, n_consumed);
 }
 
-void HLLCounter::consume_fasta(
-    read_parsers::IParser *parser,
+template<typename SeqIO>
+void HLLCounter::consume_seqfile(
+    ReadParserPtr<SeqIO>& parser,
     bool stream_records,
     unsigned int &      total_reads,
     unsigned long long &    n_consumed)
@@ -429,7 +430,7 @@ void HLLCounter::consume_fasta(
                 }
 
                 if (stream_records) {
-                    read.write_to(std::cout);
+                    read.write_fastx(std::cout);
                 }
 
                 #pragma omp task default(none) firstprivate(read) \
@@ -508,3 +509,16 @@ void HLLCounter::merge(HLLCounter &other)
         this->M[i] = std::max(other.M[i], this->M[i]);
     }
 }
+
+template void HLLCounter::consume_seqfile<FastxReader>(
+    std::string const &,
+    bool,
+    unsigned int &,
+    unsigned long long &
+);
+template void HLLCounter::consume_seqfile<FastxReader>(
+    ReadParserPtr<FastxReader>&,
+    bool,
+    unsigned int &,
+    unsigned long long &
+);

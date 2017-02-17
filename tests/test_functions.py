@@ -40,7 +40,6 @@ import screed
 import khmer
 import os
 import sys
-import collections
 import pytest
 from . import khmer_tst_utils as utils
 
@@ -49,8 +48,6 @@ try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
-
-import pytest
 
 
 def test_forward_hash():
@@ -119,8 +116,8 @@ def test_reverse_complement():
 
 
 def test_reverse_complement_exception():
-    with pytest.raises(RuntimeError):
-        khmer.reverse_complement('FGF')
+    # deal with DNA, ignore rest
+    assert khmer.reverse_complement('FGF') == 'FCF'
 
 
 def test_reverse_hash_longs():
@@ -155,6 +152,9 @@ def test_hash_murmur3():
     assert khmer.hash_murmur3('TTTT') == 526240128537019279
     assert khmer.hash_murmur3('CCCC') == 14391997331386449225
     assert khmer.hash_murmur3('GGGG') == 14391997331386449225
+    assert khmer.hash_murmur3('TATATATATATATATATATA') != 0
+    assert khmer.hash_murmur3('TTTTGCAAAA') != 0
+    assert khmer.hash_murmur3('GAAAATTTTC') != 0
 
 
 def test_hash_no_rc_murmur3():
@@ -209,7 +209,7 @@ def test_extract_countgraph_info():
             info = khmer.extract_countgraph_info(fn)
         except ValueError as err:
             assert 0, 'Should not throw a ValueErorr: ' + str(err)
-        ksize, table_size, n_tables, _, _, _, _ = info
+        ksize, n_tables, table_size, _, _, _, _ = info
         print(ksize, table_size, n_tables)
 
         assert(ksize) == 25

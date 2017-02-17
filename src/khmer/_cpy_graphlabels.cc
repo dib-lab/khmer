@@ -6,6 +6,7 @@
 #include "oxli/assembler.hh"
 
 using namespace oxli;
+using namespace oxli::read_parsers;
 
 namespace khmer {
 
@@ -52,7 +53,7 @@ PyTypeObject khmer_KGraphLabels_Type = {
 
 
 PyMethodDef khmer_graphlabels_methods[] = {
-    { "consume_fasta_and_tag_with_labels", (PyCFunction)labelhash_consume_fasta_and_tag_with_labels, METH_VARARGS, "" },
+    { "consume_seqfile_and_tag_with_labels", (PyCFunction)labelhash_consume_seqfile_and_tag_with_labels, METH_VARARGS, "" },
     { "sweep_label_neighborhood", (PyCFunction)labelhash_sweep_label_neighborhood, METH_VARARGS, "" },
     {"consume_partitioned_fasta_and_tag_with_labels", (PyCFunction)labelhash_consume_partitioned_fasta_and_tag_with_labels, METH_VARARGS, "" },
     {"sweep_tag_neighborhood", (PyCFunction)labelhash_sweep_tag_neighborhood, METH_VARARGS, "" },
@@ -148,7 +149,7 @@ labelhash_get_all_labels(khmer_KGraphLabels_Object * me, PyObject * args)
 
 
 PyObject *
-labelhash_consume_fasta_and_tag_with_labels(khmer_KGraphLabels_Object * me,
+labelhash_consume_seqfile_and_tag_with_labels(khmer_KGraphLabels_Object * me,
         PyObject * args)
 {
     LabelHash * hb = me->labelhash;
@@ -167,8 +168,8 @@ labelhash_consume_fasta_and_tag_with_labels(khmer_KGraphLabels_Object * me,
 
     //Py_BEGIN_ALLOW_THREADS
     try {
-        hb->consume_fasta_and_tag_with_labels(filename, total_reads,
-                                              n_consumed);
+        hb->consume_seqfile_and_tag_with_labels<FastxReader>(filename, total_reads,
+                n_consumed);
     } catch (oxli_file_exception &exc) {
         exc_string = exc.what();
         file_exception = exc_string.c_str();
@@ -209,7 +210,7 @@ labelhash_consume_partitioned_fasta_and_tag_with_labels(
     unsigned int        total_reads = 0;
 
     try {
-        labelhash->consume_partitioned_fasta_and_tag_with_labels(filename,
+        labelhash->consume_partitioned_fasta_and_tag_with_labels<FastxReader>(filename,
                 total_reads, n_consumed);
     } catch (oxli_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());

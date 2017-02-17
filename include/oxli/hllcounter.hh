@@ -47,7 +47,11 @@ Contact: khmer-project@idyll.org
 namespace oxli
 {
 
-using read_parsers::IParser;
+namespace read_parsers
+{
+    template<typename SeqIO> class ReadParser;
+    class FastxReader;
+}
 
 class HLLCounter
 {
@@ -57,14 +61,16 @@ public:
 
     void add(const std::string &);
     unsigned int consume_string(const std::string &);
-    void consume_fasta(std::string const &,
-                       bool,
-                       unsigned int &,
-                       unsigned long long &);
-    void consume_fasta(read_parsers::IParser *,
-                       bool,
-                       unsigned int &,
-                       unsigned long long &);
+    template<typename SeqIO>
+    void consume_seqfile(std::string const &,
+                         bool,
+                         unsigned int &,
+                         unsigned long long &);
+    template<typename SeqIO>
+    void consume_seqfile(read_parsers::ReadParserPtr<SeqIO>&,
+                         bool,
+                         unsigned int &,
+                         unsigned long long &);
     unsigned int check_and_process_read(std::string &,
                                         bool &);
     bool check_and_normalize_read(std::string &) const;

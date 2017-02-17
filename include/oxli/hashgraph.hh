@@ -55,11 +55,12 @@ Contact: khmer-project@idyll.org
 
 namespace oxli
 {
-namespace read_parsers
-{
-class IParser;
-}  // namespace read_parsers
-}  // namespace oxli
+    namespace read_parsers
+    {
+        template<typename SeqIO> class ReadParser;
+        class FastxReader;
+    }
+}
 
 #define MAX_KEEPER_SIZE int(1e6)
 
@@ -79,7 +80,8 @@ namespace oxli
 // Hashgraph: Extension of Hashtable to support graph operations.
 //
 
-class Hashgraph: public Hashtable {
+class Hashgraph: public Hashtable
+{
 
     friend class SubsetPartition;
     friend class LabelHash;
@@ -137,21 +139,40 @@ public:
         _tag_density = d;
     }
 
-    unsigned int _get_tag_density() const { return _tag_density; }
+    unsigned int _get_tag_density() const
+    {
+        return _tag_density;
+    }
 
-    void add_tag(HashIntoType tag) { all_tags.insert(tag); }
-    void add_stop_tag(HashIntoType tag) { stop_tags.insert(tag); }
+    void add_tag(HashIntoType tag)
+    {
+        all_tags.insert(tag);
+    }
+    void add_stop_tag(HashIntoType tag)
+    {
+        stop_tags.insert(tag);
+    }
 
-    size_t n_tags() const { return all_tags.size(); }
+    size_t n_tags() const
+    {
+        return all_tags.size();
+    }
 
     void divide_tags_into_subsets(unsigned int subset_size, SeenSet& divvy);
 
-    void add_kmer_to_tags(HashIntoType kmer) { all_tags.insert(kmer); }
+    void add_kmer_to_tags(HashIntoType kmer)
+    {
+        all_tags.insert(kmer);
+    }
 
-    void clear_tags() { all_tags.clear(); }
+    void clear_tags()
+    {
+        all_tags.clear();
+    }
 
     // Consume reads & build sparse graph.
-    void consume_fasta_and_tag(
+    template<typename SeqIO>
+    void consume_seqfile_and_tag(
         std::string const &filename,
         unsigned int &total_reads,
         unsigned long long &n_consumed
@@ -160,8 +181,9 @@ public:
     // Count every k-mer from a stream of FASTA or FASTQ reads,
     // using the supplied parser.
     // Tag certain ones on the connectivity graph.
-    void consume_fasta_and_tag(
-        read_parsers:: IParser * parser,
+    template<typename SeqIO>
+    void consume_seqfile_and_tag(
+        read_parsers::ReadParserPtr<SeqIO>& parser,
         unsigned int &total_reads,
         unsigned long long &n_consumed
     );
@@ -173,6 +195,7 @@ public:
 
 
     // consume an already-partitioned file & load in the partition IDs
+    template<typename SeqIO>
     void consume_partitioned_fasta(const std::string &filename,
                                    unsigned int &total_reads,
                                    unsigned long long &n_consumed);
@@ -246,8 +269,17 @@ public:
         : Hashgraph(ksize, new ByteStorage(sizes)) { } ;
 };
 
+// Hashgraph-derived class with NibbleStorage.
+class SmallCountgraph : public oxli::Hashgraph
+{
+public:
+    explicit SmallCountgraph(WordLength ksize, std::vector<uint64_t> sizes)
+        : Hashgraph(ksize, new NibbleStorage(sizes)) { } ;
+};
+
 // Hashgraph-derived class with BitStorage.
-class Nodegraph : public Hashgraph {
+class Nodegraph : public Hashgraph
+{
 public:
     explicit Nodegraph(WordLength ksize, std::vector<uint64_t> sizes)
         : Hashgraph(ksize, new BitStorage(sizes)) { } ;
