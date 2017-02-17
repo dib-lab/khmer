@@ -340,7 +340,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         countgraph = khmer.load_countgraph(args.loadgraph)
     else:
         log_info('making countgraph')
-        countgraph = khmer_args.create_countgraph(args)
+        countgraph = khmer_args.create_counttable(args)
 
     # create an object to handle diginorm of all files
     norm = Normalizer(args.cutoff, countgraph)

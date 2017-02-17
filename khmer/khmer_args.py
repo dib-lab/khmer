@@ -557,12 +557,52 @@ def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
     if ksize is None:
         ksize = args.ksize
 
+    if args.hash_function != 'twobit-exact':
+        print_error("\n** ERROR: graphs only support hash function (-H) "
+                    "'twobit-exact'.")
+        sys.exit(1)
+
+    if args.small_count:
+        tabletype = 'smallcountgraph'
+        tableclass = khmer.SmallCountgraph
+    else:
+        tabletype = 'countgraph'
+        tableclass = khmer.Countgraph
+
+    tablesize = calculate_graphsize(args, tabletype, multiplier=multiplier)
+    return khmer.Countgraph(ksize, tablesize, args.n_tables)
+
+
+def create_counttable(args, ksize=None, multiplier=1.0, fp_rate=0.1):
+    """Create and return a counttable."""
+    args = _check_fp_rate(args, fp_rate)
+
+    if hasattr(args, 'force'):
+        if args.n_tables > 20:
+            if not args.force:
+                print_error(
+                    "\n** ERROR: khmer only supports number "
+                    "of tables <= 20.\n")
+                sys.exit(1)
+            else:
+                if args.n_tables > 20:
+                    log_warn("\n*** Warning: Maximum recommended number of "
+                             "tables is 20, discarded by force nonetheless!\n")
+
+    if ksize is None:
+        ksize = args.ksize
+
     if args.hash_function == 'twobit-exact':
         if ksize > 32:
             print_error("\n** ERROR: hash function 'twobit-exact' only " +
                         "supports k-mer sizes <= 32.")
             print_error("** See -H/--hash-function for alternatives.")
             sys.exit(1)
+    elif args.hash_function == 'murmur':
+        pass
+    else:
+        print_error("\n** Error, unknown hash function")
+        sys.exit(1)
 
     if args.small_count:
         if args.hash_function == 'murmur':
@@ -581,9 +621,7 @@ def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
             tabletype = 'countgraph'
             tableclass = khmer.Countgraph
         else:
-            print_error("\n** Error, unknown hash function")
-            # @CTB be sure to catch unknown hash functions earlier, too :)
-            sys.exit(1)
+            assert 0
 
         tablesize = calculate_graphsize(args, tabletype, multiplier=multiplier)
         return tableclass(ksize, tablesize, args.n_tables)
