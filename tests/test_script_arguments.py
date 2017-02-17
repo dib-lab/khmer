@@ -185,6 +185,7 @@ FakeArgparseObject = collections.namedtuple('FakeArgs',
                                              'max_memory_usage',
                                              'unique_kmers',
                                              'small_count',
+                                             'hash_function',
                                              'force'])
 
 
@@ -192,10 +193,12 @@ def test_create_countgraph_1():
     ksize = khmer_args.DEFAULT_K
     n_tables = khmer_args.DEFAULT_N_TABLES
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
+    hash_function = 'twobit-exact'
     max_mem = 1e7
 
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0,
-                              False, 0)
+                              False, hash_function, 0)
+    print(args.hash_function)
 
     countgraph = khmer_args.create_countgraph(args)
     expected_hashsz = utils.longify([2499997, 2499989, 2499983, 2499967])
@@ -210,9 +213,10 @@ def test_create_countgraph_2():
     n_tables = khmer_args.DEFAULT_N_TABLES
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
+    hash_function = 'twobit-exact'
 
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0,
-                              False, 0)
+                              False, hash_function, 0)
 
     countgraph = khmer_args.create_countgraph(args, ksize=15)
     assert countgraph.ksize() == 15
@@ -225,9 +229,10 @@ def test_create_countgraph_3():
     n_tables = khmer_args.DEFAULT_N_TABLES
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
+    hash_function = 'twobit-exact'
 
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0,
-                              False, 0)
+                              False, hash_function, 0)
 
     old_stderr = sys.stderr
     sys.stderr = capture = StringIO()
@@ -237,7 +242,7 @@ def test_create_countgraph_3():
         assert 0, "should not reach this"
     except SystemExit:
         err = capture.getvalue()
-        assert 'khmer only supports k-mer sizes <= 32.' in err, err
+        assert 'only supports k-mer sizes <= 32' in err, err
     finally:
         sys.stderr = old_stderr
 
@@ -249,9 +254,10 @@ def test_create_countgraph_4():
     n_tables = 21  # some number larger than 20
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
+    hash_function = 'twobit-exact'
 
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0,
-                              False, 0)
+                              False, hash_function, 0)
 
     old_stderr = sys.stderr
     sys.stderr = capture = StringIO()
@@ -273,9 +279,10 @@ def test_create_countgraph_5():
     n_tables = 21  # some number larger than 20
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
+    hash_function = 'twobit-exact'
 
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0,
-                              False, 1)
+                              False, hash_function, 1)
 
     old_stderr = sys.stderr
     sys.stderr = capture = StringIO()
@@ -296,9 +303,10 @@ def test_create_countgraph_4_multiplier():
     n_tables = khmer_args.DEFAULT_N_TABLES
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
+    hash_function = 'twobit-exact'
 
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0,
-                              False, 0)
+                              False, hash_function, 0)
 
     countgraph = khmer_args.create_countgraph(args, multiplier=2.0)
     assert sum(countgraph.hashsizes()) < max_mem / 2.0, \
@@ -310,9 +318,10 @@ def test_create_nodegraph_1():
     n_tables = khmer_args.DEFAULT_N_TABLES
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
+    hash_function = 'twobit-exact'
 
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0,
-                              False, 0)
+                              False, hash_function, 0)
 
     nodegraph = khmer_args.create_nodegraph(args)
     expected_hashsz = utils.longify([19999999, 19999981, 19999963, 19999927])
@@ -329,9 +338,10 @@ def test_create_nodegraph_2():
     n_tables = khmer_args.DEFAULT_N_TABLES
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
+    hash_function = 'twobit-exact'
 
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0,
-                              False, 0)
+                              False, hash_function, 0)
 
     nodegraph = khmer_args.create_nodegraph(args, ksize=15)
     assert nodegraph.ksize() == 15
@@ -344,9 +354,10 @@ def test_create_nodegraph_3():
     n_tables = khmer_args.DEFAULT_N_TABLES
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
+    hash_function = 'twobit-exact'
 
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0,
-                              False, 0)
+                              False, hash_function, 0)
 
     sys.stderr = capture = StringIO()
 
@@ -355,7 +366,7 @@ def test_create_nodegraph_3():
         assert 0, "should not reach this"
     except SystemExit:
         err = capture.getvalue()
-        assert 'khmer only supports k-mer sizes <= 32.' in err, err
+        assert 'only supports k-mer sizes <= 32.' in err, err
 
 
 def test_create_nodegraph_4():
@@ -365,9 +376,10 @@ def test_create_nodegraph_4():
     n_tables = 21  # some number larger than 20
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
+    hash_function = 'twobit-exact'
 
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0,
-                              False, 0)
+                              False, hash_function, 0)
 
     sys.stderr = capture = StringIO()
 
@@ -386,9 +398,10 @@ def test_create_nodegraph_5():
     n_tables = 21  # some number larger than 20
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
+    hash_function = 'twobit-exact'
 
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0,
-                              False, 1)
+                              False, hash_function, 1)
 
     sys.stderr = capture = StringIO()
 
@@ -406,9 +419,10 @@ def test_create_nodegraph_4_multiplier():
     n_tables = khmer_args.DEFAULT_N_TABLES
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
+    hash_function = 'twobit-exact'
 
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0,
-                              False, 0)
+                              False, hash_function, 0)
 
     nodegraph = khmer_args.create_nodegraph(args, multiplier=2.0)
     assert sum(nodegraph.hashsizes()) / 8.0 < max_mem / 2.0, \
@@ -420,9 +434,10 @@ def test_report_on_config_bad_graphtype():
     n_tables = khmer_args.DEFAULT_N_TABLES
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
+    hash_function = 'twobit-exact'
 
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0,
-                              False, 0)
+                              False, hash_function, 0)
 
     try:
         khmer_args.report_on_config(args, 'foograph')
@@ -438,9 +453,10 @@ def test_fail_calculate_foograph_size():
     n_tables = khmer_args.DEFAULT_N_TABLES
     max_tablesize = khmer_args.DEFAULT_MAX_TABLESIZE
     max_mem = 1e7
+    hash_function = 'twobit-exact'
 
     args = FakeArgparseObject(ksize, n_tables, max_tablesize, max_mem, 0,
-                              False, 0)
+                              False, hash_function, 0)
 
     try:
         khmer_args.calculate_graphsize(args, 'foograph')

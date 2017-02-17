@@ -303,6 +303,10 @@ def main():
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
     if args.savegraph:
+        if args.hash_function != 'twobit-exact':
+            log_error('ERROR: cannot save different hash functions yet.')
+            sys.exit(1)
+
         graphsize = calculate_graphsize(args, graphtype)
         check_space_for_graph(args.savegraph, graphsize, args.force)
 
@@ -317,7 +321,7 @@ def main():
         ct = khmer.load_countgraph(args.loadgraph, args.small_count)
     else:
         log_info('making countgraph')
-        ct = khmer_args.create_countgraph(args)
+        ct = khmer_args.create_counttable(args)
 
     K = ct.ksize()
     tempdir = tempfile.mkdtemp('khmer', 'tmp', args.tempdir)
