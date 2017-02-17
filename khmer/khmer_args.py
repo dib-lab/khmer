@@ -238,7 +238,7 @@ def check_conflicting_args(args, hashtype):
 
     if getattr(args, "loadgraph", None):
         if args.hash_function != 'twobit-exact':
-            log_error('ERROR: cannot save different hash functions yet.')
+            log_error('ERROR: cannot load different hash functions yet.')
             sys.exit(1)
 
         # check for table config args
@@ -459,10 +459,6 @@ def build_graph_args(descr=None, epilog=None, parser=None, citations=None):
     group.add_argument('-M', '--max-memory-usage', type=memory_setting,
                        help='maximum amount of memory to use for data ' +
                        'structure')
-    group.add_argument('-H', '--hash-function', type=str,
-                       default='twobit-exact',
-                       help='choose hash function to use: twobit-exact, ' +
-                       'murmur')
 
     return parser
 
@@ -474,6 +470,10 @@ def build_counting_args(descr=None, epilog=None, citations=None):
     parser.add_argument('--small-count', default=False, action='store_true',
                         help='Reduce memory usage by using a smaller counter'
                         ' for individual kmers.')
+    parser.add_argument('-H', '--hash-function', type=str,
+                       default='twobit-exact',
+                       help='choose hash function to use: twobit-exact, ' +
+                       'murmur')
 
     return parser
 

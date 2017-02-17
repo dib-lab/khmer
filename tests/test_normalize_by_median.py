@@ -827,4 +827,4 @@ def test_normalize_by_median_long_k_load_fails():
     print(err)
 
     assert status == 1
-    assert 'ERROR: cannot save different hash functions yet.' in err
+    assert 'ERROR: cannot load different hash functions yet.' in err

@@ -2307,6 +2307,21 @@ def test_trim_low_abund_1():
     assert 'GGTTGACGGGGCTCAGGG' in seqs
 
 
+def test_trim_low_abund_1_long_k():
+    infile = utils.copy_test_data('test-abund-read-2.fa')
+    in_dir = os.path.dirname(infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", infile, '-H', 'murmur']
+    utils.runscript('trim-low-abund.py', args, in_dir)
+
+    outfile = infile + '.abundtrim'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.sequence for r in screed.open(outfile)])
+    assert len(seqs) == 1, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+
 def test_trim_low_abund_1_duplicate_filename_err():
     infile = utils.copy_test_data('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
