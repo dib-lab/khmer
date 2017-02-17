@@ -69,8 +69,7 @@ try:
     HAS_CYTHON = True
 except ImportError:
     pass
-finally:
-    cy_ext = '.pyx' if HAS_CYTHON else '.cpp'
+cy_ext = 'pyx' if HAS_CYTHON else 'cpp'
 
 # strip out -Wstrict-prototypes; a hack suggested by
 # http://stackoverflow.com/a/9740721
@@ -193,7 +192,8 @@ CP_EXTENSION_MOD_DICT = \
 
 EXTENSION_MODS = [Extension("khmer._khmer", ** CP_EXTENSION_MOD_DICT)]
 
-for cython_ext in glob.glob(os.path.join("khmer", "_oxli", "*." + cy_ext)):
+for cython_ext in glob.glob(os.path.join("khmer", "_oxli",
+                                         "*.{0}".format(cy_ext))):
 
     CY_EXTENSION_MOD_DICT = \
         {
