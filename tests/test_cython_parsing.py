@@ -133,7 +133,6 @@ def gather_paired(stream, **kw):
     m = 0
     num = 0
     for num, is_pair, read1, read2 in itr:
-        #print(num, is_pair, read1, read2)
         x.append((read1.name if read1 is not None else None,
                   read2.name if read2 is not None else None))
         m += 1
@@ -231,7 +230,8 @@ class Test_BrokenPairedReader(object):
         assert r == reads[1]
 
     @pytest.mark.parametrize("parser", [FastxParser, SanitizedFastxParser])
-    def testRequirePairedAndMinLength_SwappedHalfPass(self, parser, create_fastx):
+    def testRequirePairedAndMinLength_SwappedHalfPass(self, parser,
+                                                      create_fastx):
         reads = [Sequence('seq1/1', 'A' * 5),
                  Sequence('seq1/2', 'A' * 4),
                  Sequence('seq3/1', 'A' * 5),
@@ -271,7 +271,8 @@ class Test_BrokenPairedReader(object):
         assert r == reads[1]
 
     @pytest.mark.parametrize("parser", [FastxParser, SanitizedFastxParser])
-    def testRequirePairedAndMinLength_SwappedNeitherPass(self, parser, create_fastx):
+    def testRequirePairedAndMinLength_SwappedNeitherPass(self, parser,
+                                                         create_fastx):
         reads = [Sequence('seq1/1', 'A' * 3),
                  Sequence('seq1/2', 'A' * 3),
                  Sequence('seq3/1', 'A' * 5),
