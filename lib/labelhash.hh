@@ -143,7 +143,7 @@ public:
     }
 
     template<typename SeqIO>
-    void consume_fasta_and_tag_with_labels(
+    void consume_seqfile_and_tag_with_labels(
         std::string const	  &filename,
         unsigned int	  &total_reads,
         unsigned long long  &n_consumed,
@@ -151,7 +151,7 @@ public:
         void *		  callback_data	  = NULL);
 
     template<typename SeqIO>
-    void consume_fasta_and_tag_with_labels(
+    void consume_seqfile_and_tag_with_labels(
         read_parsers::ReadParserPtr<SeqIO>& parser,
         unsigned int	    &total_reads,
         unsigned long long  &n_consumed,
