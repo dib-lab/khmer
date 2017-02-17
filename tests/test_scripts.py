@@ -2311,7 +2311,7 @@ def test_trim_low_abund_1_long_k():
     infile = utils.copy_test_data('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
 
-    args = ["-k", "17", "-x", "1e7", "-N", "2", infile, '-H', 'murmur']
+    args = ["-k", "35", "-x", "1e7", "-N", "2", infile, '-H', 'murmur']
     utils.runscript('trim-low-abund.py', args, in_dir)
 
     outfile = infile + '.abundtrim'
@@ -2322,11 +2322,23 @@ def test_trim_low_abund_1_long_k():
     assert 'GGTTGACGGGGCTCAGGG' in seqs
 
 
+def test_trim_low_abund_1_long_k_twobit_fails():
+    infile = utils.copy_test_data('test-abund-read-2.fa')
+    in_dir = os.path.dirname(infile)
+
+    args = ["-k", "35", "-x", "1e7", "-N", "2", infile, '-H', 'twobit-exact']
+    (status, out, err) = utils.runscript('trim-low-abund.py', args, in_dir,
+                                         fail_ok=True)
+
+    assert status == 1
+    assert "'twobit-exact' only supports k-mer sizes <= 32" in err
+
+
 def test_trim_low_abund_1_long_k_save_fails():
     infile = utils.copy_test_data('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
 
-    args = ["-k", "17", "-x", "1e7", "-N", "2", infile, '-H', 'murmur',
+    args = ["-k", "35", "-x", "1e7", "-N", "2", infile, '-H', 'murmur',
             '-s', 'foo']
     (status, out, err) = utils.runscript('trim-low-abund.py', args, in_dir,
                                          fail_ok=True)
@@ -2339,7 +2351,7 @@ def test_trim_low_abund_1_long_k_load_fails():
     infile = utils.copy_test_data('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
 
-    args = ["-k", "17", "-x", "1e7", "-N", "2", infile, '-H', 'murmur',
+    args = ["-k", "35", "-x", "1e7", "-N", "2", infile, '-H', 'murmur',
             '-l', 'foo']
     (status, out, err) = utils.runscript('trim-low-abund.py', args, in_dir,
                                          fail_ok=True)

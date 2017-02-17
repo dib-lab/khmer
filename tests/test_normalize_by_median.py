@@ -799,6 +799,21 @@ def test_normalize_by_median_long_k():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
 
 
+def test_normalize_by_median_long_k_twobit_fails():
+    CUTOFF = '2'
+
+    infile = utils.copy_test_data('test-abund-read-2.fa')
+    in_dir = os.path.dirname(infile)
+
+    script = 'normalize-by-median.py'
+    args = ['-C', CUTOFF, '-k', '33', '-H', 'murmur', infile,
+            '-H', 'twobit-exact']
+    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+
+    assert status == 1
+    assert "'twobit-exact' only supports k-mer sizes <= 32" in err
+
+
 def test_normalize_by_median_long_k_save_fails():
     CUTOFF = '2'
 
