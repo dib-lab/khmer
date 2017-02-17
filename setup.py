@@ -52,6 +52,7 @@ import tempfile
 
 from setuptools import setup
 from setuptools import Extension
+from setuptools.command.build_ext import build_ext as _build_ext
 from distutils.spawn import spawn
 from distutils.sysconfig import get_config_vars
 from distutils.dist import Distribution
@@ -62,10 +63,14 @@ ez_setup.use_setuptools(version="3.4.1")
 
 CMDCLASS = versioneer.get_cmdclass()
 
+HAS_CYTHON = False
 try:
-    from Cython.Distutils import build_ext as _build_ext
+    import Cython
+    HAS_CYTHON = True
 except ImportError:
-    from setuptools.command.build_ext import build_ext as _build_ext
+    pass
+finally:
+    cy_ext = '.pyx' if HAS_CYTHON else '.cpp'
 
 # strip out -Wstrict-prototypes; a hack suggested by
 # http://stackoverflow.com/a/9740721
@@ -188,7 +193,7 @@ CP_EXTENSION_MOD_DICT = \
 
 EXTENSION_MODS = [Extension("khmer._khmer", ** CP_EXTENSION_MOD_DICT)]
 
-for cython_ext in glob.glob(os.path.join("khmer", "_oxli", "*.pyx")):
+for cython_ext in glob.glob(os.path.join("khmer", "_oxli", "*." + cy_ext)):
 
     CY_EXTENSION_MOD_DICT = \
         {
@@ -266,8 +271,7 @@ SETUP_METADATA = \
         "package_data": {'khmer/_oxli': ['*.pxd']},
         "package_dir": {'khmer.tests': 'tests'},
         "install_requires": ['screed >= 0.9', 'bz2file'],
-        "setup_requires": ["pytest-runner>=2.0,<3dev",
-                           'Cython>=0.25.2', "setuptools>=18.0"],
+        "setup_requires": ["pytest-runner>=2.0,<3dev", "setuptools>=18.0"],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
                            'tests': ['pytest>=2.9'],
