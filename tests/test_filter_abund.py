@@ -186,6 +186,39 @@ def test_filter_abund_1_singlefile():
     assert 'GGTTGACGGGGCTCAGGG' in seqs
 
 
+def test_filter_abund_1_singlefile_long_k():
+    infile = utils.copy_test_data('test-abund-read-2.fa')
+    in_dir = os.path.dirname(infile)
+
+    script = 'filter-abund-single.py'
+    args = ['-x', '1e7', '-N', '2', '-k', '35', '-H', 'murmur', infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert 'Total number of unique k-mers: 80' in err, err
+
+    outfile = infile + '.abundfilt'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.sequence for r in screed.open(outfile)])
+    assert len(seqs) == 0
+
+
+def test_filter_abund_1_singlefile_long_k_nosave():
+    infile = utils.copy_test_data('test-abund-read-2.fa')
+    in_dir = os.path.dirname(infile)
+
+    script = 'filter-abund-single.py'
+    args = ['-x', '1e7', '-N', '2', '-k', '35', '-H', 'murmur', infile,
+            '--savegraph', 'foo']
+    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+
+    print(out)
+    print(err)
+
+    assert status == 1
+    assert 'ERROR: cannot save different hash functions yet.' in err
+
+
 def test_filter_abund_2_singlefile():
     infile = utils.copy_test_data('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
