@@ -523,5 +523,3 @@ def tandem_repeat_structure(request, linear_structure):
         request.applymarker(pytest.mark.xfail)
 
     return graph, sequence, tandem_repeats
-
-

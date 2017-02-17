@@ -280,4 +280,3 @@ def test_check_file_status_kfile_force():
         sys.stderr = old_stderr
 
     assert "does not exist" in capture.getvalue(), capture.getvalue()
-

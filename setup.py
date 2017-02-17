@@ -126,12 +126,14 @@ def check_for_openmp():
 
     return exit_code == 0
 
+
 def distutils_dir_name(dname):
     """Returns the name of a distutils build directory"""
     f = "{dirname}.{platform}-{version[0]}.{version[1]}"
     return f.format(dirname=dname,
                     platform=sysconfig.get_platform(),
                     version=sys.version_info)
+
 
 def build_dir():
     return path_join("build", distutils_dir_name("temp"))
@@ -193,14 +195,18 @@ for cython_ext in glob.glob(os.path.join("khmer", "_oxli", "*.pyx")):
             "sources": [cython_ext],
             "extra_compile_args": EXTRA_COMPILE_ARGS,
             "extra_link_args": EXTRA_LINK_ARGS,
-            "extra_objects": [path_join(build_dir(), splitext(p)[0]+'.o')  for p in SOURCES],
+            "extra_objects": [
+                path_join(build_dir(), splitext(p)[0]+'.o') for p in SOURCES
+            ],
             "depends": [],
             "include_dirs": ["include", "."],
             "language": "c++",
             "define_macros": [("VERSION", versioneer.get_version()), ],
         }
-    
-    ext_name = "khmer._oxli.{0}".format(splitext(os.path.basename(cython_ext))[0])
+
+    ext_name = "khmer._oxli.{0}".format(
+        splitext(os.path.basename(cython_ext))[0]
+    )
     EXTENSION_MODS.append(Extension(ext_name, ** CY_EXTENSION_MOD_DICT))
 
 SCRIPTS = []
@@ -307,23 +313,27 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
                     ' configure || bash ./configure --static ) && make -f '
                     'Makefile.pic PIC']
             spawn(cmd=zcmd, dry_run=self.dry_run)
-            #self.extensions[0].extra_objects.extend(
+            # self.extensions[0].extra_objects.extend(
             for ext in self.extensions:
                 ext.extra_objects.extend(
-                path_join("third-party", "zlib", bn + ".lo") for bn in [
-                    "adler32", "compress", "crc32", "deflate", "gzclose",
-                    "gzlib", "gzread", "gzwrite", "infback", "inffast",
-                    "inflate", "inftrees", "trees", "uncompr", "zutil"])
+                    path_join("third-party", "zlib", bn + ".lo") for bn in [
+                        "adler32", "compress", "crc32", "deflate", "gzclose",
+                        "gzlib", "gzread", "gzwrite", "infback", "inffast",
+                        "inflate", "inftrees", "trees", "uncompr", "zutil"
+                    ]
+                )
         if "bz2" not in self.libraries:
             bz2cmd = ['bash', '-c', 'cd ' + BZIP2DIR + ' && make -f '
                       'Makefile-libbz2_so all']
             spawn(cmd=bz2cmd, dry_run=self.dry_run)
-            #self.extensions[0].extra_objects.extend(
+            # self.extensions[0].extra_objects.extend(
             for ext in self.extensions:
                 ext.extra_objects.extend(
-                path_join("third-party", "bzip2", bn + ".o") for bn in [
-                    "blocksort", "huffman", "crctable", "randtable",
-                    "compress", "decompress", "bzlib"])
+                    path_join("third-party", "bzip2", bn + ".o") for bn in [
+                        "blocksort", "huffman", "crctable", "randtable",
+                        "compress", "decompress", "bzlib"
+                    ]
+                )
         _build_ext.run(self)
 
 CMDCLASS.update({'build_ext': KhmerBuildExt})
