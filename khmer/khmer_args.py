@@ -54,7 +54,7 @@ import khmer
 from khmer import extract_countgraph_info
 from khmer import __version__
 from .utils import print_error
-from .khmer_logger import log_info, log_warn, configure_logging
+from .khmer_logger import log_info, log_warn, configure_logging, log_error
 
 
 DEFAULT_K = 32
@@ -237,6 +237,9 @@ def check_conflicting_args(args, hashtype):
     loadgraph_autoarg_conflicts = ("unique_kmers", "max_memory_usage")
 
     if getattr(args, "loadgraph", None):
+        if args.hash_function != 'twobit-exact':
+            log_error('ERROR: cannot save different hash functions yet.')
+            sys.exit(1)
 
         # check for table config args
         for key, value in loadgraph_table_conflicts.items():
