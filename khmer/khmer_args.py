@@ -237,7 +237,7 @@ def check_conflicting_args(args, hashtype):
     loadgraph_autoarg_conflicts = ("unique_kmers", "max_memory_usage")
 
     if getattr(args, "loadgraph", None):
-        if args.hash_function != 'twobit-exact':
+        if getattr(args, "hash_function", 'twobit-exact') != 'twobit-exact':
             log_error('ERROR: cannot load different hash functions yet.')
             sys.exit(1)
 
@@ -514,11 +514,6 @@ def calculate_graphsize(args, graphtype, multiplier=1.0):
 def create_nodegraph(args, ksize=None, multiplier=1.0, fp_rate=0.01):
     """Create and return a nodegraph."""
     args = _check_fp_rate(args, fp_rate)
-
-    if args.hash_function != 'twobit-exact':
-        print_error("\n** ERROR: we only support hash function " +
-                    "twobit-exact' in this script.")
-
 
     if hasattr(args, 'force'):
         if args.n_tables > 20:
