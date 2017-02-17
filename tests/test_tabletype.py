@@ -409,8 +409,8 @@ def test_set_bigcount(tabletype):
         tt.set_use_bigcount(True)
 
         for i in range(300):
-            tt.add('G'*12)
-        assert tt.get('G'*12) == 300
+            tt.add('G' * 12)
+        assert tt.get('G' * 12) == 300
 
     else:
         with pytest.raises(ValueError):

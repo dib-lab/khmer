@@ -80,7 +80,7 @@ class TestNonBranching:
         for start in range(0, len(contig), 150):
             path = asm.assemble_left(contig[start:start + K])
             print(path, ', ', contig[:start])
-            assert utils._equals_rc(path, contig[:start+K]), start
+            assert utils._equals_rc(path, contig[:start + K]), start
 
     def test_all_right_to_end(self, linear_structure, assembler):
         # assemble directed right
@@ -115,7 +115,6 @@ class TestLinearAssembler_RightBranching:
         graph, contig, L, HDN, R, tip = right_tip_structure
         asm = khmer.LinearAssembler(graph)
         path = asm.assemble(revcomp(contig[0:K]))
-
 
         assert len(path) == HDN.pos + K
         assert utils._equals_rc(path, contig[:len(path)])
@@ -187,7 +186,8 @@ class TestLinearAssembler_LeftBranching:
         assert utils._equals_rc(path, contig[HDN.pos:])
 
     def test_from_branch_to_ends_with_stopbf(self, left_tip_structure):
-        # block the tip with the stop_filter. should return a full length contig.
+        # block the tip with the stop_filter. should return a full length
+        # contig.
         graph, contig, L, HDN, R, tip = left_tip_structure
 
         stop_filter = khmer.Nodegraph(K, 1e5, 4)
@@ -201,7 +201,8 @@ class TestLinearAssembler_LeftBranching:
         assert utils._equals_rc(path, contig)
 
     def test_from_branch_to_ends_with_stopbf_revcomp(self, left_tip_structure):
-        # block the tip with the stop_filter. should return a full length contig.
+        # block the tip with the stop_filter. should return a full length
+        # contig.
         graph, contig, L, HDN, R, tip = left_tip_structure
 
         stop_filter = khmer.Nodegraph(K, 1e5, 4)
@@ -222,10 +223,8 @@ class TestLinearAssembler_LeftBranching:
         stop_filter.count(L)          # ...and block original path
         asm = khmer.LinearAssembler(graph, stop_filter=stop_filter)
 
-
         path = asm.assemble(contig[-K:])
         assert len(path) == len(contig) - HDN.pos + 1
-
 
         # should be the tip k-kmer, plus the last base of the HDN thru
         # the end of the contig
@@ -243,5 +242,3 @@ class TestLinearAssembler_LeftBranching:
 
         assert len(path) == K
         assert utils._equals_rc(path, HDN)
-
-

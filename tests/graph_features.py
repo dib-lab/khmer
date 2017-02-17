@@ -135,7 +135,7 @@ def reads(sequence, L=100, N=100, dbg_cover=False):
     positions = list(range(len(sequence) - L))
     if dbg_cover is True:
         for start in range(0, len(sequence), K):
-            read = sequence[start:start+L]
+            read = sequence[start:start + L]
             if len(read) < K:
                 read = sequence[-L:]
             yield read
@@ -523,5 +523,3 @@ def tandem_repeat_structure(request, linear_structure):
         request.applymarker(pytest.mark.xfail)
 
     return graph, sequence, tandem_repeats
-
-
