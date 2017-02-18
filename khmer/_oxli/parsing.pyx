@@ -1,5 +1,9 @@
+# -*- coding: UTF-8 -*-
 # cython: c_string_type=unicode, c_string_encoding=utf8
+
 from __future__ import print_function
+from __future__ import unicode_literals
+
 from cython.operator cimport dereference as deref
 cimport cython
 from libcpp cimport bool
@@ -7,29 +11,31 @@ from libcpp.string cimport string
 
 import sys
 
+from .utils cimport _bstring, _ustring
+
 
 cdef class Alphabets:
     
     @staticmethod
-    def get(str name):
-        cdef str alphabet = Alphabets._get(name.encode('UTF-8'))
+    def get(name):
+        cdef unicode alphabet = _ustring(Alphabets._get(_bstring(name)))
         if not alphabet:
             raise ValueError('No alphabet with name {0}'.format(name))
         return alphabet
 
     @staticmethod
     cdef string _get(string name):
-        if name == 'DNA_SIMPLE':
+        if name == b'DNA_SIMPLE':
             return DNA_SIMPLE
-        elif name == 'DNAN_SIMPLE':
+        elif name == b'DNAN_SIMPLE':
             return DNAN_SIMPLE
-        elif name == 'RNA_SIMPLE':
+        elif name == b'RNA_SIMPLE':
             return RNA_SIMPLE
-        elif name == 'RNAN_SIMPLE':
+        elif name == b'RNAN_SIMPLE':
             return RNAN_SIMPLE
-        elif name == 'IUPAC_NUCL':
+        elif name == b'IUPAC_NUCL':
             return IUPAC_NUCL
-        elif name == 'IUPAC_AA':
+        elif name == b'IUPAC_AA':
             return IUPAC_AA
         else:
             return string()
@@ -38,16 +44,21 @@ cdef class Alphabets:
 @cython.freelist(100)
 cdef class Sequence:
 
-    def __cinit__(self, str name=None, str sequence=None,
-                        str quality=None, str description=None):
+    def __cinit__(self, name=None, sequence=None,
+                        quality=None, description=None,
+                        cleaned_seq=None):
 
         if name is not None and sequence is not None:
-            self._obj.sequence = sequence.encode('UTF-8')
-            self._obj.name = name.encode('UTF-8')
+            self._obj.sequence = _bstring(sequence)
+            self._obj.name = _bstring(name)
             if description is not None:
-                self._obj.description = description.encode('UTF-8')
+                self._obj.description = _bstring(description)
             if quality is not None:
-                self._obj.quality = quality.encode('UTF-8')
+                self._obj.quality = _bstring(quality)
+            if cleaned_seq is not None:
+                self._obj.cleaned_seq = _bstring(cleaned_seq)
+            else:
+                self._obj.cleaned_seq = self._obj.sequence
 
     def __str__(self):
         return repr(self)
@@ -66,28 +77,40 @@ cdef class Sequence:
 
     @property
     def name(self):
-        return self._obj.name
+        cdef unicode name = self._obj.name
+        return self._obj.name if name else None
 
     @property
     def sequence(self):
-        return self._obj.sequence
+        cdef unicode sequence = self._obj.sequence
+        return self._obj.sequence if sequence else None
 
     @property
     def description(self):
-        cdef str description = self._obj.description
+        cdef unicode description = self._obj.description
         return description if description else None
 
     @property
     def quality(self):
-        cdef str quality = self._obj.quality
+        cdef unicode quality = self._obj.quality
         return quality if quality else None
+
+    @property
+    def cleaned_seq(self):
+        cdef unicode cleaned_seq = self._obj.cleaned_seq
+        return cleaned_seq if cleaned_seq else None
 
     @staticmethod
     def from_screed_record(record):
         cdef Sequence seq = Sequence(name=record.name,
                                      sequence=record.sequence)
         if hasattr(record, 'quality'):
-            seq._obj.quality = record.quality.encode('UTF-8')
+            seq._obj.quality = _bstring(record.quality)
+
+        for attr in ('annotations', 'description'):
+            if hasattr(record, attr):
+                seq._obj.description = _bstring(getattr(record, attr))
+
         return seq
 
     @staticmethod
@@ -150,15 +173,15 @@ cdef inline bool sanitize_sequence(string& sequence,
         sequence[i] &= 0xdf
         if not is_valid(sequence[i], alphabet):
             return False
-        if convert_n and sequence[i] == 'N':
-            sequence[i] = 'A'
+        if convert_n and sequence[i] == b'N':
+            sequence[i] = b'A'
     return True
 
 
 cdef class FastxParser:
 
-    def __cinit__(self, str filename, *args, **kwargs):
-        self._this = get_parser[CpFastxReader](filename.encode())
+    def __cinit__(self, filename, *args, **kwargs):
+        self._this = get_parser[CpFastxReader](_bstring(filename))
 
     cdef Sequence _next(self):
         if not self.is_complete():
@@ -178,11 +201,11 @@ cdef class FastxParser:
 
 cdef class SanitizedFastxParser(FastxParser):
 
-    def __cinit__(self, str filename, str alphabet='DNAN_SIMPLE',
+    def __cinit__(self, filename, alphabet='DNAN_SIMPLE',
                         bool convert_n=True):
         self.n_bad = 0
         self.convert_n = convert_n
-        self._alphabet = Alphabets.get(alphabet).encode('UTF-8')
+        self._alphabet = Alphabets._get(_bstring(alphabet))
 
     cdef Sequence _next(self):
         cdef Sequence seq
@@ -376,14 +399,30 @@ cdef class BrokenPairedReader:
             return 1, first, second, None
 
 
-cpdef tuple _split_left_right(str name):
+cpdef tuple _split_left_right(unicode s):
+    cdef string cppstr = s.encode('UTF-8')
+    return _cppstring_split_left_right(cppstr)
+
+
+cdef tuple _cppstring_split_left_right(string& s):
     """Split record name at the first whitespace and return both parts.
 
     RHS is set to an empty string if not present.
     """
-    cdef list parts = name.split(None, 1)
-    cdef str lhs = parts[0]
-    cdef str rhs = parts[1] if len(parts) > 1 else ''
+    cdef unsigned int i
+    cdef const char * c_str = s.c_str()
+    cdef unicode lhs, rhs
+    lhs = u''
+    rhs = u''
+    for i in range(len(s)):
+        if lhs == u'':
+            if (c_str[i] == b' ' or c_str[i] == b'\t'):
+                lhs = _ustring(c_str[0:i])
+        else:
+            if c_str[i] != b' ' or c_str[i] != b'\t':
+                rhs = _ustring(c_str[i:len(s)])
+                break
+    lhs = _ustring(c_str[0:len(s)])  if lhs == u'' else lhs
     return lhs, rhs
 
 
@@ -403,12 +442,12 @@ cdef int _check_is_pair(Sequence first, Sequence second):
         if first.quality is not second.quality:
             return -1
 
-    cdef str lhs1, rhs1, lhs2, rhs2
-    lhs1, rhs1 = _split_left_right(first.name)
-    lhs2, rhs2 = _split_left_right(second.name)
+    cdef unicode lhs1, rhs1, lhs2, rhs2
+    lhs1, rhs1 = _cppstring_split_left_right(first._obj.name)
+    lhs2, rhs2 = _cppstring_split_left_right(second._obj.name)
 
     # handle 'name/1'
-    cdef str subpart1, subpart2
+    cdef unicode subpart1, subpart2
     if lhs1.endswith('/1') and lhs2.endswith('/2'):
         subpart1 = lhs1.split('/', 1)[0]
         subpart2 = lhs2.split('/', 1)[0]
@@ -442,15 +481,15 @@ def check_is_pair(first, second):
     return ret == 1
 
 
-cpdef bool check_is_left(str name):
+cpdef bool check_is_left(s):
     """Check if the name belongs to a 'left' sequence (/1).
 
     Returns True or False.
 
     Handles both Casava formats: seq/1 and 'seq::... 1::...'
     """
-    cdef str lhs, rhs
-    lhs, rhs = _split_left_right(name)
+    cdef unicode lhs, rhs
+    lhs, rhs = _split_left_right(_ustring(s))
     if lhs.endswith('/1'):              # handle 'name/1'
         return True
     elif rhs.startswith('1:'):          # handle '@name 1:rst'
@@ -462,15 +501,15 @@ cpdef bool check_is_left(str name):
     return False
 
 
-cpdef bool check_is_right(str name):
+cpdef bool check_is_right(s):
     """Check if the name belongs to a 'right' sequence (/2).
 
     Returns True or False.
 
     Handles both Casava formats: seq/2 and 'seq::... 2::...'
     """
-    cdef str lhs, rhs
-    lhs, rhs = _split_left_right(name)
+    cdef unicode lhs, rhs
+    lhs, rhs = _split_left_right(_ustring(s))
     if lhs.endswith('/2'):              # handle 'name/2'
         return True
     elif rhs.startswith('2:'):          # handle '@name 2:rst'

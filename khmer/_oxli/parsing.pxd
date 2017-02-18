@@ -1,8 +1,12 @@
+# -*- coding: UTF-8 -*-
+# cython: c_string_type=unicode, c_string_encoding=utf8
+from __future__ import unicode_literals
+
 from libcpp.memory cimport unique_ptr
 from libcpp cimport bool
 from libcpp.string cimport string
 
-from wrapper cimport *
+from .wrapper cimport *
 
 
 cdef class Alphabets:
@@ -59,13 +63,15 @@ cdef class BrokenPairedReader:
     cdef tuple _next(self)
 
 
-cpdef tuple _split_left_right(str name)
+cpdef tuple _split_left_right(unicode s)
+
+cdef tuple _cppstring_split_left_right(string& s)
 
 cdef int _check_is_pair(Sequence first, Sequence second)
 
-cpdef bool check_is_left(str name)
+cpdef bool check_is_left(s)
 
-cpdef bool check_is_right(str name)
+cpdef bool check_is_right(s)
 
 cdef inline bool is_valid(const char base, string& alphabet)
 

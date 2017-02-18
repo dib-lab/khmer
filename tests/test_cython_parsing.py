@@ -50,6 +50,7 @@ def sequences_eq(seqs_A, seqs_B):
             assert seq1.sequence == seq2.sequence
 
 
+
 def test_FastxParser(create_fastx):
     expected = [Sequence('seq1/1', 'A' * 5),
                 Sequence('seq1/2', 'A' * 4),
@@ -398,3 +399,47 @@ def test_check_is_left():
 
     assert check_is_left(
         '@HWI-ST412:261:d15khacxx:8:1101:3149:2157 1:N:0:ATCACG')
+
+
+class Test_Sequence(object):
+
+    name = 'Test'
+    sequence = 'ACGT'
+    quality = '####'
+    description = 'The nucleotides'
+    cleaned = 'aaaa'
+    
+    def test_init_name_and_sequence(self):
+        s = Sequence(name=self.name, sequence=self.sequence)
+        assert s.name == self.name
+        assert s.sequence == self.sequence
+        assert s.quality is None
+        assert s.description is None
+        assert s.cleaned_seq == self.sequence
+
+    def test_init_name_only(self):
+        s = Sequence(name=self.name)
+        assert s.name is None
+        assert s.sequence is None
+        assert s.quality is None
+        assert s.description is None
+        assert s.cleaned_seq is None
+
+    def test_init_sequence_only(self):
+        s = Sequence(sequence=self.sequence)
+        assert s.name is None
+        assert s.sequence is None
+        assert s.quality is None
+        assert s.description is None
+        assert s.cleaned_seq is None
+
+    def test_init_with_cleaned_seq(self):
+        s = Sequence(name=self.name, sequence=self.sequence,
+                     cleaned_seq=self.cleaned)
+        assert s.name == self.name
+        assert s.sequence == self.sequence
+        assert s.quality is None
+        assert s.description is None
+        assert s.cleaned_seq == self.cleaned
+
+
