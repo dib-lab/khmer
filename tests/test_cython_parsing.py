@@ -50,7 +50,6 @@ def sequences_eq(seqs_A, seqs_B):
             assert seq1.sequence == seq2.sequence
 
 
-
 def test_FastxParser(create_fastx):
     expected = [Sequence('seq1/1', 'A' * 5),
                 Sequence('seq1/2', 'A' * 4),
@@ -408,7 +407,7 @@ class Test_Sequence(object):
     quality = '####'
     description = 'The nucleotides'
     cleaned = 'aaaa'
-    
+
     def test_init_name_and_sequence(self):
         s = Sequence(name=self.name, sequence=self.sequence)
         assert s.name == self.name
@@ -441,5 +440,3 @@ class Test_Sequence(object):
         assert s.quality is None
         assert s.description is None
         assert s.cleaned_seq == self.cleaned
-
-

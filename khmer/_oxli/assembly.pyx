@@ -1,5 +1,6 @@
+# -*- coding: UTF-8 -*-
 # cython: c_string_type=unicode, c_string_encoding=utf8
-import cython
+
 from cython.operator cimport dereference as deref
 
 from wrapper cimport CpHashgraph, CpLinearAssembler, CpKmer, get_hashgraph_ptr
