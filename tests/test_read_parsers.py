@@ -38,7 +38,7 @@
 from __future__ import print_function
 from __future__ import absolute_import
 from khmer import Read
-from khmer import ReadParser
+from khmer import ReadParser, Counttable, Nodegraph
 from screed import Record
 from . import khmer_tst_utils as utils
 import pytest
@@ -482,6 +482,80 @@ def test_clean_seq():
     for read in ReadParser(utils.get_test_data("test-abund-read-3.fa")):
         clean = read.sequence.upper().replace("N", "A")
         assert clean == read.cleaned_seq
+
+
+def test_read_cleaning_consume_seqfile():
+    infile = utils.get_test_data('valid-read-testing.fq')
+
+    x = Counttable(15, int(1e6), 4)
+    x.consume_seqfile(infile)
+
+    # the relevant read will automatically get uppercased => abundance of 2
+    kmer = "caggcgcccaccacc".upper()
+    assert x.get(kmer) == 2
+
+    # the 2nd read with this k-mer in it has an N in it.
+    kmer = "CCTCATCGGCACCAG"
+    assert x.get(kmer) == 1               # this should be 2 in the future
+
+    # the 2nd read with this k-mer in it has a Z in it
+    kmer = "ACTGAGCTTCATGTC"
+    assert x.get(kmer) == 1               # this should be 2 in the future
+
+
+def test_read_cleaning_consume_read_by_read():
+    infile = utils.get_test_data('valid-read-testing.fq')
+
+    x = Counttable(15, int(1e6), 4)
+    for read in ReadParser(infile):
+        x.consume(read.sequence)          # consume raw sequence
+
+    # the relevant read will be entirely ignored
+    # (b/c ReadParser does not uppercase)
+    kmer = "caggcgcccaccacc".upper()
+    assert x.get(kmer) == 1
+
+    # the 2nd read with this k-mer in it has an N in it; 'consume' will ignore.
+    kmer = "CCTCATCGGCACCAG"
+    assert x.get(kmer) == 2
+
+    # the 2nd read with this k-mer in it has a Z in it; 'consume' will ignore.
+    kmer = "ACTGAGCTTCATGTC"
+    assert x.get(kmer) == 2
+
+
+def test_read_cleaning_consume_read_by_read_cleaned_seq():
+    infile = utils.get_test_data('valid-read-testing.fq')
+
+    x = Counttable(15, int(1e6), 4)
+    for read in ReadParser(infile):
+        x.consume(read.cleaned_seq)       # consume cleaned_seq
+
+    # the relevant read will be cleaned & loaded
+    kmer = "caggcgcccaccacc".upper()
+    assert x.get(kmer) == 2
+
+    # this k-mer will be correctly loaded
+    kmer = "CCTCATCGGCACCAG"
+    assert x.get(kmer) == 2
+
+    # this k-mer will be correctly loaded
+    kmer = "ACTGAGCTTCATGTC"
+    assert x.get(kmer) == 2
+
+
+def test_read_cleaning_abundance_distribution():
+    infile = utils.get_test_data('valid-read-testing.fq')
+
+    x = Counttable(15, int(1e6), 4)
+    y = Nodegraph(15, int(1e6), 4)
+
+    x.consume_seqfile(infile)
+
+    dist = x.abundance_distribution(infile, y)
+    assert dist[1] == 41
+    assert dist[2] == 42
+
 
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
 # vim: set textwidth=79:
