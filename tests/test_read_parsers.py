@@ -567,13 +567,13 @@ def test_read_cleaning_trim_functions_lowercase():
 
     s = "caggcgcccaccaccgtgccctccaacctgatggt"
     _, where = x.trim_on_abundance(s, 1)
-    assert where == 35                    # in future, should be '0'
+    assert where == 0
 
     _, where = x.trim_below_abundance(s, 2)
-    assert where == 35                    # in future, should be '0'
+    assert where == 35
 
     posns = x.find_spectral_error_positions(s, 1)
-    assert posns == []                    # in future, should do same
+    assert posns == []
 
 
 def test_read_cleaning_trim_functions_N():
@@ -586,14 +586,13 @@ def test_read_cleaning_trim_functions_N():
 
     s = "ACTGGGCGTAGNCGGTGTCCTCATCGGCACCAGC"
     _, where = x.trim_on_abundance(s, 1)
-    assert where == 0                     # in future, should be ??
+    assert where == 11
 
     _, where = x.trim_below_abundance(s, 2)
-    assert where == 0                     # in future, should be ??
+    assert where == 34
 
-    with pytest.raises(ValueError):
-        posns = x.find_spectral_error_positions(s, 1)
-    # assert posns == []                    # in future, should return []
+    posns = x.find_spectral_error_positions(s, 1)
+    assert posns == [11]
 
 
 def test_read_cleaning_trim_functions_bad_dna():
@@ -606,14 +605,13 @@ def test_read_cleaning_trim_functions_bad_dna():
 
     s = "CCGGCGTGGTTZZYAGGTCACTGAGCTTCATGTC"
     _, where = x.trim_on_abundance(s, 1)
-    assert where == 0                     # in future, should be ??
+    assert where == 11
 
     _, where = x.trim_below_abundance(s, 2)
-    assert where == 0                     # in future, should be ??
+    assert where == 34
 
-    with pytest.raises(ValueError):
-        posns = x.find_spectral_error_positions(s, 1)
-    # assert posns == []                    # in future, should return []
+    posns = x.find_spectral_error_positions(s, 1)
+    assert posns == [11]
 
 
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
