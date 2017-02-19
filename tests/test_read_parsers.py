@@ -570,7 +570,7 @@ def test_read_cleaning_trim_functions_lowercase():
     assert where == 35                    # in future, should be '0'
 
     _, where = x.trim_below_abundance(s, 2)
-    assert where == 35                    # in future, should be '0'
+    assert where == 35                    # in future, should be ?? @CTB
 
     posns = x.find_spectral_error_positions(s, 1)
     assert posns == []                    # in future, should do same
@@ -613,7 +613,7 @@ def test_read_cleaning_trim_functions_bad_dna():
 
     with pytest.raises(ValueError):
         posns = x.find_spectral_error_positions(s, 1)
-    # assert posns == []                    # in future, should return []
+    # assert posns == []                    # in future, should return [11]
 
 
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
