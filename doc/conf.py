@@ -47,10 +47,7 @@ master_doc = 'index'
 project = u'khmer'
 
 # also update setup.py
-copyright = u'''2010-2014 Michael R. Crusoe, Greg Edvenson, Jordan
-Fish, Adina Howe, Luiz Irber, Eric McDonald, Joshua Nahum, Kaben Nanlohy,
-Humberto Ortiz-Zuazaga, Jason Pell, Jared Simpson, Camille Scott, Ramakrishnan
-Rajaram Srinivasan, Qingpeng Zhang, and C. Titus Brown'''
+copyright = u'''2010-2014 the authors.'''
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
