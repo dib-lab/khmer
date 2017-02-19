@@ -122,7 +122,8 @@ void Hashtable::consume_seqfile(
             break;
         }
 
-        unsigned int this_n_consumed = consume_string(read.sequence);
+        read.set_clean_seq();
+        unsigned int this_n_consumed = consume_string(read.cleaned_seq);
 
         __sync_add_and_fetch( &n_consumed, this_n_consumed );
         __sync_add_and_fetch( &total_reads, 1 );

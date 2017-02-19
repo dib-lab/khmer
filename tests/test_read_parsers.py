@@ -496,11 +496,11 @@ def test_read_cleaning_consume_seqfile():
 
     # the 2nd read with this k-mer in it has an N in it.
     kmer = "CCTCATCGGCACCAG"
-    assert x.get(kmer) == 1               # this should be 2 in the future
+    assert x.get(kmer) == 2
 
     # the 2nd read with this k-mer in it has a Z in it
     kmer = "ACTGAGCTTCATGTC"
-    assert x.get(kmer) == 1               # this should be 2 in the future
+    assert x.get(kmer) == 2
 
 
 def test_read_cleaning_consume_read_by_read():
@@ -553,8 +553,8 @@ def test_read_cleaning_abundance_distribution():
     x.consume_seqfile(infile)
 
     dist = x.abundance_distribution(infile, y)
-    assert dist[1] == 41
-    assert dist[2] == 42
+    assert dist[1] == 29                  # k-mers with non-ACGTN => ignored.
+    assert dist[2] == 68
 
 
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
