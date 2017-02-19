@@ -148,7 +148,7 @@ Building khmer and running the tests
    This will run all of the Python tests in the ``tests/`` directory. You should
    see lots of output, with something like::
 
-      ====== 658 passed, 22 deselected in 40.93 seconds =======
+      ====== 1289 passed, 1 skipped, 25 deselected, 1 xpassed in 50.98 seconds =======
 
    at the end.
 
@@ -211,15 +211,14 @@ Claiming an issue and starting to develop
 
       git commit -m 'Here you provide a brief description of your changes'
 
-   Please make your commit message informative but concise—these messages
+   Please make your commit message informative but concise - these messages
    become part of the 'official' history of the project.
 
    Once your changes have been committed, push them up to the remote branch::
 
-      git push origin fix/brief_issue_description
+      git push origin
 
-   again, replacing ``fix/brief_issue_description`` with the branch name you
-   selected in the previous steps.
+   again.
 
 #. Periodically update your branch from the main khmer master branch::
 
