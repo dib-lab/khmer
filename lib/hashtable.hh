@@ -213,7 +213,7 @@ public:
     // checks each read for non-ACGT characters
     bool check_and_normalize_read(std::string &read) const;
 
-    // Count every k-mer in a FASTA or FASTQ file.
+    // Count every k-mer in a file containing nucleotide sequences.
     template<typename SeqIO>
     void consume_seqfile(
         std::string const &filename,
