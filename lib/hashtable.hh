@@ -214,9 +214,6 @@ public:
     bool check_and_normalize_read(std::string &read) const;
 
     // Count every k-mer in a FASTA or FASTQ file.
-    // Note: Yes, the name 'consume_fasta' is a bit misleading,
-    //       but the FASTA format is effectively a subset of the FASTQ format
-    //       and the FASTA portion is what we care about in this case.
     template<typename SeqIO>
     void consume_seqfile(
         std::string const &filename,
