@@ -76,7 +76,7 @@ namespace khmer
 {
 
 typedef std::unique_ptr<KmerHashIterator> KmerHashIteratorPtr;
-    
+
 class Hashtable: public
     KmerFactory  		// Base class implementation of a Bloom ht.
 {
@@ -218,16 +218,16 @@ public:
     //       but the FASTA format is effectively a subset of the FASTQ format
     //       and the FASTA portion is what we care about in this case.
     template<typename SeqIO>
-    void consume_fasta(
+    void consume_seqfile(
         std::string const &filename,
         unsigned int &total_reads,
         unsigned long long &n_consumed
     );
 
-    // Count every k-mer from a stream of FASTA or FASTQ reads,
+    // Count every k-mer in a file containing nucleotide sequences,
     // using the supplied parser.
     template<typename SeqIO>
-    void consume_fasta(
+    void consume_seqfile(
         read_parsers::ReadParserPtr<SeqIO>& parser,
         unsigned int &total_reads,
         unsigned long long &n_consumed

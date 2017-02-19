@@ -72,7 +72,7 @@ def main():
     print('creating ht')
     ht = khmer.Nodegraph(K, HASHTABLE_SIZE, N_HT)
     print('eating fa', infile)
-    total_reads, n_consumed = ht.consume_fasta(infile)
+    total_reads, n_consumed = ht.consume_seqfile(infile)
     outfp = open(outfile, 'w')
 
     ###

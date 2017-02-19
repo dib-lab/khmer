@@ -172,7 +172,7 @@ public:
 
     // Consume reads & build sparse graph.
     template<typename SeqIO>
-    void consume_fasta_and_tag(
+    void consume_seqfile_and_tag(
         std::string const &filename,
         unsigned int &total_reads,
         unsigned long long &n_consumed
@@ -182,7 +182,7 @@ public:
     // using the supplied parser.
     // Tag certain ones on the connectivity graph.
     template<typename SeqIO>
-    void consume_fasta_and_tag(
+    void consume_seqfile_and_tag(
         read_parsers::ReadParserPtr<SeqIO>& parser,
         unsigned int &total_reads,
         unsigned long long &n_consumed

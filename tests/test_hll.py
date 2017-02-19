@@ -101,28 +101,28 @@ def test_hll_empty_fasta():
     filename = utils.get_test_data('test-empty.fa')
     hll = khmer.HLLCounter(ERR_RATE, K)
     with pytest.raises(OSError):
-        hll.consume_fasta(filename)
+        hll.consume_seqfile(filename)
 
 
-def test_hll_consume_fasta():
+def test_hll_consume_seqfile():
     # test c++ code to count unique kmers using HyperLogLog
 
     filename = utils.get_test_data('random-20-a.fa')
     hllcpp = khmer.HLLCounter(ERR_RATE, K)
-    n, n_consumed = hllcpp.consume_fasta(filename)
+    n, n_consumed = hllcpp.consume_seqfile(filename)
 
     assert n == 99
     assert n_consumed == 3960
     assert abs(1 - float(hllcpp.estimate_cardinality()) / N_UNIQUE) < ERR_RATE
 
 
-def test_hll_consume_fasta_ep():
+def test_hll_consume_seqfile_ep():
     # During estimation trigger the _Ep() method,
     # we need all internal counters values to be different than zero for this.
 
     filename = utils.get_test_data('paired-mixed.fa')
     hll = khmer.HLLCounter(0.36, 32)
-    n, n_consumed = hll.consume_fasta(filename)
+    n, n_consumed = hll.consume_seqfile(filename)
 
     assert all(c != 0 for c in hll.counters)
     assert len(hll) == 236
@@ -130,7 +130,7 @@ def test_hll_consume_fasta_ep():
     assert n_consumed == 575
 
 
-def test_hll_consume_fasta_estimate_bias():
+def test_hll_consume_seqfile_estimate_bias():
     # During estimation trigger the estimate_bias method,
     # we need all internal counters values to be different than zero for this,
     # and also the cardinality should be small (if it is large we fall on the
@@ -138,7 +138,7 @@ def test_hll_consume_fasta_estimate_bias():
 
     filename = utils.get_test_data("test-abund-read-3.fa")
     hll = khmer.HLLCounter(0.36, K)
-    n, n_consumed = hll.consume_fasta(filename)
+    n, n_consumed = hll.consume_seqfile(filename)
 
     assert all(c != 0 for c in hll.counters)
     assert len(hll) == 79
@@ -149,7 +149,7 @@ def test_hll_consume_fasta_estimate_bias():
 def test_hll_len():
     filename = utils.get_test_data('random-20-a.fa')
     hllcpp = khmer.HLLCounter(ERR_RATE, K)
-    n, n_consumed = hllcpp.consume_fasta(filename)
+    n, n_consumed = hllcpp.consume_seqfile(filename)
 
     assert n == 99
     assert n_consumed == 3960
@@ -315,10 +315,10 @@ def test_hll_merge_3():
 
     filename = utils.get_test_data('paired-mixed.fa')
     hll = khmer.HLLCounter(0.36, 32)
-    hll.consume_fasta(filename)
+    hll.consume_seqfile(filename)
 
     hll2 = khmer.HLLCounter(0.36, 32)
-    hll2.consume_fasta(filename)
+    hll2.consume_seqfile(filename)
 
     assert len(hll) == 236
     assert len(hll2) == 236

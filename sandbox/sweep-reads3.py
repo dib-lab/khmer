@@ -103,7 +103,7 @@ def main():
 
         # load contigs, connect into N partitions
         print('loading input reads from', inp_name)
-        ht.consume_fasta(inp_name)
+        ht.consume_seqfile(inp_name)
 
     print('starting sweep.')
 
