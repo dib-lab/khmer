@@ -643,16 +643,15 @@ def test_read_cleaning_output_partitions():
 
     read_names = [ read.name for read in ReadParser(savepath) ]
     print(read_names)
-    assert len(read_names) == 4
+    assert len(read_names) == 6
 
     assert '895:1:1:1246:14654 1:N:0:NNNNN\t1' in read_names
     assert '895:1:1:1248:9583 1:N:0:NNNNN\t2' in read_names
     assert '895:1:1:1252:19493 1:N:0:NNNNN\t3' in read_names
 
     assert 'lowercase_to_uppercase\t1' in read_names
-
-    assert 'n_in_read\t2' not in read_names
-    assert 'zy_in_read\t3' not in read_names
+    assert 'n_in_read\t2' in read_names
+    assert 'zy_in_read\t3' in read_names
 
 
 

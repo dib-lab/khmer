@@ -147,61 +147,61 @@ size_t SubsetPartition::output_partitioned_file(
             break;
         }
 
-        seq = read.sequence;
+        read.set_clean_seq();
+        seq = read.cleaned_seq;
 
-        if (_ht->check_and_normalize_read(seq)) {
-            const char * kmer_s = seq.c_str();
+        const char * kmer_s = seq.c_str();
 
-            bool found_tag = false;
-            for (unsigned int i = 0; i < seq.length() - ksize + 1; i++) {
-                kmer = _ht->hash_dna(kmer_s + i);
+        // @CTB this should be replaced with kmer iterator
+        bool found_tag = false;
+        for (unsigned int i = 0; i < seq.length() - ksize + 1; i++) {
+            kmer = _ht->hash_dna(kmer_s + i);
 
-                // is this a known tag?
-                if (set_contains(partition_map, kmer)) {
-                    found_tag = true;
-                    break;
-                }
+            // is this a known tag?
+            if (set_contains(partition_map, kmer)) {
+                found_tag = true;
+                break;
             }
+        }
 
-            // all sequences should have at least one tag in them.
-            // assert(found_tag);  @CTB currently breaks tests.  give fn flag
-            // to disable.
+        // all sequences should have at least one tag in them.
+        // assert(found_tag);  @CTB currently breaks tests.  give fn flag
+        // to disable.
 
-            PartitionID partition_id = 0;
-            if (found_tag) {
-                PartitionID * partition_p = partition_map[kmer];
-                if (partition_p == NULL ) {
-                    partition_id = 0;
-                    n_singletons++;
-                } else {
-                    partition_id = *partition_p;
-                    partitions.insert(partition_id);
-                }
+        PartitionID partition_id = 0;
+        if (found_tag) {
+            PartitionID * partition_p = partition_map[kmer];
+            if (partition_p == NULL ) {
+                partition_id = 0;
+                n_singletons++;
+            } else {
+                partition_id = *partition_p;
+                partitions.insert(partition_id);
             }
+        }
 
-            if (partition_id > 0 || output_unassigned) {
-                if (read.quality.length()) { // FASTQ
-                    outfile << "@" << read.name << "\t" << partition_id
-                            << "\n";
-                    outfile << seq << "\n+\n";
-                    outfile << read.quality << "\n";
-                } else {		// FASTA
-                    outfile << ">" << read.name << "\t" << partition_id;
-                    outfile << "\n" << seq << "\n";
-                }
+        if (partition_id > 0 || output_unassigned) {
+            if (read.quality.length()) { // FASTQ
+                outfile << "@" << read.name << "\t" << partition_id
+                        << "\n";
+                outfile << seq << "\n+\n";
+                outfile << read.quality << "\n";
+            } else {		// FASTA
+                outfile << ">" << read.name << "\t" << partition_id;
+                outfile << "\n" << seq << "\n";
             }
+        }
 
-            total_reads++;
+        total_reads++;
 
-            // run callback, if specified
-            if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-                try {
-                    callback("output_partitions", callback_data,
-                             total_reads, reads_kept);
-                } catch (...) {
-                    outfile.close();
-                    throw;
-                }
+        // run callback, if specified
+        if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+            try {
+                callback("output_partitions", callback_data,
+                         total_reads, reads_kept);
+            } catch (...) {
+                outfile.close();
+                throw;
             }
         }
     }
