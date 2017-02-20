@@ -616,5 +616,43 @@ def test_read_cleaning_trim_functions_bad_dna():
     # assert posns == []                    # in future, should return [11]
 
 
+def test_read_cleaning_output_partitions():
+    infile = utils.get_test_data('valid-read-testing.fq')
+    savepath = utils.get_temp_filename('foo')
+
+    # read this in using "approved good" behavior w/cleaned_seq
+    x = Nodegraph(8, int(1e6), 4)
+    for read in ReadParser(infile):
+        x.consume(read.cleaned_seq)       # consume cleaned_seq
+
+    kmer = 'caggcgcc'.upper()
+    x.add_tag(kmer)
+    x.set_partition_id(kmer, 1)
+
+    kmer = 'ACTGGGCG'
+    x.add_tag(kmer)
+    x.set_partition_id(kmer, 2)
+    
+    kmer = 'CCGGCGTG'
+    x.add_tag(kmer)
+    x.set_partition_id(kmer, 3)
+    
+    x.output_partitions(infile, savepath)
+
+    read_names = [ read.name for read in ReadParser(savepath) ]
+    print(read_names)
+    assert len(read_names) == 4
+
+    assert '895:1:1:1246:14654 1:N:0:NNNNN\t1' in read_names
+    assert '895:1:1:1248:9583 1:N:0:NNNNN\t2' in read_names
+    assert '895:1:1:1252:19493 1:N:0:NNNNN\t3' in read_names
+
+    assert 'lowercase_to_uppercase\t1' in read_names
+
+    assert 'n_in_read\t2' not in read_names
+    assert 'zy_in_read\t3' not in read_names
+
+
+
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
 # vim: set textwidth=79:
