@@ -570,7 +570,7 @@ def test_read_cleaning_trim_functions_lowercase():
     assert where == 0
 
     _, where = x.trim_below_abundance(s, 2)
-    assert where == 35
+    assert where == 35                    # in future, should be ?? @CTB
 
     posns = x.find_spectral_error_positions(s, 1)
     assert posns == []
