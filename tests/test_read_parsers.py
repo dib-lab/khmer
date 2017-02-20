@@ -653,6 +653,34 @@ def test_read_cleaning_output_partitions():
     assert 'zy_in_read\t3' not in read_names
 
 
+def test_read_cleaning_trim_on_stoptags():
+    infile = utils.get_test_data('valid-read-testing.fq')
+    savepath = utils.get_temp_filename('foo')
+
+    # read this in using "approved good" behavior w/cleaned_seq
+    x = Nodegraph(8, int(1e6), 4)
+    for read in ReadParser(infile):
+        x.consume(read.cleaned_seq)       # consume cleaned_seq
+
+    # add this as a stop tag
+    kmer = 'caggcgcc'.upper()
+    x.add_stop_tag(kmer)
+
+    kmer = 'ACTGGGCG'
+    x.add_stop_tag(kmer)
+
+    kmer = 'CCGGCGTG'
+    x.add_stop_tag(kmer)
+
+    _, pos = x.trim_on_stoptags('caggcgcccaccaccgtgccctccaacctgatggt')
+    assert pos == 6                       # should be ?? in future
+
+    _, pos = x.trim_on_stoptags('CCGGCGTGGTTZZYAGGTCACTGAGCTTCATGTC')
+    assert pos == 0                       # should be 6 in future
+
+    _, pos = x.trim_on_stoptags('CCGGCGTGGTTZZYAGGTCACTGAGCTTCATGTC')
+    assert pos == 0                       # should be 6 in future
+
 
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
 # vim: set textwidth=79:
