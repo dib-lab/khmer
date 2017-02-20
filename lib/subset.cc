@@ -150,12 +150,10 @@ size_t SubsetPartition::output_partitioned_file(
         read.set_clean_seq();
         seq = read.cleaned_seq;
 
-        const char * kmer_s = seq.c_str();
-
-        // @CTB this should be replaced with kmer iterator
         bool found_tag = false;
-        for (unsigned int i = 0; i < seq.length() - ksize + 1; i++) {
-            kmer = _ht->hash_dna(kmer_s + i);
+        KmerHashIteratorPtr kmers = _ht->new_kmer_iterator(read.cleaned_seq);
+        while (!kmers->done()) {
+            kmer = kmers->next();
 
             // is this a known tag?
             if (set_contains(partition_map, kmer)) {
