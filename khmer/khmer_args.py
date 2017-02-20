@@ -431,6 +431,10 @@ def _check_fp_rate(args, desired_max_fp):
 
 def build_graph_args(descr=None, epilog=None, parser=None, citations=None):
     """Build an ArgumentParser with args for bloom filter based scripts."""
+    expert_help = '--help-expert' in sys.argv
+    if expert_help:
+        sys.argv.append('--help')
+
     if parser is None:
         parser = KhmerArgumentParser(description=descr, epilog=epilog,
                                      citations=citations)
@@ -438,9 +442,11 @@ def build_graph_args(descr=None, epilog=None, parser=None, citations=None):
     parser.add_argument('--ksize', '-k', type=int, default=DEFAULT_K,
                         help='k-mer size to use')
 
+    help = ('number of tables to use in k-mer countgraph' if expert_help
+            else argparse.SUPPRESS)
     parser.add_argument('--n_tables', '-N', type=int,
                         default=DEFAULT_N_TABLES,
-                        help=argparse.SUPPRESS)
+                        help=help)
 
     parser.add_argument('-U', '--unique-kmers', type=float, default=0,
                         help='approximate number of unique kmers in the input'
@@ -450,9 +456,11 @@ def build_graph_args(descr=None, epilog=None, parser=None, citations=None):
                         " current script")
 
     group = parser.add_mutually_exclusive_group()
+    help = ('upper bound on tablesize to use; overrides --max-memory-usage/-M'
+            if expert_help else argparse.SUPPRESS)
     group.add_argument('--max-tablesize', '-x', type=float,
                        default=DEFAULT_MAX_TABLESIZE,
-                       help=argparse.SUPPRESS)
+                       help=help)
     group.add_argument('-M', '--max-memory-usage', type=memory_setting,
                        help='maximum amount of memory to use for data ' +
                        'structure')

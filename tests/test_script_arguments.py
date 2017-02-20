@@ -122,6 +122,34 @@ def test_check_tablespace_nodegraph(graph_type, exp_buckets):
     assert sizestr == exp_buckets
 
 
+def test_normal_help(capsys):
+    # check -x and -N are hiden by default with --help
+    parser = khmer_args.build_graph_args()
+
+    with pytest.raises(SystemExit):
+        parser.parse_args(['-h'])
+
+    out, err = capsys.readouterr()
+    assert "--max-tablesize" not in out
+    assert '--n_tables' not in out
+
+
+def test_expert_help(capsys):
+    # check -x and -N are hidden by default but appear with --help-expert
+    old_argv = sys.argv[:]
+    sys.argv.append('--help-expert')
+    parser = khmer_args.build_graph_args()
+
+    with pytest.raises(SystemExit):
+        parser.parse_args(['-h', '--help-expert'])
+
+    out, err = capsys.readouterr()
+    assert "--max-tablesize" in out
+    assert '--n_tables' in out
+
+    sys.argv = old_argv
+
+
 def test_check_space_force():
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
