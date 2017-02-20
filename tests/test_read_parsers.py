@@ -565,12 +565,16 @@ def test_read_cleaning_trim_functions_lowercase():
     for read in ReadParser(infile):
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
+    # all of these functions will fail to do anything, b/c lowercase != valid
+    # BUT they will not raise an exception, either.
+
     s = "caggcgcccaccaccgtgccctccaacctgatggt"
     _, where = x.trim_on_abundance(s, 1)
     assert where == 0
 
-    _, where = x.trim_below_abundance(s, 2)
-    assert where == 35                    # in future, should be ?? @CTB
+    _, where = x.trim_below_abundance(s, 0)
+    print(x.get_kmer_counts(s))
+    assert where == 35                    # stays at 35 (abunds all == 0)
 
     posns = x.find_spectral_error_positions(s, 1)
     assert posns == []
