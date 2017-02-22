@@ -126,13 +126,17 @@ def main():
     check_space([args.datafile], args.force)
 
     if args.savegraph:
+        if args.hash_function != 'twobit-exact':
+            log_error('ERROR: cannot save different hash functions yet.')
+            sys.exit(1)
+
         tablesize = calculate_graphsize(args, 'countgraph')
         check_space_for_graph(args.savegraph, tablesize, args.force)
 
     report_on_config(args)
 
     log_info('making countgraph')
-    graph = khmer_args.create_countgraph(args)
+    graph = khmer_args.create_counttable(args)
 
     # first, load reads into graph
     rparser = khmer.ReadParser(args.datafile)
