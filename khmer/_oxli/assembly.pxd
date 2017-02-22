@@ -1,7 +1,7 @@
 from libcpp.memory cimport unique_ptr
 from libcpp.string import string
 
-from _oxli cimport CpLinearAssembler, CpCompactingAssembler, CpHashgraph, CpKmer
+from wrapper cimport CpLinearAssembler, CpCompactingAssembler, CpHashgraph, CpKmer
 from hashing cimport Kmer
 
 

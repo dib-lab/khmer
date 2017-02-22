@@ -35,7 +35,7 @@
 """Helpful methods for performing common argument-checking tasks in scripts."""
 from __future__ import print_function, unicode_literals
 from khmer._oxli.parsing import (check_is_left, check_is_right, check_is_pair,
-                           UnpairedReadsError, _split_left_right)
+                                 UnpairedReadsError, _split_left_right)
 
 
 def print_error(msg):
@@ -78,7 +78,7 @@ def broken_paired_reader(screed_iter, min_length=None,
         raise ValueError("force_single and require_paired cannot both be set!")
 
     # handle the majority of the stream.
-    for record in clean_input_reads(screed_iter):
+    for record in screed_iter:
         if prev_record:
             if check_is_pair(prev_record, record) and not force_single:
                 if min_length and (len(prev_record.sequence) < min_length or
@@ -155,8 +155,15 @@ def write_record_pair(read1, read2, fileobj):
         fileobj.write(recstr)
 
 
-def clean_input_reads(screed_iter):
-    for record in screed_iter:
+def clean_input_reads(records):
+    """Add a cleaned_seq attribute to records that do not have one
+
+    Use this to convert a stream of records that might not have a
+    `cleaned_seq` attribute to one that does. Use this to extend
+    Records loaded by `screed.open()`. It is a mistake to apply
+    this to a `ReadParser` stream.
+    """
+    for record in records:
         record.cleaned_seq = record.sequence.upper().replace('N', 'A')
         yield record
 

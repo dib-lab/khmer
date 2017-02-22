@@ -1,9 +1,9 @@
+# -*- coding: UTF-8 -*-
 # cython: c_string_type=unicode, c_string_encoding=utf8
-import cython
+
 from cython.operator cimport dereference as deref
 
-from _oxli import *
-from _oxli cimport CpHashtable, CpLinearAssembler, CpCompactingAssembler, CpKmer, get_hashgraph_ptr
+from wrapper cimport CpHashgraph, CpLinearAssembler, CpCompactingAssembler, CpKmer, get_hashgraph_ptr
 
 
 cdef class LinearAssembler:

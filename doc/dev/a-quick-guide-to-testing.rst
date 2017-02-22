@@ -51,7 +51,7 @@ working!
 
 * We maintain fairly complete test coverage of our code.  What this
   means is that we have automated tests that, when run, execute most
-  of the lines of Python and C++ code in our lib/, khmer/ and scripts/
+  of the lines of Python and C++ code in our src/, khmer/ and scripts/
   directories.  This doesn't *guarantee* things are correct, but it
   does mean that at least most of the code works at some basic level.
 

@@ -1,5 +1,5 @@
 from libcpp.memory cimport shared_ptr
-from _oxli cimport CpKmer, HashIntoType, WordLength
+from wrapper cimport CpKmer, HashIntoType, WordLength
 
 cdef class Kmer:
     cdef shared_ptr[CpKmer] _this

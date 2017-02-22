@@ -1,6 +1,6 @@
 from libcpp.memory cimport unique_ptr
 
-from _oxli cimport CpTraverser, CpHashgraph
+from wrapper cimport CpTraverser, CpHashgraph
 
 cdef class Traverser:
     cdef unique_ptr[CpTraverser] _this

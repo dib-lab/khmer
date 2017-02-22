@@ -46,8 +46,9 @@ C++ standards
 -------------
 
 Any feature in C++11 is fine to use. Specifically we support features found in
-GCC 4.8.2. See https://github.com/dib-lab/khmer/issues/598 for an in-depth
-discussion.
+GCC 4.8.2. Our automated tests use gcc 4.8.4 on linux. See
+https://github.com/dib-lab/khmer/issues/598 for an in-depth discussion. Please
+do not use features from C++14 or newer.
 
 Coding standards
 ----------------

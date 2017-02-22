@@ -45,7 +45,6 @@ Use -h for parameter help.
 """
 from __future__ import print_function
 import sys
-import screed
 import os
 import khmer
 import tempfile
@@ -59,13 +58,11 @@ from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
                               report_on_config, calculate_graphsize,
                               sanitize_help)
 from khmer.khmer_args import FileType as khFileType
-from khmer.utils import (write_record, write_record_pair, broken_paired_reader,
-                         ReadBundle)
+from khmer.utils import write_record, broken_paired_reader, ReadBundle
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
                          get_file_writer)
-from khmer.khmer_logger import (configure_logging, log_info, log_error,
-                                log_warn)
+from khmer.khmer_logger import configure_logging, log_info, log_error
 from khmer.trimming import trim_record
 
 DEFAULT_TRIM_AT_COVERAGE = 20
@@ -203,7 +200,6 @@ class Trimmer(object):
         TRIM_AT_COVERAGE = self.trim_at_coverage
         CUTOFF = self.cutoff
         DIGINORM_COVERAGE = self.diginorm_coverage
-        K = graph.ksize()
 
         for n, is_pair, read1, read2 in reader:
             bundle = ReadBundle(read1, read2)
@@ -246,7 +242,6 @@ class Trimmer(object):
         graph = self.graph
         TRIM_AT_COVERAGE = self.trim_at_coverage
         CUTOFF = self.cutoff
-        K = graph.ksize()
 
         for n, is_pair, read1, read2 in reader:
             bundle = ReadBundle(read1, read2)
@@ -303,11 +298,12 @@ def main():
 
     ###
 
-    report_on_config(args)
+    graphtype = 'countgraph' if not args.small_count else 'smallcountgraph'
+    report_on_config(args, graphtype=graphtype)
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
     if args.savegraph:
-        graphsize = calculate_graphsize(args, 'countgraph')
+        graphsize = calculate_graphsize(args, graphtype)
         check_space_for_graph(args.savegraph, graphsize, args.force)
 
     if ('-' in args.input_filenames or '/dev/stdin' in args.input_filenames) \
@@ -318,7 +314,7 @@ def main():
 
     if args.loadgraph:
         log_info('loading countgraph from {graph}', graph=args.loadgraph)
-        ct = khmer.load_countgraph(args.loadgraph)
+        ct = khmer.load_countgraph(args.loadgraph, args.small_count)
     else:
         log_info('making countgraph')
         ct = khmer_args.create_countgraph(args)
@@ -418,7 +414,8 @@ def main():
         # so pairs will stay together if not orphaned.  This is in contrast
         # to the first loop.  Hence, force_single=True below.
 
-        paired_iter = broken_paired_reader(ReadParser(pass2filename),
+        read_parser = ReadParser(pass2filename)
+        paired_iter = broken_paired_reader(read_parser,
                                            min_length=K,
                                            force_single=True)
 
@@ -436,6 +433,8 @@ def main():
             written_reads += 1
             written_bp += len(read)
 
+        read_parser.close()
+
         log_info('removing {pass2}', pass2=pass2filename)
         os.unlink(pass2filename)
 
@@ -443,8 +442,12 @@ def main():
         if not args.output:
             trimfp.close()
 
-    log_info('removing temp directory & contents ({temp})', temp=tempdir)
-    shutil.rmtree(tempdir)
+    try:
+        log_info('removing temp directory & contents ({temp})', temp=tempdir)
+        shutil.rmtree(tempdir)
+    except OSError as oe:
+        log_info('WARNING: unable to remove {temp} (probably an NFS issue); '
+                 'please remove manually', temp=tempdir)
 
     trimmed_reads = trimmer.trimmed_reads
 

@@ -3,8 +3,8 @@ from libcpp.vector cimport vector
 from libc.stdint cimport uint32_t, uint8_t, uint64_t
 from libc.stdio cimport FILE
 
-from _oxli cimport ComponentPtr, ComponentPtrSet, CpGuardedKmerCompMap
-from _oxli cimport CpHashgraph, CpStreamingPartitioner, BoundedCounterType
+from wrapper cimport ComponentPtr, ComponentPtrSet, CpGuardedKmerCompMap
+from wrapper  cimport CpHashgraph, CpStreamingPartitioner, BoundedCounterType
 
 
 cdef class Component:

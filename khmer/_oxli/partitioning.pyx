@@ -20,7 +20,7 @@ from libc.stdio cimport FILE, fopen, fwrite, fclose, stdout, stderr, fprintf
 import json
 import os
 
-from _oxli cimport *
+from wrapper cimport *
 from .._khmer import Countgraph
 from .._khmer import Nodegraph
 from khmer import load_countgraph, load_nodegraph
@@ -31,17 +31,17 @@ cdef class Component:
         if other is not None:
             self._this.reset(other._this.get())
 
-    property component_id:
-        def __get__(self):
-            return deref(self._this).component_id
+    @property 
+    def component_id(self):
+        return deref(self._this).component_id
 
-    property _n_created:
-        def __get__(self):
-            return deref(self._this).get_n_created()
+    @property 
+    def _n_created(self):
+        return deref(self._this).get_n_created()
 
-    property _n_destroyed:
-        def __get__(self):
-            return deref(self._this).get_n_destroyed()
+    @property 
+    def _n_destroyed(self):
+        return deref(self._this).get_n_destroyed()
 
     def __len__(self):
         return deref(self._this).get_n_tags()
