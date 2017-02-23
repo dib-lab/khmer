@@ -7,6 +7,8 @@ import sys
 from .._khmer import Countgraph
 from .._khmer import Nodegraph
 from khmer.khmer_args import build_counting_args, create_countgraph
+from khmer.khmer_logger import (configure_logging, log_info, log_error,
+                                log_warn)
 
 from libcpp cimport bool
 
@@ -30,7 +32,8 @@ cdef class PartitioningApp:
         self.partitioner = StreamingPartitioner(self.graph, tag_density=self.args.tag_density)
 
     def parse_args(self, args):
-        parser = build_counting_args()
+        parser = build_counting_args(descr='Partition a sample',
+                                     citations=['counting', 'SeqAn'])
         parser.add_argument('--stats-dir', default='component-stats')
         parser.add_argument('samples', nargs='+')
         parser.add_argument('--save', default=None)
