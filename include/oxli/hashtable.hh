@@ -235,6 +235,26 @@ public:
         unsigned long long &n_consumed
     );
 
+    // Ignoring sequences that are exact subsequences of sequences in `mask`,
+    // count every k-mer in the specified file.
+    template<typename SeqIO>
+    void consume_seqfile_with_mask(
+        std::string const &seqfile,
+        std::string const &maskfile,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
+    );
+
+    // Ignoring sequences that are exact subsequences of sequences in `mask`,
+    // count every k-mer using the supplied parser.
+    template<typename SeqIO>
+    void consume_seqfile_with_mask(
+        read_parsers::ReadParserPtr<SeqIO>& parser,
+        std::set<std::string> const &mask,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
+    );
+
     void set_use_bigcount(bool b)
     {
         store->set_use_bigcount(b);

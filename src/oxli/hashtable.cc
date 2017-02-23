@@ -146,6 +146,74 @@ void Hashtable::consume_seqfile(
 
 } // consume_seqfile
 
+template<typename SeqIO>
+void Hashtable::consume_seqfile_with_mask(
+    std::string const &seqfile,
+    std::string const &maskfile,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+)
+{
+    // Load the sequences from the mask (Fasta) file into a set of strings
+    std::set<std::string> mask;
+    ReadParserPtr<FastxReader> maskparser = get_parser<FastxReader>(maskfile);
+    Read seqobj;
+    while (!maskparser->is_complete()) {
+        try {
+            seqobj = maskparser->get_next_read();
+        } catch (NoMoreReadsAvailable) {
+            break;
+        }
+        mask.insert(seqobj.sequence);
+    }
+
+    // Create a parser for the sequences of interest
+    ReadParserPtr<SeqIO> seqparser = get_parser<SeqIO>(seqfile);
+
+    // Now consume with the mask
+    consume_seqfile_with_mask<SeqIO>(seqparser, mask, total_reads, n_consumed);
+}
+
+template<typename SeqfileIO>
+void Hashtable::consume_seqfile_with_mask(
+    read_parsers::ReadParserPtr<SeqfileIO>& parser,
+    std::set<std::string> const &mask,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+)
+{
+    Read read;
+
+    // Iterate through the reads and consume their k-mers.
+    while (!parser->is_complete()) {
+        bool is_valid;
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable) {
+            break;
+        }
+
+        bool inmask = false;
+        for (auto seq : mask) {
+            if (seq.find(read.sequence) != std::string::npos) {
+                inmask = true;
+                break;
+            }
+        }
+        if (inmask) {
+            continue;
+        }
+
+        unsigned int this_n_consumed =
+            check_and_process_read(read.sequence, is_valid);
+
+        __sync_add_and_fetch( &n_consumed, this_n_consumed );
+        __sync_add_and_fetch( &total_reads, 1 );
+
+    } // while reads left for parser
+
+} // consume_seqfile_with_mask
+
 //
 // consume_string: run through every k-mer in the given string, & hash it.
 //
@@ -562,6 +630,18 @@ template void Hashtable::consume_seqfile<FastxReader>(
     unsigned int &total_reads,
     unsigned long long &n_consumed
 );
+template void Hashtable::consume_seqfile_with_mask<FastxReader>(
+    std::string const &seqfile,
+    std::string const &maskfile,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+);
+template void Hashtable::consume_seqfile_with_mask<FastxReader>(
+    read_parsers::ReadParserPtr<FastxReader>& parser,
+    std::set<std::string> const &mask,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+);
 template uint64_t * Hashtable::abundance_distribution<FastxReader>(
     ReadParserPtr<FastxReader>& parser,
     Hashtable * tracking
@@ -570,4 +650,3 @@ template uint64_t * Hashtable::abundance_distribution<FastxReader>(
     std::string filename,
     Hashtable * tracking
 );
-
