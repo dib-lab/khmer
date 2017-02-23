@@ -123,7 +123,7 @@ def test_check_tablespace_nodegraph(graph_type, exp_buckets):
 
 
 def test_normal_help(capsys):
-    # check -x and -N are hiden by default with --help
+    # check -x and -N are hidden by default with --help
     parser = khmer_args.build_graph_args()
 
     with pytest.raises(SystemExit):
