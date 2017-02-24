@@ -32,16 +32,11 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-from __future__ import print_function
-from __future__ import unicode_literals
 
 from nameparser import HumanName
 import codecs
 import textwrap
 
-import sys
-import codecs
-sys.stdout = codecs.getwriter('utf8')(sys.stdout)
 
 authors = []
 
@@ -56,17 +51,17 @@ authors.append((HumanName("C. Titus Brown"), "titus@idyll.org"))
 
 # print(authors)
 
-bibtex = u'   author = \"'
+bibtex = '   author = \"'
 
 for tup in authors:
     name = tup[0]
     name.string_format = "{last}, {first} {middle} and"
-    bibtex += unicode(name) + " "
+    bibtex += str(name) + " "
 
 bibtex = bibtex[:-5] + '"'  # remove last 'and' and close the quote
 
-print(u'  @article{khmer2015,')
-for line in textwrap.wrap(unicode(bibtex), 77):
+print('  @article{khmer2015,')
+for line in textwrap.wrap(str(bibtex), 77):
     print('  ' + line)
 
 print(
@@ -83,10 +78,9 @@ doclist = u':Authors: '
 for tup in authors:
     name = tup[0]
     name.string_format = "{first} {middle} {last}"
-    doclist += unicode(name) + ", "
+    doclist += str(name) + ", "
 
 doclist = doclist[:-2]
 
-for line in textwrap.wrap(unicode(doclist), 71):
+for line in textwrap.wrap(str(doclist), 71):
     print('        ' + line)
-

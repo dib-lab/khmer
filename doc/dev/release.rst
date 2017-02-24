@@ -74,17 +74,19 @@ release makers, following this checklist by MRC.
         git log --minimal --patch `git describe --tags --always --abbrev=0`..HEAD
 
 #. Review the issue list for any new bugs that will not be fixed in this
-   release. Add them to ``doc/known-issues.txt``
+   release. Add them to ``doc/user/known-issues.rst``
 
-#. Check for new authors. Update ``.mailmap`` to normalize their email address
+#. Check for new authors (``git log --format='%aN' v2.0... | sort -u`` lists all
+   committers since the v2.0 tag). Update ``.mailmap`` to normalize their email address
    and name spelling. If they want to opt out update the ``list-*`` Makefile
    targets to exclude them. Run ``make list-citation`` and adapt the output to
    the relevant parts of ``CITATION``, ``setup.py``, ``doc/index.rst``.
 
-#. Verify that the build is clean: http://ci.oxli.org/job/khmer-master/
+#. Verify that the build is clean: https://api.travis-ci.org/dib-lab/khmer.svg?branch=master
 
 #. Run through the `API examples <../user/api-examples.html>`__ to verify they
-   are still valid.
+   are still valid. You need to install khmer to do this, use for example
+   your normal development setup/virtualenv for that.
 
 #. Submit a build to Coverity Scan if it hasn't been done
    recently. You can get the token from
