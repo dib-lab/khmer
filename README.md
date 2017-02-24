@@ -1,4 +1,5 @@
 [![Research software impact](http://depsy.org/api/package/pypi/khmer/badge.svg)](http://depsy.org/package/python/khmer)
+![Supported Python versions](https://img.shields.io/pypi/pyversions/khmer.svg)
 [![khmer build status](https://img.shields.io/travis/dib-lab/khmer.svg)](https://travis-ci.org/dib-lab/khmer)
 [![Test coverage](https://img.shields.io/codecov/c/github/dib-lab/khmer.svg)](https://codecov.io/github/dib-lab/khmer)
 [![BSD-3 licensed](https://img.shields.io/badge/license-BSD%203--Clause-blue.svg)](https://github.com/dib-lab/khmer/blob/master/LICENSE)
@@ -6,10 +7,12 @@
 
 # khmer
 
-Welcome to khmer: k-mer counting, filtering and graph traversal FTW!
+Welcome to khmer: k-mer counting, filtering, and graph traversal FTW!
 
 The official source code repository is at https://github.com/dib-lab/khmer
-and you can read the docs online at http://khmer.readthedocs.io.
+and project documentation is available online at http://khmer.readthedocs.io.
+See http://khmer.readthedocs.io/en/stable/introduction.html for an overview of
+the khmer project.
 
 
 ## Getting help
@@ -25,8 +28,8 @@ details, but in brief:
 
 ## Important note: cite us!
 
-khmer is *research software*, so you should cite us when you use it
-in scientific publications!  Please see the [CITATION](http://khmer.readthedocs.io/en/stable/citations.html)
+khmer is *research software*, so you should cite us when you use it in
+scientific publications!  Please see the [CITATION](http://khmer.readthedocs.io/en/stable/citations.html)
 file for citation information.
 
 The khmer library is a project of the [Lab for Data Intensive Biology](http://ivory.idyll.org/lab/)
@@ -37,7 +40,7 @@ at UC Davis: its members, collaborators, and friends.
 
 ```
 pip install khmer
-FIXME FIXME py.test command here FIXME FIXME
+pytest --pyargs khmer -m 'not known_failing and not jenkins and not huge and not linux'
 ```
 
 See https://khmer.readthedocs.io/en/stable/user/install.html for more detailed

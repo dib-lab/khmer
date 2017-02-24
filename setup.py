@@ -183,8 +183,8 @@ CLASSIFIERS = [
     "Operating System :: MacOS :: MacOS X",
     "Programming Language :: C++",
     "Programming Language :: Python :: 2.7",
-    "Programming Language :: Python :: 3.3",
     "Programming Language :: Python :: 3.4",
+    "Programming Language :: Python :: 3.5",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
 if "-rc" in versioneer.get_version():
