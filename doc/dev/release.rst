@@ -49,6 +49,15 @@ How to make a khmer release candidate
 Michael R. Crusoe, Luiz Irber, and C. Titus Brown have all been
 release makers, following this checklist by MRC.
 
+#. Announce a few days ahead of time that you will cut a release. This will
+   slow down the rate at which PRs are being merged. When all outstanding PRs
+   scheduled for this release have been merged, announce it. From now on no
+   more merges to master. PRs to fix oversights or bugs follow the usual rule
+   of "author can't merge". When you reach the end of this checklist announce
+   it. Back to normal. If completing this checklist takes longer than a few
+   hours consider allowing merges to master, and starting from the top with
+   cutting a release.
+
 #. The below should be done in a clean checkout::
 
         cd `mktemp -d`
