@@ -376,8 +376,11 @@ Claiming an issue and starting to develop
    <http://scottchacon.com/2011/08/31/github-flow.html>`__ for more
    info.)
 
-#. Paste in the committer checklist from :doc:`coding-guidelines-and-review`
-   and, after its pasted in, check off as many of the boxes as you can.
+#. Check off as many of the boxes as you can from the checklist that is
+   automatically added to the first comment of the Pull Request
+   discussion. If you have an `ORCID ID<https://orcid.org/>` post that
+   as well. This will make it much easier for the khmer team to include
+   you in khmer publications.
 
 #. As you add new commits to address bugs or formatting issues, you can keep
    pushing your changes to the pull request by doing::
