@@ -270,6 +270,12 @@ Claiming an issue and starting to develop
 
 #. Review the pull request checklist and make any necessary additional changes.
 
+   Check off as many of the boxes as you can from the checklist that is
+   automatically added to the first comment of the Pull Request
+   discussion. If you have an `ORCID ID<https://orcid.org/>` post that
+   as well. This will make it much easier for the khmer team to include
+   you in khmer publications.
+
    As you add new commits to address bugs or formatting issues, you can keep
    pushing your changes to the pull request by doing::
 
