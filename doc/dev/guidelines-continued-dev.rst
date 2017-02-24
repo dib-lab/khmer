@@ -36,22 +36,54 @@
 
    Contact: khmer-project@idyll.org
 
-Coding guidelines and code review checklist
-===========================================
+Guidelines for continued development
+====================================
 
-This document is for anyone who want to contribute code to the khmer
-project, and describes our coding standards and code review checklist.
+The khmer :doc:`Getting Started <getting-started>` documentation is intended for
+first-time contributors, and is designed to make that first contribution as easy
+and as painless as possible. For those with an interest in making continued
+contributions (or those with an obligation to maintain and contribute to the
+codebase), this document describes the coding guidelines we follow, as well as
+some tips that will improve the development process for everyone involved.
 
-C++ standards
--------------
+Beyond your first contribution
+------------------------------
 
-Any feature in C++11 is fine to use. Specifically we support features found in
-GCC 4.8.2. Our automated tests use gcc 4.8.4 on linux. See
+If your :doc:`first contribution to khmer <getting-started>` has been
+accepted and merged into the codebase, you may be wondering what to do next. You
+can poke around at additional "low-hanging fruit" issues, but if you'd like to
+sink your teeth into something more substantial, here are a few suggestions.
+
+* If you're knowledgeable in C++ and/or Python and/or documentation
+  and/or biology, we'd love to attract further contributions to khmer.
+  Please visit the issues list and browse about and find something
+  interesting looking.
+
+* One general thing we'd like to do is increase our test coverage.
+  You can go find test coverage information `at Codecov.io
+  <https://codecov.io/gh/dib-lab/khmer>`__ by scrolling to the bottom and
+  clicking on individual files; or, ask us on khmer-project@idyll.org for
+  suggestions.
+
+* Ask us! Ask khmer-project@idyll.org for suggestions on what to do next.
+  We can suggest particularly ripe low-hanging fruit, or find some other
+  issues that suit your interests and background.
+
+* You can also help other people out by watching for new issues or
+  looking at pull requests. Remember to be nice and polite!
+
+Programming languages
+---------------------
+
+All Python code in khmer must run correctly in both Python version 2 and 3.
+
+For C++ code, any feature in C++11 is fine to use. Specifically we support
+features found in GCC 4.8.2. Our automated tests use gcc 4.8.4 on linux. See
 https://github.com/dib-lab/khmer/issues/598 for an in-depth discussion. Please
 do not use features from C++14 or newer.
 
-Coding standards
-----------------
+Code style standards
+--------------------
 
 All plain-text files should have line widths of 80 characters or less unless
 that is not supported for the particular file format.
@@ -78,14 +110,7 @@ Code, scripts, and documentation must have their spelling checked.
 Python-based `codespell` can be applied to multiple files easily. `codespell`
 can be installed via the following::
 
-        mkdir ~/bin
-        git clone git@github.com:lucasdemarchi/codespell.git
-        cd codespell
-        make prefix=${HOME} install
-        export PATH=$PATH:~/bin/
-
-Note, if you want codespell to always be available you will need to add the
-`export` line to your `${HOME}\.bashrc` or equivalent.
+        pip install codespell
 
 To run codespell over only what has been changed on the branch `my-branch`::
 
@@ -117,6 +142,88 @@ GNU `aspell` can also be used to check the spelling in a single file::
 
         aspell check --mode ccpp $filename
 
+Resolving merge conflicts
+-------------------------
+
+It is possible that when you do a `git pull` you will get a "merge
+conflict" -- This is what happens when something changed in the branch you're
+pulling in in the same place you made a change in your local copy. This
+frequently happens in the `ChangeLog` file.
+
+Git will complain loudly about merges and tell you specifically in which
+files they occurred. If you open the file, you'll see something vaguely
+like this in the place where the merge occurred::
+
+   <<<<<<< HEAD
+   Changes made on the branch that is being merged into. In most cases,
+   this is the branch that you have currently checked out
+   =======
+   Changes made on the branch that is being merged in, almost certainly
+   master.
+   >>>>>>> abcde1234
+
+Though there are a variety of tools to assist with resolving merge
+conflicts they can be quite complicated at first glance and it is usually
+easy enough to manually resolve the conflict.
+
+To resolve the conflict you simply have to manually 'meld' the changes
+together and remove the merge markers.
+
+After this you'll have to add and commit the merge just like any other set
+of changes. It's also recommended that you run tests.
+
+
+Virtual environments
+--------------------
+
+The khmer package, like many software packages, relies on other third-party
+software. Some of this software has been bundled together with khmer and is
+compiled when you invoke ``make`` on the command line. But some of the software
+khmer depends on is distributed as Python packages separately from khmer.
+
+Python `virtual environments <https://pypi.python.org/pypi/virtualenv>`_ were
+designed to isolate a stable development environment for a particular project.
+This makes it possible to maintain different versions of a Python package for
+different projects on your computer.
+
+The installation instructions in the :doc:`Getting Started <getting-started>`
+docs install the ``virtualenv`` command on your computer. After completing those
+instructions, you can create a virtual environment with the command::
+
+    virtualenv -p python2 env/
+
+(You can substitute `python3` for `python2` if Python version 3 is installed on
+your system.) This command will create a new directory `env/` containing your
+new virtual environment. The command::
+
+    source env/bin/activate
+
+will activate the virtual environment. Now any Python packages that you install
+with ``pip`` or ``make install-dep`` will be installed into your isolated
+virtual environment.
+
+Note that any time you create a new terminal session, using the virtual
+environment requires that you re-activate it.
+
+Pull request cleanup (commit squashing)
+---------------------------------------
+
+Submitters are invited to reduce the numbers of commits in their pull requests
+either via `git rebase -i dib/master` or this recipe::
+
+        git pull # make sure the local is up to date
+        git pull dib master # get up to date
+        # fix any merge conflicts
+        git status # sanity check
+        git diff dib/master # does the diff look correct? (no merge markers)
+        git reset --soft dib/master # un-commit the differences from dib/master
+        git status # sanity check
+        git commit --all # package all differences in one commit
+        git status # sanity check
+        git push # should fail
+        git push --force # override what's in GitHub's copy of the branch/pull request
+
+
 Code Review
 -----------
 
@@ -127,33 +234,6 @@ See also `Code reviews: the lab meeting for code
 <http://fperez.org/py4science/code_reviews.html>`__ and
 `the PyCogent coding guidelines
 <http://pycogent.org/coding_guidelines.html>`__.
-
-Checklist
----------
-
-Each pull request should be automatically populated with the following
-checklist::
-
-   - [ ] Is it mergeable?
-   - [ ] `make test` Did it pass the tests?
-   - [ ] `make clean diff-cover` If it introduces new functionality in
-     `scripts/` is it tested?
-   - [ ] `make format diff_pylint_report cppcheck doc pydocstyle` Is it well
-     formatted?
-   - [ ] Did it change the command-line interface? Only backwards-compatible
-     additions are allowed without a major version increment. Changing file
-     formats also requires a major version number increment.
-   - [ ] For substantial changes or changes to the command-line interface, is it
-     documented in `CHANGELOG.md`? See [keepachangelog](http://keepachangelog.com/)
-     for more details.
-   - [ ] Was a spellchecker run on the source code and documentation after
-     changes were made?
-   - [ ] Do the changes respect streaming IO? (Are they
-     tested for streaming IO?)
-
-**Note** that after you submit the pull request you can check and uncheck
-the individual boxes on the formatted comment; no need to put x or y
-in the middle.
 
 CPython Checklist
 -----------------
