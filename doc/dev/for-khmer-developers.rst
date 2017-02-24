@@ -50,15 +50,15 @@ First, never merge something unless it's been through a review!  This
 rule can be broken under specific conditions when doing a release; see
 :doc:`release`.
 
-Second, we ask that all contributors set up standing Pull Requests
+Second, we ask that all contributors set up standing Pull Requests (PR)
 while they are working something.  (This is a **requirement** if
 you're in the DIB lab.)  This lets us track what's going on. On the
-flip side, please do not review pull requests until they are indicated
+flip side, please do not review PRs until they are indicated
 as "ready for review".
 
-Third, if a Pull Request goes stale, that is the original author stopped
+Third, if a PR goes stale, that is the original author stopped
 working on it, wait a while to see if they come back. If not post a message
-saying that you would like to pick up the Pull Request and if that would be
+saying that you would like to pick up the PR and if that would be
 Ok with the original author. Wait a few working days to give them a chance
 to respond. Start a new branch and new PR referencing the old one, where
 appropriate cherry pick existing commits from the old PR so that we can give
