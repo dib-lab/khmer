@@ -197,7 +197,7 @@ SETUP_METADATA = \
         "name": "khmer",
         "version": versioneer.get_version(),
         "description": 'khmer k-mer counting library',
-        "long_description": open("README.rst").read(),
+        "long_description": open("README.md").read(),
         "author": "Michael R. Crusoe, Hussien F. Alameldin, Sherine Awad, "
                   "Elmar Bucher, Adam Caldwell, Reed Cartwright, "
                   "Amanda Charbonneau, Bede Constantinides, Greg Edvenson, "
