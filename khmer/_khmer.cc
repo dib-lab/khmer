@@ -2122,7 +2122,7 @@ static PyMethodDef khmer_hashtable_methods[] = {
     {
         "consume_seqfile",
         (PyCFunction)hashtable_consume_seqfile, METH_VARARGS,
-        "Incrment the counts of all the k-mers in the sequences in the "
+        "Increment the counts of all the k-mers in the sequences in the "
         "given file"
     },
     {
