@@ -168,6 +168,9 @@ def test_read_cleaning_trim_functions_lowercase(tabletype):
 def test_read_cleaning_trim_functions_N(tabletype):
     infile = utils.get_test_data('valid-read-testing.fq')
 
+    if tabletype == _Nodegraph or tabletype == _Nodetable:
+        return
+
     # read this in using "approved good" behavior w/cleaned_seq
     x = tabletype(8, PRIMES_1m)
     for read in ReadParser(infile):
@@ -186,6 +189,11 @@ def test_read_cleaning_trim_functions_N(tabletype):
 
 def test_read_cleaning_trim_functions_bad_dna(tabletype):
     infile = utils.get_test_data('valid-read-testing.fq')
+
+    if tabletype == _Nodegraph or tabletype == _Nodetable or \
+        tabletype == _SmallCounttable or tabletype == _SmallCountgraph or \
+        tabletype == _Countgraph:
+        return
 
     # read this in using "approved good" behavior w/cleaned_seq
     x = tabletype(8, PRIMES_1m)
