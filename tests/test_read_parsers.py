@@ -515,11 +515,13 @@ def test_read_cleaning_consume_read_by_read():
     kmer = "caggcgcccaccacc".upper()
     assert x.get(kmer) == 1
 
-    # the 2nd read with this k-mer in it has an N in it; 'consume' will ignore.
+    # consume will ignore the invalid base in 2nd read containing this k-mer,
+    # so the k-mer will have an abundance of 2.
     kmer = "CCTCATCGGCACCAG"
     assert x.get(kmer) == 2
 
-    # the 2nd read with this k-mer in it has a Z in it; 'consume' will ignore.
+    # consume will ignore the invalid base in 2nd read containing this k-mer,
+    # so the k-mer will have an abundance of 2.
     kmer = "ACTGAGCTTCATGTC"
     assert x.get(kmer) == 2
 
@@ -634,14 +636,14 @@ def test_read_cleaning_output_partitions():
     kmer = 'ACTGGGCG'
     x.add_tag(kmer)
     x.set_partition_id(kmer, 2)
-    
+
     kmer = 'CCGGCGTG'
     x.add_tag(kmer)
     x.set_partition_id(kmer, 3)
-    
+
     x.output_partitions(infile, savepath)
 
-    read_names = [ read.name for read in ReadParser(savepath) ]
+    read_names = [read.name for read in ReadParser(savepath)]
     print(read_names)
     assert len(read_names) == 6
 
