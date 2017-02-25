@@ -37,6 +37,8 @@
 # Tests for the ReadParser and Read classes.
 from __future__ import print_function
 from __future__ import absolute_import
+from khmer import _Countgraph, _Counttable, _SmallCountgraph, _SmallCounttable
+from khmer import _Nodegraph, _Nodetable
 from khmer import ReadParser, Counttable, Nodegraph
 from screed import Record
 from . import khmer_tst_utils as utils
@@ -44,10 +46,19 @@ import pytest
 from functools import reduce  # pylint: disable=redefined-builtin
 
 
-def test_read_cleaning_consume_seqfile():
+PRIMES_1m = [1000003, 1009837]
+
+
+# all the table types!
+@pytest.fixture(params=[_Countgraph, _Counttable, _SmallCountgraph,
+                        _SmallCounttable, _Nodegraph, _Nodetable])
+def tabletype(request):
+    return request.param
+
+def test_read_cleaning_consume_seqfile(tabletype):
     infile = utils.get_test_data('valid-read-testing.fq')
 
-    x = Counttable(15, int(1e6), 4)
+    x = tabletype(15, PRIMES_1m)
     x.consume_seqfile(infile)
 
     # the relevant read will automatically get uppercased => abundance of 2
@@ -63,10 +74,10 @@ def test_read_cleaning_consume_seqfile():
     assert x.get(kmer) == 1               # this should be 2 in the future
 
 
-def test_read_cleaning_consume_read_by_read():
+def test_read_cleaning_consume_read_by_read(tabletype):
     infile = utils.get_test_data('valid-read-testing.fq')
 
-    x = Counttable(15, int(1e6), 4)
+    x = tabletype(15, PRIMES_1m)
     for read in ReadParser(infile):
         x.consume(read.sequence)          # consume raw sequence
 
@@ -86,10 +97,10 @@ def test_read_cleaning_consume_read_by_read():
     assert x.get(kmer) == 2
 
 
-def test_read_cleaning_consume_read_by_read_cleaned_seq():
+def test_read_cleaning_consume_read_by_read_cleaned_seq(tabletype):
     infile = utils.get_test_data('valid-read-testing.fq')
 
-    x = Counttable(15, int(1e6), 4)
+    x = tabletype(15, PRIMES_1m)
     for read in ReadParser(infile):
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
@@ -106,11 +117,11 @@ def test_read_cleaning_consume_read_by_read_cleaned_seq():
     assert x.get(kmer) == 2
 
 
-def test_read_cleaning_abundance_distribution():
+def test_read_cleaning_abundance_distribution(tabletype):
     infile = utils.get_test_data('valid-read-testing.fq')
 
-    x = Counttable(15, int(1e6), 4)
-    y = Nodegraph(15, int(1e6), 4)
+    x = tabletype(15, PRIMES_1m)
+    y = _Nodegraph(15, PRIMES_1m)
 
     x.consume_seqfile(infile)
 
@@ -119,11 +130,11 @@ def test_read_cleaning_abundance_distribution():
     assert dist[2] == 42
 
 
-def test_read_cleaning_trim_functions_lowercase():
+def test_read_cleaning_trim_functions_lowercase(tabletype):
     infile = utils.get_test_data('valid-read-testing.fq')
 
     # read this in using "approved good" behavior w/cleaned_seq
-    x = Counttable(8, int(1e6), 4)
+    x = tabletype(8, PRIMES_1m)
     for read in ReadParser(infile):
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
@@ -138,11 +149,11 @@ def test_read_cleaning_trim_functions_lowercase():
     assert posns == []                    # in future, should do same
 
 
-def test_read_cleaning_trim_functions_N():
+def test_read_cleaning_trim_functions_N(tabletype):
     infile = utils.get_test_data('valid-read-testing.fq')
 
     # read this in using "approved good" behavior w/cleaned_seq
-    x = Counttable(8, int(1e6), 4)
+    x = tabletype(8, PRIMES_1m)
     for read in ReadParser(infile):
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
@@ -158,11 +169,11 @@ def test_read_cleaning_trim_functions_N():
     # assert posns == []                    # in future, should return []
 
 
-def test_read_cleaning_trim_functions_bad_dna():
+def test_read_cleaning_trim_functions_bad_dna(tabletype):
     infile = utils.get_test_data('valid-read-testing.fq')
 
     # read this in using "approved good" behavior w/cleaned_seq
-    x = Counttable(8, int(1e6), 4)
+    x = tabletype(8, PRIMES_1m)
     for read in ReadParser(infile):
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
@@ -183,7 +194,7 @@ def test_read_cleaning_output_partitions():
     savepath = utils.get_temp_filename('foo')
 
     # read this in using "approved good" behavior w/cleaned_seq
-    x = Nodegraph(8, int(1e6), 4)
+    x = _Nodegraph(8, PRIMES_1m)
     for read in ReadParser(infile):
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
