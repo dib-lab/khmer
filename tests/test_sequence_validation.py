@@ -58,6 +58,9 @@ def tabletype(request):
 def test_read_cleaning_consume_seqfile(tabletype):
     infile = utils.get_test_data('valid-read-testing.fq')
 
+    if tabletype == _Nodegraph or tabletype == _Nodetable:
+        return
+
     x = tabletype(15, PRIMES_1m)
     x.consume_seqfile(infile)
 
@@ -76,6 +79,9 @@ def test_read_cleaning_consume_seqfile(tabletype):
 
 def test_read_cleaning_consume_read_by_read(tabletype):
     infile = utils.get_test_data('valid-read-testing.fq')
+
+    if tabletype == _Nodegraph or tabletype == _Nodetable:
+        return
 
     x = tabletype(15, PRIMES_1m)
     for read in ReadParser(infile):
@@ -100,6 +106,9 @@ def test_read_cleaning_consume_read_by_read(tabletype):
 def test_read_cleaning_consume_read_by_read_cleaned_seq(tabletype):
     infile = utils.get_test_data('valid-read-testing.fq')
 
+    if tabletype == _Nodegraph or tabletype == _Nodetable:
+        return
+
     x = tabletype(15, PRIMES_1m)
     for read in ReadParser(infile):
         x.consume(read.cleaned_seq)       # consume cleaned_seq
@@ -119,6 +128,9 @@ def test_read_cleaning_consume_read_by_read_cleaned_seq(tabletype):
 
 def test_read_cleaning_abundance_distribution(tabletype):
     infile = utils.get_test_data('valid-read-testing.fq')
+
+    if tabletype == _Nodegraph or tabletype == _Nodetable:
+        return
 
     x = tabletype(15, PRIMES_1m)
     y = _Nodegraph(15, PRIMES_1m)
