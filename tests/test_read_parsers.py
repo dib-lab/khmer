@@ -634,14 +634,14 @@ def test_read_cleaning_output_partitions():
     kmer = 'ACTGGGCG'
     x.add_tag(kmer)
     x.set_partition_id(kmer, 2)
-    
+
     kmer = 'CCGGCGTG'
     x.add_tag(kmer)
     x.set_partition_id(kmer, 3)
-    
+
     x.output_partitions(infile, savepath)
 
-    read_names = [ read.name for read in ReadParser(savepath) ]
+    read_names = [read.name for read in ReadParser(savepath)]
     print(read_names)
     assert len(read_names) == 4
 
