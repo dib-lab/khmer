@@ -4,24 +4,24 @@
    Copyright (C) 2015 The Regents of the University of California.
    It is licensed under the three-clause BSD license; see LICENSE.
    Contact: khmer-project@idyll.org
-   
+
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are
    met:
-   
+
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
-   
+
     * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the following
       disclaimer in the documentation and/or other materials provided
       with the distribution.
-   
+
     * Neither the name of the Michigan State University nor the names
       of its contributors may be used to endorse or promote products
       derived from this software without specific prior written
       permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -33,7 +33,7 @@
    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-   
+
    Contact: khmer-project@idyll.org
 
 ==========================
@@ -42,7 +42,7 @@ Setting khmer memory usage
 
 If you look at the documentation for the scripts (:doc:`scripts`) you'll
 see a :option:`-M <load-into-counting.py -M>` parameter that sets the maximum
-memory usage for any script that uses k-mer counting tables or k-mer graphs. 
+memory usage for any script that uses k-mer counting tables or k-mer graphs.
 What is this?
 
 khmer uses a special data structure that lets it store counting tables
@@ -70,9 +70,11 @@ There is no way (except for experience, rules of thumb, and intuition) to
 know what this parameter should be up front.  So, use the maximum
 available memory::
 
-  -M 16e9
+  -M 16G
 
-for a machine with 16 GB of free memory, for example.
+for a machine with 16 GB of free memory, for example. The supported suffixes
+for setting memory usage are K, M, G, and T for kilobyte, megabyte, gigabyte,
+and terabyte, respectively.
 
 The short version
 =================
@@ -156,35 +158,46 @@ counting and set membership simply gets more and more accurate as you
 feed it more memory.  (Although there may be performance hits from
 memory I/O, e.g.  `see the NUMA architecture
 <http://en.wikipedia.org/wiki/Non-Uniform_Memory_Access>`__.)  The
-other good news is that khmer can measure the false positive rate and
-detect dangerously low memory conditions.  For partitioning, we
-actually *know* what a too-high false positive rate is -- our `k-mer
+other good news is that khmer can measure the false positive rate (FPR)
+and detect dangerously low memory conditions.  For partitioning, we
+actually *know* what a too-high FPR is -- our `k-mer
 percolation paper <http://arxiv.org/abs/1112.4193>`__ lays out the
-math.  For digital normalization, we assume that a false positive rate
-of 10% is bad.  In both cases the data-loading scripts will exit with
+math.  For digital normalization, we assume that a FPR
+of 20% is bad.  In both cases the data-loading scripts will exit with
 an error-code.
+
+If you insist on optimizing memory usage, the :program:`unique-kmers.py`
+script will compute the approximate number of k-mers in a data set
+fairly quickly. This number can be provided to several scripts via the
+:option:`-U <load-into-counting.py -U>` option, which will use it to
+calculate the FPR before processing any input data. If the amount of
+requested memory yields an unacceptable FPR, the script will complain
+loudly, giving you the chance to cancel the program before any time is
+wasted. It will also report the minimum amount of memory required for
+an acceptable FPR, so that you can immediately re-start the script with
+the desired settings.
 
 Rules of thumb
 --------------
 
 For digital normalization, we recommend:
 
- - ``-M 8e9`` for any amount of sequencing for a single microbial genome,
+ - ``-M 8G`` for any amount of sequencing for a single microbial genome,
    MDA-amplified or single colony.
 
- - ``-M 16e9`` for up to a billion mRNAseq reads from any organism.  Past that,
+ - ``-M 16G`` for up to a billion mRNAseq reads from any organism.  Past that,
    increase it.
 
- - ``-M 32e9`` for most eukaryotic genome samples.
+ - ``-M 32G`` for most eukaryotic genome samples.
 
- - ``-M 32e9`` will also handle most "simple" metagenomic samples (HMP on down)
+ - ``-M 32G`` will also handle most "simple" metagenomic samples (HMP on down)
 
  - For metagenomic samples that are more complex, such as soil or marine,
-   start as high as possible.  For example, we are using ``-M 256e9`` for
+   start as high as possible.  For example, we are using ``-M 256G`` for
    ~300 Gbp of soil reads.
 
 For partitioning of complex metagenome samples, we recommend starting
 as high as you can -- something like half your system memory.  So if
-you have 256 GB of RAM, use ``-M 128e9`` which will use 128 GB of RAM
+you have 256 GB of RAM, use ``-M 128G`` which will use 128 GB of RAM
 for the basic graph storage, leaving other memory for the ancillary
 data structures.
