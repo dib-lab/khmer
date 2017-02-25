@@ -187,7 +187,7 @@ diff_pep8_report: pep8_report.txt
 
 ## pydocstyle      : check Python doc strings
 pydocstyle: $(PYSOURCES) $(wildcard tests/*.py)
-	pydocstyle --ignore=D100,D101,D102,D103,D203 \
+	pydocstyle --ignore=D100,D101,D102,D103,D203 --match='(?!_version).*\.py' \
 		setup.py khmer/ scripts/ tests/ oxli/ || true
 
 pydocstyle_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
