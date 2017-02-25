@@ -674,13 +674,13 @@ def test_read_cleaning_trim_on_stoptags():
     x.add_stop_tag(kmer)
 
     _, pos = x.trim_on_stoptags('caggcgcccaccaccgtgccctccaacctgatggt')
-    assert pos == 6                       # should be ?? in future
+    assert pos == 35                      # no stoptag b/c lowercase => no trim
+
+    _, pos = x.trim_on_stoptags('ACTGGGCGTAGNCGGTGTCCTCATCGGCACCAGC')
+    assert pos == 6                       # N ignored
 
     _, pos = x.trim_on_stoptags('CCGGCGTGGTTZZYAGGTCACTGAGCTTCATGTC')
-    assert pos == 0                       # should be 6 in future
-
-    _, pos = x.trim_on_stoptags('CCGGCGTGGTTZZYAGGTCACTGAGCTTCATGTC')
-    assert pos == 0                       # should be 6 in future
+    assert pos == 6                       # ZZY ignored
 
 
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:

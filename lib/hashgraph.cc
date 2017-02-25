@@ -467,10 +467,6 @@ unsigned int Hashgraph::kmer_degree(const char * kmer_s)
 
 size_t Hashgraph::trim_on_stoptags(std::string seq) const
 {
-    if (!check_and_normalize_read(seq)) {
-        return 0;
-    }
-
     KmerIterator kmers(seq.c_str(), _ksize);
 
     size_t i = _ksize - 2;
