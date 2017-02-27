@@ -65,13 +65,6 @@ INCLUDEOPTS=$(shell gcc -E -x c++ - -v < /dev/null 2>&1 >/dev/null \
 PYINCLUDE=$(shell python -c \
 	  "import sysconfig;print(sysconfig.get_path('include'))")
 
-CPPCHECK=ls lib/*.cc khmer/_khmer.cc | grep -v test | cppcheck -DNDEBUG \
-	 -DVERSION=0.0.cppcheck -DSEQAN_HAS_BZIP2=1 -DSEQAN_HAS_ZLIB=1 \
-	 -UNO_UNIQUE_RC --enable=all --suppress='*:/usr/*' \
-	 --suppress='*:$(PYINCLUDE)/*' --file-list=- --platform=unix64 \
-	 --std=c++11 --inline-suppr --quiet -Ilib -Ithird-party/bzip2 \
-	 -Ithird-party/zlib -Ithird-party/smhasher -I$(PYINCLUDE) \
-	 $(DEFINES) $(INCLUDEOPTS)
 
 UNAME := $(shell uname)
 ifeq ($(UNAME),Linux)
@@ -163,16 +156,6 @@ build/sphinx/latex/khmer.pdf: $(SOURCES) doc/conf.py $(wildcard doc/*.rst) \
 	cd build/sphinx/latex && $(MAKE) all-pdf
 	@echo ''
 	@echo '--> pdf in build/sphinx/latex/khmer.pdf'
-
-cppcheck-result.xml: $(CPPSOURCES)
-	$(CPPCHECK) --xml-version=2 2> cppcheck-result.xml
-
-## cppcheck    : run static analysis on C++ code
-cppcheck: FORCE
-	@$(CPPCHECK)
-
-cppcheck-long: FORCE
-	@$(CPPCHECK) -Ithird-party/seqan/core/include
 
 ## pep8        : check Python code style
 pep8: $(PYSOURCES) $(wildcard tests/*.py)

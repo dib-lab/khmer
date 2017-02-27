@@ -72,7 +72,7 @@ One-time Preparation
 
       #.  Install the python development environment and some additional development packages::
 
-             brew install python astyle gcovr cppcheck enchant
+             brew install python astyle gcovr enchant
              sudo pip install --upgrade pip virtualenv
 
    ii. Linux users
@@ -82,7 +82,7 @@ One-time Preparation
        be done with::
 
           sudo apt-get install python2.7-dev python-virtualenv python-pip \
-          gcc g++ git astyle gcovr cppcheck enchant
+          gcc g++ git astyle gcovr enchant
 
        For Red Hat, Fedora, and CentOS::
 
