@@ -97,20 +97,6 @@ release makers, following this checklist by MRC.
    are still valid. You need to install khmer to do this, use for example
    your normal development setup/virtualenv for that.
 
-#. Submit a build to Coverity Scan if it hasn't been done
-   recently. You can get the token from
-   https://gitlab.msu.edu/ged-lab/ged-internal-docs/wikis/coverity-scan
-   or https://scan.coverity.com/projects/621?tab=project_settings
-
-   ::
-
-        virtualenv coverityenv
-        source coverityenv/bin/activate
-        make install-dependencies
-        make clean
-        cov_analysis_dir=~/src/coverity/cov-analysis-linux64-7.5.0/ make coverity-build
-        COVERITY_TOKEN=${COVERITY_TOKEN} make coverity-upload
-
 #. Set your new version number and release candidate::
 
         new_version=1.3
