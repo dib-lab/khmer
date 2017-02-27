@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2015, The Regents of the University of California.
 #
