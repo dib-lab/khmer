@@ -49,22 +49,8 @@ GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 VERSION=$(shell ./setup.py version | grep Version | awk '{print $$4}' \
 	| sed 's/+/-/')
 
-# wrapping the command with `printf "%q" some-text` shell-escapes the string
-# http://stackoverflow.com/a/2856010
-# list of preprocessor defines works for GCC and clang
-# http://nadeausoftware.com/articles/2011/12/c_c_tip_how_list_compiler_predefined_macros
-DEFINES=$(shell printf "%q" "$$( c++ -dM -E -x c++ /dev/null | \
-	awk '{print "-D" $$2 "=" $$3}' | tr '\n' ' ')" | sed 's/\\ / /g' )
-DEFINES += -DNDEBUG -DVERSION=$(VERSION) -DSEQAN_HAS_BZIP2=1 \
-	   -DSEQAN_HAS_ZLIB=1 -UNO_UNIQUE_RC
-
 INCLUDESTRING=$(shell gcc -E -x c++ - -v < /dev/null 2>&1 >/dev/null \
 	    | grep '^ /' | grep -v cc1plus)
-INCLUDEOPTS=$(shell gcc -E -x c++ - -v < /dev/null 2>&1 >/dev/null \
-	    | grep '^ /' | grep -v cc1plus | awk '{print "-I" $$1 " "}')
-PYINCLUDE=$(shell python -c \
-	  "import sysconfig;print(sysconfig.get_path('include'))")
-
 
 UNAME := $(shell uname)
 ifeq ($(UNAME),Linux)
