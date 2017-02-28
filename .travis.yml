@@ -66,6 +66,7 @@ install:
 script:
   - make test
   - make pep8
+  - make doc
 
 # generate all the diagnostic reports
 after_success:
@@ -78,8 +79,6 @@ after_success:
   - make diff_pylint_report
   - make cppcheck
   - make pydocstyle
-  # do the docs build?
-  - make doc
   # XXX Do not upload results from travis yet. Currently jenkins is considered
   # XXX the source of truth about coverage
   # only upload one coverage report to codecov as it merges all reports
