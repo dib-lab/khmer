@@ -39,11 +39,9 @@ from __future__ import print_function
 from __future__ import absolute_import
 from khmer import _Countgraph, _Counttable, _SmallCountgraph, _SmallCounttable
 from khmer import _Nodegraph, _Nodetable
-from khmer import ReadParser, Counttable, Nodegraph
-from screed import Record
+from khmer import ReadParser, Nodegraph
 from . import khmer_tst_utils as utils
 import pytest
-from functools import reduce  # pylint: disable=redefined-builtin
 
 
 PRIMES_1m = [1000003, 1009837]
@@ -55,9 +53,17 @@ PRIMES_1m = [1000003, 1009837]
 def tabletype(request):
     return request.param
 
+
+@pytest.fixture
+def reads():
+    infile = utils.get_test_data('valid-read-testing.fq')
+    reads = ReadParser(infile)
+    yield reads
+    reads.close()
+
+
 def test_read_cleaning_consume_seqfile(tabletype):
     infile = utils.get_test_data('valid-read-testing.fq')
-
     if tabletype == _Nodegraph or tabletype == _Nodetable:
         return
 
@@ -77,14 +83,12 @@ def test_read_cleaning_consume_seqfile(tabletype):
     assert x.get(kmer) == 1               # this should be 2 in the future
 
 
-def test_read_cleaning_consume_read_by_read(tabletype):
-    infile = utils.get_test_data('valid-read-testing.fq')
-
+def test_read_cleaning_consume_read_by_read(tabletype, reads):
     if tabletype == _Nodegraph or tabletype == _Nodetable:
         return
 
     x = tabletype(15, PRIMES_1m)
-    for read in ReadParser(infile):
+    for read in reads:
         x.consume(read.sequence)          # consume raw sequence
 
     # the relevant read will be entirely ignored
@@ -103,14 +107,12 @@ def test_read_cleaning_consume_read_by_read(tabletype):
     assert x.get(kmer) == 2
 
 
-def test_read_cleaning_consume_read_by_read_cleaned_seq(tabletype):
-    infile = utils.get_test_data('valid-read-testing.fq')
-
+def test_read_cleaning_consume_read_by_read_cleaned_seq(tabletype, reads):
     if tabletype == _Nodegraph or tabletype == _Nodetable:
         return
 
     x = tabletype(15, PRIMES_1m)
-    for read in ReadParser(infile):
+    for read in reads:
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
     # the relevant read will be cleaned & loaded
@@ -142,12 +144,10 @@ def test_read_cleaning_abundance_distribution(tabletype):
     assert dist[2] == 42
 
 
-def test_read_cleaning_trim_functions_lowercase(tabletype):
-    infile = utils.get_test_data('valid-read-testing.fq')
-
+def test_read_cleaning_trim_functions_lowercase(tabletype, reads):
     # read this in using "approved good" behavior w/cleaned_seq
     x = tabletype(8, PRIMES_1m)
-    for read in ReadParser(infile):
+    for read in reads:
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
     s = "caggcgcccaccaccgtgccctccaacctgatggt"
@@ -161,12 +161,10 @@ def test_read_cleaning_trim_functions_lowercase(tabletype):
     assert posns == []                    # in future, should do same
 
 
-def test_read_cleaning_trim_functions_N(tabletype):
-    infile = utils.get_test_data('valid-read-testing.fq')
-
+def test_read_cleaning_trim_functions_N(tabletype, reads):
     # read this in using "approved good" behavior w/cleaned_seq
     x = tabletype(8, PRIMES_1m)
-    for read in ReadParser(infile):
+    for read in reads:
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
     s = "ACTGGGCGTAGNCGGTGTCCTCATCGGCACCAGC"
@@ -181,12 +179,10 @@ def test_read_cleaning_trim_functions_N(tabletype):
     # assert posns == []                    # in future, should return []
 
 
-def test_read_cleaning_trim_functions_bad_dna(tabletype):
-    infile = utils.get_test_data('valid-read-testing.fq')
-
+def test_read_cleaning_trim_functions_bad_dna(tabletype, reads):
     # read this in using "approved good" behavior w/cleaned_seq
     x = tabletype(8, PRIMES_1m)
-    for read in ReadParser(infile):
+    for read in reads:
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
     s = "CCGGCGTGGTTZZYAGGTCACTGAGCTTCATGTC"
