@@ -49,29 +49,8 @@ GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 VERSION=$(shell ./setup.py version | grep Version | awk '{print $$4}' \
 	| sed 's/+/-/')
 
-# wrapping the command with `printf "%q" some-text` shell-escapes the string
-# http://stackoverflow.com/a/2856010
-# list of preprocessor defines works for GCC and clang
-# http://nadeausoftware.com/articles/2011/12/c_c_tip_how_list_compiler_predefined_macros
-DEFINES=$(shell printf "%q" "$$( c++ -dM -E -x c++ /dev/null | \
-	awk '{print "-D" $$2 "=" $$3}' | tr '\n' ' ')" | sed 's/\\ / /g' )
-DEFINES += -DNDEBUG -DVERSION=$(VERSION) -DSEQAN_HAS_BZIP2=1 \
-	   -DSEQAN_HAS_ZLIB=1 -UNO_UNIQUE_RC
-
 INCLUDESTRING=$(shell gcc -E -x c++ - -v < /dev/null 2>&1 >/dev/null \
 	    | grep '^ /' | grep -v cc1plus)
-INCLUDEOPTS=$(shell gcc -E -x c++ - -v < /dev/null 2>&1 >/dev/null \
-	    | grep '^ /' | grep -v cc1plus | awk '{print "-I" $$1 " "}')
-PYINCLUDE=$(shell python -c \
-	  "import sysconfig;print(sysconfig.get_path('include'))")
-
-CPPCHECK=ls lib/*.cc khmer/_khmer.cc | grep -v test | cppcheck -DNDEBUG \
-	 -DVERSION=0.0.cppcheck -DSEQAN_HAS_BZIP2=1 -DSEQAN_HAS_ZLIB=1 \
-	 -UNO_UNIQUE_RC --enable=all --suppress='*:/usr/*' \
-	 --suppress='*:$(PYINCLUDE)/*' --file-list=- --platform=unix64 \
-	 --std=c++11 --inline-suppr --quiet -Ilib -Ithird-party/bzip2 \
-	 -Ithird-party/zlib -Ithird-party/smhasher -I$(PYINCLUDE) \
-	 $(DEFINES) $(INCLUDEOPTS)
 
 UNAME := $(shell uname)
 ifeq ($(UNAME),Linux)
@@ -163,16 +142,6 @@ build/sphinx/latex/khmer.pdf: $(SOURCES) doc/conf.py $(wildcard doc/*.rst) \
 	cd build/sphinx/latex && $(MAKE) all-pdf
 	@echo ''
 	@echo '--> pdf in build/sphinx/latex/khmer.pdf'
-
-cppcheck-result.xml: $(CPPSOURCES)
-	$(CPPCHECK) --xml-version=2 2> cppcheck-result.xml
-
-## cppcheck    : run static analysis on C++ code
-cppcheck: FORCE
-	@$(CPPCHECK)
-
-cppcheck-long: FORCE
-	@$(CPPCHECK) -Ithird-party/seqan/core/include
 
 ## pep8        : check Python code style
 pep8: $(PYSOURCES) $(wildcard tests/*.py)
