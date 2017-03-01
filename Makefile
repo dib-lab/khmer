@@ -49,8 +49,21 @@ GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 VERSION=$(shell ./setup.py version | grep Version | awk '{print $$4}' \
 	| sed 's/+/-/')
 
+DEFINES += -DNDEBUG -DVERSION=$(VERSION) -DSEQAN_HAS_BZIP2=1 \
+	   -DSEQAN_HAS_ZLIB=1 -UNO_UNIQUE_RC
+
 INCLUDESTRING=$(shell gcc -E -x c++ - -v < /dev/null 2>&1 >/dev/null \
 	    | grep '^ /' | grep -v cc1plus)
+INCLUDEOPTS=$(shell gcc -E -x c++ - -v < /dev/null 2>&1 >/dev/null \
+	    | grep '^ /' | grep -v cc1plus | awk '{print "-I" $$1 " "}')
+PYINCLUDE=$(shell python2.7-config --includes)
+
+CPPCHECK_SOURCES=$(filter-out lib/test%, $(wildcard lib/*.cc khmer/_khmer.cc) )
+CPPCHECK=cppcheck --enable=all \
+	 --suppress='*:/usr/*' --platform=unix64 \
+	 --std=c++11 --inline-suppr -Ilib -Ithird-party/bzip2 \
+	 -Ithird-party/zlib -Ithird-party/smhasher \
+	 $(DEFINES) $(INCLUDEOPTS) $(PYINCLUDE) $(CPPCHECK_SOURCES) --quiet
 
 UNAME := $(shell uname)
 ifeq ($(UNAME),Linux)
@@ -142,6 +155,16 @@ build/sphinx/latex/khmer.pdf: $(SOURCES) doc/conf.py $(wildcard doc/*.rst) \
 	cd build/sphinx/latex && $(MAKE) all-pdf
 	@echo ''
 	@echo '--> pdf in build/sphinx/latex/khmer.pdf'
+
+cppcheck-result.xml: $(CPPSOURCES)
+	$(CPPCHECK) --xml-version=2 2> cppcheck-result.xml
+
+## cppcheck    : run static analysis on C++ code
+cppcheck: FORCE
+	@$(CPPCHECK)
+
+cppcheck-long: FORCE
+	@$(CPPCHECK) -Ithird-party/seqan/core/include
 
 ## pep8        : check Python code style
 pep8: $(PYSOURCES) $(wildcard tests/*.py)
