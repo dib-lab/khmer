@@ -569,6 +569,27 @@ def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
         return khmer.Countgraph(ksize, tablesize, args.n_tables)
 
 
+def create_matching_nodegraph(args, multiplier=1.0):
+    """Create a Nodegraph matched in size to a Countgraph
+
+    Use this to create Nodegraphs for kmer tracking and similar. The
+    created Nodegraph will have a similar number of buckets in its
+    tables as your Countgraph.
+    """
+    tablesize = 0
+    # the use of 'countgraph' and 'smallcountgraph' is on PURPOSE
+    # as we want to find out how big the corresponding countgraphs
+    # would be so we can make a matching Nodegraph
+    if args.small_count:
+        tablesize = calculate_graphsize(args, 'smallcountgraph',
+                                        multiplier=multiplier)
+    else:
+        tablesize = calculate_graphsize(args, 'countgraph',
+                                        multiplier=multiplier)
+    print('NG tablesize:', tablesize)
+    return khmer.Nodegraph(args.ksize, tablesize, args.n_tables)
+
+
 def report_on_config(args, graphtype='countgraph'):
     """Print out configuration.
 

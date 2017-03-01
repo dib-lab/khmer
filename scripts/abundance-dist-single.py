@@ -133,7 +133,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     countgraph.set_use_bigcount(args.bigcount)
 
     log_info('building k-mer tracking graph')
-    tracking = khmer_args.create_nodegraph(args, multiplier=1.1)
+    tracking = khmer_args.create_matching_nodegraph(args, multiplier=1.1)
 
     log_info('kmer_size: {ksize}', ksize=countgraph.ksize())
     log_info('k-mer countgraph sizes: {sizes}', sizes=countgraph.hashsizes())
