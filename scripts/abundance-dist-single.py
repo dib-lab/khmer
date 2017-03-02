@@ -55,8 +55,7 @@ from khmer.khmer_args import (build_counting_args, add_threading_args,
                               report_on_config, calculate_graphsize,
                               sanitize_help)
 from khmer.kfile import (check_input_files, check_space_for_graph)
-from khmer.khmer_logger import (configure_logging, log_info, log_error,
-                                log_warn)
+from khmer.khmer_logger import configure_logging, log_info, log_error
 
 
 def get_parser():
@@ -129,11 +128,13 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
                               'cumulative_fraction'])
 
     log_info('making countgraph')
-    countgraph = khmer_args.create_countgraph(args, multiplier=1.1)
+    # In case the user specified a maximum memory use 8/9 of that
+    # for the countgraph and 1/9 for the tracking nodegraph
+    countgraph = khmer_args.create_countgraph(args, multiplier=8/9.)
     countgraph.set_use_bigcount(args.bigcount)
 
     log_info('building k-mer tracking graph')
-    tracking = khmer_args.create_matching_nodegraph(args, multiplier=1.1)
+    tracking = khmer_args.create_matching_nodegraph(countgraph)
 
     log_info('kmer_size: {ksize}', ksize=countgraph.ksize())
     log_info('k-mer countgraph sizes: {sizes}', sizes=countgraph.hashsizes())
