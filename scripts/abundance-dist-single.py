@@ -128,7 +128,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
                               'cumulative_fraction'])
 
     log_info('making countgraph')
-    # In case the user specified a maximum memory use 8/9 of that
+    # In case the user specified a maximum memory usage, use 8/9 of that
     # for the countgraph and 1/9 for the tracking nodegraph
     # except `multiplier` is a divisor so use 9/8
     countgraph = khmer_args.create_countgraph(args, multiplier=9/8.)
