@@ -94,7 +94,6 @@ Details
 
 :Contact: khmer-project@idyll.org
 :GitHub: https://github.com/dib-lab/khmer
-:Chat: https://gitter.im/dib-lab/khmer
 :License: BSD
 
 .. toctree::
