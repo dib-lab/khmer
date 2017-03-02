@@ -331,7 +331,7 @@ def test_create_countgraph_4_multiplier():
                               False, 0)
 
     countgraph = khmer_args.create_countgraph(args, multiplier=2.0)
-    assert sum(countgraph.hashsizes()) < max_mem / 2.0, \
+    assert sum(countgraph.hashsizes()) < max_mem * 2.0, \
         sum(countgraph.hashsizes())
 
 
@@ -441,7 +441,7 @@ def test_create_nodegraph_4_multiplier():
                               False, 0)
 
     nodegraph = khmer_args.create_nodegraph(args, multiplier=2.0)
-    assert sum(nodegraph.hashsizes()) / 8.0 < max_mem / 2.0, \
+    assert sum(nodegraph.hashsizes()) / 8.0 < max_mem * 2.0, \
         sum(nodegraph.hashsizes())
 
 
