@@ -120,8 +120,8 @@ cdef class PartitioningApp:
                     print (n, self.partitioner.n_components, self.partitioner.n_tags)
                 if self.args.write_results and n > 0 and n % self.args.output_interval == 0:
                     self.write_results(self.args.output_dir, last+n, new_kmers)
-                    total_kmers += new_kmers
-                    n_kmers = 0
+                    n_kmers += new_kmers
+                    new_kmers = 0
                 if paired:
                     new_kmers += self.partitioner.consume_pair(first.sequence,
                                                                second.sequence)
