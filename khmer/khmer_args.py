@@ -504,8 +504,10 @@ def calculate_graphsize(args, graphtype, multiplier=1.0):
         raise ValueError('unknown graph type: ' + graphtype)
 
     if args.max_memory_usage:
-        tablesize = float(multiplier) * (khmer._buckets_per_byte[graphtype] *
-                                         args.max_memory_usage / args.n_tables)
+        # subtract about 30MB for the python interpreter
+        max_memory = args.max_memory_usage - 3e7
+        tablesize = (khmer._buckets_per_byte[graphtype] *
+                     max_memory / args.n_tables / float(multiplier))
     else:
         tablesize = args.max_tablesize
 
