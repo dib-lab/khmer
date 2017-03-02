@@ -56,7 +56,7 @@ INCLUDESTRING=$(shell gcc -E -x c++ - -v < /dev/null 2>&1 >/dev/null \
 	    | grep '^ /' | grep -v cc1plus)
 INCLUDEOPTS=$(shell gcc -E -x c++ - -v < /dev/null 2>&1 >/dev/null \
 	    | grep '^ /' | grep -v cc1plus | awk '{print "-I" $$1 " "}')
-PYINCLUDE=$(shell python2.7-config --includes)
+PYINCLUDE=$(shell python-config --includes)
 
 CPPCHECK_SOURCES=$(filter-out lib/test%, $(wildcard lib/*.cc khmer/_khmer.cc) )
 CPPCHECK=cppcheck --enable=all \
