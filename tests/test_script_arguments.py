@@ -110,10 +110,8 @@ def test_check_tablespace(graph_type, buckets_per_byte):
 
 @pytest.mark.parametrize('graph_type,exp_buckets', [
     ('countgraph', '3.0 million buckets'),
-    # these slightly weird values come because we subtract some space
-    # for the python interpreter
-    ('smallcountgraph', '5.9 million buckets'),
-    ('nodegraph', '23.8 million buckets'),
+    ('smallcountgraph', '6.0 million buckets'),
+    ('nodegraph', '24.0 million buckets'),
 ])
 def test_check_tablespace_nodegraph(graph_type, exp_buckets):
     parser = khmer_args.build_counting_args()
