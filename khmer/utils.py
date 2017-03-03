@@ -34,6 +34,8 @@
 # Contact: khmer-project@idyll.org
 """Helpful methods for performing common argument-checking tasks in scripts."""
 from __future__ import print_function, unicode_literals
+import numbers
+import random
 
 
 def print_error(msg):
@@ -41,6 +43,15 @@ def print_error(msg):
     import sys
 
     print(msg, file=sys.stderr)
+
+
+def check_random_state(seed):
+    if seed is None or seed is random:
+        return random
+    if isinstance(seed, numbers.Integral):
+        return random.Random(seed)
+    if isinstance(seed, random.Random):
+        return seed
 
 
 def _split_left_right(name):
