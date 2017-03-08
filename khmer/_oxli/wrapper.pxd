@@ -464,6 +464,7 @@ cdef extern from "oxli/partitioning.hh" namespace "oxli":
         uint64_t get_n_components() const
         uint64_t get_n_tags() const
         uint64_t get_n_consumed() const
+        uint32_t get_tag_density() const
 
         ComponentPtr get_tag_component(string&) const
         ComponentPtr get_nearest_component(string&) const

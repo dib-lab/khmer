@@ -261,3 +261,7 @@ cdef class StreamingPartitioner:
     @property
     def n_tags(self):
         return deref(self._this).get_n_tags()
+
+    @property
+    def tag_density(self):
+        return deref(self._this).get_tag_density()

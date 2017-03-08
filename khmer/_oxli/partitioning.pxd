@@ -31,5 +31,4 @@ cdef class StreamingPartitioner:
     cdef weak_ptr[CpGuardedKmerCompMap] _tag_component_map
     cdef CpHashgraph * _graph_ptr
     cdef readonly object graph
-    cdef readonly object tag_density
     cdef readonly uint64_t n_consumed

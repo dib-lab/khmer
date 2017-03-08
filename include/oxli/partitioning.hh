@@ -261,6 +261,10 @@ class StreamingPartitioner {
             return n_consumed;
         }
 
+        uint32_t get_tag_density() const {
+            return _tag_density;
+        }
+
         void merge_components(ComponentPtr& root, ComponentPtrSet& comps);
 
         ComponentPtr get_tag_component(HashIntoType tag) const;
