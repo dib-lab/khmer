@@ -70,13 +70,13 @@ cdef class PartitioningApp:
         if self.args.save:
             self.args.save = os.path.join(self.args.output_dir, 'partitioner')
 
-    def write_meta(self, n_sequences, n_kmers):
+    def write_meta(self, n_sequences, total_kmers):
         meta = {'samples': self.args.samples,
                 'pairing': self.args.pairing_mode,
                 'K': self.args.ksize,
-                'tag-density': self.args.tag_density,
+                'tag-density': self.partitioner.tag_density,
                 'n_sequences': n_sequences,
-                'n_unique_kmers': n_kmers}
+                'n_unique_kmers': total_kmers}
         if self.args.save:
             meta['partitioner'] = self.args.save
 
@@ -100,7 +100,7 @@ cdef class PartitioningApp:
         cdef bool paired
         cdef Sequence first, second
         cdef int new_kmers = 0
-        cdef int n_kmers = 0
+        cdef int total_kmers = 0
         cdef int print_interval = self.args.output_interval if self.args.write_results else 10000
         last = 0
         for group in samples:
@@ -121,7 +121,7 @@ cdef class PartitioningApp:
                 if self.args.write_results and n > 0 and n % self.args.output_interval == 0:
                     self.write_results(self.args.output_dir, last+n, new_kmers)
                     total_kmers += new_kmers
-                    n_kmers = 0
+                    new_kmers = 0
                 if paired:
                     new_kmers += self.partitioner.consume_pair(first.sequence,
                                                                second.sequence)
@@ -130,13 +130,13 @@ cdef class PartitioningApp:
             last = n
             n_sequences += last
             if self.args.write_results:
-                self.write_components(self.args.output_dir, last, new_kmers)
-                n_kmers += new_kmers
+                self.write_results(self.args.output_dir, last, new_kmers)
+                total_kmers += new_kmers
                 new_kmers = 0
 
         if self.args.save:
             self.partitioner.save(self.args.save)
 
-        self.write_meta(n_sequences, n_kmers)
+        self.write_meta(n_sequences, total_kmers)
 
         return self.partitioner
