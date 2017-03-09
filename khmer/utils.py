@@ -36,6 +36,7 @@
 from __future__ import print_function, unicode_literals
 from khmer._oxli.parsing import (check_is_left, check_is_right, check_is_pair,
                                  UnpairedReadsError, _split_left_right)
+import itertools
 
 
 def print_error(msg):
@@ -119,7 +120,7 @@ def broken_paired_reader(screed_iter, min_length=None,
 
 def write_record(record, fileobj):
     """Write sequence record to 'fileobj' in FASTA/FASTQ format."""
-    if hasattr(record, 'quality'):
+    if hasattr(record, 'quality') and record.quality is not None:
         recstr = '@{name}\n{sequence}\n+\n{quality}\n'.format(
             name=record.name,
             sequence=record.sequence,
@@ -140,7 +141,7 @@ def write_record_pair(read1, read2, fileobj):
     _rec_pair = '@%s\n%s\n+\n%s\n' * 2
     _rec_pair_no_qual = '>%s\n%s\n' * 2
 
-    if hasattr(read1, 'quality'):
+    if hasattr(read1, 'quality') and read1.quality is not None:
         assert hasattr(read2, 'quality')
         recstr = _rec_pair % (read1.name, read1.sequence, read1.quality,
                               read2.name, read2.sequence, read2.quality)
@@ -186,6 +187,10 @@ class ReadBundle(object):
     @property
     def total_length(self):
         return sum([len(r.sequence) for r in self.reads])
+
+def grouper(n, iterable):
+    iterable = iter(iterable)
+    return iter(lambda: list(itertools.islice(iterable, n)), [])
 
 
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:

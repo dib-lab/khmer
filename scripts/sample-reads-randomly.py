@@ -58,7 +58,8 @@ from khmer import ReadParser
 from khmer.kfile import (check_input_files, add_output_compression_type,
                          get_file_writer)
 from khmer.khmer_args import sanitize_help, KhmerArgumentParser
-from khmer.utils import write_record, broken_paired_reader
+from khmer.utils import write_record, grouper
+from khmer._oxli.parsing import FastxParser, BrokenPairedReader, SplitPairedReader
 
 DEFAULT_NUM_READS = int(1e5)
 DEFAULT_MAX_READS = int(1e8)
@@ -96,6 +97,9 @@ def get_parser():
                         help='Provide a random seed for the generator')
     parser.add_argument('--force_single', default=False, action='store_true',
                         help='Ignore read pair information if present')
+    parser.add_argument('--pairing-mode', 
+                        choices=['split', 'interleaved', 'single'],
+                        default='interleaved')
     parser.add_argument('-o', '--output', dest='output_file',
                         type=argparse.FileType('wb'),
                         metavar="filename", default=None)
@@ -163,16 +167,31 @@ def main():
               % output_filename, file=sys.stderr)
         print('', file=sys.stderr)
 
+    if args.pairing_mode == 'split':
+        samples = list(grouper(2, args.filenames))
+        for pair in samples:
+            if len(pair) != 2:
+                raise ValueError('Must have even number of samples!')
+    else:
+        samples = args.filenames
+
     reads = []
     for _ in range(num_samples):
         reads.append([])
 
     # read through all the sequences and load/resample the reservoir
-    for filename in args.filenames:
-        print('opening', filename, 'for reading', file=sys.stderr)
+    for group in samples:
 
-        for count, (_, _, rcrd1, rcrd2) in enumerate(broken_paired_reader(
-                ReadParser(filename), force_single=args.force_single)):
+        if args.pairing_mode == 'split':
+            print('opening', group[0], 'and', group[1], 'for reading', file=sys.stderr)
+            reader = SplitPairedReader(FastxParser(group[0]),
+                                       FastxParser(group[1]))
+        else:
+            print('opening', group, 'for reading', file=sys.stderr)
+            reader = BrokenPairedReader(FastxParser(group),
+                                        force_single=args.force_single)
+
+        for count, (_, _, rcrd1, rcrd2) in enumerate(reader):
             if count % 10000 == 0:
                 print('...', count, 'reads scanned', file=sys.stderr)
                 if count >= args.max_reads:
