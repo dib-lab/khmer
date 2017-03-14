@@ -504,8 +504,8 @@ def calculate_graphsize(args, graphtype, multiplier=1.0):
         raise ValueError('unknown graph type: ' + graphtype)
 
     if args.max_memory_usage:
-        tablesize = (khmer._buckets_per_byte[graphtype] *
-                     args.max_memory_usage / args.n_tables / float(multiplier))
+        tablesize = float(multiplier) * (khmer._buckets_per_byte[graphtype] *
+                                         args.max_memory_usage / args.n_tables)
     else:
         tablesize = args.max_tablesize
 
@@ -567,6 +567,17 @@ def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
         tablesize = calculate_graphsize(args, 'countgraph',
                                         multiplier=multiplier)
         return khmer.Countgraph(ksize, tablesize, args.n_tables)
+
+
+def create_matching_nodegraph(countgraph):
+    """Create a Nodegraph matched in size to a Countgraph
+
+    Use this to create Nodegraphs for kmer tracking and similar. The
+    created Nodegraph will have the same number of buckets in its
+    tables as `countgraph`.
+    """
+    tablesizes = countgraph.hashsizes()
+    return khmer._Nodegraph(countgraph.ksize(), tablesizes)
 
 
 def report_on_config(args, graphtype='countgraph'):
