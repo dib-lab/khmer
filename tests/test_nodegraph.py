@@ -40,6 +40,7 @@ from __future__ import absolute_import
 import khmer
 from khmer import ReadParser
 from khmer import reverse_complement as revcomp
+from khmer.khmer_args import create_matching_nodegraph
 
 import screed
 
@@ -1103,3 +1104,17 @@ def test_assemble_linear_path_bad_seed():
 
     path = nodegraph.assemble_linear_path('GATTACA' * 3)
     assert path == ''
+
+
+@pytest.mark.parametrize('ntables,targetsize', [
+    (4, 1e5),
+    (6, 1e5),
+    (8, 1e5),
+    (5, 1e6),
+    (7, 1e6),
+    (9, 1e6),
+])
+def test_create_matching_nodegraph(ntables, targetsize):
+    cg = khmer.Countgraph(31, targetsize, ntables)
+    ng = create_matching_nodegraph(cg)
+    assert cg.hashsizes() == ng.hashsizes()
