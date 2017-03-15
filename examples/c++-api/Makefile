@@ -1,10 +1,22 @@
-all: count-demo
+CFLAGS=--std=c++11 \
+       -I ../../lib \
+	   -I ../../third-party/smhasher \
+	   -I ../../third-party/seqan/core/include/
+
+run: all
+	./exact-counting
+	./bloom
+
+all: exact-counting bloom
 
 clean:
-	-rm -f count-demo
+	-rm -f exact-counting bloom
 
-count-demo: count-demo.cc ../../lib/liboxli.a
-	$(CXX) --std=c++11 -I ../../lib count-demo.cc -o count-demo ../../lib/liboxli.a
+bloom: bloom.cc ../../lib/liboxli.a
+	$(CXX) $(CFLAGS) bloom.cc -o bloom ../../lib/liboxli.a
+
+exact-counting: exact-counting.cc ../../lib/liboxli.a
+	$(CXX) $(CFLAGS) exact-counting.cc -o exact-counting ../../lib/liboxli.a
 
 ../../lib/liboxli.a:
 	cd ../../lib && make

@@ -1,5 +1,5 @@
-// A demonstration of using khmer to count k-mers; in this case, the request
-// was for exact counting.
+// A demonstration of using khmer for exact k-mer counting. The memory required
+// is 4^k, which limits this to small values of k.
 
 #include <vector>
 #include <cmath>
@@ -11,6 +11,7 @@ using namespace khmer;
 int main()
 {
     unsigned int ksize = 11;
+    uint64_t nkmers = pow(4, ksize);
 
     // For exact counting, you need to create one table that is >= 4**k. This
     // will be that size in bytes, note, so you will need the appropriate amount
@@ -19,9 +20,7 @@ int main()
     // If `ksize` is even, note that k-mers will collapse with their reverse
     // complement. In that case, a table size of 4**(k-1) + k is required.
 
-    std::vector<HashIntoType> tablesize;
-    tablesize.push_back(pow(4, ksize));
-
+    std::vector<uint64_t> tablesize = {nkmers};
     Counttable ktable(ksize, tablesize);
 
     ktable.consume_string("ATGGCGATGGCAAGTAGGACCCAGATGGACCAAAG");
