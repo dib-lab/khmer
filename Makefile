@@ -355,6 +355,10 @@ list-citation:
 cpp-demos:
 	cd examples/c++-api/ && make all run
 
+## py-demos    : run programs demonstrating access to the Python API
+py-demos:
+	python examples/python-api/exact-counting.py
+
 FORCE:
 
 # Use this to print the value of a Makefile variable
