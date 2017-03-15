@@ -63,6 +63,7 @@ PYINCLUDE=$(shell python -c "from __future__ import print_function; \
 CPPCHECK_SOURCES=$(filter-out lib/test%, $(wildcard lib/*.cc khmer/_khmer.cc) )
 CPPCHECK=cppcheck --enable=all \
 	 --error-exitcode=1 \
+	 --suppress='*:/Library/*' \
 	 --suppress='*:*/include/python*/Python.h' \
 	 --suppress='*:/usr/*' --platform=unix64 \
 	 --std=c++11 --inline-suppr -Ilib -Ithird-party/bzip2 \
@@ -165,7 +166,7 @@ cppcheck-result.xml: $(CPPSOURCES)
 
 ## cppcheck    : run static analysis on C++ code
 cppcheck: FORCE
-	@$(CPPCHECK) || exit 1
+	@$(CPPCHECK)
 
 cppcheck-long: FORCE
 	@$(CPPCHECK) -Ithird-party/seqan/core/include
