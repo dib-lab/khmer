@@ -189,25 +189,27 @@ def test_read_cleaning_trim_functions_N(countingtype, reads):
 
 
 def test_read_cleaning_trim_functions_bad_dna(countingtype, reads):
-    if countingtype == _SmallCounttable or \
-       countingtype == _SmallCountgraph or \
-        countingtype == _Countgraph:
-        return
-
     # read this in using "approved good" behavior w/cleaned_seq
     x = countingtype(8, PRIMES_1m)
     for read in reads:
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
+    # the precise behavior of these functions is all *undefined*
+    # because different hash functions do different things with
+    # non-ACTG characters.  So all we want to do is verify that the
+    # functions execute w/o error on the k-mers before the "bad" DNA,
+    # and don't return positions in the "good" DNA.
+
     s = "CCGGCGTGGTTZZYAGGTCACTGAGCTTCATGTC"
     _, where = x.trim_on_abundance(s, 1)
-    assert where == 11
+    assert where >= 11
 
     _, where = x.trim_below_abundance(s, 2)
-    assert where == 34
+    assert where >= 11
 
     posns = x.find_spectral_error_positions(s, 1)
-    assert posns == [11]
+    for p in posns:
+        assert p >= 11
 
 
 def test_read_cleaning_output_partitions(graphtype):
