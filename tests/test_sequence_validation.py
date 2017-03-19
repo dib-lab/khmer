@@ -58,8 +58,12 @@ def tabletype(request):
 def reads():
     infile = utils.get_test_data('valid-read-testing.fq')
     reads = ReadParser(infile)
-    yield reads
-    reads.close()
+    try:
+        return reads
+    finally:
+        reads.close()
+#    yield reads
+#    reads.close()
 
 
 def test_read_cleaning_consume_seqfile(tabletype):
