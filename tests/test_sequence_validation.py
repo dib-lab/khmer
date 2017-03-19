@@ -54,6 +54,12 @@ def tabletype(request):
     return request.param
 
 
+# all the graph types!
+@pytest.fixture(params=[_Countgraph, _Nodegraph])
+def graphtype(request):
+    return request.param
+
+
 @pytest.fixture
 def reads():
     infile = utils.get_test_data('valid-read-testing.fq')
@@ -211,7 +217,7 @@ def test_read_cleaning_trim_functions_bad_dna(tabletype, reads):
     assert posns == [11]
 
 
-def test_read_cleaning_output_partitions():
+def test_read_cleaning_output_partitions(graphtype):
     infile = utils.get_test_data('valid-read-testing.fq')
     savepath = utils.get_temp_filename('foo')
 
@@ -238,21 +244,21 @@ def test_read_cleaning_output_partitions():
     print(read_names)
     assert len(read_names) == 6
 
-    assert '895:1:1:1246:14654 1:N:0:NNNNN\t1' in read_names
-    assert '895:1:1:1248:9583 1:N:0:NNNNN\t2' in read_names
-    assert '895:1:1:1252:19493 1:N:0:NNNNN\t3' in read_names
+    print(read_names)
+    assert '895:1:1:1246:14654 1:N:0:NNNNN\t1\t1' in read_names
+    assert '895:1:1:1248:9583 1:N:0:NNNNN\t2\t2' in read_names
+    assert '895:1:1:1252:19493 1:N:0:NNNNN\t3\t3' in read_names
 
-    assert 'lowercase_to_uppercase\t1' in read_names
-    assert 'n_in_read\t2' in read_names
-    assert 'zy_in_read\t3' in read_names
+    assert 'lowercase_to_uppercase\t5\t1' in read_names
+    assert 'n_in_read\t6\t2' in read_names
+    assert 'zy_in_read\t7\t3' in read_names
 
 
-def test_read_cleaning_trim_on_stoptags():
+def test_read_cleaning_trim_on_stoptags(graphtype):
     infile = utils.get_test_data('valid-read-testing.fq')
-    savepath = utils.get_temp_filename('foo')
 
     # read this in using "approved good" behavior w/cleaned_seq
-    x = Nodegraph(8, int(1e6), 4)
+    x = graphtype(8, PRIMES_1m)
     for read in ReadParser(infile):
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
@@ -274,6 +280,52 @@ def test_read_cleaning_trim_on_stoptags():
 
     _, pos = x.trim_on_stoptags('CCGGCGTGGTTZZYAGGTCACTGAGCTTCATGTC')
     assert pos == 6                       # ZZY ignored
+
+
+def test_consume_seqfile_and_tag(graphtype):
+    infile = utils.get_test_data('valid-read-testing.fq')
+
+    # read this in consume_and_tag
+    x = graphtype(8, PRIMES_1m)
+    x.consume_seqfile_and_tag(infile)
+    _, n_tags = x.count_partitions()
+    assert n_tags == 4                    # total # of tags
+
+
+def test_consume_partitioned_seqfile(graphtype):
+    infile = utils.get_test_data('valid-read-testing.fq')
+
+    # read this in consume_and_tag
+    x = graphtype(8, PRIMES_1m)
+    x.consume_partitioned_fasta(infile)
+    n_partitions, n_tags = x.count_partitions()
+    assert n_partitions == 4
+    assert n_tags == 0
+
+
+def test_output_partitioned_file(graphtype):
+    infile = utils.get_test_data('valid-read-testing.fq')
+    savepath = utils.get_temp_filename('foo')
+
+    # read this in consume_and_tag
+    x = graphtype(8, PRIMES_1m)
+    x.consume_partitioned_fasta(infile)
+    x.output_partitions(infile, savepath)
+
+    read_names = [read.name for read in ReadParser(savepath)]
+    read_names = set(read_names)
+
+    good_names = ['895:1:1:1246:14654 1:N:0:NNNNN\t1\t5',
+                  '895:1:1:1248:9583 1:N:0:NNNNN\t2\t2',
+                  '895:1:1:1252:19493 1:N:0:NNNNN\t3\t3',
+                  '895:1:1:1255:18861 1:N:0:NNNNN\t4\t8',
+                  'lowercase_to_uppercase\t5\t5',
+                  '895:1:1:1255:18861 1:N:0:NNNNN\t8\t8',
+                  'n_in_read\t6\t2',
+                  'zy_in_read\t7\t3']
+    good_names = set(good_names)
+
+    assert good_names == read_names
 
 
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
