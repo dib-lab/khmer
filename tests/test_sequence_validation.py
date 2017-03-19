@@ -54,6 +54,13 @@ def tabletype(request):
     return request.param
 
 
+# all the counting types!
+@pytest.fixture(params=[_Countgraph, _Counttable, _SmallCountgraph,
+                        _SmallCounttable])
+def countingtype(request):
+    return request.param
+
+
 # all the graph types!
 @pytest.fixture(params=[_Countgraph, _Nodegraph])
 def graphtype(request):
@@ -72,12 +79,10 @@ def reads():
 #    reads.close()
 
 
-def test_read_cleaning_consume_seqfile(tabletype):
+def test_read_cleaning_consume_seqfile(countingtype):
     infile = utils.get_test_data('valid-read-testing.fq')
-    if tabletype == _Nodegraph or tabletype == _Nodetable:
-        return
 
-    x = tabletype(15, PRIMES_1m)
+    x = countingtype(15, PRIMES_1m)
     x.consume_seqfile(infile)
 
     # the relevant read will automatically get uppercased => abundance of 2
@@ -93,11 +98,8 @@ def test_read_cleaning_consume_seqfile(tabletype):
     assert x.get(kmer) == 1               # this should be 2 in the future
 
 
-def test_read_cleaning_consume_read_by_read(tabletype, reads):
-    if tabletype == _Nodegraph or tabletype == _Nodetable:
-        return
-
-    x = tabletype(15, PRIMES_1m)
+def test_read_cleaning_consume_read_by_read(countingtype, reads):
+    x = countingtype(15, PRIMES_1m)
     for read in reads:
         x.consume(read.sequence)          # consume raw sequence
 
@@ -117,11 +119,8 @@ def test_read_cleaning_consume_read_by_read(tabletype, reads):
     assert x.get(kmer) == 2
 
 
-def test_read_cleaning_consume_read_by_read_cleaned_seq(tabletype, reads):
-    if tabletype == _Nodegraph or tabletype == _Nodetable:
-        return
-
-    x = tabletype(15, PRIMES_1m)
+def test_read_cleaning_consume_read_by_read_cleaned_seq(countingtype, reads):
+    x = countingtype(15, PRIMES_1m)
     for read in reads:
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
@@ -138,13 +137,10 @@ def test_read_cleaning_consume_read_by_read_cleaned_seq(tabletype, reads):
     assert x.get(kmer) == 2
 
 
-def test_read_cleaning_abundance_distribution(tabletype):
+def test_read_cleaning_abundance_distribution(countingtype):
     infile = utils.get_test_data('valid-read-testing.fq')
 
-    if tabletype == _Nodegraph or tabletype == _Nodetable:
-        return
-
-    x = tabletype(15, PRIMES_1m)
+    x = countingtype(15, PRIMES_1m)
     y = _Nodegraph(15, PRIMES_1m)
 
     x.consume_seqfile(infile)
