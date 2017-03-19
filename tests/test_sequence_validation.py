@@ -75,8 +75,6 @@ def reads():
         return reads
     finally:
         reads.close()
-#    yield reads
-#    reads.close()
 
 
 def test_read_cleaning_consume_seqfile(countingtype):
