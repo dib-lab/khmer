@@ -336,7 +336,7 @@ def test_consume_seqfile_and_tag_with_labels(graphtype):
     x = _GraphLabels(graph)
     x.consume_seqfile_and_tag_with_labels(infile)
 
-    assert x.n_labels() == 6
+    assert x.n_labels() == 8
 
 
 def test_consume_partitioned_seqfile_and_label(graphtype):
@@ -347,7 +347,7 @@ def test_consume_partitioned_seqfile_and_label(graphtype):
     x = _GraphLabels(graph)
     x.consume_partitioned_fasta_and_tag_with_labels(infile)
 
-    assert x.n_labels() == 6
+    assert x.n_labels() == 8
 
 
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:

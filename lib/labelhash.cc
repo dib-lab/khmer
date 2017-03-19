@@ -108,21 +108,21 @@ void LabelHash::consume_seqfile_and_tag_with_labels(
             break;
         }
 
-        if (graph->check_and_normalize_read( read.sequence )) {
-            // TODO: make threadsafe!
-            unsigned long long this_n_consumed = 0;
-            consume_sequence_and_tag_with_labels( read.sequence,
-                                                  this_n_consumed,
-                                                  the_label );
-            the_label++;
+        read.set_clean_seq();
+
+        // TODO: make threadsafe!
+        unsigned long long this_n_consumed = 0;
+        consume_sequence_and_tag_with_labels( read.cleaned_seq,
+                                              this_n_consumed,
+                                              the_label );
+        the_label++;
 
 #if (0) // Note: Used with callback - currently disabled.
-            n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
+        n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
 #else
-            __sync_add_and_fetch( &n_consumed, this_n_consumed );
+        __sync_add_and_fetch( &n_consumed, this_n_consumed );
 #endif
-            __sync_add_and_fetch( &total_reads, 1 );
-        }
+        __sync_add_and_fetch( &total_reads, 1 );
 
         // TODO: Figure out alternative to callback into Python VM
         //       Cannot use in multi-threaded operation.
@@ -171,19 +171,19 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
     PartitionID p;
     while(!parser->is_complete())  {
         read = parser->get_next_read();
-        seq = read.sequence;
 
-        if (graph->check_and_normalize_read(seq)) {
-            // First, figure out what the partition is (if non-zero), and
-            // save that.
-            printdbg(parsing partition id)
-            p = _parse_partition_id(read.name);
-            printdbg(consuming sequence and tagging)
-            consume_sequence_and_tag_with_labels( seq,
-                                                  n_consumed,
-                                                  p );
-            printdbg(back in consume_partitioned)
-        }
+        read.set_clean_seq();
+        seq = read.cleaned_seq;
+
+        // First, figure out what the partition is (if non-zero), and
+        // save that.
+        printdbg(parsing partition id)
+        p = _parse_partition_id(read.name);
+        printdbg(consuming sequence and tagging)
+        consume_sequence_and_tag_with_labels( seq,
+                                              n_consumed,
+                                              p );
+        printdbg(back in consume_partitioned)
 
         // reset the sequence info, increment read number
         total_reads++;
