@@ -188,14 +188,14 @@ def test_read_cleaning_trim_functions_N(countingtype, reads):
     assert posns == [11]
 
 
-def test_read_cleaning_trim_functions_bad_dna(tabletype, reads):
-    if tabletype == _Nodegraph or tabletype == _Nodetable or \
-        tabletype == _SmallCounttable or tabletype == _SmallCountgraph or \
-        tabletype == _Countgraph:
+def test_read_cleaning_trim_functions_bad_dna(countingtype, reads):
+    if countingtype == _SmallCounttable or \
+       countingtype == _SmallCountgraph or \
+        countingtype == _Countgraph:
         return
 
     # read this in using "approved good" behavior w/cleaned_seq
-    x = tabletype(8, PRIMES_1m)
+    x = countingtype(8, PRIMES_1m)
     for read in reads:
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
