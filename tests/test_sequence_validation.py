@@ -39,7 +39,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 from khmer import _Countgraph, _Counttable, _SmallCountgraph, _SmallCounttable
 from khmer import _Nodegraph, _Nodetable
-from khmer import ReadParser, Nodegraph
+from khmer import ReadParser, Nodegraph, _GraphLabels
 from . import khmer_tst_utils as utils
 import pytest
 
@@ -315,6 +315,28 @@ def test_output_partitioned_file(graphtype):
     good_names = set(good_names)
 
     assert good_names == read_names
+
+
+def test_consume_seqfile_and_tag_with_labels(graphtype):
+    infile = utils.get_test_data('valid-read-testing.fq')
+
+    # read this in consume_and_tag
+    graph = graphtype(15, PRIMES_1m)
+    x = _GraphLabels(graph)
+    x.consume_seqfile_and_tag_with_labels(infile)
+
+    assert x.n_labels() == 6
+
+
+def test_consume_partitioned_seqfile_and_label(graphtype):
+    infile = utils.get_test_data('valid-read-testing.fq')
+
+    # read this in consume_and_tag
+    graph = graphtype(15, PRIMES_1m)
+    x = _GraphLabels(graph)
+    x.consume_partitioned_fasta_and_tag_with_labels(infile)
+
+    assert x.n_labels() == 6
 
 
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
