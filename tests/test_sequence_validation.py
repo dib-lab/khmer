@@ -207,7 +207,7 @@ def test_read_cleaning_trim_functions_bad_dna(tabletype, reads):
     # assert posns == []                    # in future, should return [11]
 
 
-def test_read_cleaning_output_partitions():
+def test_read_cleaning_output_partitions(graphtype):
     infile = utils.get_test_data('valid-read-testing.fq')
     savepath = utils.get_temp_filename('foo')
 
@@ -249,7 +249,7 @@ def test_read_cleaning_trim_on_stoptags(graphtype):
     savepath = utils.get_temp_filename('foo')
 
     # read this in using "approved good" behavior w/cleaned_seq
-    x = Nodegraph(8, int(1e6), 4)
+    x = graphtype(8, PRIMES_1m)
     for read in ReadParser(infile):
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
@@ -271,6 +271,17 @@ def test_read_cleaning_trim_on_stoptags(graphtype):
 
     _, pos = x.trim_on_stoptags('CCGGCGTGGTTZZYAGGTCACTGAGCTTCATGTC')
     assert pos == 0                       # should be 6 in future
+
+
+def test_consume_seqfile_and_tag(graphtype):
+    infile = utils.get_test_data('valid-read-testing.fq')
+    savepath = utils.get_temp_filename('foo')
+
+    # read this in consume_and_tag
+    x = graphtype(8, PRIMES_1m)
+    x.consume_seqfile_and_tag(infile)
+    _, n_tags = x.count_partitions()
+    assert n_tags == 4                    # total # of tags
 
 
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
