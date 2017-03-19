@@ -38,7 +38,7 @@
 from __future__ import print_function
 from __future__ import absolute_import
 from khmer import Read
-from khmer import ReadParser, Counttable, Nodegraph
+from khmer import ReadParser
 from screed import Record
 from . import khmer_tst_utils as utils
 import pytest
@@ -482,7 +482,6 @@ def test_clean_seq():
     for read in ReadParser(utils.get_test_data("test-abund-read-3.fa")):
         clean = read.sequence.upper().replace("N", "A")
         assert clean == read.cleaned_seq
-
 
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
 # vim: set textwidth=79:
