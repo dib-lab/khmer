@@ -60,35 +60,6 @@ namespace khmer
 {
 
 //
-// check_and_normalize_read: checks for non-ACGT characters
-//			     converts lowercase characters to uppercase one
-// Note: Usually it is desirable to keep checks and mutations separate.
-//	 However, in the interests of efficiency (we are potentially working
-//	 with TB of data), a check and mutation have been placed inside the
-//	 same loop. Potentially trillions fewer fetches from memory would
-//	 seem to be a worthwhile goal.
-//
-
-bool Hashtable::check_and_normalize_read(std::string &read) const
-{
-    bool rc = true;
-
-    if (read.length() < _ksize) {
-        return false;
-    }
-
-    for (unsigned int i = 0; i < read.length(); i++)  {
-        read[ i ] &= 0xdf; // toupper - knock out the "lowercase bit"
-        if (!is_valid_dna( read[ i ] )) {
-            rc = false;
-            break;
-        }
-    }
-
-    return rc;
-}
-
-//
 // consume_seqfile: consume a file of reads
 //
 
