@@ -316,13 +316,13 @@ def test_output_partitioned_file(graphtype):
     read_names = set(read_names)
 
     good_names = ['895:1:1:1246:14654 1:N:0:NNNNN\t1\t5',
-                  '895:1:1:1248:9583 1:N:0:NNNNN\t2\t2',
-                  '895:1:1:1252:19493 1:N:0:NNNNN\t3\t3',
+                  '895:1:1:1248:9583 1:N:0:NNNNN\t2\t6',
+                  '895:1:1:1252:19493 1:N:0:NNNNN\t3\t7',
                   '895:1:1:1255:18861 1:N:0:NNNNN\t4\t8',
                   'lowercase_to_uppercase\t5\t5',
                   '895:1:1:1255:18861 1:N:0:NNNNN\t8\t8',
-                  'n_in_read\t6\t2',
-                  'zy_in_read\t7\t3']
+                  'n_in_read\t6\t6',
+                  'zy_in_read\t7\t7']
     good_names = set(good_names)
 
     assert good_names == read_names

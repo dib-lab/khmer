@@ -309,13 +309,12 @@ void Hashgraph::consume_seqfile_and_tag(
             break;
         }
 
-        if (check_and_normalize_read( read.sequence )) {
-            unsigned long long this_n_consumed = 0;
-            consume_sequence_and_tag( read.sequence, this_n_consumed );
+        read.set_clean_seq();
+        unsigned long long this_n_consumed = 0;
+        consume_sequence_and_tag(read.cleaned_seq, this_n_consumed);
 
-            __sync_add_and_fetch( &n_consumed, this_n_consumed );
-            __sync_add_and_fetch( &total_reads, 1 );
-        }
+        __sync_add_and_fetch(&n_consumed, this_n_consumed);
+        __sync_add_and_fetch(&total_reads, 1);
     } // while reads left for parser
 
 }
@@ -373,21 +372,20 @@ void Hashgraph::consume_partitioned_fasta(
         } catch (NoMoreReadsAvailable &exc) {
             break;
         }
-        seq = read.sequence;
+        read.set_clean_seq();
+        seq = read.cleaned_seq;
 
-        if (check_and_normalize_read(seq)) {
-            // First, figure out what the partition is (if non-zero), and save that.
-            PartitionID p = _parse_partition_id(read.name);
+        // First, figure out what the partition is (if non-zero), and save that.
+        PartitionID p = _parse_partition_id(read.name);
 
-            // Then consume the sequence
-            n_consumed += consume_string(seq); // @CTB why are we doing this?
+        // Then consume the sequence
+        n_consumed += consume_string(seq); // @CTB why are we doing this?
 
-            // Next, compute the tag & set the partition, if nonzero
-            HashIntoType kmer = hash_dna(seq.c_str());
-            all_tags.insert(kmer);
-            if (p > 0) {
-                partition->set_partition_id(kmer, p);
-            }
+        // Next, compute the tag & set the partition, if nonzero
+        HashIntoType kmer = hash_dna(seq.c_str());
+        all_tags.insert(kmer);
+        if (p > 0) {
+            partition->set_partition_id(kmer, p);
         }
 
         // reset the sequence info, increment read number
