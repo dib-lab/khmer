@@ -299,7 +299,7 @@ def test_consume_partitioned_seqfile(graphtype):
     x = graphtype(15, PRIMES_1m)
     x.consume_partitioned_fasta(infile)
     n_partitions, n_tags = x.count_partitions()
-    assert n_partitions == 4
+    assert n_partitions == 5
     assert n_tags == 0
 
 
@@ -317,7 +317,7 @@ def test_output_partitioned_file(graphtype):
 
     good_names = ['895:1:1:1246:14654 1:N:0:NNNNN\t1\t5',
                   '895:1:1:1248:9583 1:N:0:NNNNN\t2\t6',
-                  '895:1:1:1252:19493 1:N:0:NNNNN\t3\t7',
+                  '895:1:1:1252:19493 1:N:0:NNNNN\t3\t3',
                   '895:1:1:1255:18861 1:N:0:NNNNN\t4\t8',
                   'lowercase_to_uppercase\t5\t5',
                   '895:1:1:1255:18861 1:N:0:NNNNN\t8\t8',
