@@ -234,14 +234,15 @@ def test_read_cleaning_output_partitions(graphtype):
     print(read_names)
     assert len(read_names) == 4
 
-    assert '895:1:1:1246:14654 1:N:0:NNNNN\t1' in read_names
-    assert '895:1:1:1248:9583 1:N:0:NNNNN\t2' in read_names
-    assert '895:1:1:1252:19493 1:N:0:NNNNN\t3' in read_names
+    print(read_names)
+    assert '895:1:1:1246:14654 1:N:0:NNNNN\t1\t1' in read_names
+    assert '895:1:1:1248:9583 1:N:0:NNNNN\t2\t2' in read_names
+    assert '895:1:1:1252:19493 1:N:0:NNNNN\t3\t3' in read_names
 
-    assert 'lowercase_to_uppercase\t1' in read_names
+    assert 'lowercase_to_uppercase\t5\t1' in read_names
 
-    assert 'n_in_read\t2' not in read_names
-    assert 'zy_in_read\t3' not in read_names
+    assert 'n_in_read\t6\t2' not in read_names
+    assert 'zy_in_read\t7\t3' not in read_names
 
 
 def test_read_cleaning_trim_on_stoptags(graphtype):
@@ -282,6 +283,18 @@ def test_consume_seqfile_and_tag(graphtype):
     x.consume_seqfile_and_tag(infile)
     _, n_tags = x.count_partitions()
     assert n_tags == 4                    # total # of tags
+
+
+def test_consume_partitioned_seqfile(graphtype):
+    infile = utils.get_test_data('valid-read-testing.fq')
+    savepath = utils.get_temp_filename('foo')
+
+    # read this in consume_and_tag
+    x = graphtype(8, PRIMES_1m)
+    x.consume_partitioned_fasta(infile)
+    n_partitions, n_tags = x.count_partitions()
+    assert n_partitions == 4
+    assert n_tags == 0
 
 
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
