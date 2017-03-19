@@ -247,7 +247,6 @@ def test_read_cleaning_output_partitions(graphtype):
 
 def test_read_cleaning_trim_on_stoptags(graphtype):
     infile = utils.get_test_data('valid-read-testing.fq')
-    savepath = utils.get_temp_filename('foo')
 
     # read this in using "approved good" behavior w/cleaned_seq
     x = graphtype(8, PRIMES_1m)
@@ -276,7 +275,6 @@ def test_read_cleaning_trim_on_stoptags(graphtype):
 
 def test_consume_seqfile_and_tag(graphtype):
     infile = utils.get_test_data('valid-read-testing.fq')
-    savepath = utils.get_temp_filename('foo')
 
     # read this in consume_and_tag
     x = graphtype(8, PRIMES_1m)
@@ -287,7 +285,6 @@ def test_consume_seqfile_and_tag(graphtype):
 
 def test_consume_partitioned_seqfile(graphtype):
     infile = utils.get_test_data('valid-read-testing.fq')
-    savepath = utils.get_temp_filename('foo')
 
     # read this in consume_and_tag
     x = graphtype(8, PRIMES_1m)
@@ -295,6 +292,29 @@ def test_consume_partitioned_seqfile(graphtype):
     n_partitions, n_tags = x.count_partitions()
     assert n_partitions == 4
     assert n_tags == 0
+
+
+def test_output_partitioned_file(graphtype):
+    infile = utils.get_test_data('valid-read-testing.fq')
+    savepath = utils.get_temp_filename('foo')
+
+    # read this in consume_and_tag
+    x = graphtype(8, PRIMES_1m)
+    x.consume_partitioned_fasta(infile)
+    x.output_partitions(infile, savepath)
+
+    read_names = [read.name for read in ReadParser(savepath)]
+    read_names = set(read_names)
+
+    good_names = ['895:1:1:1246:14654 1:N:0:NNNNN\t1\t5',
+                  '895:1:1:1248:9583 1:N:0:NNNNN\t2\t2',
+                  '895:1:1:1252:19493 1:N:0:NNNNN\t3\t3',
+                  '895:1:1:1255:18861 1:N:0:NNNNN\t4\t8',
+                  'lowercase_to_uppercase\t5\t5',
+                  '895:1:1:1255:18861 1:N:0:NNNNN\t8\t8']
+    good_names = set(good_names)
+
+    assert good_names == read_names
 
 
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
