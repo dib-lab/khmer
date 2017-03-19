@@ -171,12 +171,9 @@ def test_read_cleaning_trim_functions_lowercase(tabletype, reads):
     assert posns == []
 
 
-def test_read_cleaning_trim_functions_N(tabletype, reads):
-    if tabletype == _Nodegraph or tabletype == _Nodetable:
-        return
-
+def test_read_cleaning_trim_functions_N(countingtype, reads):
     # read this in using "approved good" behavior w/cleaned_seq
-    x = tabletype(8, PRIMES_1m)
+    x = countingtype(8, PRIMES_1m)
     for read in reads:
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
