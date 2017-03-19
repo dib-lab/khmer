@@ -38,7 +38,7 @@
 from __future__ import print_function
 from __future__ import absolute_import
 from khmer import Read
-from khmer import ReadParser, Counttable, Nodegraph
+from khmer import ReadParser
 from screed import Record
 from . import khmer_tst_utils as utils
 import pytest
