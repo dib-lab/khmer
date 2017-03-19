@@ -287,7 +287,7 @@ def test_consume_partitioned_seqfile(graphtype):
     infile = utils.get_test_data('valid-read-testing.fq')
 
     # read this in consume_and_tag
-    x = graphtype(8, PRIMES_1m)
+    x = graphtype(15, PRIMES_1m)
     x.consume_partitioned_fasta(infile)
     n_partitions, n_tags = x.count_partitions()
     assert n_partitions == 4
@@ -299,7 +299,7 @@ def test_output_partitioned_file(graphtype):
     savepath = utils.get_temp_filename('foo')
 
     # read this in consume_and_tag
-    x = graphtype(8, PRIMES_1m)
+    x = graphtype(15, PRIMES_1m)
     x.consume_partitioned_fasta(infile)
     x.output_partitions(infile, savepath)
 
