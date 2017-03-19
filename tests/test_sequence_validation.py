@@ -39,11 +39,9 @@ from __future__ import print_function
 from __future__ import absolute_import
 from khmer import _Countgraph, _Counttable, _SmallCountgraph, _SmallCounttable
 from khmer import _Nodegraph, _Nodetable
-from khmer import ReadParser, Counttable, Nodegraph
-from screed import Record
+from khmer import ReadParser, Nodegraph
 from . import khmer_tst_utils as utils
 import pytest
-from functools import reduce  # pylint: disable=redefined-builtin
 
 
 PRIMES_1m = [1000003, 1009837]
@@ -55,9 +53,21 @@ PRIMES_1m = [1000003, 1009837]
 def tabletype(request):
     return request.param
 
+
+@pytest.fixture
+def reads():
+    infile = utils.get_test_data('valid-read-testing.fq')
+    reads = ReadParser(infile)
+    try:
+        return reads
+    finally:
+        reads.close()
+#    yield reads
+#    reads.close()
+
+
 def test_read_cleaning_consume_seqfile(tabletype):
     infile = utils.get_test_data('valid-read-testing.fq')
-
     if tabletype == _Nodegraph or tabletype == _Nodetable:
         return
 
@@ -77,14 +87,12 @@ def test_read_cleaning_consume_seqfile(tabletype):
     assert x.get(kmer) == 2
 
 
-def test_read_cleaning_consume_read_by_read(tabletype):
-    infile = utils.get_test_data('valid-read-testing.fq')
-
+def test_read_cleaning_consume_read_by_read(tabletype, reads):
     if tabletype == _Nodegraph or tabletype == _Nodetable:
         return
 
     x = tabletype(15, PRIMES_1m)
-    for read in ReadParser(infile):
+    for read in reads:
         x.consume(read.sequence)          # consume raw sequence
 
     # the relevant read will be entirely ignored
@@ -103,14 +111,12 @@ def test_read_cleaning_consume_read_by_read(tabletype):
     assert x.get(kmer) == 2
 
 
-def test_read_cleaning_consume_read_by_read_cleaned_seq(tabletype):
-    infile = utils.get_test_data('valid-read-testing.fq')
-
+def test_read_cleaning_consume_read_by_read_cleaned_seq(tabletype, reads):
     if tabletype == _Nodegraph or tabletype == _Nodetable:
         return
 
     x = tabletype(15, PRIMES_1m)
-    for read in ReadParser(infile):
+    for read in reads:
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
     # the relevant read will be cleaned & loaded
@@ -142,12 +148,10 @@ def test_read_cleaning_abundance_distribution(tabletype):
     assert dist[2] == 68
 
 
-def test_read_cleaning_trim_functions_lowercase(tabletype):
-    infile = utils.get_test_data('valid-read-testing.fq')
-
+def test_read_cleaning_trim_functions_lowercase(tabletype, reads):
     # read this in using "approved good" behavior w/cleaned_seq
     x = tabletype(8, PRIMES_1m)
-    for read in ReadParser(infile):
+    for read in reads:
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
     # all of these functions will fail to do anything, b/c lowercase != valid
@@ -165,15 +169,13 @@ def test_read_cleaning_trim_functions_lowercase(tabletype):
     assert posns == []
 
 
-def test_read_cleaning_trim_functions_N(tabletype):
-    infile = utils.get_test_data('valid-read-testing.fq')
-
+def test_read_cleaning_trim_functions_N(tabletype, reads):
     if tabletype == _Nodegraph or tabletype == _Nodetable:
         return
 
     # read this in using "approved good" behavior w/cleaned_seq
     x = tabletype(8, PRIMES_1m)
-    for read in ReadParser(infile):
+    for read in reads:
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
     s = "ACTGGGCGTAGNCGGTGTCCTCATCGGCACCAGC"
@@ -187,9 +189,7 @@ def test_read_cleaning_trim_functions_N(tabletype):
     assert posns == [11]
 
 
-def test_read_cleaning_trim_functions_bad_dna(tabletype):
-    infile = utils.get_test_data('valid-read-testing.fq')
-
+def test_read_cleaning_trim_functions_bad_dna(tabletype, reads):
     if tabletype == _Nodegraph or tabletype == _Nodetable or \
         tabletype == _SmallCounttable or tabletype == _SmallCountgraph or \
         tabletype == _Countgraph:
@@ -197,7 +197,7 @@ def test_read_cleaning_trim_functions_bad_dna(tabletype):
 
     # read this in using "approved good" behavior w/cleaned_seq
     x = tabletype(8, PRIMES_1m)
-    for read in ReadParser(infile):
+    for read in reads:
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
     s = "CCGGCGTGGTTZZYAGGTCACTGAGCTTCATGTC"
