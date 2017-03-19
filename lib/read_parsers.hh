@@ -208,9 +208,11 @@ inline PartitionID _parse_partition_id(std::string name)
     if (*s == '\t') {
         p = (PartitionID) atoi(s + 1);
     } else {
-        std::cerr << "consume_partitioned_fasta barfed on read "
-                  << name << "\n";
-        throw khmer_exception();
+        std::string err;
+        err = "consume_partitioned_fasta cannot find partition ID for read";
+        err += name;
+
+        throw khmer_value_exception(err);
     }
 
     return p;
