@@ -483,6 +483,5 @@ def test_clean_seq():
         clean = read.sequence.upper().replace("N", "A")
         assert clean == read.cleaned_seq
 
-
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
 # vim: set textwidth=79:
