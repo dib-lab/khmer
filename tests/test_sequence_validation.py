@@ -144,8 +144,8 @@ def test_read_cleaning_abundance_distribution(countingtype):
     x.consume_seqfile(infile)
 
     dist = x.abundance_distribution(infile, y)
-    assert dist[1] == 29                  # k-mers with non-ACGTN => ignored.
-    assert dist[2] == 68
+    assert dist[1] == 35                  # k-mers with non-ACGTN => ignored.
+    assert dist[2] == 69
 
 
 def test_read_cleaning_trim_functions_lowercase(tabletype, reads):
@@ -282,7 +282,7 @@ def test_consume_seqfile_and_tag(graphtype):
     x = graphtype(8, PRIMES_1m)
     x.consume_seqfile_and_tag(infile)
     _, n_tags = x.count_partitions()
-    assert n_tags == 4                    # total # of tags
+    assert n_tags == 5                    # total # of tags
 
 
 def test_consume_partitioned_seqfile(graphtype):
@@ -292,7 +292,7 @@ def test_consume_partitioned_seqfile(graphtype):
     x = graphtype(15, PRIMES_1m)
     x.consume_partitioned_fasta(infile)
     n_partitions, n_tags = x.count_partitions()
-    assert n_partitions == 5
+    assert n_partitions == 6
     assert n_tags == 0
 
 
@@ -315,7 +315,8 @@ def test_output_partitioned_file(graphtype):
                   'lowercase_to_uppercase\t5\t5',
                   '895:1:1:1255:18861 1:N:0:NNNNN\t8\t8',
                   'n_in_read\t6\t6',
-                  'zy_in_read\t7\t7']
+                  'zy_in_read\t7\t7',
+                  'bad_dna_in_beginning\t9\t9']
     good_names = set(good_names)
 
     assert good_names == read_names
@@ -329,7 +330,7 @@ def test_consume_seqfile_and_tag_with_labels(graphtype):
     x = _GraphLabels(graph)
     x.consume_seqfile_and_tag_with_labels(infile)
 
-    assert x.n_labels() == 8
+    assert x.n_labels() == 9
 
 
 def test_consume_partitioned_seqfile_and_label(graphtype):
@@ -340,7 +341,7 @@ def test_consume_partitioned_seqfile_and_label(graphtype):
     x = _GraphLabels(graph)
     x.consume_partitioned_fasta_and_tag_with_labels(infile)
 
-    assert x.n_labels() == 8
+    assert x.n_labels() == 9
 
 
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
