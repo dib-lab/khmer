@@ -54,6 +54,12 @@ def tabletype(request):
     return request.param
 
 
+# all the graph types!
+@pytest.fixture(params=[_Countgraph, _Nodegraph])
+def graphtype(request):
+    return request.param
+
+
 @pytest.fixture
 def reads():
     infile = utils.get_test_data('valid-read-testing.fq')
@@ -238,7 +244,7 @@ def test_read_cleaning_output_partitions():
     assert 'zy_in_read\t3' not in read_names
 
 
-def test_read_cleaning_trim_on_stoptags():
+def test_read_cleaning_trim_on_stoptags(graphtype):
     infile = utils.get_test_data('valid-read-testing.fq')
     savepath = utils.get_temp_filename('foo')
 
