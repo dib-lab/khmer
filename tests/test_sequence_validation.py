@@ -50,37 +50,34 @@ PRIMES_1m = [1000003, 1009837]
 # all the table types!
 @pytest.fixture(params=[_Countgraph, _Counttable, _SmallCountgraph,
                         _SmallCounttable, _Nodegraph, _Nodetable])
-def tabletype(request):
+def Tabletype(request):
     return request.param
 
 
 # all the counting types!
 @pytest.fixture(params=[_Countgraph, _Counttable, _SmallCountgraph,
                         _SmallCounttable])
-def countingtype(request):
+def Countingtype(request):
     return request.param
 
 
 # all the graph types!
 @pytest.fixture(params=[_Countgraph, _Nodegraph])
-def graphtype(request):
+def Graphtype(request):
     return request.param
 
 
-@pytest.fixture
+@pytest.yield_fixture
 def reads():
     infile = utils.get_test_data('valid-read-testing.fq')
     reads = ReadParser(infile)
-    try:
-        return reads
-    finally:
-        reads.close()
+    yield reads
 
 
-def test_read_cleaning_consume_seqfile(countingtype):
+def test_read_cleaning_consume_seqfile(Countingtype):
     infile = utils.get_test_data('valid-read-testing.fq')
 
-    x = countingtype(15, PRIMES_1m)
+    x = Countingtype(15, PRIMES_1m)
     x.consume_seqfile(infile)
 
     # the relevant read will automatically get uppercased => abundance of 2
@@ -96,8 +93,8 @@ def test_read_cleaning_consume_seqfile(countingtype):
     assert x.get(kmer) == 1               # this should be 2 in the future
 
 
-def test_read_cleaning_consume_read_by_read(countingtype, reads):
-    x = countingtype(15, PRIMES_1m)
+def test_read_cleaning_consume_read_by_read(Countingtype, reads):
+    x = Countingtype(15, PRIMES_1m)
     for read in reads:
         x.consume(read.sequence)          # consume raw sequence
 
@@ -117,8 +114,8 @@ def test_read_cleaning_consume_read_by_read(countingtype, reads):
     assert x.get(kmer) == 2
 
 
-def test_read_cleaning_consume_read_by_read_cleaned_seq(countingtype, reads):
-    x = countingtype(15, PRIMES_1m)
+def test_read_cleaning_consume_read_by_read_cleaned_seq(Countingtype, reads):
+    x = Countingtype(15, PRIMES_1m)
     for read in reads:
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
@@ -135,10 +132,10 @@ def test_read_cleaning_consume_read_by_read_cleaned_seq(countingtype, reads):
     assert x.get(kmer) == 2
 
 
-def test_read_cleaning_abundance_distribution(countingtype):
+def test_read_cleaning_abundance_distribution(Countingtype):
     infile = utils.get_test_data('valid-read-testing.fq')
 
-    x = countingtype(15, PRIMES_1m)
+    x = Countingtype(15, PRIMES_1m)
     y = _Nodegraph(15, PRIMES_1m)
 
     x.consume_seqfile(infile)
@@ -148,9 +145,9 @@ def test_read_cleaning_abundance_distribution(countingtype):
     assert dist[2] == 42
 
 
-def test_read_cleaning_trim_functions_lowercase(tabletype, reads):
+def test_read_cleaning_trim_functions_lowercase(Tabletype, reads):
     # read this in using "approved good" behavior w/cleaned_seq
-    x = tabletype(8, PRIMES_1m)
+    x = Tabletype(8, PRIMES_1m)
     for read in reads:
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
@@ -165,9 +162,9 @@ def test_read_cleaning_trim_functions_lowercase(tabletype, reads):
     assert posns == []                    # in future, should do same
 
 
-def test_read_cleaning_trim_functions_N(tabletype, reads):
+def test_read_cleaning_trim_functions_N(Tabletype, reads):
     # read this in using "approved good" behavior w/cleaned_seq
-    x = tabletype(8, PRIMES_1m)
+    x = Tabletype(8, PRIMES_1m)
     for read in reads:
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
@@ -183,9 +180,9 @@ def test_read_cleaning_trim_functions_N(tabletype, reads):
     # assert posns == []                    # in future, should return []
 
 
-def test_read_cleaning_trim_functions_bad_dna(tabletype, reads):
+def test_read_cleaning_trim_functions_bad_dna(Tabletype, reads):
     # read this in using "approved good" behavior w/cleaned_seq
-    x = tabletype(8, PRIMES_1m)
+    x = Tabletype(8, PRIMES_1m)
     for read in reads:
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
@@ -201,12 +198,12 @@ def test_read_cleaning_trim_functions_bad_dna(tabletype, reads):
     # assert posns == []                    # in future, should return [11]
 
 
-def test_read_cleaning_output_partitions(graphtype):
+def test_read_cleaning_output_partitions(Graphtype):
     infile = utils.get_test_data('valid-read-testing.fq')
     savepath = utils.get_temp_filename('foo')
 
     # read this in using "approved good" behavior w/cleaned_seq
-    x = _Nodegraph(8, PRIMES_1m)
+    x = Graphtype(8, PRIMES_1m)
     for read in ReadParser(infile):
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
@@ -239,11 +236,11 @@ def test_read_cleaning_output_partitions(graphtype):
     assert 'zy_in_read\t7\t3' not in read_names
 
 
-def test_read_cleaning_trim_on_stoptags(graphtype):
+def test_read_cleaning_trim_on_stoptags(Graphtype):
     infile = utils.get_test_data('valid-read-testing.fq')
 
     # read this in using "approved good" behavior w/cleaned_seq
-    x = graphtype(8, PRIMES_1m)
+    x = Graphtype(8, PRIMES_1m)
     for read in ReadParser(infile):
         x.consume(read.cleaned_seq)       # consume cleaned_seq
 
@@ -267,33 +264,33 @@ def test_read_cleaning_trim_on_stoptags(graphtype):
     assert pos == 0                       # should be 6 in future
 
 
-def test_consume_seqfile_and_tag(graphtype):
+def test_consume_seqfile_and_tag(Graphtype):
     infile = utils.get_test_data('valid-read-testing.fq')
 
     # read this in consume_and_tag
-    x = graphtype(8, PRIMES_1m)
+    x = Graphtype(8, PRIMES_1m)
     x.consume_seqfile_and_tag(infile)
     _, n_tags = x.count_partitions()
     assert n_tags == 4                    # total # of tags
 
 
-def test_consume_partitioned_seqfile(graphtype):
+def test_consume_partitioned_seqfile(Graphtype):
     infile = utils.get_test_data('valid-read-testing.fq')
 
     # read this in consume_and_tag
-    x = graphtype(15, PRIMES_1m)
+    x = Graphtype(15, PRIMES_1m)
     x.consume_partitioned_fasta(infile)
     n_partitions, n_tags = x.count_partitions()
     assert n_partitions == 4
     assert n_tags == 0
 
 
-def test_output_partitioned_file(graphtype):
+def test_output_partitioned_file(Graphtype):
     infile = utils.get_test_data('valid-read-testing.fq')
     savepath = utils.get_temp_filename('foo')
 
     # read this in consume_and_tag
-    x = graphtype(15, PRIMES_1m)
+    x = Graphtype(15, PRIMES_1m)
     x.consume_partitioned_fasta(infile)
     x.output_partitions(infile, savepath)
 
@@ -311,22 +308,22 @@ def test_output_partitioned_file(graphtype):
     assert good_names == read_names
 
 
-def test_consume_seqfile_and_tag_with_labels(graphtype):
+def test_consume_seqfile_and_tag_with_labels(Graphtype):
     infile = utils.get_test_data('valid-read-testing.fq')
 
     # read this in consume_and_tag
-    graph = graphtype(15, PRIMES_1m)
+    graph = Graphtype(15, PRIMES_1m)
     x = _GraphLabels(graph)
     x.consume_seqfile_and_tag_with_labels(infile)
 
     assert x.n_labels() == 6
 
 
-def test_consume_partitioned_seqfile_and_label(graphtype):
+def test_consume_partitioned_seqfile_and_label(Graphtype):
     infile = utils.get_test_data('valid-read-testing.fq')
 
     # read this in consume_and_tag
-    graph = graphtype(15, PRIMES_1m)
+    graph = Graphtype(15, PRIMES_1m)
     x = _GraphLabels(graph)
     x.consume_partitioned_fasta_and_tag_with_labels(infile)
 
