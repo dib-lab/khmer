@@ -337,6 +337,14 @@ def test_load_partitioned():
     assert nodegraph.get(third_s)
 
 
+def test_consume_partitioned_fail():
+    inpfile = utils.get_test_data('test-reads.fa')
+    nodegraph = khmer._Nodegraph(32, [1])
+
+    with pytest.raises(ValueError):
+        nodegraph.consume_partitioned_fasta(inpfile)
+
+
 def test_count_within_radius_simple():
     inpfile = utils.get_test_data('all-A.fa')
     nodegraph = khmer._Nodegraph(4, [3, 5])
