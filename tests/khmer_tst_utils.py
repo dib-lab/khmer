@@ -143,8 +143,9 @@ def _runscript(scriptname, sandbox=False):
             exec(compile(open(scriptfile).read(), scriptfile, 'exec'),
                  namespace)
             return 0
-    elif sandbox:
-        pytest.skip("sandbox tests are only run in a repository.")
+    else:
+        raise RuntimeError("Tried to execute {} but it is"
+                           " not a file.".format(scriptfile))
 
     return -1
 

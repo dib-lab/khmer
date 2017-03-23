@@ -62,11 +62,17 @@ def teardown():
     utils.cleanup()
 
 
-def _sandbox_scripts():
-    sandbox_path = os.path.join(os.path.dirname(__file__), "../sandbox")
-    if not os.path.exists(sandbox_path):
-        pytest.skip("sandbox scripts are only tested in a repository")
+# sandbox script tests are only run when the tests are loaded from
+# the repository
+IN_REPOSITORY = os.path.exists(os.path.join(os.path.dirname(__file__),
+                                            "../sandbox"))
 
+
+def _sandbox_scripts():
+    if not IN_REPOSITORY:
+        return []
+
+    sandbox_path = os.path.join(os.path.dirname(__file__), "../sandbox")
     path = os.path.join(sandbox_path, "*.py")
     return [os.path.normpath(s) for s in glob.glob(path)]
 
@@ -105,6 +111,8 @@ def test_import_succeeds(filename, tmpdir):
             sys.stdout, sys.stderr = oldout, olderr
 
 
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
 def test_sweep_reads():
     readfile = utils.copy_test_data('test-sweep-reads.fa')
     contigfile = utils.copy_test_data('test-sweep-contigs.fp')
@@ -148,6 +156,8 @@ def test_sweep_reads():
     assert seqso == set(['read5_orphan'])
 
 
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
 def test_sweep_reads_fq():
     readfile = utils.copy_test_data('test-sweep-reads.fq')
     contigfile = utils.copy_test_data('test-sweep-contigs.fp')
@@ -198,6 +208,8 @@ def test_sweep_reads_fq():
     seqso = set([r.quality for r in screed.open(oout)])
 
 
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
 def test_sweep_reads_2():
 
     infile = utils.copy_test_data('random-20-X2.fa')
@@ -219,6 +231,8 @@ def test_sweep_reads_2():
     assert not os.path.exists(os.path.join(wdir, 'test_multi.fa'))
 
 
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
 def test_sweep_reads_3():
 
     infile = utils.copy_test_data('random-20-a.fa')
@@ -245,6 +259,8 @@ def test_sweep_reads_3():
     assert not os.path.exists(os.path.join(wdir, 'test_multi.fa'))
 
 
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
 def test_collect_reads():
     outfile = utils.get_temp_filename('out.graph')
     infile = utils.get_test_data('test-reads.fa')
@@ -257,6 +273,8 @@ def test_collect_reads():
     assert os.path.exists(outfile)
 
 
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
 def test_saturate_by_median():
     infile = utils.get_test_data('test-reads.fa')
     script = 'saturate-by-median.py'
@@ -267,6 +285,8 @@ def test_saturate_by_median():
     assert status == 0
 
 
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
 def test_count_kmers_1():
     infile = utils.copy_test_data('random-20-a.fa')
     ctfile = _make_counting(infile)
@@ -281,6 +301,8 @@ def test_count_kmers_1():
     assert 'TTGTAACCTGTGTGGGGTCG,1' in out
 
 
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
 def test_count_kmers_2_single():
     infile = utils.copy_test_data('random-20-a.fa')
 
@@ -294,6 +316,8 @@ def test_count_kmers_2_single():
     assert 'TTGTAACCTGTGTGGGGTCG,1' in out
 
 
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
 def test_multirename_fasta():
     infile1 = utils.copy_test_data('test-multi.fa')
     multioutfile = utils.get_temp_filename('out.fa')
@@ -304,6 +328,8 @@ def test_multirename_fasta():
     assert r in out
 
 
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
 def test_extract_compact_dbg_1():
     infile = utils.get_test_data('simple-genome.fa')
     outfile = utils.get_temp_filename('out.gml')
