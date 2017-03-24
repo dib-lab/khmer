@@ -42,7 +42,7 @@ from khmer.thread_utils import ThreadedSequenceProcessor, verbose_fasta_iter
 WORKER_THREADS = 8
 GROUPSIZE = 100
 
-CUTOFF = 50
+CUTOFF = 500
 
 ###
 
@@ -67,10 +67,8 @@ def main():
         outfp = open(outfile, 'w')
 
         def process_fn(record, ht=ht):
-            name = record['name']
-            seq = record['sequence']
-            if 'N' in seq:
-                return None, None
+            name = record.name
+            seq = record.cleaned_seq
 
             trim_seq, trim_at = ht.trim_below_abundance(seq, CUTOFF)
 
