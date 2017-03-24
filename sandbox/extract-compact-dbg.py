@@ -96,7 +96,10 @@ def main():
             n += 1
             if n % 10000 == 0:
                 print('...', seqfile, n)
-            graph.consume(record.sequence)
+            try:
+                graph.consume(record.sequence)
+            except ValueError:
+                continue
 
     # complain if too small set of graphs was used.
     fp_rate = khmer.calc_expected_collisions(graph,
@@ -115,9 +118,13 @@ def main():
                 print('...2', seqfile, n)
             # walk across sequences, find all high degree nodes,
             # name them and cherish them. Don't do this on identical sequences.
-            if min(stop_bf2.get_kmer_counts(record.sequence)) == 0:
-                stop_bf2.consume(record.sequence)
-                degree_nodes += graph.find_high_degree_nodes(record.sequence)
+            try:
+                if min(stop_bf2.get_kmer_counts(record.sequence)) == 0:
+                    stop_bf2.consume(record.sequence)
+                    degree_nodes += graph.find_high_degree_nodes(record.sequence)
+            except ValueError:
+                pass
+
     del stop_bf2
 
     if not len(degree_nodes):

@@ -35,11 +35,11 @@
 # Contact: khmer-project@idyll.org
 from __future__ import print_function
 import sys
-from screed.fasta import fasta_iter
+import screed
 
 
 def read_partition_file(fp):
-    for n, record in enumerate(fasta_iter(fp)):
+    for n, record in enumerate(screed.open(fp)):
         name = record['name']
         name, partition_id = name.rsplit('\t', 1)
         yield n, name, int(partition_id), record['sequence']
@@ -48,7 +48,7 @@ def read_partition_file(fp):
 def main():
     select_pid = int(sys.argv[2])
     count = 0
-    for n, name, pid, seq in read_partition_file(open(sys.argv[1])):
+    for n, name, pid, seq in read_partition_file(sys.argv[1]):
         if pid == select_pid:
             print('>%s\t%d\n%s' % (name, pid, seq))
             count += 1
