@@ -126,9 +126,9 @@ release makers, following this checklist by MRC.
         normalize-by-median.py --version 2>&1 | grep khmer\ ${new_version}-${rc} && \
                 echo 1st manual version check passed
         pip uninstall -y khmer; pip uninstall -y khmer; make install
-        mkdir ../not-khmer # if there is a subdir named 'khmer' nosetest will execute tests
-        # there instead of the installed khmer module's tests
-        pushd ../not-khmer; nosetests khmer --attr '!known_failing'; popd
+        mkdir ../not-khmer # make sure py.test executes tests
+                           # from the installed khmer module
+        pushd ../not-khmer; pytest --pyargs khmer -m 'not known_failing'; popd
 
 
         # Secondly we test via pip
@@ -143,10 +143,10 @@ release makers, following this checklist by MRC.
         make test
         cp dist/khmer*tar.gz ../../../testenv3/
         pip uninstall -y khmer; pip uninstall -y khmer; make install
-        cd ../.. # no subdir named khmer here, safe for nosetesting installed khmer module
+        cd ../.. # no subdir named khmer here, safe for testing installed khmer module
         normalize-by-median.py --version 2>&1 | grep khmer\ ${new_version}-${rc} && \
                 echo 2nd manual version check passed
-        nosetests khmer --attr '!known_failing'
+        pytest --pyargs khmer -m 'not known_failing'
 
         # Is the distribution in testenv2 complete enough to build another
         # functional distribution?
@@ -155,14 +155,14 @@ release makers, following this checklist by MRC.
         source bin/activate
         pip install -U setuptools==3.4.1
         pip install khmer*tar.gz
-        pip install nose
+        pip install pytest
         tar xzf khmer*tar.gz
         cd khmer*
         make dist
         make test
         pip uninstall -y khmer; pip uninstall -y khmer; make install
         mkdir ../not-khmer
-        pushd ../not-khmer ; nosetests khmer --attr '!known_failing' ; popd
+        pushd ../not-khmer ; pytest --pyargs khmer -m 'not known_failing' ; popd
 
 #. Publish the new release on the testing PyPI server.  You will need
    to change your PyPI credentials as documented here:
@@ -179,15 +179,15 @@ release makers, following this checklist by MRC.
         cd ../../testenv4
         source bin/activate
         pip install -U setuptools==3.4.1
-        pip install screed nose
+        pip install screed pytest
         pip install -i https://testpypi.python.org/pypi --pre --no-clean khmer
-        nosetests khmer --attr '!known_failing'
+        pytest --pyargs khmer -m 'not known_failing'
         normalize-by-median.py --version 2>&1 | grep khmer\ ${new_version}-${rc} && \
                 echo 3rd manual version check passed
         cd build/khmer
         make test
 
-#. Do any final testing (BaTLab and/or acceptance tests).
+#. Do any final acceptance tests.
 
 #. Make sure any release notes are merged into doc/release-notes/.
 
