@@ -67,6 +67,7 @@ script:
   - make test
   - make pep8
   - make doc
+  - cd examples/stamps && ./do.sh
 
 # generate all the diagnostic reports
 after_success:

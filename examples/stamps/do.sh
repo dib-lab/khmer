@@ -35,16 +35,18 @@
 #
 # Contact: khmer-project@idyll.org
 #
+set -e # exit as soon as one command fails
+set -x # echo commands before executing them
 load-into-counting.py -x 1e8 -k 20 stamps-reads.ct \
 	../../data/stamps-reads.fa.gz
 abundance-dist.py stamps-reads.ct ../../data/stamps-reads.fa.gz \
 	stamps-reads.hist
 normalize-by-median.py -k 20 -C 10 -x 1e8 ../../data/stamps-reads.fa.gz \
-	--savetable stamps-dn.ct
+	--savegraph stamps-dn.ct
 abundance-dist.py stamps-dn.ct stamps-reads.fa.gz.keep stamps-dn.hist
 do-partition.py -k 32 -x 1e8 -s 1e4 -T 8 stamps-part \
 	../../data/stamps-reads.fa.gz
-../../sandbox/error-correct-pass2.py -C 10 stamps-dn.ct \
+../../sandbox/error-correct-pass2.py --trusted-cov 10 stamps-dn.ct \
 	../../data/stamps-reads.fa.gz
 load-into-counting.py -x 1e8 -k 20 stamps-corr.ct stamps-reads.fa.gz.corr
 abundance-dist.py stamps-corr.ct stamps-reads.fa.gz.corr stamps-corr.hist
@@ -57,7 +59,7 @@ abundance-dist.py stamps-part.g1.ct stamps-part.group0001.fa stamps-part.g1.hist
 
 filter-abund.py stamps-dn.ct stamps-reads.fa.gz.keep
 normalize-by-median.py -x 1e8 -k 20 -C 10 stamps-reads.fa.gz.keep.abundfilt \
-	--savetable stamps-dn3.ct
+	--savegraph stamps-dn3.ct
 
 abundance-dist.py stamps-dn3.ct stamps-reads.fa.gz.keep.abundfilt.keep \
 	stamps-dn3.hist
