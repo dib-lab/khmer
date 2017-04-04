@@ -50,7 +50,7 @@ import khmer
 import sys
 from khmer.kfile import check_input_files, check_space
 from khmer import khmer_args
-from khmer.khmer_args import (build_counting_args, info, sanitize_help)
+from khmer.khmer_args import (build_counting_args, sanitize_help)
 
 # counting hash parameters.
 DEFAULT_COUNTING_HT_SIZE = 3e6                # number of bytes
@@ -94,7 +94,8 @@ def get_parser():
     """
     parser = build_counting_args(
         descr="Find all highly connected k-mers.",
-        epilog=textwrap.dedent(epilog))
+        epilog=textwrap.dedent(epilog),
+        citations=['graph'])
 
     parser.add_argument('graphbase', help='Basename for the input and output '
                         'files.')
@@ -104,7 +105,6 @@ def get_parser():
 
 
 def main():
-    info('find-knots.py', ['graph'])
     parser = get_parser()
     parser.epilog = parser.epilog.replace(
         ":doc:`partitioning-big-data`",

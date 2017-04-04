@@ -46,8 +46,9 @@ C++ standards
 -------------
 
 Any feature in C++11 is fine to use. Specifically we support features found in
-GCC 4.8.2. See https://github.com/dib-lab/khmer/issues/598 for an in-depth
-discussion.
+GCC 4.8.2. Our automated tests use gcc 4.8.4 on linux. See
+https://github.com/dib-lab/khmer/issues/598 for an in-depth discussion. Please
+do not use features from C++14 or newer.
 
 Coding standards
 ----------------
@@ -139,16 +140,16 @@ checklist::
      `scripts/` is it tested?
    - [ ] `make format diff_pylint_report cppcheck doc pydocstyle` Is it well
      formatted?
-   - [ ] Did it change the command-line interface? Only additions are allowed
-     without a major version increment. Changing file formats also requires a
-     major version number increment.
-   - [ ] Is it documented in the `ChangeLog`?
-     http://en.wikipedia.org/wiki/Changelog#Format
+   - [ ] Did it change the command-line interface? Only backwards-compatible
+     additions are allowed without a major version increment. Changing file
+     formats also requires a major version number increment.
+   - [ ] For substantial changes or changes to the command-line interface, is it
+     documented in `CHANGELOG.md`? See [keepachangelog](http://keepachangelog.com/)
+     for more details.
    - [ ] Was a spellchecker run on the source code and documentation after
      changes were made?
    - [ ] Do the changes respect streaming IO? (Are they
      tested for streaming IO?)
-   - [ ] Is the Copyright year up to date?
 
 **Note** that after you submit the pull request you can check and uncheck
 the individual boxes on the formatted comment; no need to put x or y

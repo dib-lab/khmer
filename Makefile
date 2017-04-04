@@ -37,13 +37,16 @@
 
 # `SHELL=bash` Will break Titus's laptop, so don't use BASH-isms like
 # `[[` conditional expressions.
-CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc) setup.py
+#
+PREFIX=/usr/local
+CPPSOURCES=$(wildcard src/oxli/*.cc include/oxli/*.hh src/khmer/_cpy_*.cc include/khmer/_cpy_*.hh) setup.py
+CYSOURCES=$(wildcard khmer/_oxli/*.pxd khmer/_oxli/*.pyx)
 PYSOURCES=$(filter-out khmer/_version.py, \
 	  $(wildcard khmer/*.py scripts/*.py oxli/*.py) )
-SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
+SOURCES=$(PYSOURCES) $(CPPSOURCES) $(CYSOURCES) setup.py
 
 DEVPKGS=pep8==1.6.2 diff_cover autopep8 pylint coverage gcovr pytest \
-	pydocstyle screed pyenchant
+	    pydocstyle screed pyenchant Cython==0.25.2
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 
 VERSION=$(shell ./setup.py version | grep Version | awk '{print $$4}' \
@@ -65,11 +68,11 @@ INCLUDEOPTS=$(shell gcc -E -x c++ - -v < /dev/null 2>&1 >/dev/null \
 PYINCLUDE=$(shell python -c \
 	  "import sysconfig;print(sysconfig.get_path('include'))")
 
-CPPCHECK=ls lib/*.cc khmer/_khmer.cc | grep -v test | cppcheck -DNDEBUG \
+CPPCHECK=ls src/oxli/*.cc src/khmer/*.cc | grep -v test | cppcheck -DNDEBUG \
 	 -DVERSION=0.0.cppcheck -DSEQAN_HAS_BZIP2=1 -DSEQAN_HAS_ZLIB=1 \
 	 -UNO_UNIQUE_RC --enable=all --suppress='*:/usr/*' \
 	 --suppress='*:$(PYINCLUDE)/*' --file-list=- --platform=unix64 \
-	 --std=c++11 --inline-suppr --quiet -Ilib -Ithird-party/bzip2 \
+	 --std=c++11 --inline-suppr --quiet --verbose -Iinclude -Ithird-party/bzip2 \
 	 -Ithird-party/zlib -Ithird-party/smhasher -I$(PYINCLUDE) \
 	 $(DEFINES) $(INCLUDEOPTS)
 
@@ -83,6 +86,7 @@ endif
 MODEXT=$(shell python -c \
        "import sysconfig;print(sysconfig.get_config_var('SO'))")
 EXTENSION_MODULE = khmer/_khmer$(MODEXT)
+CY_MODULES = $($(wildcard khmer/_oxli/*.pyx): .pyx=.$(MODEXT))
 
 PYLINT_TEMPLATE="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"
 
@@ -102,9 +106,12 @@ install-dependencies:
 	pip install --upgrade --requirement doc/requirements.txt
 
 ## sharedobj   : build khmer shared object file
-sharedobj: $(EXTENSION_MODULE)
+sharedobj: $(EXTENSION_MODULE) $(CYTHON_MODULE)
 
-$(EXTENSION_MODULE): $(CPPSOURCES)
+$(EXTENSION_MODULE): $(CPPSOURCES) $(CYSOURCES)
+	./setup.py build_ext --inplace
+
+$(CYTHON_MODULE): $(CPPSOURCES) $(CYSOURCES)
 	./setup.py build_ext --inplace
 
 coverage-debug: $(CPPSOURCES)
@@ -124,21 +131,28 @@ dist/khmer-$(VERSION).tar.gz: $(SOURCES)
 
 ## clean       : clean up all temporary / machine-generated files
 clean: FORCE
-	cd lib && $(MAKE) clean || true
+	cd src/oxli && $(MAKE) clean || true
 	cd tests && rm -rf khmertest_* || true
+	rm -f pytest_runner-*.egg pytests.xml
 	rm -f $(EXTENSION_MODULE)
-	rm -f khmer/*.pyc lib/*.pyc scripts/*.pyc tests/*.pyc oxli/*.pyc \
-		sandbox/*.pyc khmer/__pycache__/* sandbox/__pycache__/*
+	rm -f khmer/*.pyc scripts/*.pyc tests/*.pyc oxli/*.pyc \
+		sandbox/*.pyc khmer/__pycache__/* sandbox/__pycache__/* \
+		khmer/_oxli/*.cpp
 	./setup.py clean --all || true
 	rm -f coverage-debug
-	rm -Rf .coverage
+	rm -Rf .coverage coverage-gcovr.xml coverage.xml
 	rm -f diff-cover.html
 	rm -Rf build dist
+	rm -rf __pycache__/ .eggs/ khmer.egg-info/
+	@find ./ -type d -name __pycache__ -exec rm -rf {} +
+	@find ./khmer/ -type f -name *$(MODEXT) -exec rm -f {} +
+	@find ./khmer/_oxli/ -type f -name *.so -exec rm -f {} +
+	-rm -f *.gcov
 
 debug: FORCE
 	export CFLAGS="-pg -fprofile-arcs -D_GLIBCXX_DEBUG_PEDANTIC \
 		-D_GLIBCXX_DEBUG -DDEBUG_ASSEMBLY=1 -DDEBUG_FILTERS=1"; python setup.py build_ext --debug \
-		--inplace 
+		--inplace
 
 ## doc         : render documentation in HTML
 doc: build/sphinx/html/index.html
@@ -262,32 +276,37 @@ doxygen: doc/doxygen/html/index.html
 
 doc/doxygen/html/index.html: $(CPPSOURCES) $(PYSOURCES)
 	mkdir -p doc/doxygen
-	sed "s=\$${VERSION}=$$(python ./lib/get_version.py)=" Doxyfile.in | \
+	sed "s=\$${VERSION}=$(VERSION)=" Doxyfile.in | \
 		sed "s=\$${INCLUDES}=$(INCLUDESTRING)=" > Doxyfile
 	doxygen
 
-lib: FORCE
-	cd lib && \
+liboxli: FORCE
+	cd src/oxli && \
 	$(MAKE)
 
-# Runs a test of ./lib
+install-liboxli: liboxli
+	cd src/oxli && $(MAKE) install PREFIX=$(PREFIX)
+	mkdir -p $(PREFIX)/include/khmer
+	cp -r include/khmer/_cpy_*.hh $(PREFIX)/include/khmer/
+
+# Runs a test of liboxli
 libtest: FORCE
 	rm -rf install_target
 	mkdir -p install_target
-	cd lib && \
+	cd src/oxli && \
 	 $(MAKE) clean && \
 	 $(MAKE) all && \
 	 $(MAKE) install PREFIX=../install_target
 	test -d install_target/include
-	test -f install_target/include/oxli/khmer.hh
+	test -f install_target/include/oxli/oxli.hh
 	test -d install_target/lib
 	test -f install_target/lib/liboxli.a
 	$(CXX) -std=c++11 -o install_target/test-prog-static \
-		-I install_target/include lib/test-compile.cc \
+		-I install_target/include src/oxli/test-compile.cc \
 		install_target/lib/liboxli.a
 	$(CXX) -std=c++11 -o install_target/test-prog-dynamic \
 		-I install_target/include -L install_target/lib \
-		lib/test-compile.cc -loxli
+		src/oxli/test-compile.cc -loxli
 	rm -rf install_target
 
 ## test        : run the khmer test suite
@@ -296,12 +315,12 @@ test: FORCE
 	py.test -m ${TESTATTR}
 
 sloccount.sc: $(CPPSOURCES) $(PYSOURCES) $(wildcard tests/*.py) Makefile
-	sloccount --duplicates --wide --details lib khmer scripts tests \
+	sloccount --duplicates --wide --details include src khmer scripts tests \
 		setup.py Makefile > sloccount.sc
 
 ## sloccount   : count lines of code
 sloccount:
-	sloccount lib khmer scripts tests setup.py Makefile
+	sloccount src include khmer scripts tests setup.py Makefile
 
 coverity-build:
 	if [ -x "${cov_analysis_dir}/bin/cov-build" ]; \

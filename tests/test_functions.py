@@ -40,18 +40,14 @@ import screed
 import khmer
 import os
 import sys
-import collections
 import pytest
 from . import khmer_tst_utils as utils
-from khmer.utils import (check_is_pair, broken_paired_reader, check_is_left,
-                         check_is_right)
+
 from khmer.kfile import check_input_files, get_file_writer
 try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
-
-import pytest
 
 
 def test_forward_hash():
@@ -120,8 +116,8 @@ def test_reverse_complement():
 
 
 def test_reverse_complement_exception():
-    with pytest.raises(RuntimeError):
-        khmer.reverse_complement('FGF')
+    # deal with DNA, ignore rest
+    assert khmer.reverse_complement('FGF') == 'FCF'
 
 
 def test_reverse_hash_longs():
@@ -156,6 +152,9 @@ def test_hash_murmur3():
     assert khmer.hash_murmur3('TTTT') == 526240128537019279
     assert khmer.hash_murmur3('CCCC') == 14391997331386449225
     assert khmer.hash_murmur3('GGGG') == 14391997331386449225
+    assert khmer.hash_murmur3('TATATATATATATATATATA') != 0
+    assert khmer.hash_murmur3('TTTTGCAAAA') != 0
+    assert khmer.hash_murmur3('GAAAATTTTC') != 0
 
 
 def test_hash_no_rc_murmur3():
@@ -176,6 +175,11 @@ def test_get_primes():
     primes = khmer.get_n_primes_near_x(7, 20)
 
     assert primes == [19, 17, 13, 11, 7, 5, 3]
+
+    primes_not_float = khmer.get_n_primes_near_x(7, 20.)
+
+    assert primes_not_float == [19, 17, 13, 11, 7, 5, 3]
+    assert all(isinstance(p, int) for p in primes_not_float)
 
 
 def test_get_primes_fal():
@@ -205,7 +209,7 @@ def test_extract_countgraph_info():
             info = khmer.extract_countgraph_info(fn)
         except ValueError as err:
             assert 0, 'Should not throw a ValueErorr: ' + str(err)
-        ksize, table_size, n_tables, _, _, _, _ = info
+        ksize, n_tables, table_size, _, _, _, _ = info
         print(ksize, table_size, n_tables)
 
         assert(ksize) == 25
@@ -276,264 +280,3 @@ def test_check_file_status_kfile_force():
         sys.stderr = old_stderr
 
     assert "does not exist" in capture.getvalue(), capture.getvalue()
-
-
-def test_check_is_pair_1():
-    read1 = screed.Record(name='seq', quality='###', sequence='AAA')
-    read2 = screed.Record(name='seq2', quality='###', sequence='AAA')
-
-    assert not check_is_pair(read1, read2)
-
-
-def test_check_is_pair_2():
-    read1 = screed.Record(name='seq/1', quality='###', sequence='AAA')
-    read2 = screed.Record(name='seq/2', quality='###', sequence='AAA')
-
-    assert check_is_pair(read1, read2)
-
-
-def test_check_is_pair_3_fq():
-    read1 = screed.Record(name='seq 1::', quality='###', sequence='AAA')
-    read2 = screed.Record(name='seq 2::', quality='###', sequence='AAA')
-
-    assert check_is_pair(read1, read2)
-
-
-def test_check_is_pair_3_broken_fq_1():
-    read1 = screed.Record(name='seq', quality='###', sequence='AAA')
-    read2 = screed.Record(name='seq 2::', quality='###', sequence='AAA')
-
-    assert not check_is_pair(read1, read2)
-
-
-def test_check_is_pair_3_broken_fq_2():
-    read1 = screed.Record(name='seq 1::', quality='###', sequence='AAA')
-    read2 = screed.Record(name='seq', quality='###', sequence='AAA')
-
-    assert not check_is_pair(read1, read2)
-
-
-def test_check_is_pair_3_fa():
-    read1 = screed.Record(name='seq 1::', sequence='AAA')
-    read2 = screed.Record(name='seq 2::', sequence='AAA')
-
-    assert check_is_pair(read1, read2)
-
-
-def test_check_is_pair_4():
-    read1 = screed.Record(name='seq/1', quality='###', sequence='AAA')
-    read2 = screed.Record(name='seq/2', sequence='AAA')
-
-    try:
-        check_is_pair(read1, read2)
-        assert False                    # check_is_pair should fail here.
-    except ValueError:
-        pass
-
-
-def test_check_is_pair_4b():
-    read1 = screed.Record(name='seq/1', sequence='AAA')
-    read2 = screed.Record(name='seq/2', quality='###', sequence='AAA')
-
-    try:
-        check_is_pair(read1, read2)
-        assert False                    # check_is_pair should fail here.
-    except ValueError:
-        pass
-
-
-def test_check_is_pair_5():
-    read1 = screed.Record(name='seq/1', sequence='AAA')
-    read2 = screed.Record(name='seq/2', sequence='AAA')
-
-    assert check_is_pair(read1, read2)
-
-
-def test_check_is_pair_6():
-    read1 = screed.Record(name='seq1', sequence='AAA')
-    read2 = screed.Record(name='seq2', sequence='AAA')
-
-    assert not check_is_pair(read1, read2)
-
-
-def test_check_is_pair_7():
-    read1 = screed.Record(name='seq/2', sequence='AAA')
-    read2 = screed.Record(name='seq/1', sequence='AAA')
-
-    assert not check_is_pair(read1, read2)
-
-
-def test_check_is_right():
-    assert not check_is_right('seq1/1')
-    assert not check_is_right('seq1 1::N')
-    assert check_is_right('seq1/2')
-    assert check_is_right('seq1 2::N')
-
-    assert not check_is_right('seq')
-    assert not check_is_right('seq 2')
-
-
-def test_check_is_left():
-    assert check_is_left('seq1/1')
-    assert check_is_left('seq1 1::N')
-    assert not check_is_left('seq1/2')
-    assert not check_is_left('seq1 2::N')
-
-    assert not check_is_left('seq')
-    assert not check_is_left('seq 1')
-
-    assert check_is_left(
-        '@HWI-ST412:261:d15khacxx:8:1101:3149:2157 1:N:0:ATCACG')
-
-
-def gather(stream, **kw):
-    itr = broken_paired_reader(stream, **kw)
-
-    x = []
-    m = 0
-    num = 0
-    for num, is_pair, read1, read2 in itr:
-        if is_pair:
-            x.append((read1.name, read2.name))
-        else:
-            x.append((read1.name, None))
-        m += 1
-
-    return x, num, m
-
-
-class Test_BrokenPairedReader(object):
-    stream = [screed.Record(name='seq1/1', sequence='A' * 5),
-              screed.Record(name='seq1/2', sequence='A' * 4),
-              screed.Record(name='seq2/1', sequence='A' * 5),
-              screed.Record(name='seq3/1', sequence='A' * 3),
-              screed.Record(name='seq3/2', sequence='A' * 5)]
-
-    def testDefault(self):
-        x, n, m = gather(self.stream, min_length=1)
-
-        expected = [('seq1/1', 'seq1/2'),
-                    ('seq2/1', None),
-                    ('seq3/1', 'seq3/2')]
-        assert x == expected, x
-        assert m == 3
-        assert n == 3, n
-
-    def testMinLength(self):
-        x, n, m = gather(self.stream, min_length=3)
-
-        expected = [('seq1/1', 'seq1/2'),
-                    ('seq2/1', None),
-                    ('seq3/1', 'seq3/2')]
-        assert x == expected, x
-        assert m == 3
-        assert n == 3, n
-
-    def testMinLength_2(self):
-        x, n, m = gather(self.stream, min_length=4)
-
-        expected = [('seq1/1', 'seq1/2'),
-                    ('seq2/1', None),
-                    ('seq3/2', None)]
-        assert x == expected, x
-        assert m == 3
-        assert n == 3, n
-
-    def testForceSingle(self):
-        x, n, m = gather(self.stream, force_single=True)
-
-        expected = [('seq1/1', None),
-                    ('seq1/2', None),
-                    ('seq2/1', None),
-                    ('seq3/1', None),
-                    ('seq3/2', None)]
-        assert x == expected, x
-        assert m == 5
-        assert n == 4, n
-
-    def testForceSingleAndMinLength(self):
-        x, n, m = gather(self.stream, min_length=5, force_single=True)
-
-        expected = [('seq1/1', None),
-                    ('seq2/1', None),
-                    ('seq3/2', None)]
-        assert x == expected, x
-        assert m == 3, m
-        assert n == 2, n
-
-
-def test_BrokenPairedReader_OnPairs():
-    stream = [screed.Record(name='seq1/1', sequence='A' * 5),
-              screed.Record(name='seq1/2', sequence='A' * 4),
-              screed.Record(name='seq3/1', sequence='A' * 3),
-              screed.Record(name='seq3/2', sequence='A' * 5)]
-
-    x, n, m = gather(stream, min_length=4, require_paired=True)
-
-    expected = [('seq1/1', 'seq1/2')]
-    assert x == expected, x
-    assert m == 1
-    assert n == 0, n
-
-
-def test_BrokenPairedReader_OnPairs_2():
-    stream = [screed.Record(name='seq1/1', sequence='A' * 5),
-              screed.Record(name='seq1/2', sequence='A' * 4),
-              screed.Record(name='seq3/1', sequence='A' * 5),   # switched
-              screed.Record(name='seq3/2', sequence='A' * 3)]   # wrt previous
-
-    x, n, m = gather(stream, min_length=4, require_paired=True)
-
-    expected = [('seq1/1', 'seq1/2')]
-    assert x == expected, x
-    assert m == 1
-    assert n == 0, n
-
-
-def test_BrokenPairedReader_OnPairs_3():
-    stream = [screed.Record(name='seq1/1', sequence='A' * 5),
-              screed.Record(name='seq1/2', sequence='A' * 4),
-              screed.Record(name='seq3/1', sequence='A' * 3),   # both short
-              screed.Record(name='seq3/2', sequence='A' * 3)]
-
-    x, n, m = gather(stream, min_length=4, require_paired=True)
-
-    expected = [('seq1/1', 'seq1/2')]
-    assert x == expected, x
-    assert m == 1
-    assert n == 0, n
-
-
-def test_BrokenPairedReader_OnPairs_4():
-    stream = [screed.Record(name='seq1/1', sequence='A' * 3),  # too short
-              screed.Record(name='seq1/2', sequence='A' * 4),
-              screed.Record(name='seq3/1', sequence='A' * 4),
-              screed.Record(name='seq3/2', sequence='A' * 5)]
-
-    x, n, m = gather(stream, min_length=4, require_paired=True)
-
-    expected = [('seq3/1', 'seq3/2')]
-    assert x == expected, x
-    assert m == 1
-    assert n == 0, n
-
-
-def test_BrokenPairedReader_lowercase():
-    stream = [screed.Record(name='seq1/1', sequence='acgtn'),
-              screed.Record(name='seq1/2', sequence='AcGtN'),
-              screed.Record(name='seq1/2', sequence='aCgTn')]
-
-    results = []
-    for num, is_pair, read1, read2 in broken_paired_reader(stream):
-        results.append((read1, read2))
-
-    a, b = results[0]
-    assert a.sequence == 'acgtn'
-    assert a.cleaned_seq == 'ACGTA'
-    assert b.sequence == 'AcGtN'
-    assert b.cleaned_seq == 'ACGTA'
-
-    c, d = results[1]
-    assert c.sequence == 'aCgTn'
-    assert c.cleaned_seq == 'ACGTA'
-    assert d is None

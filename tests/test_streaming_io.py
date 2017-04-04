@@ -1,5 +1,5 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -201,6 +201,24 @@ def test_extract_paired_se():
     cmd = """
        cat {in1} |
        {scripts}/extract-paired-reads.py - -p /dev/null -s - > {out1}
+    """
+
+    cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1)
+
+    run_shell_cmd(cmd)
+
+    assert files_are_equal(out1, out_test), diff_files(out1, out_test)
+
+
+def test_extract_paired_stdin_equivalence():
+    # Use '/dev/stdin' instead of '-' to check it is treated the same way
+    in1 = utils.get_test_data('paired-mixed.fq')
+    out_test = utils.get_test_data('paired-mixed.fq.se')
+    out1 = utils.get_temp_filename('a.fq')
+
+    cmd = """
+       cat {in1} |
+       {scripts}/extract-paired-reads.py /dev/stdin -p /dev/null -s - > {out1}
     """
 
     cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1)
@@ -441,6 +459,47 @@ def test_trim_low_abund_1():
     cmd = """
        cat {in1} |
        {scripts}/trim-low-abund.py -k 17 -x 1e7 -N 2 - -o - > {out1}
+    """
+
+    cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1)
+
+    run_shell_cmd(cmd)
+
+    assert os.path.exists(out1)
+    seqs = set([r.sequence for r in screed.open(out1)])
+
+    assert len(seqs) == 1, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+
+def test_trim_low_abund_smallcount():
+    in1 = utils.get_test_data('test-abund-read-2.fa')
+    out1 = utils.get_temp_filename('out.abundtrim')
+
+    cmd = """
+       cat {in1} |
+       {scripts}/trim-low-abund.py --small-count \
+         -k 17 -x 1e7 -N 2 - -o - > {out1}
+    """
+
+    cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1)
+
+    run_shell_cmd(cmd)
+
+    assert os.path.exists(out1)
+    seqs = set([r.sequence for r in screed.open(out1)])
+
+    assert len(seqs) == 1, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+
+def test_trim_low_abund_1_gzip_o():
+    in1 = utils.get_test_data('test-abund-read-2.fa')
+    out1 = utils.get_temp_filename('out.abundtrim.gz')
+
+    cmd = """
+       cat {in1} |
+       {scripts}/trim-low-abund.py -k 17 -x 1e7 -N 2 - -o - --gzip > {out1}
     """
 
     cmd = cmd.format(scripts=scriptpath(), in1=in1, out1=out1)

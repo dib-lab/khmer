@@ -44,20 +44,20 @@ Use '-h' for parameter help.
 
 import sys
 
-from khmer.khmer_args import build_nodegraph_args, info
+from khmer.khmer_args import build_nodegraph_args
 from oxli import build_graph
 
 
 def get_parser():
     parser = build_nodegraph_args(descr="Load sequences into the compressible "
-                                  "graph format plus optional tagset.")
+                                  "graph format plus optional tagset.",
+                                  citations=['graph', 'SeqAn'])
 
     parser = build_graph.build_parser(parser)
     return parser
 
 
 if __name__ == '__main__':
-    info('load-graph.py', ['graph', 'SeqAn'])
     build_graph.main(get_parser().parse_args())
 
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

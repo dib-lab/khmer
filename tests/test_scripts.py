@@ -215,6 +215,8 @@ def test_load_into_counting_abundance_dist_squashing():
     assert lines[2].strip() == "1,83,83,1.0", lines[2]
 
 
+# note: if run as root, will fail b/c root can write to anything
+@pytest.mark.noroot
 def test_load_into_counting_nonwritable():
     script = 'load-into-counting.py'
     args = ['-x', '1e3', '-N', '2', '-k', '20']
@@ -687,6 +689,21 @@ def test_oxli_build_graph_fail():
     assert "** ERROR: the graph structure is too small" in err
 
 
+@pytest.mark.known_failing
+def test_oxli_build_graph_yuge():
+    script = 'oxli'
+    args = ['build-graph', '-M', '800T', '-k', '20']
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args, fail_ok=True)
+    assert status != 0, status
+    assert 'ERROR: Not enough free space on disk' in err
+
+
 def test_load_graph_write_fp():
     script = 'load-graph.py'
     args = ['-x', '1e5', '-N', '2', '-k', '20']  # use small HT
@@ -866,6 +883,21 @@ def test_partition_graph_nojoin_k21():
 
     x = ht.count_partitions()
     assert x == (99, 0), x          # should be 99 partitions at K=21
+
+
+def test_partition_load_empty_pmap():
+    graphbase = _make_graph(utils.get_test_data('random-20-a.fa'), ksize=24)
+
+    script = 'partition-graph.py'
+    args = [graphbase, '-s', '10']
+
+    utils.runscript(script, args)
+
+    script = 'merge-partitions.py'
+    args = [graphbase, '-k', '24']
+    status, out, err = utils.runscript(script, args, fail_ok=True)
+    assert status == -1
+    assert 'only a header and no partition IDs' in err
 
 
 def test_partition_graph_nojoin_stoptags():
@@ -1593,37 +1625,6 @@ def test_make_initial_stoptags_load_stoptags():
     assert os.path.exists(outfile1), outfile1
 
 
-def execute_extract_paired_streaming(ifilename):
-    fifo = utils.get_temp_filename('fifo')
-    in_dir = os.path.dirname(fifo)
-    outfile1 = utils.get_temp_filename('paired.pe')
-    outfile2 = utils.get_temp_filename('paired.se')
-    script = 'extract-paired-reads.py'
-    args = [fifo, '-p', outfile1, '-s', outfile2]
-
-    # make a fifo to simulate streaming
-    os.mkfifo(fifo)
-
-    thread = threading.Thread(target=utils.runscript,
-                              args=(script, args, in_dir))
-    thread.start()
-    ifile = open(ifilename, 'r')
-    fifofile = open(fifo, 'w')
-    chunk = ifile.read(4)
-    while len(chunk) > 0:
-        fifofile.write(chunk)
-        chunk = ifile.read(4)
-    fifofile.close()
-    thread.join()
-    assert os.path.exists(outfile1), outfile1
-    assert os.path.exists(outfile2), outfile2
-
-
-def test_extract_paired_streaming():
-    testinput = utils.get_test_data('paired-mixed.fa')
-    o = execute_extract_paired_streaming(testinput)
-
-
 def test_sample_reads_randomly():
     infile = utils.copy_test_data('test-reads.fa')
     in_dir = os.path.dirname(infile)
@@ -2328,12 +2329,9 @@ def test_trim_low_abund_1_stdin_err():
 
 
 def test_trim_low_abund_2():
-    infile = utils.get_temp_filename('test.fa')
-    infile2 = utils.get_temp_filename('test2.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
+    infile2 = utils.copy_test_data('test-abund-read-2.fa', 'copyDataTwo')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile2)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", '-C', '1', infile, infile2]
     utils.runscript('trim-low-abund.py', args, in_dir)
@@ -2347,13 +2345,10 @@ def test_trim_low_abund_2():
 
 
 def test_trim_low_abund_2_o_gzip():
-    infile = utils.get_temp_filename('test.fa')
-    infile2 = utils.get_temp_filename('test2.fa')
+    infile = utils.copy_test_data('test-abund-read-2.fa')
+    infile2 = utils.copy_test_data('test-abund-read-2.fa', 'copyDataTwo')
     outfile = utils.get_temp_filename('out.gz')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile2)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", '-C', '1',
             "-o", outfile, "--gzip",
@@ -2368,12 +2363,9 @@ def test_trim_low_abund_2_o_gzip():
 
 
 def test_trim_low_abund_3_fq_retained():
-    infile = utils.get_temp_filename('test.fq')
-    infile2 = utils.get_temp_filename('test2.fq')
+    infile = utils.copy_test_data('test-abund-read-2.fq')
+    infile2 = utils.copy_test_data('test-abund-read-2.fq', 'copyDataTwo')
     in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile)
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile2)
 
     args = ["-k", "17", "-x", "1e7", "-N", "2", '-C', '1', infile, infile2]
     utils.runscript('trim-low-abund.py', args, in_dir)
@@ -2802,10 +2794,22 @@ def test_version_and_basic_citation(scriptname):
         line = script.readline()
         line = script.readline()
         if 'khmer' in line:
-            version = re.compile("^khmer .*$", re.MULTILINE)
-            status, out, err = utils.runscript(scriptname, ["--version"])
+            # check citation information appears when using --info
+            status, out, err = utils.runscript(scriptname, ["--info"])
             assert status == 0, status
             print(out)
             print(err)
-            # assert "publication" in err, err
-            assert version.search(err) is not None, err
+            assert "publication" in err, err
+            assert "usage:" not in err, err
+
+            # check citation information appears in --version
+            status, out, err = utils.runscript(scriptname, ["--version"])
+            assert status == 0, status
+            assert "publication" in err, err
+            assert "usage:" not in err, err
+
+            # check citation information appears in --help
+            status, out, err = utils.runscript(scriptname, ["--help"])
+            assert status == 0, status
+            assert "publication" in err, err
+            assert "usage:" in out, out

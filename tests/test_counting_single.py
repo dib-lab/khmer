@@ -319,12 +319,12 @@ def test_64bitshift_2():
 def test_very_short_read():
     short_filename = utils.get_test_data('test-short.fa')
     kh = khmer.Countgraph(9, 4, 1)
-    n_reads, n_kmers = kh.consume_fasta(short_filename)
+    n_reads, n_kmers = kh.consume_seqfile(short_filename)
     assert n_reads == 1, n_reads
     assert n_kmers == 0, n_kmers
 
     kh = khmer.Countgraph(8, 4, 1)
-    n_reads, n_kmers = kh.consume_fasta(short_filename)
+    n_reads, n_kmers = kh.consume_seqfile(short_filename)
     assert n_reads == 1, n_reads
     assert n_kmers == 1, n_kmers
 
@@ -379,7 +379,7 @@ class Test_AbundanceDistribution(object):
     def setup(self):
         self.kh = khmer._Countgraph(4, [5])
         A_filename = utils.get_test_data('all-A.fa')
-        self.kh.consume_fasta(A_filename)
+        self.kh.consume_seqfile(A_filename)
 
     def test_count_A(self):
         A_filename = utils.get_test_data('all-A.fa')

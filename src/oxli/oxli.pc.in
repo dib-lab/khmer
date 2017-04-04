@@ -1,0 +1,16 @@
+prefix=@prefix@
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+sharedlibdir=${libdir}
+includedir=${prefix}/include
+
+Name: oxli
+Description: The unsupported core C++ library from the khmer project
+URL: http://khmer.readthedocs.io/
+Version: @VERSION@
+
+Requires:
+Requires.private: zlib
+Libs: -L${libdir} -L${sharedlibdir} -loxli
+Libs.private: -lbz2
+Cflags: -I${includedir}

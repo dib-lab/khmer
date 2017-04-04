@@ -61,9 +61,15 @@ def test_toobig():
         print(str(err))
 
 
+def test_bad_create():
+    try:
+        nodegraph = khmer._Nodegraph(5, [])
+    except ValueError as err:
+        assert 'tablesizes needs to be one or more numbers' in str(err)
+
+
 def test__get_set_tag_density():
     nodegraph = khmer._Nodegraph(32, [1])
-
     orig = nodegraph._get_tag_density()
     assert orig != 2
     nodegraph._set_tag_density(2)
@@ -115,8 +121,8 @@ def test_update_from_2():
     ng2 = khmer.Nodegraph(20, 1000, 4)
 
     filename = utils.get_test_data('random-20-a.fa')
-    ng1.consume_fasta(filename)
-    ng2.consume_fasta(filename)
+    ng1.consume_seqfile(filename)
+    ng2.consume_seqfile(filename)
 
     assert ng1.n_occupied() == ng2.n_occupied()
     ng1.update(ng2)
@@ -334,7 +340,7 @@ def test_count_within_radius_simple():
     inpfile = utils.get_test_data('all-A.fa')
     nodegraph = khmer._Nodegraph(4, [3, 5])
 
-    print(nodegraph.consume_fasta(inpfile))
+    print(nodegraph.consume_seqfile(inpfile))
     n = nodegraph.count_kmers_within_radius('AAAA', 1)
     assert n == 1
 
@@ -346,12 +352,12 @@ def test_count_within_radius_big():
     inpfile = utils.get_test_data('random-20-a.fa')
     nodegraph = khmer.Nodegraph(20, 1e5, 4)
 
-    nodegraph.consume_fasta(inpfile)
+    nodegraph.consume_seqfile(inpfile)
     n = nodegraph.count_kmers_within_radius('CGCAGGCTGGATTCTAGAGG', int(1e6))
     assert n == 3961, n
 
     nodegraph = khmer.Nodegraph(21, 1e5, 4)
-    nodegraph.consume_fasta(inpfile)
+    nodegraph.consume_seqfile(inpfile)
     n = nodegraph.count_kmers_within_radius('CGCAGGCTGGATTCTAGAGGC', int(1e6))
     assert n == 39
 
@@ -359,7 +365,7 @@ def test_count_within_radius_big():
 def test_count_kmer_degree():
     inpfile = utils.get_test_data('all-A.fa')
     nodegraph = khmer._Nodegraph(4, [3, 5])
-    nodegraph.consume_fasta(inpfile)
+    nodegraph.consume_seqfile(inpfile)
 
     assert nodegraph.kmer_degree('AAAA') == 2
     assert nodegraph.kmer_degree('AAAT') == 1
@@ -370,7 +376,7 @@ def test_count_kmer_degree():
 def test_kmer_neighbors():
     inpfile = utils.get_test_data('all-A.fa')
     nodegraph = khmer._Nodegraph(4, [3, 5])
-    nodegraph.consume_fasta(inpfile)
+    nodegraph.consume_seqfile(inpfile)
 
     h = khmer.forward_hash('AAAA', 4)
     print(type('AAAA'))
@@ -393,7 +399,7 @@ def test_kmer_neighbors():
 def test_kmer_neighbors_wrong_ksize():
     inpfile = utils.get_test_data('all-A.fa')
     nodegraph = khmer._Nodegraph(4, [3, 5])
-    nodegraph.consume_fasta(inpfile)
+    nodegraph.consume_seqfile(inpfile)
 
     try:
         nodegraph.neighbors('AAAAA')
@@ -472,7 +478,7 @@ def test_stop_traverse():
     nodegraph.add_stop_tag('TTGCATACGTTGAGCCAGCG')
 
     # DO NOT join reads across stoptags
-    nodegraph.consume_fasta_and_tag(filename)
+    nodegraph.consume_seqfile_and_tag(filename)
     subset = nodegraph.do_subset_partition(0, 0, True)
     nodegraph.merge_subset(subset)
 
@@ -605,9 +611,8 @@ def test_badget():
 def test_load_notexist_should_fail():
     savepath = utils.get_temp_filename('tempnodegraphsave0.htable')
 
-    hi = khmer._Countgraph(12, [1])
     try:
-        hi.load(savepath)
+        hi = khmer.load_countgraph(savepath)
         assert 0, "load should fail"
     except OSError:
         pass
@@ -619,7 +624,7 @@ def test_load_truncated_should_fail():
 
     hi = khmer.Countgraph(12, 1000, 2)
 
-    hi.consume_fasta(inpath)
+    hi.consume_seqfile(inpath)
     hi.save(savepath)
 
     fp = open(savepath, 'rb')
@@ -630,9 +635,8 @@ def test_load_truncated_should_fail():
     fp.write(data[:1000])
     fp.close()
 
-    hi = khmer._Countgraph(12, [1])
     try:
-        hi.load(savepath)
+        hi = khmer.load_countgraph(savepath)
         assert 0, "load should fail"
     except OSError as e:
         print(str(e))
@@ -692,7 +696,7 @@ def _build_testfiles():
 
     inpath = utils.get_test_data('random-20-a.fa')
     hi = khmer._Nodegraph(12, 2)
-    hi.consume_fasta(inpath)
+    hi.consume_seqfile(inpath)
     hi.save('/tmp/goodversion-k12.htable')
 
     # tagset file
@@ -708,7 +712,7 @@ def _build_testfiles():
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
     nodegraph = khmer.Nodegraph(32, 4, 4)
-    nodegraph.consume_fasta_and_tag(fakelump_fa)
+    nodegraph.consume_seqfile_and_tag(fakelump_fa)
 
     subset = nodegraph.do_subset_partition(0, 0)
     nodegraph.merge_subset(subset)
@@ -727,12 +731,11 @@ def _build_testfiles():
 
 
 def test_hashbits_file_version_check():
-    nodegraph = khmer._Nodegraph(12, [1])
 
     inpath = utils.get_test_data('badversion-k12.htable')
 
     try:
-        nodegraph.load(inpath)
+        nodegraph = khmer.load_nodegraph(inpath)
         assert 0, "this should fail"
     except OSError as e:
         print(str(e))
@@ -743,10 +746,8 @@ def test_nodegraph_file_type_check():
     savepath = utils.get_temp_filename('tempcountingsave0.ct')
     kh.save(savepath)
 
-    nodegraph = khmer._Nodegraph(12, [1])
-
     try:
-        nodegraph.load(savepath)
+        nodegraph = khmer.load_nodegraph(savepath)
         assert 0, "this should fail"
     except OSError as e:
         print(str(e))
@@ -850,13 +851,13 @@ def test_bad_primes_list():
 def test_consume_absentfasta_with_reads_parser():
     nodegraph = khmer._Nodegraph(31, [1])
     try:
-        nodegraph.consume_fasta_with_reads_parser()
+        nodegraph.consume_seqfile_with_reads_parser()
         assert 0, "this should fail"
     except TypeError as err:
         print(str(err))
     try:
         readparser = ReadParser(utils.get_test_data('empty-file'))
-        nodegraph.consume_fasta_with_reads_parser(readparser)
+        nodegraph.consume_seqfile_with_reads_parser(readparser)
         assert 0, "this should fail"
     except OSError as err:
         print(str(err))
@@ -873,11 +874,11 @@ def test_bad_primes():
         print(str(e))
 
 
-def test_consume_fasta_and_tag_with_badreads_parser():
+def test_consume_seqfile_and_tag_with_badreads_parser():
     nodegraph = khmer.Nodegraph(6, 1e6, 2)
     try:
         readsparser = khmer.ReadParser(utils.get_test_data("test-empty.fa"))
-        nodegraph.consume_fasta_and_tag_with_reads_parser(readsparser)
+        nodegraph.consume_seqfile_and_tag_with_reads_parser(readsparser)
         assert 0, "this should fail"
     except OSError as e:
         print(str(e))

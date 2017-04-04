@@ -81,7 +81,7 @@ def main():
           file=sys.stderr)
 
     htable = khmer.new_nodegraph(args.ksize, args.max_tablesize, args.n_tables)
-    target_method = htable.consume_fasta_with_reads_parser
+    target_method = htable.consume_seqfile_with_reads_parser
 
     for _, filename in enumerate(filenames):
         rparser = khmer.ReadParser(filename)

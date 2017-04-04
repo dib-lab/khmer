@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2013-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -48,18 +48,18 @@ Reads FASTQ and FASTA input, retains format for output.
 from __future__ import print_function
 
 import argparse
-import screed
 import os.path
 import random
 import textwrap
 import sys
 
 from khmer import __version__
+from khmer import ReadParser
 from khmer.kfile import (check_input_files, add_output_compression_type,
                          get_file_writer)
-from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
-                              _VersionStdErrAction)
-from khmer.utils import write_record, broken_paired_reader
+from khmer.khmer_args import sanitize_help, KhmerArgumentParser
+from khmer.utils import write_record, grouper
+from khmer._oxli.parsing import FastxParser, BrokenPairedReader, SplitPairedReader
 
 DEFAULT_NUM_READS = int(1e5)
 DEFAULT_MAX_READS = int(1e8)
@@ -82,9 +82,9 @@ def get_parser():
     <http://en.wikipedia.org/wiki/Reservoir_sampling>`__ algorithm.
     """
 
-    parser = argparse.ArgumentParser(
+    parser = KhmerArgumentParser(
         description="Uniformly subsample sequences from a collection of files",
-        formatter_class=ComboFormatter, epilog=textwrap.dedent(epilog))
+        epilog=textwrap.dedent(epilog))
 
     parser.add_argument('filenames', nargs='+')
     parser.add_argument('-N', '--num_reads', type=int, dest='num_reads',
@@ -97,11 +97,12 @@ def get_parser():
                         help='Provide a random seed for the generator')
     parser.add_argument('--force_single', default=False, action='store_true',
                         help='Ignore read pair information if present')
+    parser.add_argument('--pairing-mode', 
+                        choices=['split', 'interleaved', 'single'],
+                        default='interleaved')
     parser.add_argument('-o', '--output', dest='output_file',
                         type=argparse.FileType('wb'),
                         metavar="filename", default=None)
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exits')
     add_output_compression_type(parser)
@@ -109,7 +110,6 @@ def get_parser():
 
 
 def main():
-    info('sample-reads-randomly.py')
     parser = get_parser()
     parser.epilog = parser.epilog.replace(
         "`reservoir sampling\n"
@@ -148,6 +148,11 @@ def main():
             sys.exit(1)
         output_filename = os.path.basename(filename) + '.subset'
 
+    filename = args.filenames[0]
+    if filename in ('/dev/stdin', '-'):
+        # seqan only treats '-' as "read from stdin"
+        filename = '-'
+
     if num_samples == 1:
         print('Subsampling %d reads using reservoir sampling.' %
               args.num_reads, file=sys.stderr)
@@ -162,17 +167,31 @@ def main():
               % output_filename, file=sys.stderr)
         print('', file=sys.stderr)
 
+    if args.pairing_mode == 'split':
+        samples = list(grouper(2, args.filenames))
+        for pair in samples:
+            if len(pair) != 2:
+                raise ValueError('Must have even number of samples!')
+    else:
+        samples = args.filenames
+
     reads = []
     for _ in range(num_samples):
         reads.append([])
 
     # read through all the sequences and load/resample the reservoir
-    for filename in args.filenames:
-        print('opening', filename, 'for reading', file=sys.stderr)
-        screed_iter = screed.open(filename)
+    for group in samples:
 
-        for count, (_, _, rcrd1, rcrd2) in enumerate(broken_paired_reader(
-                screed_iter, force_single=args.force_single)):
+        if args.pairing_mode == 'split':
+            print('opening', group[0], 'and', group[1], 'for reading', file=sys.stderr)
+            reader = SplitPairedReader(FastxParser(group[0]),
+                                       FastxParser(group[1]))
+        else:
+            print('opening', group, 'for reading', file=sys.stderr)
+            reader = BrokenPairedReader(FastxParser(group),
+                                        force_single=args.force_single)
+
+        for count, (_, _, rcrd1, rcrd2) in enumerate(reader):
             if count % 10000 == 0:
                 print('...', count, 'reads scanned', file=sys.stderr)
                 if count >= args.max_reads:

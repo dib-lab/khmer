@@ -37,23 +37,16 @@
 from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
-import json
-import sys
-import os
-import stat
-from io import StringIO
-import traceback
-import threading
-import bz2
+
 import gzip
-import io
-import re
+import os
+import pytest
 
 from . import khmer_tst_utils as utils
 import khmer
 import khmer.kfile
+import khmer.utils
 import screed
-from khmer.utils import clean_input_reads
 
 
 def test_interleave_read_stdout():
@@ -257,36 +250,6 @@ def test_interleave_reads_2_fa():
         assert r.name == q.name
         assert r.sequence == q.sequence
     assert n > 0
-
-
-def execute_split_paired_streaming(ifilename):
-    fifo = utils.get_temp_filename('fifo')
-    in_dir = os.path.dirname(fifo)
-    outfile1 = utils.get_temp_filename('paired-1.fa')
-    outfile2 = utils.get_temp_filename('paired-2.fa')
-    script = 'split-paired-reads.py'
-    args = [fifo, '-1', outfile1, '-2', outfile2]
-
-    # make a fifo to simulate streaming
-    os.mkfifo(fifo)
-
-    thread = threading.Thread(target=utils.runscript,
-                              args=(script, args, in_dir))
-    thread.start()
-    ifile = open(ifilename, 'r')
-    fifofile = open(fifo, 'w')
-    chunk = ifile.read(4)
-    while len(chunk) > 0:
-        fifofile.write(chunk)
-        chunk = ifile.read(4)
-    fifofile.close()
-    thread.join()
-    assert os.path.exists(outfile1), outfile1
-    assert os.path.exists(outfile2), outfile2
-
-
-def test_split_paired_streaming():
-    o = execute_split_paired_streaming(utils.get_test_data('paired.fa'))
 
 
 def test_split_paired_reads_1_fa():
@@ -782,7 +745,7 @@ def test_extract_paired_reads_5_stdin_error():
 
 def test_read_bundler():
     infile = utils.get_test_data('unclean-reads.fastq')
-    records = [r for r in clean_input_reads(screed.open(infile))]
+    records = [r for r in khmer.ReadParser(infile)]
     bundle = khmer.utils.ReadBundle(*records)
 
     raw_seqs = (
@@ -809,7 +772,7 @@ def test_read_bundler():
 
 def test_read_bundler_single_read():
     infile = utils.get_test_data('single-read.fq')
-    records = [r for r in clean_input_reads(screed.open(infile))]
+    records = [r for r in khmer.ReadParser(infile)]
     bundle = khmer.utils.ReadBundle(*records)
     assert bundle.num_reads == 1
     assert bundle.reads[0].sequence == bundle.reads[0].cleaned_seq
@@ -817,9 +780,8 @@ def test_read_bundler_single_read():
 
 def test_read_bundler_empty_file():
     infile = utils.get_test_data('empty-file')
-    records = [r for r in clean_input_reads(screed.open(infile))]
-    bundle = khmer.utils.ReadBundle(*records)
-    assert bundle.num_reads == 0
+    with pytest.raises(OSError):
+        records = [r for r in khmer.ReadParser(infile)]
 
 
 def test_read_bundler_empty_list():

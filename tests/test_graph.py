@@ -54,7 +54,7 @@ class Test_ExactGraphFu(object):
 
     def test_counts(self):
         ht = self.ht
-        ht.consume_fasta(utils.get_test_data('test-graph.fa'))
+        ht.consume_seqfile(utils.get_test_data('test-graph.fa'))
 
         kmer = "TTAGGACTGCAC"
         x = ht.calc_connected_graph_size(kmer)
@@ -228,7 +228,7 @@ class Test_Partitioning(object):
         filename = utils.get_test_data('random-20-a.fa')
 
         ht = khmer._Nodegraph(21, [5, 7, 11, 13])
-        ht.consume_fasta_and_tag(filename)
+        ht.consume_seqfile_and_tag(filename)
 
         output_file = utils.get_temp_filename('part0test')
         ht.output_partitions(filename, output_file, True)
@@ -244,7 +244,7 @@ class Test_Partitioning(object):
         filename = utils.get_test_data('random-20-a.fa')
 
         ht = khmer._Nodegraph(21, [5, 7, 11, 13])
-        ht.consume_fasta_and_tag(filename)
+        ht.consume_seqfile_and_tag(filename)
 
         output_file = utils.get_temp_filename('parttest')
         ht.output_partitions(filename, output_file, False)
@@ -259,7 +259,7 @@ class Test_Partitioning(object):
         filename = utils.get_test_data('random-20-a.fq')
 
         ht = khmer.Nodegraph(20, 1e4, 4)
-        ht.consume_fasta_and_tag(filename)
+        ht.consume_seqfile_and_tag(filename)
         subset = ht.do_subset_partition(0, 0)
         ht.merge_subset(subset)
 
@@ -275,7 +275,7 @@ class Test_Partitioning(object):
         filename = utils.get_test_data('random-20-a.fa')
 
         ht = khmer.Nodegraph(21, 1e5, 4)
-        ht.consume_fasta_and_tag(filename)
+        ht.consume_seqfile_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
         x = ht.subset_count_partitions(subset)
@@ -285,7 +285,7 @@ class Test_Partitioning(object):
         filename = utils.get_test_data('random-20-a.fa')
 
         ht = khmer.Nodegraph(20, 1e4, 4)
-        ht.consume_fasta_and_tag(filename)
+        ht.consume_seqfile_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
         x = ht.subset_count_partitions(subset)
@@ -295,7 +295,7 @@ class Test_Partitioning(object):
         filename = utils.get_test_data('random-20-b.fa')
 
         ht = khmer.Nodegraph(21, 1e4, 4)
-        ht.consume_fasta_and_tag(filename)
+        ht.consume_seqfile_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
         x = ht.subset_count_partitions(subset)
@@ -305,7 +305,7 @@ class Test_Partitioning(object):
         filename = utils.get_test_data('random-20-b.fa')
 
         ht = khmer.Nodegraph(20, 1e4, 4)
-        ht.consume_fasta_and_tag(filename)
+        ht.consume_seqfile_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
         x = ht.subset_count_partitions(subset)
@@ -315,7 +315,7 @@ class Test_Partitioning(object):
         filename = utils.get_test_data('random-31-c.fa')
 
         ht = khmer.Nodegraph(32, 1e6, 4)
-        ht.consume_fasta_and_tag(filename)
+        ht.consume_seqfile_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
         x = ht.subset_count_partitions(subset)
@@ -325,7 +325,7 @@ class Test_Partitioning(object):
         filename = utils.get_test_data('random-31-c.fa')
 
         ht = khmer.Nodegraph(31, 1e5, 4)
-        ht.consume_fasta_and_tag(filename)
+        ht.consume_seqfile_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
         x = ht.subset_count_partitions(subset)
