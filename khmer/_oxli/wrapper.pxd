@@ -48,7 +48,7 @@ cdef extern from "oxli/kmer_hash.hh" namespace "oxli":
         bool is_forward() const
         void set_from_unique_hash(HashIntoType, WordLength)
 
-    cdef cppclass CpKmerFactory "oxli:KmerFactory":
+    cdef cppclass CpKmerFactory "oxli::KmerFactory":
         KmerFactory(WordLength)
 
         CpKmer build_kmer(HashIntoType) const
@@ -56,7 +56,7 @@ cdef extern from "oxli/kmer_hash.hh" namespace "oxli":
         CpKmer build_kmer(string &) const
         CpKmer build_kmer(const char *) const
 
-    cdef cppclass CpKmerIterator "oxli:KmerIterator" (CpKmerFactory):
+    cdef cppclass CpKmerIterator "oxli::KmerIterator" (CpKmerFactory):
         CpKmerIterator(const char *, unsigned char)
         CpKmer first(HashIntoType &, HashIntoType &)
         CpKmer next(HashIntoType &, HashIntoType &)
@@ -76,6 +76,7 @@ cdef extern from "oxli/kmer_hash.hh" namespace "oxli":
     HashIntoType _hash_forward(const char *, WordLength)
     string _revhash(HashIntoType, WordLength)
     string _revcomp(const string&)
+    HashIntoType _hash_murmur(const string&, const WordLength)
     HashIntoType _hash_murmur(const string&,
                               HashIntoType&, HashIntoType&)
     HashIntoType _hash_murmur_forward(const string&)
@@ -229,12 +230,10 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
         vector[uint32_t] find_spectral_error_positions(string, 
                                                        BoundedCounterType)
 
-cdef extern from "khmer/_cpy_counttable.hh" namespace "khmer":
-    cdef cppclass CpCounttable "khmer::Counttable" (CpHashtable):
+    cdef cppclass CpCounttable "oxli::Counttable" (CpHashtable):
         CpCounttable(WordLength, vector[uint64_t])
 
-cdef extern from "khmer/_cpy_nodetable.hh" namespace "khmer":
-    cdef cppclass CpNodetable "khmer::Nodetable" (CpHashtable):
+    cdef cppclass CpNodetable "oxli::Nodetable" (CpHashtable):
         CpNodetable(WordLength, vector[uint64_t])
 
 
