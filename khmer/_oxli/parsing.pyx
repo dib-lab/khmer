@@ -75,6 +75,12 @@ cdef class Sequence:
         else:
             raise NotImplementedError('Operator not available')
 
+    def kmers(self, int K):
+        cdef int i = 0
+        cdef unicode sequence = self.sequence
+        for i in range(0, len(self)-K+1):
+            yield sequence[i:i+K]
+
     @property
     def name(self):
         cdef unicode name = self._obj.name
