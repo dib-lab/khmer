@@ -168,8 +168,9 @@ SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
 
 # Don't forget to update lib/Makefile with these flags!
-EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11', '-pedantic']
-EXTRA_LINK_ARGS = []
+EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11', '-pedantic',
+                      '-I /usr/local/Cellar/openssl/1.0.2j/include']
+EXTRA_LINK_ARGS = ['-L/usr/local/Cellar/openssl/1.0.2j/lib/ -lssl -lcrypto']
 
 if sys.platform == 'darwin':
     # force 64bit only builds
@@ -310,18 +311,19 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
                     ' configure || bash ./configure --static ) && make -f '
                     'Makefile.pic PIC']
             spawn(cmd=zcmd, dry_run=self.dry_run)
-            # self.extensions[0].extra_objects.extend(
             for ext in self.extensions:
                 ext.extra_objects.extend(
                     path_join("third-party", "zlib", bn + ".lo") for bn in [
                         "adler32", "compress", "crc32", "deflate", "gzclose",
                         "gzlib", "gzread", "gzwrite", "infback", "inffast",
                         "inflate", "inftrees", "trees", "uncompr", "zutil"])
+                ext.extra_objects.append(
+                    path_join("third-party", "cqf", "gqf.o"))
+
         if "bz2" not in self.libraries:
             bz2cmd = ['bash', '-c', 'cd ' + BZIP2DIR + ' && make -f '
                       'Makefile-libbz2_so all']
             spawn(cmd=bz2cmd, dry_run=self.dry_run)
-            # self.extensions[0].extra_objects.extend(
             for ext in self.extensions:
                 ext.extra_objects.extend(
                     path_join("third-party", "bzip2", bn + ".o") for bn in [
