@@ -54,7 +54,7 @@ def test_read_type_basic():
     name = "895:1:1:1246:14654 1:N:0:NNNNN"
     sequence = "ACGT"
     r = Read(name, sequence)
-    s = Record(dict(name=name, sequence=sequence))
+    s = Record(name, sequence)
 
     for x in (r, s):
         assert x.name == name
