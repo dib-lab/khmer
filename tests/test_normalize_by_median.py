@@ -779,3 +779,67 @@ def test_normalize_by_median_outfile_closed_err():
     (status, out, err) = utils.runscript(script, args)
     assert status == 0, (out, err)
     assert os.path.exists(outfile)
+
+
+def test_normalize_by_median_long_k():
+    CUTOFF = '2'
+
+    infile = utils.copy_test_data('test-abund-read-2.fa')
+    in_dir = os.path.dirname(infile)
+
+    script = 'normalize-by-median.py'
+    args = ['-C', CUTOFF, '-k', '33', '-H', 'murmur', infile]
+    utils.runscript(script, args, in_dir)
+
+    outfile = infile + '.keep'
+    assert os.path.exists(outfile), outfile
+
+    seqs = [r.sequence for r in screed.open(outfile)]
+    assert len(seqs) == 1, seqs
+    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
+
+
+def test_normalize_by_median_long_k_twobit_fails():
+    CUTOFF = '2'
+
+    infile = utils.copy_test_data('test-abund-read-2.fa')
+    in_dir = os.path.dirname(infile)
+
+    script = 'normalize-by-median.py'
+    args = ['-C', CUTOFF, '-k', '33', '-H', 'murmur', infile,
+            '-H', 'twobit-exact']
+    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+
+    assert status == 1
+    assert "'twobit-exact' only supports k-mer sizes <= 32" in err
+
+
+def test_normalize_by_median_long_k_save_fails():
+    CUTOFF = '2'
+
+    infile = utils.copy_test_data('test-abund-read-2.fa')
+    in_dir = os.path.dirname(infile)
+
+    script = 'normalize-by-median.py'
+    args = ['-C', CUTOFF, '-k', '33', '-H', 'murmur', infile, '-s', 'foo']
+    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+
+    assert status == 1
+    assert 'ERROR: cannot save different hash functions yet.' in err
+
+
+def test_normalize_by_median_long_k_load_fails():
+    CUTOFF = '2'
+
+    infile = utils.copy_test_data('test-abund-read-2.fa')
+    in_dir = os.path.dirname(infile)
+
+    script = 'normalize-by-median.py'
+    args = ['-C', CUTOFF, '-k', '33', '-H', 'murmur', infile, '-l', 'foo']
+    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+
+    print(out)
+    print(err)
+
+    assert status == 1
+    assert 'ERROR: cannot load different hash functions yet.' in err

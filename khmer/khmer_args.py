@@ -54,7 +54,7 @@ import khmer
 from khmer import extract_countgraph_info
 from khmer import __version__
 from .utils import print_error
-from .khmer_logger import log_info, log_warn, configure_logging
+from .khmer_logger import log_info, log_warn, configure_logging, log_error
 
 
 DEFAULT_K = 32
@@ -237,6 +237,9 @@ def check_conflicting_args(args, hashtype):
     loadgraph_autoarg_conflicts = ("unique_kmers", "max_memory_usage")
 
     if getattr(args, "loadgraph", None):
+        if getattr(args, "hash_function", 'twobit-exact') != 'twobit-exact':
+            log_error('ERROR: cannot load different hash functions yet.')
+            sys.exit(1)
 
         # check for table config args
         for key, value in loadgraph_table_conflicts.items():
@@ -475,6 +478,10 @@ def build_counting_args(descr=None, epilog=None, citations=None):
     parser.add_argument('--small-count', default=False, action='store_true',
                         help='Reduce memory usage by using a smaller counter'
                         ' for individual kmers.')
+    parser.add_argument('-H', '--hash-function', type=str,
+                       default='twobit-exact',
+                       help='choose hash function to use: twobit-exact, ' +
+                       'murmur')
 
     return parser
 
@@ -555,18 +562,80 @@ def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
 
     if ksize is None:
         ksize = args.ksize
+
     if ksize > 32:
-        print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
+        print_error("\n** ERROR: khmer only supports k-mer sizes <= 32 for "
+                    "graphs.\n")
+        sys.exit(1)
+
+    if args.hash_function != 'twobit-exact':
+        print_error("\n** ERROR: graphs only support hash function (-H) "
+                    "'twobit-exact'.")
         sys.exit(1)
 
     if args.small_count:
+        tabletype = 'smallcountgraph'
+        tableclass = khmer.SmallCountgraph
+    else:
+        tabletype = 'countgraph'
+        tableclass = khmer.Countgraph
+
+    tablesize = calculate_graphsize(args, tabletype, multiplier=multiplier)
+    return khmer.Countgraph(ksize, tablesize, args.n_tables)
+
+
+def create_counttable(args, ksize=None, multiplier=1.0, fp_rate=0.1):
+    """Create and return a counttable."""
+    args = _check_fp_rate(args, fp_rate)
+
+    if hasattr(args, 'force'):
+        if args.n_tables > 20:
+            if not args.force:
+                print_error(
+                    "\n** ERROR: khmer only supports number "
+                    "of tables <= 20.\n")
+                sys.exit(1)
+            else:
+                if args.n_tables > 20:
+                    log_warn("\n*** Warning: Maximum recommended number of "
+                             "tables is 20, discarded by force nonetheless!\n")
+
+    if ksize is None:
+        ksize = args.ksize
+
+    if args.hash_function == 'twobit-exact':
+        if ksize > 32:
+            print_error("\n** ERROR: hash function 'twobit-exact' only " +
+                        "supports k-mer sizes <= 32.")
+            print_error("** See -H/--hash-function for alternatives.")
+            sys.exit(1)
+    elif args.hash_function == 'murmur':
+        pass
+    else:
+        print_error("\n** Error, unknown hash function")
+        sys.exit(1)
+
+    if args.small_count:
+        if args.hash_function == 'murmur':
+            print_error("\n** ERROR: hash function 'murmur' does not " +
+                        "support small counts yet.")
+            sys.exit(1)
+
         tablesize = calculate_graphsize(args, 'smallcountgraph',
                                         multiplier=multiplier)
         return khmer.SmallCountgraph(ksize, tablesize, args.n_tables)
     else:
-        tablesize = calculate_graphsize(args, 'countgraph',
-                                        multiplier=multiplier)
-        return khmer.Countgraph(ksize, tablesize, args.n_tables)
+        if args.hash_function == 'murmur':
+            tabletype = 'counttable'
+            tableclass = khmer.Counttable
+        elif args.hash_function == 'twobit-exact':
+            tabletype = 'countgraph'
+            tableclass = khmer.Countgraph
+        else:
+            assert 0
+
+        tablesize = calculate_graphsize(args, tabletype, multiplier=multiplier)
+        return tableclass(ksize, tablesize, args.n_tables)
 
 
 def create_matching_nodegraph(countgraph):

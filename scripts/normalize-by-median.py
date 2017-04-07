@@ -330,6 +330,10 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
     if args.savegraph:
+        if args.hash_function != 'twobit-exact':
+            log_error('ERROR: cannot save different hash functions yet.')
+            sys.exit(1)
+
         graphsize = calculate_graphsize(args, 'countgraph')
         check_space_for_graph(args.savegraph, graphsize, args.force)
 
@@ -340,7 +344,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         countgraph = khmer.load_countgraph(args.loadgraph)
     else:
         log_info('making countgraph')
-        countgraph = khmer_args.create_countgraph(args)
+        countgraph = khmer_args.create_counttable(args)
 
     # create an object to handle diginorm of all files
     norm = Normalizer(args.cutoff, countgraph)

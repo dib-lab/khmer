@@ -88,6 +88,7 @@ del get_versions
 
 _buckets_per_byte = {
     'countgraph': 1,
+    'counttable': 1,
     'smallcountgraph': 2,
     'nodegraph': 8,
 }
