@@ -16,7 +16,8 @@ cdef class LinearAssembler:
         self.set_stop_filter(stop_filter=stop_filter)
         
         if type(self) is LinearAssembler:
-            self._this.reset(new CpLinearAssembler(self._graph_ptr))
+            self._this = new CpLinearAssembler(self._graph_ptr)
+            #self._this.reset(new CpLinearAssembler(self._graph_ptr))
 
     def set_stop_filter(self, stop_filter=None):
         self.stop_filter = stop_filter
@@ -75,6 +76,7 @@ cdef class CompactingAssembler(LinearAssembler):
         
         cdef CpCompactingAssembler* ptr = new CpCompactingAssembler(self._graph_ptr)
         if type(self) is CompactingAssembler:
-            self._this.reset(<CpLinearAssembler*> ptr)
+            self._this = ptr
+            #self._this.reset(<CpLinearAssembler*> ptr)
 
 

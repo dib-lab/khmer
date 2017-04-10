@@ -6,7 +6,8 @@ from hashing cimport Kmer
 
 
 cdef class LinearAssembler:
-    cdef unique_ptr[CpLinearAssembler] _this
+    #cdef unique_ptr[CpLinearAssembler] _this
+    cdef CpLinearAssembler * _this
 
     cdef public object graph
     cdef CpHashgraph * _graph_ptr
