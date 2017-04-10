@@ -82,13 +82,13 @@ public:
 
     explicit LinearAssembler(const Hashgraph * ht);
 
-    std::string assemble(const Kmer seed_kmer,
+    virtual std::string assemble(const Kmer seed_kmer,
                          const Hashgraph * stop_bf = 0) const;
 
-    std::string assemble_right(const Kmer seed_kmer,
+    virtual std::string assemble_right(const Kmer seed_kmer,
                                const Hashgraph * stop_bf = 0) const;
 
-    std::string assemble_left(const Kmer seed_kmer,
+    virtual std::string assemble_left(const Kmer seed_kmer,
                               const Hashgraph * stop_bf = 0) const;
 
     template <bool direction>
@@ -112,11 +112,13 @@ public:
 
     explicit CompactingAssembler(const Hashgraph* ht) : LinearAssembler(ht) {}
 
-    std::string assemble_right(const Kmer seed_kmer,
-                               const Hashgraph * stop_bf = 0) const;
+    virtual std::string assemble_right(const Kmer seed_kmer,
+                               const Hashgraph * stop_bf = 0,
+                               SeenSet * visited = 0) const;
 
-    std::string assemble_left(const Kmer seed_kmer,
-                              const Hashgraph * stop_bf = 0) const;
+    virtual std::string assemble_left(const Kmer seed_kmer,
+                              const Hashgraph * stop_bf = 0,
+                              SeenSet * visited = 0) const;
 };
 typedef CompactingAssembler CpCompactingAssembler;
 
