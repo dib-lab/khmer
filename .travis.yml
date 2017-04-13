@@ -71,6 +71,7 @@ script:
 
 # generate all the diagnostic reports
 after_success:
+  - cd $TRAVIS_BUILD_DIR && echo $TRAVIS_BUILD_DIR
   - make clean
   - PYTEST_ADDOPTS=-qqq make coverage-gcovr.xml coverage.xml
   # Fix suggested by http://diff-cover.readthedocs.io/en/latest/#troubleshooting

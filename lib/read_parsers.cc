@@ -240,8 +240,9 @@ void FastxReader::_init()
 {
     seqan::open(_stream, _filename.c_str());
     if (!seqan::isGood(_stream)) {
-        std::string message = "Could not open ";
-        message = message + _filename + " for reading.";
+        std::string message = "File ";
+        message = message + _filename + " contains badly formatted sequence";
+        message = message + " or does not exist.";
         throw InvalidStream(message);
     } else if (seqan::atEnd(_stream)) {
         std::string message = "File ";
