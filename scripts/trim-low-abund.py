@@ -44,8 +44,10 @@ Output sequences will be placed in 'infile.abundtrim'.
 Use -h for parameter help.
 """
 from __future__ import print_function
+import csv
 import sys
 import os
+import json
 import khmer
 import tempfile
 import shutil
@@ -129,6 +131,11 @@ def get_parser():
                         'reads are loaded.')
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
+    parser.add_argument('--summary-info', type=str, default=None,
+                        metavar="FORMAT", choices=['json', 'tsv'],
+                        help="What format should the machine readable run "
+                        "summary be in? (`json` or `tsv`, disabled by"
+                        " default)")
 
     # expert options
     parser.add_argument('--force', default=False, action='store_true')
@@ -265,6 +272,30 @@ class Trimmer(object):
                     self.n_skipped += 1
                     self.bp_skipped += 1
                     yield read
+
+
+def store_provenance_info(info, fname, format='json'):
+    """Store execution `info` as `format` in `fname`
+
+    The `format` defaults to JSON, 'tsv' is also supported.
+    """
+    format = format.lower() if format is not None else 'json'
+    fname = '{}.info.{}'.format(fname, format)
+    if format == 'json':
+        with open(fname, 'w') as f:
+            json.dump(info, f)
+            f.write('\n')
+
+    elif format == 'tsv':
+        with open(fname, 'w') as f:
+            tsv = csv.DictWriter(f, fieldnames=info.keys(),
+                                 dialect='excel-tab')
+            tsv.writeheader()
+            tsv.writerow(info)
+
+    else:
+        raise RuntimeError("File format has to be one of json or tsv"
+                           " not {}.".format(format))
 
 
 def main():
@@ -487,6 +518,24 @@ def main():
     if args.savegraph:
         log_info("Saving k-mer countgraph to {graph}", graph=args.savegraph)
         ct.save(args.savegraph)
+
+    if args.output is not None and args.output.name != 1:
+        base = args.output.name
+    # no explicit name or stdout stream get a default name
+    else:
+        base = 'trim-low-abund'
+    store_provenance_info({'fpr': fp_rate,
+                           'reads': n_reads,
+                           'basepairs': n_bp,
+                           'reads_written': written_reads,
+                           'basepairs_written': written_bp,
+                           'reads_skipped': n_skipped,
+                           'basepairs_skipped': bp_skipped,
+                           'reads_removed': n_reads - written_reads,
+                           'reads_trimmed': trimmed_reads,
+                           'basepairs_removed_or_trimmed': n_bp - written_bp,
+                           },
+                          fname=base, format=args.summary_info)
 
 
 if __name__ == '__main__':
