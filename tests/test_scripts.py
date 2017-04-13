@@ -2576,6 +2576,22 @@ def test_trim_low_abund_stdout():
     _, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
 
     assert 'GGTTGACGGGGCTCAGGG' in out
+    # can't test that the correct message appears because we redirect
+    # the output when under testing. Instead check that incorrect message
+    # does not appear.
+    assert 'output in *.abundtrim' not in err
+
+
+def test_trim_low_abund_output_named():
+    # check the output filename is mentioned when it is explicitly set
+    infile = utils.copy_test_data('test-abund-read-2.fa')
+    in_dir = os.path.dirname(infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", infile,
+            "-o", "explicitname.abundtrim"]
+    _, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
+
+    assert 'output in explicitname.abundtrim' in err
 
 
 def test_trim_low_abund_diginorm_coverage_err():

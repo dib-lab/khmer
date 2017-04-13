@@ -477,7 +477,12 @@ def main():
     # for max_false_pos see Zhang et al., http://arxiv.org/abs/1309.2975
     log_info('fp rate estimated to be {fpr:1.3f}', fpr=fp_rate)
 
-    log_info('output in *.abundtrim')
+    if args.output is None:
+        log_info('output in *.abundtrim')
+    elif args.output.name == 1:
+        log_info('output streamed to stdout')
+    elif args.output.name:
+        log_info('output in {}'.format(args.output.name))
 
     if args.savegraph:
         log_info("Saving k-mer countgraph to {graph}", graph=args.savegraph)
