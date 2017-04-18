@@ -169,8 +169,10 @@ SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
 
 # Don't forget to update lib/Makefile with these flags!
 EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11', '-pedantic',
-                      '-I /usr/local/Cellar/openssl/1.0.2j/include']
-EXTRA_LINK_ARGS = ['-L/usr/local/Cellar/openssl/1.0.2j/lib/ -lssl -lcrypto']
+                      #'-I /usr/local/Cellar/openssl/1.0.2j/include'
+                      ]
+EXTRA_LINK_ARGS = [#'-L/usr/local/Cellar/openssl/1.0.2j/lib/'
+    '-lssl', '-lcrypto']
 
 if sys.platform == 'darwin':
     # force 64bit only builds

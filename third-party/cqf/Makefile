@@ -1,4 +1,4 @@
-TARGETS=main
+TARGETS=gqf.o
 
 ifdef D
 	DEBUG=-g
@@ -18,8 +18,8 @@ ifdef P
 	PROFILE=-pg -no-pie # for bug in gprof.
 endif
 
-CXX = g++ -std=c++11
-CC = g++ -std=c++11
+CXX = g++ -std=c++11 -fPIC
+CC = g++ -std=c++11 -fPIC
 LD= g++ -std=c++11
 
 CXXFLAGS = -Wall $(DEBUG) $(PROFILE) $(OPT) $(ARCH) -m64 -I. -Wno-unused-result -Wno-strict-aliasing -Wno-unused-function
@@ -34,11 +34,7 @@ all: $(TARGETS)
 
 # dependencies between programs and .o files
 
-main:                  main.o 								 gqf.o
 
-# dependencies between .o files and .h files
-
-main.o: 								 									gqf.h
 
 # dependencies between .o files and .cc (or .c) files
 
@@ -48,9 +44,6 @@ gqf.o: gqf.c gqf.h
 #
 # generic build rules
 #
-
-$(TARGETS):
-	$(LD) $^ $(LDFLAGS) -o $@
 
 %.o: %.cc
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $< -c -o $@
