@@ -49,6 +49,30 @@ Contact: khmer-project@idyll.org
 
 using namespace std;
 
+
+const khmer::HashIntoType
+twobit_values[256] = {['A'] = 0+1, ['T'] = 1+1, ['C'] = 2+1, ['G'] = 3+1,
+                      ['a'] = 0+1, ['t'] = 1+1, ['c'] = 2+1, ['g'] = 3+1};
+khmer::HashIntoType twobit_repr(const char ch)
+{
+  const khmer::HashIntoType v(twobit_values[ch]);
+  if (v > 0) {
+    return v - 1;
+  } else {
+    throw khmer::khmer_exception("Sequence contains invalid DNA symbol.");
+  }
+}
+const khmer::HashIntoType
+twobit_values_comp[256] = {['A'] = 1+1, ['T'] = 0+1, ['C'] = 3+1, ['G'] = 2+1,
+                           ['a'] = 1+1, ['t'] = 0+1, ['c'] = 3+1, ['g'] = 2+1};
+khmer::HashIntoType twobit_comp(const char ch)
+{
+  return twobit_values_comp[ch] - 1;
+  // this should not get called without twobit_repr() having been called
+  // first so no need to check for invalid DNA characters
+}
+
+
 //
 // _hash: hash a k-length DNA sequence into a 64-bit number.
 //
