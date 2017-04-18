@@ -43,6 +43,8 @@ Contact: khmer-project@idyll.org
 #include <mutex>
 using MuxGuard = std::lock_guard<std::mutex>;
 
+#include "gqf.h"
+
 namespace oxli {
 typedef std::map<HashIntoType, BoundedCounterType> KmerCountMap;
 
@@ -399,6 +401,48 @@ public:
     {
         return _counts;
     }
+};
+
+
+/*
+ * \class QFStorage
+ *
+ * \brief A Quotient Filter storage
+ */
+ class QFStorage : public Storage {
+protected:
+  QF cf;
+
+public:
+  QFStorage() { qf_init(&cf, (1ULL << 24), 32, 0); }
+
+  ~QFStorage() { qf_destroy(&cf); }
+
+  BoundedCounterType test_and_set_bits(HashIntoType khash) {
+    BoundedCounterType x = get_count(khash);
+    add(khash);
+    return !x;
+  }
+
+  //
+  void add(HashIntoType khash) {
+      qf_insert(&cf, khash, 0, 1);
+  }
+
+  // get the count for the given k-mer hash.
+  const BoundedCounterType get_count(HashIntoType khash) const {
+    return qf_count_key_value(&cf, khash, 0);
+  }
+
+  // Accessors for protected/private table info members
+  std::vector<uint64_t> get_tablesizes() const { return {42, 42}; }
+  const size_t n_tables() const { return 42; }
+  const uint64_t n_unique_kmers() const { return 42; }
+  const uint64_t n_occupied() const { return 42; }
+  void save(std::string outfilename, WordLength ksize) {}
+  void load(std::string infilename, WordLength &ksize) {}
+
+  Byte **get_raw_tables() { return nullptr; }
 };
 
 

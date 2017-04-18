@@ -516,6 +516,14 @@ public:
           : MurmurHashtable(ksize, new NibbleStorage(sizes)) { };
 };
 
+// Hashtable-derived class with QFStorage.
+class QFCounttable : public khmer::Hashtable
+{
+public:
+    explicit QFCounttable(WordLength ksize, std::vector<uint64_t> sizes)
+        : Hashtable(ksize, new QFStorage()) { } ;
+};
+
 // Hashtable-derived class with BitStorage.
 class Nodetable : public oxli::MurmurHashtable
 {
