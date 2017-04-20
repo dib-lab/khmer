@@ -50,6 +50,7 @@ import os
 import json
 import khmer
 import tempfile
+import time
 import shutil
 import textwrap
 
@@ -519,23 +520,25 @@ def main():
         log_info("Saving k-mer countgraph to {graph}", graph=args.savegraph)
         ct.save(args.savegraph)
 
-    if args.output is not None and args.output.name != 1:
-        base = args.output.name
-    # no explicit name or stdout stream get a default name
-    else:
-        base = 'trim-low-abund'
-    store_provenance_info({'fpr': fp_rate,
-                           'reads': n_reads,
-                           'basepairs': n_bp,
-                           'reads_written': written_reads,
-                           'basepairs_written': written_bp,
-                           'reads_skipped': n_skipped,
-                           'basepairs_skipped': bp_skipped,
-                           'reads_removed': n_reads - written_reads,
-                           'reads_trimmed': trimmed_reads,
-                           'basepairs_removed_or_trimmed': n_bp - written_bp,
-                           },
-                          fname=base, format=args.summary_info)
+    if args.summary_info is not None:
+        # when the output is stdout the name is == 1
+        if args.output is not None and args.output.name != 1:
+            base = args.output.name
+        # no explicit name or stdout stream -> use a default name
+        else:
+            base = 'trim-low-abund-{}'.format(time.strftime("%Y-%m-%dT%H:%M:%S"))
+        store_provenance_info({'fpr': fp_rate,
+                               'reads': n_reads,
+                               'basepairs': n_bp,
+                               'reads_written': written_reads,
+                               'basepairs_written': written_bp,
+                               'reads_skipped': n_skipped,
+                               'basepairs_skipped': bp_skipped,
+                               'reads_removed': n_reads - written_reads,
+                               'reads_trimmed': trimmed_reads,
+                               'basepairs_removed_or_trimmed': n_bp - written_bp,
+                               },
+                              fname=base, format=args.summary_info)
 
 
 if __name__ == '__main__':
