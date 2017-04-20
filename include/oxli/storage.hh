@@ -414,7 +414,10 @@ protected:
   QF cf;
 
 public:
-  QFStorage() { qf_init(&cf, (1ULL << (32-8)), 32, 0); }
+  QFStorage(int size) {
+    qf_init(&cf, (1ULL << size), size+8, 0);
+    //qf_dump(&cf);
+  }
 
   ~QFStorage() { qf_destroy(&cf); }
 
@@ -426,7 +429,10 @@ public:
 
   //
   void add(HashIntoType khash) {
+    //std::cout << khash << std::endl;
       qf_insert(&cf, khash, 0, 1);
+      //qf_dump(&cf);
+
   }
 
   // get the count for the given k-mer hash.

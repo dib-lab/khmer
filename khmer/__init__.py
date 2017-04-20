@@ -362,9 +362,7 @@ class SmallCounttable(_SmallCounttable):
 
 class QFCounttable(_QFCounttable):
     def __new__(cls, k, starting_size, n_tables):
-        primes = get_n_primes_near_x(n_tables, starting_size)
-        counttable = _QFCounttable.__new__(cls, k, primes)
-        counttable.primes = primes
+        counttable = _QFCounttable.__new__(cls, k, [starting_size])
         return counttable
 
 
