@@ -1414,9 +1414,10 @@ void qf_init(QF *qf, uint64_t nslots, uint64_t key_bits, uint64_t value_bits)
 	qf->ndistinct_elts = 0;
 	qf->noccupied_slots = 0;
 #if BITS_PER_SLOT == 8 || BITS_PER_SLOT == 16 || BITS_PER_SLOT == 32 || BITS_PER_SLOT == 64
-	qf->blocks = (qfblock *)calloc(qf->nblocks, sizeof(qfblock));
+  std::cout << "malloc'ed: " << qf->nblocks * sizeof(qfblock) << std::endl;
+	qf->blocks = (qfblock *)malloc(qf->nblocks * sizeof(qfblock));
 #else
-	qf->blocks = (qfblock *)calloc(qf->nblocks, sizeof(qfblock) + SLOTS_PER_BLOCK * qf->bits_per_slot / 8);
+	qf->blocks = (qfblock *)malloc(qf->nblocks * (sizeof(qfblock) + SLOTS_PER_BLOCK * qf->bits_per_slot / 8));
 #endif
 }
 

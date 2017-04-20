@@ -414,7 +414,7 @@ protected:
   QF cf;
 
 public:
-  QFStorage() { qf_init(&cf, (1ULL << 24), 32, 0); }
+  QFStorage() { qf_init(&cf, (1ULL << (32-8)), 32, 0); }
 
   ~QFStorage() { qf_destroy(&cf); }
 

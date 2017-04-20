@@ -68,7 +68,8 @@ PREFIX=/usr/local
 ### NOTE: No user-serviceable parts below this line! ###
 
 INCLUDES= -I ../../include/ -I ../../third-party/seqan/core/include/ \
-	      -I ../../third-party/smhasher/
+	      -I ../../third-party/smhasher/ \
+				-I ../../third-party/cqf/
 
 ifeq ($(USE_SYSTEM_ZLIB), false)
 INCLUDES += -I ../../third-party/zlib/
