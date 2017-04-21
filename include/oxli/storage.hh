@@ -416,7 +416,6 @@ protected:
 public:
   QFStorage(int size) {
     qf_init(&cf, (1ULL << size), size+8, 0);
-    //qf_dump(&cf);
   }
 
   ~QFStorage() { qf_destroy(&cf); }
@@ -429,15 +428,12 @@ public:
 
   //
   void add(HashIntoType khash) {
-    //std::cout << khash << std::endl;
-      qf_insert(&cf, khash, 0, 1);
-      //qf_dump(&cf);
-
+      qf_insert(&cf, khash % cf.range, 0, 1);
   }
 
   // get the count for the given k-mer hash.
   const BoundedCounterType get_count(HashIntoType khash) const {
-    return qf_count_key_value(&cf, khash, 0);
+    return qf_count_key_value(&cf, khash % cf.range, 0);
   }
 
   // Accessors for protected/private table info members

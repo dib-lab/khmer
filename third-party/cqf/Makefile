@@ -53,4 +53,3 @@ gqf.o: gqf.c gqf.h
 
 clean:
 	rm -f *.o $(TARGETS)
-

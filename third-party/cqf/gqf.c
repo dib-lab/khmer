@@ -28,6 +28,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <sys/mman.h>
+#include <iostream>
 
 #include "gqf.h"
 
@@ -484,6 +485,7 @@ static inline void shift_remainders(QF *qf, uint64_t start_index, uint64_t empty
 	uint64_t empty_block  = empty_index / SLOTS_PER_BLOCK;
 	uint64_t empty_offset = empty_index % SLOTS_PER_BLOCK;
 
+std::cout << start_index <<" "<< empty_index<<" "<< empty_index <<" "<< qf->xnslots <<std::endl;
 	assert (start_index <= empty_index && empty_index < qf->xnslots);
 
 	while (start_block < empty_block) {
@@ -1422,7 +1424,7 @@ void qf_init(QF *qf, uint64_t nslots, uint64_t key_bits, uint64_t value_bits)
 
 uint64_t qf_count_key_value(const QF *qf, uint64_t key, uint64_t value)
 {
-	__uint128_t hash = key % (qf->nblocks * SLOTS_PER_BLOCK);
+	__uint128_t hash = key;
 	uint64_t hash_remainder   = hash & BITMASK(qf->bits_per_slot);
 	int64_t hash_bucket_index = hash >> qf->bits_per_slot;
 
@@ -1449,7 +1451,6 @@ uint64_t qf_count_key_value(const QF *qf, uint64_t key, uint64_t value)
 void qf_insert(QF *qf, uint64_t key, uint64_t value, uint64_t count)
 {
 	/*uint64_t hash = (key << qf->value_bits) | (value & BITMASK(qf->value_bits));*/
-	key = key % (qf->nblocks * SLOTS_PER_BLOCK);
 	if (count == 1)
 		insert1(qf, key);
 	else
