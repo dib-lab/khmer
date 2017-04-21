@@ -2616,7 +2616,10 @@ def test_trim_low_abund_stdout():
     args = ["-k", "17", "-x", "1e7", "-N", "2", infile, "-o", "-"]
     _, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
 
-    assert 'GGTTGACGGGGCTCAGGG' in out
+    # attempt to parse output to check it is in FASTA format
+    stream = io.StringIO(out)
+    assert list(screed.fasta.fasta_iter(stream)), "can't parse stdout"
+
     # can't test that the correct message appears because we redirect
     # the output when under testing. Instead check that incorrect message
     # does not appear.
