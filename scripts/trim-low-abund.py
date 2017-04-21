@@ -521,7 +521,8 @@ def main():
         ct.save(args.savegraph)
 
     if args.summary_info is not None:
-        # when the output is stdout the name is == 1
+        # note that when streaming to stdout the name of args.output will
+        # be set to 1
         if args.output is not None and args.output.name != 1:
             base = args.output.name
         # no explicit name or stdout stream -> use a default name
