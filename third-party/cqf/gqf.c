@@ -485,7 +485,7 @@ static inline void shift_remainders(QF *qf, uint64_t start_index, uint64_t empty
 	uint64_t empty_block  = empty_index / SLOTS_PER_BLOCK;
 	uint64_t empty_offset = empty_index % SLOTS_PER_BLOCK;
 
-std::cout << start_index <<" "<< empty_index<<" "<< empty_index <<" "<< qf->xnslots <<std::endl;
+//std::cout << start_index <<" "<< empty_index<<" "<< empty_index <<" "<< qf->xnslots <<std::endl;
 	assert (start_index <= empty_index && empty_index < qf->xnslots);
 
 	while (start_block < empty_block) {
@@ -1416,7 +1416,7 @@ void qf_init(QF *qf, uint64_t nslots, uint64_t key_bits, uint64_t value_bits)
 	qf->ndistinct_elts = 0;
 	qf->noccupied_slots = 0;
 #if BITS_PER_SLOT == 8 || BITS_PER_SLOT == 16 || BITS_PER_SLOT == 32 || BITS_PER_SLOT == 64
-	qf->blocks = (qfblock *)calloc(qf->nblocks,  sizeof(qfblock));
+	qf->blocks = (qfblock *)calloc(qf->nblocks, sizeof(qfblock));
 #else
 	qf->blocks = (qfblock *)calloc(qf->nblocks, (sizeof(qfblock) + SLOTS_PER_BLOCK * qf->bits_per_slot / 8));
 #endif
