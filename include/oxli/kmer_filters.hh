@@ -61,7 +61,7 @@ KmerFilter get_simple_label_intersect_filter(const LabelSet& src_labels,
 
 KmerFilter get_stop_bf_filter(const Hashtable * stop_bf);
 
-KmerFilter get_visited_filter(const SeenSet * visited);
+KmerFilter get_visited_filter(std::shared_ptr<SeenSet> visited);
 
 KmerFilter get_junction_count_filter(const Kmer& src_node,
                                      Countgraph * junctions,

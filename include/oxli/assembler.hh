@@ -112,13 +112,14 @@ public:
 
     explicit CompactingAssembler(const Hashgraph* ht) : LinearAssembler(ht) {}
 
+    virtual std::string assemble(const Kmer seed_kmer,
+                                          const Hashgraph * stop_bf) const;
+
     virtual std::string assemble_right(const Kmer seed_kmer,
-                               const Hashgraph * stop_bf = 0,
-                               SeenSet * visited = 0) const;
+                               const Hashgraph * stop_bf = 0) const;
 
     virtual std::string assemble_left(const Kmer seed_kmer,
-                              const Hashgraph * stop_bf = 0,
-                              SeenSet * visited = 0) const;
+                              const Hashgraph * stop_bf = 0) const;
 };
 typedef CompactingAssembler CpCompactingAssembler;
 
@@ -158,7 +159,7 @@ public:
                           const Hashgraph * stop_bf=0) const;
 
     template <bool direction>
-    void _assemble_directed(NonLoopingAT<direction>& start_cursor,
+    void _assemble_directed(AssemblerTraverser<direction>& start_cursor,
                             StringVector& paths) const;
 
 };
@@ -187,7 +188,7 @@ public:
     BoundedCounterType get_junction_count(Kmer kmer_a, Kmer kmer_b) const;
 
     template <bool direction>
-    void _assemble_directed(NonLoopingAT<direction>& start_cursor,
+    void _assemble_directed(AssemblerTraverser<direction>& start_cursor,
                             StringVector& paths) const;
 
 };

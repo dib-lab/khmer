@@ -246,9 +246,21 @@ public:
 template <bool direction>
 class AssemblerTraverser: public NodeCursor<direction>
 {
+protected:
+    std::shared_ptr<SeenSet> visited;
 
 public:
     using NodeCursor<direction>::NodeCursor;
+
+    explicit AssemblerTraverser(const Hashgraph * ht,
+                          Kmer start_kmer,
+                          KmerFilterList filters);
+
+    explicit AssemblerTraverser(const Hashgraph * ht,
+                          Kmer start_kmer,
+                          KmerFilterList filters,
+                          std::shared_ptr<SeenSet> visited);
+    AssemblerTraverser(const AssemblerTraverser& other);
 
     /**
      * @brief Get the next symbol.
@@ -278,32 +290,6 @@ public:
 };
 
 
-/**
- * @brief An AssemblerTraverser which does not traverse to Kmers it has already encountered.
- *
- * Simply adds a new filter to check if the Kmer has been seen, and adds the Kmer to the set
- * of seen Kmers after calling ::next_symbol.
- *
- * @tparam direction The direction to assemble.
- */
-template<bool direction>
-class NonLoopingAT: public AssemblerTraverser<direction>
-{
-protected:
-
-    SeenSet * visited;
-
-public:
-
-    explicit NonLoopingAT(const Hashgraph * ht,
-                          Kmer start_kmer,
-                          KmerFilterList filters,
-                          SeenSet * visited);
-
-    virtual char next_symbol();
-};
-
-
 template<bool direction>
 class CompactingAT: public AssemblerTraverser<direction>
 {
@@ -316,6 +302,11 @@ public:
     explicit CompactingAT(const Hashgraph * ht,
                           Kmer start_kmer,
                           KmerFilterList filters);
+
+    explicit CompactingAT(const Hashgraph * ht,
+                          Kmer start_kmer,
+                          KmerFilterList filters,
+                          std::shared_ptr<SeenSet> visited);
 
     virtual char next_symbol();
 
