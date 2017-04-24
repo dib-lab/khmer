@@ -455,6 +455,9 @@ cdef extern from "oxli/partitioning.hh" namespace "oxli":
         uint64_t  consume_pair(string&, string&) nogil except +MemoryError
         uint64_t consume_fasta(string&) except +MemoryError
 
+        uint64_t seed_sequence(string&, set[HashIntoType]&, KmerQueue&,
+                           set[HashIntoType]&) except +MemoryError
+        void create_and_connect_components(set[HashIntoType]&)
         void add_component(ComponentPtr comp)
         void map_tags_to_component(set[HashIntoType]&, ComponentPtr&)
         void find_connected_tags(queue[CpKmer]&, 

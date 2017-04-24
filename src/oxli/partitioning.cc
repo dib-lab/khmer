@@ -96,7 +96,11 @@ uint64_t StreamingPartitioner::consume_fasta(const std::string& filename)
 uint64_t StreamingPartitioner::consume(const std::string& seq)
 {
     std::set<HashIntoType> tags;
-    uint64_t n_new = consume_and_connect_tags(seq, tags);
+    KmerQueue seeds;
+    std::set<HashIntoType> seen;
+
+    uint64_t n_new = seed_sequence(seq, tags, seeds, seen);
+    find_connected_tags(seeds, tags, seen, false);
     //acquire_components();
     create_and_connect_components(tags);
     //release_components();
@@ -108,8 +112,12 @@ uint64_t StreamingPartitioner::consume_pair(const std::string& first,
                                         const std::string& second)
 {
     std::set<HashIntoType> tags;
-    uint64_t n_new = consume_and_connect_tags(first, tags);
-    n_new += consume_and_connect_tags(second, tags);
+    KmerQueue seeds;
+    std::set<HashIntoType> seen;
+
+    uint64_t n_new = seed_sequence(first, tags, seeds, seen);
+    n_new += seed_sequence(second, tags, seeds, seen);
+    find_connected_tags(seeds, tags, seen, false);
     //acquire_components();
     create_and_connect_components(tags);
     //release_components();
@@ -123,8 +131,11 @@ void StreamingPartitioner::add_component(ComponentPtr comp)
 }
 
 
-uint64_t StreamingPartitioner::consume_and_connect_tags(const std::string& seq,
-                                                    std::set<HashIntoType>& tags)
+
+uint64_t StreamingPartitioner::seed_sequence(const std::string& seq,
+                                          std::set<HashIntoType>& tags,
+                                          KmerQueue& seeds,
+                                          std::set<HashIntoType>& seen)
 {
     /* For the following comments, let G be the set of k-mers
      * known in the graph before inserting the k-mers R from
@@ -142,9 +153,7 @@ uint64_t StreamingPartitioner::consume_and_connect_tags(const std::string& seq,
         KmerIterator kmers(seq.c_str(), graph->ksize());
         unsigned int since = _tag_density / 2 + 1;
 
-        std::set<HashIntoType> seen;
         KmerSet intersection;
-        KmerQueue search_from;
 
         bool in_known_territory = false;
         bool found_tag_in_territory = false;
@@ -164,12 +173,12 @@ uint64_t StreamingPartitioner::consume_and_connect_tags(const std::string& seq,
                     seen.insert(intersection.begin(), intersection.end());
                 } /*else {
                     for (auto km : intersection) {
-                        search_from.push(km);
+                        seeds.push(km);
                     }
                 }*/
                 intersection.clear();
 
-                search_from.push(kmer);
+                seeds.push(kmer);
                 in_known_territory = false;
                 found_tag_in_territory = false;
                 ++since;
@@ -200,18 +209,16 @@ uint64_t StreamingPartitioner::consume_and_connect_tags(const std::string& seq,
         if (since >= _tag_density / 2) {
             tags.insert(kmer);
         }
-        search_from.push(kmer);
+        seeds.push(kmer);
 
         // now go back and make sure to search from the first k-mer
         kmer = kmers.first();
-        search_from.push(kmer);
+        seeds.push(kmer);
 
 #if(DEBUG_SP)
         std::cout << "Done iterating k-mers" << std::endl;
         std::cout << tags.size() << " tags in sequence" << std::endl;
 #endif
-        // Now search for tagged nodes connected to U.
-        find_connected_tags(search_from, tags, seen, false);
     } else {
         throw oxli_ptr_exception("Hashgraph has been deleted.");
     }

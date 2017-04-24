@@ -237,8 +237,10 @@ class StreamingPartitioner {
         uint64_t consume(const std::string& seq);
         uint64_t consume_pair(const std::string& first,
                           const std::string& second);
-        uint64_t consume_and_connect_tags(const std::string& seq,
-                                      std::set<HashIntoType>& tags);
+        uint64_t seed_sequence(const std::string& seq,
+                              std::set<HashIntoType>& tags,
+                              KmerQueue& seeds,
+                              std::set<HashIntoType>& seen);
         void create_and_connect_components(std::set<HashIntoType>& tags);
 
         uint64_t consume_fasta(std::string const &filename);
