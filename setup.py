@@ -168,11 +168,8 @@ SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
 
 # Don't forget to update lib/Makefile with these flags!
-EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11', '-pedantic',
-                      #'-I /usr/local/Cellar/openssl/1.0.2j/include'
-                      ]
-EXTRA_LINK_ARGS = [#'-L/usr/local/Cellar/openssl/1.0.2j/lib/'
-    '-lssl', '-lcrypto']
+EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11', '-pedantic']
+EXTRA_LINK_ARGS = []
 
 if sys.platform == 'darwin':
     # force 64bit only builds
@@ -307,6 +304,9 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
 
         if sys.platform == 'darwin' and 'gcov' in self.libraries:
             self.libraries.remove('gcov')
+
+        self.extensions[0].extra_objects.append(
+            path_join("third-party", "cqf", "gqf.o"))
 
         if "z" not in self.libraries:
             zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'
