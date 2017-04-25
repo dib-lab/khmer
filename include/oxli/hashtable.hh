@@ -520,8 +520,8 @@ public:
 class QFCounttable : public khmer::Hashtable
 {
 public:
-    explicit QFCounttable(WordLength ksize, std::vector<uint64_t> sizes)
-        : Hashtable(ksize, new QFStorage(sizes[0])) { } ;
+    explicit QFCounttable(WordLength ksize, int size)
+        : Hashtable(ksize, new QFStorage(size)) { } ;
 };
 
 // Hashtable-derived class with BitStorage.

@@ -38,7 +38,7 @@
 
 from __future__ import print_function
 from collections import namedtuple
-from math import log
+from math import log, log2
 import json
 
 from khmer._khmer import Countgraph as _Countgraph
@@ -361,8 +361,13 @@ class SmallCounttable(_SmallCounttable):
 
 
 class QFCounttable(_QFCounttable):
-    def __new__(cls, k, starting_size, n_tables):
-        counttable = _QFCounttable.__new__(cls, k, [starting_size])
+    def __new__(cls, k, starting_size):
+        # starting size has to be a power of two
+        power_of_two = ((starting_size & (starting_size - 1) == 0) and
+                        (starting_size != 0))
+        if not power_of_two:
+            raise ValueError("starting_size has to be a power of two.")
+        counttable = _QFCounttable.__new__(cls, k, int(log2(starting_size)))
         return counttable
 
 

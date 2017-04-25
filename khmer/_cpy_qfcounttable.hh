@@ -100,21 +100,15 @@ static PyObject* khmer_QFcounttable_new(PyTypeObject * type, PyObject * args,
 
     if (self != NULL) {
         WordLength k = 0;
-        PyListObject * sizes_list_o = NULL;
+        int size = 0;
 
-        if (!PyArg_ParseTuple(args, "bO!", &k, &PyList_Type, &sizes_list_o)) {
-            Py_DECREF(self);
-            return NULL;
-        }
-
-        std::vector<uint64_t> sizes;
-        if (!convert_Pytablesizes_to_vector(sizes_list_o, sizes)) {
+        if (!PyArg_ParseTuple(args, "bi", &k, &size)) {
             Py_DECREF(self);
             return NULL;
         }
 
         try {
-            self->counttable = new QFCounttable(k, sizes);
+            self->counttable = new QFCounttable(k, size);
         } catch (std::bad_alloc &e) {
             Py_DECREF(self);
             return PyErr_NoMemory();
