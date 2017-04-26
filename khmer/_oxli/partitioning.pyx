@@ -116,7 +116,7 @@ cdef class Component:
 
 cdef class StreamingPartitioner:
 
-    def __cinit__(self, graph, tag_density=None):
+    def __cinit__(self, graph, tag_density=None, *args, **kwargs):
         self._graph_ptr =  get_hashgraph_ptr(graph)
         if self._graph_ptr == NULL:
             raise ValueError('Must take an object with Hashgraph *')
@@ -265,3 +265,4 @@ cdef class StreamingPartitioner:
     @property
     def tag_density(self):
         return deref(self._this).get_tag_density()
+
