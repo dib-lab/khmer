@@ -88,7 +88,9 @@ const
         node_filters.push_back(get_stop_bf_filter(stop_bf));
     }
 
-    AssemblerTraverser<TRAVERSAL_RIGHT> cursor(graph, seed_kmer, node_filters);
+    SeenSet visited;
+
+    NonLoopingAT<TRAVERSAL_RIGHT> cursor(graph, seed_kmer, node_filters, &visited);
     return _assemble_directed<TRAVERSAL_RIGHT>(cursor);
 }
 
@@ -102,7 +104,9 @@ const
         node_filters.push_back(get_stop_bf_filter(stop_bf));
     }
 
-    AssemblerTraverser<TRAVERSAL_LEFT> cursor(graph, seed_kmer, node_filters);
+    SeenSet visited;
+
+    NonLoopingAT<TRAVERSAL_LEFT> cursor(graph, seed_kmer, node_filters, &visited);
     return _assemble_directed<TRAVERSAL_LEFT>(cursor);
 }
 
