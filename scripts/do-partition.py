@@ -48,7 +48,6 @@ import sys
 import threading
 import os.path
 import os
-import gc
 import textwrap
 from khmer import khmer_args
 from khmer.khmer_args import (build_nodegraph_args, report_on_config,
@@ -94,9 +93,8 @@ def get_parser():
     parser.add_argument('--no-big-traverse', dest='no_big_traverse',
                         action='store_true', default=False,
                         help='Truncate graph joins at big traversals')
-    parser.add_argument('--keep-subsets', dest='remove_subsets',
-                        default=True, action='store_false',
-                        help='Keep individual subsets (default: False)')
+    parser.add_argument('--keep-subsets', default=True, action='store_false',
+                        help='Keep individual subsets')
     parser.add_argument('graphbase', help="base name for output files")
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         nargs='+', help='input FAST[AQ] sequence filenames')
@@ -212,7 +210,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
         print('merging', pmap_file, file=sys.stderr)
         nodegraph.merge_subset_from_disk(pmap_file)
 
-    if args.remove_subsets:
+    if not args.keep_subsets:
         print('removing pmap files', file=sys.stderr)
         for pmap_file in pmap_files:
             os.unlink(pmap_file)
