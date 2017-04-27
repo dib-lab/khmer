@@ -49,12 +49,8 @@ GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 VERSION=$(shell ./setup.py version | grep Version | awk '{print $$4}' \
 	| sed 's/+/-/')
 
-# wrapping the command with `printf "%q" some-text` shell-escapes the string
-# http://stackoverflow.com/a/2856010
-# list of preprocessor defines works for GCC and clang
-# http://nadeausoftware.com/articles/2011/12/c_c_tip_how_list_compiler_predefined_macros
-DEFINES=$(shell printf "%q" "$$( c++ -dM -E -x c++ /dev/null | \
-	awk '{print "-D" $$2 "=" $$3}' | tr '\n' ' ')" | sed 's/\\ / /g' )
+# The following four variables are only used by cppcheck. If you want to
+# change how things are compiled edit `setup.cfg` or `setup.py`.
 DEFINES += -DNDEBUG -DVERSION=$(VERSION) -DSEQAN_HAS_BZIP2=1 \
 	   -DSEQAN_HAS_ZLIB=1 -UNO_UNIQUE_RC
 
@@ -62,16 +58,19 @@ INCLUDESTRING=$(shell gcc -E -x c++ - -v < /dev/null 2>&1 >/dev/null \
 	    | grep '^ /' | grep -v cc1plus)
 INCLUDEOPTS=$(shell gcc -E -x c++ - -v < /dev/null 2>&1 >/dev/null \
 	    | grep '^ /' | grep -v cc1plus | awk '{print "-I" $$1 " "}')
-PYINCLUDE=$(shell python -c \
-	  "import sysconfig;print(sysconfig.get_path('include'))")
+PYINCLUDE=$(shell python -c "from __future__ import print_function; \
+	    import sysconfig; flags = ['-I' + sysconfig.get_path('include'), \
+	    '-I' + sysconfig.get_path('platinclude')]; print(' '.join(flags))")
 
-CPPCHECK=ls lib/*.cc khmer/_khmer.cc | grep -v test | cppcheck -DNDEBUG \
-	 -DVERSION=0.0.cppcheck -DSEQAN_HAS_BZIP2=1 -DSEQAN_HAS_ZLIB=1 \
-	 -UNO_UNIQUE_RC --enable=all --suppress='*:/usr/*' \
-	 --suppress='*:$(PYINCLUDE)/*' --file-list=- --platform=unix64 \
-	 --std=c++11 --inline-suppr --quiet -Ilib -Ithird-party/bzip2 \
-	 -Ithird-party/zlib -Ithird-party/smhasher -I$(PYINCLUDE) \
-	 $(DEFINES) $(INCLUDEOPTS)
+CPPCHECK_SOURCES=$(filter-out lib/test%, $(wildcard lib/*.cc khmer/_khmer.cc) )
+CPPCHECK=cppcheck --enable=all \
+	 --error-exitcode=1 \
+	 --suppress='*:/Library/*' \
+	 --suppress='*:*/include/python*/Python.h' \
+	 --suppress='*:/usr/*' --platform=unix64 \
+	 --std=c++11 --inline-suppr -Ilib -Ithird-party/bzip2 \
+	 -Ithird-party/zlib -Ithird-party/smhasher \
+	 $(DEFINES) $(INCLUDEOPTS) $(PYINCLUDE) $(CPPCHECK_SOURCES) --quiet
 
 UNAME := $(shell uname)
 ifeq ($(UNAME),Linux)
@@ -187,8 +186,8 @@ diff_pep8_report: pep8_report.txt
 
 ## pydocstyle      : check Python doc strings
 pydocstyle: $(PYSOURCES) $(wildcard tests/*.py)
-	pydocstyle --ignore=D100,D101,D102,D103,D203 \
-		setup.py khmer/ scripts/ tests/ oxli/ || true
+	pydocstyle --ignore=D100,D101,D102,D103,D203 --match='(?!_version).*\.py' \
+		setup.py khmer/ scripts/ oxli/ || true
 
 pydocstyle_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
 	pydocstyle setup.py khmer/ scripts/ tests/ oxli/ \

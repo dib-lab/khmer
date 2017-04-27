@@ -186,8 +186,8 @@ CLASSIFIERS = [
     "Operating System :: MacOS :: MacOS X",
     "Programming Language :: C++",
     "Programming Language :: Python :: 2.7",
-    "Programming Language :: Python :: 3.3",
     "Programming Language :: Python :: 3.4",
+    "Programming Language :: Python :: 3.5",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
 if "-rc" in versioneer.get_version():
@@ -200,7 +200,7 @@ SETUP_METADATA = \
         "name": "khmer",
         "version": versioneer.get_version(),
         "description": 'khmer k-mer counting library',
-        "long_description": open("README.rst").read(),
+        "long_description": open("README.md").read(),
         "author": "Michael R. Crusoe, Hussien F. Alameldin, Sherine Awad, "
                   "Elmar Bucher, Adam Caldwell, Reed Cartwright, "
                   "Amanda Charbonneau, Bede Constantinides, Greg Edvenson, "
@@ -229,7 +229,7 @@ SETUP_METADATA = \
         "url": 'https://khmer.readthedocs.io/',
         "packages": ['khmer', 'khmer.tests', 'oxli'],
         "package_dir": {'khmer.tests': 'tests'},
-        "install_requires": ['screed >= 0.9', 'bz2file'],
+        "install_requires": ['screed >= 1.0', 'bz2file'],
         "setup_requires": ["pytest-runner>=2.0,<3dev"],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
