@@ -280,8 +280,8 @@ def get_parser():
                         help='write progress report to report_filename',
                         metavar='report_filename', type=argparse.FileType('w'))
     parser.add_argument('--report-frequency',
-                        metavar='report_frequency', type=int,
-                        default=100000)
+                        metavar='report_frequency', type=int, default=100000,
+                        help='report progress every report_frequency reads')
     parser.add_argument('-f', '--force', dest='force',
                         help='continue past file reading errors',
                         action='store_true')
