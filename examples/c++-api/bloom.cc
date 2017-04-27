@@ -19,20 +19,20 @@ int main()
     std::vector<uint64_t> tablesizes = {
         499999897, 499999909, 499999931, 499999993
     };
-    Nodetable ktable(ksize, tablesizes);
+    Nodetable bloomfilter(ksize, tablesizes);
 
-    ktable.consume_string("GCTGCACCGATGTACGCAAAGCTATTTAAAACCATAACTATTCTCACTTA");
+    bloomfilter.consume_string("GCTGCACCGATGTACGCAAAGCTATTTAAAACCATAACTATTCTCACTTA");
 
-    std::cout << "count for: " << "GCTGCACCGATGTACGCAAAG" << " is " <<
-        ktable.get_count("GCTGCACCGATGTACGCAAAG") << "\n";
+    std::cout << "count for: 'GCTGCACCGATGTACGCAAAG' is "
+              << bloomfilter.get_count("GCTGCACCGATGTACGCAAAG") << "\n";
 
-    ktable.add("GCTGCACCGATGTACGCAAAG");
+    bloomfilter.add("GCTGCACCGATGTACGCAAAG");
 
-    std::cout << "count for: " << "GCTGCACCGATGTACGCAAAG" << " is " <<
-        ktable.get_count("GCTGCACCGATGTACGCAAAG") << "\n";
+    std::cout << "count for: 'GCTGCACCGATGTACGCAAAG' is "
+              << bloomfilter.get_count("GCTGCACCGATGTACGCAAAG") << "\n";
 
-    std::cout << "count for: " << "GATTACAGATTACAGATTACA" << " is " <<
-        ktable.get_count("GATTACAGATTACAGATTACA") << "\n";
+    std::cout << "count for: 'GATTACAGATTACAGATTACA' is "
+              << bloomfilter.get_count("GATTACAGATTACAGATTACA") << "\n";
 
     return 0;
 }

@@ -388,6 +388,8 @@ cpp-demos:
 ## py-demos    : run programs demonstrating access to the Python API
 py-demos:
 	python examples/python-api/exact-counting.py
+	python examples/python-api/bloom.py
+	python examples/python-api/consume.py examples/c++-api/reads.fastq
 
 FORCE:
 

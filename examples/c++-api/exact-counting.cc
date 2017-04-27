@@ -21,20 +21,20 @@ int main()
     // complement. In that case, a table size of 4**(k-1) + k is required.
 
     std::vector<uint64_t> tablesize = {nkmers};
-    Counttable ktable(ksize, tablesize);
+    Countgraph counts(ksize, tablesize);
 
-    ktable.consume_string("ATGGCGATGGCAAGTAGGACCCAGATGGACCAAAG");
-
-    std::cout << "count for: " << "ATGGCGATGGC" << " is " <<
-        ktable.get_count("ATGGCGATGGC") << "\n";
-
-    ktable.add("ATGGCGATGGC");
+    counts.consume_string("ATGGCGATGGCAAGTAGGACCCAGATGGACCAAAG");
 
     std::cout << "count for: " << "ATGGCGATGGC" << " is " <<
-        ktable.get_count("ATGGCGATGGC") << "\n";
+        counts.get_count("ATGGCGATGGC") << "\n";
+
+    counts.add("ATGGCGATGGC");
+
+    std::cout << "count for: " << "ATGGCGATGGC" << " is " <<
+        counts.get_count("ATGGCGATGGC") << "\n";
 
     std::cout << "count for: " << "GTGGCGATGGC" << " is " <<
-        ktable.get_count("GTGGCGATGGC") << "\n";
+        counts.get_count("GTGGCGATGGC") << "\n";
 
     return 0;
 }

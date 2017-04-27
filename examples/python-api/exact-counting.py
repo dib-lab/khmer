@@ -17,6 +17,8 @@ cg.count('ACATGG')
 cg.count('AAAAAA')
 cg.count('TTTTTT') # this will be counted towards AAAAAA
 
+# The reverse_hash function is only available for Countgraph and Nodegraph,
+# not Counttable and Nodetable.
 for i in range(0, nkmers):
     if cg.get(i):
         print(cg.reverse_hash(i), cg.get(i))

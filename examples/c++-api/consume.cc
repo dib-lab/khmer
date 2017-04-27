@@ -1,6 +1,4 @@
-// A demonstration of using khmer to query a dataset for a k-mer. Typically
-// khmer accrues a small false positive rate in order to save substantially on
-// memory requirements.
+// A demonstration of khmer's primary sequence loading function.
 
 #include <vector>
 #include "khmer.hh"
