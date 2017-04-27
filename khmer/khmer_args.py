@@ -83,7 +83,9 @@ class CitationAction(argparse.Action):
 
     def __init__(self, *args, **kwargs):
         self.citations = kwargs.pop('citations')
-        super(CitationAction, self).__init__(*args, nargs=0, **kwargs)
+        super(CitationAction, self).__init__(*args, nargs=0,
+                                             default=argparse.SUPPRESS,
+                                             **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
         info(parser.prog, self.citations)
@@ -137,6 +139,7 @@ class KhmerArgumentParser(argparse.ArgumentParser):
         self.add_argument('--version', action=_VersionStdErrAction,
                           version='khmer {v}'.format(v=__version__))
         self.add_argument('--info', action=CitationAction,
+                          help='print citation information',
                           citations=self._citations)
         self.add_argument('-h', '--help', action=_HelpAction,
                           default=argparse.SUPPRESS,

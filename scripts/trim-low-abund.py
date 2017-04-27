@@ -140,7 +140,8 @@ def get_parser():
 
     # expert options
     parser.add_argument('--force', default=False, action='store_true')
-    parser.add_argument('--ignore-pairs', default=False, action='store_true')
+    parser.add_argument('--ignore-pairs', default=False, action='store_true',
+                        help='treat all reads as if they were singletons')
     parser.add_argument('--tempdir', '-T', type=str, default='./',
                         help="Set location of temporary directory for "
                         "second pass")
