@@ -6,17 +6,15 @@ CFLAGS=--std=c++11 \
 run: all
 	./exact-counting
 	./bloom
+	./consume reads.fastq
 
-all: exact-counting bloom
+all: exact-counting bloom consume
 
 clean:
-	-rm -f exact-counting bloom
+	-rm -f exact-counting bloom consume
 
-bloom: bloom.cc ../../lib/liboxli.a
-	$(CXX) $(CFLAGS) bloom.cc -o bloom ../../lib/liboxli.a
-
-exact-counting: exact-counting.cc ../../lib/liboxli.a
-	$(CXX) $(CFLAGS) exact-counting.cc -o exact-counting ../../lib/liboxli.a
+%: %.cc ../../lib/liboxli.a
+	$(CXX) $(CFLAGS) -o $* $*.cc ../../lib/liboxli.a
 
 ../../lib/liboxli.a:
 	cd ../../lib && make
