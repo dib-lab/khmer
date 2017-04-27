@@ -49,6 +49,8 @@ GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 VERSION=$(shell ./setup.py version | grep Version | awk '{print $$4}' \
 	| sed 's/+/-/')
 
+# The following four variables are only used by cppcheck. If you want to
+# change how things are compiled edit `setup.cfg` or `setup.py`.
 DEFINES += -DNDEBUG -DVERSION=$(VERSION) -DSEQAN_HAS_BZIP2=1 \
 	   -DSEQAN_HAS_ZLIB=1 -UNO_UNIQUE_RC
 
