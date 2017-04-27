@@ -55,13 +55,13 @@ import textwrap
 from khmer import khmer_args
 from contextlib import contextmanager
 from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
-                              report_on_config, info, calculate_graphsize,
+                              report_on_config, calculate_graphsize,
                               sanitize_help, check_argument_range)
 from khmer.khmer_args import FileType as khFileType
 import argparse
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
-                         get_file_writer, is_block, describe_file_handle)
+                         get_file_writer, describe_file_handle)
 from khmer.utils import (write_record, broken_paired_reader, ReadBundle,
                          clean_input_reads)
 from khmer.khmer_logger import (configure_logging, log_info, log_error)
@@ -273,10 +273,11 @@ def get_parser():
                         metavar="unpaired_reads_filename",
                         help='include a file of unpaired reads to which '
                         '-p/--paired does not apply.')
-    parser.add_argument('-s', '--savegraph', metavar="filename", default='',
+    parser.add_argument('-s', '--savegraph', metavar="filename", default=None,
                         help='save the k-mer countgraph to disk after all '
                         'reads are loaded.')
     parser.add_argument('-R', '--report',
+                        help='write progress report to report_filename',
                         metavar='report_filename', type=argparse.FileType('w'))
     parser.add_argument('--report-frequency',
                         metavar='report_frequency', type=int,
@@ -329,7 +330,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     # check that files exist and there is sufficient output disk space.
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
-    if args.savegraph:
+    if args.savegraph is not None:
         graphsize = calculate_graphsize(args, 'countgraph')
         check_space_for_graph(args.savegraph, graphsize, args.force)
 
@@ -399,7 +400,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     log_info('Total number of unique k-mers: {umers}',
              umers=countgraph.n_unique_kmers())
 
-    if args.savegraph:
+    if args.savegraph is not None:
         log_info('...saving to {name}', name=args.savegraph)
         countgraph.save(args.savegraph)
 
