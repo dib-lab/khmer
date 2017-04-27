@@ -98,7 +98,7 @@ def get_parser():
                         help="Save the k-mer countgraph to the specified "
                         "filename.")
     parser.add_argument('-f', '--force', default=False, action='store_true',
-                        help='Overwrite output file if it exists')
+                        help='Override sanity checks')
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
     return parser
