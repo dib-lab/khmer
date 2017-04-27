@@ -94,7 +94,7 @@ def get_parser():
     parser.add_argument('-s', '--squash', dest='squash_output', default=False,
                         action='store_true',
                         help='Overwrite output file if it exists')
-    parser.add_argument('--savegraph', default='', metavar="filename",
+    parser.add_argument('--savegraph', metavar="filename",
                         help="Save the k-mer countgraph to the specified "
                         "filename.")
     parser.add_argument('-f', '--force', default=False, action='store_true',
@@ -112,7 +112,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     report_on_config(args, graph_type)
 
     check_input_files(args.input_sequence_filename, args.force)
-    if args.savegraph:
+    if args.savegraph is not None:
         graphsize = calculate_graphsize(args, graph_type)
         check_space_for_graph(args.savegraph, graphsize, args.force)
     if (not args.squash_output and
@@ -213,7 +213,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         if sofar == total:
             break
 
-    if args.savegraph:
+    if args.savegraph is not None:
         log_info('Saving k-mer countgraph to {savegraph}',
                  savegraph=args.savegraph)
         countgraph.save(args.savegraph)
