@@ -226,7 +226,7 @@ SETUP_METADATA = \
         "url": 'https://khmer.readthedocs.io/',
         "packages": ['khmer', 'khmer.tests', 'oxli'],
         "package_dir": {'khmer.tests': 'tests'},
-        "install_requires": ['screed >= 0.9', 'bz2file'],
+        "install_requires": ['screed >= 1.0', 'bz2file'],
         "setup_requires": ["pytest-runner>=2.0,<3dev"],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],

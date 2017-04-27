@@ -337,6 +337,14 @@ def test_load_partitioned():
     assert nodegraph.get(third_s)
 
 
+def test_consume_partitioned_fail():
+    inpfile = utils.get_test_data('test-reads.fa')
+    nodegraph = khmer._Nodegraph(32, [1])
+
+    with pytest.raises(ValueError):
+        nodegraph.consume_partitioned_fasta(inpfile)
+
+
 def test_count_within_radius_simple():
     inpfile = utils.get_test_data('all-A.fa')
     nodegraph = khmer._Nodegraph(4, [3, 5])
@@ -696,7 +704,7 @@ def _build_testfiles():
     # nodegraph file
 
     inpath = utils.get_test_data('random-20-a.fa')
-    hi = khmer._Nodegraph(12, 2)
+    hi = khmer._Nodegraph(12, [2])
     hi.consume_seqfile(inpath)
     hi.save('/tmp/goodversion-k12.htable')
 
@@ -712,7 +720,7 @@ def _build_testfiles():
 
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
-    nodegraph = khmer.Nodegraph(32, 4, 4)
+    nodegraph = khmer.Nodegraph(32, 100000, 4)
     nodegraph.consume_seqfile_and_tag(fakelump_fa)
 
     subset = nodegraph.do_subset_partition(0, 0)
@@ -721,7 +729,7 @@ def _build_testfiles():
     EXCURSION_DISTANCE = 40
     EXCURSION_KMER_THRESHOLD = 82
     EXCURSION_KMER_COUNT_THRESHOLD = 1
-    counting = khmer.Countgraph(32, 4, 4)
+    counting = khmer.Countgraph(32, 100000, 4)
 
     nodegraph.repartition_largest_partition(None, counting,
                                             EXCURSION_DISTANCE,

@@ -38,15 +38,13 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import csv
 import json
 import sys
 import os
-import shutil
 import stat
 import threading
-import gzip
 import io
-import re
 
 import pytest
 from . import khmer_tst_utils as utils
@@ -2565,9 +2563,52 @@ def test_trim_low_abund_trimtest_savegraph():
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
 
+
+def test_trim_low_abund_no_summary_info_by_default():
+    infile = utils.copy_test_data("test-abund-read-2.fa")
+    in_dir = os.path.dirname(infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", "-o", "summary", infile]
+    _, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
+
+    summary_fname = os.path.join(in_dir, "summary.info.json")
+    print(os.path.exists(summary_fname))
+    assert not os.path.exists(summary_fname), summary_fname
+
+
+def test_trim_low_abund_summary_info_json():
+    # test JSON file with summary info is created
+    infile = utils.copy_test_data("test-abund-read-2.fa")
+    in_dir = os.path.dirname(infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", "--summary-info", "json",
+            "-o", "summary", infile]
+    _, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
+
+    summary_fname = os.path.join(in_dir, "summary.info.json")
+    assert os.path.exists(summary_fname), summary_fname
+    with open(summary_fname) as f:
+        assert json.load(f), 'summary file does not contain valid JSON'
+
+
+def test_trim_low_abund_summary_info_tsv():
+    # test TSV file with summary info is created
+    infile = utils.copy_test_data("test-abund-read-2.fa")
+    in_dir = os.path.dirname(infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", "--summary-info", "tsv",
+            "-o", "summary", infile]
+    _, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
+
+    summary_fname = os.path.join(in_dir, "summary.info.tsv")
+    assert os.path.exists(summary_fname), summary_fname
+    with open(summary_fname) as f:
+        reader = csv.DictReader(f, dialect='excel-tab')
+        lines = [row for row in reader]
+        assert len(lines) == 1
+
+
 # test that -o/--out option outputs to STDOUT
-
-
 def test_trim_low_abund_stdout():
     infile = utils.copy_test_data('test-abund-read-2.fa')
     in_dir = os.path.dirname(infile)
@@ -2575,7 +2616,26 @@ def test_trim_low_abund_stdout():
     args = ["-k", "17", "-x", "1e7", "-N", "2", infile, "-o", "-"]
     _, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
 
-    assert 'GGTTGACGGGGCTCAGGG' in out
+    # attempt to parse output to check it is in FASTA format
+    stream = io.StringIO(out)
+    assert list(screed.fasta.fasta_iter(stream)), "can't parse stdout"
+
+    # can't test that the correct message appears because we redirect
+    # the output when under testing. Instead check that incorrect message
+    # does not appear.
+    assert 'output in *.abundtrim' not in err
+
+
+def test_trim_low_abund_output_named():
+    # check the output filename is mentioned when it is explicitly set
+    infile = utils.copy_test_data('test-abund-read-2.fa')
+    in_dir = os.path.dirname(infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", infile,
+            "-o", "explicitname.abundtrim"]
+    _, out, err = utils.runscript('trim-low-abund.py', args, in_dir)
+
+    assert 'output in explicitname.abundtrim' in err
 
 
 def test_trim_low_abund_diginorm_coverage_err():

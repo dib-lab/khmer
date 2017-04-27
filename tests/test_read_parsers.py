@@ -54,7 +54,7 @@ def test_read_type_basic():
     name = "895:1:1:1246:14654 1:N:0:NNNNN"
     sequence = "ACGT"
     r = Read(name, sequence)
-    s = Record(dict(name=name, sequence=sequence))
+    s = Record(name, sequence)
 
     for x in (r, s):
         assert x.name == name
@@ -482,6 +482,26 @@ def test_clean_seq():
     for read in ReadParser(utils.get_test_data("test-abund-read-3.fa")):
         clean = read.sequence.upper().replace("N", "A")
         assert clean == read.cleaned_seq
+
+
+def test_error_badly_formatted_file():
+    fname = utils.get_temp_filename('badly-formatted.fa')
+    with open(fname, 'w') as f:
+        f.write("not-sequence")
+
+    with pytest.raises(OSError) as e:
+        ReadParser(fname)
+
+    assert e.match("contains badly formatted sequence")
+
+
+def test_error_file_does_not_exist():
+    fname = utils.get_temp_filename('does-not-exist.fa')
+
+    with pytest.raises(OSError) as e:
+        ReadParser(fname)
+
+    assert e.match("does not exist")
 
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
 # vim: set textwidth=79:

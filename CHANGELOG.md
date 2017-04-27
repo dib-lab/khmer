@@ -32,6 +32,7 @@ under semantic versioning, but will be in future versions of khmer.
   SmallCounttable and SmallCountgraph.
 - Added `cleaned_seq` attribute to `khmer.Read` class which provides a cleaned
   version of the sequence of each read.
+- Added --summary-info to trim-low-abund.py to record run information in a file.
 
 ### Changed
 - Suppress display of -x and -N command line options in script help messages.
