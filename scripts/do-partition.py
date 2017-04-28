@@ -87,7 +87,7 @@ def get_parser():
         descr='Load, partition, and annotate FAST[AQ] sequences',
         epilog=textwrap.dedent(epilog), citations=['graph'])
     add_threading_args(parser)
-    parser.add_argument('--subset-size', '-s', default=DEFAULT_SUBSET_SIZE,
+    parser.add_argument('-s', '--subset-size', default=DEFAULT_SUBSET_SIZE,
                         dest='subset_size', type=float,
                         help='Set subset size (usually 1e5-1e6 is good)')
     parser.add_argument('--no-big-traverse', dest='no_big_traverse',

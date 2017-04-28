@@ -105,11 +105,11 @@ def get_parser():
 
     parser.add_argument('input_filenames', nargs='+')
 
-    parser.add_argument('--cutoff', '-C', type=int,
+    parser.add_argument('-C', '--cutoff', type=int,
                         help='remove k-mers below this abundance',
                         default=DEFAULT_CUTOFF)
 
-    parser.add_argument('--trim-at-coverage', '-Z', '--normalize-to',
+    parser.add_argument('-Z', '--trim-at-coverage', '--normalize-to',
                         type=int,
                         help='trim reads when entire read above this coverage',
                         default=DEFAULT_TRIM_AT_COVERAGE)
@@ -121,7 +121,7 @@ def get_parser():
                         'specify that output should go to STDOUT (the '
                         'terminal)')
 
-    parser.add_argument('--variable-coverage', '-V', action='store_true',
+    parser.add_argument('-V', '--variable-coverage', action='store_true',
                         default=False,
                         help='Only trim low-abundance k-mers from sequences '
                         'that have high coverage.')
@@ -142,7 +142,7 @@ def get_parser():
     parser.add_argument('--force', default=False, action='store_true')
     parser.add_argument('--ignore-pairs', default=False, action='store_true',
                         help='treat all reads as if they were singletons')
-    parser.add_argument('--tempdir', '-T', type=str, default='./',
+    parser.add_argument('-T', '--tempdir', type=str, default='./',
                         help="Set location of temporary directory for "
                         "second pass")
     add_output_compression_type(parser)

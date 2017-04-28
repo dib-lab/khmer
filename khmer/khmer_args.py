@@ -442,7 +442,7 @@ def build_graph_args(descr=None, epilog=None, parser=None, citations=None):
         parser = KhmerArgumentParser(description=descr, epilog=epilog,
                                      citations=citations)
 
-    parser.add_argument('--ksize', '-k', type=int, default=DEFAULT_K,
+    parser.add_argument('-k', '--ksize', type=int, default=DEFAULT_K,
                         help='k-mer size to use')
 
     help = ('number of tables to use in k-mer countgraph' if expert_help
@@ -618,7 +618,7 @@ def report_on_config(args, graphtype='countgraph'):
 
 def add_threading_args(parser):
     """Add option for threading to options parser."""
-    parser.add_argument('--threads', '-T', default=DEFAULT_N_THREADS, type=int,
+    parser.add_argument('-T', '--threads', default=DEFAULT_N_THREADS, type=int,
                         help='Number of simultaneous threads to execute')
 
 
