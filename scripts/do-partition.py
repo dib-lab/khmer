@@ -93,7 +93,7 @@ def get_parser():
     parser.add_argument('--no-big-traverse', dest='no_big_traverse',
                         action='store_true', default=False,
                         help='Truncate graph joins at big traversals')
-    parser.add_argument('--keep-subsets', default=True, action='store_false',
+    parser.add_argument('--keep-subsets', default=False, action='store_true',
                         help='Keep individual subsets')
     parser.add_argument('graphbase', help="base name for output files")
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
