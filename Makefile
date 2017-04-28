@@ -382,11 +382,11 @@ list-citation:
 	python sort-authors-list.py
 
 ## cpp-demos   : run programs demonstrating access to the (unstable) C++ API
-cpp-demos:
+cpp-demos: sharedobj
 	cd examples/c++-api/ && make all run
 
 ## py-demos    : run programs demonstrating access to the Python API
-py-demos:
+py-demos: sharedobj
 	python examples/python-api/exact-counting.py
 	python examples/python-api/bloom.py
 	python examples/python-api/consume.py examples/c++-api/reads.fastq
