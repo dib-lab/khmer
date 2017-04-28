@@ -67,6 +67,8 @@ script:
   - make test
   - make pep8
   - make doc
+  - make py-demos
+  - make cpp-demos
   - cd examples/stamps && ./do.sh
 
 # generate all the diagnostic reports
