@@ -184,7 +184,7 @@ pep8_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
 diff_pep8_report: pep8_report.txt
 	diff-quality --violations=pep8 pep8_report.txt
 
-## pydocstyle      : check Python doc strings
+## pydocstyle  : check Python doc strings
 pydocstyle: $(PYSOURCES) $(wildcard tests/*.py)
 	pydocstyle --ignore=D100,D101,D102,D103,D203 --match='(?!_version).*\.py' \
 		setup.py khmer/ scripts/ oxli/ || true
@@ -380,6 +380,16 @@ list-citation:
 		'root\|crusoe\|titus\|waffleio\|Hello\|boyce\|rodney' \
 		> authors.csv
 	python sort-authors-list.py
+
+## cpp-demos   : run programs demonstrating access to the (unstable) C++ API
+cpp-demos: sharedobj
+	cd examples/c++-api/ && make all run
+
+## py-demos    : run programs demonstrating access to the Python API
+py-demos: sharedobj
+	python examples/python-api/exact-counting.py
+	python examples/python-api/bloom.py
+	python examples/python-api/consume.py examples/c++-api/reads.fastq
 
 FORCE:
 
