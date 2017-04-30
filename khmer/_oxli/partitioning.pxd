@@ -26,9 +26,10 @@ cdef class Component:
 
 
 cdef class StreamingPartitioner:
-    cdef unique_ptr[CpStreamingPartitioner] _this
+    cdef shared_ptr[CpStreamingPartitioner] _this
     cdef weak_ptr[ComponentPtrSet] _components
     cdef weak_ptr[CpGuardedKmerCompMap] _tag_component_map
     cdef CpHashgraph * _graph_ptr
     cdef readonly object graph
     cdef readonly uint64_t n_consumed
+
