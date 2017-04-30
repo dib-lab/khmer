@@ -450,26 +450,37 @@ cdef extern from "oxli/partitioning.hh" namespace "oxli":
     cdef cppclass CpStreamingPartitioner "oxli::StreamingPartitioner":
         CpStreamingPartitioner(CpHashgraph * ) except +MemoryError
         CpStreamingPartitioner(CpHashgraph *, uint32_t) except +MemoryError
-
+        
+        CpHashgraph * graph
         uint64_t consume(string&) nogil except +MemoryError
         uint64_t  consume_pair(string&, string&) nogil except +MemoryError
         uint64_t consume_fasta(string&) except +MemoryError
 
         uint64_t seed_sequence(string&, set[HashIntoType]&, KmerQueue&,
                            set[HashIntoType]&) except +MemoryError
-        void create_and_connect_components(set[HashIntoType]&)
+        uint32_t create_and_connect_components(set[HashIntoType]&)
         void add_component(ComponentPtr comp)
         void map_tags_to_component(set[HashIntoType]&, ComponentPtr&)
+
         void find_connected_tags(queue[CpKmer]&, 
                                  set[HashIntoType]&,
                                  set[HashIntoType]&) except +MemoryError
+
+        void find_connected_tags(queue[CpKmer]&, 
+                                 set[HashIntoType]&,
+                                 set[HashIntoType]&,
+                                 bool) except +MemoryError
+
         uint64_t get_n_components() const
         uint64_t get_n_tags() const
         uint64_t get_n_consumed() const
         uint32_t get_tag_density() const
 
         ComponentPtr get_tag_component(string&) const
+        ComponentPtr get_tag_component(HashIntoType) const
+
         ComponentPtr get_nearest_component(string&) const
+        ComponentPtr get_nearest_component(CpKmer) const
 
         weak_ptr[ComponentPtrSet] get_component_set()
         weak_ptr[CpGuardedKmerCompMap] get_tag_component_map()

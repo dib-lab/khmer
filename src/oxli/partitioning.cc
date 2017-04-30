@@ -93,6 +93,7 @@ uint64_t StreamingPartitioner::consume_fasta(const std::string& filename)
 }
 
 
+
 uint64_t StreamingPartitioner::consume(const std::string& seq)
 {
     std::set<HashIntoType> tags;
@@ -227,7 +228,7 @@ uint64_t StreamingPartitioner::seed_sequence(const std::string& seq,
 }
 
 
-void StreamingPartitioner::create_and_connect_components(std::set<HashIntoType> &tags)
+uint32_t StreamingPartitioner::create_and_connect_components(std::set<HashIntoType> &tags)
 {
 
         // Now resolve components. First, get components from existing tags.
@@ -254,7 +255,8 @@ void StreamingPartitioner::create_and_connect_components(std::set<HashIntoType> 
 #if(DEBUG_SP)
         std::cout << found_comps.size() << " unique components." << std::endl;
 #endif
-
+        
+        uint32_t n_merged = 1;
         if (found_comps.size() == 0) {
             ComponentPtr new_comp = std::make_shared<Component>();
 #if(DEBUG_SP)
@@ -278,15 +280,17 @@ void StreamingPartitioner::create_and_connect_components(std::set<HashIntoType> 
             root_comp->add_tag(tags);
             map_tags_to_component(tags, root_comp);
             if (found_comps.size() > 1) {
-                merge_components(root_comp, found_comps);
+                n_merged = merge_components(root_comp, found_comps);
             }
         }
+        return n_merged;
 }
 
 
-void StreamingPartitioner::merge_components(ComponentPtr& root, 
+uint32_t StreamingPartitioner::merge_components(ComponentPtr& root, 
                                             ComponentPtrSet& comps)
 {
+    uint32_t n_merged = 1;
     for (auto other : comps) {
         if (*other == *root) {
             continue;
@@ -294,10 +298,12 @@ void StreamingPartitioner::merge_components(ComponentPtr& root,
         root->add_tag(other->tags); // transfer the tags from the other comp
         map_tags_to_component(other->tags, root); // set the other's tags to point to root
         components->erase(other); // remove other component entirely
+        n_merged++;
 
     }
     comps.clear(); // should call destructor on all the merged comps, unless they have
                    // and active Python wrapper; this leaves them as sole owners
+    return n_merged;
 }
 
 

@@ -218,11 +218,6 @@ class StreamingPartitioner {
     private:
     
         uint32_t _tag_density;
-
-        // We're not graph's owner, simply an observer.
-        // Unforunately our ownership policies elsewhere are a mess
-        Hashgraph * graph;
-        //std::weak_ptr<Hashgraph> graph;
         // We should exclusively own tag_component_map.
         std::shared_ptr<GuardedKmerCompMap> tag_component_map;
         std::shared_ptr<ComponentPtrSet> components;
@@ -230,6 +225,10 @@ class StreamingPartitioner {
         uint64_t n_consumed;
 
     public:
+        // We're not graph's owner, simply an observer.
+        // Unforunately our ownership policies elsewhere are a mess
+        Hashgraph * graph;
+        //std::weak_ptr<Hashgraph> graph;
 
         explicit StreamingPartitioner(Hashgraph * graph, 
                                       uint32_t tag_density=DEFAULT_TAG_DENSITY);
@@ -241,7 +240,7 @@ class StreamingPartitioner {
                               std::set<HashIntoType>& tags,
                               KmerQueue& seeds,
                               std::set<HashIntoType>& seen);
-        void create_and_connect_components(std::set<HashIntoType>& tags);
+        uint32_t create_and_connect_components(std::set<HashIntoType>& tags);
 
         uint64_t consume_fasta(std::string const &filename);
         void map_tags_to_component(std::set<HashIntoType>& tags, ComponentPtr& comp);
@@ -250,6 +249,9 @@ class StreamingPartitioner {
                                  std::set<HashIntoType>& found_tags,
                                  std::set<HashIntoType>& seen,
                                  bool truncate=false) const;
+        uint32_t merge_components(ComponentPtr& root, ComponentPtrSet& comps);
+
+
 
         uint64_t get_n_components() const {
             return components->size();
@@ -266,8 +268,6 @@ class StreamingPartitioner {
         uint32_t get_tag_density() const {
             return _tag_density;
         }
-
-        void merge_components(ComponentPtr& root, ComponentPtrSet& comps);
 
         ComponentPtr get_tag_component(HashIntoType tag) const;
         ComponentPtr get_tag_component(std::string& tag) const;
