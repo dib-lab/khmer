@@ -81,6 +81,10 @@ cdef class Sequence:
         for i in range(0, len(self)-K+1):
             yield sequence[i:i+K]
 
+    def __getitem__(self, x):
+        # not ideal
+        return self.sequence[x]
+
     @property
     def name(self):
         cdef unicode name = self._obj.name
