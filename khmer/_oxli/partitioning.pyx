@@ -21,6 +21,7 @@ import json
 import os
 
 from wrapper cimport *
+from utils cimport _bstring
 from .._khmer import Countgraph
 from .._khmer import Nodegraph
 from khmer import load_countgraph, load_nodegraph
@@ -145,7 +146,8 @@ cdef class StreamingPartitioner:
 
     def get_tag_component(self, kmer):
         cdef ComponentPtr compptr
-        compptr = deref(self._this).get_tag_component(kmer.encode('utf-8'))
+        cdef string kmer_s = _bstring(kmer)
+        compptr = deref(self._this).get_tag_component(kmer_s)
         if compptr == NULL:
             return None
         else:
@@ -153,7 +155,8 @@ cdef class StreamingPartitioner:
 
     def get_nearest_component(self, kmer):
         cdef ComponentPtr compptr
-        compptr = deref(self._this).get_nearest_component(kmer.encode('utf-8'))
+        cdef string kmer_s = _bstring(kmer)
+        compptr = deref(self._this).get_nearest_component(kmer_s)
         if compptr == NULL:
             return None
         else:
