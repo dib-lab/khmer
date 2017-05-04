@@ -20,7 +20,8 @@ under semantic versioning, but will be in future versions of khmer.
   terminal output.
 - Support for human-friendly memory requests (2G instead of 2000000000 or 2e9).
 - Support for variable-coverage trimming in the `filter-abund-single.py` script.
-- A simple example of the C++ API in `examples/c++-api`.
+- Several simple examples of the Python API and the C++ API in
+  `examples/python-api` and `examples/c++-api`, respectively.
 - New `assemble_linear_path` function for baiting unambiguous contigs with a
   seed k-mer from a hashtable.
 - Support for assembling directly from k-mer graphs, and a new
@@ -35,8 +36,10 @@ under semantic versioning, but will be in future versions of khmer.
 - New function `consume_fasta_banding` for bulk loading of sequences into
   hashtables. Only k-mers whose hashed values fall within a specified range are
   counted.
+- Added --summary-info to trim-low-abund.py to record run information in a file.
 
 ### Changed
+- Suppress display of -x and -N command line options in script help messages.
 - Switch from nose to py.test as the testing framework.
 - Switch from internally managed Jenkins setup to Travis CI for continuous
   integration testing.

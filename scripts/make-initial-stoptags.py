@@ -87,10 +87,10 @@ def get_parser():
         descr="Find an initial set of highly connected k-mers.",
         epilog=textwrap.dedent(epilog),
         citations=['graph'])
-    parser.add_argument('--subset-size', '-s', default=DEFAULT_SUBSET_SIZE,
+    parser.add_argument('-s', '--subset-size', default=DEFAULT_SUBSET_SIZE,
                         dest='subset_size', type=float,
                         help='Set subset size (default 1e4 is prob ok)')
-    parser.add_argument('--stoptags', '-S', metavar='filename', default='',
+    parser.add_argument('-S', '--stoptags', metavar='filename', default='',
                         help="Use stoptags in this file during partitioning")
     parser.add_argument('graphbase', help='basename for input and output '
                         'filenames')

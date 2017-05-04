@@ -49,7 +49,7 @@ from __future__ import print_function
 import os
 import textwrap
 import sys
-from khmer import __version__, Nodegraph
+from khmer import Nodegraph
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import sanitize_help, KhmerArgumentParser
@@ -67,7 +67,7 @@ def get_parser():
     parser = KhmerArgumentParser(
         description="Trim sequences at stoptags.",
         epilog=textwrap.dedent(epilog), citations=['graph'])
-    parser.add_argument('--ksize', '-k', default=DEFAULT_K, type=int,
+    parser.add_argument('-k', '--ksize', default=DEFAULT_K, type=int,
                         help='k-mer size')
     parser.add_argument('stoptags_file', metavar='input_stoptags_filename')
     parser.add_argument('input_filenames', metavar='input_sequence_filename',

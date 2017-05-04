@@ -48,10 +48,8 @@ from __future__ import print_function
 import threading
 import textwrap
 import sys
-import gc
-import os.path
 
-from khmer import __version__, load_nodegraph
+from khmer import load_nodegraph
 from khmer.khmer_args import (add_threading_args, sanitize_help,
                               KhmerArgumentParser)
 from khmer.kfile import check_input_files
@@ -79,9 +77,9 @@ def get_parser():
 
     parser.add_argument('basename', help="basename of the input k-mer "
                         "nodegraph  + tagset files")
-    parser.add_argument('--stoptags', '-S', metavar='filename', default='',
+    parser.add_argument('-S', '--stoptags', metavar='filename', default='',
                         help="Use stoptags in this file during partitioning")
-    parser.add_argument('--subset-size', '-s', default=DEFAULT_SUBSET_SIZE,
+    parser.add_argument('-s', '--subset-size', default=DEFAULT_SUBSET_SIZE,
                         type=float, help='Set subset size (usually 1e5-1e6 is '
                         'good)')
     parser.add_argument('--no-big-traverse', action='store_true',

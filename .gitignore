@@ -52,3 +52,4 @@ pylint_report.txt
 pep8_report.txt
 pep257_report.txt
 .cache/
+.eggs
