@@ -1135,7 +1135,7 @@ def test_banding_bad_params(graphclass):
     with pytest.raises(OSError) as ose:
         nreads, kmersconsumed = \
             nodegraph.consume_seqfile_banding('file-no-exist.fa', 16, 3)
-    assert 'Could not open' in str(ose)
+    assert 'does not exist' in str(ose)
 
 
 @pytest.mark.parametrize('graphclass,num_batches,batch', [
