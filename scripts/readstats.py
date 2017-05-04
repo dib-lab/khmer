@@ -49,7 +49,6 @@ import csv
 import screed
 import textwrap
 
-from khmer import __version__
 from khmer.khmer_args import sanitize_help, KhmerArgumentParser
 
 
