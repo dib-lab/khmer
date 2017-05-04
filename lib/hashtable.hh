@@ -367,6 +367,33 @@ class SmallCounttable : public khmer::Hashtable
 public:
     explicit SmallCounttable(WordLength ksize, std::vector<uint64_t> sizes)
         : Hashtable(ksize, new NibbleStorage(sizes)) { } ;
+
+    inline
+    virtual
+    HashIntoType
+    hash_dna(const char * kmer) const {
+        if (!(strlen(kmer) >= _ksize)) {
+            throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
+        }
+        return _hash_murmur(kmer, _ksize);
+    }
+
+    inline virtual HashIntoType
+    hash_dna_top_strand(const char * kmer) const {
+        throw khmer_exception("not implemented");
+    }
+
+    inline virtual HashIntoType
+    hash_dna_bottom_strand(const char * kmer) const {
+        throw khmer_exception("not implemented");
+    }
+
+    inline virtual std::string
+    unhash_dna(HashIntoType hashval) const {
+        throw khmer_exception("not implemented");
+    }
+
+    virtual KmerHashIteratorPtr new_kmer_iterator(const char * sp) const;
 };
 
 // Hashtable-derived class with BitStorage.

@@ -554,6 +554,11 @@ KmerHashIteratorPtr Counttable::new_kmer_iterator(const char * sp) const {
     return unique_ptr<KmerHashIterator>(ki);
 }
 
+KmerHashIteratorPtr SmallCounttable::new_kmer_iterator(const char * sp) const {
+    KmerHashIterator * ki = new MurmurKmerHashIterator(sp, _ksize);
+    return unique_ptr<KmerHashIterator>(ki);
+}
+
 template void Hashtable::consume_seqfile<FastxReader>(
     std::string const &filename,
     unsigned int &total_reads,
