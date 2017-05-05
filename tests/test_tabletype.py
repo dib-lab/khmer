@@ -15,20 +15,21 @@ be tested separately.  We can use code coverage to identify that
 code...
 """
 
+import math
 import sys
 import pytest
-
 
 from . import khmer_tst_utils as utils
 import khmer
 from khmer import _Countgraph, _Counttable, _SmallCountgraph, _SmallCounttable
-from khmer import _Nodegraph, _Nodetable
+from khmer import _Nodegraph, _Nodetable, QFCounttable
 from khmer import ReadParser
 import screed
 
 
 PRIMES_1m = [1000003, 1009837]
-
+# roughly same size, QFCounttable needs a size that is power of two
+QF_SIZE = 2**math.ceil(math.log2(PRIMES_1m[0]))
 
 # all the table types!
 @pytest.fixture(params=[_Countgraph, _Counttable, _SmallCountgraph,
@@ -37,15 +38,28 @@ def tabletype(request):
     return request.param
 
 
+@pytest.fixture(params=[_Countgraph, _Counttable, _SmallCountgraph,
+                        _SmallCounttable, _Nodegraph, _Nodetable,
+                        QFCounttable])
+def any_tabletype(request):
+    """Take care of interface difference between CQF and other table types"""
+    tabletype = request.param
+
+    if tabletype.__name__ == 'QFCounttable':
+        return lambda ksize: tabletype(ksize, QF_SIZE)
+    else:
+        return lambda ksize: tabletype(ksize, PRIMES_1m)
+
+
 # For map(long, [list of ints]) cross-version hackery
 if sys.version_info.major > 2:
     long = int  # pylint: disable=redefined-builtin
     unicode = str
 
 
-def test_presence(tabletype):
+def test_presence(any_tabletype):
     # basic get/add test
-    tt = tabletype(12, PRIMES_1m)
+    tt = any_tabletype(12)
 
     kmer = 'G' * 12
     hashval = tt.hash('G' * 12)
@@ -66,29 +80,29 @@ def test_bad_create(tabletype):
         assert 'tablesizes needs to be one or more numbers' in str(err)
 
 
-def test_get_ksize(tabletype):
+def test_get_ksize(any_tabletype):
     # ksize() function.
-    kh = tabletype(22, PRIMES_1m)
+    kh = any_tabletype(22)
     assert kh.ksize() == 22
 
 
-def test_hash(tabletype):
+def test_hash(any_tabletype):
     # hashing of strings -> numbers.
-    kh = tabletype(5, PRIMES_1m)
+    kh = any_tabletype(5)
     x = kh.hash("ATGGC")
     assert type(x) == long
 
 
-def test_hash_bad_dna(tabletype):
+def test_hash_bad_dna(any_tabletype):
     # hashing of bad dna -> succeeds w/o complaint
-    kh = tabletype(5, PRIMES_1m)
+    kh = any_tabletype(5)
 
     x = kh.hash("ATGYC")
 
 
-def test_hash_bad_length(tabletype):
+def test_hash_bad_length(any_tabletype):
     # hashing of bad dna length -> error
-    kh = tabletype(5, PRIMES_1m)
+    kh = any_tabletype(5)
 
     with pytest.raises(ValueError):
         x = kh.hash("ATGGGC")
@@ -97,9 +111,9 @@ def test_hash_bad_length(tabletype):
         x = kh.hash("ATGG")
 
 
-def test_reverse_hash(tabletype):
+def test_reverse_hash(any_tabletype):
     # hashing of strings -> numbers.
-    kh = tabletype(5, PRIMES_1m)
+    kh = any_tabletype(5)
 
     try:
         x = kh.reverse_hash(15)
@@ -109,15 +123,15 @@ def test_reverse_hash(tabletype):
     assert isinstance(x, (unicode, str))
 
 
-def test_hashsizes(tabletype):
+def test_hashsizes(any_tabletype):
     # hashsizes method.
-    kh = tabletype(5, PRIMES_1m)
-    assert kh.hashsizes() == PRIMES_1m
+    kh = any_tabletype(5)
+    assert kh.hashsizes() == PRIMES_1m or kh.hashsizes() == [QF_SIZE]
 
 
-def test_add_hashval(tabletype):
+def test_add_hashval(any_tabletype):
     # test add(hashval)
-    kh = tabletype(5, PRIMES_1m)
+    kh = any_tabletype(5)
     x = kh.hash("ATGGC")
     y = kh.add(x)
     assert y
@@ -126,9 +140,9 @@ def test_add_hashval(tabletype):
     assert z == 1
 
 
-def test_add_dna_kmer(tabletype):
+def test_add_dna_kmer(any_tabletype):
     # test add(dna)
-    kh = tabletype(5, PRIMES_1m)
+    kh = any_tabletype(5)
     x = kh.add("ATGGC")
     assert x
 
@@ -136,16 +150,16 @@ def test_add_dna_kmer(tabletype):
     assert z == 1
 
 
-def test_add_bad_dna_kmer(tabletype):
+def test_add_bad_dna_kmer(any_tabletype):
     # even with 'bad' dna, should succeed.
-    kh = tabletype(5, PRIMES_1m)
+    kh = any_tabletype(5)
 
     x = kh.add("ATYGC")
 
 
-def test_get_hashval(tabletype):
+def test_get_hashval(any_tabletype):
     # test get(hashval)
-    kh = tabletype(5, PRIMES_1m)
+    kh = any_tabletype(5)
     hashval = kh.hash("ATGGC")
     kh.add(hashval)
 
@@ -153,18 +167,18 @@ def test_get_hashval(tabletype):
     assert z == 1
 
 
-def test_get_hashval_rc(tabletype):
+def test_get_hashval_rc(any_tabletype):
     # test get(hashval)
-    kh = tabletype(4, PRIMES_1m)
+    kh = any_tabletype(4)
     hashval = kh.hash("ATGC")
     rc = kh.hash("GCAT")
 
     assert hashval == rc
 
 
-def test_get_dna_kmer(tabletype):
+def test_get_dna_kmer(any_tabletype):
     # test get(dna)
-    kh = tabletype(5, PRIMES_1m)
+    kh = any_tabletype(5)
     hashval = kh.hash("ATGGC")
     kh.add(hashval)
 
@@ -172,15 +186,15 @@ def test_get_dna_kmer(tabletype):
     assert z == 1
 
 
-def test_get_bad_dna_kmer(tabletype):
+def test_get_bad_dna_kmer(any_tabletype):
     # test get(dna) with bad dna; should be fine.
-    kh = tabletype(5, PRIMES_1m)
+    kh = any_tabletype(5)
 
     kh.hash("ATYGC")
 
 
-def test_consume_and_count(tabletype):
-    tt = tabletype(6, PRIMES_1m)
+def test_consume_and_count(any_tabletype):
+    tt = any_tabletype(6)
 
     x = "ATGCCGATGCA"
     num_kmers = tt.consume(x)
@@ -190,10 +204,10 @@ def test_consume_and_count(tabletype):
         assert tt.get(x[start:start + 6]) == 1
 
 
-def test_consume_and_count_bad_dna(tabletype):
+def test_consume_and_count_bad_dna(any_tabletype):
     # while we don't specifically handle bad DNA, we should at least be
     # consistent...
-    tt = tabletype(6, PRIMES_1m)
+    tt = any_tabletype(6)
 
     x = "ATGCCGNTGCA"
     num_kmers = tt.consume(x)
@@ -202,17 +216,17 @@ def test_consume_and_count_bad_dna(tabletype):
         assert tt.get(x[start:start + 6]) == 1
 
 
-def test_consume_short(tabletype):
+def test_consume_short(any_tabletype):
     # raise error on too short when consume is run
-    tt = tabletype(6, PRIMES_1m)
+    tt = any_tabletype(6)
 
     x = "ATGCA"
     with pytest.raises(ValueError):
         tt.consume(x)
 
 
-def test_get_kmer_counts(tabletype):
-    hi = tabletype(6, PRIMES_1m)
+def test_get_kmer_counts(any_tabletype):
+    hi = any_tabletype(6)
 
     hi.consume("AAAAAA")
     counts = hi.get_kmer_counts("AAAAAA")
@@ -234,8 +248,8 @@ def test_get_kmer_counts(tabletype):
     assert counts[1] == 1
 
 
-def test_get_kmer_hashes(tabletype):
-    hi = tabletype(6, PRIMES_1m)
+def test_get_kmer_hashes(any_tabletype):
+    hi = any_tabletype(6)
 
     hashes = hi.get_kmer_hashes("ACGTGCGT")
     print(hashes)
@@ -245,8 +259,8 @@ def test_get_kmer_hashes(tabletype):
     assert hashes[2] == hi.hash("GTGCGT")
 
 
-def test_get_min_count(tabletype):
-    hi = tabletype(6, PRIMES_1m)
+def test_get_min_count(any_tabletype):
+    hi = any_tabletype(6)
 
     # master string, 3 k-mers
     x = "ACGTGCGT"
@@ -267,8 +281,8 @@ def test_get_min_count(tabletype):
     assert med == list(sorted(counts))[len(counts) // 2]
 
 
-def test_get_kmers(tabletype):
-    hi = tabletype(6, PRIMES_1m)
+def test_get_kmers(any_tabletype):
+    hi = any_tabletype(6)
 
     kmers = hi.get_kmers("AAAAAA")
     assert kmers == ["AAAAAA"]
@@ -280,8 +294,8 @@ def test_get_kmers(tabletype):
     assert kmers == ['AGCTTT', 'GCTTTT', 'CTTTTC']
 
 
-def test_trim_on_abundance(tabletype):
-    hi = tabletype(6, PRIMES_1m)
+def test_trim_on_abundance(any_tabletype):
+    hi = any_tabletype(6)
 
     x = "ATGGCAGTAGCAGTGAGC"
     hi.consume(x[:10])
@@ -291,8 +305,8 @@ def test_trim_on_abundance(tabletype):
     assert x[:pos] == y
 
 
-def test_trim_below_abundance(tabletype):
-    hi = tabletype(6, PRIMES_1m)
+def test_trim_below_abundance(any_tabletype):
+    hi = any_tabletype(6)
 
     x = "ATGGCAGTAGCAGTGAGC"
     x_rc = screed.rc(x)
@@ -308,8 +322,8 @@ def test_trim_below_abundance(tabletype):
 DNA = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC"
 
 
-def test_find_spectral_error_positions(tabletype):
-    kh = tabletype(8, PRIMES_1m)
+def test_find_spectral_error_positions(any_tabletype):
+    kh = any_tabletype(8)
 
     kh.consume(DNA[:30])
 
@@ -320,8 +334,8 @@ def test_find_spectral_error_positions(tabletype):
     assert posns == [30], posns
 
 
-def test_find_spectral_error_positions_6(tabletype):
-    kh = tabletype(8, PRIMES_1m)
+def test_find_spectral_error_positions_6(any_tabletype):
+    kh = any_tabletype(8)
 
     kh.consume(DNA[1:])
 
@@ -332,8 +346,8 @@ def test_find_spectral_error_positions_6(tabletype):
     assert posns == [0], posns
 
 
-def test_find_spectral_error_positions_5(tabletype):
-    kh = tabletype(8, PRIMES_1m)
+def test_find_spectral_error_positions_5(any_tabletype):
+    kh = any_tabletype(8)
 
     kh.consume(DNA[:10])
     kh.consume(DNA[11:])
@@ -342,24 +356,24 @@ def test_find_spectral_error_positions_5(tabletype):
     assert posns == [10], posns
 
 
-def test_consume_seqfile_reads_parser(tabletype):
-    kh = tabletype(5, PRIMES_1m)
+def test_consume_seqfile_reads_parser(any_tabletype):
+    kh = any_tabletype(5)
     rparser = ReadParser(utils.get_test_data('test-fastq-reads.fq'))
 
     kh.consume_seqfile_with_reads_parser(rparser)
 
-    kh2 = tabletype(5, PRIMES_1m)
+    kh2 = any_tabletype(5)
     for record in screed.open(utils.get_test_data('test-fastq-reads.fq')):
         kh2.consume(record.sequence)
 
     assert kh.get('CCGGC') == kh2.get('CCGGC')
 
 
-def test_consume_seqfile(tabletype):
-    kh = tabletype(5, PRIMES_1m)
+def test_consume_seqfile(any_tabletype):
+    kh = any_tabletype(5)
     kh.consume_seqfile(utils.get_test_data('test-fastq-reads.fq'))
 
-    kh2 = tabletype(5, PRIMES_1m)
+    kh2 = any_tabletype(5)
     for record in screed.open(utils.get_test_data('test-fastq-reads.fq')):
         kh2.consume(record.sequence)
 
@@ -420,10 +434,10 @@ def test_set_bigcount(tabletype):
             tt.set_use_bigcount(True)
 
 
-def test_abund_dist_A(tabletype):
+def test_abund_dist_A(any_tabletype):
     A_filename = utils.get_test_data('all-A.fa')
 
-    kh = tabletype(4, PRIMES_1m)
+    kh = any_tabletype(4)
     tracking = khmer._Nodegraph(4, PRIMES_1m)
 
     kh.consume_seqfile(A_filename)
@@ -434,11 +448,11 @@ def test_abund_dist_A(tabletype):
     assert dist[0] == 0
 
 
-def test_abund_dist_A_readparser(tabletype):
+def test_abund_dist_A_readparser(any_tabletype):
     A_filename = utils.get_test_data('all-A.fa')
     rparser = ReadParser(A_filename)
 
-    kh = tabletype(4, PRIMES_1m)
+    kh = any_tabletype(4)
     tracking = khmer._Nodetable(4, PRIMES_1m)
 
     kh.consume_seqfile(A_filename)

@@ -437,8 +437,8 @@ public:
   }
 
   // Accessors for protected/private table info members
-  std::vector<uint64_t> get_tablesizes() const { return {42, 42}; }
-  const size_t n_tables() const { return 42; }
+  std::vector<uint64_t> get_tablesizes() const { return {cf.nslots}; }
+  const size_t n_tables() const { return 1; }
   const uint64_t n_unique_kmers() const { return 42; }
   const uint64_t n_occupied() const { return 42; }
   void save(std::string outfilename, WordLength ksize) {}
