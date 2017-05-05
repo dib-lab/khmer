@@ -63,11 +63,11 @@ using namespace std;
 
 namespace khmer
 {
-    namespace read_parsers
-    {
-        template<typename SeqIO> class ReadParser;
-        class FastxReader;
-    }
+namespace read_parsers
+{
+template<typename SeqIO> class ReadParser;
+class FastxReader;
+}
 }
 
 #define CALLBACK_PERIOD 100000
@@ -117,12 +117,14 @@ protected:
     explicit Hashtable(const Hashtable&);
     Hashtable& operator=(const Hashtable&);
 
-    virtual KmerHashIteratorPtr new_kmer_iterator(const char * sp) const {
+    virtual KmerHashIteratorPtr new_kmer_iterator(const char * sp) const
+    {
         KmerHashIterator * ki = new TwoBitKmerHashIterator(sp, _ksize);
         return unique_ptr<KmerHashIterator>(ki);
     }
 
-    virtual KmerHashIteratorPtr new_kmer_iterator(const std::string& s) const {
+    virtual KmerHashIteratorPtr new_kmer_iterator(const std::string& s) const
+    {
         return new_kmer_iterator(s.c_str());
     }
 
@@ -336,14 +338,22 @@ class MurmurKmerHashIterator : public KmerHashIterator
     bool _initialized;
 public:
     MurmurKmerHashIterator(const char * seq, unsigned char k) :
-        _seq(seq), _ksize(k), index(0), _initialized(false) {
+        _seq(seq), _ksize(k), index(0), _initialized(false)
+    {
         length = strlen(_seq);
     };
 
-    HashIntoType first() { _initialized = true; return next(); }
+    HashIntoType first()
+    {
+        _initialized = true;
+        return next();
+    }
 
-    HashIntoType next() {
-        if (!_initialized) { _initialized = true; }
+    HashIntoType next()
+    {
+        if (!_initialized) {
+            _initialized = true;
+        }
 
         if (done()) {
             throw khmer_exception("past end of iterator");
@@ -355,16 +365,23 @@ public:
         return _hash_murmur(kmer, _ksize);
     }
 
-    bool done() const {
+    bool done() const
+    {
         return (index + _ksize > length);
     }
 
-    unsigned int get_start_pos() const {
-        if (!_initialized) { return 0; }
+    unsigned int get_start_pos() const
+    {
+        if (!_initialized) {
+            return 0;
+        }
         return index - 1;
     }
-    unsigned int get_end_pos() const {
-        if (!_initialized) { return _ksize; }
+    unsigned int get_end_pos() const
+    {
+        if (!_initialized) {
+            return _ksize;
+        }
         return index + _ksize - 1;
     }
 };
@@ -379,7 +396,8 @@ public:
     inline
     virtual
     HashIntoType
-    hash_dna(const char * kmer) const {
+    hash_dna(const char * kmer) const
+    {
         if (!(strlen(kmer) >= _ksize)) {
             throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
         }
@@ -387,21 +405,25 @@ public:
     }
 
     inline virtual HashIntoType
-    hash_dna_top_strand(const char * kmer) const {
+    hash_dna_top_strand(const char * kmer) const
+    {
         throw khmer_exception("not implemented");
     }
 
     inline virtual HashIntoType
-    hash_dna_bottom_strand(const char * kmer) const {
+    hash_dna_bottom_strand(const char * kmer) const
+    {
         throw khmer_exception("not implemented");
     }
 
     inline virtual std::string
-    unhash_dna(HashIntoType hashval) const {
+    unhash_dna(HashIntoType hashval) const
+    {
         throw khmer_exception("not implemented");
     }
 
-    virtual KmerHashIteratorPtr new_kmer_iterator(const char * sp) const {
+    virtual KmerHashIteratorPtr new_kmer_iterator(const char * sp) const
+    {
         KmerHashIterator * ki = new MurmurKmerHashIterator(sp, _ksize);
         return unique_ptr<KmerHashIterator>(ki);
     }

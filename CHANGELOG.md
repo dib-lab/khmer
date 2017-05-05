@@ -47,6 +47,9 @@ under semantic versioning, but will be in future versions of khmer.
   class.
 - Renamed `consume_fasta` and related functions to `consume_seqfile`, with
   support for reading sequences from additional formats pending.
+- `Counttable` and `SmallCounttable` now use murmur hash 3 as hash function.
+  This means they support kmers longer than 32 bases but means the hashes are
+  no longer reversible.
 
 ### Fixed
 - Bug in compressed(gzip) streaming output from scripts
