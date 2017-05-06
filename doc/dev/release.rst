@@ -67,12 +67,9 @@ release makers, following this checklist by MRC.
 #. (Optional) Check for updates to versioneer::
 
         pip install --upgrade versioneer
-        versioneer-installer
+        versioneer install
+        git diff --staged
 
-        git diff
-
-        ./setup.py versioneer
-        git diff
         git commit -m -a "new version of versioneer.py"
         # or
         git checkout -- versioneer.py khmer/_version.py khmer/__init__.py MANIFEST.in
@@ -128,6 +125,7 @@ release makers, following this checklist by MRC.
         pip uninstall -y khmer; pip uninstall -y khmer; make install
         mkdir ../not-khmer # make sure py.test executes tests
                            # from the installed khmer module
+        # you might want to add 'and not huge' to the test selection
         pushd ../not-khmer; pytest --pyargs khmer -m 'not known_failing'; popd
 
 
