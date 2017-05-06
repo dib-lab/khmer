@@ -266,7 +266,7 @@ cdef class SplitPairedReader:
                 raise err
             
             if self.min_length > 0:
-                if len(first) >= self.min_length or \
+                if len(first) >= self.min_length and \
                    len(second) >= self.min_length:
 
                     yield read_num, True, first, second
