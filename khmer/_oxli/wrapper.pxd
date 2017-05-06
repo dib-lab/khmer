@@ -430,7 +430,6 @@ cdef extern from "oxli/partitioning.hh" namespace "oxli":
         const uint64_t component_id
         set[HashIntoType] tags
 
-        void merge(set[shared_ptr[CpComponent]])
         void add_tag(HashIntoType)
         void add_tag(set[HashIntoType])
         uint64_t get_n_tags() const

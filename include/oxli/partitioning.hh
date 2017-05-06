@@ -95,15 +95,6 @@ class Component {
             n_destroyed++;
         }
 
-        void merge(ComponentPtrSet other_comps) {
-            for (auto other : other_comps) {
-                if (*other == *this) {
-                    continue;
-                }
-                this->add_tag(other->tags);
-            }
-        }
-
         uint64_t get_n_created() const {
             return n_created;
         }
