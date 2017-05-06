@@ -236,7 +236,8 @@ LIBOXLI_OBJS= \
 	alphabets.o \
 	murmur3.o \
 	storage.o \
-	partitioning.o
+	partitioning.o \
+	gmap.o
 
 PRECOMILE_OBJS ?=
 PRECLEAN_TARGS ?=
@@ -269,7 +270,9 @@ HEADERS= \
 	assembler.hh \
 	alphabets.hh \
 	storage.hh \
-	partitioning.hh
+	partitioning.hh \
+	gmap.hh
+
 OXLI_HEADERS = $(addprefix ../../include/oxli/,$(HEADERS))
 
 # START OF RULES #

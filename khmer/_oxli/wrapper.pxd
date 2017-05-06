@@ -440,7 +440,7 @@ cdef extern from "oxli/partitioning.hh" namespace "oxli":
     ctypedef shared_ptr[CpComponent] ComponentPtr
     ctypedef set[ComponentPtr] ComponentPtrSet
 
-    cdef cppclass CpGuardedKmerCompMap "oxli::GuardedKmerCompMap":
+    cdef cppclass CpGuardedHashCompMap "oxli::GuardedHashCompMap":
         map[HashIntoType, ComponentPtr] data
 
         ComponentPtr get(HashIntoType)
@@ -483,6 +483,6 @@ cdef extern from "oxli/partitioning.hh" namespace "oxli":
         ComponentPtr get_nearest_component(CpKmer) const
 
         weak_ptr[ComponentPtrSet] get_component_set()
-        weak_ptr[CpGuardedKmerCompMap] get_tag_component_map()
+        weak_ptr[CpGuardedHashCompMap] get_tag_component_map()
 
 

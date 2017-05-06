@@ -42,8 +42,8 @@ StreamingPartitioner::StreamingPartitioner(Hashgraph * graph, uint32_t tag_densi
         // positive rate to be about the same as the graph, we should make its table
         // sizes proportional by the number of tags. Here, we use _tag_density-2
         // because we always tag the first and last k-mers in a read.
-        tag_component_map = std::unique_ptr<GuardedKmerCompMap>(
-                                new GuardedKmerCompMap(graph->ksize(), 
+        tag_component_map = std::unique_ptr<GuardedHashCompMap>(
+                                new GuardedHashCompMap(graph->ksize(), 
                                                        graph->n_tables(),
                                                        graph_max_table_size / (_tag_density-2)));
         components = std::make_shared<ComponentPtrSet>();
