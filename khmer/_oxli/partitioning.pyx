@@ -44,6 +44,12 @@ cdef class Component:
     def _n_destroyed(self):
         return deref(self._this).get_n_destroyed()
 
+    def __repr__(self):
+        status = 'ALIVE' if deref(self._this).is_alive() else 'DEAD'
+        return '<Component ID={0} n_tags={1} status={2}>'.format(self.component_id,
+                                                                 len(self),
+                                                                 status)
+
     def __len__(self):
         return deref(self._this).get_n_tags()
 
@@ -129,7 +135,7 @@ cdef class StreamingPartitioner:
             self._this.reset(new CpStreamingPartitioner(self._graph_ptr, tag_density))
 
         self._tag_component_map = deref(self._this).get_tag_component_map()
-        self._components = deref(self._this).get_component_set()
+        self._components = deref(self._this).get_components()
         self.n_consumed = 0
 
     def consume(self, sequence):
@@ -163,17 +169,18 @@ cdef class StreamingPartitioner:
             return Component.wrap(compptr)
 
     def components(self):
-        cdef shared_ptr[ComponentPtrSet] locked
+        cdef shared_ptr[ComponentPtrVector] locked
         cdef ComponentPtr cmpptr
         lockedptr = self._components.lock()
         if lockedptr:
             for cmpptr in deref(lockedptr):
-                yield Component.wrap(cmpptr)
+                if cmpptr != NULL:
+                    yield Component.wrap(cmpptr)
         else:
             raise MemoryError("Can't locked underlying Component set")
 
     def tag_components(self):
-        cdef shared_ptr[CpGuardedKmerCompMap] locked
+        cdef shared_ptr[CpGuardedHashCompMap] locked
         cdef pair[HashIntoType,ComponentPtr] cpair
         locked = self._tag_component_map.lock()
         if locked:
@@ -189,7 +196,7 @@ cdef class StreamingPartitioner:
             raise IOError('Can\'t open file.')
         
         cdef ComponentPtr cmpptr
-        cdef shared_ptr[ComponentPtrSet] lockedptr
+        cdef shared_ptr[ComponentPtrVector] lockedptr
         lockedptr = self._components.lock()
 
         if lockedptr:      
@@ -218,7 +225,7 @@ cdef class StreamingPartitioner:
 
         cdef Component comp
         cdef int i
-        cdef shared_ptr[ComponentPtrSet] locked
+        cdef shared_ptr[ComponentPtrVector] locked
         locked = self._components.lock()
         if locked:
             for i, comp in enumerate(self.components()):
@@ -227,7 +234,7 @@ cdef class StreamingPartitioner:
                 comp.save(fp)
         fprintf(fp, "\n]}")
         fclose(fp)
-
+    
     @staticmethod
     def load(filename):
 

@@ -4,6 +4,7 @@
 #include <memory>
 #include <functional>
 #include <algorithm>
+#include <iostream>
 
 #include "oxli/hashtable.hh"
 #include "oxli/hashgraph.hh"
@@ -26,39 +27,132 @@ inline std::ostream& operator<< (std::ostream& stream, Component& comp) {
     return stream;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 
-StreamingPartitioner::StreamingPartitioner(Hashgraph * graph, uint32_t tag_density)  : 
-    graph(graph), _tag_density(tag_density), components_lock(0), n_consumed(0)
+
+ComponentMap::ComponentMap(WordLength ksize,
+                           WordLength n_tables,
+                           uint64_t max_table_size) : components_lock(0),
+                                                      component_counter(0),
+                                                      n_live_components(0)
+{
+
+    tag_component_map = std::unique_ptr<GuardedHashCompMap>(
+                            new GuardedHashCompMap(ksize, 
+                                                   n_tables, 
+                                                   max_table_size));
+    components = std::make_shared<ComponentPtrVector>();
+}
+
+void ComponentMap::map_tags_to_component(TagVector& tags,
+                                         ComponentPtr& comp)
+{
+    for (auto tag: tags) {
+        tag_component_map->set(tag, comp);
+        comp->add_tag(tag);
+    }
+}
+
+void ComponentMap::create_component(TagVector& tags)
+{
+    ComponentPtr new_comp = std::make_shared<Component>(component_counter);
+    component_counter++;
+    n_live_components++;
+    components->push_back(new_comp);
+    map_tags_to_component(tags, new_comp);
+
+    std::cout << "new component=" << *new_comp << std::endl;
+    std::cout << components->size() << " components in vector" << std::endl;
+}
+
+
+uint32_t ComponentMap::create_and_merge_components(TagVector& tags)
+{
+
+        // Now resolve components. First, get components from existing tags.
+        ComponentPtrSet found_comps;
+        TagVector new_tags;
+        for (auto tag: tags) {
+            ComponentPtr comp;
+            if ((comp = tag_component_map->get(tag)) != NULL) {
+                found_comps.insert(comp);
+            } else {
+                new_tags.push_back(tag);
+            }
+        }
+        
+        uint32_t n_merged = 1;
+        if (found_comps.size() == 0) {
+            create_component(tags);
+        } else {
+            // Choose the largest component as the root
+            // We want to minimize tag copying
+            ComponentPtr root_comp = *(found_comps.begin());
+            for (auto other : found_comps) {
+                if (other->get_n_tags() > root_comp->get_n_tags()) {
+                    root_comp = other;
+                }
+            }
+            // map the new tags to this component
+            root_comp->add_tags(new_tags);
+            map_tags_to_component(new_tags, root_comp);
+            if (found_comps.size() > 1) {
+                n_merged = merge_components(root_comp, found_comps);
+            }
+        }
+        return n_merged;
+}
+
+
+uint32_t ComponentMap::merge_components(ComponentPtr& root, 
+                                        ComponentPtrSet& comps)
+{
+    uint32_t n_merged = 1;
+    std::cout << "Merge with root=" << *root << std::endl;
+    for (auto other : comps) {
+        std::cout << "\tmerge in " << *other << std::endl;
+        if (*other == *root) {
+            continue;
+        }
+        root->add_tags(other->tags); // transfer the tags from the other comp
+        map_tags_to_component(other->tags, root);
+        (*components)[other->component_id]->kill();
+        (*components)[other->component_id] = nullptr;
+        n_live_components--;
+        n_merged++;
+
+    }
+                   // and active Python wrapper; this leaves them as sole owners
+    return n_merged;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+
+StreamingPartitioner::StreamingPartitioner(Hashgraph * graph,
+                                           uint32_t tag_density) :
+    graph(graph),
+    _tag_density(tag_density), 
+    n_consumed(0)
 {
 
     //if (auto graphptr = graph.lock()) {
     if (graph != NULL) {
-        std::vector<uint64_t> graph_table_sizes = graph->get_tablesizes(); 
-        uint64_t graph_max_table_size = *std::max_element(graph_table_sizes.begin(),
-                                                          graph_table_sizes.end());
-
         // We can guess that, given N k-mers in the graph, there will be
         // approximately N / _tag_density tags. If we want to the filter false
         // positive rate to be about the same as the graph, we should make its table
         // sizes proportional by the number of tags. Here, we use _tag_density-2
         // because we always tag the first and last k-mers in a read.
-        tag_component_map = std::unique_ptr<GuardedHashCompMap>(
-                                new GuardedHashCompMap(graph->ksize(), 
-                                                       graph->n_tables(),
-                                                       graph_max_table_size / (_tag_density-2)));
-        components = std::make_shared<ComponentPtrSet>();
+        std::vector<uint64_t> graph_table_sizes = graph->get_tablesizes(); 
+        uint64_t graph_max_table_size = *std::max_element(graph_table_sizes.begin(),
+                                                          graph_table_sizes.end());
+
+        partitions = std::make_shared<ComponentMap>(graph->ksize(), 
+                                                    graph->n_tables(),
+                                                    graph_max_table_size / (_tag_density-2));
     } else {
         throw oxli_ptr_exception("Hashgraph has been deleted.");
-    }
-}
-
-
-void StreamingPartitioner::map_tags_to_component(std::set<HashIntoType>& tags,
-                                                 ComponentPtr& comp)
-{
-    for (auto tag: tags) {
-        tag_component_map->set(tag, comp);
-        comp->add_tag(tag);
     }
 }
 
@@ -93,26 +187,25 @@ uint64_t StreamingPartitioner::consume_fasta(const std::string& filename)
 }
 
 
-
 uint64_t StreamingPartitioner::consume(const std::string& seq)
 {
-    std::set<HashIntoType> tags;
+    TagVector tags;
     KmerQueue seeds;
     std::set<HashIntoType> seen;
 
     uint64_t n_new = seed_sequence(seq, tags, seeds, seen);
     find_connected_tags(seeds, tags, seen, false);
     //acquire_components();
-    create_and_connect_components(tags);
+    partitions->create_and_merge_components(tags);
     //release_components();
     return n_new;
 }
 
 
 uint64_t StreamingPartitioner::consume_pair(const std::string& first,
-                                        const std::string& second)
+                                            const std::string& second)
 {
-    std::set<HashIntoType> tags;
+    TagVector tags;
     KmerQueue seeds;
     std::set<HashIntoType> seen;
 
@@ -120,23 +213,23 @@ uint64_t StreamingPartitioner::consume_pair(const std::string& first,
     n_new += seed_sequence(second, tags, seeds, seen);
     find_connected_tags(seeds, tags, seen, false);
     //acquire_components();
-    create_and_connect_components(tags);
+    partitions->create_and_merge_components(tags);
     //release_components();
     return n_new;
 }
 
-void StreamingPartitioner::add_component(ComponentPtr comp)
+
+ComponentPtr StreamingPartitioner::get_tag_component(std::string& kmer) const
 {
-    components->insert(comp);
-    map_tags_to_component(comp->tags, comp);
+    HashIntoType h = graph->hash_dna(kmer.c_str());
+    return partitions->get(h);
 }
 
 
-
 uint64_t StreamingPartitioner::seed_sequence(const std::string& seq,
-                                          std::set<HashIntoType>& tags,
-                                          KmerQueue& seeds,
-                                          std::set<HashIntoType>& seen)
+                                             TagVector& tags,
+                                             KmerQueue& seeds,
+                                             std::set<HashIntoType>& seen)
 {
     /* For the following comments, let G be the set of k-mers
      * known in the graph before inserting the k-mers R from
@@ -190,10 +283,10 @@ uint64_t StreamingPartitioner::seed_sequence(const std::string& seq,
                 // to the seen set, as we do not need to traverse from them in the tag search.
                 intersection.insert(kmer);
                 in_known_territory = true;
-                kmer_tagged = tag_component_map->contains(kmer);
+                kmer_tagged = partitions->contains(kmer);
                 if (kmer_tagged) {
                     since = 1;
-                    tags.insert(kmer);
+                    tags.push_back(kmer);
                     found_tag_in_territory = true;
                 } else {
                     ++since;
@@ -201,14 +294,14 @@ uint64_t StreamingPartitioner::seed_sequence(const std::string& seq,
             }
 
             if (since >= _tag_density) {
-                tags.insert(kmer);
+                tags.push_back(kmer);
                 since = 1;
             }
         } while (!kmers.done());
 
         // always tag the last k-mer
         if (since >= _tag_density / 2) {
-            tags.insert(kmer);
+            tags.push_back(kmer);
         }
         seeds.push(kmer);
 
@@ -227,99 +320,6 @@ uint64_t StreamingPartitioner::seed_sequence(const std::string& seq,
     return n_new;
 }
 
-
-uint32_t StreamingPartitioner::create_and_connect_components(std::set<HashIntoType> &tags)
-{
-
-        // Now resolve components. First, get components from existing tags.
-        ComponentPtrSet found_comps;
-#if(DEBUG_SP)
-        std::cout << "Get found comps: " << std::endl;
-#endif
-        for (auto tag: tags) {
-#if(DEBUG_SP)
-            std::cout << "Tag: " <<  tag;
-#endif
-            ComponentPtr comp;
-            if ((comp = tag_component_map->get(tag)) != NULL) {
-#if(DEBUG_SP)
-                std::cout << "->" << *comp;
-#endif
-                found_comps.insert(comp);
-            }
-#if(DEBUG_SP)
-            std::cout << std::endl;
-#endif
-        }
-
-#if(DEBUG_SP)
-        std::cout << found_comps.size() << " unique components." << std::endl;
-#endif
-        
-        uint32_t n_merged = 1;
-        if (found_comps.size() == 0) {
-            ComponentPtr new_comp = std::make_shared<Component>();
-#if(DEBUG_SP)
-            std::cout << "Build new comp: " << *new_comp << std::endl;
-#endif
-            components->insert(new_comp);
-            map_tags_to_component(tags, new_comp);
-        } else {
-            // Choose the largest component as the root
-            // We want to minimize tag copying
-            ComponentPtr root_comp = *(found_comps.begin());
-            for (auto other : found_comps) {
-                if (other->get_n_tags() > root_comp->get_n_tags()) {
-                    root_comp = other;
-                }
-            }
-#if(DEBUG_SP)
-            std::cout << "Merge into: " << *root_comp << std::endl;
-#endif
-            // map the new tags to this component
-            root_comp->add_tag(tags);
-            map_tags_to_component(tags, root_comp);
-            if (found_comps.size() > 1) {
-                n_merged = merge_components(root_comp, found_comps);
-            }
-        }
-        return n_merged;
-}
-
-
-uint32_t StreamingPartitioner::merge_components(ComponentPtr& root, 
-                                            ComponentPtrSet& comps)
-{
-    uint32_t n_merged = 1;
-    for (auto other : comps) {
-        if (*other == *root) {
-            continue;
-        }
-        root->add_tag(other->tags); // transfer the tags from the other comp
-        map_tags_to_component(other->tags, root); // set the other's tags to point to root
-        components->erase(other); // remove other component entirely
-        n_merged++;
-
-    }
-    comps.clear(); // should call destructor on all the merged comps, unless they have
-                   // and active Python wrapper; this leaves them as sole owners
-    return n_merged;
-}
-
-
-ComponentPtr StreamingPartitioner::get_tag_component(HashIntoType tag) const
-{
-    return tag_component_map->get(tag);
-}
-
-
-ComponentPtr StreamingPartitioner::get_tag_component(std::string& kmer) const
-{
-    HashIntoType h = graph->hash_dna(kmer.c_str());
-    return get_tag_component(h);
-}
-
-
 ComponentPtr StreamingPartitioner::get_nearest_component(std::string& kmer) const
 {
     Kmer hashed = graph->build_kmer(kmer);
@@ -329,7 +329,7 @@ ComponentPtr StreamingPartitioner::get_nearest_component(std::string& kmer) cons
 
 ComponentPtr StreamingPartitioner::get_nearest_component(Kmer kmer) const
 {
-    std::set<HashIntoType> tags;
+    TagVector tags;
     std::set<HashIntoType> seen;
     KmerQueue node_q;
     node_q.push(kmer);
@@ -337,7 +337,7 @@ ComponentPtr StreamingPartitioner::get_nearest_component(Kmer kmer) const
     find_connected_tags(node_q, tags, seen, true);
     if (tags.size() > 0) {
         HashIntoType tag = *(tags.begin());
-        return tag_component_map->get(tag);
+        return partitions->get(tag);
     } else {
         return NULL;
     }
@@ -345,7 +345,7 @@ ComponentPtr StreamingPartitioner::get_nearest_component(Kmer kmer) const
 
 
 void StreamingPartitioner::find_connected_tags(KmerQueue& node_q,
-                                               std::set<HashIntoType>& found_tags,
+                                               TagVector& found_tags,
                                                std::set<HashIntoType>& seen,
                                                bool truncate) const
 {
@@ -380,8 +380,8 @@ void StreamingPartitioner::find_connected_tags(KmerQueue& node_q,
             total++;
 
             // Found a tag!
-            if (tag_component_map->contains(node)) {
-                found_tags.insert(node);
+            if (partitions->contains(node)) {
+                found_tags.push_back(node);
                 if (truncate) {
                     return;
                 }

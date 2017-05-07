@@ -68,6 +68,8 @@ class ComponentPtrCompare {
 
 class ComponentPtrCompare;
 typedef std::set<ComponentPtr, ComponentPtrCompare> ComponentPtrSet;
+typedef std::vector<ComponentPtr> ComponentPtrVector;
+typedef std::vector<HashIntoType> TagVector;
 typedef GuardedHashMap<ComponentPtr, false> GuardedHashCompMap;
 
 
@@ -77,13 +79,14 @@ class Component {
         
         static uint64_t n_created;
         static uint64_t n_destroyed;
+        bool alive;
 
     public:
 
         const uint64_t component_id;
-        std::set<HashIntoType> tags;
+        TagVector tags;
 
-        explicit Component(): component_id(n_created) {
+        explicit Component(): component_id(n_created), alive(true) {
             n_created++;
         }
 
@@ -95,6 +98,15 @@ class Component {
             n_destroyed++;
         }
 
+        void kill() {
+            tags.clear();
+            alive = false;
+        }
+
+        bool is_alive() const {
+            return alive;
+        }
+
         uint64_t get_n_created() const {
             return n_created;
         }
@@ -104,13 +116,13 @@ class Component {
         }
 
         void add_tag(HashIntoType tag) {
-            tags.insert(tag);
+            tags.push_back(tag);
         }
 
-        void add_tag(std::set<HashIntoType>& new_tags) {
-            for (auto tag: new_tags) {
-                add_tag(tag);
-            }
+        void add_tags(TagVector& new_tags) {
+            tags.insert(tags.end(),
+                        new_tags.begin(),
+                        new_tags.end());
         }
 
         uint64_t get_n_tags() const {
@@ -129,15 +141,71 @@ class Component {
 };
 
 
+class ComponentMap {
+
+    private:
+    
+        // We should exclusively own tag_component_map.
+        std::shared_ptr<GuardedHashCompMap> tag_component_map;
+        std::shared_ptr<ComponentPtrVector> components;
+        uint32_t components_lock;
+        uint64_t component_counter;
+        uint64_t n_live_components;
+
+    public:
+
+
+        explicit ComponentMap(WordLength ksize,
+                              WordLength n_tables,
+                              uint64_t max_table_size);
+
+        void create_component(TagVector& tags);
+        uint32_t create_and_merge_components(TagVector& tags);
+        void map_tags_to_component(TagVector& tags, ComponentPtr& comp);
+        uint32_t merge_components(ComponentPtr& root, ComponentPtrSet& comps);
+
+        bool contains(HashIntoType tag)
+        {
+            return tag_component_map->contains(tag);
+        }
+
+        ComponentPtr get(HashIntoType tag) const {
+            return tag_component_map->get(tag);
+        }
+
+        uint64_t get_n_components() const {
+            return n_live_components;
+        }
+
+        uint64_t get_n_tags() const {
+            return tag_component_map->size();
+        }
+
+        std::weak_ptr<ComponentPtrVector> get_components() const {
+            return std::weak_ptr<ComponentPtrVector>(components);
+        }
+
+        std::weak_ptr<GuardedHashCompMap> get_tag_component_map() const {
+            return std::weak_ptr<GuardedHashCompMap>(tag_component_map);
+        }
+
+        inline void acquire_components() {
+            while(!__sync_bool_compare_and_swap( &components_lock, 0, 1));
+        }
+
+        inline void release_components() {
+            __sync_bool_compare_and_swap( &components_lock, 1, 0);
+        }
+};
+
+
 class StreamingPartitioner {
 
     private:
     
         uint32_t _tag_density;
         // We should exclusively own tag_component_map.
-        std::shared_ptr<GuardedHashCompMap> tag_component_map;
-        std::shared_ptr<ComponentPtrSet> components;
-        uint32_t components_lock;
+        std::shared_ptr<ComponentMap> partitions;
         uint64_t n_consumed;
 
     public:
@@ -152,59 +220,40 @@ class StreamingPartitioner {
         uint64_t consume(const std::string& seq);
         uint64_t consume_pair(const std::string& first,
                           const std::string& second);
+
         uint64_t seed_sequence(const std::string& seq,
-                              std::set<HashIntoType>& tags,
+                              TagVector& tags,
                               KmerQueue& seeds,
                               std::set<HashIntoType>& seen);
-        uint32_t create_and_connect_components(std::set<HashIntoType>& tags);
 
         uint64_t consume_fasta(std::string const &filename);
-        void map_tags_to_component(std::set<HashIntoType>& tags, ComponentPtr& comp);
-        void add_component(ComponentPtr comp);
         void find_connected_tags(KmerQueue& node_q,
-                                 std::set<HashIntoType>& found_tags,
+                                 TagVector& found_tags,
                                  std::set<HashIntoType>& seen,
                                  bool truncate=false) const;
-        uint32_t merge_components(ComponentPtr& root, ComponentPtrSet& comps);
 
+        ComponentPtr get_tag_component(std::string& kmer) const;
+        ComponentPtr get_nearest_component(Kmer kmer) const;
+        ComponentPtr get_nearest_component(std::string& kmer) const;
 
+        std::weak_ptr<ComponentPtrVector> get_components() const {
+            return partitions->get_components();
+        }
+
+        std::weak_ptr<GuardedHashCompMap> get_tag_component_map() const {
+            return partitions->get_tag_component_map();
+        }
 
         uint64_t get_n_components() const {
-            return components->size();
+            return partitions->get_n_components();
         }
 
         uint64_t get_n_tags() const {
-            return tag_component_map->size();
-        }
-
-        uint64_t get_n_consumed() const {
-            return n_consumed;
+            return partitions->get_n_tags();
         }
 
         uint32_t get_tag_density() const {
             return _tag_density;
-        }
-
-        ComponentPtr get_tag_component(HashIntoType tag) const;
-        ComponentPtr get_tag_component(std::string& tag) const;
-        
-        ComponentPtr get_nearest_component(Kmer kmer) const;
-        ComponentPtr get_nearest_component(std::string& kmer) const;
-
-        std::weak_ptr<ComponentPtrSet> get_component_set() const {
-            return std::weak_ptr<ComponentPtrSet>(components);
-        }
-
-        std::weak_ptr<GuardedHashCompMap> get_tag_component_map() const {
-            return std::weak_ptr<GuardedHashCompMap>(tag_component_map);
-        }
-
-        inline void acquire_components() {
-            while(!__sync_bool_compare_and_swap( &components_lock, 0, 1));
-        }
-
-        inline void release_components() {
-            __sync_bool_compare_and_swap( &components_lock, 1, 0);
         }
 };
 

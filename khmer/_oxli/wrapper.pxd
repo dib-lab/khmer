@@ -423,21 +423,28 @@ cdef extern from "oxli/hllcounter.hh" namespace "oxli":
 
 cdef extern from "oxli/partitioning.hh" namespace "oxli":
 
+    ctypedef vector[HashIntoType] TagVector
+
     cdef cppclass CpComponent "oxli::Component":
         CpComponent()
         CpComponent(uint64_t)
 
         const uint64_t component_id
-        set[HashIntoType] tags
+        vector[HashIntoType] tags
+
+        void kill()
+        bool is_alive() const
 
         void add_tag(HashIntoType)
-        void add_tag(set[HashIntoType])
+        void add_tags(TagVector&)
+
         uint64_t get_n_tags() const
         uint64_t get_n_created() const
         uint64_t get_n_destroyed() const
 
     ctypedef shared_ptr[CpComponent] ComponentPtr
     ctypedef set[ComponentPtr] ComponentPtrSet
+    ctypedef vector[ComponentPtr] ComponentPtrVector
 
     cdef cppclass CpGuardedHashCompMap "oxli::GuardedHashCompMap":
         map[HashIntoType, ComponentPtr] data
@@ -445,6 +452,22 @@ cdef extern from "oxli/partitioning.hh" namespace "oxli":
         ComponentPtr get(HashIntoType)
         void set(HashIntoType, ComponentPtr)
         bool contains(HashIntoType)
+
+    cdef cppclass CpComponentMap "oxli::ComponentMap":
+        CpComponentMap(WordLength, WordLength, uint64_t)
+
+        void create_component(TagVector&)
+        uint32_t create_and_merge_components(TagVector&)
+        void map_tags_to_component(TagVector&, ComponentPtr&)
+        uint32_t merge_components(ComponentPtr&, ComponentPtrSet&)
+
+        bool contains(HashIntoType)
+        ComponentPtr get(HashIntoType) const
+
+        uint64_t get_n_components() const
+        uint64_t get_n_tags() const
+        weak_ptr[ComponentPtrVector] get_components()
+        weak_ptr[CpGuardedHashCompMap] get_tag_component_map()
 
     cdef cppclass CpStreamingPartitioner "oxli::StreamingPartitioner":
         CpStreamingPartitioner(CpHashgraph * ) except +MemoryError
@@ -455,33 +478,28 @@ cdef extern from "oxli/partitioning.hh" namespace "oxli":
         uint64_t  consume_pair(string&, string&) nogil except +MemoryError
         uint64_t consume_fasta(string&) except +MemoryError
 
-        uint64_t seed_sequence(string&, set[HashIntoType]&, KmerQueue&,
+        uint64_t seed_sequence(string&, TagVector&, KmerQueue&,
                            set[HashIntoType]&) except +MemoryError
-        uint32_t create_and_connect_components(set[HashIntoType]&)
-        void add_component(ComponentPtr comp)
-        void map_tags_to_component(set[HashIntoType]&, ComponentPtr&)
 
         void find_connected_tags(queue[CpKmer]&, 
-                                 set[HashIntoType]&,
+                                 TagVector&,
                                  set[HashIntoType]&) except +MemoryError
 
         void find_connected_tags(queue[CpKmer]&, 
-                                 set[HashIntoType]&,
+                                 TagVector&,
                                  set[HashIntoType]&,
                                  bool) except +MemoryError
 
-        uint64_t get_n_components() const
-        uint64_t get_n_tags() const
+
         uint64_t get_n_consumed() const
         uint32_t get_tag_density() const
+        uint64_t get_n_components() const
+        uint64_t get_n_tags() const
 
         ComponentPtr get_tag_component(string&) const
-        ComponentPtr get_tag_component(HashIntoType) const
-
         ComponentPtr get_nearest_component(string&) const
         ComponentPtr get_nearest_component(CpKmer) const
 
-        weak_ptr[ComponentPtrSet] get_component_set()
+        weak_ptr[ComponentPtrVector] get_components()
         weak_ptr[CpGuardedHashCompMap] get_tag_component_map()
-
 
