@@ -204,7 +204,6 @@ class StreamingPartitioner {
     private:
     
         uint32_t _tag_density;
-        // We should exclusively own tag_component_map.
         std::shared_ptr<ComponentMap> partitions;
         uint64_t n_consumed;
 
