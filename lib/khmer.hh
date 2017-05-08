@@ -94,7 +94,9 @@ private:\
 #   define SAVED_SUBSET 5
 #   define SAVED_LABELSET 6
 #   define SAVED_SMALLCOUNT 7
-
+#   define SAVED_COUNTING_HT_MURMUR 8
+#   define SAVED_HASHBITS_MURMUR 9
+#   define SAVED_SMALLCOUNT_MURMUR 10
 
 #   define TRAVERSAL_LEFT 0
 #   define TRAVERSAL_RIGHT 1

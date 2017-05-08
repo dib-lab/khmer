@@ -37,6 +37,8 @@ from __future__ import absolute_import
 
 import random
 
+import pytest
+
 from khmer import SmallCounttable
 
 from . import khmer_tst_utils as utils
@@ -50,8 +52,8 @@ def test_single_add():
     assert sct.get("AAAA") == 1
 
 
-def test_split_byte():
-    # check the byte is correctly split
+def test_split_byte_murmur():
+    # check the byte is correctly split when using murmur hash
     sct = SmallCounttable(4, 4, 1)
 
     # these kmers were carefully chosen to have hash values that produce

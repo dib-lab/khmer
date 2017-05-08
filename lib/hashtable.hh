@@ -199,11 +199,11 @@ public:
         return store->get_count(khash);
     }
 
-    void save(std::string filename)
+    virtual void save(std::string filename)
     {
         store->save(filename, _ksize);
     }
-    void load(std::string filename)
+    virtual void load(std::string filename)
     {
         store->load(filename, _ksize);
         _init_bitstuff();
@@ -427,6 +427,16 @@ public:
         KmerHashIterator * ki = new MurmurKmerHashIterator(sp, _ksize);
         return unique_ptr<KmerHashIterator>(ki);
     }
+
+    virtual void save(std::string filename)
+    {
+        store->save(filename, _ksize);
+    }
+    virtual void load(std::string filename)
+    {
+        store->load(filename, _ksize);
+        _init_bitstuff();
+    }
 };
 
 // Hashtable-derived class with ByteStorage.
@@ -442,15 +452,15 @@ class SmallCounttable : public khmer::MurmurHashtable
 {
 public:
     explicit SmallCounttable(WordLength ksize, std::vector<uint64_t> sizes)
-        : MurmurHashtable(ksize, new NibbleStorage(sizes)) { } ;
+          : MurmurHashtable(ksize, new NibbleStorage(sizes)) { };
 };
 
 // Hashtable-derived class with BitStorage.
-class Nodetable : public Hashtable
+class Nodetable : public khmer::MurmurHashtable
 {
 public:
     explicit Nodetable(WordLength ksize, std::vector<uint64_t> sizes)
-        : Hashtable(ksize, new BitStorage(sizes)) { } ;
+        : MurmurHashtable(ksize, new BitStorage(sizes)) { } ;
 };
 
 }

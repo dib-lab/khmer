@@ -908,7 +908,8 @@ void NibbleStorage::load(std::string infilename, WordLength& ksize)
                   + strerror(errno);
         }
         throw khmer_file_exception(err);
-    } catch (const std::exception &e) {
+    }
+     catch (const std::exception &e) {
         std::string err = "Error reading from k-mer count file: " + infilename + " "
                           + strerror(errno);
         throw khmer_file_exception(err);
