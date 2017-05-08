@@ -90,7 +90,7 @@ class TestStreamingPartitionerBasic:
         sp.consume(seq)
 
         tags = [t for t,c in sp.tag_components()]
-        comp = sp.get_nearest_component(seq[:K])
+        comp = sp.find_nearest_component(seq[:K])
         assert len(tags) == len(comp)
 
     def test_tag_components_iter(self, random_sequence):
@@ -114,7 +114,7 @@ class TestStreamingPartitionerBasic:
         assert len(comps) == 2
         assert len(tags) == sum([len(c) for c in comps])
 
-    def test_get_nearest_component(self, random_sequence):
+    def test_find_nearest_component(self, random_sequence):
         seq1 =  random_sequence()
         seq2 = random_sequence(exclude=seq1)
 
@@ -124,8 +124,8 @@ class TestStreamingPartitionerBasic:
         sp.consume(seq1)
         sp.consume(seq2)
 
-        c1 = sp.get_nearest_component(seq1[:K])
-        c2 = sp.get_nearest_component(seq2[:K])
+        c1 = sp.find_nearest_component(seq1[:K])
+        c2 = sp.find_nearest_component(seq2[:K])
         assert c1.component_id != c2.component_id
 
         for tag in c1:

@@ -132,28 +132,21 @@ uint32_t ComponentMap::merge_components(ComponentPtr& root,
 
 StreamingPartitioner::StreamingPartitioner(Hashgraph * graph,
                                            uint32_t tag_density) :
+    ComponentMap::ComponentMap(graph->ksize(),
+                               graph->n_tables(),
+                               _cstr_get_max_table_size(graph)),
     graph(graph),
     _tag_density(tag_density), 
     n_consumed(0)
 {
+}
 
-    //if (auto graphptr = graph.lock()) {
-    if (graph != NULL) {
-        // We can guess that, given N k-mers in the graph, there will be
-        // approximately N / _tag_density tags. If we want to the filter false
-        // positive rate to be about the same as the graph, we should make its table
-        // sizes proportional by the number of tags. Here, we use _tag_density-2
-        // because we always tag the first and last k-mers in a read.
-        std::vector<uint64_t> graph_table_sizes = graph->get_tablesizes(); 
-        uint64_t graph_max_table_size = *std::max_element(graph_table_sizes.begin(),
-                                                          graph_table_sizes.end());
 
-        partitions = std::make_shared<ComponentMap>(graph->ksize(), 
-                                                    graph->n_tables(),
-                                                    graph_max_table_size / (_tag_density-2));
-    } else {
-        throw oxli_ptr_exception("Hashgraph has been deleted.");
-    }
+uint64_t StreamingPartitioner::_cstr_get_max_table_size(Hashgraph * graph)
+{
+    std::vector<uint64_t> graph_table_sizes = graph->get_tablesizes(); 
+    return  *std::max_element(graph_table_sizes.begin(),
+                              graph_table_sizes.end());
 }
 
 
@@ -196,7 +189,7 @@ uint64_t StreamingPartitioner::consume(const std::string& seq)
     uint64_t n_new = seed_sequence(seq, tags, seeds, seen);
     find_connected_tags(seeds, tags, seen, false);
     //acquire_components();
-    partitions->create_and_merge_components(tags);
+    create_and_merge_components(tags);
     //release_components();
     return n_new;
 }
@@ -213,16 +206,22 @@ uint64_t StreamingPartitioner::consume_pair(const std::string& first,
     n_new += seed_sequence(second, tags, seeds, seen);
     find_connected_tags(seeds, tags, seen, false);
     //acquire_components();
-    partitions->create_and_merge_components(tags);
+    create_and_merge_components(tags);
     //release_components();
     return n_new;
 }
 
 
-ComponentPtr StreamingPartitioner::get_tag_component(std::string& kmer) const
+ComponentPtr StreamingPartitioner::get(std::string& kmer) const
 {
     HashIntoType h = graph->hash_dna(kmer.c_str());
-    return partitions->get(h);
+    return ComponentMap::get(h);
+}
+
+
+ComponentPtr StreamingPartitioner::get(HashIntoType h) const
+{
+    return ComponentMap::get(h);
 }
 
 
@@ -283,7 +282,7 @@ uint64_t StreamingPartitioner::seed_sequence(const std::string& seq,
                 // to the seen set, as we do not need to traverse from them in the tag search.
                 intersection.insert(kmer);
                 in_known_territory = true;
-                kmer_tagged = partitions->contains(kmer);
+                kmer_tagged = this->contains(kmer);
                 if (kmer_tagged) {
                     since = 1;
                     tags.push_back(kmer);
@@ -320,14 +319,14 @@ uint64_t StreamingPartitioner::seed_sequence(const std::string& seq,
     return n_new;
 }
 
-ComponentPtr StreamingPartitioner::get_nearest_component(std::string& kmer) const
+ComponentPtr StreamingPartitioner::find_nearest_component(std::string& kmer) const
 {
     Kmer hashed = graph->build_kmer(kmer);
-    return get_nearest_component(hashed);
+    return find_nearest_component(hashed);
 }
 
 
-ComponentPtr StreamingPartitioner::get_nearest_component(Kmer kmer) const
+ComponentPtr StreamingPartitioner::find_nearest_component(Kmer kmer) const
 {
     TagVector tags;
     std::set<HashIntoType> seen;
@@ -337,7 +336,7 @@ ComponentPtr StreamingPartitioner::get_nearest_component(Kmer kmer) const
     find_connected_tags(node_q, tags, seen, true);
     if (tags.size() > 0) {
         HashIntoType tag = *(tags.begin());
-        return partitions->get(tag);
+        return this->get(tag);
     } else {
         return NULL;
     }
@@ -380,7 +379,7 @@ void StreamingPartitioner::find_connected_tags(KmerQueue& node_q,
             total++;
 
             // Found a tag!
-            if (partitions->contains(node)) {
+            if (this->contains(node)) {
                 found_tags.push_back(node);
                 if (truncate) {
                     return;

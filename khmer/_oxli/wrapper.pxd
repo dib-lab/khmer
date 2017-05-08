@@ -469,7 +469,7 @@ cdef extern from "oxli/partitioning.hh" namespace "oxli":
         weak_ptr[ComponentPtrVector] get_components()
         weak_ptr[CpGuardedHashCompMap] get_tag_component_map()
 
-    cdef cppclass CpStreamingPartitioner "oxli::StreamingPartitioner":
+    cdef cppclass CpStreamingPartitioner "oxli::StreamingPartitioner" (CpComponentMap):
         CpStreamingPartitioner(CpHashgraph * ) except +MemoryError
         CpStreamingPartitioner(CpHashgraph *, uint32_t) except +MemoryError
         
@@ -490,16 +490,11 @@ cdef extern from "oxli/partitioning.hh" namespace "oxli":
                                  set[HashIntoType]&,
                                  bool) except +MemoryError
 
+        ComponentPtr find_nearest_component(string&) const
+        ComponentPtr find_nearest_component(CpKmer) const
 
         uint64_t get_n_consumed() const
         uint32_t get_tag_density() const
-        uint64_t get_n_components() const
-        uint64_t get_n_tags() const
 
-        ComponentPtr get_tag_component(string&) const
-        ComponentPtr get_nearest_component(string&) const
-        ComponentPtr get_nearest_component(CpKmer) const
-
-        weak_ptr[ComponentPtrVector] get_components()
-        weak_ptr[CpGuardedHashCompMap] get_tag_component_map()
+        ComponentPtr get(string&) const
 

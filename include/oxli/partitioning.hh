@@ -164,7 +164,7 @@ class ComponentMap {
         void map_tags_to_component(TagVector& tags, ComponentPtr& comp);
         uint32_t merge_components(ComponentPtr& root, ComponentPtrSet& comps);
 
-        bool contains(HashIntoType tag)
+        bool contains(HashIntoType tag) const
         {
             return tag_component_map->contains(tag);
         }
@@ -199,13 +199,13 @@ class ComponentMap {
 };
 
 
-class StreamingPartitioner {
+class StreamingPartitioner: public ComponentMap {
 
     private:
     
         uint32_t _tag_density;
-        std::shared_ptr<ComponentMap> partitions;
         uint64_t n_consumed;
+        uint64_t _cstr_get_max_table_size(Hashgraph * graph);
 
     public:
         // We're not graph's owner, simply an observer.
@@ -219,37 +219,23 @@ class StreamingPartitioner {
         uint64_t consume(const std::string& seq);
         uint64_t consume_pair(const std::string& first,
                           const std::string& second);
+        uint64_t consume_fasta(std::string const &filename);
 
         uint64_t seed_sequence(const std::string& seq,
                               TagVector& tags,
                               KmerQueue& seeds,
                               std::set<HashIntoType>& seen);
 
-        uint64_t consume_fasta(std::string const &filename);
         void find_connected_tags(KmerQueue& node_q,
                                  TagVector& found_tags,
                                  std::set<HashIntoType>& seen,
                                  bool truncate=false) const;
 
-        ComponentPtr get_tag_component(std::string& kmer) const;
-        ComponentPtr get_nearest_component(Kmer kmer) const;
-        ComponentPtr get_nearest_component(std::string& kmer) const;
+        ComponentPtr get(std::string& kmer) const;
+        ComponentPtr get(HashIntoType h) const;
+        ComponentPtr find_nearest_component(Kmer kmer) const;
+        ComponentPtr find_nearest_component(std::string& kmer) const;
 
-        std::weak_ptr<ComponentPtrVector> get_components() const {
-            return partitions->get_components();
-        }
-
-        std::weak_ptr<GuardedHashCompMap> get_tag_component_map() const {
-            return partitions->get_tag_component_map();
-        }
-
-        uint64_t get_n_components() const {
-            return partitions->get_n_components();
-        }
-
-        uint64_t get_n_tags() const {
-            return partitions->get_n_tags();
-        }
 
         uint32_t get_tag_density() const {
             return _tag_density;

@@ -150,19 +150,19 @@ cdef class StreamingPartitioner:
     def consume_fasta(self, filename):
         return deref(self._this).consume_fasta(filename.encode('utf-8'))
 
-    def get_tag_component(self, kmer):
+    def get(self, kmer):
         cdef ComponentPtr compptr
         cdef string kmer_s = _bstring(kmer)
-        compptr = deref(self._this).get_tag_component(kmer_s)
+        compptr = deref(self._this).get(kmer_s)
         if compptr == NULL:
             return None
         else:
             return Component.wrap(compptr)
 
-    def get_nearest_component(self, kmer):
+    def find_nearest_component(self, kmer):
         cdef ComponentPtr compptr
         cdef string kmer_s = _bstring(kmer)
-        compptr = deref(self._this).get_nearest_component(kmer_s)
+        compptr = deref(self._this).find_nearest_component(kmer_s)
         if compptr == NULL:
             return None
         else:
@@ -234,7 +234,7 @@ cdef class StreamingPartitioner:
                 comp.save(fp)
         fprintf(fp, "\n]}")
         fclose(fp)
-    
+    ''' 
     @staticmethod
     def load(filename):
 
@@ -259,6 +259,7 @@ cdef class StreamingPartitioner:
                                       comp_info['tags'])
             deref(partitioner._this).add_component(comp_ptr)
         return partitioner
+    '''
 
     @property
     def component_dict(self):
