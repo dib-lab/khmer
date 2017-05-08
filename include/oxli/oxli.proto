@@ -1,0 +1,38 @@
+package oxli;
+
+message PBComponent {
+    required uint64 component_id = 1;
+    repeated uint64 tags = 2;
+}
+
+message PBComponentMap {
+
+    required uint64 n_components = 1;
+    required uint64 component_counter = 2;
+    repeated PBComponent components = 3;
+
+    optional uint32 K = 4;
+    optional uint32 n_tables = 5;
+    optional uint64 max_table_size = 6;
+
+}
+
+message PBHashtable {
+
+    required string URI = 1;
+
+    enum HashType {
+        NODEGRAPH = 0;
+        COUNTGRAPH = 1;
+    }
+
+    required HashType type = 2 [default = COUNTGRAPH];
+}
+
+message PBPartitioner {
+
+    required uint32 tag_density = 1;
+    optional uint32 n_consumed = 2;
+    required PBComponentMap map = 3;
+    required PBHashtable graph = 4;
+}

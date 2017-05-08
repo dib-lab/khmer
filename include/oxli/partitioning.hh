@@ -48,6 +48,8 @@ Contact: khmer-project@idyll.org
 #include "kmer_filters.hh"
 #include "traversal.hh"
 
+#include "oxli.pb.h"
+
 #ifndef DEBUG_SP
 #define DEBUG_SP 0
 #endif
@@ -93,6 +95,20 @@ class Component {
         explicit Component(uint64_t component_id): component_id(component_id) {
             n_created++;
         }
+
+        explicit Component(const std::string& pbuf) {
+            
+        }
+
+        bool serialize(std::string* target) {
+
+        }
+
+        bool serialize(std::ostream* output) {
+
+        }
+
+        const PBComponent* as_protobuf(
 
         ~Component() {
             n_destroyed++;

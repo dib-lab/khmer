@@ -120,7 +120,7 @@ coverage-debug: $(CPPSOURCES)
 	touch coverage-debug
 
 ## install     : install the khmer module and scripts
-install: FORCE
+install: protobuf FORCE
 	./setup.py build install
 
 ## dist        : create a module package for distribution
@@ -280,7 +280,13 @@ doc/doxygen/html/index.html: $(CPPSOURCES) $(PYSOURCES)
 		sed "s=\$${INCLUDES}=$(INCLUDESTRING)=" > Doxyfile
 	doxygen
 
-liboxli: FORCE
+include/oxli/oxli.proto: FORCE
+
+protobuf: include/oxli/oxli.proto
+	protoc -I=. --cpp_out=. $<
+	mv include/oxli/oxli.pb.cc src/oxli/
+
+liboxli: protobuf FORCE
 	cd src/oxli && \
 	$(MAKE)
 
