@@ -211,6 +211,48 @@ HashIntoType _hash_murmur_forward(const std::string& kmer, const WordLength k)
     return h;
 }
 
+HashIntoType _hash_karprabin(const std::string& kmer, const WordLength k)
+{
+    HashIntoType h = 0;
+    HashIntoType r = 0;
+
+    return khmer::_hash_karprabin(kmer, k, h, r);
+}
+
+HashIntoType _hash_karprabin(const std::string& kmer, const WordLength k,
+                             HashIntoType& h, HashIntoType& r)
+{
+    const std::string rev = khmer::_revcomp(kmer);
+    KarpRabinHash<uint64_t> fwd_hasher(k);
+    for (WordLength i = 0; i < k; ++i) {
+        fwd_hasher.eat(kmer[i]);
+    }
+    h = fwd_hasher.hashvalue;
+
+    if (rev == kmer) {
+        // self complement kmer, can't use bitwise XOR
+        r = h;
+        return h;
+    }
+
+    KarpRabinHash<uint64_t> rev_hasher(k);
+    for (WordLength i = 0; i < k; ++i) {
+        rev_hasher.eat(rev[i]);
+    }
+    r = rev_hasher.hashvalue;
+
+    return h ^ r;
+}
+
+HashIntoType _hash_karprabin_forward(const std::string& kmer, const WordLength k)
+{
+    HashIntoType h = 0;
+    HashIntoType r = 0;
+
+    khmer::_hash_karprabin(kmer, k, h, r);
+    return h;
+}
+
 KmerIterator::KmerIterator(const char * seq,
                            unsigned char k) :
     KmerFactory(k), _seq(seq)
@@ -278,4 +320,4 @@ Kmer KmerIterator::next(HashIntoType& f, HashIntoType& r)
     return build_kmer(_kmer_f, _kmer_r);
 }
 
-}
+} // khmer namespace

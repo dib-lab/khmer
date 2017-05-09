@@ -46,6 +46,9 @@ Contact: khmer-project@idyll.org
 
 #include "khmer.hh"
 
+#include "rabinkarphash.h"
+
+
 // test validity
 #ifdef KHMER_EXTRA_SANITY_CHECKS
 #   define is_valid_dna(ch) ((toupper(ch)) == 'A' || (toupper(ch)) == 'C' || \
@@ -114,6 +117,13 @@ HashIntoType _hash_murmur(const std::string& kmer, const WordLength k,
                           HashIntoType& h, HashIntoType& r);
 HashIntoType _hash_murmur_forward(const std::string& kmer,
                                   const WordLength k);
+
+// KarpRabin hash, a rolling hash that is irreversible
+HashIntoType _hash_karprabin(const std::string& kmer, const WordLength k);
+HashIntoType _hash_karprabin(const std::string& kmer, const WordLength k,
+                             HashIntoType& h, HashIntoType& r);
+HashIntoType _hash_karprabin_forward(const std::string& kmer, const WordLength k);
+
 
 /**
  * \class Kmer
@@ -402,6 +412,110 @@ public:
 
     virtual unsigned int get_end_pos() const {
         return iter.get_end_pos();
+    }
+};
+
+class MurmurKmerHashIterator : public KmerHashIterator
+{
+    const char * _seq;
+    const char _ksize;
+    unsigned int index;
+    unsigned int length;
+    bool _initialized;
+public:
+    MurmurKmerHashIterator(const char * seq, unsigned char k) :
+        _seq(seq), _ksize(k), index(0), _initialized(false) {
+        length = strlen(_seq);
+    };
+
+    HashIntoType first() { _initialized = true; return next(); }
+
+    HashIntoType next() {
+        if (!_initialized) { _initialized = true; }
+
+        if (done()) {
+            throw khmer_exception("past end of iterator");
+        }
+
+        std::string kmer;
+        kmer.assign(_seq + index, _ksize);
+        index += 1;
+        return _hash_murmur(kmer, _ksize);
+    }
+
+    bool done() const {
+        return (index + _ksize > length);
+    }
+
+    unsigned int get_start_pos() const {
+        if (!_initialized) { return 0; }
+        return index - 1;
+    }
+    unsigned int get_end_pos() const {
+        if (!_initialized) { return _ksize; }
+        return index + _ksize - 1;
+    }
+};
+
+
+class KarpRabinKmerHashIterator : public KmerHashIterator
+{
+    const char * _seq;
+    const std::string _rev;
+    const char _ksize;
+    unsigned int index;
+    unsigned int length;
+    bool _initialized;
+    KarpRabinHash<uint64_t> hasher;
+    KarpRabinHash<uint64_t> rev_hasher;
+public:
+    KarpRabinKmerHashIterator(const char * seq, unsigned char k) :
+        _seq(seq), _rev(khmer::_revcomp(seq)), _ksize(k), index(0),
+        _initialized(false), hasher(k), rev_hasher(k) {
+        length = strlen(_seq);
+        std::cout << "fwd " << _seq << std::endl;
+        std::cout << "rev " << _rev << std::endl;
+    };
+
+    HashIntoType first() {
+        _initialized = true;
+
+        for (char i = 0; i < _ksize; ++i) {
+            hasher.eat(*(_seq + i));
+            rev_hasher.eat(_rev[length - _ksize + i]);
+        }
+        index += 1;
+        return (hasher.hashvalue == rev_hasher.hashvalue ?
+          hasher.hashvalue : hasher.hashvalue ^ rev_hasher.hashvalue);
+    }
+
+    HashIntoType next() {
+        if (!_initialized) {
+            return first();
+        }
+
+        if (done()) {
+            throw khmer_exception("past end of iterator");
+        }
+        hasher.update(*(_seq + index - 1), *(_seq + index + _ksize - 1));
+  std::cout << _rev[length - index] <<" "<< _rev[length - _ksize - index]<<std::endl;
+        rev_hasher.reverse_update(
+          _rev[length - index], _rev[length - _ksize - index]);
+        index += 1;
+        return (hasher.hashvalue == rev_hasher.hashvalue ?
+          hasher.hashvalue : hasher.hashvalue ^ rev_hasher.hashvalue);
+    }
+
+    bool done() const {
+        return (index + _ksize > length);
+    }
+    unsigned int get_start_pos() const {
+        if (!_initialized) { return 0; }
+        return index - 1;
+    }
+    unsigned int get_end_pos() const {
+        if (!_initialized) { return _ksize; }
+        return index + _ksize - 1;
     }
 };
 
