@@ -367,6 +367,31 @@ class SmallCounttable : public khmer::Hashtable
 public:
     explicit SmallCounttable(WordLength ksize, std::vector<uint64_t> sizes)
         : Hashtable(ksize, new NibbleStorage(sizes)) { } ;
+
+    inline
+    virtual
+    HashIntoType
+    hash_dna(const char * kmer) const {
+        if (!(strlen(kmer) >= _ksize)) {
+            throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
+        }
+        return _hash_murmur(kmer, _ksize);
+    }
+
+    inline virtual HashIntoType
+    hash_dna_top_strand(const char * kmer) const {
+        throw khmer_exception("not implemented");
+    }
+
+    inline virtual HashIntoType
+    hash_dna_bottom_strand(const char * kmer) const {
+        throw khmer_exception("not implemented");
+    }
+
+    inline virtual std::string
+    unhash_dna(HashIntoType hashval) const {
+        throw khmer_exception("not implemented");
+    }
 };
 
 // Hashtable-derived class with BitStorage.
@@ -375,6 +400,31 @@ class Nodetable : public Hashtable
 public:
     explicit Nodetable(WordLength ksize, std::vector<uint64_t> sizes)
         : Hashtable(ksize, new BitStorage(sizes)) { } ;
+
+    inline
+    virtual
+    HashIntoType
+    hash_dna(const char * kmer) const {
+        if (!(strlen(kmer) >= _ksize)) {
+            throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
+        }
+        return _hash_murmur(kmer, _ksize);
+    }
+
+    inline virtual HashIntoType
+    hash_dna_top_strand(const char * kmer) const {
+        throw khmer_exception("not implemented");
+    }
+
+    inline virtual HashIntoType
+    hash_dna_bottom_strand(const char * kmer) const {
+        throw khmer_exception("not implemented");
+    }
+
+    inline virtual std::string
+    unhash_dna(HashIntoType hashval) const {
+        throw khmer_exception("not implemented");
+    }
 };
 
 }
