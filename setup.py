@@ -198,26 +198,28 @@ SETUP_METADATA = \
         "version": versioneer.get_version(),
         "description": 'khmer k-mer counting library',
         "long_description": open("README.md").read(),
-        "author": "Michael R. Crusoe, Hussien F. Alameldin, Sherine Awad, "
-                  "Elmar Bucher, Adam Caldwell, Reed Cartwright, "
-                  "Amanda Charbonneau, Bede Constantinides, Greg Edvenson, "
-                  "Scott Fay, Jacob Fenton, Thomas Fenzl, Jordan Fish, "
+        "author": "Michael R. Crusoe, Russell, Hussien F. Alameldin, "
+                  "Ali Aliyari, Sherine Awad, Elmar Bucher, Adam Caldwell, "
+                  "Reed Cartwright, Amanda Charbonneau, Lisa Cohen, "
+                  "Bede Constantinides, Greg Edvenson, Scott Fay, "
+                  "Jacob Fenton, Thomas Fenzl, Jordan Fish, "
                   "Leonor Garcia-Gutierrez, Phillip Garland, Jonathan Gluck, "
                   "Iván González, Sarah Guermond, Jiarong Guo, Aditi Gupta, "
-                  "Joshua R. Herr, Adina Howe, Alex Hyer, Andreas Härpfer, "
-                  "Luiz Irber, Rhys Kidd, David Lin, Justin Lippi, "
-                  "Tamer Mansour, Pamela McA'Nulty, Eric McDonald, "
-                  "Jessica Mizzi, Kevin D. Murray, Joshua R. Nahum, "
-                  "Kaben Nanlohy, Alexander Johan Nederbragt, "
-                  "Humberto Ortiz-Zuazaga, Jeramia Ory, Jason Pell, "
-                  "Charles Pepe-Ranney, Zachary N Russ, Erich Schwarz, "
-                  "Camille Scott, Josiah Seaman, Scott Sievert, "
+                  "Tim Head, Joshua R. Herr, Adina Howe, Alex Hyer, "
+                  "Andreas Härpfer, Luiz Irber, Shannon EK Joslin, Rhys Kidd, "
+                  "Nicole Kingsley, David Lin, Justin Lippi, Tamer Mansour, "
+                  "Pamela McA'Nulty, Eric McDonald, Jessica Mizzi, "
+                  "Kevin D. Murray, Joshua R. Nahum, Kaben Nanlohy, "
+                  "Alexander Johan Nederbragt, Humberto Ortiz-Zuazaga, "
+                  "Jeramia Ory, Jason Pell, Charles Pepe-Ranney, "
+                  "Sydney Pickens, Zachary N Russ, Erich Schwarz, "
+                  "Camille Scott, Josiah Seaman, Ryan Shean, Scott Sievert, "
                   "Jared Simpson, Connor T. Skennerton, James Spencer, "
                   "Ramakrishnan Srinivasan, Daniel Standage, "
-                  "James A. Stapleton, Joe Stein, Susan R Steinman, "
-                  "Benjamin Taylor, Will Trimble, Heather L. Wiencko, "
-                  "Michael Wright, Brian Wyss, Qingpeng Zhang, en zyme, "
-                  "C. Titus Brown",
+                  "James A. Stapleton, Joe Stein, Sascha Steinbiss, "
+                  "Susan R Steinman, Cait Sydney, Benjamin Taylor, "
+                  "Will Trimble, Heather L. Wiencko, Michael Wright, "
+                  "Brian Wyss, Qingpeng Zhang, en zyme, C. Titus Brown",
         "author_email": 'khmer-project@idyll.org',
         # "maintainer": 'Michael R. Crusoe', # this overrides the author field
         # "maintainer_email": 'mcrusoe@msu.edu', # so don't include it
