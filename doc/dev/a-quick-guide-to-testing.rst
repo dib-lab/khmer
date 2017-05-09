@@ -153,9 +153,19 @@ You can also invoke the test via setup.py, which is a bit more verbose::
 Let's consider a simple test as an example.
 The following code ensures that a k-mer and its reverse complement hash to the same value, since they represent the same molecule (just observed from a different orientation).
 
-  def test_kmer_rc_same_hash():
-      kmer = 'GATTACAGATTACAGATTACA'
-      kmer_rc = 'TGTAATCTGTAATCTGTAATC'
+.. code:: python
 
-      ct = Counttable(21, 1e5, 2)
-      assert ct.hash(kmer) == ct.hash(kmer_rc)
+    def test_kmer_rc_same_hash():
+        kmer = 'GATTACAGATTACAGATTACA'
+        kmer_rc = 'TGTAATCTGTAATCTGTAATC'
+
+        ct = Counttable(21, 1e5, 2)
+        assert ct.hash(kmer) == ct.hash(kmer_rc)
+
+----
+
+This example tests only a single function.
+Tests that execute entire scripts and tests involving file I/O can require a bit more code.
+Fortunately, we've created some helper functions that make this quite a bit easier in khmer.
+See ``tests/test_scripts.py`` for some examples of code for executing scripts, capturing their output, and tidying up afterwards.
+Also, see ``tests/khmer_tst_utils.py`` for helper functions that assist with loading test data and creating temporary output files.
