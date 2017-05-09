@@ -90,14 +90,14 @@ def get_parser():
         citations=['counting', 'SeqAn'])
     add_threading_args(parser)
 
-    parser.add_argument('--cutoff', '-C', default=DEFAULT_CUTOFF,
+    parser.add_argument('-C', '--cutoff', default=DEFAULT_CUTOFF,
                         type=check_argument_range(0, 256, "cutoff"),
                         help="Trim at k-mers below this abundance.")
-    parser.add_argument('--variable-coverage', '-V', action='store_true',
+    parser.add_argument('-V', '--variable-coverage', action='store_true',
                         dest='variable_coverage', default=False,
                         help='Only trim low-abundance k-mers from sequences '
                         'that have high coverage.')
-    parser.add_argument('--normalize-to', '-Z', type=int, dest='normalize_to',
+    parser.add_argument('-Z', '--normalize-to', type=int, dest='normalize_to',
                         help='Base the variable-coverage cutoff on this median'
                         ' k-mer abundance.',
                         default=DEFAULT_NORMALIZE_LIMIT)

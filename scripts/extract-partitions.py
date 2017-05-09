@@ -94,16 +94,16 @@ def get_parser():
     parser.add_argument('prefix', metavar='output_filename_prefix')
     parser.add_argument('part_filenames', metavar='input_partition_filename',
                         nargs='+')
-    parser.add_argument('--max-size', '-X', dest='max_size',
+    parser.add_argument('-X', '--max-size', dest='max_size',
                         default=DEFAULT_MAX_SIZE, type=int,
                         help='Max group size (n sequences)')
-    parser.add_argument('--min-partition-size', '-m', dest='min_part_size',
+    parser.add_argument('-m', '--min-partition-size', dest='min_part_size',
                         default=DEFAULT_THRESHOLD, type=int,
                         help='Minimum partition size worth keeping')
-    parser.add_argument('--no-output-groups', '-n', dest='output_groups',
+    parser.add_argument('-n', '--no-output-groups', dest='output_groups',
                         default=True, action='store_false',
                         help='Do not actually output groups files.')
-    parser.add_argument('--output-unassigned', '-U', default=False,
+    parser.add_argument('-U', '--output-unassigned', default=False,
                         action='store_true',
                         help='Output unassigned sequences, too')
     parser.add_argument('-f', '--force', default=False, action='store_true',
