@@ -94,11 +94,11 @@ def get_parser():
     parser.add_argument('-d', '--output-dir', default='', help='Output '
                         'split reads to specified directory. Creates '
                         'directory if necessary')
-    parser.add_argument('--output-paired', '-p', metavar="filename",
+    parser.add_argument('-p', '--output-paired', metavar="filename",
                         type=khFileType('wb'),
                         default=None, help='Output paired reads to this '
                         'file')
-    parser.add_argument('--output-single', '-s', metavar="filename",
+    parser.add_argument('-s', '--output-single', metavar="filename",
                         type=khFileType('wb'), default=None,
                         help='Output orphaned reads to this file')
     parser.add_argument('-f', '--force', default=False, action='store_true',
