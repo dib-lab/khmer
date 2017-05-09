@@ -34,6 +34,9 @@ under semantic versioning, but will be in future versions of khmer.
 - Added `cleaned_seq` attribute to `khmer.Read` class which provides a cleaned
   version of the sequence of each read.
 - Added --summary-info to trim-low-abund.py to record run information in a file.
+- `Nodetable`, `Counttable` and `SmallCounttable` use murmur hash 3 as hash
+  function. This means they support kmers longer than 32 bases but means
+  the hashes are not reversible.
 
 ### Changed
 - Suppress display of -x and -N command line options in script help messages.
@@ -47,9 +50,6 @@ under semantic versioning, but will be in future versions of khmer.
   class.
 - Renamed `consume_fasta` and related functions to `consume_seqfile`, with
   support for reading sequences from additional formats pending.
-- `Counttable` and `SmallCounttable` now use murmur hash 3 as hash function.
-  This means they support kmers longer than 32 bases but means the hashes are
-  no longer reversible.
 
 ### Fixed
 - Bug in compressed(gzip) streaming output from scripts
