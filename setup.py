@@ -155,7 +155,7 @@ BUILD_DEPENDS.extend(path_join("include", "oxli", bn + ".hh") for bn in [
     "oxli", "kmer_hash", "hashtable", "labelhash", "hashgraph",
     "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers",
     "kmer_filters", "traversal", "assembler", "alphabets", "storage",
-    "partitioning", "gmap"])
+    "partitioning", "gmap", "hist"])
 
 SOURCES = glob.glob(path_join("src", "khmer", "_cpy_*.cc"))
 SOURCES.extend(path_join("src", "oxli", bn + ".cc") for bn in [

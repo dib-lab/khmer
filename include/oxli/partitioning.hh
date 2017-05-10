@@ -41,6 +41,7 @@ Contact: khmer-project@idyll.org
 #include <memory>
 
 #include "gmap.hh"
+#include "hist.hh"
 #include "oxli.hh"
 #include "kmer_hash.hh"
 #include "hashtable.hh"
@@ -85,6 +86,7 @@ class Component {
 
         const uint64_t component_id;
         TagVector tags;
+        Histogram<16> coverage;
 
         explicit Component(): component_id(n_created), alive(true) {
             n_created++;
@@ -96,6 +98,13 @@ class Component {
 
         ~Component() {
             n_destroyed++;
+        }
+
+        void update_coverage(Hashgraph * graph) {
+            coverage.clear();
+            for (auto tag: tags) {
+                coverage.add(graph->get_count(tag));
+            }
         }
 
         void kill() {
@@ -129,15 +138,18 @@ class Component {
             return tags.size();
         }
 
-        friend bool operator==(const Component& lhs, const Component& rhs) {
+        friend bool operator==(const Component& lhs, 
+                               const Component& rhs) {
             return lhs.component_id == rhs.component_id;
         }
 
-        friend bool operator<(const Component& lhs, const Component& rhs) {
+        friend bool operator<(const Component& lhs, 
+                              const Component& rhs) {
             return lhs.component_id < rhs.component_id;
         }
 
-        friend std::ostream& operator<< (std::ostream& stream, const Component& comp);
+        friend std::ostream& operator<< (std::ostream& stream, 
+                                         const Component& comp);
 };
 
 

@@ -442,6 +442,8 @@ cdef extern from "oxli/partitioning.hh" namespace "oxli":
         uint64_t get_n_created() const
         uint64_t get_n_destroyed() const
 
+        void update_coverage(CpHashgraph *) 
+
     ctypedef shared_ptr[CpComponent] ComponentPtr
     ctypedef set[ComponentPtr] ComponentPtrSet
     ctypedef vector[ComponentPtr] ComponentPtrVector
