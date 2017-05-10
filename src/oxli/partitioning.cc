@@ -61,8 +61,8 @@ void ComponentMap::create_component(TagVector& tags)
     components->push_back(new_comp);
     map_tags_to_component(tags, new_comp);
 
-    std::cout << "new component=" << *new_comp << std::endl;
-    std::cout << components->size() << " components in vector" << std::endl;
+    //std::cout << "new component=" << *new_comp << std::endl;
+    //std::cout << components->size() << " components in vector" << std::endl;
 }
 
 
@@ -108,9 +108,9 @@ uint32_t ComponentMap::merge_components(ComponentPtr& root,
                                         ComponentPtrSet& comps)
 {
     uint32_t n_merged = 1;
-    std::cout << "Merge with root=" << *root << std::endl;
+    //std::cout << "Merge with root=" << *root << std::endl;
     for (auto other : comps) {
-        std::cout << "\tmerge in " << *other << std::endl;
+        //std::cout << "\tmerge in " << *other << std::endl;
         if (*other == *root) {
             continue;
         }
