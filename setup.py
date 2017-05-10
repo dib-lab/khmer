@@ -192,12 +192,20 @@ if "-rc" in versioneer.get_version():
 else:
     CLASSIFIERS.append("Development Status :: 5 - Production/Stable")
 
+# Before making a new release make sure to install pypandoc. Pypi does not
+# render markdown which is why we convert to rst here.
+try:
+    import pypandoc
+    long_description = pypandoc.convert('README.md', 'rst')
+except(IOError, ImportError):
+    long_description = open('README.md').read()
+
 SETUP_METADATA = \
     {
         "name": "khmer",
         "version": versioneer.get_version(),
         "description": 'khmer k-mer counting library',
-        "long_description": open("README.md").read(),
+        "long_description": long_description,
         "author": "Michael R. Crusoe, Hussien F. Alameldin, Sherine Awad, "
                   "Elmar Bucher, Adam Caldwell, Reed Cartwright, "
                   "Amanda Charbonneau, Bede Constantinides, Greg Edvenson, "
