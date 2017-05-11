@@ -37,8 +37,6 @@ from __future__ import absolute_import
 
 import random
 
-import pytest
-
 from khmer import SmallCounttable
 
 from . import khmer_tst_utils as utils
