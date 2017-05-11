@@ -95,7 +95,6 @@ private:\
 #   define SAVED_LABELSET 6
 #   define SAVED_SMALLCOUNT 7
 
-
 #   define TRAVERSAL_LEFT 0
 #   define TRAVERSAL_RIGHT 1
 
