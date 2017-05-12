@@ -305,6 +305,8 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
         if sys.platform == 'darwin' and 'gcov' in self.libraries:
             self.libraries.remove('gcov')
 
+        cqfcmd = ['bash', '-c', 'cd third-party/cqf && make']
+        spawn(cmd=cqfcmd, dry_run=self.dry_run)
         self.extensions[0].extra_objects.append(
             path_join("third-party", "cqf", "gqf.o"))
 

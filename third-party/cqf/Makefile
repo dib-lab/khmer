@@ -8,7 +8,8 @@ else
 	OPT=-Ofast
 endif
 
-ifdef NH
+OS := $(shell uname)
+ifeq ($(OS), Darwin)
 	ARCH=
 else
 	ARCH=-msse4.2 -D__SSE4_2_
