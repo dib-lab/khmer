@@ -48,6 +48,9 @@ from khmer._khmer import SmallCounttable as _SmallCounttable
 from khmer._khmer import GraphLabels as _GraphLabels
 from khmer._khmer import Nodegraph as _Nodegraph
 from khmer._khmer import Nodetable as _Nodetable
+from khmer._khmer import RCounttable as _RCounttable
+from khmer._khmer import RSmallCounttable as _RSmallCounttable
+from khmer._khmer import RNodetable as _RNodetable
 from khmer._khmer import HLLCounter as _HLLCounter
 from khmer._khmer import ReadAligner as _ReadAligner
 from khmer._khmer import LinearAssembler
@@ -396,6 +399,33 @@ class Nodetable(_Nodetable):
         nodetable = _Nodetable.__new__(cls, k, primes)
         nodetable.primes = primes
         return nodetable
+
+
+class RCounttable(_RCounttable):
+
+    def __new__(cls, k, starting_size, n_tables):
+        primes = get_n_primes_near_x(n_tables, starting_size)
+        rcounttable = _RCounttable.__new__(cls, k, primes)
+        rcounttable.primes = primes
+        return rcounttable
+
+
+class RSmallCounttable(_RSmallCounttable):
+
+    def __new__(cls, k, starting_size, n_tables):
+        primes = get_n_primes_near_x(n_tables, starting_size)
+        rsmallcounttable = _RSmallCounttable.__new__(cls, k, primes)
+        rsmallcounttable.primes = primes
+        return rsmallcounttable
+
+
+class RNodetable(_RNodetable):
+
+    def __new__(cls, k, starting_size, n_tables):
+        primes = get_n_primes_near_x(n_tables, starting_size)
+        rnodetable = _RNodetable.__new__(cls, k, primes)
+        rnodetable.primes = primes
+        return rnodetable
 
 
 class HLLCounter(_HLLCounter):

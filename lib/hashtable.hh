@@ -554,7 +554,25 @@ public:
     HashIntoType
     hash_dna(const char * kmer) const
     {
-        throw khmer_exception("not implemented");
+        CyclicHash<uint64_t> fhash(_ksize, 64);
+        CyclicHash<uint64_t> rhash(_ksize, 64);
+        std::deque<char> buffer;
+        unsigned int length = strlen(kmer);
+        unsigned int index;
+        if (length != _ksize) {
+            throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
+        }
+
+        while (buffer.size() < _ksize) {
+            buffer.push_back(kmer[index]);
+            fhash.eat(kmer[index]);
+            index++;
+        }
+
+        for (int i = buffer.size() - 1; i >= 0; i--) {
+            rhash.eat(nucl_comp(buffer[i]));
+        }
+        return fhash.hashvalue ^ rhash.hashvalue;
     }
 
     inline virtual HashIntoType
