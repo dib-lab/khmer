@@ -51,6 +51,7 @@ Contact: khmer-project@idyll.org
 #include <vector>
 #include <memory>
 #include "MurmurHash3.h"
+#include "ntHashIterator.hpp"
 
 #include "khmer.hh"
 #include "khmer_exception.hh"
@@ -461,6 +462,121 @@ class Nodetable : public khmer::MurmurHashtable
 public:
     explicit Nodetable(WordLength ksize, std::vector<uint64_t> sizes)
         : MurmurHashtable(ksize, new BitStorage(sizes)) { } ;
+};
+
+
+class NtKmerHashIterator : public KmerHashIterator
+{
+    ntHashIterator nt_iter;
+public:
+    NtKmerHashIterator(const char * seq, unsigned char k) : nt_iter(seq, 1, k) {}
+
+    HashIntoType first()
+    {
+        return next();
+    }
+
+    HashIntoType next()
+    {
+        if (done()) {
+            throw khmer_exception("past end of iterator");
+        }
+
+        HashIntoType hashval = (*nt_iter)[0];
+        ++nt_iter;
+        return hashval;
+    }
+
+    bool done() const
+    {
+        return (nt_iter == nt_iter.end());
+    }
+
+    unsigned int get_start_pos() const
+    {
+        throw khmer_exception("not implemented");
+    }
+    unsigned int get_end_pos() const
+    {
+        throw khmer_exception("not implemented");
+    }
+};
+
+
+class NtHashtable : public khmer::Hashtable
+{
+public:
+    explicit NtHashtable(WordLength ksize, Storage * s)
+        : Hashtable(ksize, s) { };
+
+    inline
+    virtual
+    HashIntoType
+    hash_dna(const char * kmer) const
+    {
+        if (!(strlen(kmer) >= _ksize)) {
+            throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
+        }
+        return _hash_nt(kmer, _ksize);
+    }
+
+    inline virtual HashIntoType
+    hash_dna_top_strand(const char * kmer) const
+    {
+        throw khmer_exception("not implemented");
+    }
+
+    inline virtual HashIntoType
+    hash_dna_bottom_strand(const char * kmer) const
+    {
+        throw khmer_exception("not implemented");
+    }
+
+    inline virtual std::string
+    unhash_dna(HashIntoType hashval) const
+    {
+        throw khmer_exception("not implemented");
+    }
+
+    virtual KmerHashIteratorPtr new_kmer_iterator(const char * sp) const
+    {
+        KmerHashIterator * ki = new NtKmerHashIterator(sp, _ksize);
+        return unique_ptr<KmerHashIterator>(ki);
+    }
+
+    virtual void save(std::string filename)
+    {
+        store->save(filename, _ksize);
+    }
+    virtual void load(std::string filename)
+    {
+        store->load(filename, _ksize);
+        _init_bitstuff();
+    }
+};
+
+// Hashtable-derived class with ByteStorage.
+class NtCounttable : public khmer::NtHashtable
+{
+public:
+    explicit NtCounttable(WordLength ksize, std::vector<uint64_t> sizes)
+        : NtHashtable(ksize, new ByteStorage(sizes)) { } ;
+};
+
+// Hashtable-derived class with NibbleStorage.
+class NtSmallCounttable : public khmer::NtHashtable
+{
+public:
+    explicit NtSmallCounttable(WordLength ksize, std::vector<uint64_t> sizes)
+          : NtHashtable(ksize, new NibbleStorage(sizes)) { };
+};
+
+// Hashtable-derived class with BitStorage.
+class NtNodetable : public khmer::NtHashtable
+{
+public:
+    explicit NtNodetable(WordLength ksize, std::vector<uint64_t> sizes)
+        : NtHashtable(ksize, new BitStorage(sizes)) { } ;
 };
 
 }
