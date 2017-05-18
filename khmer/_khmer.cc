@@ -2273,6 +2273,9 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashtable_Object")
 #include "_cpy_nodetable.hh"
 #include "_cpy_counttable.hh"
 #include "_cpy_smallcounttable.hh"
+#include "_cpy_ntnodetable.hh"
+#include "_cpy_ntcounttable.hh"
+#include "_cpy_ntsmallcounttable.hh"
 #include "_cpy_hashgraph.hh"
 #include "_cpy_smallcountgraph.hh"
 
@@ -4765,6 +4768,21 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
+    khmer_KNtCounttable_Type.tp_base = &khmer_KHashtable_Type;
+    if (PyType_Ready(&khmer_KNtCounttable_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    khmer_KNtSmallCounttable_Type.tp_base = &khmer_KHashtable_Type;
+    if (PyType_Ready(&khmer_KNtSmallCounttable_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    khmer_KNtNodetable_Type.tp_base = &khmer_KHashtable_Type;
+    if (PyType_Ready(&khmer_KNtNodetable_Type) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
     khmer_KHashgraph_Type.tp_base = &khmer_KHashtable_Type;
     khmer_KHashgraph_Type.tp_methods = khmer_hashgraph_methods;
     if (PyType_Ready(&khmer_KHashgraph_Type) < 0) {
@@ -4881,6 +4899,24 @@ MOD_INIT(_khmer)
     Py_INCREF(&khmer_KNodetable_Type);
     if (PyModule_AddObject( m, "Nodetable",
                             (PyObject *)&khmer_KNodetable_Type ) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    Py_INCREF(&khmer_KNtCounttable_Type);
+    if (PyModule_AddObject( m, "NtCounttable",
+                            (PyObject *)&khmer_KNtCounttable_Type ) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    Py_INCREF(&khmer_KNtSmallCounttable_Type);
+    if (PyModule_AddObject( m, "NtSmallCounttable",
+                            (PyObject *)&khmer_KNtSmallCounttable_Type ) < 0) {
+        return MOD_ERROR_VAL;
+    }
+
+    Py_INCREF(&khmer_KNtNodetable_Type);
+    if (PyModule_AddObject( m, "NtNodetable",
+                            (PyObject *)&khmer_KNtNodetable_Type ) < 0) {
         return MOD_ERROR_VAL;
     }
 
