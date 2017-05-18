@@ -421,6 +421,17 @@ cdef extern from "oxli/hllcounter.hh" namespace "oxli":
         void set_erate(double)
 
 
+cdef extern from "oxli/hist.hh" namespace "oxli":
+
+    cdef cppclass CpHistogram "oxli::Histogram<16>":
+        uint64_t[16] bins
+
+        CpHistogram()
+
+        void add(uint64_t)
+        void clear()
+
+
 cdef extern from "oxli/partitioning.hh" namespace "oxli":
 
     ctypedef vector[HashIntoType] TagVector
@@ -429,6 +440,7 @@ cdef extern from "oxli/partitioning.hh" namespace "oxli":
         CpComponent()
         CpComponent(uint64_t)
 
+        CpHistogram coverage
         const uint64_t component_id
         vector[HashIntoType] tags
 

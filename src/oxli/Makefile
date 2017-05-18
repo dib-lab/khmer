@@ -236,9 +236,7 @@ LIBOXLI_OBJS= \
 	alphabets.o \
 	murmur3.o \
 	storage.o \
-	partitioning.o \
-	gmap.o \
-	hist.o
+	partitioning.o
 
 PRECOMILE_OBJS ?=
 PRECLEAN_TARGS ?=

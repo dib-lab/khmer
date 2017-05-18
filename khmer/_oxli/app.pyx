@@ -60,6 +60,8 @@ cdef class PartitioningApp:
         with open(os.path.join(folder, 'global.csv'), 'a') as fp:
             fp.write('{0}, {1}, {2}, {3}\n'.format(n, self.partitioner.n_components,
                                                  self.partitioner.n_tags, new_kmers))
+        cov_filename = os.path.join(folder, '{0}.coverage.csv'.format(n))
+        self.partitioner.write_component_coverage(cov_filename)
 
     def prep_results_dir(self):
         try:
@@ -140,3 +142,9 @@ cdef class PartitioningApp:
         self.write_meta(n_sequences, total_kmers)
 
         return self.partitioner
+
+
+cdef class DynamicPartitioning(PartitioningApp):
+
+    def run(self):
+        pass

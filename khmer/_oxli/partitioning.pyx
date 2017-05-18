@@ -201,10 +201,35 @@ cdef class StreamingPartitioner:
 
         if lockedptr:      
             for cmpptr in deref(lockedptr):
+                if cmpptr == NULL:
+                    continue
                 fprintf(fp, "%llu,%llu,%f\n", 
                         deref(cmpptr).component_id,
                         deref(cmpptr).get_n_tags(),
                         Component._mean_tag_count(cmpptr, self._graph_ptr))
+        fclose(fp)
+
+    def write_component_coverage(self, filename):
+        cdef FILE* fp
+        fp = fopen(filename.encode('utf-8'), 'wb')
+        if fp == NULL:
+            raise IOError('Can\'t open file.')
+        
+        cdef ComponentPtr cmpptr
+        cdef shared_ptr[ComponentPtrVector] lockedptr
+        cdef size_t i
+        lockedptr = self._components.lock()
+
+        if lockedptr:      
+            for cmpptr in deref(lockedptr):
+                if cmpptr == NULL:
+                    continue
+                deref(cmpptr).update_coverage(self._graph_ptr)
+                fprintf(fp, "%llu",
+                        deref(cmpptr).component_id)
+                for i in range(16):
+                    fprintf(fp, ",%llu", deref(cmpptr).coverage.bins[i])
+                fprintf(fp, "\n")
         fclose(fp)
 
     def save(self, filename):

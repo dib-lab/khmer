@@ -73,7 +73,7 @@ class Histogram {
         }
 
         void add(uint64_t val) {
-            size_t bin = highest_bit(val);
+            size_t bin = highest_bit(val) - 1;
             if (bin >= n_bins) {
                 bins[n_bins-1] += 1;
             } else {
