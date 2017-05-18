@@ -91,7 +91,7 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KNtCounttable_Object")
 // khmer_counttable_new
 //
 
-static PyObject* khmer_mtcounttable_new(PyTypeObject * type, PyObject * args,
+static PyObject* khmer_ntcounttable_new(PyTypeObject * type, PyObject * args,
                                         PyObject * kwds)
 {
     khmer_KNtCounttable_Object * self;
