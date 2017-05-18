@@ -50,6 +50,7 @@ under semantic versioning, but will be in future versions of khmer.
   class.
 - Renamed `consume_fasta` and related functions to `consume_seqfile`, with
   support for reading sequences from additional formats pending.
+- Changed Sphinx documentation theme to "guzzle".
 
 ### Fixed
 - Bug in compressed(gzip) streaming output from scripts
