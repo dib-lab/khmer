@@ -45,12 +45,14 @@ Contact: khmer-project@idyll.org
 #include <iostream>
 #include <list>
 #include <map>
+#include <deque>
 #include <queue>
 #include <set>
 #include <string>
 #include <vector>
 #include <memory>
 #include "MurmurHash3.h"
+#include "cyclichash.h"
 
 #include "khmer.hh"
 #include "khmer_exception.hh"
@@ -461,6 +463,157 @@ class Nodetable : public khmer::MurmurHashtable
 public:
     explicit Nodetable(WordLength ksize, std::vector<uint64_t> sizes)
         : MurmurHashtable(ksize, new BitStorage(sizes)) { } ;
+};
+
+
+class RollingKmerHashIterator : public KmerHashIterator
+{
+private:
+    const char * _seq;
+    const char _ksize;
+    unsigned int index;
+    unsigned int length;
+    CyclicHash<uint64_t> fhash;
+    CyclicHash<uint64_t> rhash;
+    std::deque<char> buffer;
+
+public:
+    RollingKmerHashIterator(const char * seq, unsigned char k)
+            : _seq(seq), _ksize(k), index(0), fhash(k, 64), rhash(k, 64)
+    {
+        length = strlen(_seq);
+        if (length < _ksize) {
+            throw khmer_exception("Supplied sequence is shorter than k-size.");
+        }
+
+        while (buffer.size() < _ksize) {
+            buffer.push_back(_seq[index]);
+            fhash.eat(_seq[index]);
+            index++;
+        }
+
+        for (int i = buffer.size() - 1; i >= 0; i--) {
+            rhash.eat(nucl_comp(buffer[i]));
+        }
+    };
+
+    HashIntoType first()
+    {
+        return next();
+    }
+
+    HashIntoType next()
+    {
+        if (index == 0) {
+            throw khmer_exception("past end of iterator");
+        }
+
+        HashIntoType hashval = fhash.hashvalue ^ rhash.hashvalue;
+        if (done()) {
+            index = 0;
+            return hashval;
+        }
+
+        char nextnucl = _seq[index];
+        index += 1;
+        char nextnuclrc = nucl_comp(nextnucl);
+        buffer.push_back(nextnucl);
+        char nucl2go = buffer.front();
+        buffer.pop_front();
+        char nucl2gorc = nucl_comp(nucl2go);
+
+        fhash.update(nucl2go, nextnucl);
+        rhash.reverse_update(nucl2gorc, nextnuclrc);
+
+        return hashval;
+    }
+
+    bool done() const
+    {
+        return (index + _ksize > length);
+    }
+
+    unsigned int get_start_pos() const
+    {
+        return index - 1;
+    }
+    unsigned int get_end_pos() const
+    {
+        return index + _ksize - 1;
+    }
+};
+
+class RollingHashtable : public khmer::Hashtable
+{
+public:
+    explicit RollingHashtable(WordLength ksize, Storage * s)
+        : Hashtable(ksize, s) { };
+
+    inline
+    virtual
+    HashIntoType
+    hash_dna(const char * kmer) const
+    {
+        throw khmer_exception("not implemented");
+    }
+
+    inline virtual HashIntoType
+    hash_dna_top_strand(const char * kmer) const
+    {
+        throw khmer_exception("not implemented");
+    }
+
+    inline virtual HashIntoType
+    hash_dna_bottom_strand(const char * kmer) const
+    {
+        throw khmer_exception("not implemented");
+    }
+
+    inline virtual std::string
+    unhash_dna(HashIntoType hashval) const
+    {
+        throw khmer_exception("not implemented");
+    }
+
+    virtual KmerHashIteratorPtr new_kmer_iterator(const char * sp) const
+    {
+        KmerHashIterator * ki = new RollingKmerHashIterator(sp, _ksize);
+        return unique_ptr<KmerHashIterator>(ki);
+    }
+
+    virtual void save(std::string filename)
+    {
+        store->save(filename, _ksize);
+    }
+    virtual void load(std::string filename)
+    {
+        store->load(filename, _ksize);
+        _init_bitstuff();
+    }
+};
+
+// Hashtable-derived class with ByteStorage.
+class RCounttable : public khmer::RollingHashtable
+{
+public:
+    explicit RCounttable(WordLength ksize, std::vector<uint64_t> sizes)
+        : RollingHashtable(ksize, new ByteStorage(sizes)) { } ;
+};
+
+// Hashtable-derived class with NibbleStorage.
+class RSmallCounttable : public khmer::RollingHashtable
+{
+public:
+    explicit RSmallCounttable(WordLength ksize, std::vector<uint64_t> sizes)
+          : RollingHashtable(ksize, new NibbleStorage(sizes)) { };
+};
+
+// Hashtable-derived class with BitStorage.
+class RNodetable : public khmer::RollingHashtable
+{
+public:
+    explicit RNodetable(WordLength ksize, std::vector<uint64_t> sizes)
+        : RollingHashtable(ksize, new BitStorage(sizes)) { } ;
 };
 
 }

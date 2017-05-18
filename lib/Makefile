@@ -68,7 +68,8 @@ PREFIX=/usr/local
 ### NOTE: No user-serviceable parts below this line! ###
 
 INCLUDES= -I ../third-party/seqan/core/include/ 	\
-	  -I ../third-party/smhasher/
+	  -I ../third-party/smhasher/ \
+	  -I ../third-party/rollinghashcpp/
 
 ifeq ($(USE_SYSTEM_ZLIB), false)
 INCLUDES += -I ../third-party/zlib/
@@ -235,6 +236,7 @@ LIBKHMER_OBJS= \
 	assembler.o \
 	alphabets.o \
 	murmur3.o \
+	mersennetwister.o \
 	storage.o
 
 PRECOMILE_OBJS ?=
@@ -301,6 +303,10 @@ $(BZIP2_OBJS):
 
 # MurMur3
 murmur3.o: ../third-party/smhasher/MurmurHash3.cc
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+# RollingHash MersenneTwister
+mersennetwister.o: ../third-party/rollinghashcpp/mersennetwister.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 %.o: %.cc $(PRECOMILE_OBJS) $(KHMER_HEADERS)

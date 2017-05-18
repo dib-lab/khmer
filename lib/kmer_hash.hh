@@ -86,6 +86,22 @@ Contact: khmer-project@idyll.org
 			    (ch) == 'C' ? 3LL : 2LL)
 #endif
 
+#ifdef KHMER_EXTRA_SANITY_CHECKS
+# define nucl_comp(ch) ( \
+	(toupper(ch)) == 'A' ? 'T' : \
+	(toupper(ch)) == 'T' ? 'A' : \
+	(toupper(ch)) == 'C' ? 'G' : 'C' \
+)
+#else
+// NOTE: Assumes data is already sanitized as it should be by parsers.
+//	     This assumption eliminates 4 function calls.
+# define nucl_comp(ch) ( \
+	(ch) == 'A' ? 'T' : \
+	(ch) == 'T' ? 'A' : \
+	(ch) == 'C' ? 'G' : 'C' \
+)
+#endif
+
 // choose wisely between forward and rev comp.
 #ifndef NO_UNIQUE_RC
 #define uniqify_rc(f, r) ((f) < (r) ? (f) : (r))
