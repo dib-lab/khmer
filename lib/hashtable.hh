@@ -481,6 +481,7 @@ public:
     RollingKmerHashIterator(const char * seq, unsigned char k)
             : _seq(seq), _ksize(k), index(0), fhash(k, 64), rhash(k, 64)
     {
+        std::cerr << "DEBUG c: " << _seq << " \n";
         length = strlen(_seq);
         if (length < _ksize) {
             throw khmer_exception("Supplied sequence is shorter than k-size.");
@@ -509,8 +510,14 @@ public:
         }
 
         HashIntoType hashval = fhash.hashvalue ^ rhash.hashvalue;
+        std::cerr << "DEBUG d: ";
+        for (auto c : buffer) {
+            std::cerr << c;
+        }
+        std::cerr << " " << hashval << " \n";
         if (done()) {
             index = 0;
+            std::cerr << "DEBUG a\n";
             return hashval;
         }
 
@@ -525,12 +532,13 @@ public:
         fhash.update(nucl2go, nextnucl);
         rhash.reverse_update(nucl2gorc, nextnuclrc);
 
+        std::cerr << "DEBUG b\n";
         return hashval;
     }
 
     bool done() const
     {
-        return (index + _ksize > length);
+        return (index > length);
     }
 
     unsigned int get_start_pos() const
@@ -558,7 +566,7 @@ public:
         CyclicHash<uint64_t> rhash(_ksize, 64);
         std::deque<char> buffer;
         unsigned int length = strlen(kmer);
-        unsigned int index;
+        unsigned int index = 0;
         if (length != _ksize) {
             throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
         }
@@ -572,7 +580,9 @@ public:
         for (int i = buffer.size() - 1; i >= 0; i--) {
             rhash.eat(nucl_comp(buffer[i]));
         }
-        return fhash.hashvalue ^ rhash.hashvalue;
+        HashIntoType hashval = fhash.hashvalue ^ rhash.hashvalue;
+        std::cerr << "DEBUG f: " << kmer << " " << hashval << "\n";
+        return hashval;
     }
 
     inline virtual HashIntoType

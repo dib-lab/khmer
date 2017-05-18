@@ -55,12 +55,12 @@ def test_basic(sketchtype):
     """
     sketch1 = sketchtype(25, 1e4, 4)
     allseq = utils.get_test_data('rollhash-allseq.fa')
-    sketch1.consume(allseq)
+    sketch1.consume_seqfile(allseq)
 
     sketch2 = sketchtype(25, 1e4, 4)
     for f in glob.glob('rollhash-seq?.fa'):
         seqfile = utils.get_test_data(f)
-        sketch2.consume(seqfile)
+        sketch2.consume_seqfile(seqfile)
 
     assert sketch1.get('AAGATTTCCCGCCCCGATCGATTCG') > 0
     assert sketch1.get('AGATTTCCCGCCCCGATCGATTCGT') > 0
