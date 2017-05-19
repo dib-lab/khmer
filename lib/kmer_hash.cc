@@ -215,13 +215,13 @@ HashIntoType _hash_murmur_forward(const std::string& kmer, const WordLength k)
 HashIntoType _hash_nt(const std::string& kmer, const WordLength k)
 {
     HashIntoType f=0, r=0;
-    return NTPC64(kmer.c_str(), k, f, r);
+    return NTPC64(kmer.c_str(), k);
 }
 
 HashIntoType _hash_nt(const char *kmer, const WordLength k)
 {
     HashIntoType f=0, r=0;
-    return NTPC64(kmer, k, f, r);
+    return NTPC64(kmer, k);
 }
 
 KmerIterator::KmerIterator(const char * seq,
