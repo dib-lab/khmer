@@ -76,8 +76,8 @@ khmer comes "out of the box" with a number of scripts that make it immediately u
  - trimming reads of certain kinds of sequencing errors;
  - counting k-mers and estimating data set coverage based on k-mer counts;
  - running Velvet and calculating assembly statistics;
- - optimizing assemblies on various parameters;
  - converting FASTQ to FASTA;
+ - converting between paired and interleaved formats for paired FASTQ data
 
 Practical considerations
 ========================
