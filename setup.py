@@ -45,6 +45,7 @@ from os.path import join as path_join
 import shutil
 import subprocess
 import tempfile
+import csv
 
 from setuptools import setup
 from setuptools import Extension
@@ -192,34 +193,25 @@ if "-rc" in versioneer.get_version():
 else:
     CLASSIFIERS.append("Development Status :: 5 - Production/Stable")
 
+
+# This sorts the author list by first name rather than last name. Not worth
+#     fixing for PyPI in my opinion. The sort-authors-list.py handles it
+#     correctly for the citation information, but this requires a non-standard
+#     library that we don't want to add as a dependency for `setup.py`.
+#     -- Daniel Standage, 2017-05-21
+with open('authors.csv', 'r') as csvin:
+    authors = csv.reader(csvin)
+    authorstr = ', '.join([row[0] for row in authors])
+    authorstr = 'Daniel Standage, ' + authorstr + ', C. Titus Brown'
+
+
 SETUP_METADATA = \
     {
         "name": "khmer",
         "version": versioneer.get_version(),
         "description": 'khmer k-mer counting library',
         "long_description": open("README.rst").read(),
-        "author": "Daniel Standage, Hussien F. Alameldin, Ali Aliyari, "
-                  "Sherine Awad, Elmar Bucher, Adam Caldwell, "
-                  "Reed Cartwright, Amanda Charbonneau, Lisa Cohen, "
-                  "Bede Constantinides, Michael R. Crusoe, Greg Edvenson, "
-                  "Scott Fay, Jacob Fenton, Thomas Fenzl, Jordan Fish, "
-                  "Leonor Garcia-Gutierrez, Phillip Garland, Jonathan Gluck, "
-                  "Iván González, Sarah Guermond, Jiarong Guo, Aditi Gupta, "
-                  "Tim Head, Joshua R. Herr, Adina Howe, Alex Hyer, "
-                  "Andreas Härpfer, Luiz Irber, Shannon EK Joslin, Rhys Kidd, "
-                  "Nicole Kingsley, David Lin, Justin Lippi, Tamer Mansour, "
-                  "Pamela McA'Nulty, Eric McDonald, Jessica Mizzi, "
-                  "Kevin D. Murray, Joshua R. Nahum, Kaben Nanlohy, "
-                  "Russell Neches, Alexander Johan Nederbragt, "
-                  "Humberto Ortiz-Zuazaga, Jeramia Ory, Jason Pell, "
-                  "Charles Pepe-Ranney, Sydney Pickens, Zachary N Russ, "
-                  "Erich Schwarz, Camille Scott, Josiah Seaman, Ryan Shean, "
-                  "Scott Sievert, Jared Simpson, Connor T. Skennerton, "
-                  "James Spencer, Ramakrishnan Srinivasan, "
-                  "James A. Stapleton, Joe Stein, Sascha Steinbiss, "
-                  "Susan R Steinman, Cait Sydney, Benjamin Taylor, "
-                  "Will Trimble, Heather L. Wiencko, Michael Wright, "
-                  "Brian Wyss, Qingpeng Zhang, en zyme, C. Titus Brown",
+        "author": authorstr,
         "author_email": 'khmer-project@idyll.org',
         # "maintainer": 'Daniel Standage', # this overrides the author field
         # "maintainer_email": 'daniel.standage@gmail.com', # so don't include

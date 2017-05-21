@@ -46,7 +46,7 @@ with codecs.open('authors.csv', 'r', encoding='utf-8') as namefile:
         authors.append((HumanName(name), address))
 
 authors = sorted(authors, key=lambda author: author[0].last)
-authors.insert(0, (HumanName("Michael R. Crusoe"), "crusoe@ucdavis.edu"))
+authors.insert(0, (HumanName("Daniel Standage"), "daniel.standage@gmail.com"))
 authors.append((HumanName("C. Titus Brown"), "titus@idyll.org"))
 
 # print(authors)
