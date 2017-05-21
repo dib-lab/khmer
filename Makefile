@@ -43,7 +43,7 @@ PYSOURCES=$(filter-out khmer/_version.py, \
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
 
 DEVPKGS=pep8==1.6.2 diff_cover autopep8 pylint coverage gcovr pytest \
-	pydocstyle screed pyenchant
+	pydocstyle pyenchant
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 
 VERSION=$(shell ./setup.py version | grep Version | awk '{print $$4}' \
@@ -96,7 +96,6 @@ help: Makefile
 install-dep: install-dependencies
 
 install-dependencies:
-	pip install git+https://github.com/dib-lab/screed.git
 	pip install --upgrade --ignore-installed $(DEVPKGS)
 	pip install --upgrade --requirement doc/requirements.txt
 
