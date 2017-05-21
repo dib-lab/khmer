@@ -53,3 +53,4 @@ pep8_report.txt
 pep257_report.txt
 .cache/
 .eggs
+authors.csv
