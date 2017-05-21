@@ -144,7 +144,7 @@ KmerFilter get_stop_bf_filter(const Hashtable * stop_bf)
 }
 
 
-KmerFilter get_visited_filter(const SeenSet * visited)
+KmerFilter get_visited_filter(std::shared_ptr<SeenSet> visited)
 {
 #if DEBUG_FILTERS
     std::cout << "Create new visited filter with " << visited <<
