@@ -197,12 +197,12 @@ SETUP_METADATA = \
         "name": "khmer",
         "version": versioneer.get_version(),
         "description": 'khmer k-mer counting library',
-        "long_description": open("README.md").read(),
-        "author": "Michael R. Crusoe, Russell, Hussien F. Alameldin, "
+        "long_description": open("README.rst").read(),
+        "author": "Daniel Standage, Russell Neches, Hussien F. Alameldin, "
                   "Ali Aliyari, Sherine Awad, Elmar Bucher, Adam Caldwell, "
                   "Reed Cartwright, Amanda Charbonneau, Lisa Cohen, "
-                  "Bede Constantinides, Greg Edvenson, Scott Fay, "
-                  "Jacob Fenton, Thomas Fenzl, Jordan Fish, "
+                  "Bede Constantinides, Michael R. Crusoe, Greg Edvenson, "
+                  "Scott Fay, Jacob Fenton, Thomas Fenzl, Jordan Fish, "
                   "Leonor Garcia-Gutierrez, Phillip Garland, Jonathan Gluck, "
                   "Iván González, Sarah Guermond, Jiarong Guo, Aditi Gupta, "
                   "Tim Head, Joshua R. Herr, Adina Howe, Alex Hyer, "
@@ -215,14 +215,14 @@ SETUP_METADATA = \
                   "Sydney Pickens, Zachary N Russ, Erich Schwarz, "
                   "Camille Scott, Josiah Seaman, Ryan Shean, Scott Sievert, "
                   "Jared Simpson, Connor T. Skennerton, James Spencer, "
-                  "Ramakrishnan Srinivasan, Daniel Standage, "
-                  "James A. Stapleton, Joe Stein, Sascha Steinbiss, "
-                  "Susan R Steinman, Cait Sydney, Benjamin Taylor, "
-                  "Will Trimble, Heather L. Wiencko, Michael Wright, "
-                  "Brian Wyss, Qingpeng Zhang, en zyme, C. Titus Brown",
+                  "Ramakrishnan Srinivasan, James A. Stapleton, Joe Stein, "
+                  "Sascha Steinbiss, Susan R Steinman, Cait Sydney, "
+                  "Benjamin Taylor, Will Trimble, Heather L. Wiencko, "
+                  "Michael Wright, Brian Wyss, Qingpeng Zhang, en zyme, "
+                  "C. Titus Brown",
         "author_email": 'khmer-project@idyll.org',
-        # "maintainer": 'Michael R. Crusoe', # this overrides the author field
-        # "maintainer_email": 'mcrusoe@msu.edu', # so don't include it
+        # "maintainer": 'Daniel Standage', # this overrides the author field
+        # "maintainer_email": 'daniel.standage@gmail.com', # so don't include it
         # http://docs.python.org/2/distutils/setupscript.html
         # additional-meta-data note #3
         "url": 'https://khmer.readthedocs.io/',
