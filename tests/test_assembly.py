@@ -520,6 +520,18 @@ def tandem_repeat_structure(request, linear_structure):
     return graph, sequence, tandem_repeats
 
 
+@pytest.fixture
+def circular_linear_structure(request, linear_structure):
+    graph, sequence = linear_structure
+
+    sequence += sequence
+
+    if hdn_counts(sequence, graph):
+        request.applymarker(pytest.mark.xfail)
+
+    return graph, sequence
+
+
 class TestNonBranching:
 
     def test_all_start_positions(self, linear_structure):
@@ -550,6 +562,14 @@ class TestNonBranching:
             path = asm.assemble(contig[start:start + K], direction='R')
             print(path, ', ', contig[:start])
             assert utils._equals_rc(path, contig[start:]), start
+
+    def test_circular(self, circular_linear_structure):
+        graph, contig = circular_linear_structure
+        asm = khmer.LinearAssembler(graph)
+
+        path = asm.assemble(contig[:K], direction='R')
+        print(path, ',', contig)
+        assert utils._equals_rc(path, contig[:len(path)])
 
 
 class TestLinearAssembler_RightBranching:
