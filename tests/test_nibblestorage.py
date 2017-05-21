@@ -50,15 +50,17 @@ def test_single_add():
     assert sct.get("AAAA") == 1
 
 
-def test_split_byte():
-    # check the byte is correctly split
+def test_split_byte_murmur():
+    # check the byte is correctly split when using murmur hash
     sct = SmallCounttable(4, 4, 1)
 
-    a = "AAAA"
-    b = "AAAT"
+    # these kmers were carefully chosen to have hash values that produce
+    # consecutive indices in the count table.
+    a = "AAAC"
+    b = "AAAG"
 
-    assert sct.get_kmer_hashes(a) == [0]
-    assert sct.get_kmer_hashes(b) == [1]
+    assert sct.get_kmer_hashes(a) == [11898086063751343884]
+    assert sct.get_kmer_hashes(b) == [10548630838975263317]
 
     sct.add(a)
 

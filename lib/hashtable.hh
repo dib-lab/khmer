@@ -63,11 +63,11 @@ using namespace std;
 
 namespace khmer
 {
-    namespace read_parsers
-    {
-        template<typename SeqIO> class ReadParser;
-        class FastxReader;
-    }
+namespace read_parsers
+{
+template<typename SeqIO> class ReadParser;
+class FastxReader;
+}
 }
 
 #define CALLBACK_PERIOD 100000
@@ -117,12 +117,14 @@ protected:
     explicit Hashtable(const Hashtable&);
     Hashtable& operator=(const Hashtable&);
 
-    virtual KmerHashIteratorPtr new_kmer_iterator(const char * sp) const {
+    virtual KmerHashIteratorPtr new_kmer_iterator(const char * sp) const
+    {
         KmerHashIterator * ki = new TwoBitKmerHashIterator(sp, _ksize);
         return unique_ptr<KmerHashIterator>(ki);
     }
 
-    virtual KmerHashIteratorPtr new_kmer_iterator(const std::string& s) const {
+    virtual KmerHashIteratorPtr new_kmer_iterator(const std::string& s) const
+    {
         return new_kmer_iterator(s.c_str());
     }
 
@@ -197,11 +199,11 @@ public:
         return store->get_count(khash);
     }
 
-    void save(std::string filename)
+    virtual void save(std::string filename)
     {
         store->save(filename, _ksize);
     }
-    void load(std::string filename)
+    virtual void load(std::string filename)
     {
         store->load(filename, _ksize);
         _init_bitstuff();
@@ -326,17 +328,76 @@ public:
             BoundedCounterType min_abund) const;
 };
 
-// Hashtable-derived class with ByteStorage.
-class Counttable : public khmer::Hashtable
+
+class MurmurKmerHashIterator : public KmerHashIterator
+{
+    const char * _seq;
+    const char _ksize;
+    unsigned int index;
+    unsigned int length;
+    bool _initialized;
+public:
+    MurmurKmerHashIterator(const char * seq, unsigned char k) :
+        _seq(seq), _ksize(k), index(0), _initialized(false)
+    {
+        length = strlen(_seq);
+    };
+
+    HashIntoType first()
+    {
+        _initialized = true;
+        return next();
+    }
+
+    HashIntoType next()
+    {
+        if (!_initialized) {
+            _initialized = true;
+        }
+
+        if (done()) {
+            throw khmer_exception("past end of iterator");
+        }
+
+        std::string kmer;
+        kmer.assign(_seq + index, _ksize);
+        index += 1;
+        return _hash_murmur(kmer, _ksize);
+    }
+
+    bool done() const
+    {
+        return (index + _ksize > length);
+    }
+
+    unsigned int get_start_pos() const
+    {
+        if (!_initialized) {
+            return 0;
+        }
+        return index - 1;
+    }
+    unsigned int get_end_pos() const
+    {
+        if (!_initialized) {
+            return _ksize;
+        }
+        return index + _ksize - 1;
+    }
+};
+
+
+class MurmurHashtable : public khmer::Hashtable
 {
 public:
-    explicit Counttable(WordLength ksize, std::vector<uint64_t> sizes)
-        : Hashtable(ksize, new ByteStorage(sizes)) { } ;
+    explicit MurmurHashtable(WordLength ksize, Storage * s)
+        : Hashtable(ksize, s) { };
 
     inline
     virtual
     HashIntoType
-    hash_dna(const char * kmer) const {
+    hash_dna(const char * kmer) const
+    {
         if (!(strlen(kmer) >= _ksize)) {
             throw khmer_exception("Supplied kmer string doesn't match the underlying k-size.");
         }
@@ -344,37 +405,62 @@ public:
     }
 
     inline virtual HashIntoType
-    hash_dna_top_strand(const char * kmer) const {
+    hash_dna_top_strand(const char * kmer) const
+    {
         throw khmer_exception("not implemented");
     }
 
     inline virtual HashIntoType
-    hash_dna_bottom_strand(const char * kmer) const {
+    hash_dna_bottom_strand(const char * kmer) const
+    {
         throw khmer_exception("not implemented");
     }
 
     inline virtual std::string
-    unhash_dna(HashIntoType hashval) const {
+    unhash_dna(HashIntoType hashval) const
+    {
         throw khmer_exception("not implemented");
     }
 
-    virtual KmerHashIteratorPtr new_kmer_iterator(const char * sp) const;
+    virtual KmerHashIteratorPtr new_kmer_iterator(const char * sp) const
+    {
+        KmerHashIterator * ki = new MurmurKmerHashIterator(sp, _ksize);
+        return unique_ptr<KmerHashIterator>(ki);
+    }
+
+    virtual void save(std::string filename)
+    {
+        store->save(filename, _ksize);
+    }
+    virtual void load(std::string filename)
+    {
+        store->load(filename, _ksize);
+        _init_bitstuff();
+    }
+};
+
+// Hashtable-derived class with ByteStorage.
+class Counttable : public khmer::MurmurHashtable
+{
+public:
+    explicit Counttable(WordLength ksize, std::vector<uint64_t> sizes)
+        : MurmurHashtable(ksize, new ByteStorage(sizes)) { } ;
 };
 
 // Hashtable-derived class with NibbleStorage.
-class SmallCounttable : public khmer::Hashtable
+class SmallCounttable : public khmer::MurmurHashtable
 {
 public:
     explicit SmallCounttable(WordLength ksize, std::vector<uint64_t> sizes)
-        : Hashtable(ksize, new NibbleStorage(sizes)) { } ;
+          : MurmurHashtable(ksize, new NibbleStorage(sizes)) { };
 };
 
 // Hashtable-derived class with BitStorage.
-class Nodetable : public Hashtable
+class Nodetable : public khmer::MurmurHashtable
 {
 public:
     explicit Nodetable(WordLength ksize, std::vector<uint64_t> sizes)
-        : Hashtable(ksize, new BitStorage(sizes)) { } ;
+        : MurmurHashtable(ksize, new BitStorage(sizes)) { } ;
 };
 
 }

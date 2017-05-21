@@ -102,18 +102,18 @@ def get_parser():
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
 
-    parser.add_argument('--ksize', '-k', type=int, default=env_ksize,
+    parser.add_argument('-k', '--ksize', type=int, default=env_ksize,
                         help='k-mer size to use')
 
-    parser.add_argument('--error-rate', '-e', type=float, default=0.01,
+    parser.add_argument('-e', '--error-rate', type=float, default=0.01,
                         help='Acceptable error rate')
 
-    parser.add_argument('--report', '-R',
+    parser.add_argument('-R', '--report',
                         metavar='filename', type=argparse.FileType('w'),
                         help='generate informational report and write to'
                         ' filename')
 
-    parser.add_argument('--stream-records', '-S', default=False,
+    parser.add_argument('-S', '--stream-records', default=False,
                         action='store_true',
                         help='write input sequences to STDOUT')
 
