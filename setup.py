@@ -198,8 +198,8 @@ SETUP_METADATA = \
         "version": versioneer.get_version(),
         "description": 'khmer k-mer counting library',
         "long_description": open("README.rst").read(),
-        "author": "Daniel Standage, Russell Neches, Hussien F. Alameldin, "
-                  "Ali Aliyari, Sherine Awad, Elmar Bucher, Adam Caldwell, "
+        "author": "Daniel Standage, Hussien F. Alameldin, Ali Aliyari, "
+                  "Sherine Awad, Elmar Bucher, Adam Caldwell, "
                   "Reed Cartwright, Amanda Charbonneau, Lisa Cohen, "
                   "Bede Constantinides, Michael R. Crusoe, Greg Edvenson, "
                   "Scott Fay, Jacob Fenton, Thomas Fenzl, Jordan Fish, "
@@ -210,16 +210,16 @@ SETUP_METADATA = \
                   "Nicole Kingsley, David Lin, Justin Lippi, Tamer Mansour, "
                   "Pamela McA'Nulty, Eric McDonald, Jessica Mizzi, "
                   "Kevin D. Murray, Joshua R. Nahum, Kaben Nanlohy, "
-                  "Alexander Johan Nederbragt, Humberto Ortiz-Zuazaga, "
-                  "Jeramia Ory, Jason Pell, Charles Pepe-Ranney, "
-                  "Sydney Pickens, Zachary N Russ, Erich Schwarz, "
-                  "Camille Scott, Josiah Seaman, Ryan Shean, Scott Sievert, "
-                  "Jared Simpson, Connor T. Skennerton, James Spencer, "
-                  "Ramakrishnan Srinivasan, James A. Stapleton, Joe Stein, "
-                  "Sascha Steinbiss, Susan R Steinman, Cait Sydney, "
-                  "Benjamin Taylor, Will Trimble, Heather L. Wiencko, "
-                  "Michael Wright, Brian Wyss, Qingpeng Zhang, en zyme, "
-                  "C. Titus Brown",
+                  "Russell Neches, Alexander Johan Nederbragt, "
+                  "Humberto Ortiz-Zuazaga, Jeramia Ory, Jason Pell, "
+                  "Charles Pepe-Ranney, Sydney Pickens, Zachary N Russ, "
+                  "Erich Schwarz, Camille Scott, Josiah Seaman, Ryan Shean, "
+                  "Scott Sievert, Jared Simpson, Connor T. Skennerton, "
+                  "James Spencer, Ramakrishnan Srinivasan, "
+                  "James A. Stapleton, Joe Stein, Sascha Steinbiss, "
+                  "Susan R Steinman, Cait Sydney, Benjamin Taylor, "
+                  "Will Trimble, Heather L. Wiencko, Michael Wright, "
+                  "Brian Wyss, Qingpeng Zhang, en zyme, C. Titus Brown",
         "author_email": 'khmer-project@idyll.org',
         # "maintainer": 'Daniel Standage', # this overrides the author field
         # "maintainer_email": 'daniel.standage@gmail.com', # so don't include
