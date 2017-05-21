@@ -222,7 +222,7 @@ SETUP_METADATA = \
                   "C. Titus Brown",
         "author_email": 'khmer-project@idyll.org',
         # "maintainer": 'Daniel Standage', # this overrides the author field
-        # "maintainer_email": 'daniel.standage@gmail.com', # so don't include it
+        # "maintainer_email": 'daniel.standage@gmail.com', # so don't include
         # http://docs.python.org/2/distutils/setupscript.html
         # additional-meta-data note #3
         "url": 'https://khmer.readthedocs.io/',
