@@ -385,8 +385,10 @@ def test_save_load(tabletype):
         loaded = khmer.load_countgraph(savefile, small=True)
     elif tabletype == _SmallCounttable:
         loaded = khmer.load_counttable(savefile, small=True)
-    elif tabletype in (_Nodegraph, _Nodetable):
+    elif tabletype == _Nodegraph:
         loaded = khmer.load_nodegraph(savefile)
+    elif tabletype == _Nodetable:
+        loaded = khmer.load_nodetable(savefile)
     else:
         raise Exception("unknown tabletype")
 

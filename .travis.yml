@@ -66,9 +66,14 @@ install:
 script:
   - make test
   - make pep8
+  - make doc
+  - make py-demos
+  - make cpp-demos
+  - cd examples/stamps && ./do.sh
 
 # generate all the diagnostic reports
 after_success:
+  - cd $TRAVIS_BUILD_DIR && echo $TRAVIS_BUILD_DIR
   - make clean
   - PYTEST_ADDOPTS=-qqq make coverage-gcovr.xml coverage.xml
   # Fix suggested by http://diff-cover.readthedocs.io/en/latest/#troubleshooting
@@ -78,8 +83,6 @@ after_success:
   - make diff_pylint_report
   - make cppcheck
   - make pydocstyle
-  # do the docs build?
-  - make doc
   # XXX Do not upload results from travis yet. Currently jenkins is considered
   # XXX the source of truth about coverage
   # only upload one coverage report to codecov as it merges all reports

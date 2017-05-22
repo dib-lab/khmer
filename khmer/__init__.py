@@ -105,6 +105,18 @@ def load_nodegraph(filename):
     return nodegraph
 
 
+def load_nodetable(filename):
+    """Load a nodetable object from the given filename and return it.
+
+    Keyword argument:
+    filename -- the name of the nodegraph file
+    """
+    nodetable = _Nodetable(1, [1])
+    nodetable.load(filename)
+
+    return nodetable
+
+
 def load_countgraph(filename, small=False):
     """Load a countgraph object from the given filename and return it.
 
@@ -341,6 +353,7 @@ class Counttable(_Counttable):
 
 
 class SmallCounttable(_SmallCounttable):
+
     def __new__(cls, k, starting_size, n_tables):
         primes = get_n_primes_near_x(n_tables, starting_size)
         counttable = _SmallCounttable.__new__(cls, k, primes)

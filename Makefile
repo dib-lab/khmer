@@ -47,17 +47,14 @@ SOURCES=$(PYSOURCES) $(CPPSOURCES) $(CYSOURCES) setup.py
 
 DEVPKGS=pep8==1.6.2 diff_cover autopep8 pylint coverage gcovr pytest \
 	pydocstyle screed pyenchant Cython==0.25.2
+
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 
 VERSION=$(shell ./setup.py version | grep Version | awk '{print $$4}' \
 	| sed 's/+/-/')
 
-# wrapping the command with `printf "%q" some-text` shell-escapes the string
-# http://stackoverflow.com/a/2856010
-# list of preprocessor defines works for GCC and clang
-# http://nadeausoftware.com/articles/2011/12/c_c_tip_how_list_compiler_predefined_macros
-DEFINES=$(shell printf "%q" "$$( c++ -dM -E -x c++ /dev/null | \
-	awk '{print "-D" $$2 "=" $$3}' | tr '\n' ' ')" | sed 's/\\ / /g' )
+# The following four variables are only used by cppcheck. If you want to
+# change how things are compiled edit `setup.cfg` or `setup.py`.
 DEFINES += -DNDEBUG -DVERSION=$(VERSION) -DSEQAN_HAS_BZIP2=1 \
 	   -DSEQAN_HAS_ZLIB=1 -UNO_UNIQUE_RC
 
@@ -65,16 +62,20 @@ INCLUDESTRING=$(shell gcc -E -x c++ - -v < /dev/null 2>&1 >/dev/null \
 	    | grep '^ /' | grep -v cc1plus)
 INCLUDEOPTS=$(shell gcc -E -x c++ - -v < /dev/null 2>&1 >/dev/null \
 	    | grep '^ /' | grep -v cc1plus | awk '{print "-I" $$1 " "}')
-PYINCLUDE=$(shell python -c \
-	  "import sysconfig;print(sysconfig.get_path('include'))")
 
-CPPCHECK=ls src/oxli/*.cc src/khmer/*.cc | grep -v test | cppcheck -DNDEBUG \
-	 -DVERSION=0.0.cppcheck -DSEQAN_HAS_BZIP2=1 -DSEQAN_HAS_ZLIB=1 \
-	 -UNO_UNIQUE_RC --enable=all --suppress='*:/usr/*' \
-	 --suppress='*:$(PYINCLUDE)/*' --file-list=- --platform=unix64 \
-	 --std=c++11 --inline-suppr --quiet --verbose -Iinclude -Ithird-party/bzip2 \
-	 -Ithird-party/zlib -Ithird-party/smhasher -I$(PYINCLUDE) \
-	 $(DEFINES) $(INCLUDEOPTS)
+PYINCLUDE=$(shell python -c "from __future__ import print_function; \
+	    import sysconfig; flags = ['-I' + sysconfig.get_path('include'), \
+	    '-I' + sysconfig.get_path('platinclude')]; print(' '.join(flags))")
+
+CPPCHECK_SOURCES=$(filter-out lib/test%, $(wildcard lib/*.cc khmer/_khmer.cc) )
+CPPCHECK=cppcheck --enable=all \
+	 --error-exitcode=1 \
+	 --suppress='*:/Library/*' \
+	 --suppress='*:*/include/python*/Python.h' \
+	 --suppress='*:/usr/*' --platform=unix64 \
+	 --std=c++11 --inline-suppr -Ilib -Ithird-party/bzip2 \
+	 -Ithird-party/zlib -Ithird-party/smhasher \
+	 $(DEFINES) $(INCLUDEOPTS) $(PYINCLUDE) $(CPPCHECK_SOURCES) --quiet
 
 UNAME := $(shell uname)
 ifeq ($(UNAME),Linux)
@@ -101,7 +102,6 @@ help: Makefile
 install-dep: install-dependencies
 
 install-dependencies:
-	pip install git+https://github.com/dib-lab/screed.git
 	pip install --upgrade --ignore-installed $(DEVPKGS)
 	pip install --upgrade --requirement doc/requirements.txt
 
@@ -192,10 +192,10 @@ pep8_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
 diff_pep8_report: pep8_report.txt
 	diff-quality --violations=pep8 pep8_report.txt
 
-## pydocstyle      : check Python doc strings
+## pydocstyle  : check Python doc strings
 pydocstyle: $(PYSOURCES) $(wildcard tests/*.py)
-	pydocstyle --ignore=D100,D101,D102,D103,D203 \
-		setup.py khmer/ scripts/ tests/ oxli/ || true
+	pydocstyle --ignore=D100,D101,D102,D103,D203 --match='(?!_version).*\.py' \
+		setup.py khmer/ scripts/ oxli/ || true
 
 pydocstyle_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
 	pydocstyle setup.py khmer/ scripts/ tests/ oxli/ \
@@ -369,30 +369,25 @@ convert-release-notes:
 		pandoc --from=markdown --to=rst $${file} > $${file%%.md}.rst; \
 		done
 
-list-authors:
-	@echo '\author[1]{Michael R. Crusoe}'
-	@git log --format='\author[]{%aN}' | sort -uk2 | \
-		grep -v 'root\|crusoe\|titus'
-	@echo '\author[]{C. Titus Brown}'
-	@echo '\affil[1]{mcrusoe@msu.edu}'
-	@git log --format='\author[]{%aN} \affil[]{%aE}' | sort -uk2 | \
-		awk -F\\ '{print "\\"$$3}' | grep -v \
-		'root\|crusoe\|titus\|waffle\|boyce\|pickett.rodney'
-	# R. Boyce requested to be removed 2015/05/21
-	# via pers correspondence to MRC
-	# P Rodney requested to be removed 2015/06/22 via pers correspondence
-	# to MRC
-	@echo '\affil[]{titus@idyll.org}'
-
 list-author-emails:
-	@echo 'name, E-Mail Address'
-	@git log --format='%aN,%aE' | sort -u | grep -v 'root\|waffle\|boyce'
+	@echo 'name,E-Mail Address'
+	@echo 'Daniel Standage,daniel.standage@gmail.com'
+	@git log --format='%aN,%aE' | sort -u | grep -v -F -f author-skips.txt
+	@echo 'C. Titus Brown,ctbrown@ucdavis.edu'
 
 list-citation:
-	git log --format='%aN,%aE' | sort -u | grep -v \
-		'root\|crusoe\|titus\|waffleio\|Hello\|boyce\|rodney' \
-		> authors.csv
+	git log --format='%aN,%aE' | sort -u | grep -v -F -f author-skips.txt > authors.csv
 	python sort-authors-list.py
+
+## cpp-demos   : run programs demonstrating access to the (unstable) C++ API
+cpp-demos: sharedobj
+	cd examples/c++-api/ && make all run
+
+## py-demos    : run programs demonstrating access to the Python API
+py-demos: sharedobj
+	python examples/python-api/exact-counting.py
+	python examples/python-api/bloom.py
+	python examples/python-api/consume.py examples/c++-api/reads.fastq
 
 FORCE:
 

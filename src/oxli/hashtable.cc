@@ -505,67 +505,27 @@ const
     return posns;
 }
 
-class MurmurKmerHashIterator : public KmerHashIterator
-{
-    const char * _seq;
-    const char _ksize;
-    unsigned int index;
-    unsigned int length;
-    bool _initialized;
-public:
-    MurmurKmerHashIterator(const char * seq, unsigned char k) :
-        _seq(seq), _ksize(k), index(0), _initialized(false) {
-        length = strlen(_seq);
-    };
-
-    HashIntoType first() { _initialized = true; return next(); }
-
-    HashIntoType next() {
-        if (!_initialized) { _initialized = true; }
-
-        if (done()) {
-            throw oxli_exception("past end of iterator");
-        }
-
-        std::string kmer;
-        kmer.assign(_seq + index, _ksize);
-        index += 1;
-        return _hash_murmur(kmer, _ksize);
-    }
-
-    bool done() const {
-        return (index + _ksize > length);
-    }
-
-    unsigned int get_start_pos() const {
-        if (!_initialized) { return 0; }
-        return index - 1;
-    }
-    unsigned int get_end_pos() const {
-        if (!_initialized) { return _ksize; }
-        return index + _ksize - 1;
-    }
-};
-
-KmerHashIteratorPtr Counttable::new_kmer_iterator(const char * sp) const {
-    KmerHashIterator * ki = new MurmurKmerHashIterator(sp, _ksize);
-    return unique_ptr<KmerHashIterator>(ki);
-}
 
 template void Hashtable::consume_seqfile<FastxReader>(
     std::string const &filename,
     unsigned int &total_reads,
     unsigned long long &n_consumed
 );
+
+
 template void Hashtable::consume_seqfile<FastxReader>(
     ReadParserPtr<FastxReader>& parser,
     unsigned int &total_reads,
     unsigned long long &n_consumed
 );
+
+
 template uint64_t * Hashtable::abundance_distribution<FastxReader>(
     ReadParserPtr<FastxReader>& parser,
     Hashtable * tracking
 );
+
+
 template uint64_t * Hashtable::abundance_distribution<FastxReader>(
     std::string filename,
     Hashtable * tracking

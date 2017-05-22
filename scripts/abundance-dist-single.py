@@ -55,8 +55,7 @@ from khmer.khmer_args import (build_counting_args, add_threading_args,
                               report_on_config, calculate_graphsize,
                               sanitize_help)
 from khmer.kfile import (check_input_files, check_space_for_graph)
-from khmer.khmer_logger import (configure_logging, log_info, log_error,
-                                log_warn)
+from khmer.khmer_logger import configure_logging, log_info, log_error
 
 
 def get_parser():
@@ -95,11 +94,11 @@ def get_parser():
     parser.add_argument('-s', '--squash', dest='squash_output', default=False,
                         action='store_true',
                         help='Overwrite output file if it exists')
-    parser.add_argument('--savegraph', default='', metavar="filename",
+    parser.add_argument('--savegraph', metavar="filename",
                         help="Save the k-mer countgraph to the specified "
                         "filename.")
     parser.add_argument('-f', '--force', default=False, action='store_true',
-                        help='Overwrite output file if it exists')
+                        help='Override sanity checks')
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
     return parser
@@ -113,7 +112,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     report_on_config(args, graph_type)
 
     check_input_files(args.input_sequence_filename, args.force)
-    if args.savegraph:
+    if args.savegraph is not None:
         graphsize = calculate_graphsize(args, graph_type)
         check_space_for_graph(args.savegraph, graphsize, args.force)
     if (not args.squash_output and
@@ -129,11 +128,14 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
                               'cumulative_fraction'])
 
     log_info('making countgraph')
-    countgraph = khmer_args.create_countgraph(args, multiplier=1.1)
+    # In case the user specified a maximum memory usage, use 8/(9+eps) of that
+    # for the countgraph and 1/(9+eps) for the tracking nodegraph
+    # `eps` is used to account for the memory used by the python interpreter
+    countgraph = khmer_args.create_countgraph(args, multiplier=8/(9. + 0.3))
     countgraph.set_use_bigcount(args.bigcount)
 
     log_info('building k-mer tracking graph')
-    tracking = khmer_args.create_nodegraph(args, multiplier=1.1)
+    tracking = khmer_args.create_matching_nodegraph(countgraph)
 
     log_info('kmer_size: {ksize}', ksize=countgraph.ksize())
     log_info('k-mer countgraph sizes: {sizes}', sizes=countgraph.hashsizes())
@@ -211,7 +213,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         if sofar == total:
             break
 
-    if args.savegraph:
+    if args.savegraph is not None:
         log_info('Saving k-mer countgraph to {savegraph}',
                  savegraph=args.savegraph)
         countgraph.save(args.savegraph)

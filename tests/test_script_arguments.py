@@ -122,6 +122,34 @@ def test_check_tablespace_nodegraph(graph_type, exp_buckets):
     assert sizestr == exp_buckets
 
 
+def test_normal_help(capsys):
+    # check -x and -N are hidden by default with --help
+    parser = khmer_args.build_graph_args()
+
+    with pytest.raises(SystemExit):
+        parser.parse_args(['-h'])
+
+    out, err = capsys.readouterr()
+    assert "--max-tablesize" not in out
+    assert '--n_tables' not in out
+
+
+def test_expert_help(capsys):
+    # check -x and -N are hidden by default but appear with --help-expert
+    old_argv = sys.argv[:]
+    sys.argv.append('--help-expert')
+    parser = khmer_args.build_graph_args()
+
+    with pytest.raises(SystemExit):
+        parser.parse_args(['-h', '--help-expert'])
+
+    out, err = capsys.readouterr()
+    assert "--max-tablesize" in out
+    assert '--n_tables' in out
+
+    sys.argv = old_argv
+
+
 def test_check_space_force():
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
@@ -301,7 +329,7 @@ def test_create_countgraph_4_multiplier():
                               False, 0)
 
     countgraph = khmer_args.create_countgraph(args, multiplier=2.0)
-    assert sum(countgraph.hashsizes()) < max_mem / 2.0, \
+    assert sum(countgraph.hashsizes()) < max_mem * 2.0, \
         sum(countgraph.hashsizes())
 
 
@@ -411,7 +439,7 @@ def test_create_nodegraph_4_multiplier():
                               False, 0)
 
     nodegraph = khmer_args.create_nodegraph(args, multiplier=2.0)
-    assert sum(nodegraph.hashsizes()) / 8.0 < max_mem / 2.0, \
+    assert sum(nodegraph.hashsizes()) / 8.0 < max_mem * 2.0, \
         sum(nodegraph.hashsizes())
 
 

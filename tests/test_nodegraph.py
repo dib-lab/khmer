@@ -40,6 +40,7 @@ from __future__ import absolute_import
 import khmer
 from khmer import ReadParser
 from khmer import reverse_complement as revcomp
+from khmer.khmer_args import create_matching_nodegraph
 
 import screed
 
@@ -334,6 +335,14 @@ def test_load_partitioned():
 
     third_s = "CATGCAGAAGTTCCGCAACCATACCGTTCAGTTCCTGGTGGCTA"[-32:]
     assert nodegraph.get(third_s)
+
+
+def test_consume_partitioned_fail():
+    inpfile = utils.get_test_data('test-reads.fa')
+    nodegraph = khmer._Nodegraph(32, [1])
+
+    with pytest.raises(ValueError):
+        nodegraph.consume_partitioned_fasta(inpfile)
 
 
 def test_count_within_radius_simple():
@@ -695,7 +704,7 @@ def _build_testfiles():
     # nodegraph file
 
     inpath = utils.get_test_data('random-20-a.fa')
-    hi = khmer._Nodegraph(12, 2)
+    hi = khmer._Nodegraph(12, [2])
     hi.consume_seqfile(inpath)
     hi.save('/tmp/goodversion-k12.htable')
 
@@ -711,7 +720,7 @@ def _build_testfiles():
 
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
-    nodegraph = khmer.Nodegraph(32, 4, 4)
+    nodegraph = khmer.Nodegraph(32, 100000, 4)
     nodegraph.consume_seqfile_and_tag(fakelump_fa)
 
     subset = nodegraph.do_subset_partition(0, 0)
@@ -720,7 +729,7 @@ def _build_testfiles():
     EXCURSION_DISTANCE = 40
     EXCURSION_KMER_THRESHOLD = 82
     EXCURSION_KMER_COUNT_THRESHOLD = 1
-    counting = khmer.Countgraph(32, 4, 4)
+    counting = khmer.Countgraph(32, 100000, 4)
 
     nodegraph.repartition_largest_partition(None, counting,
                                             EXCURSION_DISTANCE,
@@ -1103,3 +1112,17 @@ def test_assemble_linear_path_bad_seed():
 
     path = nodegraph.assemble_linear_path('GATTACA' * 3)
     assert path == ''
+
+
+@pytest.mark.parametrize('ntables,targetsize', [
+    (4, 1e5),
+    (6, 1e5),
+    (8, 1e5),
+    (5, 1e6),
+    (7, 1e6),
+    (9, 1e6),
+])
+def test_create_matching_nodegraph(ntables, targetsize):
+    cg = khmer.Countgraph(31, targetsize, ntables)
+    ng = create_matching_nodegraph(cg)
+    assert cg.hashsizes() == ng.hashsizes()

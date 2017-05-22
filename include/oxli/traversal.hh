@@ -87,6 +87,8 @@ public:
 
     explicit NodeGatherer(const Hashgraph * ht, KmerFilter filter);
 
+    WordLength ksize() const;
+
     /**
      * @brief Push a new filter on to the filter stack.
      */
@@ -218,6 +220,7 @@ public:
                        KmerFilter filter);
 
     void push_filter(KmerFilter filter);
+    KmerFilter pop_filter();
 
     unsigned int traverse(const Kmer& node,
                           KmerQueue& node_q) const;
@@ -244,8 +247,23 @@ template <bool direction>
 class AssemblerTraverser: public NodeCursor<direction>
 {
 
+protected:
+    std::shared_ptr<SeenSet> visited;
+
 public:
     using NodeCursor<direction>::NodeCursor;
+    
+    explicit AssemblerTraverser(const Hashgraph * ht,
+                                Kmer start_kmer,
+                                KmerFilterList filters);
+
+    explicit AssemblerTraverser(const Hashgraph * ht,
+                                Kmer start_kmer,
+                                KmerFilterList filters,
+                                std::shared_ptr<SeenSet> visited);
+
+    AssemblerTraverser(const AssemblerTraverser& other);
+
 
     /**
      * @brief Get the next symbol.
@@ -274,30 +292,6 @@ public:
                              WordLength offset = 0) const;
 };
 
-
-/**
- * @brief An AssemblerTraverser which does not traverse to Kmers it has already encountered.
- *
- * Simply adds a new filter to check if the Kmer has been seen, and adds the Kmer to the set
- * of seen Kmers after calling ::next_symbol.
- *
- * @tparam direction The direction to assemble.
- */
-template<bool direction>
-class NonLoopingAT: public AssemblerTraverser<direction>
-{
-protected:
-
-    SeenSet * visited;
-
-public:
-
-    explicit NonLoopingAT(const Hashgraph * ht,
-                          Kmer start_kmer,
-                          KmerFilterList filters,
-                          SeenSet * visited);
-    virtual char next_symbol();
-};
 
 }
 #endif

@@ -44,10 +44,13 @@ Output sequences will be placed in 'infile.abundtrim'.
 Use -h for parameter help.
 """
 from __future__ import print_function
+import csv
 import sys
 import os
+import json
 import khmer
 import tempfile
+import time
 import shutil
 import textwrap
 
@@ -102,11 +105,11 @@ def get_parser():
 
     parser.add_argument('input_filenames', nargs='+')
 
-    parser.add_argument('--cutoff', '-C', type=int,
+    parser.add_argument('-C', '--cutoff', type=int,
                         help='remove k-mers below this abundance',
                         default=DEFAULT_CUTOFF)
 
-    parser.add_argument('--trim-at-coverage', '-Z', '--normalize-to',
+    parser.add_argument('-Z', '--trim-at-coverage', '--normalize-to',
                         type=int,
                         help='trim reads when entire read above this coverage',
                         default=DEFAULT_TRIM_AT_COVERAGE)
@@ -118,7 +121,7 @@ def get_parser():
                         'specify that output should go to STDOUT (the '
                         'terminal)')
 
-    parser.add_argument('--variable-coverage', '-V', action='store_true',
+    parser.add_argument('-V', '--variable-coverage', action='store_true',
                         default=False,
                         help='Only trim low-abundance k-mers from sequences '
                         'that have high coverage.')
@@ -129,11 +132,17 @@ def get_parser():
                         'reads are loaded.')
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
+    parser.add_argument('--summary-info', type=str, default=None,
+                        metavar="FORMAT", choices=['json', 'tsv'],
+                        help="What format should the machine readable run "
+                        "summary be in? (`json` or `tsv`, disabled by"
+                        " default)")
 
     # expert options
     parser.add_argument('--force', default=False, action='store_true')
-    parser.add_argument('--ignore-pairs', default=False, action='store_true')
-    parser.add_argument('--tempdir', '-T', type=str, default='./',
+    parser.add_argument('--ignore-pairs', default=False, action='store_true',
+                        help='treat all reads as if they were singletons')
+    parser.add_argument('-T', '--tempdir', type=str, default='./',
                         help="Set location of temporary directory for "
                         "second pass")
     add_output_compression_type(parser)
@@ -265,6 +274,30 @@ class Trimmer(object):
                     self.n_skipped += 1
                     self.bp_skipped += 1
                     yield read
+
+
+def store_provenance_info(info, fname, format='json'):
+    """Store execution `info` as `format` in `fname`
+
+    The `format` defaults to JSON, 'tsv' is also supported.
+    """
+    format = format.lower() if format is not None else 'json'
+    fname = '{}.info.{}'.format(fname, format)
+    if format == 'json':
+        with open(fname, 'w') as f:
+            json.dump(info, f)
+            f.write('\n')
+
+    elif format == 'tsv':
+        with open(fname, 'w') as f:
+            tsv = csv.DictWriter(f, fieldnames=info.keys(),
+                                 dialect='excel-tab')
+            tsv.writeheader()
+            tsv.writerow(info)
+
+    else:
+        raise RuntimeError("File format has to be one of json or tsv"
+                           " not {}.".format(format))
 
 
 def main():
@@ -477,11 +510,39 @@ def main():
     # for max_false_pos see Zhang et al., http://arxiv.org/abs/1309.2975
     log_info('fp rate estimated to be {fpr:1.3f}', fpr=fp_rate)
 
-    log_info('output in *.abundtrim')
+    if args.output is None:
+        log_info('output in *.abundtrim')
+    elif args.output.name == 1:
+        log_info('output streamed to stdout')
+    elif args.output.name:
+        log_info('output in {}'.format(args.output.name))
 
     if args.savegraph:
         log_info("Saving k-mer countgraph to {graph}", graph=args.savegraph)
         ct.save(args.savegraph)
+
+    if args.summary_info is not None:
+        # note that when streaming to stdout the name of args.output will
+        # be set to 1
+        if args.output is not None and args.output.name != 1:
+            base = args.output.name
+        # no explicit name or stdout stream -> use a default name
+        else:
+            base = 'trim-low-abund-{}'.format(
+                time.strftime("%Y-%m-%dT%H:%M:%S"))
+
+        info = {'fpr': fp_rate,
+                'reads': n_reads,
+                'basepairs': n_bp,
+                'reads_written': written_reads,
+                'basepairs_written': written_bp,
+                'reads_skipped': n_skipped,
+                'basepairs_skipped': bp_skipped,
+                'reads_removed': n_reads - written_reads,
+                'reads_trimmed': trimmed_reads,
+                'basepairs_removed_or_trimmed': n_bp - written_bp
+                }
+        store_provenance_info(info, fname=base, format=args.summary_info)
 
 
 if __name__ == '__main__':

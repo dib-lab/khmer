@@ -66,8 +66,18 @@ const
         // something happen. It's not going to happen!
         return "";
     }
-    std::string right_contig = assemble_right(seed_kmer, stop_bf);
-    std::string left_contig = assemble_left(seed_kmer, stop_bf);
+
+    std::list<KmerFilter> node_filters;
+    if (stop_bf) {
+        node_filters.push_back(get_stop_bf_filter(stop_bf));
+    }
+
+    std::shared_ptr<SeenSet> visited = std::make_shared<SeenSet>();
+    AssemblerTraverser<TRAVERSAL_RIGHT> rcursor(graph, seed_kmer, node_filters, visited);
+    AssemblerTraverser<TRAVERSAL_LEFT> lcursor(graph, seed_kmer, node_filters, visited);
+
+    std::string right_contig = _assemble_directed<TRAVERSAL_RIGHT>(rcursor);
+    std::string left_contig = _assemble_directed<TRAVERSAL_LEFT>(lcursor);
 
 #if DEBUG_ASSEMBLY
     std::cout << "Left: " << left_contig << std::endl;
@@ -107,8 +117,8 @@ const
 }
 
 template <>
-std::string LinearAssembler::_assemble_directed<TRAVERSAL_LEFT>(AssemblerTraverser<TRAVERSAL_LEFT>&
-        cursor)
+std::string LinearAssembler::
+_assemble_directed<TRAVERSAL_LEFT>(AssemblerTraverser<TRAVERSAL_LEFT>& cursor)
 const
 {
     std::string contig = cursor.cursor.get_string_rep(_ksize);
@@ -138,8 +148,8 @@ const
 }
 
 template<>
-std::string LinearAssembler::_assemble_directed<TRAVERSAL_RIGHT>
-(AssemblerTraverser<TRAVERSAL_RIGHT>& cursor)
+std::string LinearAssembler::
+_assemble_directed<TRAVERSAL_RIGHT>(AssemblerTraverser<TRAVERSAL_RIGHT>& cursor)
 const
 {
     std::string contig = cursor.cursor.get_string_rep(_ksize);
@@ -195,20 +205,20 @@ const
         node_filters.push_back(get_stop_bf_filter(stop_bf));
     }
 
-    SeenSet visited;
+    std::shared_ptr<SeenSet> visited = std::make_shared<SeenSet>();
 
 #if DEBUG_ASSEMBLY
     std::cout << "Assemble Labeled RIGHT: " << seed_kmer.repr(_ksize) << std::endl;
 #endif
     StringVector right_paths;
-    NonLoopingAT<TRAVERSAL_RIGHT> rcursor(graph, seed_kmer, node_filters, &visited);
+    AssemblerTraverser<TRAVERSAL_RIGHT> rcursor(graph, seed_kmer, node_filters, visited);
     _assemble_directed<TRAVERSAL_RIGHT>(rcursor, right_paths);
 
 #if DEBUG_ASSEMBLY
     std::cout << "Assemble Labeled LEFT: " << seed_kmer.repr(_ksize) << std::endl;
 #endif
     StringVector left_paths;
-    NonLoopingAT<TRAVERSAL_LEFT> lcursor(graph, seed_kmer, node_filters, &visited);
+    AssemblerTraverser<TRAVERSAL_LEFT> lcursor(graph, seed_kmer, node_filters, visited);
     _assemble_directed<TRAVERSAL_LEFT>(lcursor, left_paths);
 
     StringVector paths;
@@ -221,14 +231,14 @@ const
         }
     }
 
-    visited.clear();
+    visited->clear();
     return paths;
 }
 
 template <bool direction>
-void SimpleLabeledAssembler::_assemble_directed(NonLoopingAT<direction>&
-        start_cursor,
-        StringVector& paths)
+void SimpleLabeledAssembler::
+_assemble_directed(AssemblerTraverser<direction>& start_cursor,
+        		   StringVector& paths)
 const
 {
 #if DEBUG_ASSEMBLY
@@ -244,7 +254,7 @@ const
     std::cout << "Cursor: " << start_cursor.cursor.repr(_ksize) << std::endl;
 #endif
     StringVector segments;
-    std::vector< NonLoopingAT<direction> > cursors;
+    std::vector< AssemblerTraverser<direction> > cursors;
 
     segments.push_back(root_contig);
     cursors.push_back(start_cursor);
@@ -252,7 +262,7 @@ const
     while(segments.size() != 0) {
 
         std::string segment = segments.back();
-        NonLoopingAT<direction> cursor = cursors.back();
+        AssemblerTraverser<direction> cursor = cursors.back();
 #if DEBUG_ASSEMBLY
         std::cout << "Pop: " << segments.size() << " segments on stack." << std::endl;
         std::cout << "Segment: " << segment << std::endl;
@@ -297,7 +307,7 @@ const
                 // found some neighbors; extend them
                 while(!branch_starts.empty()) {
                     // spin off a cursor for the new branch
-                    NonLoopingAT<direction> branch_cursor(cursor);
+                    AssemblerTraverser<direction> branch_cursor(cursor);
                     branch_cursor.cursor = branch_starts.front();
                     branch_starts.pop();
 
@@ -400,7 +410,7 @@ const
 // Starting from the given seed k-mer, assemble all maximal linear paths in
 // both directions, using junction counts to skip over tricky bits.
 StringVector JunctionCountAssembler::assemble(const Kmer seed_kmer,
-        const Hashtable * stop_bf)
+                                              const Hashtable * stop_bf)
 const
 {
 #if DEBUG_ASSEMBLY
@@ -412,21 +422,21 @@ const
         node_filters.push_back(get_stop_bf_filter(stop_bf));
     }
 
-    SeenSet visited;
+    std::shared_ptr<SeenSet> visited = std::make_shared<SeenSet>();
 
 #if DEBUG_ASSEMBLY
     std::cout << "Assemble Junctions RIGHT: " << seed_kmer.repr(
                   _ksize) << std::endl;
 #endif
     StringVector right_paths;
-    NonLoopingAT<TRAVERSAL_RIGHT> rcursor(graph, seed_kmer, node_filters, &visited);
+    AssemblerTraverser<TRAVERSAL_RIGHT> rcursor(graph, seed_kmer, node_filters, visited);
     _assemble_directed<TRAVERSAL_RIGHT>(rcursor, right_paths);
 
 #if DEBUG_ASSEMBLY
     std::cout << "Assemble Junctions LEFT: " << seed_kmer.repr(_ksize) << std::endl;
 #endif
     StringVector left_paths;
-    NonLoopingAT<TRAVERSAL_LEFT> lcursor(graph, seed_kmer, node_filters, &visited);
+    AssemblerTraverser<TRAVERSAL_LEFT> lcursor(graph, seed_kmer, node_filters, visited);
     _assemble_directed<TRAVERSAL_LEFT>(lcursor, left_paths);
 
     StringVector paths;
@@ -439,14 +449,14 @@ const
         }
     }
 
-    visited.clear();
+    visited->clear();
     return paths;
 }
 
 template <bool direction>
-void JunctionCountAssembler::_assemble_directed(NonLoopingAT<direction>&
-        start_cursor,
-        StringVector& paths)
+void JunctionCountAssembler::
+_assemble_directed(AssemblerTraverser<direction>& start_cursor,
+        		   StringVector& paths)
 const
 {
 #if DEBUG_ASSEMBLY
@@ -462,7 +472,7 @@ const
     std::cout << "Cursor: " << start_cursor.cursor.repr(_ksize) << std::endl;
 #endif
     StringVector segments;
-    std::vector< NonLoopingAT<direction> > cursors;
+    std::vector< AssemblerTraverser<direction> > cursors;
 
     segments.push_back(root_contig);
     cursors.push_back(start_cursor);
@@ -470,7 +480,7 @@ const
     while(segments.size() != 0) {
 
         std::string segment = segments.back();
-        NonLoopingAT<direction> cursor = cursors.back();
+        AssemblerTraverser<direction> cursor = cursors.back();
 #if DEBUG_ASSEMBLY
         std::cout << "Pop: " << segments.size() << " segments on stack." << std::endl;
         std::cout << "Segment: " << segment << std::endl;
@@ -499,7 +509,7 @@ const
             // found some neighbors; extend them
             while(!branch_starts.empty()) {
                 // spin off a cursor for the new branch
-                NonLoopingAT<direction> branch_cursor(cursor);
+                AssemblerTraverser<direction> branch_cursor(cursor);
 
                 branch_cursor.cursor = branch_starts.front();
                 branch_starts.pop();

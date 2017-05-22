@@ -39,11 +39,8 @@
 A quick guide to the khmer codebase
 ===================================
 
-This document describes the khmer project's directory layout.
-
-----
-
-The ChangeLog file lists changes to the codebase, most recent first.
+The ``CHANGELOG.md`` file lists major changes to the codebase with each version,
+with the most recent version first.
 
 The ``include/`` directory contains all C++ and C headers. The core C++ library
 is under ``include/oxli``, and the CPython wrapper is under ``include/khmer``.

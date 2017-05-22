@@ -49,6 +49,15 @@ How to make a khmer release candidate
 Michael R. Crusoe, Luiz Irber, and C. Titus Brown have all been
 release makers, following this checklist by MRC.
 
+#. Announce a few days ahead of time that you will cut a release. This will
+   slow down the rate at which PRs are being merged. When all outstanding PRs
+   scheduled for this release have been merged, announce it. From now on no
+   more merges to master. PRs to fix oversights or bugs follow the usual rule
+   of "author can't merge". When you reach the end of this checklist announce
+   it. Back to normal. If completing this checklist takes longer than a few
+   hours consider allowing merges to master, and starting from the top with
+   cutting a release.
+
 #. The below should be done in a clean checkout::
 
         cd `mktemp -d`
@@ -58,12 +67,9 @@ release makers, following this checklist by MRC.
 #. (Optional) Check for updates to versioneer::
 
         pip install --upgrade versioneer
-        versioneer-installer
+        versioneer install
+        git diff --staged
 
-        git diff
-
-        ./setup.py versioneer
-        git diff
         git commit -m -a "new version of versioneer.py"
         # or
         git checkout -- versioneer.py khmer/_version.py khmer/__init__.py MANIFEST.in
@@ -74,31 +80,19 @@ release makers, following this checklist by MRC.
         git log --minimal --patch `git describe --tags --always --abbrev=0`..HEAD
 
 #. Review the issue list for any new bugs that will not be fixed in this
-   release. Add them to ``doc/known-issues.txt``
+   release. Add them to ``doc/user/known-issues.rst``
 
-#. Check for new authors. Update ``.mailmap`` to normalize their email address
+#. Check for new authors (``git log --format='%aN' v2.0... | sort -u`` lists all
+   committers since the v2.0 tag). Update ``.mailmap`` to normalize their email address
    and name spelling. If they want to opt out update the ``list-*`` Makefile
    targets to exclude them. Run ``make list-citation`` and adapt the output to
    the relevant parts of ``CITATION``, ``setup.py``, ``doc/index.rst``.
 
-#. Verify that the build is clean: http://ci.oxli.org/job/khmer-master/
+#. Verify that the build is clean: https://api.travis-ci.org/dib-lab/khmer.svg?branch=master
 
 #. Run through the `API examples <../user/api-examples.html>`__ to verify they
-   are still valid.
-
-#. Submit a build to Coverity Scan if it hasn't been done
-   recently. You can get the token from
-   https://gitlab.msu.edu/ged-lab/ged-internal-docs/wikis/coverity-scan
-   or https://scan.coverity.com/projects/621?tab=project_settings
-
-   ::
-
-        virtualenv coverityenv
-        source coverityenv/bin/activate
-        make install-dependencies
-        make clean
-        cov_analysis_dir=~/src/coverity/cov-analysis-linux64-7.5.0/ make coverity-build
-        COVERITY_TOKEN=${COVERITY_TOKEN} make coverity-upload
+   are still valid. You need to install khmer to do this, use for example
+   your normal development setup/virtualenv for that.
 
 #. Set your new version number and release candidate::
 
@@ -129,9 +123,10 @@ release makers, following this checklist by MRC.
         normalize-by-median.py --version 2>&1 | grep khmer\ ${new_version}-${rc} && \
                 echo 1st manual version check passed
         pip uninstall -y khmer; pip uninstall -y khmer; make install
-        mkdir ../not-khmer # if there is a subdir named 'khmer' nosetest will execute tests
-        # there instead of the installed khmer module's tests
-        pushd ../not-khmer; nosetests khmer --attr '!known_failing'; popd
+        mkdir ../not-khmer # make sure py.test executes tests
+                           # from the installed khmer module
+        # you might want to add 'and not huge' to the test selection
+        pushd ../not-khmer; pytest --pyargs khmer -m 'not known_failing'; popd
 
 
         # Secondly we test via pip
@@ -146,10 +141,10 @@ release makers, following this checklist by MRC.
         make test
         cp dist/khmer*tar.gz ../../../testenv3/
         pip uninstall -y khmer; pip uninstall -y khmer; make install
-        cd ../.. # no subdir named khmer here, safe for nosetesting installed khmer module
+        cd ../.. # no subdir named khmer here, safe for testing installed khmer module
         normalize-by-median.py --version 2>&1 | grep khmer\ ${new_version}-${rc} && \
                 echo 2nd manual version check passed
-        nosetests khmer --attr '!known_failing'
+        pytest --pyargs khmer -m 'not known_failing'
 
         # Is the distribution in testenv2 complete enough to build another
         # functional distribution?
@@ -158,14 +153,14 @@ release makers, following this checklist by MRC.
         source bin/activate
         pip install -U setuptools==3.4.1
         pip install khmer*tar.gz
-        pip install nose
+        pip install pytest
         tar xzf khmer*tar.gz
         cd khmer*
         make dist
         make test
         pip uninstall -y khmer; pip uninstall -y khmer; make install
         mkdir ../not-khmer
-        pushd ../not-khmer ; nosetests khmer --attr '!known_failing' ; popd
+        pushd ../not-khmer ; pytest --pyargs khmer -m 'not known_failing' ; popd
 
 #. Publish the new release on the testing PyPI server.  You will need
    to change your PyPI credentials as documented here:
@@ -182,15 +177,15 @@ release makers, following this checklist by MRC.
         cd ../../testenv4
         source bin/activate
         pip install -U setuptools==3.4.1
-        pip install screed nose
+        pip install screed pytest
         pip install -i https://testpypi.python.org/pypi --pre --no-clean khmer
-        nosetests khmer --attr '!known_failing'
+        pytest --pyargs khmer -m 'not known_failing'
         normalize-by-median.py --version 2>&1 | grep khmer\ ${new_version}-${rc} && \
                 echo 3rd manual version check passed
         cd build/khmer
         make test
 
-#. Do any final testing (BaTLab and/or acceptance tests).
+#. Do any final acceptance tests.
 
 #. Make sure any release notes are merged into doc/release-notes/.
 
