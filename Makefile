@@ -355,29 +355,14 @@ convert-release-notes:
 		pandoc --from=markdown --to=rst $${file} > $${file%%.md}.rst; \
 		done
 
-list-authors:
-	@echo '\author[1]{Michael R. Crusoe}'
-	@git log --format='\author[]{%aN}' | sort -uk2 | \
-		grep -v 'root\|crusoe\|titus'
-	@echo '\author[]{C. Titus Brown}'
-	@echo '\affil[1]{mcrusoe@msu.edu}'
-	@git log --format='\author[]{%aN} \affil[]{%aE}' | sort -uk2 | \
-		awk -F\\ '{print "\\"$$3}' | grep -v \
-		'root\|crusoe\|titus\|waffle\|boyce\|pickett.rodney'
-	# R. Boyce requested to be removed 2015/05/21
-	# via pers correspondence to MRC
-	# P Rodney requested to be removed 2015/06/22 via pers correspondence
-	# to MRC
-	@echo '\affil[]{titus@idyll.org}'
-
 list-author-emails:
-	@echo 'name, E-Mail Address'
-	@git log --format='%aN,%aE' | sort -u | grep -v 'root\|waffle\|boyce'
+	@echo 'name,E-Mail Address'
+	@echo 'Daniel Standage,daniel.standage@gmail.com'
+	@git log --format='%aN,%aE' | sort -u | grep -v -F -f author-skips.txt
+	@echo 'C. Titus Brown,ctbrown@ucdavis.edu'
 
 list-citation:
-	git log --format='%aN,%aE' | sort -u | grep -v \
-		'root\|crusoe\|titus\|waffleio\|Hello\|boyce\|rodney' \
-		> authors.csv
+	git log --format='%aN,%aE' | sort -u | grep -v -F -f author-skips.txt > authors.csv
 	python sort-authors-list.py
 
 ## cpp-demos   : run programs demonstrating access to the (unstable) C++ API
