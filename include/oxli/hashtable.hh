@@ -76,6 +76,53 @@ class FastxReader;
 namespace oxli
 {
 
+
+inline bool is_prime(uint64_t n)
+{
+    if (n < 2) {
+        return false;
+    }
+    if (n == 2) {
+        return true;
+    }
+    if (n % 2 == 0) {
+        return false;
+    }
+    for (unsigned long long i=3; i < sqrt(n) + 1; i += 2) {
+        if (n % i == 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+
+inline std::vector<uint64_t> get_n_primes_near_x(uint32_t n, uint64_t x)
+{
+    std::vector<uint64_t> primes;
+    if (x == 1 && n == 1) {
+        primes.push_back(1);
+        return primes;
+    }
+
+    uint64_t i = x - 1;
+    if (i % 2 == 0) {
+        i--;
+    }
+    while (primes.size() != n && i > 0) {
+        if (is_prime(i)) {
+            primes.push_back(i);
+        }
+        if (i == 1) {
+            break;
+        }
+        i -= 2;
+    }
+
+    // might return < n primes if x is too small
+    return primes;
+}
+
 typedef std::unique_ptr<KmerHashIterator> KmerHashIteratorPtr;
 
 class Hashtable: public
@@ -181,13 +228,13 @@ public:
     {
         store->add(khash);
     }
-    void add(const char * kmer)
+    bool add(const char * kmer)
     {
-        store->add(hash_dna(kmer));
+        return store->add(hash_dna(kmer));
     }
-    void add(HashIntoType khash)
+    bool add(HashIntoType khash)
     {
-        store->add(khash);
+        return store->add(khash);
     }
 
     // get the count for the given k-mer.

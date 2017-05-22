@@ -66,7 +66,7 @@ public:
     virtual const uint64_t n_occupied() const = 0;
     virtual const uint64_t n_unique_kmers() const = 0;
     virtual BoundedCounterType test_and_set_bits( HashIntoType khash ) = 0;
-    virtual void add(HashIntoType khash) = 0;
+    virtual bool add(HashIntoType khash) = 0;
     virtual const BoundedCounterType get_count(HashIntoType khash) const = 0;
     virtual Byte ** get_raw_tables() = 0;
 
@@ -195,9 +195,9 @@ public:
         return 0; // kmer already seen
     } // test_and_set_bits
 
-    inline void add(HashIntoType khash)
+    inline bool add(HashIntoType khash)
     {
-        test_and_set_bits(khash);
+        return test_and_set_bits(khash);
     }
 
     // get the count for the given k-mer hash.
@@ -314,7 +314,7 @@ public:
         return !x;
     }
 
-    void add(HashIntoType khash)
+    bool add(HashIntoType khash)
     {
         bool is_new_kmer = false;
 
@@ -351,6 +351,8 @@ public:
         if (is_new_kmer) {
             __sync_add_and_fetch(&_n_unique_kmers, 1);
         }
+
+        return is_new_kmer;
     }
 
     // get the count for the given k-mer hash.
@@ -510,7 +512,7 @@ public:
         return !x;
     }
 
-    inline void add(HashIntoType khash)
+    inline bool add(HashIntoType khash)
     {
         bool is_new_kmer = false;
         unsigned int  n_full	  = 0;
@@ -562,6 +564,7 @@ public:
             __sync_add_and_fetch(&_n_unique_kmers, 1);
         }
 
+        return is_new_kmer;
     }
 
     // get the count for the given k-mer hash.

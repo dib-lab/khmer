@@ -75,6 +75,16 @@ cdef class Sequence:
         else:
             raise NotImplementedError('Operator not available')
 
+    def kmers(self, int K):
+        cdef int i = 0
+        cdef unicode sequence = self.sequence
+        for i in range(0, len(self)-K+1):
+            yield sequence[i:i+K]
+
+    def __getitem__(self, x):
+        # not ideal
+        return self.sequence[x]
+
     @property
     def name(self):
         cdef unicode name = self._obj.name
@@ -256,7 +266,7 @@ cdef class SplitPairedReader:
                 raise err
             
             if self.min_length > 0:
-                if len(first) >= self.min_length or \
+                if len(first) >= self.min_length and \
                    len(second) >= self.min_length:
 
                     yield read_num, True, first, second

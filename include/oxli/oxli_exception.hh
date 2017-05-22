@@ -86,6 +86,14 @@ public:
         : oxli_exception(msg) { }
 };
 
+
+class oxli_ptr_exception : public oxli_exception
+{
+public:
+    explicit oxli_ptr_exception(const std::string& msg)
+        : oxli_exception(msg) { }
+};
+
 /////// Specialised Exceptions /////
 
 class InvalidStream : public oxli_file_exception

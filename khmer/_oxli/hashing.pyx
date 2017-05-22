@@ -26,6 +26,9 @@ cdef class Kmer:
     def __hash__(self):
         return self.kmer_u
 
+    def __repr__(self):
+        return self.kmer
+
     @property
     def kmer_f(self):
         return deref(self._this).kmer_f
