@@ -1,7 +1,11 @@
 root
+# Duplicates
 mcrusoe@msu.edu
 mr-c@users.noreply.github.com
+Sydney Pickens
+# First author
 standage
+# Last author
 titus
 waffleio
 Hello
