@@ -87,10 +87,10 @@ Details
         McA'Nulty, Eric McDonald, Jessica Mizzi, Kevin D. Murray, Joshua R.
         Nahum, Kaben Nanlohy, Russell Neches, Alexander Johan Nederbragt,
         Humberto Ortiz-Zuazaga, Jeramia Ory, Jason Pell, Charles Pepe-Ranney,
-        Sydney Pickens, Zachary N Russ, Erich Schwarz, Camille Scott, Josiah
-        Seaman, Ryan Shean, Scott Sievert, Jared Simpson, Connor T. Skennerton,
-        James Spencer, Ramakrishnan Srinivasan, James A. Stapleton, Joe Stein,
-        Sascha Steinbiss, Susan R Steinman, Cait Sydney, Benjamin Taylor, Will
+        Zachary N Russ, Erich Schwarz, Camille Scott, Josiah Seaman, Ryan
+        Shean, Scott Sievert, Jared Simpson, Connor T. Skennerton, James
+        Spencer, Ramakrishnan Srinivasan, James A. Stapleton, Joe Stein, Sascha
+        Steinbiss, Susan R Steinman, Cait Sydney, Benjamin Taylor, Will
         Trimble, Heather L. Wiencko, Michael Wright, Brian Wyss, Qingpeng
         Zhang, en zyme, C. Titus Brown
 
