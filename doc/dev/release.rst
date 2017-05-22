@@ -126,7 +126,7 @@ release makers, following this checklist by MRC.
         mkdir ../not-khmer # make sure py.test executes tests
                            # from the installed khmer module
         # you might want to add 'and not huge' to the test selection
-        pushd ../not-khmer; pytest --pyargs khmer -m 'not known_failing'; popd
+        pushd ../not-khmer; pytest --pyargs khmer.tests -m 'not known_failing'; popd
 
 
         # Secondly we test via pip
@@ -144,7 +144,7 @@ release makers, following this checklist by MRC.
         cd ../.. # no subdir named khmer here, safe for testing installed khmer module
         normalize-by-median.py --version 2>&1 | grep khmer\ ${new_version}-${rc} && \
                 echo 2nd manual version check passed
-        pytest --pyargs khmer -m 'not known_failing'
+        pytest --pyargs khmer.tests -m 'not known_failing'
 
         # Is the distribution in testenv2 complete enough to build another
         # functional distribution?
@@ -160,7 +160,7 @@ release makers, following this checklist by MRC.
         make test
         pip uninstall -y khmer; pip uninstall -y khmer; make install
         mkdir ../not-khmer
-        pushd ../not-khmer ; pytest --pyargs khmer -m 'not known_failing' ; popd
+        pushd ../not-khmer ; pytest --pyargs khmer.tests -m 'not known_failing' ; popd
 
 #. Publish the new release on the testing PyPI server.  You will need
    to change your PyPI credentials as documented here:
@@ -179,7 +179,7 @@ release makers, following this checklist by MRC.
         pip install -U setuptools==3.4.1
         pip install screed pytest
         pip install -i https://testpypi.python.org/pypi --pre --no-clean khmer
-        pytest --pyargs khmer -m 'not known_failing'
+        pytest --pyargs khmer.tests -m 'not known_failing'
         normalize-by-median.py --version 2>&1 | grep khmer\ ${new_version}-${rc} && \
                 echo 3rd manual version check passed
         cd build/khmer
