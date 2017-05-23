@@ -45,4 +45,4 @@ The ``examples/python-api`` and ``examples/c++-api`` directories contain several
 These programs are run frequently as part of our continuous integration build, so they are quite stable.
 Note, however, that unlike the khmer command-line scripts, the Python and C++ API **ARE NOT** under `semantic versioning <http://semver.org/>`__.
 Consequently, internal changes to the khmer codebase may require changes to the API examples at any time.
-We expect to have the Python API under semantic versioning :doc:`by version 5.0 <roadmap>`.
+We expect to have the Python API under semantic versioning :doc:`by version 5.0 <../roadmap>`.
