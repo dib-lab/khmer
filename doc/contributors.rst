@@ -47,8 +47,10 @@ California, Davis (the succesor to the GED lab at Michigan State University),
 
 ---
 
-C. Titus Brown <titus@idyll.org> wrote the initial ktable and hashtable
-implementations, as well as hashbits and counting_hash.
+C. Titus Brown <titus@idyll.org> wrote the initial Bloom filter and
+Count-Min Sketch implementations, has contributed to their continuing
+maintenance and improvement and refactoring, and has contributed
+extensively more generally to the codebase.
 
 Jason Pell implemented many of the C++ k-mer filtering functions.
 
@@ -65,6 +67,24 @@ Eric McDonald thoroughly revised many aspects of the code base, made
 much of the codebase thread safe, and otherwise improved performance
 dramatically.
 
-Michael R. Crusoe took over maintainership June, 2013.
+Michael R. Crusoe took over maintainership June, 2013, and streamlined
+and improved many of khmer's development and community processes.
+
+Luiz Irber implemented an efficient HyperLogLog-based cardinality
+estimator and has contributed extensively more generally to the
+codebase.
+
+Camille Scott has contributed significantly to khmer's assembly and
+graph traversal functionality, and has contributed extensively more
+generally to the codebase.
+
+Tim Head has contributed to refactoring the core data structures,
+performance benchmarking, and has contributed extensively more generally
+to the codebase.
+
+Daniel Standage took over maintainership May, 2016, has refined the
+documentation extensively, contributed Python and C++ code examples,
+refactored core data structures for a more extensible sequence loading
+functionality, and contributed more generally to the codebase.
 
 Last updated by MRC on 2015-07-31
