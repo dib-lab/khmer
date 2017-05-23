@@ -13,43 +13,6 @@ from hashing cimport CpKmer, KmerQueue, KmerSet, KmerFilter
 from graphs cimport CpHashtable, CpHashgraph, CpHashtable, CpLabelHash
 from parsing cimport CpReadParser, CpSequence, CpFastxReader
 
-########################################################################
-#
-# Core: typedefs from oxli.hh.
-#
-########################################################################
-#
-# Hashtable: Bindings for the existing CPython Hashtable wrapper.
-#
-
-########################################################################
-#
-# Traversal: wrapper for traversal.hh.
-#
-########################################################################
-
-
-cdef extern from "oxli/traversal.hh" namespace "oxli":
-    cdef cppclass CpTraverser "oxli::Traverser":
-        CpTraverser(CpHashgraph *)
-
-        void push_filter(KmerFilter)
-        KmerFilter pop_filter()
-    
-        uint32_t traverse(const CpKmer&, KmerQueue&) const
-        uint32_t traverse_left(const CpKmer&, KmerQueue&) const     
-        uint32_t traverse_right(const CpKmer&, KmerQueue&) const
-
-        uint32_t degree(const CpKmer&) const
-        uint32_t degree_left(const CpKmer&) const
-        uint32_t degree_right(const CpKmer&) const
-
-########################################################################
-#
-# Assembler: wrapper for assembler.hh.
-#
-########################################################################
-
 
 cdef extern from "oxli/assembler.hh" namespace "oxli":
     cdef cppclass CpLinearAssembler "oxli::LinearAssembler":
