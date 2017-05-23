@@ -48,9 +48,9 @@ California, Davis (the succesor to the GED lab at Michigan State University),
 ---
 
 C. Titus Brown <titus@idyll.org> wrote the initial Bloom filter and
-Count-Min Sketch implementations, has contributed to their continuing
-maintenance and improvement and refactoring, and has contributed
-extensively more generally to the codebase.
+Count-Min Sketch implementations, has contributed to their continued
+improvement and refactoring, and has contributed extensively to feature
+development and code review throughout the codebase more generally.
 
 Jason Pell implemented many of the C++ k-mer filtering functions.
 
@@ -67,22 +67,28 @@ Eric McDonald thoroughly revised many aspects of the code base, made
 much of the codebase thread safe, and otherwise improved performance
 dramatically.
 
-Michael R. Crusoe took over maintainership June, 2013, and streamlined
-and improved many of khmer's development and community processes.
+Michael R. Crusoe took over maintainership in June 2013, streamlining
+and improving many of khmer's development, deployment, and community
+processes.
+
+Jacob Fenton...
+
+Kevin Murray...
 
 Luiz Irber implemented an efficient HyperLogLog-based cardinality
-estimator and has contributed extensively more generally to the
-codebase.
+estimator, contributed substantially to screed/khmer integration
+(including spearheading the screed 1.0 release), and has contributed
+extensively to code review.
 
 Camille Scott has contributed significantly to khmer's assembly and
-graph traversal functionality, and has contributed extensively more
-generally to the codebase.
+graph traversal functionality, and has contributed to feature
+development and code review throughout the codebase more generally.
 
 Tim Head has contributed to refactoring the core data structures,
-performance benchmarking, and has contributed extensively more generally
-to the codebase.
+performance benchmarking, and has contributed extensively to feature
+development and code review throughout the codebase more generally.
 
-Daniel Standage took over maintainership May, 2016, has refined the
+Daniel Standage took over maintainership in May 2016, has refined the
 documentation extensively, contributed Python and C++ code examples,
 refactored core data structures for a more extensible sequence loading
 functionality, and contributed more generally to the codebase.
