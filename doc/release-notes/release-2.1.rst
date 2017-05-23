@@ -1,4 +1,4 @@
-khmer v2.0 release notes
+khmer v2.1 release notes
 ========================
 
 We are pleased to announce release version 2.1 of khmer! This release
@@ -71,8 +71,8 @@ Known issues:
 Contributors
 ------------
 
-\*@aaliyari, @ctb, \*@caitsydney, @camillescott, @standage, @kdmurray91,
-@ljcohen, @luizirber, @mr-c, \*@NBKingsley, \*@ryneches, \*@rcs333,
-\*@satta, \*@shannonekj, \*@betatim
+‡@aaliyari, @ctb, ‡@caitsydney, @camillescott, @standage, @kdmurray91,
+@ljcohen, @luizirber, @mr-c, ‡@NBKingsley, ‡@ryneches, ‡@rcs333,
+‡@satta, ‡@shannonekj, ‡@betatim
 
-\* Indicates new contributors
+‡ Indicates new contributors
