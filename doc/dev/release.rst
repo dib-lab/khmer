@@ -75,7 +75,8 @@ release makers, following this checklist by MRC.
         git checkout -- versioneer.py khmer/_version.py khmer/__init__.py MANIFEST.in
 
 #. Review the git logs since the last release and diffs (if needed) and ensure
-   that the ``ChangeLog`` is up to date::
+   that ``CHANGELOG.md`` is up to date (presumably peer code review has ensured
+   that it is)::
 
         git log --minimal --patch `git describe --tags --always --abbrev=0`..HEAD
 
@@ -90,13 +91,9 @@ release makers, following this checklist by MRC.
 
 #. Verify that the build is clean: https://api.travis-ci.org/dib-lab/khmer.svg?branch=master
 
-#. Run through the `API examples <../user/api-examples.html>`__ to verify they
-   are still valid. You need to install khmer to do this, use for example
-   your normal development setup/virtualenv for that.
-
 #. Set your new version number and release candidate::
 
-        new_version=1.3
+        new_version=2.2
         rc=rc1
 
    and then tag the release candidate with the new version number prefixed by
@@ -112,16 +109,18 @@ release makers, following this checklist by MRC.
         virtualenv testenv2
         virtualenv testenv3
         virtualenv testenv4
-        # First we test the tag
 
+
+        # First we test the tag
         cd testenv1
         source bin/activate
         git clone --depth 1 --branch v${new_version}-${rc} https://github.com/dib-lab/khmer.git
         cd khmer
         make install-dependencies
         make test
-        normalize-by-median.py --version 2>&1 | grep khmer\ ${new_version}-${rc} && \
-                echo 1st manual version check passed
+        normalize-by-median.py --version 2>&1 \
+            | grep khmer\ ${new_version}-${rc} \
+            && echo 1st manual version check passed
         pip uninstall -y khmer; pip uninstall -y khmer; make install
         mkdir ../not-khmer # make sure py.test executes tests
                            # from the installed khmer module
@@ -130,7 +129,6 @@ release makers, following this checklist by MRC.
 
 
         # Secondly we test via pip
-
         cd ../../testenv2
         source bin/activate
         pip install -U setuptools==3.4.1
@@ -142,16 +140,16 @@ release makers, following this checklist by MRC.
         cp dist/khmer*tar.gz ../../../testenv3/
         pip uninstall -y khmer; pip uninstall -y khmer; make install
         cd ../.. # no subdir named khmer here, safe for testing installed khmer module
-        normalize-by-median.py --version 2>&1 | grep khmer\ ${new_version}-${rc} && \
-                echo 2nd manual version check passed
+        normalize-by-median.py --version 2>&1 \
+            | grep khmer\ ${new_version}-${rc} \
+            && echo 2nd manual version check passed
         pytest --pyargs khmer.tests -m 'not known_failing'
+
 
         # Is the distribution in testenv2 complete enough to build another
         # functional distribution?
-
         cd ../testenv3/
         source bin/activate
-        pip install -U setuptools==3.4.1
         pip install khmer*tar.gz
         pip install pytest
         tar xzf khmer*tar.gz
@@ -176,18 +174,18 @@ release makers, following this checklist by MRC.
 
         cd ../../testenv4
         source bin/activate
-        pip install -U setuptools==3.4.1
         pip install screed pytest
         pip install -i https://testpypi.python.org/pypi --pre --no-clean khmer
         pytest --pyargs khmer.tests -m 'not known_failing'
-        normalize-by-median.py --version 2>&1 | grep khmer\ ${new_version}-${rc} && \
-                echo 3rd manual version check passed
+        normalize-by-median.py --version 2>&1 \
+            | grep khmer\ ${new_version}-${rc} \
+            && echo 3rd manual version check passed
         cd build/khmer
         make test
 
 #. Do any final acceptance tests.
 
-#. Make sure any release notes are merged into doc/release-notes/.
+#. Make sure any release notes are merged into ``doc/release-notes/``.
 
 How to make a final release
 ---------------------------
@@ -216,7 +214,7 @@ so:
         virtualenv build
         cd build
         source bin/activate
-        pip install -U setuptools==3.4.1 wheel
+        pip install wheel
         pip install --no-clean khmer==${new_version}
         cd build/khmer
         ./setup.py bdist_wheel upload
@@ -238,24 +236,6 @@ so:
 #. Send email including the release notes to khmer@lists.idyll.org
    and khmer-announce@lists.idyll.org
 
-BaTLab testing
---------------
-
-The UW-Madison Build and Test Lab provides the khmer project with a free
-cross-platform testing environment.
-
-#. Connect to their head node::
-
-        ssh mcrusoe@submit-1.batlab.org
-
-#. Move into the khmer directory and download a release from PyPI's main server
-   or the test PyPI server::
-
-        cd khmer/
-        wget https://testpypi.python.org/packages/source/k/khmer/khmer-1.0.1-rc3.tar.gz
-        vim khmer-v1.0.inputs # change the 'scp_file' to point to the release
-        vim khmer-v1.0.run-spec # change 'project_version' at bottom
-        nmi_submit khmer-v1.0.run-spec
 
 Setuptools Bootstrap
 --------------------

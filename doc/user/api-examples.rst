@@ -39,56 +39,10 @@ Example API Usage
 =================
 
 Examples of how to run khmer command-line scripts are included in the main khmer documentation, as well as the `khmer protocols collection <http://khmer-protocols.readthedocs.io>`__.
-This document is intended for programmers and developers who want to use khmer's Python or C++ API.
+However, the intrepid user may be interested in having more direct access to khmer via its Python or C++ API.
 
-**Note**: The khmer command-line scripts are under `semantic versioning <http://semver.org/>`__, but (as of khmer v2) neither the Python API nor the C++ API are covered under semantic versioning.
-Consequently, updates to the khmer code base may require changes to the examples below at any time.
-We expect to have the Python API under semantic versioning by version 5.0.
-
-
-Python API
-----------
-
-The following example demonstrates the basics of counting k-mers with khmer.
-
-.. code:: python
-
-    >>> import khmer
-    >>>
-    >>> ksize = 11
-    >>>
-    >>> # exact counting with and odd k requires a single table with 4^k bytes
-    >>> # even k will collapse k-mers with their reverse complement, and requires 4^(k-1) + k bytes
-    >>> cg = khmer.Countgraph(ksize, 4**ksize, 1)
-    >>>
-    >>> # load all k-mers from the given string (returns the number of k-mers processed)
-    >>> cg.consume('ATGGCGATGGCAAGTAGGACCCAGATGGACCAAAG')
-    25
-    >>>
-    >>> # what is the count of the k-mer "ATGGCGATGGC"?
-    >>> cg.get('ATGGCGATGGC')
-    1
-    >>> # increase the count of the k-mer by 1
-    >>> cg.add('ATGGCGATGGC')
-    1
-    >>> # what is the k-mer's count now?
-    >>> cg.get('ATGGCGATGGC')
-    2
-    >>>
-    >>> # what is the count of this bogus k-mer?
-    >>> cg.get('GTGGCGATGGC')
-    0
-    >>>
-
-C++ API
--------
-
-The `count-stuff.cpp` file in the `examples/c++-api/` directory contains source code that calls khmer's C++ API directly.
-To run this example, issue the following commands from your terminal.
-The `Makefile` in `examples/c++-api/` shows how to compile and link against the khmer library.
-
-.. code:: bash
-
-    cd examples/c++-api/
-    make
-    ./count-stuff
+The ``examples/python-api`` and ``examples/c++-api`` directories contain several small programs that demonstrate how one would write a program that uses the khmer API.
+These programs are run frequently as part of our continuous integration build, so they are quite stable.
+Note, however, that unlike the khmer command-line scripts, the Python and C++ API **ARE NOT** under `semantic versioning <http://semver.org/>`__.
+Consequently, internal changes to the khmer codebase may require changes to the API examples at any time.
+We expect to have the Python API under semantic versioning :doc:`by version 5.0 <roadmap>`.
