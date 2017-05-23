@@ -188,6 +188,7 @@ class ReadBundle(object):
     def total_length(self):
         return sum([len(r.sequence) for r in self.reads])
 
+
 def grouper(n, iterable):
     iterable = iter(iterable)
     return iter(lambda: list(itertools.islice(iterable, n)), [])

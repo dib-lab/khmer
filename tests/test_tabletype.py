@@ -36,6 +36,7 @@ PRIMES_1m = [1000003, 1009837]
 def tabletype(request):
     return request.param
 
+
 # For map(long, [list of ints]) cross-version hackery
 if sys.version_info.major > 2:
     long = int  # pylint: disable=redefined-builtin

@@ -60,6 +60,7 @@ def verbose_loader(filename):
             log_info('... filtering {num}', num=num)
         yield record
 
+
 verbose_fasta_iter = verbose_loader  # pylint: disable=invalid-name
 
 

@@ -149,5 +149,6 @@ def main():
     nodegraph.save_stop_tags(graphbase + '.stoptags')
     print('wrote to:', graphbase + '.stoptags', file=sys.stderr)
 
+
 if __name__ == '__main__':
     main()

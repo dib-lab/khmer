@@ -147,6 +147,7 @@ def build_dir():
 # change setup.cfg or use the `--libraries z,bz2` parameter which will make our
 # custom build_ext command strip out the bundled versions.
 
+
 ZLIBDIR = 'third-party/zlib'
 BZIP2DIR = 'third-party/bzip2'
 
@@ -329,6 +330,7 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
                         "compress", "decompress", "bzlib"])
         _build_ext.run(self)
 
+
 CMDCLASS.update({'build_ext': KhmerBuildExt})
 
 _DISTUTILS_REINIT = Distribution.reinitialize_command
@@ -348,6 +350,8 @@ def reinitialize_command(self, command, reinit_subcommands):
         self._set_command_options(  # pylint: disable=protected-access
             cmd_obj, options)
     return cmd_obj
+
+
 Distribution.reinitialize_command = reinitialize_command
 
 
