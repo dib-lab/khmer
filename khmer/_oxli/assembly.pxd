@@ -2,8 +2,10 @@ from libcpp.memory cimport unique_ptr
 from libcpp.string import string
 
 from oxli_types cimport *
-from wrapper cimport CpLinearAssembler, CpHashgraph
 from hashing cimport CpKmer, Kmer
+from graphs cimport CpHashgraph, CpHashtable, get_hashgraph_ptr
+from wrapper cimport CpLinearAssembler
+
 
 
 cdef class LinearAssembler:

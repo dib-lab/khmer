@@ -1,5 +1,4 @@
 # cython: c_string_type=unicode, c_string_encoding=utf8
-import cython
 from cython.operator cimport dereference as deref
 
 from .._khmer import Countgraph
