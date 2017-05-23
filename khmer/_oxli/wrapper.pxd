@@ -9,6 +9,8 @@ from libcpp.utility cimport pair
 from libc.stdint cimport uint32_t, uint8_t, uint16_t, uint64_t, uintptr_t 
 
 
+from parsing cimport CpReadParser, CpSequence, CpFastxReader
+
 ########################################################################
 #
 # Core: typedefs from oxli.hh.
@@ -82,82 +84,12 @@ cdef extern from "oxli/kmer_hash.hh" namespace "oxli":
     HashIntoType _hash_murmur_forward(const string&)
 
 
-cdef extern from "oxli/alphabets.hh" namespace "oxli":
-    cdef string DNA_SIMPLE "oxli::alphabets::DNA_SIMPLE"
-    cdef string DNAN_SIMPLE "oxli::alphabets::DNAN_SIMPLE"
-    cdef string RNA_SIMPLE "oxli::alphabets::RNA_SIMPLE"
-    cdef string RNAN_SIMPLE "oxli::alphabets::RNAN_SIMPLE"
-    cdef string IUPAC_NUCL "oxli::alphabets::IUPAC_NUCL"
-    cdef string IUPAC_AA "oxli::alphabets::IUPAC_AA"
-
 
 ########################################################################
 #
 # ReadParser: read parsing stuff, Read object
 #
 ########################################################################
-
-# C++ ostream wrapper code stolen shamelessly from stackoverflow
-# http://stackoverflow.com/questions/30984078/cython-working-with-c-streams
-# We need ostream to wrap ReadParser
-
-cdef extern from "<iostream>" namespace "std":
-    cdef cppclass ostream:
-        ostream& write(const char*, int) except +
-
-# obviously std::ios_base isn't a namespace, but this lets
-# Cython generate the connect C++ code
-cdef extern from "<iostream>" namespace "std::ios_base":
-    cdef cppclass open_mode:
-        pass
-    cdef open_mode binary
-    # you can define other constants as needed
-
-cdef extern from "<fstream>" namespace "std":
-    cdef cppclass ofstream(ostream):
-        # constructors
-        ofstream(const char*) except +
-        ofstream(const char*, open_mode) except+
-
-cdef extern from  "oxli/read_parsers.hh" namespace "oxli::read_parsers":
-    cdef cppclass CpSequence "oxli::read_parsers::Read":
-        string name
-        string description
-        string sequence
-        string quality
-        string cleaned_seq
-
-        void reset()
-        void write_fastx(ostream&)
-        void set_cleaned_seq()        
-
-    ctypedef pair[CpSequence,CpSequence] CpSequencePair \
-        "oxli::read_parsers::ReadPair"
-
-    cdef cppclass CpReadParser "oxli::read_parsers::ReadParser" [SeqIO]:
-        CpReadParser(unique_ptr[SeqIO])
-        CpReadParser(CpReadParser&)
-
-        CpSequence get_next_read()
-        CpSequencePair get_next_read_pair()
-        CpSequencePair get_next_read_pair(uint8_t)
-
-        uintptr_t get_num_reads()
-        bool is_complete()
-        void close()
-
-    cdef cppclass CpFastxReader "oxli::read_parsers::FastxReader":
-        CpFastxReader()
-        CpFastxReader(const string&)
-        CpFastxReader(CpFastxReader&)
-
-        CpSequence get_next_read()
-        bool is_complete()
-        uintptr_t get_num_reads()
-        void close()
-
-    unique_ptr[CpReadParser[SeqIO]] get_parser[SeqIO](const string&) 
-    ctypedef unique_ptr[CpReadParser[CpFastxReader]] FastxParserPtr
 
 #
 # Hashtable: Bindings for the existing CPython Hashtable wrapper.

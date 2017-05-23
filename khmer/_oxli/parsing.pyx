@@ -82,7 +82,7 @@ cdef class Sequence:
             yield sequence[i:i+K]
 
     def __getitem__(self, x):
-        # not ideal
+        # Definitely optimize this.
         return self.sequence[x]
 
     @property
