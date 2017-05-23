@@ -8,7 +8,8 @@ from libcpp.memory cimport unique_ptr, weak_ptr, shared_ptr
 from libcpp.utility cimport pair
 from libc.stdint cimport uint32_t, uint8_t, uint16_t, uint64_t, uintptr_t 
 
-
+from oxli_types cimport *
+from hashing cimport CpKmer, KmerQueue, KmerSet, KmerFilter
 from parsing cimport CpReadParser, CpSequence, CpFastxReader
 
 ########################################################################
@@ -16,81 +17,6 @@ from parsing cimport CpReadParser, CpSequence, CpFastxReader
 # Core: typedefs from oxli.hh.
 #
 ########################################################################
-
-cdef extern from "oxli/oxli.hh" namespace "oxli":
-    ctypedef unsigned long long int HashIntoType
-    ctypedef unsigned long long int Label
-    ctypedef set[Label] LabelSet
-    ctypedef set[HashIntoType] TagSet
-    ctypedef set[HashIntoType] HashIntoTypeSet
-    ctypedef unsigned char WordLength
-    ctypedef unsigned short int BoundedCounterType
-    ctypedef queue[CpKmer] KmerQueue
-    ctypedef set[CpKmer] KmerSet
-    ctypedef bool (*KmerFilter) (CpKmer kmer)
-    ctypedef void (*CallbackFn)(const char *, void *, uint64_t, uint64_t)
-
-########################################################################
-#
-# Hashing: Definitions from kmer_hash.hh.
-#
-########################################################################
-
-cdef extern from "oxli/kmer_hash.hh" namespace "oxli":
-    cdef cppclass CpKmer "oxli::Kmer":
-        HashIntoType kmer_f
-        HashIntoType kmer_r
-        HashIntoType kmer_u
-
-        CpKmer(HashIntoType, HashIntoType, HashIntoType)
-        CpKmer(string, WordLength)
-        CpKmer(const CpKmer&)
-        CpKmer()
-
-        bool is_forward() const
-        void set_from_unique_hash(HashIntoType, WordLength)
-
-    cdef cppclass CpKmerFactory "oxli::KmerFactory":
-        KmerFactory(WordLength)
-
-        CpKmer build_kmer(HashIntoType) const
-        CpKmer build_kmer(HashIntoType, HashIntoType) const
-        CpKmer build_kmer(string &) const
-        CpKmer build_kmer(const char *) const
-
-    cdef cppclass CpKmerIterator "oxli::KmerIterator" (CpKmerFactory):
-        CpKmerIterator(const char *, unsigned char)
-        CpKmer first(HashIntoType &, HashIntoType &)
-        CpKmer next(HashIntoType &, HashIntoType &)
-        CpKmer first()
-        CpKmer next()
-        bool done()
-        unsigned int get_start_pos() const
-        unsigned int get_end_pos() const
-
-
-    HashIntoType _hash(const string, const WordLength)
-    HashIntoType _hash(const string, const WordLength, 
-                       HashIntoType &, HashIntoType &)
-    HashIntoType _hash(const char *, const WordLength)
-    HashIntoType _hash(const char *, const WordLength,
-                       HashIntoType &, HashIntoType &)
-    HashIntoType _hash_forward(const char *, WordLength)
-    string _revhash(HashIntoType, WordLength)
-    string _revcomp(const string&)
-    HashIntoType _hash_murmur(const string&, const WordLength)
-    HashIntoType _hash_murmur(const string&,
-                              HashIntoType&, HashIntoType&)
-    HashIntoType _hash_murmur_forward(const string&)
-
-
-
-########################################################################
-#
-# ReadParser: read parsing stuff, Read object
-#
-########################################################################
-
 #
 # Hashtable: Bindings for the existing CPython Hashtable wrapper.
 #
