@@ -3,9 +3,6 @@
 
 from cython.operator cimport dereference as deref
 
-from hashing cimport CpKmer
-from wrapper cimport CpLinearAssembler
-
 
 cdef class LinearAssembler:
 
