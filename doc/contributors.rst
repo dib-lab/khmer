@@ -87,4 +87,4 @@ documentation extensively, contributed Python and C++ code examples,
 refactored core data structures for a more extensible sequence loading
 functionality, and contributed more generally to the codebase.
 
-Last updated by MRC on 2015-07-31
+Last updated by DSS on 2017-05-22
