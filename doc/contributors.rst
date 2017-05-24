@@ -73,7 +73,10 @@ processes.
 
 Jacob Fenton...
 
-Kevin Murray...
+Kevin Murray enabled use of the C++ code-base by external projects,
+fixed numerous bugs and documentation issues, implemented unit tests,
+enabled machine-readable statistics and miscellaneous code cleaning,
+refactoring, and reviewing.
 
 Luiz Irber implemented an efficient HyperLogLog-based cardinality
 estimator, contributed substantially to screed/khmer integration
