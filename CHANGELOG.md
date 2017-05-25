@@ -6,6 +6,13 @@ The khmer project's command line scripts adhere to
 [Semantic Versioning](http://semver.org/). The Python and C++ APIs are not yet
 under semantic versioning, but will be in future versions of khmer.
 
+## [2.1.1] - 2017-05-25
+### Added
+- Document for submission to the Journal of Open Source Software.
+
+### Fixed
+- Several typos and outdated content in the documentation.
+
 ## [2.1] - 2017-05-21
 ### Added
 - New `--no-reformat` option for `interleave-reads.py` script disables default
