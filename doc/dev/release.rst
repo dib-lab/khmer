@@ -150,6 +150,7 @@ release makers, following this checklist by MRC.
         # functional distribution?
         cd ../testenv3/
         source bin/activate
+        pip install -U setuptools==3.4.1
         pip install khmer*tar.gz
         pip install pytest
         tar xzf khmer*tar.gz
@@ -174,6 +175,7 @@ release makers, following this checklist by MRC.
 
         cd ../../testenv4
         source bin/activate
+        pip install -U setuptools==3.4.1
         pip install screed pytest
         pip install -i https://testpypi.python.org/pypi --pre --no-clean khmer
         pytest --pyargs khmer.tests -m 'not known_failing'
@@ -214,7 +216,7 @@ so:
         virtualenv build
         cd build
         source bin/activate
-        pip install wheel
+        pip install -U setuptools==3.4.1 wheel
         pip install --no-clean khmer==${new_version}
         cd build/khmer
         ./setup.py bdist_wheel upload
