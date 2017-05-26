@@ -1607,7 +1607,7 @@ hashtable_consume_seqfile_with_reads_parser(khmer_KHashtable_Object * me,
 
 static
 PyObject *
-hashtable_consume(khmer_KHashtable_Object * me, PyObject * args)
+hashtable_consume_string(khmer_KHashtable_Object * me, PyObject * args)
 {
     Hashtable * hashtable = me->hashtable;
 
@@ -2115,8 +2115,8 @@ static PyMethodDef khmer_hashtable_methods[] = {
         "Increment the count of this k-mer. (Synonym for 'count'.)"
     },
     {
-        "consume",
-        (PyCFunction)hashtable_consume, METH_VARARGS,
+        "consume_string",
+        (PyCFunction)hashtable_consume_string, METH_VARARGS,
         "Increment the counts of all of the k-mers in the string."
     },
     {
@@ -4349,7 +4349,7 @@ junctioncountassembler_assemble(khmer_KJunctionCountAssembler_Object * me,
 
 static
 PyObject *
-junctioncountassembler_consume(khmer_KJunctionCountAssembler_Object * me,
+junctioncountassembler_consume_string(khmer_KJunctionCountAssembler_Object * me,
                                PyObject * args)
 {
     JunctionCountAssembler * assembler = me->assembler;
@@ -4365,7 +4365,7 @@ junctioncountassembler_consume(khmer_KJunctionCountAssembler_Object * me,
         return NULL;
     }
 
-    uint16_t n_junctions = assembler->consume(long_str);
+    uint16_t n_junctions = assembler->consume_string(long_str);
 
     return PyLong_FromLong((HashIntoType) n_junctions);
 }
@@ -4378,8 +4378,8 @@ static PyMethodDef khmer_junctioncountassembler_methods[] = {
         "Assemble paths, using recorded junctions to jump branches."
     },
     {
-        "consume",
-        (PyCFunction)junctioncountassembler_consume, METH_VARARGS,
+        "consume_string",
+        (PyCFunction)junctioncountassembler_consume_string, METH_VARARGS,
         "Consume a string and count its branch junctions."
     },
     {NULL, NULL, 0, NULL}           /* sentinel */
