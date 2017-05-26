@@ -38,10 +38,6 @@ Contact: khmer-project@idyll.org
 #ifndef STORAGE_HH
 #define STORAGE_HH
 
-#include <cassert>
-#include <array>
-#include <mutex>
-using MuxGuard = std::lock_guard<std::mutex>;
 
 namespace khmer
 {
@@ -69,7 +65,6 @@ public:
     virtual BoundedCounterType test_and_set_bits( HashIntoType khash ) = 0;
     virtual void add(HashIntoType khash) = 0;
     virtual const BoundedCounterType get_count(HashIntoType khash) const = 0;
-    virtual Byte ** get_raw_tables() = 0;
 
     void set_use_bigcount(bool b);
     bool get_use_bigcount();
@@ -216,13 +211,6 @@ public:
         return 1;
     }
 
-    // Writing to the tables outside of defined methods has undefined behavior!
-    // As such, this should only be used to return read-only interfaces
-    Byte ** get_raw_tables()
-    {
-        return _counts;
-    }
-
     void update_from(const BitStorage&);
 };
 
@@ -248,9 +236,8 @@ protected:
     size_t _n_tables;
     uint64_t _occupied_bins;
     uint64_t _n_unique_kmers;
-    std::array<std::mutex, 32> mutexes;
     static constexpr uint8_t _max_count{15};
-    Byte ** _counts;
+    AtomicByte ** _counts;
 
     // Compute index into the table, this retrieves the correct byte
     // which you then need to select the correct nibble from
@@ -274,8 +261,6 @@ public:
         _tablesizes{tablesizes},
         _occupied_bins{0}, _n_unique_kmers{0}
     {
-        // to allow more than 32 tables increase the size of mutex pool
-        assert(_n_tables <= 32);
         _allocate_counters();
     }
 
@@ -296,13 +281,13 @@ public:
     {
         _n_tables = _tablesizes.size();
 
-        _counts = new Byte*[_n_tables];
+        _counts = new AtomicByte*[_n_tables];
 
         for (size_t i = 0; i < _n_tables; i++) {
             const uint64_t tablesize = _tablesizes[i];
             const uint64_t tablebytes = tablesize / 2 + 1;
 
-            _counts[i] = new Byte[tablebytes];
+            _counts[i] = new AtomicByte[tablebytes];
             memset(_counts[i], 0, tablebytes);
         }
     }
@@ -320,12 +305,12 @@ public:
         bool is_new_kmer = false;
 
         for (unsigned int i = 0; i < _n_tables; i++) {
-            MuxGuard g(mutexes[i]);
-            Byte* const table(_counts[i]);
+            AtomicByte* const table(_counts[i]);
             const uint64_t idx = _table_index(khash, _tablesizes[i]);
             const uint8_t mask = _mask(khash, _tablesizes[i]);
             const uint8_t shift = _shift(khash, _tablesizes[i]);
-            const uint8_t current_count = (table[idx] & mask) >> shift;
+            uint8_t current_tbl = table[idx];
+            uint8_t current_count = (current_tbl & mask) >> shift;
 
             if (!is_new_kmer) {
                 if (current_count == 0) {
@@ -345,8 +330,25 @@ public:
             }
 
             // increase count, no checking for overflow
-            const uint8_t new_count = (current_count + 1) << shift;
-            table[idx] = (table[idx] & ~mask) | (new_count & mask);
+            // current_tbl and new_tbl are the current and new bit packed values
+            // for the idx'th byte of the table.
+            // compare_exchange_weak will update the value of table[idx] if
+            // current_tbl is the current value (hasn't been changed by a
+            // different thread) if they differ the value actually stored
+            // in table[idx] is written to current_tbl so this is a
+            // compare-and-swap loop
+            uint8_t new_count = (current_count + 1) << shift;
+            uint8_t new_tbl = (current_tbl & ~mask) | (new_count & mask);
+
+            while(!table[idx].compare_exchange_weak(current_tbl, new_tbl)) {
+                current_count = (current_tbl & mask) >> shift;
+                new_count = (current_count + 1);
+                if (new_count > _max_count) {
+                  break;
+                }
+                new_count <<= shift;
+                new_tbl = (current_tbl & ~mask) | (new_count & mask);
+            }
         }
 
         if (is_new_kmer) {
@@ -361,7 +363,7 @@ public:
 
         // get the minimum count across all tables
         for (unsigned int i = 0; i < _n_tables; i++) {
-            const Byte* table(_counts[i]);
+            const AtomicByte* table(_counts[i]);
             const uint64_t idx = _table_index(khash, _tablesizes[i]);
             const uint8_t mask = _mask(khash, _tablesizes[i]);
             const uint8_t shift = _shift(khash, _tablesizes[i]);
@@ -394,10 +396,6 @@ public:
     void save(std::string outfilename, WordLength ksize);
     void load(std::string infilename, WordLength& ksize);
 
-    Byte ** get_raw_tables()
-    {
-        return _counts;
-    }
 };
 
 

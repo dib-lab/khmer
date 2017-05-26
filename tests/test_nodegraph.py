@@ -562,15 +562,11 @@ def test_extract_unique_paths_4():
 
 
 def test_get_raw_tables():
+    # nodegraphs store individual bits packed into a byte, the raw tables
+    # probably do not give users what they expect (something that can be
+    # given to numpy.frombuffer)
     kh = khmer.Nodegraph(10, 1e6, 4)
-    kh.consume('ATGGAGAGAC')
-    kh.consume('AGTGGCGATG')
-    kh.consume('ATAGACAGGA')
-    tables = kh.get_raw_tables()
-
-    for size, table in zip(kh.hashsizes(), tables):
-        assert isinstance(table, memoryview)
-        assert size == len(table)
+    assert not hasattr(kh, 'get_raw_tables')
 
 
 def test_simple_median():

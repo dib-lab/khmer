@@ -291,12 +291,6 @@ public:
     void get_kmer_counts(const std::string &s,
                          std::vector<BoundedCounterType> &counts) const;
 
-    // get access to raw tables.
-    Byte ** get_raw_tables()
-    {
-        return store->get_raw_tables();
-    }
-
     // find the minimum k-mer count in the given sequence
     BoundedCounterType get_min_count(const std::string &s);
 

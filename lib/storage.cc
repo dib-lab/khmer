@@ -875,7 +875,7 @@ void NibbleStorage::load(std::string infilename, WordLength& ksize)
         _n_tables = (unsigned int) save_n_tables;
         _occupied_bins = save_occupied_bins;
 
-        _counts = new Byte*[_n_tables];
+        _counts = new AtomicByte*[_n_tables];
         for (unsigned int i = 0; i < _n_tables; i++) {
             _counts[i] = NULL;
         }
@@ -890,7 +890,7 @@ void NibbleStorage::load(std::string infilename, WordLength& ksize)
             tablesize = save_tablesize;
             _tablesizes.push_back(tablesize);
 
-            _counts[i] = new Byte[tablebytes];
+            _counts[i] = new AtomicByte[tablebytes];
 
             unsigned long long loaded = 0;
             while (loaded != tablebytes) {

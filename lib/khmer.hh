@@ -69,6 +69,7 @@ private:\
     className(const className&);\
     const className& operator=(const className&)
 
+#include <atomic>
 #include <set>
 #include <map>
 #include <queue>
@@ -120,6 +121,8 @@ typedef unsigned short int BoundedCounterType;
 
 // A single-byte type.
 typedef unsigned char Byte;
+using AtomicByte = std::atomic<uint8_t>;
+
 
 typedef void (*CallbackFn)(const char * info, void * callback_data,
                            unsigned long long n_reads,

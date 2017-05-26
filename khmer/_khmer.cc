@@ -2494,43 +2494,12 @@ nodegraph_update(khmer_KNodegraph_Object * me, PyObject * args)
     Py_RETURN_NONE;
 }
 
-static
-PyObject *
-nodegraph_get_raw_tables(khmer_KNodegraph_Object * self, PyObject * args)
-{
-    Nodegraph * countgraph = self->nodegraph;
-
-    khmer::Byte ** table_ptrs = countgraph->get_raw_tables();
-    std::vector<uint64_t> sizes = countgraph->get_tablesizes();
-
-    PyObject * raw_tables = PyList_New(sizes.size());
-    for (unsigned int i=0; i<sizes.size(); ++i) {
-        Py_buffer buffer;
-        int res = PyBuffer_FillInfo(&buffer, NULL, table_ptrs[i], sizes[i], 0,
-                                    PyBUF_FULL_RO);
-        if (res == -1) {
-            return NULL;
-        }
-        PyObject * buf = PyMemoryView_FromBuffer(&buffer);
-        if(!PyMemoryView_Check(buf)) {
-            return NULL;
-        }
-        PyList_SET_ITEM(raw_tables, i, buf);
-    }
-
-    return raw_tables;
-}
 
 static PyMethodDef khmer_nodegraph_methods[] = {
     {
         "update",
         (PyCFunction) nodegraph_update, METH_VARARGS,
         "a set update: update this nodegraph with all the entries from the other"
-    },
-    {
-        "get_raw_tables",
-        (PyCFunction) nodegraph_get_raw_tables, METH_VARARGS,
-        "Get a list of the raw tables as memoryview objects"
     },
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
