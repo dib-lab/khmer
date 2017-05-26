@@ -1,10 +1,10 @@
 // A demonstration of khmer's primary sequence loading function.
 
 #include <vector>
-#include "khmer.hh"
-#include "hashtable.hh"
+#include "oxli/oxli.hh"
+#include "oxli/hashtable.hh"
 
-using namespace khmer;
+using namespace oxli;
 using namespace read_parsers;
 
 int main(int argc, char **argv)

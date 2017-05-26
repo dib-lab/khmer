@@ -1,5 +1,5 @@
 CFLAGS=--std=c++11 \
-       -I ../../lib \
+	   -I ../../include \
 	   -I ../../third-party/smhasher \
 	   -I ../../third-party/seqan/core/include/
 
@@ -13,8 +13,8 @@ all: exact-counting bloom consume
 clean:
 	-rm -f exact-counting bloom consume
 
-%: %.cc ../../lib/liboxli.a
-	$(CXX) $(CFLAGS) -o $* $*.cc ../../lib/liboxli.a
+%: %.cc liboxli_a
+	$(CXX) $(CFLAGS) -o $* $*.cc ../../src/oxli/liboxli.a
 
-../../lib/liboxli.a:
-	cd ../../lib && make
+liboxli_a:
+	cd ../../src/oxli && make
