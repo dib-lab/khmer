@@ -48,6 +48,7 @@ Contact: khmer-project@idyll.org
 
 #include "hashtable.hh"
 #include "khmer.hh"
+#include "khmer_exception.hh"
 #include "traversal.hh"
 #include "read_parsers.hh"
 #include "kmer_hash.hh"
@@ -119,6 +120,82 @@ void Hashtable::consume_seqfile(
     ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
     consume_seqfile<SeqIO>(parser, total_reads, n_consumed);
 }
+
+void Hashtable::_check_batches(unsigned int num_batches, unsigned int batch)
+{
+    bool powerof2 = !(num_batches == 0) && !(num_batches & (num_batches - 1));
+    if (!powerof2) {
+        std::string message = "num_batches must be a power of 2";
+        throw InvalidValue(message);
+    }
+    if (batch >= num_batches) {
+        std::string message = "batch must be less than num_batches";
+        throw InvalidValue(message);
+    }
+}
+
+template<typename SeqIO>
+void Hashtable::consume_seqfile_banding(
+    std::string const &filename, unsigned int num_batches, unsigned int batch,
+    unsigned int &total_reads, unsigned long long &n_consumed
+)
+{
+    _check_batches(num_batches, batch);
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
+    consume_seqfile_banding<SeqIO>(parser, num_batches, batch, total_reads,
+                                 n_consumed);
+}
+
+template<typename SeqIO>
+void Hashtable::consume_seqfile_banding(
+    ReadParserPtr<SeqIO>& parser, unsigned int num_batches, unsigned int batch,
+    unsigned int &total_reads, unsigned long long &n_consumed
+)
+{
+    _check_batches(num_batches, batch);
+
+    Read read;
+    while (!parser->is_complete()) {
+        try {
+            read = parser->get_next_read();
+        } catch (NoMoreReadsAvailable) {
+            break;
+        }
+
+        if (read.sequence.length() < _ksize) {
+            continue;
+        }
+
+        bool is_valid = true;
+        for (unsigned int i = 0; i < read.sequence.length(); i++) {
+            read.sequence[i] &= 0xdf; // upper case
+            if (!is_valid_dna(read.sequence[i])) {
+                is_valid = false;
+                break;
+            }
+        }
+        if (!is_valid) {
+            continue;
+        }
+
+        unsigned int this_n_consumed = 0;
+        unique_ptr<KmerHashIterator> kmers = new_kmer_iterator(read.sequence);
+        while (!kmers->done()) {
+            HashIntoType kmer = kmers->next();
+            // This is the sweet chocolate center of this function:
+            // for num_batches = 2^n and batch \in {0, 1, ..., num_batches - 1},
+            // store only k-mers whose n least significant bits encode the
+            // tag.
+            if ((kmer & (num_batches-1)) == batch) {
+                count(kmer);
+                this_n_consumed++;
+            }
+        }
+
+        __sync_add_and_fetch(&n_consumed, this_n_consumed);
+        __sync_add_and_fetch(&total_reads, 1);
+    }
+} // consume_seqfile_banding
 
 template<typename SeqIO>
 void Hashtable::consume_seqfile(
@@ -515,6 +592,20 @@ template void Hashtable::consume_seqfile<FastxReader>(
 );
 template void Hashtable::consume_seqfile<FastxReader>(
     ReadParserPtr<FastxReader>& parser,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+);
+template void Hashtable::consume_seqfile_banding<FastxReader>(
+    std::string const &filename,
+    unsigned int num_batches,
+    unsigned int batch,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+);
+template void Hashtable::consume_seqfile_banding<FastxReader>(
+    ReadParserPtr<FastxReader>& parser,
+    unsigned int num_batches,
+    unsigned int batch,
     unsigned int &total_reads,
     unsigned long long &n_consumed
 );

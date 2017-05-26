@@ -114,6 +114,8 @@ protected:
         _nbits_sub_1 = (_ksize*2 - 2);
     }
 
+    void _check_batches(unsigned int num_batches, unsigned int batch);
+
     explicit Hashtable(const Hashtable&);
     Hashtable& operator=(const Hashtable&);
 
@@ -235,6 +237,21 @@ public:
         unsigned int &total_reads,
         unsigned long long &n_consumed
     );
+
+    template<typename SeqIO>
+    void consume_seqfile_banding(
+        std::string const &filename, unsigned int num_batches,
+        unsigned int batch, unsigned int &total_reads,
+        unsigned long long &n_consumed
+    );
+
+    template<typename SeqIO>
+    void consume_seqfile_banding(
+        read_parsers::ReadParserPtr<SeqIO>& parser, unsigned int num_batches,
+        unsigned int batch, unsigned int &total_reads,
+        unsigned long long &n_consumed
+    );
+
 
     void set_use_bigcount(bool b)
     {

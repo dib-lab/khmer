@@ -15,6 +15,7 @@ be tested separately.  We can use code coverage to identify that
 code...
 """
 
+from __future__ import absolute_import
 import sys
 import pytest
 

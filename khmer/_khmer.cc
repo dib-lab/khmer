@@ -1561,6 +1561,37 @@ hashtable_consume_seqfile(khmer_KHashtable_Object * me, PyObject * args)
 
 static
 PyObject *
+hashtable_consume_seqfile_banding(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable  = me->hashtable;
+
+    const char * filename;
+    unsigned int num_batches;
+    unsigned int batch;
+
+    if (!PyArg_ParseTuple(args, "sII", &filename, &num_batches, &batch)) {
+        return NULL;
+    }
+
+    // call the C++ function, and trap signals => Python
+    unsigned long long n_consumed = 0;
+    unsigned int total_reads = 0;
+    try {
+        hashtable->consume_seqfile_banding<FastxReader>(filename, num_batches,
+            batch, total_reads, n_consumed);
+    } catch (khmer_file_exception &exc) {
+        PyErr_SetString(PyExc_OSError, exc.what());
+        return NULL;
+    } catch (khmer_value_exception &exc) {
+        PyErr_SetString(PyExc_ValueError, exc.what());
+        return NULL;
+    }
+
+    return Py_BuildValue("IK", total_reads, n_consumed);
+}
+
+static
+PyObject *
 hashtable_consume_seqfile_with_reads_parser(khmer_KHashtable_Object * me,
         PyObject * args)
 {
@@ -2124,6 +2155,12 @@ static PyMethodDef khmer_hashtable_methods[] = {
         (PyCFunction)hashtable_consume_seqfile, METH_VARARGS,
         "Increment the counts of all the k-mers in the sequences in the "
         "given file"
+    },
+    {
+        "consume_seqfile_banding",
+        (PyCFunction)hashtable_consume_seqfile_banding, METH_VARARGS,
+        "Increment the counts of a subset of the k-mers in the sequence "
+        "file"
     },
     {
         "consume_seqfile_with_reads_parser",

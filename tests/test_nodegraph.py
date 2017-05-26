@@ -1114,6 +1114,49 @@ def test_assemble_linear_path_bad_seed():
     assert path == ''
 
 
+@pytest.mark.parametrize('graphclass', [
+    (khmer.Nodegraph),
+    (khmer.Countgraph),
+])
+def test_banding_bad_params(graphclass):
+    nodegraph = graphclass(31, 1e5, 4)
+
+    # Fails because 11 is not a power of 2
+    with pytest.raises(ValueError) as ve:
+        _ = nodegraph.consume_seqfile_banding('file-not-touched.fa', 11, 1)
+    assert 'must be a power of 2' in str(ve)
+
+    # Fails because 13 >= 8
+    with pytest.raises(ValueError) as ve:
+        _ = nodegraph.consume_seqfile_banding('file-not-touched.fa', 8, 13)
+    assert 'must be less than num_batches' in str(ve)
+
+    # Fails because file does not exist
+    with pytest.raises(OSError) as ose:
+        nreads, kmersconsumed = \
+            nodegraph.consume_seqfile_banding('file-no-exist.fa', 16, 3)
+    assert 'does not exist' in str(ose)
+
+
+@pytest.mark.parametrize('graphclass,num_batches,batch', [
+    (khmer.Nodegraph, 8, 3),
+    (khmer.Countgraph, 8, 3),
+])
+def test_banding(graphclass, num_batches, batch):
+    nodegraph = graphclass(31, 1e5, 4)
+    infile = utils.get_test_data('bogus.fa')
+    nreads, kmersconsumed = \
+        nodegraph.consume_seqfile_banding(infile, num_batches, batch)
+    assert nreads == 1
+    assert kmersconsumed == 3
+    assert nodegraph.get('ACGGCTATTATCTGAGCTCAAGACTAATACG') == 1
+    assert nodegraph.get('CTATTATCTGAGCTCAAGACTAATACGCGCT') == 1
+    assert nodegraph.get('CTGAGCTCAAGACTAATACGCGCTGGCCACT') == 1
+    assert nodegraph.get('GTACGGCTATTATCTGAGCTCAAGACTAATA') == 0
+    assert nodegraph.get('TCTGAGCTCAAGACTAATACGCGCTGGCCAC') == 0
+    assert nodegraph.get('AGCTCAAGACTAATACGCGCTGGCCACTGGT') == 0
+
+
 @pytest.mark.parametrize('ntables,targetsize', [
     (4, 1e5),
     (6, 1e5),
