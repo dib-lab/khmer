@@ -43,6 +43,7 @@ Contact: khmer-project@idyll.org
 #include <assert.h>
 
 #include "MurmurHash3.h"
+#include "nthash.hpp"
 #include "khmer.hh"
 #include "khmer_exception.hh"
 #include "kmer_hash.hh"
@@ -209,6 +210,18 @@ HashIntoType _hash_murmur_forward(const std::string& kmer, const WordLength k)
 
     khmer::_hash_murmur(kmer, k, h, r);
     return h;
+}
+
+HashIntoType _hash_nt(const std::string& kmer, const WordLength k)
+{
+    HashIntoType f=0, r=0;
+    return NTPC64(kmer.c_str(), k);
+}
+
+HashIntoType _hash_nt(const char *kmer, const WordLength k)
+{
+    HashIntoType f=0, r=0;
+    return NTPC64(kmer, k);
 }
 
 KmerIterator::KmerIterator(const char * seq,

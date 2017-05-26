@@ -115,6 +115,10 @@ HashIntoType _hash_murmur(const std::string& kmer, const WordLength k,
 HashIntoType _hash_murmur_forward(const std::string& kmer,
                                   const WordLength k);
 
+// ntHash hash function
+HashIntoType _hash_nt(const std::string& kmer, const WordLength k);
+HashIntoType _hash_nt(const char *kmer, const WordLength k);
+
 /**
  * \class Kmer
  *

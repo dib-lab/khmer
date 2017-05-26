@@ -44,10 +44,13 @@ import json
 from khmer._khmer import Countgraph as _Countgraph
 from khmer._khmer import SmallCountgraph as _SmallCountgraph
 from khmer._khmer import Counttable as _Counttable
+from khmer._khmer import NtCounttable as _NtCounttable
 from khmer._khmer import SmallCounttable as _SmallCounttable
+from khmer._khmer import NtSmallCounttable as _NtSmallCounttable
 from khmer._khmer import GraphLabels as _GraphLabels
 from khmer._khmer import Nodegraph as _Nodegraph
 from khmer._khmer import Nodetable as _Nodetable
+from khmer._khmer import NtNodetable as _NtNodetable
 from khmer._khmer import HLLCounter as _HLLCounter
 from khmer._khmer import ReadAligner as _ReadAligner
 from khmer._khmer import LinearAssembler
@@ -352,11 +355,29 @@ class Counttable(_Counttable):
         return counttable
 
 
+class NtCounttable(_NtCounttable):
+
+    def __new__(cls, k, starting_size, n_tables):
+        primes = get_n_primes_near_x(n_tables, starting_size)
+        counttable = _NtCounttable.__new__(cls, k, primes)
+        counttable.primes = primes
+        return counttable
+
+
 class SmallCounttable(_SmallCounttable):
 
     def __new__(cls, k, starting_size, n_tables):
         primes = get_n_primes_near_x(n_tables, starting_size)
         counttable = _SmallCounttable.__new__(cls, k, primes)
+        counttable.primes = primes
+        return counttable
+
+
+class NtSmallCounttable(_NtSmallCounttable):
+
+    def __new__(cls, k, starting_size, n_tables):
+        primes = get_n_primes_near_x(n_tables, starting_size)
+        counttable = _NtSmallCounttable.__new__(cls, k, primes)
         counttable.primes = primes
         return counttable
 
@@ -394,6 +415,15 @@ class Nodetable(_Nodetable):
     def __new__(cls, k, starting_size, n_tables):
         primes = get_n_primes_near_x(n_tables, starting_size)
         nodetable = _Nodetable.__new__(cls, k, primes)
+        nodetable.primes = primes
+        return nodetable
+
+
+class NtNodetable(_NtNodetable):
+
+    def __new__(cls, k, starting_size, n_tables):
+        primes = get_n_primes_near_x(n_tables, starting_size)
+        nodetable = _NtNodetable.__new__(cls, k, primes)
         nodetable.primes = primes
         return nodetable
 
