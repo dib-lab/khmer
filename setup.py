@@ -38,6 +38,7 @@
 
 import ez_setup
 
+import codecs
 import os
 import sys
 from os import listdir as os_listdir
@@ -199,7 +200,7 @@ else:
 #     correctly for the citation information, but this requires a non-standard
 #     library that we don't want to add as a dependency for `setup.py`.
 #     -- Daniel Standage, 2017-05-21
-with open('authors.csv', 'r') as csvin:
+with codecs.open('authors.csv', encoding='utf-8') as csvin:
     authors = csv.reader(csvin)
     authorstr = ', '.join([row[0] for row in authors])
     authorstr = 'Daniel Standage, ' + authorstr + ', C. Titus Brown'
