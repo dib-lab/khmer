@@ -599,6 +599,8 @@ public:
         return _counts;
     }
 
+    void update_from(const ByteStorage&);
+
 };
 
 // Helper classes for saving ByteStorage objs to disk & loading them.

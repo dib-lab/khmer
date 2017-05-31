@@ -1513,3 +1513,95 @@ def test_bad_create():
         countgraph = khmer._Countgraph(5, [])
     except ValueError as err:
         assert 'tablesizes needs to be one or more numbers' in str(err)
+
+
+def test_update_from():
+    graph = khmer.Countgraph(5, 1000, 4)
+    other_graph = khmer.Countgraph(5, 1000, 4)
+
+    assert graph.get('AAAAA') == 0
+    assert graph.get('GCGCG') == 0
+    assert graph.n_occupied() == 0
+    assert other_graph.get('AAAAA') == 0
+    assert other_graph.get('GCGCG') == 0
+    assert other_graph.n_occupied() == 0
+
+    other_graph.count('AAAAA')
+
+    assert graph.get('AAAAA') == 0
+    assert graph.get('GCGCG') == 0
+    assert graph.n_occupied() == 0
+    assert other_graph.get('AAAAA') == 1
+    assert other_graph.get('GCGCG') == 0
+    assert other_graph.n_occupied() == 1
+
+    graph.count('GCGCG')
+
+    assert graph.get('AAAAA') == 0
+    assert graph.get('GCGCG') == 1
+    assert graph.n_occupied() == 1
+    assert other_graph.get('AAAAA') == 1
+    assert other_graph.get('GCGCG') == 0
+    assert other_graph.n_occupied() == 1
+
+    graph.update(other_graph)
+
+    assert graph.get('AAAAA') == 1
+    assert graph.get('GCGCG') == 1
+    assert graph.n_occupied() == 2
+    assert other_graph.get('AAAAA') == 1
+    assert other_graph.get('GCGCG') == 0
+    assert other_graph.n_occupied() == 1
+
+def test_update_from_2():
+
+    ng1 = khmer.Countgraph(20, 1000, 4)
+    ng2 = khmer.Countgraph(20, 1000, 4)
+
+    filename = utils.get_test_data('random-20-a.fa')
+    ng1.consume_seqfile(filename)
+    ng2.consume_seqfile(filename)
+
+    assert ng1.n_occupied() == ng2.n_occupied()
+    ng1.update(ng2)
+
+    assert ng1.n_occupied() == ng2.n_occupied()
+
+
+def test_update_from_diff_ksize_2():
+    graph = khmer.Countgraph(5, 1000, 4)
+    other_graph = khmer.Countgraph(4, 1000, 4)
+
+    try:
+        graph.update(other_graph)
+        assert 0, "should not be reached"
+    except ValueError as err:
+        print(str(err))
+
+    try:
+        other_graph.update(graph)
+        assert 0, "should not be reached"
+    except ValueError as err:
+        print(str(err))
+
+
+def test_update_from_diff_tablesize():
+    graph = khmer.Countgraph(5, 100, 4)
+    other_graph = khmer.Countgraph(5, 1000, 4)
+
+    try:
+        graph.update(other_graph)
+        assert 0, "should not be reached"
+    except ValueError as err:
+        print(str(err))
+
+
+def test_update_from_diff_num_tables():
+    graph = khmer.Countgraph(5, 1000, 3)
+    other_graph = khmer.Countgraph(5, 1000, 4)
+
+    try:
+        graph.update(other_graph)
+        assert 0, "should not be reached"
+    except ValueError as err:
+        print(str(err))

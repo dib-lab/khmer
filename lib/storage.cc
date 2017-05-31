@@ -252,6 +252,32 @@ void BitStorage::load(std::string infilename, WordLength &ksize)
     }
 }
 
+void ByteStorage::update_from(const ByteStorage& other)
+{
+    if (_tablesizes != other._tablesizes) {
+        throw khmer_exception("both countgraphs must have same table sizes");
+    }
+
+    Byte tmp = 0;
+    for (unsigned int table_num = 0; table_num < _n_tables; table_num++) {
+        Byte * me = _counts[table_num];
+        Byte * ot = other._counts[table_num];
+        uint64_t tablesize = _tablesizes[table_num];
+        uint64_t tablebytes = tablesize / 8 + 1;
+
+        for (uint64_t index = 0; index < tablebytes; index++) {
+            // updating by keeping the max value in each position
+            // First, get the new value
+            tmp = std::max(me[index], ot[index]);
+            if (table_num == 0) {
+                // TODO: How to update this?
+                _occupied_bins += __builtin_popcountll(me[index] ^ tmp);
+            }
+            me[index] = tmp;
+        }
+    }
+}
+
 void ByteStorageFile::save(
     const std::string   &outfilename,
     WordLength ksize,

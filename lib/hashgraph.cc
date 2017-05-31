@@ -889,6 +889,23 @@ void Nodegraph::update_from(const Nodegraph &otherBASE)
     }
 }
 
+void Countgraph::update_from(const Countgraph &otherBASE)
+{
+    if (_ksize != otherBASE._ksize) {
+        throw khmer_exception("both countgraphs must have same k size");
+    }
+    ByteStorage * myself = dynamic_cast<ByteStorage *>(this->store);
+    const ByteStorage * other;
+    other = dynamic_cast<const ByteStorage*>(otherBASE.store);
+
+    // if dynamic_cast worked, then the pointers will be not null.
+    if (myself && other) {
+        myself->update_from(*other);
+    } else {
+        throw khmer_exception("update_from failed with incompatible objects");
+    }
+}
+
 template void Hashgraph::consume_seqfile_and_tag<read_parsers::FastxReader>(
     std::string const &filename,
     unsigned int &total_reads,

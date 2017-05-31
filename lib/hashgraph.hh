@@ -267,6 +267,8 @@ class Countgraph : public khmer::Hashgraph
 public:
     explicit Countgraph(WordLength ksize, std::vector<uint64_t> sizes)
         : Hashgraph(ksize, new ByteStorage(sizes)) { } ;
+
+    void update_from(const Countgraph &other);
 };
 
 // Hashgraph-derived class with NibbleStorage.

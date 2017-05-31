@@ -2292,6 +2292,76 @@ typedef struct {
 
 static void khmer_countgraph_dealloc(khmer_KCountgraph_Object * obj);
 
+static PyObject* khmer_countgraph_new(PyTypeObject * type, PyObject * args,
+                                      PyObject * kwds);
+
+static PyTypeObject khmer_KCountgraph_Type
+CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KCountgraph_Object")
+= {
+    PyVarObject_HEAD_INIT(NULL, 0)       /* init & ob_size */
+    "_khmer.Countgraph",                 /*tp_name*/
+    sizeof(khmer_KCountgraph_Object),  /*tp_basicsize*/
+    0,                                   /*tp_itemsize*/
+    (destructor)khmer_countgraph_dealloc,  /*tp_dealloc*/
+    0,                                   /*tp_print*/
+    0,                                   /*tp_getattr*/
+    0,                                   /*tp_setattr*/
+    0,                                   /*tp_compare*/
+    0,                                   /*tp_repr*/
+    0,                                   /*tp_as_number*/
+    0,                                   /*tp_as_sequence*/
+    0,                                   /*tp_as_mapping*/
+    0,                                   /*tp_hash */
+    0,                                   /*tp_call*/
+    0,                                   /*tp_str*/
+    0,                                   /*tp_getattro*/
+    0,                                   /*tp_setattro*/
+    0,                                   /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,                  /*tp_flags*/
+    "countgraph hash object",              /* tp_doc */
+    0,                                   /* tp_traverse */
+    0,                                   /* tp_clear */
+    0,                                   /* tp_richcompare */
+    0,                                   /* tp_weaklistoffset */
+    0,                                   /* tp_iter */
+    0,                                   /* tp_iternext */
+    0,                                   /* tp_methods */
+    0,                                   /* tp_members */
+    0,                                   /* tp_getset */
+    0,                                   /* tp_base */
+    0,                                   /* tp_dict */
+    0,                                   /* tp_descr_get */
+    0,                                   /* tp_descr_set */
+    0,                                   /* tp_dictoffset */
+    0,                                   /* tp_init */
+    0,                                   /* tp_alloc */
+    khmer_countgraph_new,                /* tp_new */
+};
+
+static
+PyObject *
+countgraph_update(khmer_KCountgraph_Object * me, PyObject * args)
+{
+    Countgraph * graph = me->countgraph;
+    Countgraph * other;
+    khmer_KCountgraph_Object * other_o;
+
+    if (!PyArg_ParseTuple(args, "O!", &khmer_KCountgraph_Type, &other_o)) {
+        return NULL;
+    }
+
+    other = other_o->countgraph;
+
+    try {
+        graph->update_from(*other);
+    } catch (khmer_exception &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
 static
 PyObject *
 count_get_raw_tables(khmer_KCountgraph_Object * self, PyObject * args)
@@ -2376,6 +2446,11 @@ count_do_subset_partition_with_abundance(khmer_KCountgraph_Object * me,
 
 static PyMethodDef khmer_countgraph_methods[] = {
     {
+        "update",
+        (PyCFunction) countgraph_update, METH_VARARGS,
+        "a set update: update this countgraph with all the entries from the other"
+    },
+    {
         "get_raw_tables",
         (PyCFunction)count_get_raw_tables, METH_VARARGS,
         "Get a list of the raw storage tables as memoryview objects."
@@ -2384,51 +2459,6 @@ static PyMethodDef khmer_countgraph_methods[] = {
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
-static PyObject* khmer_countgraph_new(PyTypeObject * type, PyObject * args,
-                                      PyObject * kwds);
-
-static PyTypeObject khmer_KCountgraph_Type
-CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KCountgraph_Object")
-= {
-    PyVarObject_HEAD_INIT(NULL, 0)       /* init & ob_size */
-    "_khmer.Countgraph",                 /*tp_name*/
-    sizeof(khmer_KCountgraph_Object),  /*tp_basicsize*/
-    0,                                   /*tp_itemsize*/
-    (destructor)khmer_countgraph_dealloc,  /*tp_dealloc*/
-    0,                                   /*tp_print*/
-    0,                                   /*tp_getattr*/
-    0,                                   /*tp_setattr*/
-    0,                                   /*tp_compare*/
-    0,                                   /*tp_repr*/
-    0,                                   /*tp_as_number*/
-    0,                                   /*tp_as_sequence*/
-    0,                                   /*tp_as_mapping*/
-    0,                                   /*tp_hash */
-    0,                                   /*tp_call*/
-    0,                                   /*tp_str*/
-    0,                                   /*tp_getattro*/
-    0,                                   /*tp_setattro*/
-    0,                                   /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,                  /*tp_flags*/
-    "countgraph hash object",              /* tp_doc */
-    0,                                   /* tp_traverse */
-    0,                                   /* tp_clear */
-    0,                                   /* tp_richcompare */
-    0,                                   /* tp_weaklistoffset */
-    0,                                   /* tp_iter */
-    0,                                   /* tp_iternext */
-    khmer_countgraph_methods,              /* tp_methods */
-    0,                                   /* tp_members */
-    0,                                   /* tp_getset */
-    0,                                   /* tp_base */
-    0,                                   /* tp_dict */
-    0,                                   /* tp_descr_get */
-    0,                                   /* tp_descr_set */
-    0,                                   /* tp_dictoffset */
-    0,                                   /* tp_init */
-    0,                                   /* tp_alloc */
-    khmer_countgraph_new,                /* tp_new */
-};
 
 //
 // khmer_countgraph_new
@@ -4772,6 +4802,7 @@ MOD_INIT(_khmer)
     }
 
     khmer_KCountgraph_Type.tp_base = &khmer_KHashgraph_Type;
+    khmer_KCountgraph_Type.tp_methods = khmer_countgraph_methods;
     if (PyType_Ready(&khmer_KCountgraph_Type) < 0) {
         return MOD_ERROR_VAL;
     }
