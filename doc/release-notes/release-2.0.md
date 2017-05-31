@@ -331,9 +331,9 @@ unique kmers. This is being investigated in #1248
 ## Contributors
 
 @ctb, @bocajnotnef, @mr-c, @luizirber, @kdmurray91, @SherineAwad,
-@camillescott, \*@ACharbonneau
+@camillescott, ‡@ACharbonneau
 
-\* Indicates new contributors
+‡ Indicates new contributors
 
 ## Issue reporters
 

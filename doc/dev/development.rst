@@ -62,27 +62,16 @@ Still in the works, but read `this
 Make a branch on dib-lab (preferred so others can contribute) or fork the
 repository and make a branch there.
 
-Each piece or fix you are working on should have its own branch; make a pull-
+Each piece or fix you are working on should have its own branch; make a pull
 request to dib-lab/master to aid in code review, testing, and feedback.
 
-If you want your code integrated then it needs to be mergable
-
-Example pull request update using the command line:
-
- #. Clone the source of the pull request (if needed)
-     ``git clone git@github.com:mr-c/khmer.git``
- #. Checkout the source branch of the pull request
-     ``git checkout my-pull-request``
- #. Pull in the destination of the pull request and resolve any conflicts
-     ``git pull git@github.com:dib-lab/khmer.git master``
- #. Push your update to the source of the pull request ``git push``
- #. Jenkins will automatically attempt to build and test your pull requests.
+If you want your code integrated then it needs to be mergeable.
 
 Code coverage
 -------------
 
-Jenkins calculates code coverage for every build. Navigate to the results from
-the master node first to view the coverage information.
+Travis and CodeCov calculate code coverage for every build, and post changes
+in code coverage to every pull request thread after a successful build.
 
 Code coverage should never go down and new functionality needs to be tested.
 
@@ -98,15 +87,13 @@ Command line scripts
 Python command-line scripts should use '-' instead of '_' in the name.
 (Only filenames containing code for import should use _.)
 
-Please follow the command-line conventions used under scripts/.  This
-includes most especially standardization of '-x' to be hash table size,
-'-N' to be number of hash tables, and '-k' to always refer to the
-k-mer size.
+Please follow the command-line conventions used in ``scripts/``, as described
+in the :doc:`scripts and sandbox documentation <scripts-and-sandbox>`.
 
 Command line thoughts:
 
-   If a filename is required, typically UNIX commands don't use a flag to
-   specify it.
+   If a input filename is required, typically UNIX commands don't use a flag
+   to specify it.
 
    Also, positional arguments typically aren't used with multiple files.
 
@@ -116,8 +103,6 @@ Command line thoughts:
    override of this, e.g. ::
 
       filter-abund.py <ct file> <filename> [ -o <filename.keep> ]
-
-----
 
 All code in ``scripts/`` must have automated tests; see
 ``tests/test_scripts.py``. Otherwise it belongs in ``sandbox/``.
@@ -129,8 +114,6 @@ command line mistakes from trashing important files.
 A general error should be signaled by exit code `1` and success by `0`. Linux
 supports exit codes from `0` to `255` where the value `1` means a general
 error. An exit code of `-1` will get converted to `255`.
-
-----
 
 CLI reading:
 
