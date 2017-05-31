@@ -83,7 +83,9 @@ class CitationAction(argparse.Action):
 
     def __init__(self, *args, **kwargs):
         self.citations = kwargs.pop('citations')
-        super(CitationAction, self).__init__(*args, nargs=0, **kwargs)
+        super(CitationAction, self).__init__(*args, nargs=0,
+                                             default=argparse.SUPPRESS,
+                                             **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
         info(parser.prog, self.citations)
@@ -137,6 +139,7 @@ class KhmerArgumentParser(argparse.ArgumentParser):
         self.add_argument('--version', action=_VersionStdErrAction,
                           version='khmer {v}'.format(v=__version__))
         self.add_argument('--info', action=CitationAction,
+                          help='print citation information',
                           citations=self._citations)
         self.add_argument('-h', '--help', action=_HelpAction,
                           default=argparse.SUPPRESS,
@@ -431,16 +434,23 @@ def _check_fp_rate(args, desired_max_fp):
 
 def build_graph_args(descr=None, epilog=None, parser=None, citations=None):
     """Build an ArgumentParser with args for bloom filter based scripts."""
+    expert_help = '--help-expert' in sys.argv
+    if expert_help:
+        sys.argv.append('--help')
+
     if parser is None:
         parser = KhmerArgumentParser(description=descr, epilog=epilog,
                                      citations=citations)
 
-    parser.add_argument('--ksize', '-k', type=int, default=DEFAULT_K,
+    parser.add_argument('-k', '--ksize', type=int, default=DEFAULT_K,
                         help='k-mer size to use')
 
+    help = ('number of tables to use in k-mer countgraph' if expert_help
+            else argparse.SUPPRESS)
     parser.add_argument('--n_tables', '-N', type=int,
                         default=DEFAULT_N_TABLES,
-                        help='number of tables to use in k-mer countgraph')
+                        help=help)
+
     parser.add_argument('-U', '--unique-kmers', type=float, default=0,
                         help='approximate number of unique kmers in the input'
                              ' set')
@@ -449,10 +459,11 @@ def build_graph_args(descr=None, epilog=None, parser=None, citations=None):
                         " current script")
 
     group = parser.add_mutually_exclusive_group()
+    help = ('upper bound on tablesize to use; overrides --max-memory-usage/-M'
+            if expert_help else argparse.SUPPRESS)
     group.add_argument('--max-tablesize', '-x', type=float,
                        default=DEFAULT_MAX_TABLESIZE,
-                       help='upper bound on tablesize to use; overrides ' +
-                       '--max-memory-usage/-M')
+                       help=help)
     group.add_argument('-M', '--max-memory-usage', type=memory_setting,
                        help='maximum amount of memory to use for data ' +
                        'structure')
@@ -496,8 +507,8 @@ def calculate_graphsize(args, graphtype, multiplier=1.0):
         raise ValueError('unknown graph type: ' + graphtype)
 
     if args.max_memory_usage:
-        tablesize = (khmer._buckets_per_byte[graphtype] *
-                     args.max_memory_usage / args.n_tables / float(multiplier))
+        tablesize = float(multiplier) * (khmer._buckets_per_byte[graphtype] *
+                                         args.max_memory_usage / args.n_tables)
     else:
         tablesize = args.max_tablesize
 
@@ -561,6 +572,17 @@ def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
         return khmer.Countgraph(ksize, tablesize, args.n_tables)
 
 
+def create_matching_nodegraph(countgraph):
+    """Create a Nodegraph matched in size to a Countgraph
+
+    Use this to create Nodegraphs for kmer tracking and similar. The
+    created Nodegraph will have the same number of buckets in its
+    tables as `countgraph`.
+    """
+    tablesizes = countgraph.hashsizes()
+    return khmer._Nodegraph(countgraph.ksize(), tablesizes)
+
+
 def report_on_config(args, graphtype='countgraph'):
     """Print out configuration.
 
@@ -596,7 +618,7 @@ def report_on_config(args, graphtype='countgraph'):
 
 def add_threading_args(parser):
     """Add option for threading to options parser."""
-    parser.add_argument('--threads', '-T', default=DEFAULT_N_THREADS, type=int,
+    parser.add_argument('-T', '--threads', default=DEFAULT_N_THREADS, type=int,
                         help='Number of simultaneous threads to execute')
 
 

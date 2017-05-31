@@ -38,6 +38,10 @@ Contact: khmer-project@idyll.org
 #ifndef READ_PARSERS_HH
 #define READ_PARSERS_HH
 
+#include <seqan/seq_io.h> // IWYU pragma: keep
+#include <seqan/sequence.h> // IWYU pragma: keep
+#include <seqan/stream.h> // IWYU pragma: keep
+
 #include <regex.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -51,10 +55,6 @@ Contact: khmer-project@idyll.org
 #include "oxli.hh"
 #include "oxli_exception.hh"
 
-namespace seqan
-{
-    class SequenceStream; // forward dec seqan dep
-}
 
 namespace oxli
 {
@@ -175,7 +175,7 @@ class FastxReader
 {
 private:
     std::string _filename;
-    std::unique_ptr<seqan::SequenceStream> _stream;
+    seqan::SequenceStream _stream;
     uint32_t _spin_lock;
     size_t _num_reads;
     bool _have_qualities;
@@ -209,9 +209,11 @@ inline PartitionID _parse_partition_id(std::string name)
     if (*s == '\t') {
         p = (PartitionID) atoi(s + 1);
     } else {
-        std::cerr << "consume_partitioned_fasta barfed on read "
-                  << name << "\n";
-        throw oxli_exception();
+        std::string err;
+        err = "consume_partitioned_fasta cannot find partition ID for read ";
+        err += name;
+
+        throw oxli_value_exception(err);
     }
 
     return p;

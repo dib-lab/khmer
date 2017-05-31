@@ -291,9 +291,9 @@ const
 }
 
 template <bool direction>
-void SimpleLabeledAssembler::_assemble_directed(AssemblerTraverser<direction>&
-        start_cursor,
-        StringVector& paths)
+void SimpleLabeledAssembler::
+_assemble_directed(AssemblerTraverser<direction>& start_cursor,
+        		   StringVector& paths)
 const
 {
 #if DEBUG_ASSEMBLY
@@ -465,7 +465,7 @@ const
 // Starting from the given seed k-mer, assemble all maximal linear paths in
 // both directions, using junction counts to skip over tricky bits.
 StringVector JunctionCountAssembler::assemble(const Kmer seed_kmer,
-        const Hashgraph * stop_bf)
+                                              const Hashtable * stop_bf)
 const
 {
 #if DEBUG_ASSEMBLY
@@ -509,9 +509,9 @@ const
 }
 
 template <bool direction>
-void JunctionCountAssembler::_assemble_directed(AssemblerTraverser<direction>&
-        start_cursor,
-        StringVector& paths)
+void JunctionCountAssembler::
+_assemble_directed(AssemblerTraverser<direction>& start_cursor,
+        		   StringVector& paths)
 const
 {
 #if DEBUG_ASSEMBLY

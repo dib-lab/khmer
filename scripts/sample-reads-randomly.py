@@ -242,5 +242,6 @@ def main():
                 if records[1] is not None:
                     write_record(records[1], output_file)
 
+
 if __name__ == '__main__':
     main()

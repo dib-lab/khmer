@@ -65,7 +65,7 @@ def get_parser():
         description="Merge partition map '.pmap' files.",
         epilog=textwrap.dedent(epilog),
         citations=['graph'])
-    parser.add_argument('--ksize', '-k', type=int, default=DEFAULT_K,
+    parser.add_argument('-k', '--ksize', type=int, default=DEFAULT_K,
                         help="k-mer size (default: %d)" % DEFAULT_K)
     parser.add_argument('--keep-subsets', dest='remove_subsets',
                         default=True, action='store_false',

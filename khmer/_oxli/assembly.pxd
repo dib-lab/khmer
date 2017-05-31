@@ -1,8 +1,42 @@
 from libcpp.memory cimport unique_ptr
-from libcpp.string import string
+from libcpp.string cimport string
+from libcpp.vector cimport vector
+from libc.stdint cimport uint16_t
 
-from wrapper cimport CpLinearAssembler, CpCompactingAssembler, CpHashgraph, CpKmer
-from hashing cimport Kmer
+from oxli_types cimport *
+from hashing cimport CpKmer, Kmer
+from graphs cimport CpHashgraph, CpHashtable, CpLabelHash, get_hashgraph_ptr
+
+
+cdef extern from "oxli/assembler.hh" namespace "oxli":
+    cdef cppclass CpLinearAssembler "oxli::LinearAssembler":
+        CpLinearAssembler(CpHashgraph *)
+    
+        string assemble(const CpKmer, const CpHashgraph *) const
+        string assemble_left(const CpKmer, const CpHashgraph *) const     
+        string assemble_right(const CpKmer, const CpHashgraph *) const
+
+        string assemble(const CpKmer) const
+        string assemble_left(const CpKmer) const     
+        string assemble_right(const CpKmer) const
+
+    cdef cppclass CpCompactingAssembler(CpLinearAssembler):
+        CpCompactingAssembler(CpHashgraph *)
+
+    cdef cppclass CpSimpleLabeledAsssembler "oxli::SimpleLabeledAsssembler":
+        CpSimpleLabeledAssembler(const CpLabelHash *)
+
+        vector[string] assemble(const CpKmer)
+        vector[string] assemble(const CpKmer, const CpHashgraph *) const
+
+    cdef cppclass CpJunctionCountAssembler "oxli::JunctionCountAssembler":
+        CpJunctionCountAssembler(CpHashgraph *)
+
+        vector[string] assemble(const CpKmer) const
+        vector[string] assemble(const CpKmer, const CpHashtable *) const
+        uint16_t consume(string)
+        void count_junction(CpKmer, CpKmer)
+        BoundedCounterType get_junction_count(CpKmer, CpKmer) const
 
 
 cdef class LinearAssembler:

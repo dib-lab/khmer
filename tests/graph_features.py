@@ -523,3 +523,15 @@ def tandem_repeat_structure(request, linear_structure):
         request.applymarker(pytest.mark.xfail)
 
     return graph, sequence, tandem_repeats
+
+
+@pytest.fixture
+def circular_linear_structure(request, linear_structure):
+    graph, sequence = linear_structure
+
+    sequence += sequence
+
+    if hdn_counts(sequence, graph):
+        request.applymarker(pytest.mark.xfail)
+
+    return graph, sequence

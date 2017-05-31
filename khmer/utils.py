@@ -193,5 +193,10 @@ def grouper(n, iterable):
     return iter(lambda: list(itertools.islice(iterable, n)), [])
 
 
+def grouper(n, iterable):
+    iterable = iter(iterable)
+    return iter(lambda: list(itertools.islice(iterable, n)), [])
+
+
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
 # vim: set textwidth=79:

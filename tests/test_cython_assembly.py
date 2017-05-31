@@ -92,6 +92,15 @@ class TestNonBranching:
             print(path, ', ', contig[:start])
             assert utils._equals_rc(path, contig[start:]), start
 
+    def test_circular(self, circular_linear_structure, assembler):
+
+        graph, contig = circular_linear_structure
+        asm = assembler(graph)
+
+        path = asm.assemble_right(contig[:K])
+        print(path, ',', contig)
+        assert utils._equals_rc(path, contig[:len(path)])
+
 
 class TestCompactingAssembler:
 

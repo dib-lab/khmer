@@ -83,13 +83,13 @@ public:
     explicit LinearAssembler(const Hashgraph * ht);
 
     virtual std::string assemble(const Kmer seed_kmer,
-                         const Hashgraph * stop_bf = 0) const;
+                                 const Hashgraph * stop_bf = 0) const;
 
     virtual std::string assemble_right(const Kmer seed_kmer,
-                               const Hashgraph * stop_bf = 0) const;
+                                       const Hashgraph * stop_bf = 0) const;
 
     virtual std::string assemble_left(const Kmer seed_kmer,
-                              const Hashgraph * stop_bf = 0) const;
+                                      const Hashgraph * stop_bf = 0) const;
 
     template <bool direction>
     std::string _assemble_directed(AssemblerTraverser<direction>& cursor) const;
@@ -179,9 +179,8 @@ public:
     explicit JunctionCountAssembler(Hashgraph * ht);
     ~JunctionCountAssembler();
 
-
     StringVector assemble(const Kmer seed_kmer,
-                          const Hashgraph * stop_bf=0) const;
+                          const Hashtable * stop_bf=0) const;
 
     uint16_t consume(std::string sequence);
     void count_junction(Kmer kmer_a, Kmer kmer_b);

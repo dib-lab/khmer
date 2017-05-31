@@ -1,9 +1,8 @@
 from libcpp.memory cimport unique_ptr
 from cython.operator cimport dereference as deref
 
-from wrapper cimport *
-from hashing cimport Kmer
-from hashing import Kmer
+from graphs cimport CpHashgraph, CpHashtable, get_hashgraph_ptr
+from hashing cimport Kmer, CpKmer
 
 
 cdef class Traverser:

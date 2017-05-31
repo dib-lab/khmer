@@ -87,7 +87,7 @@ public:
 
     explicit NodeGatherer(const Hashgraph * ht, KmerFilter filter);
 
-    WordLength ksize();
+    WordLength ksize() const;
 
     /**
      * @brief Push a new filter on to the filter stack.
@@ -251,16 +251,18 @@ protected:
 
 public:
     using NodeCursor<direction>::NodeCursor;
+    
+    explicit AssemblerTraverser(const Hashgraph * ht,
+                                Kmer start_kmer,
+                                KmerFilterList filters);
 
     explicit AssemblerTraverser(const Hashgraph * ht,
-                          Kmer start_kmer,
-                          KmerFilterList filters);
+                                Kmer start_kmer,
+                                KmerFilterList filters,
+                                std::shared_ptr<SeenSet> visited);
 
-    explicit AssemblerTraverser(const Hashgraph * ht,
-                          Kmer start_kmer,
-                          KmerFilterList filters,
-                          std::shared_ptr<SeenSet> visited);
     AssemblerTraverser(const AssemblerTraverser& other);
+
 
     /**
      * @brief Get the next symbol.

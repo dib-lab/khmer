@@ -49,6 +49,7 @@ import subprocess
 import sys
 import sysconfig
 import tempfile
+import csv
 
 from setuptools import setup
 from setuptools import Extension
@@ -146,6 +147,7 @@ def build_dir():
 # change setup.cfg or use the `--libraries z,bz2` parameter which will make our
 # custom build_ext command strip out the bundled versions.
 
+
 ZLIBDIR = 'third-party/zlib'
 BZIP2DIR = 'third-party/bzip2'
 
@@ -229,8 +231,8 @@ CLASSIFIERS = [
     "Operating System :: MacOS :: MacOS X",
     "Programming Language :: C++",
     "Programming Language :: Python :: 2.7",
-    "Programming Language :: Python :: 3.3",
     "Programming Language :: Python :: 3.4",
+    "Programming Language :: Python :: 3.5",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
 if "-rc" in versioneer.get_version():
@@ -238,42 +240,35 @@ if "-rc" in versioneer.get_version():
 else:
     CLASSIFIERS.append("Development Status :: 5 - Production/Stable")
 
+
+# This sorts the author list by first name rather than last name. Not worth
+#     fixing for PyPI in my opinion. The sort-authors-list.py handles it
+#     correctly for the citation information, but this requires a non-standard
+#     library that we don't want to add as a dependency for `setup.py`.
+#     -- Daniel Standage, 2017-05-21
+with open('authors.csv', 'r') as csvin:
+    authors = csv.reader(csvin)
+    authorstr = ', '.join([row[0] for row in authors])
+    authorstr = 'Daniel Standage, ' + authorstr + ', C. Titus Brown'
+
+
 SETUP_METADATA = \
     {
         "name": "khmer",
         "version": versioneer.get_version(),
         "description": 'khmer k-mer counting library',
         "long_description": open("README.rst").read(),
-        "author": "Michael R. Crusoe, Hussien F. Alameldin, Sherine Awad, "
-                  "Elmar Bucher, Adam Caldwell, Reed Cartwright, "
-                  "Amanda Charbonneau, Bede Constantinides, Greg Edvenson, "
-                  "Scott Fay, Jacob Fenton, Thomas Fenzl, Jordan Fish, "
-                  "Leonor Garcia-Gutierrez, Phillip Garland, Jonathan Gluck, "
-                  "Iván González, Sarah Guermond, Jiarong Guo, Aditi Gupta, "
-                  "Joshua R. Herr, Adina Howe, Alex Hyer, Andreas Härpfer, "
-                  "Luiz Irber, Rhys Kidd, David Lin, Justin Lippi, "
-                  "Tamer Mansour, Pamela McA'Nulty, Eric McDonald, "
-                  "Jessica Mizzi, Kevin D. Murray, Joshua R. Nahum, "
-                  "Kaben Nanlohy, Alexander Johan Nederbragt, "
-                  "Humberto Ortiz-Zuazaga, Jeramia Ory, Jason Pell, "
-                  "Charles Pepe-Ranney, Zachary N Russ, Erich Schwarz, "
-                  "Camille Scott, Josiah Seaman, Scott Sievert, "
-                  "Jared Simpson, Connor T. Skennerton, James Spencer, "
-                  "Ramakrishnan Srinivasan, Daniel Standage, "
-                  "James A. Stapleton, Joe Stein, Susan R Steinman, "
-                  "Benjamin Taylor, Will Trimble, Heather L. Wiencko, "
-                  "Michael Wright, Brian Wyss, Qingpeng Zhang, en zyme, "
-                  "C. Titus Brown",
+        "author": authorstr,
         "author_email": 'khmer-project@idyll.org',
-        # "maintainer": 'Michael R. Crusoe', # this overrides the author field
-        # "maintainer_email": 'mcrusoe@msu.edu', # so don't include it
+        # "maintainer": 'Daniel Standage', # this overrides the author field
+        # "maintainer_email": 'daniel.standage@gmail.com', # so don't include
         # http://docs.python.org/2/distutils/setupscript.html
         # additional-meta-data note #3
         "url": 'https://khmer.readthedocs.io/',
         "packages": ['khmer', 'khmer.tests', 'oxli', 'khmer._oxli'],
         "package_data": {'khmer/_oxli': ['*.pxd']},
         "package_dir": {'khmer.tests': 'tests'},
-        "install_requires": ['screed >= 0.9', 'bz2file'],
+        "install_requires": ['screed >= 1.0', 'bz2file'],
         "setup_requires": ["pytest-runner>=2.0,<3dev", "setuptools>=18.0",
                            "Cython>=0.25.2"],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
@@ -337,6 +332,7 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
                         "compress", "decompress", "bzlib"])
         _build_ext.run(self)
 
+
 CMDCLASS.update({'build_ext': KhmerBuildExt})
 
 _DISTUTILS_REINIT = Distribution.reinitialize_command
@@ -356,6 +352,8 @@ def reinitialize_command(self, command, reinit_subcommands):
         self._set_command_options(  # pylint: disable=protected-access
             cmd_obj, options)
     return cmd_obj
+
+
 Distribution.reinitialize_command = reinitialize_command
 
 

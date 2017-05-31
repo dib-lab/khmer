@@ -79,7 +79,7 @@ NodeGatherer<direction>::NodeGatherer(const Hashgraph * ht,
 
 
 template <bool direction>
-WordLength NodeGatherer<direction>::ksize()
+WordLength NodeGatherer<direction>::ksize() const
 {
     return graph->ksize();
 }
@@ -220,6 +220,7 @@ void Traverser::push_filter(KmerFilter filter)
     right_gatherer.push_filter(filter);
 }
 
+
 KmerFilter Traverser::pop_filter()
 {
     left_gatherer.pop_filter();
@@ -278,6 +279,7 @@ AssemblerTraverser<direction>::AssemblerTraverser(const Hashgraph * ht,
                                       Kmer start_kmer,
                                       KmerFilterList filters) :
     NodeCursor<direction>(ht, start_kmer, filters)
+
 {
     visited = std::make_shared<SeenSet>();
     AssemblerTraverser<direction>::push_filter(get_visited_filter(visited));
@@ -394,6 +396,7 @@ char CompactingAT<TRAVERSAL_LEFT>::next_symbol()
     return AssemblerTraverser<TRAVERSAL_LEFT>::next_symbol();
 }
 
+
 template class NodeGatherer<TRAVERSAL_LEFT>;
 template class NodeGatherer<TRAVERSAL_RIGHT>;
 template class NodeCursor<TRAVERSAL_LEFT>;
@@ -402,7 +405,6 @@ template class AssemblerTraverser<TRAVERSAL_RIGHT>;
 template class AssemblerTraverser<TRAVERSAL_LEFT>;
 template class CompactingAT<TRAVERSAL_RIGHT>;
 template class CompactingAT<TRAVERSAL_LEFT>;
-
 
 
 } // namespace oxli

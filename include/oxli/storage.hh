@@ -565,7 +565,6 @@ public:
         }
 
         return is_new_kmer;
-
     }
 
     // get the count for the given k-mer hash.

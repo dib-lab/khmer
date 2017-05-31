@@ -67,6 +67,7 @@ def load_records_d(stringio_fp):
 def idem(record):
     return record['name'], record['sequence']
 
+
 # keep every *other* sequence
 odd_counter = 0
 

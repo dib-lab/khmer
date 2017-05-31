@@ -20,7 +20,7 @@ from libc.stdio cimport FILE, fopen, fwrite, fclose, stdout, stderr, fprintf
 import json
 import os
 
-from wrapper cimport *
+from oxli_types cimport *
 from utils cimport _bstring
 from .._khmer import Countgraph
 from .._khmer import Nodegraph

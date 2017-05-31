@@ -36,6 +36,7 @@ PRIMES_1m = [1000003, 1009837]
 def tabletype(request):
     return request.param
 
+
 # For map(long, [list of ints]) cross-version hackery
 if sys.version_info.major > 2:
     long = int  # pylint: disable=redefined-builtin
@@ -385,8 +386,10 @@ def test_save_load(tabletype):
         loaded = khmer.load_countgraph(savefile, small=True)
     elif tabletype == _SmallCounttable:
         loaded = khmer.load_counttable(savefile, small=True)
-    elif tabletype in (_Nodegraph, _Nodetable):
+    elif tabletype == _Nodegraph:
         loaded = khmer.load_nodegraph(savefile)
+    elif tabletype == _Nodetable:
+        loaded = khmer.load_nodetable(savefile)
     else:
         raise Exception("unknown tabletype")
 

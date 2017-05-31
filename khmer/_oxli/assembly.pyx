@@ -3,7 +3,8 @@
 
 from cython.operator cimport dereference as deref
 
-from wrapper cimport CpHashgraph, CpLinearAssembler, CpCompactingAssembler, CpKmer, get_hashgraph_ptr
+from graphs cimport CpHashgraph, get_hashgraph_ptr
+from hashing cimport CpKmer
 
 
 cdef class LinearAssembler:
