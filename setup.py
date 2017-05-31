@@ -38,12 +38,16 @@
 
 import ez_setup
 
+import glob
 import os
 import sys
 from os import listdir as os_listdir
 from os.path import join as path_join
+from os.path import splitext
 import shutil
 import subprocess
+import sys
+import sysconfig
 import tempfile
 import csv
 
@@ -59,6 +63,14 @@ import versioneer
 ez_setup.use_setuptools(version="3.4.1")
 
 CMDCLASS = versioneer.get_cmdclass()
+
+HAS_CYTHON = False
+try:
+    import Cython
+    HAS_CYTHON = True
+except ImportError:
+    pass
+cy_ext = 'pyx' if HAS_CYTHON else 'cpp'
 
 # strip out -Wstrict-prototypes; a hack suggested by
 # http://stackoverflow.com/a/9740721
@@ -119,24 +131,34 @@ def check_for_openmp():
 
     return exit_code == 0
 
+
+def distutils_dir_name(dname):
+    """Returns the name of a distutils build directory"""
+    f = "{dirname}.{platform}-{version[0]}.{version[1]}"
+    return f.format(dirname=dname,
+                    platform=sysconfig.get_platform(),
+                    version=sys.version_info)
+
+
+def build_dir():
+    return path_join("build", distutils_dir_name("temp"))
+
 # We bundle tested versions of zlib & bzip2. To use the system zlib and bzip2
 # change setup.cfg or use the `--libraries z,bz2` parameter which will make our
 # custom build_ext command strip out the bundled versions.
 
+
 ZLIBDIR = 'third-party/zlib'
 BZIP2DIR = 'third-party/bzip2'
 
-BUILD_DEPENDS = []
-BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
+BUILD_DEPENDS = glob.glob(path_join("include", "khmer", "_cpy_*.hh"))
+BUILD_DEPENDS.extend(path_join("include", "oxli", bn + ".hh") for bn in [
     "khmer", "kmer_hash", "hashtable", "labelhash", "hashgraph",
     "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers",
     "kmer_filters", "traversal", "assembler", "alphabets", "storage"])
-BUILD_DEPENDS.extend(path_join("khmer", bn + ".hh") for bn in [
-    "_cpy_counttable", "_cpy_hashgraph", "_cpy_nodetable",
-    "_cpy_smallcounttable", "_cpy_smallcountgraph"])
 
-SOURCES = ["khmer/_khmer.cc"]
-SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
+SOURCES = glob.glob(path_join("src", "khmer", "_cpy_*.cc"))
+SOURCES.extend(path_join("src", "oxli", bn + ".cc") for bn in [
     "read_parsers", "kmer_hash", "hashtable", "hashgraph",
     "labelhash", "subset", "read_aligner",
     "hllcounter", "traversal", "kmer_filters", "assembler", "alphabets",
@@ -153,22 +175,45 @@ if sys.platform == 'darwin':
     # force 64bit only builds
     EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64', '-mmacosx-version-min=10.7',
                                '-stdlib=libc++'])
+    EXTRA_LINK_ARGS.append('-mmacosx-version-min=10.7')
 
 if check_for_openmp():
     EXTRA_COMPILE_ARGS.extend(['-fopenmp'])
     EXTRA_LINK_ARGS.extend(['-fopenmp'])
 
-EXTENSION_MOD_DICT = \
+CP_EXTENSION_MOD_DICT = \
     {
         "sources": SOURCES,
         "extra_compile_args": EXTRA_COMPILE_ARGS,
         "extra_link_args": EXTRA_LINK_ARGS,
         "depends": BUILD_DEPENDS,
+        "include_dirs": ["include", "."],
         "language": "c++",
         "define_macros": [("VERSION", versioneer.get_version()), ],
     }
 
-EXTENSION_MOD = Extension("khmer._khmer", ** EXTENSION_MOD_DICT)
+EXTENSION_MODS = [Extension("khmer._khmer", ** CP_EXTENSION_MOD_DICT)]
+
+for cython_ext in glob.glob(os.path.join("khmer", "_oxli",
+                                         "*.{0}".format(cy_ext))):
+
+    CY_EXTENSION_MOD_DICT = \
+        {
+            "sources": [cython_ext],
+            "extra_compile_args": EXTRA_COMPILE_ARGS,
+            "extra_link_args": EXTRA_LINK_ARGS,
+            "extra_objects": [path_join(build_dir(), splitext(p)[0] + '.o')
+                              for p in SOURCES],
+            "depends": [],
+            "include_dirs": ["include", "."],
+            "language": "c++",
+            "define_macros": [("VERSION", versioneer.get_version()), ],
+        }
+
+    ext_name = "khmer._oxli.{0}".format(
+        splitext(os.path.basename(cython_ext))[0])
+    EXTENSION_MODS.append(Extension(ext_name, ** CY_EXTENSION_MOD_DICT))
+
 SCRIPTS = []
 SCRIPTS.extend([path_join("scripts", script)
                 for script in os_listdir("scripts")
@@ -218,10 +263,12 @@ SETUP_METADATA = \
         # http://docs.python.org/2/distutils/setupscript.html
         # additional-meta-data note #3
         "url": 'https://khmer.readthedocs.io/',
-        "packages": ['khmer', 'khmer.tests', 'oxli'],
+        "packages": ['khmer', 'khmer.tests', 'oxli', 'khmer._oxli'],
+        "package_data": {'khmer/_oxli': ['*.pxd']},
         "package_dir": {'khmer.tests': 'tests'},
         "install_requires": ['screed >= 1.0', 'bz2file'],
-        "setup_requires": ["pytest-runner>=2.0,<3dev"],
+        "setup_requires": ["pytest-runner>=2.0,<3dev", "setuptools>=18.0",
+                           "Cython>=0.25.2"],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
                            'tests': ['pytest>=2.9'],
@@ -232,7 +279,7 @@ SETUP_METADATA = \
         #        "oxli = oxli:main"
         #    ]
         # },
-        "ext_modules": [EXTENSION_MOD, ],
+        "ext_modules": EXTENSION_MODS,
         # "platforms": '', # empty as is conveyed by the classifiers below
         # "license": '', # empty as is conveyed by the classifier below
         "include_package_data": True,
@@ -264,20 +311,25 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
                     ' configure || bash ./configure --static ) && make -f '
                     'Makefile.pic PIC']
             spawn(cmd=zcmd, dry_run=self.dry_run)
-            self.extensions[0].extra_objects.extend(
-                path_join("third-party", "zlib", bn + ".lo") for bn in [
-                    "adler32", "compress", "crc32", "deflate", "gzclose",
-                    "gzlib", "gzread", "gzwrite", "infback", "inffast",
-                    "inflate", "inftrees", "trees", "uncompr", "zutil"])
+            # self.extensions[0].extra_objects.extend(
+            for ext in self.extensions:
+                ext.extra_objects.extend(
+                    path_join("third-party", "zlib", bn + ".lo") for bn in [
+                        "adler32", "compress", "crc32", "deflate", "gzclose",
+                        "gzlib", "gzread", "gzwrite", "infback", "inffast",
+                        "inflate", "inftrees", "trees", "uncompr", "zutil"])
         if "bz2" not in self.libraries:
             bz2cmd = ['bash', '-c', 'cd ' + BZIP2DIR + ' && make -f '
                       'Makefile-libbz2_so all']
             spawn(cmd=bz2cmd, dry_run=self.dry_run)
-            self.extensions[0].extra_objects.extend(
-                path_join("third-party", "bzip2", bn + ".o") for bn in [
-                    "blocksort", "huffman", "crctable", "randtable",
-                    "compress", "decompress", "bzlib"])
+            # self.extensions[0].extra_objects.extend(
+            for ext in self.extensions:
+                ext.extra_objects.extend(
+                    path_join("third-party", "bzip2", bn + ".o") for bn in [
+                        "blocksort", "huffman", "crctable", "randtable",
+                        "compress", "decompress", "bzlib"])
         _build_ext.run(self)
+
 
 CMDCLASS.update({'build_ext': KhmerBuildExt})
 
@@ -298,6 +350,8 @@ def reinitialize_command(self, command, reinit_subcommands):
         self._set_command_options(  # pylint: disable=protected-access
             cmd_obj, options)
     return cmd_obj
+
+
 Distribution.reinitialize_command = reinitialize_command
 
 

@@ -125,5 +125,6 @@ def main():
             ave, stdev = [round(x, 9) for x in (ave, stdev)]
             output.writerow([record.name, medn, ave, stdev, len(seq)])
 
+
 if __name__ == '__main__':
     main()

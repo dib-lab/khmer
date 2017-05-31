@@ -116,5 +116,6 @@ def main():
 
         print('output in', outfile, file=sys.stderr)
 
+
 if __name__ == '__main__':
     main()

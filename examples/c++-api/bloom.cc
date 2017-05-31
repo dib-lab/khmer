@@ -3,10 +3,10 @@
 // memory requirements.
 
 #include <vector>
-#include "khmer.hh"
-#include "hashtable.hh"
+#include "oxli/oxli.hh"
+#include "oxli/hashtable.hh"
 
-using namespace khmer;
+using namespace oxli;
 
 int main()
 {

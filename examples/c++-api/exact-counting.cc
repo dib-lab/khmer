@@ -3,10 +3,11 @@
 
 #include <vector>
 #include <cmath>
-#include "khmer.hh"
-#include "hashgraph.hh"
+#include "oxli/oxli.hh"
+#include "oxli/hashgraph.hh"
 
-using namespace khmer;
+
+using namespace oxli;
 
 int main()
 {

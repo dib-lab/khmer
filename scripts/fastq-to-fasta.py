@@ -102,5 +102,6 @@ def main():
     print('Wrote output to', describe_file_handle(args.output),
           file=sys.stderr)
 
+
 if __name__ == '__main__':
     main()
