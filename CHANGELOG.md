@@ -6,6 +6,17 @@ The khmer project's command line scripts adhere to
 [Semantic Versioning](http://semver.org/). The Python and C++ APIs are not yet
 under semantic versioning, but will be in future versions of khmer.
 
+## [Unreleased]
+### Added
+- Cython wrapper for liboxli.
+- Cython containers for parsing, assembly, and hashing.
+- Header install for liboxli.
+
+### Changed
+- Split CPython wrapper file into per-class files under src/khmer and include/khmer.
+- Moved liboxli headers to include/oxli and implementations to src/oxli.
+- Removed CPython assembler wrappers.
+
 ## [2.1.1] - 2017-05-25
 ### Added
 - Document for submission to the Journal of Open Source Software.
