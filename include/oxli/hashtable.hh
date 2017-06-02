@@ -260,13 +260,6 @@ public:
     // count every k-mer in the string.
     unsigned int consume_string(const std::string &s);
 
-    // checks each read for non-ACGT characters
-    bool check_and_normalize_read(std::string &read) const;
-
-    // check each read for non-ACGT characters, and then consume it.
-    unsigned int check_and_process_read(std::string &read,
-                                        bool &is_valid);
-
     // Count every k-mer in a file containing nucleotide sequences.
     template<typename SeqIO>
     void consume_seqfile(
