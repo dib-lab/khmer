@@ -115,6 +115,10 @@ HashIntoType _hash_murmur(const std::string& kmer, const WordLength k,
 HashIntoType _hash_murmur_forward(const std::string& kmer,
                                   const WordLength k);
 
+// Function to support k-mer banding.
+std::pair<uint64_t, uint64_t> compute_band_interval(unsigned int num_bands,
+                                                    unsigned int band);
+
 /**
  * \class Kmer
  *

@@ -12,11 +12,15 @@ under semantic versioning, but will be in future versions of khmer.
 - Cython wrapper for liboxli.
 - Cython containers for parsing, assembly, and hashing.
 - Header install for liboxli.
+- New function `consume_fasta_banding` for bulk loading of sequences into
+  hashtables. Only k-mers whose hashed values fall within a specified range are
+  counted.
 
 ### Changed
-- Non-ACTG handling significantly changed so that only bulk-loading functions 
+- Non-ACTG handling significantly changed so that only bulk-loading functions
   "clean" sequences of non-DNA characters. See #1590 for details.
-- Split CPython wrapper file into per-class files under src/khmer and include/khmer.
+- Split CPython wrapper file into per-class files under `src/khmer` and
+  `include/khmer`.
 - Moved liboxli headers to include/oxli and implementations to src/oxli.
 - Removed CPython assembler wrappers.
 
