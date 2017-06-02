@@ -214,6 +214,19 @@ HashIntoType _hash_murmur_forward(const std::string& kmer, const WordLength k)
     return h;
 }
 
+std::pair<uint64_t, uint64_t> compute_band_interval(unsigned int num_bands,
+                                                    unsigned int band)
+{
+    if (band < 1 || band > num_bands) {
+        throw InvalidValue("'band' must be in the interval [1, num_bands]");
+    }
+    uint64_t band_size = std::numeric_limits<uint64_t>::max() / num_bands;
+    uint64_t min = band_size * (band - 1);
+    uint64_t max = band_size;
+    std::pair<uint64_t, uint64_t> interval (min, max);
+    return interval;
+}
+
 KmerIterator::KmerIterator(const char * seq,
                            unsigned char k) :
     KmerFactory(k), _seq(seq)

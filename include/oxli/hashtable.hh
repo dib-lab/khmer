@@ -277,6 +277,26 @@ public:
         unsigned long long &n_consumed
     );
 
+    // Consume sequences in k-mer banding mode.
+    template<typename SeqIO>
+    void consume_seqfile_banding(
+        std::string const &filename,
+        unsigned int num_bands,
+        unsigned int band,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
+    );
+
+    // Consume sequences in k-mer banding mode.
+    template<typename SeqIO>
+    void consume_seqfile_banding(
+        read_parsers::ReadParserPtr<SeqIO>& parser,
+        unsigned int num_bands,
+        unsigned int band,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
+    );
+
     void set_use_bigcount(bool b)
     {
         store->set_use_bigcount(b);
