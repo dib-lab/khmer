@@ -50,8 +50,7 @@ from khmer._khmer import Nodegraph as _Nodegraph
 from khmer._khmer import Nodetable as _Nodetable
 from khmer._khmer import HLLCounter as _HLLCounter
 from khmer._khmer import ReadAligner as _ReadAligner
-from khmer._oxli.assembly import LinearAssembler
-from khmer._khmer import SimpleLabeledAssembler
+
 from khmer._khmer import JunctionCountAssembler
 from khmer._khmer import HashSet
 from khmer._khmer import Read
@@ -515,3 +514,5 @@ class ReadAligner(_ReadAligner):
         the traditional way.
         """
         _ReadAligner.__init__(self)
+
+from khmer._oxli.assembly import LinearAssembler, SimpleLabeledAssembler

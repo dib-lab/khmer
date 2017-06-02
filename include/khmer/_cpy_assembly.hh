@@ -8,31 +8,6 @@
 
 namespace khmer {
 
-typedef struct {
-    PyObject_HEAD
-    oxli::SimpleLabeledAssembler * assembler;
-} khmer_KSimpleLabeledAssembler_Object;
-
-extern PyTypeObject khmer_KSimpleLabeledAssembler_Type;
-
-extern PyMethodDef khmer_simplelabeledassembler_methods[];
-
-void khmer_simplelabeledassembler_dealloc(khmer_KSimpleLabeledAssembler_Object *
-        obj);
-
-PyObject * khmer_simplelabeledassembler_new(PyTypeObject *type,
-        PyObject *args,
-        PyObject *kwds);
-
-PyObject *
-simplelabeledassembler_assemble(khmer_KSimpleLabeledAssembler_Object * me,
-                                PyObject * args, PyObject *kwargs);
-
-
-/********************************
- * JunctionCountAssembler
- ********************************/
-
 
 typedef struct {
     PyObject_HEAD

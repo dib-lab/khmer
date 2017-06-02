@@ -306,9 +306,6 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
-    if (PyType_Ready(&khmer_KSimpleLabeledAssembler_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
     if (PyType_Ready(&khmer_KJunctionCountAssembler_Type) < 0) {
         return MOD_ERROR_VAL;
     }
@@ -412,12 +409,6 @@ MOD_INIT(_khmer)
     Py_INCREF(&khmer_KGraphLabels_Type);
     if (PyModule_AddObject(m, "GraphLabels",
                            (PyObject *)&khmer_KGraphLabels_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    Py_INCREF(&khmer_KSimpleLabeledAssembler_Type);
-    if (PyModule_AddObject(m, "SimpleLabeledAssembler",
-                           (PyObject *)&khmer_KSimpleLabeledAssembler_Type) < 0) {
         return MOD_ERROR_VAL;
     }
 
