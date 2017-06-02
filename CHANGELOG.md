@@ -7,12 +7,15 @@ The khmer project's command line scripts adhere to
 under semantic versioning, but will be in future versions of khmer.
 
 ## [Unreleased]
+
 ### Added
 - Cython wrapper for liboxli.
 - Cython containers for parsing, assembly, and hashing.
 - Header install for liboxli.
 
 ### Changed
+- Non-ACTG handling significanly changed so that only bulk-loading functions 
+  "clean" sequences of non-DNA characters. See #1590 for details.
 - Split CPython wrapper file into per-class files under src/khmer and include/khmer.
 - Moved liboxli headers to include/oxli and implementations to src/oxli.
 - Removed CPython assembler wrappers.
