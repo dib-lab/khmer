@@ -14,7 +14,7 @@ under semantic versioning, but will be in future versions of khmer.
 - Header install for liboxli.
 
 ### Changed
-- Non-ACTG handling significanly changed so that only bulk-loading functions 
+- Non-ACTG handling significantly changed so that only bulk-loading functions 
   "clean" sequences of non-DNA characters. See #1590 for details.
 - Split CPython wrapper file into per-class files under src/khmer and include/khmer.
 - Moved liboxli headers to include/oxli and implementations to src/oxli.
