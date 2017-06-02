@@ -62,7 +62,7 @@ cdef class SimpleLabeledAssembler:
     
     cdef vector[string] _assemble(self, Kmer start)
 
-'''
+
 cdef class JunctionCountAssembler:
     cdef unique_ptr[CpJunctionCountAssembler] _this
 
@@ -72,6 +72,4 @@ cdef class JunctionCountAssembler:
     cdef public object stop_filter
     cdef CpHashgraph * _stop_filter_ptr
     
-    cdef str _assemble(self, Kmer)
-    cdef uint16_t _consume(self, string)
-'''
+    cdef vector[string] _assemble(self, Kmer)

@@ -3,6 +3,8 @@
 
 from cython.operator cimport dereference as deref
 
+from utils cimport _bstring
+
 
 cdef class LinearAssembler:
 
@@ -95,4 +97,38 @@ cdef class SimpleLabeledAssembler:
         else:
             return self._assemble(Kmer(str(seed)))
 
+cdef class JunctionCountAssembler:
 
+    def __cinit__(self, graph, stop_filter=None):
+        self._graph_ptr = get_hashgraph_ptr(graph)
+        if self._graph_ptr == NULL:
+            raise ValueError('Must take an object with Hashgraph *')
+        self.graph = graph
+        self.set_stop_filter(stop_filter=stop_filter)
+        
+        if type(self) is JunctionCountAssembler:
+            self._this.reset(new CpJunctionCountAssembler(self._graph_ptr))
+
+    def set_stop_filter(self, stop_filter=None):
+        self.stop_filter = stop_filter
+        if stop_filter is not None:
+            self._stop_filter_ptr = get_hashgraph_ptr(stop_filter)
+            if self._stop_filter_ptr == NULL:
+                raise ValueError('Must take an object with Hashgraph *')
+        else:
+            self._stop_filter_ptr = NULL
+
+    cdef vector[string] _assemble(self, Kmer kmer):
+        if self.stop_filter is None:
+            return deref(self._this).assemble(deref(kmer._this))
+        else:
+            return deref(self._this).assemble(deref(kmer._this), self._stop_filter_ptr)
+
+    def consume(self, sequence):
+        return deref(self._this).consume(_bstring(sequence))
+
+    def assemble(self, seed):
+        if isinstance(seed, Kmer):
+            return self._assemble(seed)
+        else:
+            return self._assemble(Kmer(str(seed)))
