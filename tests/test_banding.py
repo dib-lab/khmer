@@ -85,10 +85,10 @@ def test_banding_in_memory(ksize, memory, epsilon, numbands):
 
 
 @pytest.mark.parametrize('ksize,memory,numbands', [
-    (21, 5e7, 2),
-    (21, 5e7, 4),
-    (21, 5e7, 8),
-    (21, 5e7, 16),
+    (21, 5e7, 3),
+    (21, 5e7, 11),
+    (21, 5e7, 23),
+    (21, 5e7, 29),
 ])
 def test_banding_to_disk(ksize, memory, numbands):
     """
