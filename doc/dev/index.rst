@@ -61,7 +61,5 @@ Contents:
    for-khmer-developers
    release
 
-   details
    development
-   crazy-ideas
    binary-file-formats

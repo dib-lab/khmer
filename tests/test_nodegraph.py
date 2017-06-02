@@ -704,7 +704,7 @@ def _build_testfiles():
     # nodegraph file
 
     inpath = utils.get_test_data('random-20-a.fa')
-    hi = khmer._Nodegraph(12, 2)
+    hi = khmer._Nodegraph(12, [2])
     hi.consume_seqfile(inpath)
     hi.save('/tmp/goodversion-k12.htable')
 
@@ -720,7 +720,7 @@ def _build_testfiles():
 
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
-    nodegraph = khmer.Nodegraph(32, 4, 4)
+    nodegraph = khmer.Nodegraph(32, 100000, 4)
     nodegraph.consume_seqfile_and_tag(fakelump_fa)
 
     subset = nodegraph.do_subset_partition(0, 0)
@@ -729,7 +729,7 @@ def _build_testfiles():
     EXCURSION_DISTANCE = 40
     EXCURSION_KMER_THRESHOLD = 82
     EXCURSION_KMER_COUNT_THRESHOLD = 1
-    counting = khmer.Countgraph(32, 4, 4)
+    counting = khmer.Countgraph(32, 100000, 4)
 
     nodegraph.repartition_largest_partition(None, counting,
                                             EXCURSION_DISTANCE,

@@ -50,7 +50,7 @@ from khmer._khmer import Nodegraph as _Nodegraph
 from khmer._khmer import Nodetable as _Nodetable
 from khmer._khmer import HLLCounter as _HLLCounter
 from khmer._khmer import ReadAligner as _ReadAligner
-from khmer._khmer import LinearAssembler
+from khmer._oxli.assembly import LinearAssembler
 from khmer._khmer import SimpleLabeledAssembler
 from khmer._khmer import JunctionCountAssembler
 from khmer._khmer import HashSet
@@ -103,6 +103,18 @@ def load_nodegraph(filename):
     nodegraph.load(filename)
 
     return nodegraph
+
+
+def load_nodetable(filename):
+    """Load a nodetable object from the given filename and return it.
+
+    Keyword argument:
+    filename -- the name of the nodegraph file
+    """
+    nodetable = _Nodetable(1, [1])
+    nodetable.load(filename)
+
+    return nodetable
 
 
 def load_countgraph(filename, small=False):
@@ -341,6 +353,7 @@ class Counttable(_Counttable):
 
 
 class SmallCounttable(_SmallCounttable):
+
     def __new__(cls, k, starting_size, n_tables):
         primes = get_n_primes_near_x(n_tables, starting_size)
         counttable = _SmallCounttable.__new__(cls, k, primes)

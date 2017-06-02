@@ -4,24 +4,24 @@
    Copyright (C) 2015 The Regents of the University of California.
    It is licensed under the three-clause BSD license; see LICENSE.
    Contact: khmer-project@idyll.org
-   
+
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are
    met:
-   
+
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
-   
+
     * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the following
       disclaimer in the documentation and/or other materials provided
       with the distribution.
-   
+
     * Neither the name of the Michigan State University nor the names
       of its contributors may be used to endorse or promote products
       derived from this software without specific prior written
       permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -33,7 +33,7 @@
    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-   
+
    Contact: khmer-project@idyll.org
 
 ============================
@@ -43,10 +43,18 @@ Installing and running khmer
 You'll need a 64-bit operating system, internet access, and Python
 2.7.x OR Python 3.3 or greater.
 
+If you are running khmer in a HPC environment or for other reasons do not
+have root access try creating a virtual environment as described in the OS X
+instructions below (even if you are on linux) and then installing khmer in
+that newly created virtual environment.
+
+.. _osx-label:
+
 Build requirements
 ------------------
 
-OS X 
+
+OS X
 ^^^^
 
 #) From a terminal download the virtualenv package and create a
@@ -56,6 +64,8 @@ OS X
       tar xzf virtualenv*
       cd virtualenv-*; python2.7 virtualenv.py ../khmerEnv; cd ..
       source khmerEnv/bin/activate
+
+#) Go to :ref:`install-in-venv` to install khmer itself.
 
 Linux
 ^^^^^
@@ -70,7 +80,7 @@ Linux
    - For RHEL6::
 
          sudo yum install -y python-devel python-pip git gcc gcc-c++ make
-         sudo pip install virtualenv   
+         sudo pip install virtualenv
 
 #) Create a virtualenv and activate it::
 
@@ -79,6 +89,9 @@ Linux
       source khmerEnv/bin/activate
 
    Linux users without root access can try the OS X instructions above.
+
+
+.. _install-in-venv:
 
 Installing khmer inside the virtualenv
 --------------------------------------

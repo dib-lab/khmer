@@ -36,8 +36,8 @@
 
    Contact: khmer-project@idyll.org
 
-Development miscellany
-======================
+Development Nuts and Bolts
+==========================
 
 Third-party use
 ---------------
@@ -62,27 +62,16 @@ Still in the works, but read `this
 Make a branch on dib-lab (preferred so others can contribute) or fork the
 repository and make a branch there.
 
-Each piece or fix you are working on should have its own branch; make a pull-
+Each piece or fix you are working on should have its own branch; make a pull
 request to dib-lab/master to aid in code review, testing, and feedback.
 
-If you want your code integrated then it needs to be mergable
-
-Example pull request update using the command line:
-
- #. Clone the source of the pull request (if needed)
-     ``git clone git@github.com:mr-c/khmer.git``
- #. Checkout the source branch of the pull request
-     ``git checkout my-pull-request``
- #. Pull in the destination of the pull request and resolve any conflicts
-     ``git pull git@github.com:dib-lab/khmer.git master``
- #. Push your update to the source of the pull request ``git push``
- #. Jenkins will automatically attempt to build and test your pull requests.
+If you want your code integrated then it needs to be mergeable.
 
 Code coverage
 -------------
 
-Jenkins calculates code coverage for every build. Navigate to the results from
-the master node first to view the coverage information.
+Travis and CodeCov calculate code coverage for every build, and post changes
+in code coverage to every pull request thread after a successful build.
 
 Code coverage should never go down and new functionality needs to be tested.
 
@@ -98,15 +87,13 @@ Command line scripts
 Python command-line scripts should use '-' instead of '_' in the name.
 (Only filenames containing code for import should use _.)
 
-Please follow the command-line conventions used under scripts/.  This
-includes most especially standardization of '-x' to be hash table size,
-'-N' to be number of hash tables, and '-k' to always refer to the
-k-mer size.
+Please follow the command-line conventions used in ``scripts/``, as described
+in the :doc:`scripts and sandbox documentation <scripts-and-sandbox>`.
 
 Command line thoughts:
 
-   If a filename is required, typically UNIX commands don't use a flag to
-   specify it.
+   If a input filename is required, typically UNIX commands don't use a flag
+   to specify it.
 
    Also, positional arguments typically aren't used with multiple files.
 
@@ -116,8 +103,6 @@ Command line thoughts:
    override of this, e.g. ::
 
       filter-abund.py <ct file> <filename> [ -o <filename.keep> ]
-
-----
 
 All code in ``scripts/`` must have automated tests; see
 ``tests/test_scripts.py``. Otherwise it belongs in ``sandbox/``.
@@ -129,8 +114,6 @@ command line mistakes from trashing important files.
 A general error should be signaled by exit code `1` and success by `0`. Linux
 supports exit codes from `0` to `255` where the value `1` means a general
 error. An exit code of `-1` will get converted to `255`.
-
-----
 
 CLI reading:
 
@@ -144,7 +127,7 @@ Python / C integration
 ----------------------
 
 The Python extension that wraps the C++ core of khmer lives in
-``khmer/_khmer.cc``
+``src/khmer/_cpy_khmer.cc``
 
 This wrapper code is tedious and annoying so we use a static analysis tool to
 check for correctness.
@@ -168,13 +151,13 @@ Errors to ignore: "Unhandled Python exception raised calling 'execute' method",
 
 Warnings to address: ::
 
-        khmer/_khmer.cc:3109:1: note: this function is too complicated
+        src/khmer/_cpy_khmer.cc:3109:1: note: this function is too complicated
         for the reference-count checker to fully analyze: not all paths were
         analyzed
 
 Adjust --maxtrans and re-run. ::
 
-	khmer/_khmer.cc:2191:61: warning: Mismatching type in call to
+	src/khmer/_cpy_khmer.cc:2191:61: warning: Mismatching type in call to
 	Py_BuildValue with format code "i" [enabled by default]
 	  argument 2 ("D.68937") had type
 	    "long long unsigned int"
@@ -186,7 +169,43 @@ See below for a format string cheat sheet One also benefits by matching C type
 with the function signature used later.
 
 "I" for unsigned int
-"K" for unsigned long long a.k.a khmer::HashIntoType.
+"K" for unsigned long long a.k.a oxli::HashIntoType.
+
+Linking Against liboxli
+-----------------------
+
+The C++ library can be installed as a shared library and linked against from external projects.
+To build and install it, run: ::
+
+    make install-liboxli
+
+This command can be given an optional ``PREFIX`` variable to control where the library and headers are
+installed (by default, in ``/usr/local``. Code can then include the headers by prefixing their paths 
+with ``oxli/``. For example, to use ``Hashgraph``, use ``#include "oxli/hashgraph.hh"``. To compile,
+add ``-Ioxli`` to your compiler invocation.
+    
+
+Experimental Cython Bindings
+----------------------------
+
+khmer includes experimental Cython bindings in ``khmer/_oxli``. ``wrapper.pxd`` contains all the C++
+library declarations. To use extension classes in regular Python code, simply ``import`` them: for
+example, to get the wrapped ``ReadParser``, use ``from khmer._oxli.parsing import FastxParser``.
+Extension classes can all be used in external Cython code by using `cimport`; the declarations in
+``wrapper.pxd`` can also be used, meaning you have access to liboxli. Note that for any ``cimport``'ed code
+to work, you'll need to install liboxli and include ``oxli`` in your Cython project's ``Extension``
+class. This is done by adding ``oxli`` to the ``libraries`` argument of your ``Extension`` object in
+``setup.py``, which instructs setuptools to add ``-Ioxli`` to its compiler invocation.
+
+ An example: ::
+
+   
+    cy_ext = Extension('mypackage.example',
+                       sources = 'mypackage/example.pyx',
+                       extra_compile_args = ['-arch', 'x86_64', '-stdlib=libc++'],
+                       libraries = ['oxli'],
+                       include_dirs = [],
+                       language = 'c++')
 
 Read handling
 -------------

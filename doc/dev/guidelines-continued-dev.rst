@@ -142,6 +142,34 @@ GNU `aspell` can also be used to check the spelling in a single file::
 
         aspell check --mode ccpp $filename
 
+Cython Style
+~~~~~~~~~~~~
+
+Cython code can become messy very quickly, and as such, we have guidelines
+for style and structure.
+
+When wrapping code from liboxli:
+
+- `extern` definition should begin with `Cp`; for example, `CpHashtable` wraps
+  `oxli::Hashtable`.
+- If the extension class wrapping the liboxli class stores it as a pointer,
+  it should be named `_this`. If it wraps a stack object directly, it should
+  be named `_obj`.
+
+For imports,
+
+- `__future__` imports at the top, as usual.
+- `libc` cimports next,
+- then `libcpp` imports and cimports.
+- followed by cimports
+- and finally, regular imports.
+
+Generally,
+
+- Pure C methods should be underscore prefixed.
+- `cpdef` methods do not need to be underscore prefixed.
+
+
 Resolving merge conflicts
 -------------------------
 
