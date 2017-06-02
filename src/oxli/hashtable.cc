@@ -58,51 +58,6 @@ using namespace oxli:: read_parsers;
 
 
 //
-// check_and_process_read: checks for non-ACGT characters before consuming
-//
-
-unsigned int Hashtable::check_and_process_read(std::string &read,
-        bool &is_valid)
-{
-    is_valid = check_and_normalize_read(read);
-
-    if (!is_valid) {
-        return 0;
-    }
-
-    return consume_string(read);
-}
-
-//
-// check_and_normalize_read: checks for non-ACGT characters
-//			     converts lowercase characters to uppercase one
-// Note: Usually it is desirable to keep checks and mutations separate.
-//	 However, in the interests of efficiency (we are potentially working
-//	 with TB of data), a check and mutation have been placed inside the
-//	 same loop. Potentially trillions fewer fetches from memory would
-//	 seem to be a worthwhile goal.
-//
-
-bool Hashtable::check_and_normalize_read(std::string &read) const
-{
-    bool rc = true;
-
-    if (read.length() < _ksize) {
-        return false;
-    }
-
-    for (unsigned int i = 0; i < read.length(); i++)  {
-        read[ i ] &= 0xdf; // toupper - knock out the "lowercase bit"
-        if (!is_valid_dna( read[ i ] )) {
-            rc = false;
-            break;
-        }
-    }
-
-    return rc;
-}
-
-//
 // consume_seqfile: consume a file of reads
 //
 
@@ -136,8 +91,8 @@ void Hashtable::consume_seqfile(
             break;
         }
 
-        unsigned int this_n_consumed =
-            check_and_process_read(read.sequence, is_valid);
+        read.set_clean_seq();
+        unsigned int this_n_consumed = consume_string(read.cleaned_seq);
 
         __sync_add_and_fetch( &n_consumed, this_n_consumed );
         __sync_add_and_fetch( &total_reads, 1 );
@@ -350,20 +305,19 @@ uint64_t * Hashtable::abundance_distribution(
         } catch (NoMoreReadsAvailable &exc) {
             break;
         }
-        seq = read.sequence;
+        read.set_clean_seq();
+        seq = read.cleaned_seq;
 
-        if (check_and_normalize_read(seq)) {
-            KmerHashIteratorPtr kmers = new_kmer_iterator(seq);
+        KmerHashIteratorPtr kmers = new_kmer_iterator(seq);
 
-            while(!kmers->done()) {
-                HashIntoType kmer = kmers->next();
+        while(!kmers->done()) {
+            HashIntoType kmer = kmers->next();
 
-                if (!tracking->get_count(kmer)) {
-                    tracking->count(kmer);
+            if (!tracking->get_count(kmer)) {
+                tracking->count(kmer);
 
-                    BoundedCounterType n = get_count(kmer);
-                    dist[n]++;
-                }
+                BoundedCounterType n = get_count(kmer);
+                dist[n]++;
             }
 
             name.clear();
@@ -387,10 +341,6 @@ unsigned long Hashtable::trim_on_abundance(
     BoundedCounterType  min_abund)
 const
 {
-    if (!check_and_normalize_read(seq)) {
-        return 0;
-    }
-
     KmerHashIteratorPtr kmers = new_kmer_iterator(seq);
 
     HashIntoType kmer;
@@ -422,12 +372,7 @@ unsigned long Hashtable::trim_below_abundance(
     BoundedCounterType  max_abund)
 const
 {
-    if (!check_and_normalize_read(seq)) {
-        return 0;
-    }
-
     KmerHashIteratorPtr kmers = new_kmer_iterator(seq);
-
     HashIntoType kmer;
 
     if (kmers->done()) {
@@ -458,10 +403,6 @@ std::vector<unsigned int> Hashtable::find_spectral_error_positions(
 const
 {
     std::vector<unsigned int> posns;
-    if (!check_and_normalize_read(seq)) {
-        throw oxli_exception("invalid read");
-    }
-
     KmerHashIteratorPtr kmers = new_kmer_iterator(seq);
 
     HashIntoType kmer = kmers->next();

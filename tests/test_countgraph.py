@@ -889,12 +889,6 @@ def test_find_spectral_error_positions_err():
     except ValueError:
         pass
 
-    try:
-        hi.find_spectral_error_positions("ACGTACGN", 1)
-        assert 0, "should raise ValueError; contains N"
-    except ValueError:
-        pass
-
 
 def test_maxcount():
     # hashtable should saturate at some point so as not to overflow counter
