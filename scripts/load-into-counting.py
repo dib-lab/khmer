@@ -110,7 +110,8 @@ def main():
     args = sanitize_help(get_parser()).parse_args()
 
     configure_logging(args.quiet)
-    report_on_config(args)
+    graphtype = 'smallcountgraph' if args.small_count else 'countgraph'
+    report_on_config(args, graphtype=graphtype)
 
     base = args.output_countgraph_filename
     filenames = args.input_sequence_filename
