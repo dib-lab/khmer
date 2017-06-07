@@ -78,6 +78,20 @@ def test_load_into_counting():
     assert os.path.exists(outfile)
 
 
+def test_load_into_counting_smallcount():
+    script = 'load-into-counting.py'
+    args = ['-x', '1e3', '--small-count']
+
+    outfile = utils.get_temp_filename('out.ct')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+    assert 'Total number of unique k-mers: 83' in err, err
+    assert os.path.exists(outfile)
+
+
 def test_load_into_counting_quiet():
     script = 'load-into-counting.py'
     args = ['-q', '-x', '1e3', '-N', '2', '-k', '20']
@@ -1427,6 +1441,17 @@ def test_abundance_dist_single_nobigcount():
         assert line == '1,96,96,0.98', line
         line = fp.readline().strip()
         assert line == '255,2,98,1.0', line
+
+
+def test_abundance_dist_single_smallcount():
+    infile = utils.copy_test_data('test-abund-read-2.fa')
+    outfile = utils.get_temp_filename('test.dist')
+    in_dir = os.path.dirname(infile)
+
+    script = 'abundance-dist-single.py'
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '--small-count',
+            infile, outfile]
+    utils.runscript(script, args, in_dir)
 
 
 def test_abundance_dist_single_nosquash():

@@ -136,7 +136,6 @@ def main():
 
     log_info('making countgraph')
     countgraph = khmer_args.create_countgraph(args)
-    countgraph.set_use_bigcount(args.bigcount)
 
     filename = None
 
