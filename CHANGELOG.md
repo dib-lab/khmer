@@ -6,6 +6,11 @@ The khmer project's command line scripts adhere to
 [Semantic Versioning](http://semver.org/). The Python and C++ APIs are not yet
 under semantic versioning, but will be in future versions of khmer.
 
+## [Unreleased]
+### Fixed
+- Bug resulting in conflict between `--small-count` and `--no-bigcount` for
+  certain scripts.
+
 ## [2.1.1] - 2017-05-25
 ### Added
 - Document for submission to the Journal of Open Source Software.

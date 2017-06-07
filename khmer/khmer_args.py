@@ -569,7 +569,10 @@ def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
     else:
         tablesize = calculate_graphsize(args, 'countgraph',
                                         multiplier=multiplier)
-        return khmer.Countgraph(ksize, tablesize, args.n_tables)
+        cg = khmer.Countgraph(ksize, tablesize, args.n_tables)
+        if hasattr(args, 'bigcount'):
+            cg.set_use_bigcount(args.bigcount)
+        return cg
 
 
 def create_matching_nodegraph(countgraph):
