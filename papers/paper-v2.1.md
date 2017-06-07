@@ -112,10 +112,10 @@ and several examples of khmer's Python and C++ APIs for those interested in usin
 
 **Brown CT, Howe A, Zhang Q, Pyrkosz AB, Brom TH** (2012) A Reference-Free Algorithm for Computational Normalization of Shotgun Sequencing Data. *arXiv*, arXiv:1203.4802, https://arxiv.org/abs/1203.4802.
 
-**Crusoe MR, Alameldin HF, Awad S, Bucher E, *et al.*** (2015) The khmer software package: enabling efficient nucleotide sequence analysis. *F1000 Research*, doi:10.12688/f1000research.6924.1.
+**Crusoe MR, Alameldin HF, Awad S, Bucher E, *et al.*** (2015) The khmer software package: enabling efficient nucleotide sequence analysis. *F1000 Research*, [doi:10.12688/f1000research.6924.1](10.12688/f1000research.6924.1).
 
-**Pell J, Hintze A, Canino-Koning R, Howe A, Tiedje JM, Brown CT** (2012). Scaling metagenome sequence assembly with probabilistic de Bruijn graphs. *Proc Natl Acad Sci U S A*, 109(33):13272-7, doi:10.1073/pnas.1121464109.
+**Pell J, Hintze A, Canino-Koning R, Howe A, Tiedje JM, Brown CT** (2012). Scaling metagenome sequence assembly with probabilistic de Bruijn graphs. *Proc Natl Acad Sci U S A*, 109(33):13272-7, [doi:10.1073/pnas.1121464109](10.1073/pnas.1121464109).
 
-**Zhang Q, Awad S, Brown CT** (2015) Crossing the streams: a framework for streaming analysis of short DNA sequencing reads. *PeerJ PrePrints*, 3:e890v1, doi:10.7287/peerj.preprints.890v1.
+**Zhang Q, Awad S, Brown CT** (2015) Crossing the streams: a framework for streaming analysis of short DNA sequencing reads. *PeerJ PrePrints*, 3:e890v1, [doi:10.7287/peerj.preprints.890v1](10.7287/peerj.preprints.890v1).
 
-**Zhang Q, Pell J, Canino-Koning R, Howe A, Brown CT** (2014) These Are Not the K-mers You Are Looking For: Efficient Online K-mer Counting Using a Probabilistic Data Structure. *PLoS ONE*, e101271, doi:10.1371/journal.pone.0101271.
+**Zhang Q, Pell J, Canino-Koning R, Howe A, Brown CT** (2014) These Are Not the K-mers You Are Looking For: Efficient Online K-mer Counting Using a Probabilistic Data Structure. *PLoS ONE*, e101271, [doi:10.1371/journal.pone.0101271](10.1371/journal.pone.0101271).
