@@ -1,0 +1,47 @@
+A short HOWTO on comparing assemblies
+=====================================
+
+We regularly get e-mails and see blog posts telling us that people
+got better (or worse) results with diginorm/partitioning/etc than
+with other approaches.  It is often hard to evaluate these statements,
+but we *really* do want to be able to evaluate them, because we want
+to make sensible recommendations to people and figure out how to
+improve our own software and protocols.
+
+In that vein, here are some points to keep in mind:
+
+- please keep track of exactly what you did, so we can understand
+  and discuss it without guessing.
+
+- if you can give us access to your data, that's even better; then
+  we can run it ourselves, too.
+
+- if you can do your assembly without diginorm and partitioning, that's
+  great! We've developed these techniques to make assembly easier and
+  faster, so if you're happy with your current pipeline, you may not
+  need to use them.
+
+- diginorm and partitioning may both alter the "best" parameters for your
+  assembler, so you can't do "apples to apples" comparisons by running the
+  same assembly command pre- and post-processing.  For example, with
+  Velvet, you need to use different 'k' and expected-coverage values
+  before and after diginorm.
+
+- khmer protocols and advice focuses on sensitivity over other measurements.
+  If your interest is in maximizing (for example) contig length, you'll
+  have to adapt appropriately.
+
+- please don't use N50 or summed bp for transcriptome and metagenome
+  comparison!  In neither case are they good measures: transcriptomes
+  may have many different splice variants, and metagenome stats may
+  depend critically on polymorphism structure; neither of these can be
+  measured by N50/summed bp.
+
+- in the microbial world, some great assemblers have been developed
+  that may obviate the use of khmer+diginorm.  For example, SPADES and
+  IDBA may do better jobs on your metagenomes and single-cell data
+  than khmer+diginorm.  It seems to depend quite a bit on your data.  If you
+  run into obvious cases where khmer+diginorm performs better, or worse,
+  please do let us know.
+
+- evaluating eukaryotic genome assemblies is *hard*; see Assemblathon 2.
