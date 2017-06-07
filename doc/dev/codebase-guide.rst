@@ -42,10 +42,15 @@ A quick guide to the khmer codebase
 The ``CHANGELOG.md`` file lists major changes to the codebase with each version,
 with the most recent version first.
 
-The ``lib/`` directory contains all of the C++ code.
+The ``include/`` directory contains all C++ and C headers. The core C++ library
+is under ``include/oxli``, and the CPython wrapper is under ``include/khmer``.
+
+The ``src`` directory contains all of the C++ and CPython code. This structure
+corresponds to the one in ``include``. The main CPython module is built in
+``src/khmer/_cpy_khmer.hh``.
 
 The ``khmer/`` directory contains the `khmer` package (``khmer/__init__.py``,
-etc) and the C++-to-Python bridge (``khmer/_khmer.cc``).
+etc) and experimental Cython bindings under ``khmer/_oxli``.
 
 The ``scripts/`` and ``sandbox/`` directory contain Python command-line scripts.
 

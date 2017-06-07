@@ -131,7 +131,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     # In case the user specified a maximum memory usage, use 8/(9+eps) of that
     # for the countgraph and 1/(9+eps) for the tracking nodegraph
     # `eps` is used to account for the memory used by the python interpreter
-    countgraph = khmer_args.create_countgraph(args, multiplier=8/(9. + 0.3))
+    countgraph = khmer_args.create_countgraph(args, multiplier=8 / (9. + 0.3))
     countgraph.set_use_bigcount(args.bigcount)
 
     log_info('building k-mer tracking graph')

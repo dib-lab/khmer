@@ -217,6 +217,7 @@ def main():
     log_info('DONE.')
     log_info('wrote to: {filename}', filename=info_filename)
 
+
 if __name__ == '__main__':
     main()
 

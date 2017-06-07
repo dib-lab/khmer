@@ -225,6 +225,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
             part_count, infile), file=sys.stderr)
         print('partitions are in', outfile, file=sys.stderr)
 
+
 if __name__ == '__main__':
     main()
 

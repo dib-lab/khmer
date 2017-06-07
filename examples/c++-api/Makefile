@@ -1,20 +1,23 @@
-CFLAGS=--std=c++11 \
-       -I ../../lib \
+CXXFLAGS=--std=c++11 \
+       -I ../../include/ \
 	   -I ../../third-party/smhasher \
 	   -I ../../third-party/seqan/core/include/
+
+TESTS=exact-counting bloom consume
+
+%: %.cc ../../src/oxli/liboxli.a
+	$(CXX) $(CXXFLAGS) $< ../../src/oxli/liboxli.a -o $@ 
+
+../../src/oxli/liboxli.a:
+	cd ../../src/oxli && make
 
 run: all
 	./exact-counting
 	./bloom
 	./consume reads.fastq
 
-all: exact-counting bloom consume
+all: $(TESTS)
 
 clean:
 	-rm -f exact-counting bloom consume
 
-%: %.cc ../../lib/liboxli.a
-	$(CXX) $(CFLAGS) -o $* $*.cc ../../lib/liboxli.a
-
-../../lib/liboxli.a:
-	cd ../../lib && make
