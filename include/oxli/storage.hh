@@ -427,8 +427,10 @@ public:
   }
 
   //
-  void add(HashIntoType khash) {
+  bool add(HashIntoType khash) {
+      bool is_new = !qf_query(&cf, khash % cf.range, 0);
       qf_insert(&cf, khash % cf.range, 0, 1);
+      return is_new;
   }
 
   // get the count for the given k-mer hash.

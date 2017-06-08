@@ -321,8 +321,6 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
                         "adler32", "compress", "crc32", "deflate", "gzclose",
                         "gzlib", "gzread", "gzwrite", "infback", "inffast",
                         "inflate", "inftrees", "trees", "uncompr", "zutil"])
-                ext.extra_objects.append(
-                    path_join("third-party", "cqf", "gqf.o"))
 
         if "bz2" not in self.libraries:
             bz2cmd = ['bash', '-c', 'cd ' + BZIP2DIR + ' && make -f '
