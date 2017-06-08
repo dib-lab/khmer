@@ -3,7 +3,7 @@
 
 from __future__ import unicode_literals
 
-from libc.stdint cimport uintptr_t 
+from libc.stdint cimport uintptr_t
 
 from libcpp cimport bool
 from libcpp.memory cimport unique_ptr
@@ -49,7 +49,7 @@ cdef extern from  "oxli/read_parsers.hh" namespace "oxli::read_parsers":
 
         void reset()
         void write_fastx(ostream&)
-        void set_cleaned_seq()        
+        void set_cleaned_seq()
 
     ctypedef pair[CpSequence,CpSequence] CpSequencePair \
         "oxli::read_parsers::ReadPair"
@@ -76,7 +76,7 @@ cdef extern from  "oxli/read_parsers.hh" namespace "oxli::read_parsers":
         uintptr_t get_num_reads()
         void close()
 
-    unique_ptr[CpReadParser[SeqIO]] get_parser[SeqIO](const string&) 
+    unique_ptr[CpReadParser[SeqIO]] get_parser[SeqIO](const string&)
     ctypedef unique_ptr[CpReadParser[CpFastxReader]] FastxParserPtr
 
 
@@ -161,4 +161,3 @@ cdef inline bool is_valid(const char base, string& alphabet)
 cdef inline bool sanitize_sequence(string& sequence,
                                    string& alphabet,
                                    bool convert_n)
-

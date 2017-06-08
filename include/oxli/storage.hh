@@ -428,7 +428,7 @@ public:
 
   //
   bool add(HashIntoType khash) {
-      bool is_new = !qf_query(&cf, khash % cf.range, 0);
+      bool is_new = get_count(khash) == 0;
       qf_insert(&cf, khash % cf.range, 0, 1);
       return is_new;
   }

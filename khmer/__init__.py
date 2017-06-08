@@ -45,7 +45,6 @@ from khmer._khmer import Countgraph as _Countgraph
 from khmer._khmer import SmallCountgraph as _SmallCountgraph
 from khmer._khmer import Counttable as _Counttable
 from khmer._khmer import SmallCounttable as _SmallCounttable
-from khmer._khmer import QFCounttable as _QFCounttable
 
 from khmer._khmer import GraphLabels as _GraphLabels
 from khmer._khmer import Nodegraph as _Nodegraph
@@ -359,7 +358,7 @@ class SmallCounttable(_SmallCounttable):
         counttable.primes = primes
         return counttable
 
-
+from khmer._oxli.graphs import QFCounttable_t as _QFCounttable
 class QFCounttable(_QFCounttable):
     def __new__(cls, k, starting_size):
         # starting size has to be a power of two
