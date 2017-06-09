@@ -48,7 +48,6 @@ from khmer._khmer import SmallCounttable as _SmallCounttable
 from khmer._khmer import GraphLabels as _GraphLabels
 from khmer._khmer import Nodegraph as _Nodegraph
 from khmer._khmer import Nodetable as _Nodetable
-from khmer._khmer import HLLCounter as _HLLCounter
 from khmer._khmer import ReadAligner as _ReadAligner
 
 from khmer._khmer import HashSet
@@ -396,28 +395,6 @@ class Nodetable(_Nodetable):
         return nodetable
 
 
-class HLLCounter(_HLLCounter):
-    """HyperLogLog counter.
-
-    A HyperLogLog counter is a probabilistic data structure specialized on
-    cardinality estimation.
-    There is a precision/memory consumption trade-off: error rate determines
-    how much memory is consumed.
-
-    # Creating a new HLLCounter:
-
-    >>> khmer.HLLCounter(error_rate, ksize)
-
-    where the default values are:
-      - error_rate: 0.01
-      - ksize: 20
-    """
-
-    def __len__(self):
-        """Return the cardinality estimate."""
-        return _HLLCounter.estimate_cardinality(self)
-
-
 class ReadAligner(_ReadAligner):
     """Sequence to graph aligner.
 
@@ -516,3 +493,5 @@ class ReadAligner(_ReadAligner):
 
 from khmer._oxli.assembly import (LinearAssembler, SimpleLabeledAssembler,
                                   JunctionCountAssembler)
+
+from khmer._oxli.hllcounter import HLLCounter

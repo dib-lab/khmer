@@ -1,6 +1,6 @@
 from libcpp cimport bool
 from libcpp.memory cimport unique_ptr
-from libcpp.sting cimport string
+from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libc.stdint cimport uint64_t
 
@@ -19,10 +19,10 @@ cdef extern from "oxli/hllcounter.hh" namespace "oxli":
                                     unsigned int &,
                                     unsigned long long &)
 
-        void consume_seqfile[SeqIO](unique_ptr[CpReadParser[SeqIO]]&,
-                                    bool,
-                                    unsigned int &,
-                                    unsigned long long &)
+#        void consume_seqfile[SeqIO](unique_ptr[CpReadParser[SeqIO]]&,
+#                                    bool,
+#                                    unsigned int &,
+#                                    unsigned long long &)
         unsigned int check_and_process_read(string &, bool &)
         bool check_and_normalize_read(string &) const
         uint64_t estimate_cardinality()
@@ -30,9 +30,13 @@ cdef extern from "oxli/hllcounter.hh" namespace "oxli":
         double get_alpha()
         int get_p()
         int get_m()
-        void set_ksize(WordLegth)
+        void set_ksize(WordLength)
         int get_ksize()
         vector[int] get_M()
         double get_erate()
         void set_erate(double)
 
+
+cdef class HLLCounter:
+    cdef unique_ptr[CpHLLCounter] _this
+    cpdef tuple consume_seqfile(self, str filename, bool stream_records=*)
