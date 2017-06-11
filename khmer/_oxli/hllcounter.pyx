@@ -40,7 +40,7 @@ cdef class HLLCounter:
         """Break a sequence into k-mers and add each k-mer to the counter."""
         return deref(self._this).consume_string(_bstring(seq))
 
-    cpdef tuple consume_seqfile(self, str filename, bool stream_records=False):
+    cpdef tuple consume_seqfile(self, filename, bool stream_records=False):
         "Read sequences from file, break into k-mers, "
         "and add each k-mer to the counter. If optional keyword 'stream_out' "
         "is True, also prints each sequence to stdout."

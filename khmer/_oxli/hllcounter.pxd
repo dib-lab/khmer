@@ -44,4 +44,4 @@ cdef extern from "oxli/hllcounter.hh" namespace "oxli":
 
 cdef class HLLCounter:
     cdef unique_ptr[CpHLLCounter] _this
-    cpdef tuple consume_seqfile(self, str filename, bool stream_records=*)
+    cpdef tuple consume_seqfile(self, filename, bool stream_records=*)
