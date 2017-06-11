@@ -240,9 +240,6 @@ def test_hll_change_error_rate():
     with pytest.raises(TypeError):
         del hllcpp.error_rate
 
-    with pytest.raises(TypeError):
-        hllcpp.error_rate = 5
-
     with pytest.raises(ValueError):
         hllcpp.error_rate = 2.5
 

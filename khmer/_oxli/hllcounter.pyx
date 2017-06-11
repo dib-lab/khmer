@@ -21,7 +21,7 @@ cdef class HLLCounter:
       - ksize: 20
     """
 
-    def __cinit__(self, float error_rate=0.01, int ksize=20):
+    def __cinit__(self, double error_rate=0.01, int ksize=20):
         self._this.reset(new CpHLLCounter(error_rate, ksize))
 
     def __len__(self):
@@ -73,6 +73,10 @@ cdef class HLLCounter:
     @error_rate.setter
     def error_rate(self, erate):
         deref(self._this).set_erate(float(erate))
+
+    @error_rate.deleter
+    def error_rate(self):
+        raise TypeError("Cannot delete attribute")
 
     @property
     def ksize(self):
