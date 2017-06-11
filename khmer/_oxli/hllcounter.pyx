@@ -22,7 +22,6 @@ cdef class HLLCounter:
     """
 
     def __cinit__(self, float error_rate=0.01, int ksize=20):
-        # TODO: catch InvalidValue
         self._this.reset(new CpHLLCounter(error_rate, ksize))
 
     def __len__(self):
@@ -48,8 +47,6 @@ cdef class HLLCounter:
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
 
-        # TODO: catch oxli_file_exception
-        # TODO: catch oxli_value_exception
         #cdef unique_ptr[CpReadParser[CpFastxReader]] parser
         deref(self._this).consume_seqfile[CpFastxReader](
                              _bstring(filename), stream_records,
@@ -59,7 +56,6 @@ cdef class HLLCounter:
 
     def merge(self, HLLCounter other):
         """Merge other counter into this one."""
-        # TODO: catch oxli_exception
         deref(self._this).merge(deref(other._this))
 
     @property
@@ -86,9 +82,17 @@ cdef class HLLCounter:
         return deref(self._this).get_ksize()
 
     @ksize.setter
-    def ksize(self, int new_k):
-        cdef unsigned char k = <int>new_k
-        deref(self._this).set_ksize(k)
+    def ksize(self, object new_k):
+        if new_k <= 0:
+            raise ValueError("Please set k-mer size to a value greater "
+                             "than zero")
+        if isinstance(new_k, float):
+            raise TypeError("Please use an integer value for k-mer size")
+        deref(self._this).set_ksize(<int>new_k)
+
+    @ksize.deleter
+    def ksize(self):
+        raise TypeError("Cannot delete attribute")
 
     @property
     def counters(self):

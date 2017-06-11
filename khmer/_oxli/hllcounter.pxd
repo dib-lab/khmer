@@ -7,17 +7,22 @@ from libc.stdint cimport uint64_t
 from oxli_types cimport *
 from parsing cimport CpReadParser
 
+
+cdef extern from "oxli/oxli_exception_convert.hh":
+    cdef void oxli_raise_py_error()
+
+
 cdef extern from "oxli/hllcounter.hh" namespace "oxli":
     cdef cppclass CpHLLCounter "oxli::HLLCounter":
-        CpHLLCounter(double, WordLength)
-        CpHLLCounter(int, WordLength)
+        CpHLLCounter(double, WordLength) except +oxli_raise_py_error
+        CpHLLCounter(int, WordLength) except +oxli_raise_py_error
 
         void add(const string &)
         unsigned int consume_string(const string &)
         void consume_seqfile[SeqIO](const string &,
                                     bool,
                                     unsigned int &,
-                                    unsigned long long &)
+                                    uint64_t &) except +oxli_raise_py_error
 
 #        void consume_seqfile[SeqIO](unique_ptr[CpReadParser[SeqIO]]&,
 #                                    bool,
@@ -26,15 +31,15 @@ cdef extern from "oxli/hllcounter.hh" namespace "oxli":
         unsigned int check_and_process_read(string &, bool &)
         bool check_and_normalize_read(string &) const
         uint64_t estimate_cardinality()
-        void merge(CpHLLCounter &)
+        void merge(CpHLLCounter &) except +oxli_raise_py_error
         double get_alpha()
         int get_p()
         int get_m()
-        void set_ksize(WordLength)
+        void set_ksize(WordLength) except +oxli_raise_py_error
         int get_ksize()
         vector[int] get_M()
         double get_erate()
-        void set_erate(double)
+        void set_erate(double) except +oxli_raise_py_error
 
 
 cdef class HLLCounter:
