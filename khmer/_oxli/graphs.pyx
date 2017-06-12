@@ -43,7 +43,7 @@ cdef class QFCounttable_:
         """
         if isinstance(kmer, (unicode, str)):
             data = _bstring(kmer)
-            return deref(self.c_table).add(data)
+            return deref(self.c_table).add(deref(self.c_table).hash_dna(data))
         # assume kmer is an integer representing the hash value
         else:
             return deref(self.c_table).add(kmer)
@@ -68,7 +68,7 @@ cdef class QFCounttable_:
         """
         if isinstance(kmer, (unicode, str)):
             data = _bstring(kmer)
-            return deref(self.c_table).get_count(data)
+            return deref(self.c_table).get_count(deref(self.c_table).hash_dna(data))
         # assume kmer is an integer representing the hash value
         else:
             return deref(self.c_table).get_count(kmer)

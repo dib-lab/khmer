@@ -43,8 +43,8 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
         void count(HashIntoType)
         bool add(const char *)
         bool add(HashIntoType)
-        const BoundedCounterType get_count(HashIntoType) const
         const BoundedCounterType get_count(const char *) const
+        const BoundedCounterType get_count(HashIntoType) const
         void save(string)
         void load(string)
         uint32_t consume_string(const string &)
