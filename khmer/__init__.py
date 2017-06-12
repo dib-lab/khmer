@@ -75,6 +75,8 @@ from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 
 from khmer._khmer import FILETYPES
 
+from khmer._oxli.graphs import QFCounttable_ as _QFCounttable
+
 import sys
 
 from struct import pack, unpack
@@ -358,7 +360,7 @@ class SmallCounttable(_SmallCounttable):
         counttable.primes = primes
         return counttable
 
-from khmer._oxli.graphs import QFCounttable_t as _QFCounttable
+
 class QFCounttable(_QFCounttable):
     def __new__(cls, k, starting_size):
         # starting size has to be a power of two
