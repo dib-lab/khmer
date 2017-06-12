@@ -47,7 +47,6 @@ cdef class HLLCounter:
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
 
-        #cdef unique_ptr[CpReadParser[CpFastxReader]] parser
         deref(self._this).consume_seqfile[CpFastxReader](
                              _bstring(filename), stream_records,
                              total_reads, n_consumed)
