@@ -85,8 +85,15 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
     cdef cppclass CpNodetable "oxli::Nodetable" (CpHashtable):
         CpNodetable(WordLength, vector[uint64_t])
 
-    cdef cppclass CpQFCounttable "oxli::QFCounttable" (CpHashtable):
+    cdef cppclass CpQFCounttable "oxli::QFCounttable":
         CpQFCounttable(WordLength, int)
+        void count(const char *)
+        void count(HashIntoType)
+        bool add(const char *)
+        bool add(HashIntoType)
+        const BoundedCounterType get_count(const char *) const
+        const BoundedCounterType get_count(HashIntoType) const
+        HashIntoType hash_dna(const char *) const
 
 
 cdef extern from "oxli/hashgraph.hh" namespace "oxli":

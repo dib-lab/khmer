@@ -1,9 +1,11 @@
 # cython: c_string_type=unicode, c_string_encoding=utf8
 from cython.operator cimport dereference as deref
+from libc.stdint cimport uint64_t
 
 from libcpp.memory cimport unique_ptr
 
 from .utils cimport _bstring
+from graphs cimport CpQFCounttable
 from .._khmer import Countgraph, Nodegraph, GraphLabels
 
 
@@ -41,12 +43,12 @@ cdef class QFCounttable_:
         `kmer` can be either a string or an integer representing the hashed
         value of the kmer.
         """
-        if isinstance(kmer, (unicode, str)):
-            data = _bstring(kmer)
-            return deref(self.c_table).add(deref(self.c_table).hash_dna(data))
+        if isinstance(kmer, str):
+            temp = kmer.encode('utf-8')
+            return deref(self.c_table).add(<char*>temp)
         # assume kmer is an integer representing the hash value
         else:
-            return deref(self.c_table).add(kmer)
+            return deref(self.c_table).add(<uint64_t>kmer)
 
     def hash(self, kmer):
         """"Returns the hash of this k-mer.
@@ -66,9 +68,9 @@ cdef class QFCounttable_:
         For Nodetables and Counttables, this function will fail if the
         supplied k-mer contains non-ACGT characters.
         """
-        if isinstance(kmer, (unicode, str)):
-            data = _bstring(kmer)
-            return deref(self.c_table).get_count(deref(self.c_table).hash_dna(data))
+        if isinstance(kmer, str):
+            temp = kmer.encode('utf-8')
+            return deref(self.c_table).get_count(<char*>temp)
         # assume kmer is an integer representing the hash value
         else:
-            return deref(self.c_table).get_count(kmer)
+            return deref(self.c_table).get_count(<uint64_t>kmer)
