@@ -94,6 +94,25 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
         const BoundedCounterType get_count(const char *) const
         const BoundedCounterType get_count(HashIntoType) const
         HashIntoType hash_dna(const char *) const
+        string unhash_dna(HashIntoType) const
+        const WordLength ksize() const
+        vector[uint64_t] get_tablesizes() const
+        void get_kmers(const string &, vector[string] &)
+        uint32_t consume_string(const string &)
+        void get_kmer_counts(const string &,
+                             vector[BoundedCounterType] &) const
+        void get_kmer_hashes(const string &, vector[HashIntoType] &) const
+        BoundedCounterType get_min_count(const string &)
+        BoundedCounterType get_max_count(const string &)
+        void get_median_count(const string &, BoundedCounterType &,
+                              float &, float &)
+        uint64_t trim_on_abundance(string, BoundedCounterType) const
+        uint64_t trim_below_abundance(string, BoundedCounterType) const
+        vector[uint32_t] find_spectral_error_positions(string,
+                                                       BoundedCounterType)
+        void consume_seqfile[SeqIO](const string &, uint32_t &, uint64_t &)
+        void consume_seqfile[SeqIO](unique_ptr[CpReadParser[SeqIO]]&,
+                                    uint32_t &, uint64_t &)
 
 
 cdef extern from "oxli/hashgraph.hh" namespace "oxli":
