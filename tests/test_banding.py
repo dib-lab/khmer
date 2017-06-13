@@ -42,10 +42,10 @@ import pytest
 
 
 @pytest.mark.parametrize('ksize,memory,epsilon,numbands', [
-    (21, 5e7, 1, 2),
-    (21, 5e7, 1, 4),
-    (21, 5e7, 1, 8),
-    (21, 5e7, 1, 16),
+    (21, 5e6, 1, 2),
+    (21, 5e6, 1, 4),
+    (21, 5e6, 1, 8),
+    (21, 5e6, 1, 16),
 ])
 def test_banding_in_memory(ksize, memory, epsilon, numbands):
     """
@@ -55,7 +55,7 @@ def test_banding_in_memory(ksize, memory, epsilon, numbands):
     reasonable behavior compared to k-mer counts computed in the normal
     fashion.
     """
-    infile = utils.get_test_data('test-reads.fa')
+    infile = utils.get_test_data('banding-reads.fq')
 
     ct_normal = khmer.Counttable(ksize, memory / 4, 4)
     ct_normal.consume_seqfile(infile)
@@ -85,10 +85,10 @@ def test_banding_in_memory(ksize, memory, epsilon, numbands):
 
 
 @pytest.mark.parametrize('ksize,memory,numbands', [
-    (21, 5e7, 3),
-    (21, 5e7, 11),
-    (21, 5e7, 23),
-    (21, 5e7, 29),
+    (21, 5e6, 3),
+    (21, 5e6, 11),
+    (21, 5e6, 23),
+    (21, 5e6, 29),
 ])
 def test_banding_to_disk(ksize, memory, numbands):
     """
@@ -98,7 +98,7 @@ def test_banding_to_disk(ksize, memory, numbands):
     a computing k-mer abundances in banding mode produces the same data
     structure as counting k-mer abundances in the normal fashion.
     """
-    infile = utils.get_test_data('test-reads.fa')
+    infile = utils.get_test_data('banding-reads.fq')
     path1 = utils.get_temp_filename('normal.ct')
     path2 = utils.get_temp_filename('banding.ct')
 
