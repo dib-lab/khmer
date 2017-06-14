@@ -69,13 +69,14 @@ from khmer._khmer import reverse_complement
 from khmer._khmer import get_version_cpp as __version_cpp__
 # tests/test_version.py
 
-from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
+#from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 # tests/test_read_parsers.py,scripts/{filter-abund-single,load-graph}.py
 # scripts/{abundance-dist-single,load-into-counting}.py
 
 from khmer._khmer import FILETYPES
 
 from khmer._oxli.graphs import QFCounttable_ as _QFCounttable
+from khmer._oxli.parsing import FastxParser as ReadParser
 
 import sys
 

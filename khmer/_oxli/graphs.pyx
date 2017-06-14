@@ -7,7 +7,7 @@ from libcpp.vector cimport vector
 
 from .utils cimport _bstring
 from graphs cimport CpQFCounttable
-from parsing cimport CpFastxReader, FastxParserPtr
+from parsing cimport CpFastxReader, FastxParser
 from .._khmer import Countgraph, Nodegraph, GraphLabels
 
 
@@ -164,12 +164,12 @@ cdef class QFCounttable_:
                                                                    max_count))
         return posns
 
-    def consume_seqfile_with_reads_parser(self, read_parser):
+    def consume_seqfile_with_reads_parser(self, FastxParser read_parser):
         """Count all k-mers from read_parser."""
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
 
-        parser = <FastxParser>read_parser
-        deref(self.c_table).consume_seqfile[CpFastxReader](parser,
+        #parser = read_parser._this
+        deref(self.c_table).consume_seqfile[CpFastxReader](read_parser._this,
                                                            total_reads,
                                                            n_consumed)
