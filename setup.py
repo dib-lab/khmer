@@ -155,15 +155,14 @@ BUILD_DEPENDS = glob.glob(path_join("include", "khmer", "_cpy_*.hh"))
 BUILD_DEPENDS.extend(path_join("include", "oxli", bn + ".hh") for bn in [
     "khmer", "kmer_hash", "hashtable", "labelhash", "hashgraph",
     "hllcounter", "oxli_exception", "read_aligner", "subset", "read_parsers",
-    "kmer_filters", "traversal", "assembler", "alphabets", "storage",
-    "oxli_exception_convert"])
+    "kmer_filters", "traversal", "assembler", "alphabets", "storage"])
 
 SOURCES = glob.glob(path_join("src", "khmer", "_cpy_*.cc"))
 SOURCES.extend(path_join("src", "oxli", bn + ".cc") for bn in [
     "read_parsers", "kmer_hash", "hashtable", "hashgraph",
     "labelhash", "subset", "read_aligner",
     "hllcounter", "traversal", "kmer_filters", "assembler", "alphabets",
-    "storage", "oxli_exception_convert"])
+    "storage"])
 
 SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
@@ -200,7 +199,7 @@ for cython_ext in glob.glob(os.path.join("khmer", "_oxli",
 
     CY_EXTENSION_MOD_DICT = \
         {
-            "sources": [cython_ext],
+            "sources": [cython_ext, "khmer/_oxli/oxli_exception_convert.cc"],
             "extra_compile_args": EXTRA_COMPILE_ARGS,
             "extra_link_args": EXTRA_LINK_ARGS,
             "extra_objects": [path_join(build_dir(), splitext(p)[0] + '.o')

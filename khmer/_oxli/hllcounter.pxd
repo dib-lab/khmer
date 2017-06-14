@@ -8,7 +8,7 @@ from oxli_types cimport *
 from parsing cimport CpReadParser
 
 
-cdef extern from "oxli/oxli_exception_convert.hh":
+cdef extern from "oxli_exception_convert.hh":
     cdef void oxli_raise_py_error()
 
 

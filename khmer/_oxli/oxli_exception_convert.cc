@@ -2,14 +2,14 @@
 #include <exception>
 #include <string>
 #include "oxli/oxli_exception.hh"
-#include "oxli/oxli_exception_convert.hh"
+#include "oxli_exception_convert.hh"
 
 
 void oxli_raise_py_error()
 {
   try {
     throw;
-  } 
+  }
   catch (oxli::ReadOnlyAttribute& e) {
     PyErr_SetString(PyExc_AttributeError, e.what());
   }
