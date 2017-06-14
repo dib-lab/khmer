@@ -1,4 +1,4 @@
 sphinxcontrib-autoprogram==0.1.2
 setuptools>=3.4.1
 guzzle_sphinx_theme==0.7.11
-cython
+cython==0.25.2
