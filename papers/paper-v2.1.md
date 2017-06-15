@@ -94,16 +94,16 @@ date: 2017-05-25
 
 The khmer software is a set of command-line tools built around a Python library designed for analysis of large DNA sequence collections.
 Functionality in khmer has primarily been motivated by scaling issues with (meta)genome and (meta)transcriptome assembly (Crusoe *et al.*, 2015).
-khmer provides convenient access to several k-mer based operations on DNA sequence collections, such as abundance filtering, error trimming, assembly graph partitioning, and most notably, abundance normalization of reads (Brown *et al.*, 2012) and streaming error trimming of reads (Zhang, Awad, and Brown, 2015).
-All of these operations utilize khmer's implementation of two primary data structures, the Bloom filter and the Count-Min Sketch, for efficient probabalistic storage of k-mer presence or k-mer abundance, respectively (Pell *et al.*, 2012; Zhang *et al.*, 2014).
+khmer provides convenient access to several *k*-mer based operations on DNA sequence collections, such as abundance filtering, error trimming, assembly graph partitioning, and most notably, abundance normalization of reads (Brown *et al.*, 2012) and streaming error trimming of reads (Zhang, Awad, and Brown, 2015).
+All of these operations utilize khmer's implementation of two primary data structures, the Bloom filter and the Count-Min Sketch, for efficient probabalistic storage of *k*-mer presence or *k*-mer abundance, respectively (Pell *et al.*, 2012; Zhang *et al.*, 2014).
 
 Release version 2.1 of the khmer software includes several new features that extend its utility to a wider set of sequence processing and analysis problems.
 These include the following:
 support for variable-coverage trimming of sequence reads;
-support for k > 32 using the non-reversible hash function MurmurHash3 (Appleby, 2010);
+support for *k* > 32 using the non-reversible hash function MurmurHash3 (Appleby, 2010);
 a new optional Count-Min Sketch implementation providing increased storage efficiency;
-support for assembly directly from a k-mer graph;
-a script for computing a compact de Bruijn graph from a k-mer graph;
+support for assembly directly from a *k*-mer graph;
+a script for computing a compact de Bruijn graph from a *k*-mer graph;
 and several examples of khmer's Python and C++ APIs for those interested in using and extending the library.
 
 # References
