@@ -169,7 +169,26 @@ cdef class QFCounttable_:
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
 
-        #parser = read_parser._this
         deref(self.c_table).consume_seqfile[CpFastxReader](read_parser._this,
                                                            total_reads,
                                                            n_consumed)
+
+    def consume_seqfile(self, file_name):
+        """Count all k-mers from file_name."""
+        cdef unsigned long long n_consumed = 0
+        cdef unsigned int total_reads = 0
+
+        read_parser = FastxParser(file_name)
+        deref(self.c_table).consume_seqfile[CpFastxReader](read_parser._this,
+                                                           total_reads,
+                                                           n_consumed)
+
+    def abundance_distribution(self, file_name, CpHashtable tracking):
+        """Calculate the k-mer abundance distribution of the given file_name."""
+        read_parser = FastxParser(file_name)
+        cdef uint64_t * x = deref(self.c_table).abundance_distribution[CpFastxReader](
+                read_parser._this, tracking)
+        abunds = []
+        for i in range(MAX_BIGCOUNT):
+            abunds.append(x[i])
+        return abunds

@@ -23,7 +23,7 @@ from . import khmer_tst_utils as utils
 import khmer
 from khmer import _Countgraph, _Counttable, _SmallCountgraph, _SmallCounttable
 from khmer import _Nodegraph, _Nodetable, QFCounttable
-from khmer import ReadParser
+from khmer import ReadParser, FastxParser
 import screed
 
 
@@ -356,13 +356,26 @@ def test_find_spectral_error_positions_5(any_tabletype):
     assert posns == [10], posns
 
 
-def test_consume_seqfile_reads_parser(any_tabletype):
-    kh = any_tabletype(5)
+def test_consume_seqfile_reads_parser(tabletype):
+    kh = tabletype(5, PRIMES_1m)
     rparser = ReadParser(utils.get_test_data('test-fastq-reads.fq'))
 
     kh.consume_seqfile_with_reads_parser(rparser)
 
-    kh2 = any_tabletype(5)
+    kh2 = tabletype(5, PRIMES_1m)
+    for record in screed.open(utils.get_test_data('test-fastq-reads.fq')):
+        kh2.consume(record.sequence)
+
+    assert kh.get('CCGGC') == kh2.get('CCGGC')
+
+
+def test_consume_seqfile_fastx_reads_parser():
+    kh = QFCounttable(5, QF_SIZE)
+    rparser = FastxParser(utils.get_test_data('test-fastq-reads.fq'))
+
+    kh.consume_seqfile_with_reads_parser(rparser)
+
+    kh2 = QFCounttable(5, QF_SIZE)
     for record in screed.open(utils.get_test_data('test-fastq-reads.fq')):
         kh2.consume(record.sequence)
 

@@ -106,6 +106,9 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
         BoundedCounterType get_max_count(const string &)
         void get_median_count(const string &, BoundedCounterType &,
                               float &, float &)
+        uint64_t * abundance_distribution[SeqIO](unique_ptr[CpReadParser[SeqIO]]&,
+                                                 CpHashtable *)
+        #uint64_t * abundance_distribution[SeqIO](string, CpHashtable *)
         uint64_t trim_on_abundance(string, BoundedCounterType) const
         uint64_t trim_below_abundance(string, BoundedCounterType) const
         vector[uint32_t] find_spectral_error_positions(string,
