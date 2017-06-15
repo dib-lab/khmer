@@ -8,6 +8,7 @@ from libcpp.vector cimport vector
 from .utils cimport _bstring
 from graphs cimport CpQFCounttable
 from parsing cimport CpFastxReader, FastxParser
+from oxli_types cimport MAX_BIGCOUNT
 from .._khmer import Countgraph, Nodegraph, GraphLabels
 
 
@@ -183,11 +184,13 @@ cdef class QFCounttable_:
                                                            total_reads,
                                                            n_consumed)
 
-    def abundance_distribution(self, file_name, CpHashtable tracking):
+    def abundance_distribution(self, file_name, tracking):
         """Calculate the k-mer abundance distribution of the given file_name."""
         read_parser = FastxParser(file_name)
+        cdef CPyHashtable_Object* hashtable = <CPyHashtable_Object*>tracking
+
         cdef uint64_t * x = deref(self.c_table).abundance_distribution[CpFastxReader](
-                read_parser._this, tracking)
+                read_parser._this, hashtable.hashtable)
         abunds = []
         for i in range(MAX_BIGCOUNT):
             abunds.append(x[i])
