@@ -8,11 +8,15 @@ else
 	OPT=-Ofast
 endif
 
+# using the SSE4.2 extensions doesn't seem to speed things up by a large
+# amount, so disabling it for the time being till we have a good automated
+# test for detecting whether or not the CPU supports it
 OS := $(shell uname)
 ifeq ($(OS), Darwin)
 	ARCH=
 else
-	ARCH=-msse4.2 -D__SSE4_2_
+	#ARCH=-msse4.2 -D__SSE4_2_
+	ARCH=
 endif
 
 ifdef P
