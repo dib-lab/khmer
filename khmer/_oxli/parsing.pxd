@@ -80,6 +80,11 @@ cdef extern from  "oxli/read_parsers.hh" namespace "oxli::read_parsers":
     ctypedef unique_ptr[CpReadParser[CpFastxReader]] FastxParserPtr
 
 
+cdef extern from "khmer/_cpy_khmer.hh":
+    ctypedef struct CPyReadParser_Object "khmer::khmer_ReadParser_Object":
+        FastxParserPtr parser
+
+
 cdef extern from "oxli/alphabets.hh" namespace "oxli":
     cdef string DNA_SIMPLE "oxli::alphabets::DNA_SIMPLE"
     cdef string DNAN_SIMPLE "oxli::alphabets::DNAN_SIMPLE"

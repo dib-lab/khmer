@@ -31,6 +31,7 @@ PRIMES_1m = [1000003, 1009837]
 # roughly same size, QFCounttable needs a size that is power of two
 QF_SIZE = 2**math.ceil(math.log2(PRIMES_1m[0]))
 
+
 # all the table types!
 @pytest.fixture(params=[_Countgraph, _Counttable, _SmallCountgraph,
                         _SmallCounttable, _Nodegraph, _Nodetable])
@@ -356,26 +357,13 @@ def test_find_spectral_error_positions_5(any_tabletype):
     assert posns == [10], posns
 
 
-def test_consume_seqfile_reads_parser(tabletype):
-    kh = tabletype(5, PRIMES_1m)
+def test_consume_seqfile_reads_parser(any_tabletype):
+    kh = any_tabletype(5)
     rparser = ReadParser(utils.get_test_data('test-fastq-reads.fq'))
 
     kh.consume_seqfile_with_reads_parser(rparser)
 
-    kh2 = tabletype(5, PRIMES_1m)
-    for record in screed.open(utils.get_test_data('test-fastq-reads.fq')):
-        kh2.consume(record.sequence)
-
-    assert kh.get('CCGGC') == kh2.get('CCGGC')
-
-
-def test_consume_seqfile_fastx_reads_parser():
-    kh = QFCounttable(5, QF_SIZE)
-    rparser = FastxParser(utils.get_test_data('test-fastq-reads.fq'))
-
-    kh.consume_seqfile_with_reads_parser(rparser)
-
-    kh2 = QFCounttable(5, QF_SIZE)
+    kh2 = any_tabletype(5)
     for record in screed.open(utils.get_test_data('test-fastq-reads.fq')):
         kh2.consume(record.sequence)
 
@@ -461,26 +449,11 @@ def test_abund_dist_A(any_tabletype):
     assert dist[0] == 0
 
 
-def test_abund_dist_A_readparser(tabletype):
+def test_abund_dist_A_readparser(any_tabletype):
     A_filename = utils.get_test_data('all-A.fa')
     rparser = ReadParser(A_filename)
 
-    kh = tabletype(4, PRIMES_1m)
-    tracking = khmer._Nodetable(4, PRIMES_1m)
-
-    kh.consume_seqfile(A_filename)
-    dist = kh.abundance_distribution_with_reads_parser(rparser, tracking)
-
-    print(dist[:10])
-    assert sum(dist) == 1
-    assert dist[0] == 0
-
-
-def test_abund_dist_A_fastxparser():
-    A_filename = utils.get_test_data('all-A.fa')
-    rparser = FastxParser(A_filename)
-
-    kh = kh = QFCounttable(4, QF_SIZE)
+    kh = any_tabletype(4)
     tracking = khmer._Nodetable(4, PRIMES_1m)
 
     kh.consume_seqfile(A_filename)
