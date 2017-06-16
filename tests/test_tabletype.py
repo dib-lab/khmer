@@ -461,15 +461,30 @@ def test_abund_dist_A(any_tabletype):
     assert dist[0] == 0
 
 
-def test_abund_dist_A_readparser(any_tabletype):
+def test_abund_dist_A_readparser(tabletype):
     A_filename = utils.get_test_data('all-A.fa')
     rparser = ReadParser(A_filename)
 
-    kh = any_tabletype(4)
+    kh = tabletype(4, PRIMES_1m)
     tracking = khmer._Nodetable(4, PRIMES_1m)
 
     kh.consume_seqfile(A_filename)
-    dist = kh.abundance_distribution(A_filename, tracking)
+    dist = kh.abundance_distribution_with_reads_parser(rparser, tracking)
+
+    print(dist[:10])
+    assert sum(dist) == 1
+    assert dist[0] == 0
+
+
+def test_abund_dist_A_fastxparser():
+    A_filename = utils.get_test_data('all-A.fa')
+    rparser = FastxParser(A_filename)
+
+    kh = kh = QFCounttable(4, QF_SIZE)
+    tracking = khmer._Nodetable(4, PRIMES_1m)
+
+    kh.consume_seqfile(A_filename)
+    dist = kh.abundance_distribution_with_reads_parser(rparser, tracking)
 
     print(dist[:10])
     assert sum(dist) == 1

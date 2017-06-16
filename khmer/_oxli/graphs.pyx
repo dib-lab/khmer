@@ -9,7 +9,7 @@ from .utils cimport _bstring
 from graphs cimport CpQFCounttable
 from parsing cimport CpFastxReader, FastxParser
 from oxli_types cimport MAX_BIGCOUNT
-from .._khmer import Countgraph, Nodegraph, GraphLabels
+from .._khmer import Countgraph, Nodegraph, GraphLabels, Nodetable
 
 
 cdef CpHashgraph * get_hashgraph_ptr(object graph):
@@ -147,19 +147,19 @@ cdef class QFCounttable_:
         return hashes
 
     def trim_on_abundance(self, sequence, abundance):
-        """"Trim sequence at first k-mer below the given abundance."""
+        """Trim sequence at first k-mer below the given abundance."""
         data = self._valid_sequence(sequence)
         trimmed_at = deref(self.c_table).trim_on_abundance(data, abundance)
         return sequence[:trimmed_at], trimmed_at
 
     def trim_below_abundance(self, sequence, abundance):
-        """"Trim sequence at first k-mer above the given abundance."""
+        """Trim sequence at first k-mer above the given abundance."""
         data = self._valid_sequence(sequence)
         trimmed_at = deref(self.c_table).trim_below_abundance(data, abundance)
         return sequence[:trimmed_at], trimmed_at
 
     def find_spectral_error_positions(self, sequence, max_count):
-        """"Identify positions of low-abundance k-mers."""
+        """Identify positions of low-abundance k-mers."""
         data = self._valid_sequence(sequence)
         posns = (deref(self.c_table).find_spectral_error_positions(data,
                                                                    max_count))
@@ -185,9 +185,37 @@ cdef class QFCounttable_:
                                                            n_consumed)
 
     def abundance_distribution(self, file_name, tracking):
-        """Calculate the k-mer abundance distribution of the given file_name."""
-        read_parser = FastxParser(file_name)
-        cdef CPyHashtable_Object* hashtable = <CPyHashtable_Object*>tracking
+        """Calculate the k-mer abundance distribution over reads in file_name."""
+        cdef FastxParser read_parser
+        if isinstance(file_name, str):
+            read_parser = FastxParser(file_name)
+        else:
+            raise ValueError('Expected file_name to be string, '
+                             'got {} instead.'.format(type(file_name)))
+
+        cdef CPyHashtable_Object* hashtable
+        if isinstance(tracking, (Nodetable, Nodegraph)):
+            hashtable = <CPyHashtable_Object*>tracking
+        else:
+            raise ValueError('Expected `tracking` to be a Nodetable or '
+                             'Nodegraph, got {} instead.'.format(type(tracking)))
+
+        cdef uint64_t * x = deref(self.c_table).abundance_distribution[CpFastxReader](
+                read_parser._this, hashtable.hashtable)
+        abunds = []
+        for i in range(MAX_BIGCOUNT):
+            abunds.append(x[i])
+        return abunds
+
+    def abundance_distribution_with_reads_parser(self, FastxParser read_parser,
+                                                 tracking):
+        """Calculate the k-mer abundance distribution over reads."""
+        cdef CPyHashtable_Object* hashtable
+        if isinstance(tracking, (Nodetable, Nodegraph)):
+            hashtable = <CPyHashtable_Object*>tracking
+        else:
+            raise ValueError('Expected `tracking` to be a Nodetable or '
+                             'Nodegraph, got {} instead.'.format(type(tracking)))
 
         cdef uint64_t * x = deref(self.c_table).abundance_distribution[CpFastxReader](
                 read_parser._this, hashtable.hashtable)
