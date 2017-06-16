@@ -1,4 +1,6 @@
 # cython: c_string_type=unicode, c_string_encoding=utf8
+from math import log2
+
 from cython.operator cimport dereference as deref
 from libc.stdint cimport uint64_t
 
@@ -28,10 +30,15 @@ cdef CpLabelHash * get_labelhash_ptr(object labels):
     return deref(ptr).labelhash
 
 
-cdef class QFCounttable_:
+cdef class QFCounttable:
     cdef unique_ptr[CpQFCounttable] c_table
-    def __cinit__(self, int k, int size):
-        self.c_table.reset(new CpQFCounttable(k, size))
+    def __cinit__(self, int k, int starting_size):
+        # starting size has to be a power of two
+        power_of_two = ((starting_size & (starting_size - 1) == 0) and
+                        (starting_size != 0))
+        if not power_of_two:
+            raise ValueError("starting_size has to be a power of two.")
+        self.c_table.reset(new CpQFCounttable(k, int(log2(starting_size))))
 
     def add(self, kmer):
         """Increment the count of this k-mer.

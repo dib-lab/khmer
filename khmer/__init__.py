@@ -38,7 +38,7 @@
 
 from __future__ import print_function
 from collections import namedtuple
-from math import log, log2
+from math import log
 import json
 
 from khmer._khmer import Countgraph as _Countgraph
@@ -75,7 +75,7 @@ from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 
 from khmer._khmer import FILETYPES
 
-from khmer._oxli.graphs import QFCounttable_ as _QFCounttable
+from khmer._oxli.graphs import QFCounttable
 from khmer._oxli.parsing import FastxParser
 
 import sys
@@ -359,17 +359,6 @@ class SmallCounttable(_SmallCounttable):
         primes = get_n_primes_near_x(n_tables, starting_size)
         counttable = _SmallCounttable.__new__(cls, k, primes)
         counttable.primes = primes
-        return counttable
-
-
-class QFCounttable(_QFCounttable):
-    def __new__(cls, k, starting_size):
-        # starting size has to be a power of two
-        power_of_two = ((starting_size & (starting_size - 1) == 0) and
-                        (starting_size != 0))
-        if not power_of_two:
-            raise ValueError("starting_size has to be a power of two.")
-        counttable = _QFCounttable.__new__(cls, k, int(log2(starting_size)))
         return counttable
 
 
