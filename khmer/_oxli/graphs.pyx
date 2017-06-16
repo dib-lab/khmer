@@ -1,5 +1,5 @@
 # cython: c_string_type=unicode, c_string_encoding=utf8
-from math import log2
+from math import log
 
 from cython.operator cimport dereference as deref
 from libc.stdint cimport uint64_t
@@ -38,7 +38,7 @@ cdef class QFCounttable:
                         (starting_size != 0))
         if not power_of_two:
             raise ValueError("starting_size has to be a power of two.")
-        self.c_table.reset(new CpQFCounttable(k, int(log2(starting_size))))
+        self.c_table.reset(new CpQFCounttable(k, int(log(starting_size, 2))))
 
     def add(self, kmer):
         """Increment the count of this k-mer.

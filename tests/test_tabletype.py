@@ -29,7 +29,7 @@ import screed
 
 PRIMES_1m = [1000003, 1009837]
 # roughly same size, QFCounttable needs a size that is power of two
-QF_SIZE = 2**math.ceil(math.log2(PRIMES_1m[0]))
+QF_SIZE = 2**math.ceil(math.log(PRIMES_1m[0], 2))
 
 
 # all the table types!
