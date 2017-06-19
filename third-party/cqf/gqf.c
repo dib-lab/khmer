@@ -28,7 +28,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <sys/mman.h>
-#include <iostream>
 
 #include "gqf.h"
 
@@ -1164,7 +1163,8 @@ static inline void insert1(QF *qf, __uint128_t hash)
 					else if (carry) {			/* Increment the new value because we don't use 0 to encode counters */
 						new_value = 2;
 						/* If the rem is greater than or equal to the new_value then fail*/
-						assert(new_value < current_remainder);
+						if (current_remainder)
+							assert(new_value < current_remainder);
 					}
 				} else {
 					operation = -1;
