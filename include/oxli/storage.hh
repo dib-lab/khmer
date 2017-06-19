@@ -443,8 +443,8 @@ public:
   const size_t n_tables() const { return 1; }
   const uint64_t n_unique_kmers() const { return 42; }
   const uint64_t n_occupied() const { return 42; }
-  void save(std::string outfilename, WordLength ksize) {}
-  void load(std::string infilename, WordLength &ksize) {}
+  void save(std::string outfilename, WordLength ksize);
+  void load(std::string infilename, WordLength &ksize);
 
   Byte **get_raw_tables() { return nullptr; }
 };

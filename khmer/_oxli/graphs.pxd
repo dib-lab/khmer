@@ -116,6 +116,8 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
         void consume_seqfile[SeqIO](const string &, uint32_t &, uint64_t &)
         void consume_seqfile[SeqIO](unique_ptr[CpReadParser[SeqIO]]&,
                                     uint32_t &, uint64_t &)
+        void save(string)
+        void load(string)
 
 
 cdef extern from "oxli/hashgraph.hh" namespace "oxli":

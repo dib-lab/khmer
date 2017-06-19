@@ -236,3 +236,9 @@ cdef class QFCounttable:
         for i in range(MAX_BIGCOUNT):
             abunds.append(x[i])
         return abunds
+
+    def save(self, file_name):
+        deref(self.c_table).save(_bstring(file_name))
+
+    def load(self, file_name):
+        deref(self.c_table).load(_bstring(file_name))
