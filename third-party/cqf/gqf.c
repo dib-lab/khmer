@@ -43,35 +43,10 @@
  * the content of the slots.
  ******************************************************************/
 
-/* Must be >= 6.  6 seems fastest. */
-#define BLOCK_OFFSET_BITS (6)
-
-#define SLOTS_PER_BLOCK (1ULL << BLOCK_OFFSET_BITS)
-#define METADATA_WORDS_PER_BLOCK ((SLOTS_PER_BLOCK + 63) / 64)
-
 #define METADATA_WORD(qf,field,slot_index) (get_block((qf), (slot_index) / SLOTS_PER_BLOCK)->field[((slot_index) % SLOTS_PER_BLOCK) / 64])
 #define BITMASK(nbits) ((nbits) == 64 ? 0xffffffffffffffff : (1ULL << (nbits)) - 1ULL)
 #define MAX_VALUE(nbits) ((1ULL << (nbits)) - 1)
 
-typedef struct __attribute__ ((__packed__)) qfblock {
-	uint8_t offset; /* Code works with uint16_t, uint32_t, etc, but uint8_t seems just as fast as anything else */
-	uint64_t occupieds[METADATA_WORDS_PER_BLOCK];
-	uint64_t runends[METADATA_WORDS_PER_BLOCK];
-
-#if BITS_PER_SLOT == 8
-	uint8_t  slots[SLOTS_PER_BLOCK];
-#elif BITS_PER_SLOT == 16
-	uint16_t  slots[SLOTS_PER_BLOCK];
-#elif BITS_PER_SLOT == 32
-	uint32_t  slots[SLOTS_PER_BLOCK];
-#elif BITS_PER_SLOT == 64
-	uint64_t  slots[SLOTS_PER_BLOCK];
-#elif BITS_PER_SLOT != 0
-	uint8_t   slots[SLOTS_PER_BLOCK * BITS_PER_SLOT / 8];
-#else
-	uint8_t   slots[];
-#endif
-} qfblock;
 
 static inline int popcnt(uint64_t val)
 {
