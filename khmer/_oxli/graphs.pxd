@@ -118,6 +118,9 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
                                     uint32_t &, uint64_t &)
         void save(string)
         void load(string)
+        const uint64_t n_unique_kmers() const
+        const uint64_t n_occupied() const
+        const uintptr_t n_tables() const
 
 
 cdef extern from "oxli/hashgraph.hh" namespace "oxli":

@@ -441,8 +441,11 @@ public:
   // Accessors for protected/private table info members
   std::vector<uint64_t> get_tablesizes() const { return {cf.nslots}; }
   const size_t n_tables() const { return 1; }
-  const uint64_t n_unique_kmers() const { return 42; }
-  const uint64_t n_occupied() const { return 42; }
+  const uint64_t n_unique_kmers() const { return cf.ndistinct_elts; }
+  const uint64_t n_occupied() const {
+      // can not return noccupied_slots as that does not count number
+      //
+     return cf.noccupied_slots; }
   void save(std::string outfilename, WordLength ksize);
   void load(std::string infilename, WordLength &ksize);
 

@@ -238,7 +238,21 @@ cdef class QFCounttable:
         return abunds
 
     def save(self, file_name):
+        """Save the graph to the specified file."""
         deref(self.c_table).save(_bstring(file_name))
 
     def load(self, file_name):
+        """Load the graph from the specified file."""
         deref(self.c_table).load(_bstring(file_name))
+
+    def n_unique_kmers(self):
+        """Estimate of the number of unique kmers stored."""
+        return deref(self.c_table).n_unique_kmers()
+
+    def n_occupied(self):
+        """Estimate of the number of occupied slots in the storage."""
+        return deref(self.c_table).n_occupied()
+
+    def n_tables(self):
+        """Number of tables used in the storage."""
+        return deref(self.c_table).n_tables()

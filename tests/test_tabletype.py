@@ -72,6 +72,28 @@ def test_presence(any_tabletype):
     assert tt.get(kmer) == 1
     assert tt.get(hashval) == 1
 
+    tt.add(kmer)
+    assert tt.get(kmer) == 2
+    assert tt.get(hashval) == 2
+
+
+def test_n_occupied(any_tabletype):
+    # basic get/add test
+    tt = any_tabletype(12)
+
+    kmer = 'G' * 12
+
+    assert tt.n_occupied() == 0
+    assert tt.n_unique_kmers() == 0
+
+    tt.add(kmer)
+    assert tt.n_occupied() == 1
+    assert tt.n_unique_kmers() == 1
+
+    tt.add(kmer)
+    #assert tt.n_occupied() == 2
+    assert tt.n_unique_kmers() == 1
+
 
 def test_bad_create(tabletype):
     # creation should fail w/bad parameters
