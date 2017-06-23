@@ -389,6 +389,9 @@ py-demos: sharedobj
 	python examples/python-api/bloom.py
 	python examples/python-api/consume.py examples/c++-api/reads.fastq
 
+docker-container:
+	cd docker && docker build --build-arg branch=$(shell git rev-parse HEAD) .
+
 FORCE:
 
 # Use this to print the value of a Makefile variable

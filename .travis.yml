@@ -2,6 +2,8 @@ language: python
 
 # Tell travis we want Ubuntu 14.04
 sudo: required
+services:
+  - docker
 dist: trusty
 
 notifications:
@@ -70,6 +72,7 @@ script:
   - make py-demos
   - make cpp-demos
   - cd examples/stamps && ./do.sh
+  - make docker-container
 
 # generate all the diagnostic reports
 after_success:
