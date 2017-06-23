@@ -247,7 +247,7 @@ else:
 if sys.version_info[0] == 2:
     author_opts = {}
 else:
-    author_opts = { "newline": '', "encoding": 'utf-8'}
+    author_opts = {"newline": '', "encoding": 'utf-8'}
 with open('authors.csv', 'r', **author_opts) as csvin:
     authors = csv.reader(csvin)
     authorstr = ', '.join([row[0] for row in authors])
