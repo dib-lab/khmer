@@ -73,8 +73,13 @@ def test_presence(any_tabletype):
     assert tt.get(hashval) == 1
 
     tt.add(kmer)
-    assert tt.get(kmer) == 2
-    assert tt.get(hashval) == 2
+    # Node* types can only tell presence/absence
+    if 'Node' in tt.__class__.__name__:
+        assert tt.get(kmer) == 1
+        assert tt.get(hashval) == 1
+    else:
+        assert tt.get(kmer) == 2
+        assert tt.get(hashval) == 2
 
 
 def test_n_occupied(any_tabletype):
@@ -91,7 +96,12 @@ def test_n_occupied(any_tabletype):
     assert tt.n_unique_kmers() == 1
 
     tt.add(kmer)
-    #assert tt.n_occupied() == 2
+    # the CQF implementation we use can use more than one slot to represent
+    # counts for a single kmer
+    if not tt.__class__.__name__.startswith("QF"):
+        assert tt.n_occupied() == 1
+    else:
+        assert tt.n_occupied() == 2
     assert tt.n_unique_kmers() == 1
 
 
@@ -149,7 +159,10 @@ def test_reverse_hash(any_tabletype):
 def test_hashsizes(any_tabletype):
     # hashsizes method.
     kh = any_tabletype(5)
-    assert kh.hashsizes() == PRIMES_1m or kh.hashsizes() == [QF_SIZE]
+    assert (kh.hashsizes() == PRIMES_1m or
+            # CQF allocates some extra slots beyond what you request
+            # exactly how many extra is an implementation detail
+            kh.hashsizes()[0] >= QF_SIZE)
 
 
 def test_add_hashval(any_tabletype):
