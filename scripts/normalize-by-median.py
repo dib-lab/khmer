@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2011-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -55,13 +55,15 @@ import textwrap
 from khmer import khmer_args
 from contextlib import contextmanager
 from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
-                              report_on_config, info, calculate_graphsize,
-                              sanitize_help)
+                              report_on_config, calculate_graphsize,
+                              sanitize_help, check_argument_range)
+from khmer.khmer_args import FileType as khFileType
 import argparse
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
-                         get_file_writer, is_block, describe_file_handle)
-from khmer.utils import write_record, broken_paired_reader
+                         get_file_writer, describe_file_handle)
+from khmer.utils import (write_record, broken_paired_reader, ReadBundle,
+                         clean_input_reads)
 from khmer.khmer_logger import (configure_logging, log_info, log_error)
 
 
@@ -152,7 +154,6 @@ class WithDiagnostics(object):
 
 
 class Normalizer(object):
-
     """Digital normalization algorithm."""
 
     def __init__(self, desired_coverage, countgraph):
@@ -169,24 +170,13 @@ class Normalizer(object):
         * if any read's median k-mer count is below desired coverage, keep all;
         * consume and yield kept reads.
         """
+        batch = ReadBundle(read0, read1)
         desired_coverage = self.desired_coverage
 
-        passed_filter = False
-
-        batch = []
-        batch.append(read0)
-        if read1 is not None:
-            batch.append(read1)
-
-        for record in batch:
-            seq = record.sequence.replace('N', 'A')
-            if not self.countgraph.median_at_least(seq, desired_coverage):
-                passed_filter = True
-
-        if passed_filter:
-            for record in batch:
-                seq = record.sequence.replace('N', 'A')
-                self.countgraph.consume(seq)
+        # if any in batch have coverage below desired coverage, consume &yield
+        if not batch.coverages_at_least(self.countgraph, desired_coverage):
+            for record in batch.reads:
+                self.countgraph.consume(record.cleaned_seq)
                 yield record
 
 
@@ -265,12 +255,14 @@ def get_parser():
         tests/test-data/test-fastq-reads.fq"""
     parser = build_counting_args(
         descr="Do digital normalization (remove mostly redundant sequences)",
-        epilog=textwrap.dedent(epilog))
+        epilog=textwrap.dedent(epilog),
+        citations=['diginorm'])
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
-    parser.add_argument('-C', '--cutoff', type=int, help="when the median "
-                        "k-mer coverage level above is above this numer the "
+    parser.add_argument('-C', '--cutoff', help="when the median "
+                        "k-mer coverage level is above this number the "
                         "read is not kept.",
+                        type=check_argument_range(0, 256, "cutoff"),
                         default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-p', '--paired', action='store_true',
                         help='require that all sequences be properly paired')
@@ -281,19 +273,20 @@ def get_parser():
                         metavar="unpaired_reads_filename",
                         help='include a file of unpaired reads to which '
                         '-p/--paired does not apply.')
-    parser.add_argument('-s', '--savegraph', metavar="filename", default='',
+    parser.add_argument('-s', '--savegraph', metavar="filename", default=None,
                         help='save the k-mer countgraph to disk after all '
                         'reads are loaded.')
     parser.add_argument('-R', '--report',
+                        help='write progress report to report_filename',
                         metavar='report_filename', type=argparse.FileType('w'))
     parser.add_argument('--report-frequency',
-                        metavar='report_frequency', type=int,
-                        default=100000)
+                        metavar='report_frequency', type=int, default=100000,
+                        help='report progress every report_frequency reads')
     parser.add_argument('-f', '--force', dest='force',
                         help='continue past file reading errors',
                         action='store_true')
     parser.add_argument('-o', '--output', metavar="filename",
-                        type=argparse.FileType('wb'),
+                        type=khFileType('wb'),
                         default=None, dest='single_output_file',
                         help='only output a single file with '
                         'the specified filename; use a single dash "-" to '
@@ -307,9 +300,9 @@ def get_parser():
 
 
 def main():  # pylint: disable=too-many-branches,too-many-statements
-    info('normalize-by-median.py', ['diginorm'])
     parser = sanitize_help(get_parser())
     args = parser.parse_args()
+
     configure_logging(args.quiet)
     report_on_config(args)
 
@@ -337,7 +330,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     # check that files exist and there is sufficient output disk space.
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
-    if args.savegraph:
+    if args.savegraph is not None:
         graphsize = calculate_graphsize(args, 'countgraph')
         check_space_for_graph(args.savegraph, graphsize, args.force)
 
@@ -388,8 +381,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         # failsafe context manager in case an input file breaks
         with catch_io_errors(filename, outfp, args.single_output_file,
                              args.force, corrupt_files):
-
-            screed_iter = screed.open(filename)
+            screed_iter = clean_input_reads(screed.open(filename))
             reader = broken_paired_reader(screed_iter, min_length=args.ksize,
                                           force_single=force_single,
                                           require_paired=require_paired)
@@ -400,7 +392,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
                     write_record(record, outfp)
 
             log_info('output in {name}', name=describe_file_handle(outfp))
-            if not is_block(outfp):
+            if not args.single_output_file:
                 outfp.close()
 
     # finished - print out some diagnostics.
@@ -408,7 +400,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     log_info('Total number of unique k-mers: {umers}',
              umers=countgraph.n_unique_kmers())
 
-    if args.savegraph:
+    if args.savegraph is not None:
         log_info('...saving to {name}', name=args.savegraph)
         countgraph.save(args.savegraph)
 
@@ -427,4 +419,5 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 if __name__ == '__main__':
     main()
 
-# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
+# vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
+# vim: set textwidth=79:

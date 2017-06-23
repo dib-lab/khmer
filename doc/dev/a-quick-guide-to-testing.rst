@@ -4,24 +4,24 @@
    Copyright (C) 2015 The Regents of the University of California.
    It is licensed under the three-clause BSD license; see LICENSE.
    Contact: khmer-project@idyll.org
-   
+
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are
    met:
-   
+
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
-   
+
     * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the following
       disclaimer in the documentation and/or other materials provided
       with the distribution.
-   
+
     * Neither the name of the Michigan State University nor the names
       of its contributors may be used to endorse or promote products
       derived from this software without specific prior written
       permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -33,7 +33,7 @@
    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-   
+
    Contact: khmer-project@idyll.org
 
 A quick guide to testing (for khmer)
@@ -51,7 +51,7 @@ working!
 
 * We maintain fairly complete test coverage of our code.  What this
   means is that we have automated tests that, when run, execute most
-  of the lines of Python and C++ code in our lib/, khmer/ and scripts/
+  of the lines of Python and C++ code in our src/, khmer/ and scripts/
   directories.  This doesn't *guarantee* things are correct, but it
   does mean that at least most of the code works at some basic level.
 
@@ -114,15 +114,15 @@ For adding tests to **old code**, we recommend a mix of two approaches:
 
 ----
 
-Next, to add a test, you have two options: either write a new one from 
+Next, to add a test, you have two options: either write a new one from
 scratch, or copy an existing one.  (We recommend the latter.)
 
 To write a new one, you'll need to know how to write tests. For
 getting an idea of the syntax, read this `introductory guide
-<http://ivory.idyll.org/articles/nose-intro.html>`__ and the `official
-documentation
-<https://nose.readthedocs.org/en/latest/writing_tests.html>`__.  Then
-find the right file in ``tests/*.py`` and add your test!
+<http://ivory.idyll.org/articles/nose-intro.html>`__ and the `writing tests
+documentation from Astropy
+<http://docs.astropy.org/en/v1.1/development/testguide.html#writing-tests>`__.
+Then find the right file in ``tests/*.py`` and add your test!
 
 A better approach is, frankly, to go into the existing test code, find
 a test that does something similar to what you want to do, copy it,
@@ -139,7 +139,33 @@ review.
 
 To run one specific test rather than all of them, you can do::
 
-  ./setup.py nosetests --tests tests/test_scripts.py:test_load_into_counting
+  py.test tests/test_scripts.py::test_load_into_counting
 
 Here, you're running just one test -- the test function named
 ``test_load_into_counting`` in the file ``test_scripts.py``.
+
+You can also invoke the test via setup.py, which is a bit more verbose::
+
+  ./setup.py test --addopts "tests/test_scripts.py::test_load_into_counting"
+
+----
+
+Let's consider a simple test as an example.
+The following code ensures that a k-mer and its reverse complement hash to the same value, since they represent the same molecule (just observed from a different orientation).
+
+.. code:: python
+
+    def test_kmer_rc_same_hash():
+        kmer = 'GATTACAGATTACAGATTACA'
+        kmer_rc = 'TGTAATCTGTAATCTGTAATC'
+
+        ct = Counttable(21, 1e5, 2)
+        assert ct.hash(kmer) == ct.hash(kmer_rc)
+
+----
+
+This example tests only a single function.
+Tests that execute entire scripts and tests involving file I/O can require a bit more code.
+Fortunately, we've created some helper functions that make this quite a bit easier in khmer.
+See ``tests/test_scripts.py`` for some examples of code for executing scripts, capturing their output, and tidying up afterwards.
+Also, see ``tests/khmer_tst_utils.py`` for helper functions that assist with loading test data and creating temporary output files.

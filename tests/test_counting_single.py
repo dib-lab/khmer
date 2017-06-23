@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2010-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -32,21 +32,24 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-# pylint: disable=C0111,C0103
+# pylint: disable=C0111,C0103,missing-docstring,no-member,protected-access
+
 from __future__ import print_function
 from __future__ import absolute_import
 
 import khmer
+
+import pytest
 from . import khmer_tst_utils as utils
-from nose.plugins.attrib import attr
+
 
 MAX_COUNT = 255
 
 
-@attr('huge')
+@pytest.mark.huge
 def test_toobig():
     try:
-        ct = khmer.Countgraph(4, 1000000000000, 1)
+        khmer.Countgraph(4, 1000000000000, 1)
         assert 0, "this should fail"
     except MemoryError as err:
         print(str(err))
@@ -101,7 +104,7 @@ def test_complete_no_collision():
     assert n_rc_filled == n_entries, n_rc_filled
     assert n_palindromes == 16, n_palindromes
     assert n_fwd_filled == n_entries // 2 + n_palindromes // 2, \
-        n_fwd_filled
+        (n_fwd_filled, n_entries // 2 + n_palindromes // 2)
 
 
 def test_complete_2_collision():
@@ -316,12 +319,12 @@ def test_64bitshift_2():
 def test_very_short_read():
     short_filename = utils.get_test_data('test-short.fa')
     kh = khmer.Countgraph(9, 4, 1)
-    n_reads, n_kmers = kh.consume_fasta(short_filename)
+    n_reads, n_kmers = kh.consume_seqfile(short_filename)
     assert n_reads == 1, n_reads
     assert n_kmers == 0, n_kmers
 
     kh = khmer.Countgraph(8, 4, 1)
-    n_reads, n_kmers = kh.consume_fasta(short_filename)
+    n_reads, n_kmers = kh.consume_seqfile(short_filename)
     assert n_reads == 1, n_reads
     assert n_kmers == 1, n_kmers
 
@@ -342,45 +345,6 @@ class Test_ConsumeString(object):
             assert 0, "n_occupied shouldn't accept three arguments"
         except TypeError as err:
             print(str(err))
-
-    def test_abundance_by_pos(self):
-        kh = self.kh
-
-        for _ in range(0, 300):
-            kh.count('ATCG')
-
-        for _ in range(0, 10):
-            kh.count('ATGG')
-
-        short_filename = utils.get_test_data('test-short.fa')
-        dist = kh.fasta_count_kmers_by_position(short_filename, 6, 10)
-        assert dist[4] == 1
-        assert sum(dist) == 1
-
-        dist = kh.fasta_count_kmers_by_position(short_filename, 6, MAX_COUNT)
-        assert dist[0] == 1, dist[0]
-        assert dist[2] == 1
-        assert sum(dist) == 2
-
-    def test_abundance_by_pos_bigcount(self):
-        kh = self.kh
-        kh.set_use_bigcount(True)       # count past MAX_COUNT
-
-        for _ in range(0, 300):
-            kh.count('ATCG')
-
-        for _ in range(0, 10):
-            kh.count('ATGG')
-
-        short_filename = utils.get_test_data('test-short.fa')
-        dist = kh.fasta_count_kmers_by_position(short_filename, 6, 10)
-        assert dist[4] == 1
-        assert sum(dist) == 1
-
-        dist = kh.fasta_count_kmers_by_position(short_filename, 6, 300)
-        assert dist[0] == 1, dist[0]
-        assert dist[2] == 1
-        assert sum(dist) == 2
 
     def test_simple(self):
         n = self.kh.consume('AAAA')
@@ -415,7 +379,7 @@ class Test_AbundanceDistribution(object):
     def setup(self):
         self.kh = khmer._Countgraph(4, [5])
         A_filename = utils.get_test_data('all-A.fa')
-        self.kh.consume_fasta(A_filename)
+        self.kh.consume_seqfile(A_filename)
 
     def test_count_A(self):
         A_filename = utils.get_test_data('all-A.fa')

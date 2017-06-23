@@ -33,6 +33,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
+# pylint: disable=missing-docstring
 """
 Display summary statistics for one or more FASTA/FASTQ files.
 
@@ -42,15 +43,13 @@ Use '-h' for parameter help.
 """
 from __future__ import print_function
 
+import argparse
 import sys
 import csv
 import screed
-import argparse
 import textwrap
 
-from khmer import __version__
-from khmer.khmer_args import (sanitize_help, ComboFormatter, info,
-                              _VersionStdErrAction)
+from khmer.khmer_args import sanitize_help, KhmerArgumentParser
 
 
 def get_parser():
@@ -67,9 +66,9 @@ def get_parser():
         readstats.py tests/test-data/test-abund-read-2.fa
     """
 
-    parser = argparse.ArgumentParser(
-        description=descr, formatter_class=ComboFormatter,
-        epilog=textwrap.dedent(epilog),)
+    parser = KhmerArgumentParser(
+        description=descr,
+        epilog=textwrap.dedent(epilog))
     parser.add_argument('filenames', nargs='+')
     parser.add_argument('-o', '--output', dest='outfp', metavar="filename",
                         help="output file for statistics; defaults to stdout.",
@@ -77,13 +76,10 @@ def get_parser():
     parser.add_argument('--csv', default=False, action='store_true',
                         help='Use the CSV format for the statistics, '
                         'including column headers.')
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
     return parser
 
 
 class StatisticsOutput(object):  # pylint: disable=too-few-public-methods
-
     """
     Output statistics for several data files.
 
@@ -95,6 +91,7 @@ class StatisticsOutput(object):  # pylint: disable=too-few-public-methods
         self.formatter = formatter
 
     def __enter__(self):
+        """Write header upon entry."""
         self.formatter.write_header()
         return self
 
@@ -104,13 +101,13 @@ class StatisticsOutput(object):  # pylint: disable=too-few-public-methods
             basepairs, seqs, basepairs / float(seqs), filename)
 
     def __exit__(self, exc_type, exc_value, traceback):
+        """No exception? Finalize the formatter on exit."""
         if exc_type is None:
             self.formatter.finalize()
 
 
 class CsvFormatter(object):
-
-    """Format the statistis information as CSV."""
+    """Format the statistics information as CSV."""
 
     headers = ['bp', 'seqs', 'avg_len', 'filename']
 
@@ -131,7 +128,6 @@ class CsvFormatter(object):
 
 
 class StdFormatter(object):
-
     """Format the statistics in a human readable string."""
 
     def __init__(self, underlying_file):
@@ -176,11 +172,7 @@ def analyze_file(filename):
 
 def main():
     """Main function - run when executed as a script."""
-    info('readstats.py')
     args = sanitize_help(get_parser()).parse_args()
-
-    total_bp = 0
-    total_seqs = 0
 
     statistics = []
 

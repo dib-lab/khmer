@@ -32,13 +32,12 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-# pylint: disable=missing-docstring
+# pylint: disable=missing-docstring,no-member,protected-access,invalid-name
 from __future__ import absolute_import
+
 import khmer
-import screed
 
 from . import khmer_tst_utils as utils
-from nose.plugins.attrib import attr
 
 # Below, 'fakelump.fa' is an artificial data set of 3x1 kb sequences in
 # which the last 79 bases are common between the 3 sequences.
@@ -48,12 +47,12 @@ def test_fakelump_together():
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
     ht = khmer.Nodegraph(32, 1e5, 4)
-    ht.consume_fasta_and_tag(fakelump_fa)
+    ht.consume_seqfile_and_tag(fakelump_fa)
 
     subset = ht.do_subset_partition(0, 0)
     ht.merge_subset(subset)
 
-    (n_partitions, n_singletons) = ht.count_partitions()
+    (n_partitions, _) = ht.count_partitions()
     assert n_partitions == 1, n_partitions
 
 # try loading stop tags from previously saved
@@ -64,7 +63,7 @@ def test_fakelump_stop():
     fakelump_stoptags_txt = utils.get_test_data('fakelump.fa.stoptags.txt')
 
     ht = khmer.Nodegraph(32, 1e5, 4)
-    ht.consume_fasta_and_tag(fakelump_fa)
+    ht.consume_seqfile_and_tag(fakelump_fa)
 
     for line in open(fakelump_stoptags_txt):
         ht.add_stop_tag(line.strip())
@@ -72,7 +71,7 @@ def test_fakelump_stop():
     subset = ht.do_subset_partition(0, 0, True)
     ht.merge_subset(subset)
 
-    (n_partitions, n_singletons) = ht.count_partitions()
+    (n_partitions, _) = ht.count_partitions()
     assert n_partitions == 3, n_partitions
 
 # check specific insertion of stop tag
@@ -82,14 +81,14 @@ def test_fakelump_stop2():
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
     ht = khmer.Nodegraph(32, 1e5, 4)
-    ht.consume_fasta_and_tag(fakelump_fa)
+    ht.consume_seqfile_and_tag(fakelump_fa)
 
     ht.add_stop_tag('GGGGAGGGGTGCAGTTGTGACTTGCTCGAGAG')
 
     subset = ht.do_subset_partition(0, 0, True)
     ht.merge_subset(subset)
 
-    (n_partitions, n_singletons) = ht.count_partitions()
+    (n_partitions, _) = ht.count_partitions()
     assert n_partitions == 3, n_partitions
 
 # try repartitioning
@@ -100,12 +99,12 @@ def test_fakelump_repartitioning():
     fakelump_fa_foo = utils.get_temp_filename('fakelump.fa.stopfoo')
 
     ht = khmer.Nodegraph(32, 1e5, 4)
-    ht.consume_fasta_and_tag(fakelump_fa)
+    ht.consume_seqfile_and_tag(fakelump_fa)
 
     subset = ht.do_subset_partition(0, 0)
     ht.merge_subset(subset)
 
-    (n_partitions, n_singletons) = ht.count_partitions()
+    (n_partitions, _) = ht.count_partitions()
     assert n_partitions == 1, n_partitions
 
     # now, break partitions on any k-mer that you see more than once
@@ -128,13 +127,13 @@ def test_fakelump_repartitioning():
     # ok, now re-do everything with these stop tags, specifically.
 
     ht = khmer.Nodegraph(32, 1e5, 4)
-    ht.consume_fasta_and_tag(fakelump_fa)
+    ht.consume_seqfile_and_tag(fakelump_fa)
     ht.load_stop_tags(fakelump_fa_foo)
 
     subset = ht.do_subset_partition(0, 0, True)
     ht.merge_subset(subset)
 
-    (n_partitions, n_singletons) = ht.count_partitions()
+    (n_partitions, _) = ht.count_partitions()
     assert n_partitions == 6, n_partitions
 
 
@@ -143,12 +142,12 @@ def test_fakelump_load_stop_tags_trunc():
     fakelump_fa_foo = utils.get_temp_filename('fakelump.fa.stopfoo')
 
     ht = khmer.Nodegraph(32, 1e5, 4)
-    ht.consume_fasta_and_tag(fakelump_fa)
+    ht.consume_seqfile_and_tag(fakelump_fa)
 
     subset = ht.do_subset_partition(0, 0)
     ht.merge_subset(subset)
 
-    (n_partitions, n_singletons) = ht.count_partitions()
+    (n_partitions, _) = ht.count_partitions()
     assert n_partitions == 1, n_partitions
 
     # now, break partitions on any k-mer that you see more than once
@@ -175,7 +174,7 @@ def test_fakelump_load_stop_tags_trunc():
 
     # ok, now try loading these stop tags; should fail.
     ht = khmer._Nodegraph(32, [5, 7, 11, 13])
-    ht.consume_fasta_and_tag(fakelump_fa)
+    ht.consume_seqfile_and_tag(fakelump_fa)
 
     try:
         ht.load_stop_tags(fakelump_fa_foo)

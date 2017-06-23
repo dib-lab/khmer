@@ -48,13 +48,11 @@ from __future__ import print_function
 
 import screed
 import sys
-import os
 import textwrap
-import argparse
 from khmer import __version__
-from khmer.kfile import check_input_files, check_space, is_block
-from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
-                              _VersionStdErrAction)
+from khmer.kfile import check_input_files, check_space
+from khmer.khmer_args import sanitize_help, KhmerArgumentParser
+from khmer.khmer_args import FileType as khFileType
 from khmer.kfile import (add_output_compression_type, get_file_writer,
                          describe_file_handle)
 from khmer.utils import (write_record_pair, check_is_left, check_is_right,
@@ -75,22 +73,25 @@ def get_parser():
     As a "bonus", this file ensures that if read names are not already
     formatted properly, they are reformatted consistently, such that
     they look like the pre-1.8 Casava format (`@name/1`, `@name/2`).
+    This reformatting can be switched off with the
+    :option:`--no-reformat` flag.
 
     Example::
 
         interleave-reads.py tests/test-data/paired.fq.1 \\
                 tests/test-data/paired.fq.2 -o paired.fq"""
-    parser = argparse.ArgumentParser(
+    parser = KhmerArgumentParser(
         description='Produce interleaved files from R1/R2 paired files',
-        epilog=textwrap.dedent(epilog), formatter_class=ComboFormatter)
+        epilog=textwrap.dedent(epilog))
 
     parser.add_argument('left')
     parser.add_argument('right')
     parser.add_argument('-o', '--output', metavar="filename",
-                        type=argparse.FileType('wb'),
+                        type=khFileType('wb'),
                         default=sys.stdout)
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
+    parser.add_argument('--no-reformat', default=False, action='store_true',
+                        help='Do not reformat read names or enforce\
+                              consistency')
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     add_output_compression_type(parser)
@@ -98,7 +99,6 @@ def get_parser():
 
 
 def main():
-    info('interleave-reads.py')
     args = sanitize_help(get_parser()).parse_args()
 
     check_input_files(args.left, args.force)
@@ -107,8 +107,6 @@ def main():
 
     s1_file = args.left
     s2_file = args.right
-
-    fail = False
 
     print("Interleaving:\n\t%s\n\t%s" % (s1_file, s2_file), file=sys.stderr)
 
@@ -128,24 +126,27 @@ def main():
         counter += 1
 
         name1 = read1.name
-        if not check_is_left(name1):
-            name1 += '/1'
         name2 = read2.name
-        if not check_is_right(name2):
-            name2 += '/2'
 
-        read1.name = name1
-        read2.name = name2
+        if not args.no_reformat:
+            if not check_is_left(name1):
+                name1 += '/1'
+            if not check_is_right(name2):
+                name2 += '/2'
 
-        if not check_is_pair(read1, read2):
-            print("ERROR: This doesn't look like paired data! "
-                  "%s %s" % (read1.name, read2.name), file=sys.stderr)
-            sys.exit(1)
+            read1.name = name1
+            read2.name = name2
+
+            if not check_is_pair(read1, read2):
+                print("ERROR: This doesn't look like paired data! "
+                      "%s %s" % (read1.name, read2.name), file=sys.stderr)
+                sys.exit(1)
 
         write_record_pair(read1, read2, outfp)
 
     print('final: interleaved %d pairs' % counter, file=sys.stderr)
     print('output written to', describe_file_handle(outfp), file=sys.stderr)
+
 
 if __name__ == '__main__':
     main()

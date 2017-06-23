@@ -44,19 +44,14 @@ Use '-h' for parameter help.
 """
 from __future__ import print_function
 
-
 import argparse
 import os
 import sys
 import textwrap
 
 import khmer
-from khmer.khmer_args import (DEFAULT_K, info, ComboFormatter,
-                              _VersionStdErrAction, sanitize_help)
-from khmer.utils import write_record
+from khmer.khmer_args import DEFAULT_K, sanitize_help, KhmerArgumentParser
 from khmer.khmer_args import graphsize_args_report
-from khmer import __version__
-import screed
 
 
 def get_parser():
@@ -98,30 +93,27 @@ def get_parser():
 
         unique-kmers.py -R unique_count -k 30 \\
         tests/test-data/test-abund-read-paired.fa"""  # noqa
-    parser = argparse.ArgumentParser(
+    parser = KhmerArgumentParser(
         description=descr, epilog=textwrap.dedent(epilog),
-        formatter_class=ComboFormatter)
+        citations=['SeqAn', 'hll'])
 
     env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
-
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
 
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
 
-    parser.add_argument('--ksize', '-k', type=int, default=env_ksize,
+    parser.add_argument('-k', '--ksize', type=int, default=env_ksize,
                         help='k-mer size to use')
 
-    parser.add_argument('--error-rate', '-e', type=float, default=0.01,
+    parser.add_argument('-e', '--error-rate', type=float, default=0.01,
                         help='Acceptable error rate')
 
-    parser.add_argument('--report', '-R',
+    parser.add_argument('-R', '--report',
                         metavar='filename', type=argparse.FileType('w'),
                         help='generate informational report and write to'
                         ' filename')
 
-    parser.add_argument('--stream-records', '-S', default=False,
+    parser.add_argument('-S', '--stream-records', default=False,
                         action='store_true',
                         help='write input sequences to STDOUT')
 
@@ -136,22 +128,20 @@ def get_parser():
 
 
 def main():
-    info('unique-kmers.py', ['SeqAn', 'hll'])
     args = sanitize_help(get_parser()).parse_args()
 
     total_hll = khmer.HLLCounter(args.error_rate, args.ksize)
 
     report_fp = args.report
     input_filename = None
-    for index, input_filename in enumerate(args.input_filenames):
+    for _, input_filename in enumerate(args.input_filenames):
         hllcpp = khmer.HLLCounter(args.error_rate, args.ksize)
-        hllcpp.consume_fasta(input_filename,
-                             stream_records=args.stream_records)
+        hllcpp.consume_seqfile(input_filename,
+                               stream_records=args.stream_records)
 
         cardinality = hllcpp.estimate_cardinality()
         print('Estimated number of unique {0}-mers in {1}: {2}'.format(
-              args.ksize, input_filename, cardinality),
-              file=sys.stderr)
+            args.ksize, input_filename, cardinality), file=sys.stderr)
 
         if report_fp:
             print(cardinality, args.ksize, '(total)', file=report_fp)
@@ -160,8 +150,7 @@ def main():
 
     cardinality = total_hll.estimate_cardinality()
     print('Total estimated number of unique {0}-mers: {1}'.format(
-          args.ksize, cardinality),
-          file=sys.stderr)
+        args.ksize, cardinality), file=sys.stderr)
 
     to_print = graphsize_args_report(cardinality, args.error_rate)
     if args.diagnostics:
@@ -171,6 +160,7 @@ def main():
         print(cardinality, args.ksize, 'total', file=report_fp)
         print(to_print, file=report_fp)
         report_fp.flush()
+
 
 if __name__ == "__main__":
     main()

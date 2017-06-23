@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2013-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -45,16 +45,14 @@ extract them into separate files (.pe and .se).
 Reads FASTQ and FASTA input, retains format for output.
 """
 from __future__ import print_function
-import screed
 import sys
 import os.path
 import textwrap
-import argparse
 
-from khmer import __version__
+from khmer import ReadParser
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
-                              _VersionStdErrAction)
+from khmer.khmer_args import sanitize_help, KhmerArgumentParser
+from khmer.khmer_args import FileType as khFileType
 from khmer.kfile import add_output_compression_type
 from khmer.kfile import get_file_writer
 
@@ -89,22 +87,19 @@ def get_parser():
 
         extract-paired-reads.py tests/test-data/paired.fq
     """
-    parser = argparse.ArgumentParser(
+    parser = KhmerArgumentParser(
         description='Take a mixture of reads and split into pairs and '
-        'orphans.', epilog=textwrap.dedent(epilog),
-        formatter_class=ComboFormatter)
+        'orphans.', epilog=textwrap.dedent(epilog))
     parser.add_argument('infile', nargs='?', default='/dev/stdin')
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-d', '--output-dir', default='', help='Output '
                         'split reads to specified directory. Creates '
                         'directory if necessary')
-    parser.add_argument('--output-paired', '-p', metavar="filename",
-                        type=argparse.FileType('wb'),
+    parser.add_argument('-p', '--output-paired', metavar="filename",
+                        type=khFileType('wb'),
                         default=None, help='Output paired reads to this '
                         'file')
-    parser.add_argument('--output-single', '-s', metavar="filename",
-                        type=argparse.FileType('wb'), default=None,
+    parser.add_argument('-s', '--output-single', metavar="filename",
+                        type=khFileType('wb'), default=None,
                         help='Output orphaned reads to this file')
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
@@ -113,7 +108,6 @@ def get_parser():
 
 
 def main():
-    info('extract-paired-reads.py')
     args = sanitize_help(get_parser()).parse_args()
 
     infile = args.infile
@@ -122,6 +116,8 @@ def main():
 
     # decide where to put output files - specific directory? or just default?
     if infile in ('/dev/stdin', '-'):
+        # seqan only treats '-' as "read from stdin"
+        infile = '-'
         if not (args.output_paired and args.output_single):
             print("Accepting input from stdin; output filenames must be "
                   "provided.", file=sys.stderr)
@@ -156,8 +152,8 @@ def main():
     n_pe = 0
     n_se = 0
 
-    screed_iter = screed.open(infile)
-    for index, is_pair, read1, read2 in broken_paired_reader(screed_iter):
+    reads = ReadParser(infile)
+    for index, is_pair, read1, read2 in broken_paired_reader(reads):
         if index % 100000 == 0 and index > 0:
             print('...', index, file=sys.stderr)
 

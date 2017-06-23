@@ -103,7 +103,7 @@ def main():
 
         # load contigs, connect into N partitions
         print('loading input reads from', inp_name)
-        ht.consume_fasta(inp_name)
+        ht.consume_seqfile(inp_name)
 
     print('starting sweep.')
 
@@ -124,4 +124,5 @@ def main():
 if __name__ == '__main__':
     main()
 
-# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
+# vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
+# vim: set textwidth=79:

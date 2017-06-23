@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2010-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -43,7 +43,6 @@ k-mers are output into a .stoptags file, for later use in partitioning.
 """
 from __future__ import print_function
 
-import argparse
 import glob
 import os
 import textwrap
@@ -51,9 +50,7 @@ import khmer
 import sys
 from khmer.kfile import check_input_files, check_space
 from khmer import khmer_args
-from khmer.khmer_args import (build_counting_args, info, add_loadgraph_args,
-                              report_on_config, sanitize_help,
-                              ComboFormatter)
+from khmer.khmer_args import (build_counting_args, sanitize_help)
 
 # counting hash parameters.
 DEFAULT_COUNTING_HT_SIZE = 3e6                # number of bytes
@@ -97,7 +94,8 @@ def get_parser():
     """
     parser = build_counting_args(
         descr="Find all highly connected k-mers.",
-        epilog=textwrap.dedent(epilog))
+        epilog=textwrap.dedent(epilog),
+        citations=['graph'])
 
     parser.add_argument('graphbase', help='Basename for the input and output '
                         'files.')
@@ -107,11 +105,10 @@ def get_parser():
 
 
 def main():
-    info('find-knots.py', ['graph'])
     parser = get_parser()
     parser.epilog = parser.epilog.replace(
         ":doc:`partitioning-big-data`",
-        "http://khmer.readthedocs.org/en/stable/user/"
+        "http://khmer.readthedocs.io/en/stable/user/"
         "partitioning-big-data.html"
     )
     args = sanitize_help(parser).parse_args()
@@ -184,6 +181,7 @@ def main():
         print('(%d of %d)\n' % (index, len(pmap_files)), file=sys.stderr)
 
     print('done!', file=sys.stderr)
+
 
 if __name__ == '__main__':
     main()

@@ -81,7 +81,7 @@ def main():
           file=sys.stderr)
 
     htable = khmer.new_nodegraph(args.ksize, args.max_tablesize, args.n_tables)
-    target_method = htable.consume_fasta_with_reads_parser
+    target_method = htable.consume_seqfile_with_reads_parser
 
     for _, filename in enumerate(filenames):
         rparser = khmer.ReadParser(filename)
@@ -122,4 +122,5 @@ def main():
 if __name__ == '__main__':
     main()
 
-# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
+# vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
+# vim: set textwidth=79:

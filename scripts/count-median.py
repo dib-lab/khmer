@@ -41,7 +41,7 @@ The abundance is based on the k-mer counts in the given k-mer countgraph.
 Can be used to estimate expression levels (mRNAseq) or coverage
 (genomic/metagenomic).
 
-% scripts/count-median.py <htname> <input seqs> <output counts>
+% scripts/count-median.py <countgraph> <input seqs> <output counts>
 
 Use '-h' for parameter help.
 
@@ -50,16 +50,15 @@ The output file contains sequence id, median, average, stddev, and seq length.
 NOTE: All 'N's in the input sequences are converted to 'A's.
 """
 from __future__ import print_function
-import screed
 import argparse
+import screed
 import sys
 import csv
 import textwrap
 
 from khmer import __version__, load_countgraph
 from khmer.kfile import check_input_files, check_space
-from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
-                              _VersionStdErrAction)
+from khmer.khmer_args import (sanitize_help, KhmerArgumentParser)
 
 
 def get_parser():
@@ -73,14 +72,14 @@ def get_parser():
 
     Example::
 
-        load-into-countgraph.py counts tests/test-data/test-reads.fq.gz
+        load-into-counting.py counts tests/test-data/test-reads.fq.gz
         count-median.py counts tests/test-data/test-reads.fq.gz medians.txt
 
     NOTE: All 'N's in the input sequences are converted to 'A's.
     """
-    parser = argparse.ArgumentParser(
+    parser = KhmerArgumentParser(
         description='Count k-mers summary stats for sequences',
-        epilog=textwrap.dedent(epilog), formatter_class=ComboFormatter)
+        epilog=textwrap.dedent(epilog))
 
     parser.add_argument('countgraph', metavar='input_count_graph_filename',
                         help='input k-mer countgraph filename')
@@ -89,15 +88,12 @@ def get_parser():
     parser.add_argument('output', metavar='output_summary_filename',
                         help='output summary filename',
                         type=argparse.FileType('w'))
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
 
 
 def main():
-    info('count-median.py', ['diginorm'])
     args = sanitize_help(get_parser()).parse_args()
 
     htfile = args.countgraph
@@ -128,6 +124,7 @@ def main():
             medn, ave, stdev = countgraph.get_median_count(seq)
             ave, stdev = [round(x, 9) for x in (ave, stdev)]
             output.writerow([record.name, medn, ave, stdev, len(seq)])
+
 
 if __name__ == '__main__':
     main()

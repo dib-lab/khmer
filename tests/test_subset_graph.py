@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2010-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -32,9 +32,10 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-# pylint: disable=missing-docstring,invalid-name,unused-variable,no-member
-from __future__ import print_function
-from __future__ import absolute_import
+# pylint: disable=missing-docstring,invalid-name,no-member,no-self-use
+# pylint: disable=protected-access
+from __future__ import print_function, absolute_import
+
 import khmer
 import screed
 
@@ -53,12 +54,12 @@ class Test_RandomData(object):
 
         filename = utils.get_test_data('test-graph2.fa')
 
-        (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+        (total_reads, _) = ht.consume_seqfile_and_tag(filename)
         assert total_reads == 3, total_reads
 
         divvy = ht.divide_tags_into_subsets(1)
         assert len(divvy) is 3
-        (a, b, c) = divvy
+        (a, b, _) = divvy
 
         x = ht.do_subset_partition(a, a)
         ht.merge_subset(x)
@@ -74,7 +75,7 @@ class Test_RandomData(object):
         ht = khmer.Nodegraph(20, 4 ** 4 + 1, 2)
         filename = utils.get_test_data('test-graph2.fa')
 
-        (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+        (total_reads, _) = ht.consume_seqfile_and_tag(filename)
         assert total_reads == 3, total_reads
 
         divvy = ht.divide_tags_into_subsets(1)
@@ -95,10 +96,11 @@ class Test_RandomData(object):
         ht = khmer.Nodegraph(20, 4 ** 4 + 1, 2)
         filename = utils.get_test_data('test-graph5.fa')
 
-        (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+        (total_reads, _) = ht.consume_seqfile_and_tag(filename)
         assert total_reads == 6, total_reads
 
         divvy = ht.divide_tags_into_subsets(1)
+        divvy = list(divvy)
 
         x = ht.do_subset_partition(divvy[0], divvy[4])
         ht.merge_subset(x)
@@ -115,10 +117,11 @@ class Test_RandomData(object):
         filename = utils.get_test_data('random-20-a.fa')
         outfile = utils.get_temp_filename('out')
 
-        total_reads, _ = ht.consume_fasta_and_tag(filename)
+        total_reads, _ = ht.consume_seqfile_and_tag(filename)
 
         subset_size = total_reads // 2 + total_reads % 2
         divvy = ht.divide_tags_into_subsets(subset_size)
+        divvy = list(divvy)
         assert len(divvy) == 4
 
         x = ht.do_subset_partition(divvy[0], divvy[2])
@@ -134,10 +137,11 @@ class Test_RandomData(object):
         filename = utils.get_test_data('random-20-a.fa')
         outfile = utils.get_temp_filename('out')
 
-        total_reads, _ = ht.consume_fasta_and_tag(filename)
+        total_reads, _ = ht.consume_seqfile_and_tag(filename)
 
         subset_size = total_reads // 2 + total_reads % 2
         divvy = ht.divide_tags_into_subsets(subset_size)
+        divvy = list(divvy)
         assert len(divvy) == 4
 
         x = ht.do_subset_partition(divvy[0], divvy[2])
@@ -153,10 +157,11 @@ class Test_RandomData(object):
         filename = utils.get_test_data('random-20-a.fa')
         outfile = utils.get_temp_filename('out')
 
-        total_reads, _ = ht.consume_fasta_and_tag(filename)
+        total_reads, _ = ht.consume_seqfile_and_tag(filename)
 
         subset_size = total_reads // 2 + total_reads % 2
         divvy = ht.divide_tags_into_subsets(subset_size)
+        divvy = list(divvy)
         assert len(divvy) == 4, len(divvy)
 
         x = ht.do_subset_partition(divvy[0], divvy[2])
@@ -176,10 +181,11 @@ class Test_RandomData(object):
         filename = utils.get_test_data('random-20-a.fa')
         outfile = utils.get_temp_filename('out')
 
-        total_reads, _ = ht.consume_fasta_and_tag(filename)
+        ht.consume_seqfile_and_tag(filename)
         subsets = []
 
         divvy = ht.divide_tags_into_subsets(1)
+        divvy = list(divvy)
         divvy.append(0)
         for i in range(len(divvy) - 1):
             x = ht.do_subset_partition(divvy[i], divvy[i + 1])
@@ -199,7 +205,7 @@ class Test_RandomData(object):
         savefile_tags = utils.get_temp_filename('tags')
         outfile = filename + utils.get_temp_filename('out')
 
-        total_reads, _ = ht.consume_fasta_and_tag(filename)
+        ht.consume_seqfile_and_tag(filename)
 
         ht.save(savefile_ht)
         ht.save_tagset(savefile_tags)
@@ -211,6 +217,7 @@ class Test_RandomData(object):
         ht.load_tagset(savefile_tags)
 
         divvy = ht.divide_tags_into_subsets(1)
+        divvy = list(divvy)
         divvy.append(0)
 
         subsets = []
@@ -231,13 +238,12 @@ class Test_SaveLoadPmap(object):
         ht = khmer.Nodegraph(20, 4 ** 4 + 1, 2)
         filename = utils.get_test_data('test-graph2.fa')
 
-        (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+        (total_reads, _) = ht.consume_seqfile_and_tag(filename)
         assert total_reads == 3, total_reads
 
         divvy = ht.divide_tags_into_subsets(1)
-        print(divvy)
         assert len(divvy) == 3
-        (a, b, c) = divvy
+        (a, b, _) = divvy
 
         outfile1 = utils.get_temp_filename('x.pmap')
         outfile2 = utils.get_temp_filename('y.pmap')
@@ -264,13 +270,13 @@ class Test_SaveLoadPmap(object):
         ht = khmer.Nodegraph(20, 4 ** 4 + 1, 2)
         filename = utils.get_test_data('test-graph2.fa')
 
-        (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+        (total_reads, _) = ht.consume_seqfile_and_tag(filename)
         assert total_reads == 3, total_reads
 
         divvy = ht.divide_tags_into_subsets(1)
         print(divvy)
         assert len(divvy) is 3
-        (a, b, c) = divvy
+        (a, b, _) = divvy
 
         outfile1 = utils.get_temp_filename('x.pmap')
         outfile2 = utils.get_temp_filename('y.pmap')
@@ -301,10 +307,11 @@ class Test_SaveLoadPmap(object):
         ht = khmer.Nodegraph(20, 4 ** 8 + 1, 2)
         filename = utils.get_test_data('random-20-a.fa')
 
-        (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+        (total_reads, _) = ht.consume_seqfile_and_tag(filename)
 
         subset_size = total_reads // 2 + total_reads % 2
         divvy = ht.divide_tags_into_subsets(subset_size)
+        divvy = list(divvy)
 
         outfile1 = utils.get_temp_filename('x.pmap')
         outfile2 = utils.get_temp_filename('y.pmap')
@@ -332,7 +339,7 @@ class Test_SaveLoadPmap(object):
     def test_save_load_merge_nexist(self):
         ht = khmer._Nodegraph(20, [1])
         try:
-            a = ht.load_subset_partitionmap('this does not exist')
+            ht.load_subset_partitionmap('this does not exist')
             assert 0, "this should not succeed"
         except OSError as e:
             print(str(e))
@@ -341,12 +348,12 @@ class Test_SaveLoadPmap(object):
         ht = khmer.Nodegraph(20, 4 ** 4 + 1, 2)
         filename = utils.get_test_data('test-graph2.fa')
 
-        (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+        (total_reads, _) = ht.consume_seqfile_and_tag(filename)
         assert total_reads == 3, total_reads
 
         divvy = ht.divide_tags_into_subsets(1)
         print(divvy)
-        (a, b, c) = divvy
+        (a, b, _) = divvy
 
         outfile1 = utils.get_temp_filename('x.pmap')
         outfile2 = utils.get_temp_filename('y.pmap')
@@ -370,10 +377,11 @@ class Test_SaveLoadPmap(object):
         ht = khmer.Nodegraph(20, 4 ** 7 + 1, 2)
         filename = utils.get_test_data('random-20-a.fa')
 
-        (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+        (total_reads, _) = ht.consume_seqfile_and_tag(filename)
 
         subset_size = total_reads // 2 + total_reads % 2
         divvy = ht.divide_tags_into_subsets(subset_size)
+        divvy = list(divvy)
 
         outfile1 = utils.get_temp_filename('x.pmap')
         outfile2 = utils.get_temp_filename('y.pmap')
@@ -399,12 +407,8 @@ class Test_SaveLoadPmap(object):
         ht = khmer.Nodegraph(20, 4 ** 4 + 1, 2)
         filename = utils.get_test_data('test-graph2.fa')
 
-        (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+        (total_reads, _) = ht.consume_seqfile_and_tag(filename)
         assert total_reads == 3, total_reads
-
-        divvy = ht.divide_tags_into_subsets(1)
-        print(divvy)
-        (a, b, c) = divvy
 
         outfile1 = utils.get_temp_filename('x.pmap')
 
@@ -440,12 +444,12 @@ class Test_SaveLoadPmap(object):
         ht = khmer.Nodegraph(20, 4 ** 4 + 1, 2)
         filename = utils.get_test_data('test-graph2.fa')
 
-        (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+        (total_reads, _) = ht.consume_seqfile_and_tag(filename)
         assert total_reads == 3, total_reads
 
         divvy = ht.divide_tags_into_subsets(1)
         print(divvy)
-        (a, b, c) = divvy
+        (a, b, _) = divvy
 
         outfile1 = utils.get_temp_filename('x.pmap')
         x = ht.do_subset_partition(a, b)
@@ -464,13 +468,13 @@ def test_save_load_merge_on_graph():
     ht = khmer.Nodegraph(20, 4 ** 4 + 1, 2)
     filename = utils.get_test_data('test-graph2.fa')
 
-    (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+    (total_reads, _) = ht.consume_seqfile_and_tag(filename)
     assert total_reads == 3, total_reads
 
     divvy = ht.divide_tags_into_subsets(1)
     print(divvy)
     assert len(divvy) is 3
-    (a, b, c) = divvy
+    (a, b, _) = divvy
 
     outfile1 = utils.get_temp_filename('x.pmap')
     outfile2 = utils.get_temp_filename('y.pmap')
@@ -497,13 +501,13 @@ def test_save_load_on_graph_truncate():
     ht = khmer.Nodegraph(20, 4 ** 4 + 1, 2)
     filename = utils.get_test_data('test-graph2.fa')
 
-    (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+    (total_reads, _) = ht.consume_seqfile_and_tag(filename)
     assert total_reads == 3, total_reads
 
     divvy = ht.divide_tags_into_subsets(1)
     print(divvy)
     assert len(divvy) is 3
-    (a, b, c) = divvy
+    (a, b, _) = divvy
 
     outfile1 = utils.get_temp_filename('x.pmap')
     outfile2 = utils.get_temp_filename('y.pmap')
@@ -553,6 +557,7 @@ def test_output_partitions():
     assert parts[1] == '3'
     assert parts[2] == '4'
 
+
 test_output_partitions.runme = True
 
 
@@ -560,7 +565,7 @@ def test_tiny_real_partitions():
     filename = utils.get_test_data('real-partition-tiny.fa')
 
     ht = khmer.Nodegraph(32, 8e2, 4)
-    ht.consume_fasta_and_tag(filename)
+    ht.consume_seqfile_and_tag(filename)
 
     subset = ht.do_subset_partition(0, 0)
     ht.merge_subset(subset)
@@ -587,7 +592,7 @@ def test_small_real_partitions():
     filename = utils.get_test_data('real-partition-small.fa')
 
     ht = khmer.Nodegraph(32, 2e3, 4)
-    ht.consume_fasta_and_tag(filename)
+    ht.consume_seqfile_and_tag(filename)
 
     subset = ht.do_subset_partition(0, 0)
     ht.merge_subset(subset)
@@ -606,9 +611,10 @@ def test_small_real_partitions():
     assert len(set(parts)) == 1
     assert set(parts) != set(['0'])
 
+
 test_small_real_partitions.runme = True
 
-a = """\
+first = """\
 CAGACTTGGAAGCTGAGAGTCCGACGTCACTGCCTCAACTCGCGCAAATGTTCCCGCCAA\
 ATTGTATCCTAGGGATCTTCCATAAGCTTATATACGGGGGTTTCCAAGGCCCTGATGCCA\
 GTGCCTAATCTTTTGGAGTCCTCTCAGGGCCACTAGATGCCATGCTACGCGTCCCAGGTT\
@@ -616,7 +622,7 @@ GGCCTGAGGGTCTACACGGAGTGGGAAGCATGGGTACCTTAGCGAACATTCATACTGGCC\
 TGTTTATGCTTATCAGACTTCAGCTTCGCTTAGCGCGTCACCGTTTGTAACTTGTTATCT\
 """
 
-b = """\
+second = """\
 TGTTTATGCTTATCAGACTTCAGCTTCGCTTAGCGCGTCACCGTTTGTAACTTGTTATCT\
 GACTGTAGACTTGAACCTCGATGGAATGCAGGTCCCATTCTCTGGCCTGACTCATGGAAC\
 CGAGGCCAAAAAAGCATGGCACGAAGACGCTATGCGAGGGTGCTCGCCCATGTCGTCGCC\
@@ -626,14 +632,12 @@ CCTCGGGCCTTTCCGTTCCGTTGCCGCCCAAGCTCTCTAGCATCGAATCGGTCAAGCGGT\
 
 
 def test_partition_on_abundance_1():
-    print((a,))
-    print((b,))
     kh = khmer.Countgraph(20, 1e3, 4)
-    for i in range(10):
-        print(kh.consume_and_tag(a))
+    for _ in range(10):
+        print(kh.consume_and_tag(first))
 
-    for i in range(10):
-        print(kh.consume_and_tag(b))
+    for _ in range(10):
+        print(kh.consume_and_tag(second))
 
     # all paths in 'a' and 'b'
     p = kh.do_subset_partition_with_abundance(10, 50)
@@ -643,11 +647,11 @@ def test_partition_on_abundance_1():
 
 def test_partition_on_abundance_2():
     kh = khmer.Countgraph(20, 1e3, 4)
-    for i in range(10):
-        print(kh.consume_and_tag(a))
+    for _ in range(10):
+        print(kh.consume_and_tag(first))
 
-    for i in range(5):
-        print(kh.consume_and_tag(b))
+    for _ in range(5):
+        print(kh.consume_and_tag(second))
 
     # all paths in 'a'
     p = kh.do_subset_partition_with_abundance(10, 50)
@@ -657,11 +661,11 @@ def test_partition_on_abundance_2():
 
 def test_partition_on_abundance_3():
     kh = khmer.Countgraph(20, 1e4, 4)
-    for i in range(10):
-        print(kh.consume_and_tag(a))
+    for _ in range(10):
+        print(kh.consume_and_tag(first))
 
-    for i in range(5):
-        print(kh.consume_and_tag(b))
+    for _ in range(5):
+        print(kh.consume_and_tag(second))
 
     # this will get paths only in 'a'
     p = kh.do_subset_partition_with_abundance(10, 50)
@@ -674,34 +678,13 @@ def test_partition_on_abundance_3():
     assert x == (2, 2)                  # two partitions, two ignored tags
 
 
-def test_partition_overlap_1():
-    kh = khmer.Countgraph(20, 1e3, 4)
-    for i in range(10):
-        kh.consume_and_tag(a)
-
-    for i in range(10):
-        kh.consume_and_tag(b)
-
-    # this will get paths only in 'a'
-    p1 = kh.do_subset_partition_with_abundance(10, 50)
-
-    # this will get paths only in 'a', again -- should be the same!
-    p2 = kh.do_subset_partition_with_abundance(10, 50)
-
-    # p1.report_on_partitions()
-    # p2.report_on_partitions()
-
-    x = p1.compare_partitions(3, p2, 3)
-    assert x == (0, 0, 14), x
-
-
 def test_partition_overlap_2():
     kh = khmer.Countgraph(20, 1e4, 4)
-    for i in range(10):
-        kh.consume_and_tag(a)
+    for _ in range(10):
+        kh.consume_and_tag(first)
 
-    for i in range(5):
-        kh.consume_and_tag(b)
+    for _ in range(5):
+        kh.consume_and_tag(second)
 
     # this will get paths only in 'a'
     p1 = kh.do_subset_partition_with_abundance(10, 50)
@@ -712,17 +695,11 @@ def test_partition_overlap_2():
     # p1.report_on_partitions()
     # p2.report_on_partitions()
 
-    x = p1.compare_partitions(3, p2, 3)
-    assert x == (8, 6, 0), x
-
-    x = p1.compare_partitions(3, p2, 5)
-    assert x == (2, 0, 6), x
-
     x = p1.partition_sizes()
     assert x == ([(3, 8)], 0), x
 
     x = p2.partition_sizes()
-    assert x == ([(3, 6), (5, 6)], 2), x
+    assert x == ([(3, 6), (5, 6)], 0), x
 
     x = p1.partition_average_coverages(kh)
     assert x == [(3, 11)]

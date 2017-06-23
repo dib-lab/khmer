@@ -1,27 +1,27 @@
 ..
    This file is part of khmer, https://github.com/dib-lab/khmer/, and is
    Copyright (C) 2010-2015 Michigan State University
-   Copyright (C) 2015 The Regents of the University of California.
+   Copyright (C) 2015-2016 The Regents of the University of California.
    It is licensed under the three-clause BSD license; see LICENSE.
    Contact: khmer-project@idyll.org
-   
+
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are
    met:
-   
+
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
-   
+
     * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the following
       disclaimer in the documentation and/or other materials provided
       with the distribution.
-   
+
     * Neither the name of the Michigan State University nor the names
       of its contributors may be used to endorse or promote products
       derived from this software without specific prior written
       permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -33,7 +33,7 @@
    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-   
+
    Contact: khmer-project@idyll.org
 
 ###################################################################
@@ -61,8 +61,8 @@ line.  See :doc:`our command line documentation <user/scripts>`.
 
 We have **additional documentation** in several places, including
 `protocols for metagenome and mRNAseq assembly
-<https://khmer-protocols.readthedocs.org/>`__ and `recipes for several
-common research tasks <https://khmer-recipes.readthedocs.org/>`__.
+<https://khmer-protocols.readthedocs.io/>`__ and `recipes for several
+common research tasks <https://khmer-recipes.readthedocs.io/>`__.
 You might also be interested in :doc:`papers using or citing khmer
 <user/biblio>`.
 
@@ -76,25 +76,27 @@ started on khmer development <dev/getting-started>`.
 Details
 =======
 
-:Authors: Michael R. Crusoe, Hussien F. Alameldin, Sherine Awad, Elmar
-        Bucher, Adam Caldwell, Reed Cartwright, Amanda Charbonneau, Bede
-        Constantinides, Greg Edvenson, Scott Fay, Jacob Fenton, Thomas Fenzl,
-        Jordan Fish, Leonor Garcia-Gutierrez, Phillip Garland, Jonathan Gluck,
-        Iván González, Sarah Guermond, Jiarong Guo, Aditi Gupta, Joshua R.
-        Herr, Adina Howe, Alex Hyer, Andreas Härpfer, Luiz Irber, Rhys Kidd,
-        David Lin, Justin Lippi, Tamer Mansour, Pamela McA'Nulty, Eric
-        McDonald, Jessica Mizzi, Kevin D. Murray, Joshua R. Nahum, Kaben
-        Nanlohy, Alexander Johan Nederbragt, Humberto Ortiz-Zuazaga, Jeramia
-        Ory, Jason Pell, Charles Pepe-Ranney, Zachary N Russ, Erich Schwarz,
-        Camille Scott, Josiah Seaman, Scott Sievert, Jared Simpson, Connor T.
-        Skennerton, James Spencer, Ramakrishnan Srinivasan, Daniel Standage,
-        James A. Stapleton, Joe Stein, Susan R Steinman, Benjamin Taylor, Will
+:Authors: Daniel Standage, Hussien F. Alameldin, Ali Aliyari, Sherine
+        Awad, Elmar Bucher, Adam Caldwell, Reed Cartwright, Amanda Charbonneau,
+        Lisa Cohen, Bede Constantinides, Michael R. Crusoe, Greg Edvenson,
+        Scott Fay, Jacob Fenton, Thomas Fenzl, Jordan Fish, Leonor Garcia-
+        Gutierrez, Phillip Garland, Jonathan Gluck, Iván González, Sarah
+        Guermond, Jiarong Guo, Aditi Gupta, Tim Head, Joshua R. Herr, Adina
+        Howe, Alex Hyer, Andreas Härpfer, Luiz Irber, Shannon EK Joslin, Rhys
+        Kidd, Nicole Kingsley, David Lin, Justin Lippi, Tamer Mansour, Pamela
+        McA'Nulty, Eric McDonald, Jessica Mizzi, Kevin D. Murray, Joshua R.
+        Nahum, Kaben Nanlohy, Russell Neches, Alexander Johan Nederbragt,
+        Humberto Ortiz-Zuazaga, Jeramia Ory, Jason Pell, Charles Pepe-Ranney,
+        Zachary N Russ, Erich Schwarz, Camille Scott, Josiah Seaman, Ryan
+        Shean, Scott Sievert, Jared Simpson, Connor T. Skennerton, James
+        Spencer, Ramakrishnan Srinivasan, James A. Stapleton, Joe Stein, Sascha
+        Steinbiss, Susan R Steinman, Cait Sydney, Benjamin Taylor, Will
         Trimble, Heather L. Wiencko, Michael Wright, Brian Wyss, Qingpeng
         Zhang, en zyme, C. Titus Brown
 
+
 :Contact: khmer-project@idyll.org
 :GitHub: https://github.com/dib-lab/khmer
-:Chat: https://gitter.im/dib-lab/khmer
 :License: BSD
 
 .. toctree::
@@ -103,7 +105,6 @@ Details
    introduction
    contributors
    citations
-   whats-new-2.0
    release-notes/index
    user/index
    dev/index
@@ -113,12 +114,12 @@ Details
 There are two mailing lists dedicated to khmer, an announcements-only list and
 a discussion list. To search their archives and sign-up for them, please visit
 the following URLs:
-    
+
     * Discussion: http://lists.idyll.org/listinfo/khmer
 
     * Announcements: http://lists.idyll.org/listinfo/khmer-announce
 
-The archives for the khmer mailing list are available at: 
+The archives for the khmer mailing list are available at:
 http://lists.idyll.org/pipermail/khmer/
 
 khmer development was initially supported by AFRI Competitive Grant

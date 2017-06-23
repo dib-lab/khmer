@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2014-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -42,16 +42,14 @@ from __future__ import unicode_literals
 import sys
 import os
 import os.path
-import shutil
 from io import StringIO
 import traceback
-import nose
-from nose.plugins.attrib import attr
 import glob
 import imp
 
+import pytest
+
 from . import khmer_tst_utils as utils
-import khmer
 import screed
 from .test_scripts import _make_counting
 
@@ -64,37 +62,32 @@ def teardown():
     utils.cleanup()
 
 
-def test_import_all():
+# sandbox script tests are only run when the tests are loaded from
+# the repository
+IN_REPOSITORY = os.path.exists(os.path.join(os.path.dirname(__file__),
+                                            "../sandbox"))
+
+
+def _sandbox_scripts():
+    if not IN_REPOSITORY:
+        return []
+
     sandbox_path = os.path.join(os.path.dirname(__file__), "../sandbox")
-    if not os.path.exists(sandbox_path):
-        raise nose.SkipTest("sandbox scripts are only tested in a repository")
-
     path = os.path.join(sandbox_path, "*.py")
-    scripts = glob.glob(path)
-    for s in scripts:
-        s = os.path.normpath(s)
-        yield _checkImportSucceeds('test_sandbox_scripts.py', s)
+    return [os.path.normpath(s) for s in glob.glob(path)]
 
 
-class _checkImportSucceeds(object):
+@pytest.mark.parametrize("filename", _sandbox_scripts())
+def test_import_succeeds(filename, tmpdir):
+    try:
+        mod = imp.load_source('__zzz', filename)
+    except:
+        print(traceback.format_exc())
+        raise AssertionError("%s cannot be imported" % (filename,))
 
-    def __init__(self, tag, filename):
-        self.tag = tag
-        self.filename = filename
-        self.description = '%s: test import %s' % (self.tag,
-                                                   os.path.split(filename)[-1])
-
-    def __call__(self):
-        try:
-            mod = imp.load_source('__zzz', self.filename)
-        except:
-            print(traceback.format_exc())
-            raise AssertionError("%s cannot be imported" % (self.filename,))
-
-        #
-
+    with tmpdir.as_cwd():
         oldargs = sys.argv
-        sys.argv = [self.filename]
+        sys.argv = [filename]
 
         oldout, olderr = sys.stdout, sys.stderr
         sys.stdout = StringIO()
@@ -103,14 +96,14 @@ class _checkImportSucceeds(object):
         try:
             try:
                 global_dict = {'__name__': '__main__'}
-                exec(
-                    compile(open(self.filename).read(), self.filename, 'exec'),
+                exec(  # pylint: disable=exec-used
+                    compile(open(filename).read(), filename, 'exec'),
                     global_dict)
             except (ImportError, SyntaxError) as err:
                 print("{0}".format(err))
-                raise AssertionError("%s cannot be exec'd" % (self.filename),
+                raise AssertionError("%s cannot be exec'd" % (filename),
                                      "{0}".format(traceback))
-            except:
+            except:  # pylint: disable=bare-except
                 pass                        # other failures are expected :)
         finally:
             sys.argv = oldargs
@@ -118,13 +111,12 @@ class _checkImportSucceeds(object):
             sys.stdout, sys.stderr = oldout, olderr
 
 
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
 def test_sweep_reads():
-    readfile = utils.get_temp_filename('reads.fa')
-    contigfile = utils.get_temp_filename('contigs.fp')
+    readfile = utils.copy_test_data('test-sweep-reads.fa')
+    contigfile = utils.copy_test_data('test-sweep-contigs.fp')
     in_dir = os.path.dirname(contigfile)
-
-    shutil.copyfile(utils.get_test_data('test-sweep-reads.fa'), readfile)
-    shutil.copyfile(utils.get_test_data('test-sweep-contigs.fp'), contigfile)
 
     script = scriptpath('sweep-reads.py')
     args = ['-k', '25', '--prefix', 'test', '--label-by-pid',
@@ -164,13 +156,12 @@ def test_sweep_reads():
     assert seqso == set(['read5_orphan'])
 
 
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
 def test_sweep_reads_fq():
-    readfile = utils.get_temp_filename('reads.fa')
-    contigfile = utils.get_temp_filename('contigs.fp')
+    readfile = utils.copy_test_data('test-sweep-reads.fq')
+    contigfile = utils.copy_test_data('test-sweep-contigs.fp')
     in_dir = os.path.dirname(contigfile)
-
-    shutil.copyfile(utils.get_test_data('test-sweep-reads.fq'), readfile)
-    shutil.copyfile(utils.get_test_data('test-sweep-contigs.fp'), contigfile)
 
     script = scriptpath('sweep-reads.py')
     args = ['-k', '25', '--prefix', 'test', '--label-by-pid',
@@ -217,12 +208,13 @@ def test_sweep_reads_fq():
     seqso = set([r.quality for r in screed.open(oout)])
 
 
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
 def test_sweep_reads_2():
 
-    infile = utils.get_temp_filename('seqs.fa')
-    inref = utils.get_temp_filename('ref.fa')
-    shutil.copyfile(utils.get_test_data('random-20-X2.fa'), infile)
-    shutil.copyfile(utils.get_test_data('random-20-a.fa'), inref)
+    infile = utils.copy_test_data('random-20-X2.fa')
+    inref = utils.copy_test_data('random-20-a.fa')
+
     wdir = os.path.dirname(inref)
     script = scriptpath('sweep-reads.py')
     args = ['-m', '50', '-k', '20', '-l', '9', '-b', '60', '--prefix',
@@ -239,10 +231,11 @@ def test_sweep_reads_2():
     assert not os.path.exists(os.path.join(wdir, 'test_multi.fa'))
 
 
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
 def test_sweep_reads_3():
 
-    infile = utils.get_temp_filename('seqs.fa')
-    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+    infile = utils.copy_test_data('random-20-a.fa')
     wdir = os.path.dirname(infile)
     script = scriptpath('sweep-reads.py')
     args = ['-m', '75', '-k', '20', '-l', '1', '--prefix',
@@ -266,6 +259,8 @@ def test_sweep_reads_3():
     assert not os.path.exists(os.path.join(wdir, 'test_multi.fa'))
 
 
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
 def test_collect_reads():
     outfile = utils.get_temp_filename('out.graph')
     infile = utils.get_test_data('test-reads.fa')
@@ -278,6 +273,8 @@ def test_collect_reads():
     assert os.path.exists(outfile)
 
 
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
 def test_saturate_by_median():
     infile = utils.get_test_data('test-reads.fa')
     script = 'saturate-by-median.py'
@@ -288,9 +285,10 @@ def test_saturate_by_median():
     assert status == 0
 
 
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
 def test_count_kmers_1():
-    infile = utils.get_temp_filename('input.fa')
-    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+    infile = utils.copy_test_data('random-20-a.fa')
     ctfile = _make_counting(infile)
 
     script = scriptpath('count-kmers.py')
@@ -303,9 +301,10 @@ def test_count_kmers_1():
     assert 'TTGTAACCTGTGTGGGGTCG,1' in out
 
 
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
 def test_count_kmers_2_single():
-    infile = utils.get_temp_filename('input.fa')
-    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+    infile = utils.copy_test_data('random-20-a.fa')
 
     script = scriptpath('count-kmers-single.py')
     args = ['-x', '1e7', '-k', '20', '-N', '2', infile]
@@ -317,13 +316,28 @@ def test_count_kmers_2_single():
     assert 'TTGTAACCTGTGTGGGGTCG,1' in out
 
 
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
 def test_multirename_fasta():
-    infile1 = utils.get_temp_filename('test-multi.fa')
+    infile1 = utils.copy_test_data('test-multi.fa')
     multioutfile = utils.get_temp_filename('out.fa')
-    infile2 = utils.get_temp_filename('out.fa')
-    shutil.copyfile(utils.get_test_data('test-multi.fa'), infile1)
-    shutil.copyfile(utils.get_test_data('multi-output.fa'), infile2)
+    infile2 = utils.copy_test_data('multi-output.fa')
     args = ['assembly', infile1]
     _, out, err = utils.runscript('multi-rename.py', args, sandbox=True)
     r = open(infile2).read()
     assert r in out
+
+
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
+def test_extract_compact_dbg_1():
+    infile = utils.get_test_data('simple-genome.fa')
+    outfile = utils.get_temp_filename('out.gml')
+    args = ['-x', '1e4', '-o', outfile, infile]
+    _, out, err = utils.runscript('extract-compact-dbg.py', args, sandbox=True)
+
+    print(out)
+    print(err)
+    assert os.path.exists(outfile)
+
+    assert '174 segments, containing 2803 nodes' in out

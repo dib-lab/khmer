@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2010-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -32,15 +32,17 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
+# pylint: disable=missing-docstring,invalid-name,no-member
 from __future__ import print_function
 from __future__ import absolute_import
+
+import screed
 import khmer
 import os
 import sys
-import collections
+import pytest
 from . import khmer_tst_utils as utils
-from khmer.utils import (check_is_pair, broken_paired_reader, check_is_left,
-                         check_is_right)
+
 from khmer.kfile import check_input_files, get_file_writer
 try:
     from StringIO import StringIO
@@ -54,6 +56,9 @@ def test_forward_hash():
     assert khmer.forward_hash('CCCC', 4) == 170
     assert khmer.forward_hash('GGGG', 4) == 170
 
+    h = 13607885392109549066
+    assert khmer.forward_hash('GGTTGACGGGGCTCAGGGGGCGGCTGACTCCG', 32) == h
+
 
 def test_get_file_writer_fail():
     somefile = utils.get_temp_filename("potato")
@@ -62,7 +67,7 @@ def test_get_file_writer_fail():
     try:
         get_file_writer(somefile, True, True)
         stopped = False
-    except Exception as err:
+    except ValueError as err:
         assert "Cannot specify both bzip and gzip" in str(err), str(err)
 
     assert stopped, "Expected exception"
@@ -96,11 +101,60 @@ def test_reverse_hash():
     assert s == "GGGG"
 
 
+def test_reverse_complement():
+    s = 'AATTCCGG'
+    assert khmer.reverse_complement(s) == 'CCGGAATT'
+
+    s = 'A'
+    assert khmer.reverse_complement(s) == 'T'
+    s = 'T'
+    assert khmer.reverse_complement(s) == 'A'
+    s = 'C'
+    assert khmer.reverse_complement(s) == 'G'
+    s = 'G'
+    assert khmer.reverse_complement(s) == 'C'
+
+
+def test_reverse_complement_exception():
+    # deal with DNA, ignore rest
+    assert khmer.reverse_complement('FGF') == 'FCF'
+
+
+def test_reverse_hash_longs():
+    # test explicitly with long integers, only needed for python2
+    # the builtin `long` exists in the global scope only
+    global long  # pylint: disable=global-variable-undefined
+    if sys.version_info > (3,):
+        long = int
+
+    s = khmer.reverse_hash(long(0), 4)
+    assert s == "AAAA"
+
+    s = khmer.reverse_hash(long(85), 4)
+    assert s == "TTTT"
+
+    s = khmer.reverse_hash(long(170), 4)
+    assert s == "CCCC"
+
+    s = khmer.reverse_hash(long(255), 4)
+    assert s == "GGGG"
+
+
+def test_reverse_hash_raises():
+    with pytest.raises(TypeError) as excinfo:
+        khmer.reverse_hash('2345', 4)
+
+    assert 'int' in str(excinfo.value)
+
+
 def test_hash_murmur3():
     assert khmer.hash_murmur3('AAAA') == 526240128537019279
     assert khmer.hash_murmur3('TTTT') == 526240128537019279
     assert khmer.hash_murmur3('CCCC') == 14391997331386449225
     assert khmer.hash_murmur3('GGGG') == 14391997331386449225
+    assert khmer.hash_murmur3('TATATATATATATATATATA') != 0
+    assert khmer.hash_murmur3('TTTTGCAAAA') != 0
+    assert khmer.hash_murmur3('GAAAATTTTC') != 0
 
 
 def test_hash_no_rc_murmur3():
@@ -122,10 +176,15 @@ def test_get_primes():
 
     assert primes == [19, 17, 13, 11, 7, 5, 3]
 
+    primes_not_float = khmer.get_n_primes_near_x(7, 20.)
+
+    assert primes_not_float == [19, 17, 13, 11, 7, 5, 3]
+    assert all(isinstance(p, int) for p in primes_not_float)
+
 
 def test_get_primes_fal():
     try:
-        primes = khmer.get_n_primes_near_x(5, 5)
+        khmer.get_n_primes_near_x(5, 5)
         assert 0, "previous statement should fail"
     except RuntimeError as err:
         assert "unable to find 5 prime numbers < 5" in str(err)
@@ -149,9 +208,8 @@ def test_extract_countgraph_info():
         try:
             info = khmer.extract_countgraph_info(fn)
         except ValueError as err:
-            raise
             assert 0, 'Should not throw a ValueErorr: ' + str(err)
-        ksize, table_size, n_tables, _, _, _, _ = info
+        ksize, n_tables, table_size, _, _, _, _ = info
         print(ksize, table_size, n_tables)
 
         assert(ksize) == 25
@@ -196,7 +254,6 @@ def test_extract_nodegraph_info():
 
 def test_check_file_status_kfile():
     fn = utils.get_temp_filename('thisfiledoesnotexist')
-    check_file_status_exited = False
 
     old_stderr = sys.stderr
     sys.stderr = capture = StringIO()
@@ -223,189 +280,3 @@ def test_check_file_status_kfile_force():
         sys.stderr = old_stderr
 
     assert "does not exist" in capture.getvalue(), capture.getvalue()
-
-
-FakeFQRead = collections.namedtuple('Read', ['name', 'quality', 'sequence'])
-FakeFastaRead = collections.namedtuple('Read', ['name', 'sequence'])
-
-
-def test_check_is_pair_1():
-    read1 = FakeFQRead(name='seq', quality='###', sequence='AAA')
-    read2 = FakeFQRead(name='seq2', quality='###', sequence='AAA')
-
-    assert not check_is_pair(read1, read2)
-
-
-def test_check_is_pair_2():
-    read1 = FakeFQRead(name='seq/1', quality='###', sequence='AAA')
-    read2 = FakeFQRead(name='seq/2', quality='###', sequence='AAA')
-
-    assert check_is_pair(read1, read2)
-
-
-def test_check_is_pair_3_fq():
-    read1 = FakeFQRead(name='seq 1::', quality='###', sequence='AAA')
-    read2 = FakeFQRead(name='seq 2::', quality='###', sequence='AAA')
-
-    assert check_is_pair(read1, read2)
-
-
-def test_check_is_pair_3_broken_fq_1():
-    read1 = FakeFQRead(name='seq', quality='###', sequence='AAA')
-    read2 = FakeFQRead(name='seq 2::', quality='###', sequence='AAA')
-
-    assert not check_is_pair(read1, read2)
-
-
-def test_check_is_pair_3_broken_fq_2():
-    read1 = FakeFQRead(name='seq 1::', quality='###', sequence='AAA')
-    read2 = FakeFQRead(name='seq', quality='###', sequence='AAA')
-
-    assert not check_is_pair(read1, read2)
-
-
-def test_check_is_pair_3_fa():
-    read1 = FakeFastaRead(name='seq 1::', sequence='AAA')
-    read2 = FakeFastaRead(name='seq 2::', sequence='AAA')
-
-    assert check_is_pair(read1, read2)
-
-
-def test_check_is_pair_4():
-    read1 = FakeFQRead(name='seq/1', quality='###', sequence='AAA')
-    read2 = FakeFastaRead(name='seq/2', sequence='AAA')
-
-    try:
-        check_is_pair(read1, read2)
-        assert False                    # check_is_pair should fail here.
-    except ValueError:
-        pass
-
-
-def test_check_is_pair_4b():
-    read1 = FakeFastaRead(name='seq/1', sequence='AAA')
-    read2 = FakeFQRead(name='seq/2', quality='###', sequence='AAA')
-
-    try:
-        check_is_pair(read1, read2)
-        assert False                    # check_is_pair should fail here.
-    except ValueError:
-        pass
-
-
-def test_check_is_pair_5():
-    read1 = FakeFastaRead(name='seq/1', sequence='AAA')
-    read2 = FakeFastaRead(name='seq/2', sequence='AAA')
-
-    assert check_is_pair(read1, read2)
-
-
-def test_check_is_pair_6():
-    read1 = FakeFastaRead(name='seq1', sequence='AAA')
-    read2 = FakeFastaRead(name='seq2', sequence='AAA')
-
-    assert not check_is_pair(read1, read2)
-
-
-def test_check_is_pair_7():
-    read1 = FakeFastaRead(name='seq/2', sequence='AAA')
-    read2 = FakeFastaRead(name='seq/1', sequence='AAA')
-
-    assert not check_is_pair(read1, read2)
-
-
-def test_check_is_right():
-    assert not check_is_right('seq1/1')
-    assert not check_is_right('seq1 1::N')
-    assert check_is_right('seq1/2')
-    assert check_is_right('seq1 2::N')
-
-    assert not check_is_right('seq')
-    assert not check_is_right('seq 2')
-
-
-def test_check_is_left():
-    assert check_is_left('seq1/1')
-    assert check_is_left('seq1 1::N')
-    assert not check_is_left('seq1/2')
-    assert not check_is_left('seq1 2::N')
-
-    assert not check_is_left('seq')
-    assert not check_is_left('seq 1')
-
-    assert check_is_left(
-        '@HWI-ST412:261:d15khacxx:8:1101:3149:2157 1:N:0:ATCACG')
-
-
-class Test_BrokenPairedReader(object):
-    stream = [FakeFastaRead(name='seq1/1', sequence='A' * 5),
-              FakeFastaRead(name='seq1/2', sequence='A' * 4),
-              FakeFastaRead(name='seq2/1', sequence='A' * 5),
-              FakeFastaRead(name='seq3/1', sequence='A' * 3),
-              FakeFastaRead(name='seq3/2', sequence='A' * 5)]
-
-    def gather(self, **kw):
-        iter = broken_paired_reader(self.stream, **kw)
-
-        x = []
-        m = 0
-        for n, is_pair, read1, read2 in iter:
-            if is_pair:
-                x.append((read1.name, read2.name))
-            else:
-                x.append((read1.name, None))
-            m += 1
-
-        return x, n, m
-
-    def testDefault(self):
-        x, n, m = self.gather(min_length=1)
-
-        expected = [('seq1/1', 'seq1/2'),
-                    ('seq2/1', None),
-                    ('seq3/1', 'seq3/2')]
-        assert x == expected, x
-        assert m == 3
-        assert n == 3, n
-
-    def testMinLength(self):
-        x, n, m = self.gather(min_length=3)
-
-        expected = [('seq1/1', 'seq1/2'),
-                    ('seq2/1', None),
-                    ('seq3/1', 'seq3/2')]
-        assert x == expected, x
-        assert m == 3
-        assert n == 3, n
-
-    def testMinLength_2(self):
-        x, n, m = self.gather(min_length=4)
-
-        expected = [('seq1/1', 'seq1/2'),
-                    ('seq2/1', None),
-                    ('seq3/2', None)]
-        assert x == expected, x
-        assert m == 3
-        assert n == 3, n
-
-    def testForceSingle(self):
-        x, n, m = self.gather(force_single=True)
-
-        expected = [('seq1/1', None),
-                    ('seq1/2', None),
-                    ('seq2/1', None),
-                    ('seq3/1', None),
-                    ('seq3/2', None)]
-        assert x == expected, x
-        assert m == 5
-        assert n == 4, n
-
-    def testForceSingleAndMinLength(self):
-        x, n, m = self.gather(min_length=5, force_single=True)
-
-        expected = [('seq1/1', None),
-                    ('seq2/1', None),
-                    ('seq3/2', None)]
-        assert x == expected, x
-        assert m == 3, m
-        assert n == 2, n

@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2011-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -45,7 +45,7 @@ import sys
 import textwrap
 import khmer
 from khmer import khmer_args
-from khmer.khmer_args import (build_counting_args, info, sanitize_help)
+from khmer.khmer_args import (build_counting_args, sanitize_help)
 from khmer.kfile import check_input_files
 
 DEFAULT_SUBSET_SIZE = int(1e4)
@@ -85,11 +85,12 @@ def get_parser():
     """
     parser = build_counting_args(
         descr="Find an initial set of highly connected k-mers.",
-        epilog=textwrap.dedent(epilog))
-    parser.add_argument('--subset-size', '-s', default=DEFAULT_SUBSET_SIZE,
+        epilog=textwrap.dedent(epilog),
+        citations=['graph'])
+    parser.add_argument('-s', '--subset-size', default=DEFAULT_SUBSET_SIZE,
                         dest='subset_size', type=float,
                         help='Set subset size (default 1e4 is prob ok)')
-    parser.add_argument('--stoptags', '-S', metavar='filename', default='',
+    parser.add_argument('-S', '--stoptags', metavar='filename', default='',
                         help="Use stoptags in this file during partitioning")
     parser.add_argument('graphbase', help='basename for input and output '
                         'filenames')
@@ -99,8 +100,6 @@ def get_parser():
 
 
 def main():
-
-    info('make-initial-stoptags.py', ['graph'])
     args = sanitize_help(get_parser()).parse_args()
 
     graphbase = args.graphbase
@@ -127,6 +126,7 @@ def main():
 
     # divide up into SUBSET_SIZE fragments
     divvy = nodegraph.divide_tags_into_subsets(args.subset_size)
+    divvy = list(divvy)
 
     # pick off the first one
     if len(divvy) == 1:
@@ -148,6 +148,7 @@ def main():
     print('saving stop tags', file=sys.stderr)
     nodegraph.save_stop_tags(graphbase + '.stoptags')
     print('wrote to:', graphbase + '.stoptags', file=sys.stderr)
+
 
 if __name__ == '__main__':
     main()

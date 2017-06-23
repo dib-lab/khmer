@@ -31,13 +31,10 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-# pylint: disable=C0111,C0103,E1103,W0612
-from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import unicode_literals
+# pylint: disable=missing-docstring,invalid-name,no-member
+from __future__ import print_function, absolute_import, unicode_literals
 
 from . import khmer_tst_utils as utils
-import khmer
 
 # Technically not from 'oxli' but it's what they are
 from khmer.khmer_args import (estimate_optimal_with_K_and_M,
@@ -115,4 +112,4 @@ def test_optimal_size_function():
 
 
 def test_output_gen():
-    res = graphsize_args_report(99, 0.00701925498897)
+    graphsize_args_report(99, 0.00701925498897)

@@ -4,24 +4,24 @@
    Copyright (C) 2015 The Regents of the University of California.
    It is licensed under the three-clause BSD license; see LICENSE.
    Contact: khmer-project@idyll.org
-   
+
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are
    met:
-   
+
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
-   
+
     * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the following
       disclaimer in the documentation and/or other materials provided
       with the distribution.
-   
+
     * Neither the name of the Michigan State University nor the names
       of its contributors may be used to endorse or promote products
       derived from this software without specific prior written
       permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -33,7 +33,7 @@
    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-   
+
    Contact: khmer-project@idyll.org
 
 An assembly handbook for khmer - rough draft
@@ -94,7 +94,7 @@ Broadly, normalize each insert library separately, in the following way:
 For high-coverage libraries (> ~50x), do three-pass digital
 normalization: run :program:`normalize-by-median.py` with :option:`--cutoff=20
 <normalize-by-median.py --cutoff>` and then run :program:`filter-abund.py` with
-:option:`--cutoff=1 <filter-abund.py --cutoff>`.  Now split out the remaining
+:option:`--cutoff=2 <filter-abund.py --cutoff>`.  Now split out the remaining
 paired-end/interleaved and single-end reads using
 :program:`extract-paired-reads.py`, and run :program:`normalize-by-median.py`
 on the paired-end and single-end files (using :option:`--unpaired-reads
@@ -144,7 +144,7 @@ Metagenome assembly
    <normalize-by-median.py --cutoff>`) or wiht ``--cutoff=100`` if you ran
    :program:`normalize-by-median.py` with :option:`--cutoff=20
    <normalize-by-median.py --cutoff>`)
- 
+
 3. Partition reads with :program:`load-graph.py`, etc. etc.
 
 4. Assemble groups as normal, extracting paired-end reads and lumping

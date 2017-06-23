@@ -51,7 +51,7 @@ import khmer
 from khmer import khmer_args
 from khmer.khmer_args import (report_on_config, info, add_threading_args,
                               calculate_graphsize)
-from khmer.kfile import check_input_files, check_space
+from khmer.kfile import check_input_files
 from khmer.kfile import check_space_for_graph
 from oxli import functions as oxfuncs
 
@@ -72,15 +72,18 @@ def build_parser(parser):
 
 
 def main(args):
-    report_on_config(args, graphtype='nodegraph')
+    graph_type = 'nodegraph'
+    report_on_config(args, graphtype=graph_type)
     base = args.output_filename
     filenames = args.input_filenames
 
     for fname in args.input_filenames:
         check_input_files(fname, args.force)
 
-    graphsize = calculate_graphsize(args, 'nodegraph')
-    check_space_for_graph(args.output_filename, graphsize, args.force)
+    graphsize = calculate_graphsize(args, graph_type)
+    space_needed = (args.n_tables * graphsize /
+                    khmer._buckets_per_byte[graph_type])
+    check_space_for_graph(args.output_filename, space_needed, args.force)
 
     print('Saving k-mer nodegraph to %s' % base, file=sys.stderr)
     print('Loading kmers from sequences in %s' %
@@ -126,7 +129,9 @@ def main(args):
 
     sys.exit(0)
 
+
 if __name__ == '__main__':
     main(None)
 
-# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
+# vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
+# vim: set textwidth=79:

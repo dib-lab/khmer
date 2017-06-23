@@ -1,27 +1,27 @@
 ..
    This file is part of khmer, https://github.com/dib-lab/khmer/, and is
    Copyright (C) 2010-2015 Michigan State University
-   Copyright (C) 2015 The Regents of the University of California.
+   Copyright (C) 2015-2016 The Regents of the University of California.
    It is licensed under the three-clause BSD license; see LICENSE.
    Contact: khmer-project@idyll.org
-   
+
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are
    met:
-   
+
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
-   
+
     * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the following
       disclaimer in the documentation and/or other materials provided
       with the distribution.
-   
+
     * Neither the name of the Michigan State University nor the names
       of its contributors may be used to endorse or promote products
       derived from this software without specific prior written
       permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -33,7 +33,7 @@
    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-   
+
    Contact: khmer-project@idyll.org
 
 =======================================
@@ -87,3 +87,11 @@ You can assess high/low abundance k-mer distributions with the
 
 This will produce two output files, <filename>.pos.abund=1 and
 <filename>.pos.abund=255.
+
+
+Finding valleys/minima in *k*-mer abundance profiles
+====================================================
+
+Using *k*-mer abundance profiles to dynamically calculate the abundance threshold separating erroneous *k*-mers from real *k*-mers is described in this blog post:
+
+    https://bitsandbugs.org/2016/07/29/mash-and-khmer-abundance/

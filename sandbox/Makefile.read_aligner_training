@@ -1,6 +1,6 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -33,7 +33,7 @@
 #
 # Contact: khmer-project@idyll.org
 
-KHMER= ../khmer
+KHMER=..
 
 KSIZE= 30
 HASH_SIZE= 4e8
@@ -41,21 +41,25 @@ N_HASHES= 4
 
 all: estimated_probabilities.${KSIZE}.json
 
-mockRefG.fa:
-	wget https://github.com/dib-lab/khmer-testdata/raw/master/mockRefG.fa
+my_mock.fa:
+	wget https://github.com/dib-lab/khmer-testdata/raw/master/my_mock.fa
 
 %.fastq.gz:
 	wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR172/SRR172903/SRR172903.fastq.gz
 	wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR172/SRR172902/SRR172902.fastq.gz
 
 combined_reads.ht: SRR172902.fastq.gz SRR172903.fastq.gz
-	python $(KHMER)/scripts/load-into-counting.py --ksize $(KSIZE) -x $(HASH_SIZE) -N $(N_HASHES) $@ $^
+	python $(KHMER)/scripts/load-into-counting.py --ksize $(KSIZE) \
+		-x $(HASH_SIZE) -N $(N_HASHES) $@ $^
 
-mockRefG.1.bt1: mockRefG.fa
-	bowtie2-build mockRefG.fa
+my_mock.1.bt1: my_mock.fa
+	bowtie2-build my_mock.fa my_mock
 
-combined_reads_mapping.bam: SRR172902.fastq.gz SRR172903.fastq.gz mockRefG.1.bt1
-	bowtie2 -x mockRefG -U SRR172902.fastq.gz -U SRR172903.fastq.gz | samtools view -S -F4 -b - > combined_reads_mapping.bam
+combined_reads_mapping.bam: SRR172902.fastq.gz SRR172903.fastq.gz my_mock.1.bt1
+	bowtie2 -x my_mock -U SRR172902.fastq.gz -U SRR172903.fastq.gz \
+		| samtools view -S -F4 -b - > combined_reads_mapping.bam
 
-estimated_probabilities.${KSIZE}.json: combined_reads.ht combined_reads_mapping.bam
-	python readaligner_pairhmm_train.py --json combined_reads.ht combined_reads_mapping.bam > estimated_probabilities.${KSIZE}.json
+estimated_probabilities.$(KSIZE).json: combined_reads.ht combined_reads_mapping.bam
+	python readaligner_pairhmm_train.py --json combined_reads.ht \
+		combined_reads_mapping.bam \
+		> estimated_probabilities.${KSIZE}.json

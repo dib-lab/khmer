@@ -44,42 +44,37 @@ Use '-h' for parameter help.
 """
 from __future__ import print_function, unicode_literals
 import sys
-import argparse
 import screed
 from khmer import __version__
 from khmer.kfile import (add_output_compression_type, get_file_writer,
-                         is_block, describe_file_handle)
+                         describe_file_handle)
 from khmer.utils import write_record
-from khmer.khmer_args import (sanitize_help, ComboFormatter, info,
-                              _VersionStdErrAction)
+from khmer.khmer_args import sanitize_help, KhmerArgumentParser
+from khmer.khmer_args import FileType as khFileType
 
 
 def get_parser():
-    parser = argparse.ArgumentParser(
-        description='Converts FASTQ format (.fq) files to FASTA format (.fa).',
-        formatter_class=ComboFormatter)
+    parser = KhmerArgumentParser(
+        description='Converts FASTQ format (.fq) files to FASTA format (.fa).')
 
     parser.add_argument('input_sequence', help='The name of the input'
                         ' FASTQ sequence file.')
     parser.add_argument('-o', '--output', metavar="filename",
-                        type=argparse.FileType('wb'),
+                        type=khFileType('wb'),
                         help='The name of the output'
                         ' FASTA sequence file.',
                         default=sys.stdout)
     parser.add_argument('-n', '--n_keep', default=False, action='store_true',
                         help='Option to keep reads containing \'N\'s in '
                              'input_sequence file. Default is to drop reads')
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
     add_output_compression_type(parser)
     return parser
 
 
 def main():
-    info('fastq-to-fasta.py')
     args = sanitize_help(get_parser()).parse_args()
 
-    print(('fastq from ', args.input_sequence), file=sys.stderr)
+    print('fastq from ', args.input_sequence, file=sys.stderr)
     outfp = get_file_writer(args.output, args.gzip, args.bzip)
     n_count = 0
     for n, record in enumerate(screed.open(args.input_sequence)):
@@ -87,7 +82,6 @@ def main():
             print('...', n, file=sys.stderr)
 
         sequence = record['sequence']
-        name = record['name']
 
         if 'N' in sequence:
             if not args.n_keep:
@@ -107,6 +101,7 @@ def main():
 
     print('Wrote output to', describe_file_handle(args.output),
           file=sys.stderr)
+
 
 if __name__ == '__main__':
     main()

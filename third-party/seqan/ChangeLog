@@ -1,3 +1,8 @@
+2015-08-14  Michael R. Crusoe  <crusoe@ucdavis.edu>
+
+   * third-party/seqan/core/include/seqan/basic/debug_test_system.h: disable
+   unfullifable #include
+
 2014-12-02  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * core/include/seqan/seq_io/sequence_stream_impl.h: don't memory map plain

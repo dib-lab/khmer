@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2011-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -33,11 +33,11 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-# pylint: disable=missing-docstring,invalid-name
+# pylint: disable=missing-docstring,invalid-name,no-member
 """
-Build a counting Bloom filter from the given sequences, save in <htname>.
+Build a counting Bloom filter from the given sequences, save in <countgraph>.
 
-% load-into-counting.py <htname> <data1> [ <data2> <...> ]
+% load-into-counting.py <countgraph> <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
 """
@@ -56,6 +56,8 @@ from khmer.khmer_args import (build_counting_args, report_on_config, info,
 from khmer.kfile import check_file_writable
 from khmer.kfile import check_input_files
 from khmer.kfile import check_space_for_graph
+from khmer.khmer_logger import (configure_logging, log_info, log_error,
+                                log_warn)
 
 
 def get_parser():
@@ -79,7 +81,8 @@ def get_parser():
     """
 
     parser = build_counting_args("Build a k-mer countgraph from the given"
-                                 " sequences.", epilog=textwrap.dedent(epilog))
+                                 " sequences.", epilog=textwrap.dedent(epilog),
+                                 citations=['counting', 'SeqAn'])
     add_threading_args(parser)
     parser.add_argument('output_countgraph_filename', help="The name of the"
                         " file to write the k-mer countgraph to.")
@@ -90,21 +93,23 @@ def get_parser():
                         action='store_false', help="The default behaviour is "
                         "to count past 255 using bigcount. This flag turns "
                         "bigcount off, limiting counts to 255.")
-    parser.add_argument('--summary-info', '-s', type=str, default=None,
+    parser.add_argument('-s', '--summary-info', type=str, default=None,
                         metavar="FORMAT", choices=[str('json'), str('tsv')],
                         help="What format should the machine readable run "
                         "summary be in? (`json` or `tsv`, disabled by"
                         " default)")
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
+    parser.add_argument('-q', '--quiet', dest='quiet', default=False,
+                        action='store_true')
     return parser
 
 
 def main():
 
-    info('load-into-counting.py', ['counting', 'SeqAn'])
-
     args = sanitize_help(get_parser()).parse_args()
+
+    configure_logging(args.quiet)
     report_on_config(args)
 
     base = args.output_countgraph_filename
@@ -117,20 +122,20 @@ def main():
     check_space_for_graph(args.output_countgraph_filename, tablesize,
                           args.force)
 
+    info_filename = base + ".info"
     check_file_writable(base)
-    check_file_writable(base + ".info")
+    check_file_writable(info_filename)
 
-    print('Saving k-mer countgraph to %s' % base, file=sys.stderr)
-    print('Loading kmers from sequences in %s' %
-          repr(filenames), file=sys.stderr)
+    log_info('Saving k-mer countgraph to {base}', base=base)
+    log_info('Loading kmers from sequences in {filenames}',
+             filenames=repr(filenames))
 
     # clobber the '.info' file now, as we always open in append mode below
-    if os.path.exists(base + '.info'):
-        os.remove(base + '.info')
+    with open(info_filename, 'w') as info_fp:
+        print('khmer version:', khmer.__version__, file=info_fp)
 
-    print('making countgraph', file=sys.stderr)
+    log_info('making countgraph')
     countgraph = khmer_args.create_countgraph(args)
-    countgraph.set_use_bigcount(args.bigcount)
 
     filename = None
 
@@ -140,11 +145,11 @@ def main():
 
         rparser = khmer.ReadParser(filename)
         threads = []
-        print('consuming input', filename, file=sys.stderr)
+        log_info('consuming input {input}', input=filename)
         for _ in range(args.threads):
             cur_thrd = \
                 threading.Thread(
-                    target=countgraph.consume_fasta_with_reads_parser,
+                    target=countgraph.consume_seqfile_with_reads_parser,
                     args=(rparser, )
                 )
             threads.append(cur_thrd)
@@ -156,19 +161,19 @@ def main():
         if index > 0 and index % 10 == 0:
             tablesize = calculate_graphsize(args, 'countgraph')
             check_space_for_graph(base, tablesize, args.force)
-            print('mid-save', base, file=sys.stderr)
+            log_info('mid-save {base}', base=base)
 
             countgraph.save(base)
-        with open(base + '.info', 'a') as info_fh:
+        with open(info_filename, 'a') as info_fh:
             print('through', filename, file=info_fh)
         total_num_reads += rparser.num_reads
 
     n_kmers = countgraph.n_unique_kmers()
-    print('Total number of unique k-mers:', n_kmers, file=sys.stderr)
-    with open(base + '.info', 'a') as info_fp:
+    log_info('Total number of unique k-mers: {nk}', nk=n_kmers)
+    with open(info_filename, 'a') as info_fp:
         print('Total number of unique k-mers:', n_kmers, file=info_fp)
 
-    print('saving', base, file=sys.stderr)
+    log_info('saving {base}', base=base)
     countgraph.save(base)
 
     # Change max_false_pos=0.2 only if you really grok it. HINT: You don't
@@ -176,13 +181,13 @@ def main():
         khmer.calc_expected_collisions(
             countgraph, args.force, max_false_pos=.2)
 
-    with open(base + '.info', 'a') as info_fp:
+    with open(info_filename, 'a') as info_fp:
         print('fp rate estimated to be %1.3f\n' % fp_rate, file=info_fp)
 
     if args.summary_info:
         mr_fmt = args.summary_info.lower()
         mr_file = base + '.info.' + mr_fmt
-        print("Writing summmary info to", mr_file, file=sys.stderr)
+        log_info("Writing summmary info to {mr_file}", mr_file=mr_file)
         with open(mr_file, 'w') as mr_fh:
             if mr_fmt == 'json':
                 mr_data = {
@@ -206,12 +211,14 @@ def main():
                 ]
                 mr_fh.write("\t".join(vals) + "\n")
 
-    print('fp rate estimated to be %1.3f' % fp_rate, file=sys.stderr)
+    log_info('fp rate estimated to be {fpr:1.3f}', fpr=fp_rate)
 
-    print('DONE.', file=sys.stderr)
-    print('wrote to:', base + '.info', file=sys.stderr)
+    log_info('DONE.')
+    log_info('wrote to: {filename}', filename=info_filename)
+
 
 if __name__ == '__main__':
     main()
 
-# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
+# vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
+# vim: set textwidth=79:

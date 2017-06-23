@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2010-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -37,7 +37,7 @@
 """
 Produce the k-mer abundance distribution for the given file.
 
-% python scripts/abundance-dist.py [ -z -s ] <htname> <data> <histout>
+% python scripts/abundance-dist.py [ -z -s ] <countgraph> <data> <histout>
 
 Use '-h' for parameter help.
 """
@@ -46,27 +46,26 @@ from __future__ import print_function
 import sys
 import csv
 import khmer
-import argparse
 import textwrap
 import os
-from khmer import __version__
 from khmer.kfile import check_input_files
-from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
-                              _VersionStdErrAction)
+from khmer.khmer_args import (sanitize_help, KhmerArgumentParser)
+from khmer.khmer_logger import (configure_logging, log_info, log_error,
+                                log_warn)
 
 
 def get_parser():
     epilog = """\
     Example::
 
-        load-into-countgraph.py -x 1e7 -N 2 -k 17 counts \\
+        load-into-counting.py -x 1e7 -N 2 -k 17 counts \\
                 tests/test-data/test-abund-read-2.fa
         abundance-dist.py counts tests/test-data/test-abund-read-2.fa test-dist
     """
-    parser = argparse.ArgumentParser(
+    parser = KhmerArgumentParser(
         description="Calculate abundance distribution of the k-mers in "
         "the sequence file using a pre-made k-mer countgraph.",
-        formatter_class=ComboFormatter, epilog=textwrap.dedent(epilog))
+        epilog=textwrap.dedent(epilog), citations=['counting'])
 
     parser.add_argument('input_count_graph_filename', help='The name of the'
                         ' input k-mer countgraph file.')
@@ -84,33 +83,33 @@ def get_parser():
     parser.add_argument('-b', '--no-bigcount', dest='bigcount', default=True,
                         action='store_false',
                         help='Do not count k-mers past 255')
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Continue even if specified input files '
                         'do not exist or are empty.')
+    parser.add_argument('-q', '--quiet', dest='quiet', default=False,
+                        action='store_true')
     return parser
 
 
 def main():
-    info('abundance-dist.py', ['counting'])
     args = sanitize_help(get_parser()).parse_args()
+
+    configure_logging(args.quiet)
 
     infiles = [args.input_count_graph_filename,
                args.input_sequence_filename]
     for infile in infiles:
         check_input_files(infile, False)
 
-    print('Counting graph from', args.input_count_graph_filename,
-          file=sys.stderr)
+    log_info('Loading counting graph from {graph}',
+             graph=args.input_count_graph_filename)
     countgraph = khmer.load_countgraph(
         args.input_count_graph_filename)
 
     if not countgraph.get_use_bigcount() and args.bigcount:
-        print("WARNING: The loaded graph has bigcount DISABLED while bigcount"
-              " reporting is ENABLED--counts higher than 255 will not be "
-              "reported.",
-              file=sys.stderr)
+        log_warn("WARNING: The loaded graph has bigcount DISABLED while "
+                 "bigcount reporting is ENABLED--counts higher than 255 will "
+                 "not be reported.")
 
     countgraph.set_use_bigcount(args.bigcount)
 
@@ -119,31 +118,29 @@ def main():
     tracking = khmer._Nodegraph(  # pylint: disable=protected-access
         kmer_size, hashsizes)
 
-    print('K:', kmer_size, file=sys.stderr)
-    print('outputting to', args.output_histogram_filename, file=sys.stderr)
+    log_info('K: {ksize}', ksize=kmer_size)
+    log_info('outputting to {output}', output=args.output_histogram_filename)
 
     if args.output_histogram_filename in ('-', '/dev/stdout'):
         pass
     elif os.path.exists(args.output_histogram_filename):
         if not args.squash_output:
-            print('ERROR: %s exists; not squashing.' %
-                  args.output_histogram_filename,
-                  file=sys.stderr)
+            log_error('ERROR: {output} exists; not squashing.',
+                      output=args.output_histogram_filename)
             sys.exit(1)
 
-        print('** squashing existing file %s' %
-              args.output_histogram_filename, file=sys.stderr)
+        log_info('** squashing existing file {output}',
+                 output=args.output_histogram_filename)
 
-    print('preparing hist...', file=sys.stderr)
+    log_info('preparing hist...')
     abundances = countgraph.abundance_distribution(
         args.input_sequence_filename, tracking)
     total = sum(abundances)
 
     if 0 == total:
-        print("ERROR: abundance distribution is uniformly zero; "
-              "nothing to report.", file=sys.stderr)
-        print("\tPlease verify that the input files are valid.",
-              file=sys.stderr)
+        log_error("ERROR: abundance distribution is uniformly zero; "
+                  "nothing to report.")
+        log_error("\tPlease verify that the input files are valid.")
         sys.exit(1)
 
     if args.output_histogram_filename in ('-', '/dev/stdout'):
@@ -172,4 +169,5 @@ def main():
 if __name__ == '__main__':
     main()
 
-# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
+# vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
+# vim: set textwidth=79:

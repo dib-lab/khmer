@@ -103,7 +103,7 @@ def main():
     for _ in range(args.threads):
         thread = \
             threading.Thread(
-                target=countgraph.consume_fasta_with_reads_parser,
+                target=countgraph.consume_seqfile_with_reads_parser,
                 args=(rparser, )
             )
         threads.append(thread)
@@ -127,4 +127,5 @@ def main():
 if __name__ == '__main__':
     main()
 
-# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
+# vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
+# vim: set textwidth=79:

@@ -2,7 +2,7 @@
 # vim: set fileencoding=utf-8
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2013-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -38,13 +38,18 @@
 
 import ez_setup
 
+import glob
 import os
 import sys
 from os import listdir as os_listdir
 from os.path import join as path_join
+from os.path import splitext
 import shutil
 import subprocess
+import sys
+import sysconfig
 import tempfile
+import csv
 
 from setuptools import setup
 from setuptools import Extension
@@ -57,12 +62,15 @@ from distutils.errors import DistutilsPlatformError
 import versioneer
 ez_setup.use_setuptools(version="3.4.1")
 
-versioneer.VCS = 'git'
-versioneer.versionfile_source = 'khmer/_version.py'
-versioneer.versionfile_build = 'khmer/_version.py'
-versioneer.tag_prefix = 'v'  # tags are like v1.2.0
-versioneer.parentdir_prefix = '.'
 CMDCLASS = versioneer.get_cmdclass()
+
+HAS_CYTHON = False
+try:
+    import Cython
+    HAS_CYTHON = True
+except ImportError:
+    pass
+cy_ext = 'pyx' if HAS_CYTHON else 'cpp'
 
 # strip out -Wstrict-prototypes; a hack suggested by
 # http://stackoverflow.com/a/9740721
@@ -99,8 +107,8 @@ def check_for_openmp():
         # Attempt to compile a test script.
         # See http://openmp.org/wp/openmp-compilers/
         filename = r'test.c'
-        file = open(filename, 'wt', 1)
-        file.write(
+        source = open(filename, 'wt', 1)
+        source.write(
             """
             #include <omp.h>
             #include <stdio.h>
@@ -116,31 +124,45 @@ def check_for_openmp():
                                         stdout=fnull, stderr=fnull)
 
         # Clean up
-        file.close()
+        source.close()
     finally:
         os.chdir(curdir)
         shutil.rmtree(tmpdir)
 
     return exit_code == 0
 
+
+def distutils_dir_name(dname):
+    """Returns the name of a distutils build directory"""
+    f = "{dirname}.{platform}-{version[0]}.{version[1]}"
+    return f.format(dirname=dname,
+                    platform=sysconfig.get_platform(),
+                    version=sys.version_info)
+
+
+def build_dir():
+    return path_join("build", distutils_dir_name("temp"))
+
 # We bundle tested versions of zlib & bzip2. To use the system zlib and bzip2
 # change setup.cfg or use the `--libraries z,bz2` parameter which will make our
 # custom build_ext command strip out the bundled versions.
 
+
 ZLIBDIR = 'third-party/zlib'
 BZIP2DIR = 'third-party/bzip2'
 
-BUILD_DEPENDS = []
-BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
-    "khmer", "kmer_hash", "hashtable", "counting", "hashbits", "labelhash",
+BUILD_DEPENDS = glob.glob(path_join("include", "khmer", "_cpy_*.hh"))
+BUILD_DEPENDS.extend(path_join("include", "oxli", bn + ".hh") for bn in [
+    "khmer", "kmer_hash", "hashtable", "labelhash", "hashgraph",
     "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers",
-    "traversal"])
+    "kmer_filters", "traversal", "assembler", "alphabets", "storage"])
 
-SOURCES = ["khmer/_khmer.cc"]
-SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
-    "read_parsers", "kmer_hash", "hashtable",
-    "hashbits", "labelhash", "counting", "subset", "read_aligner",
-    "hllcounter", "traversal"])
+SOURCES = glob.glob(path_join("src", "khmer", "_cpy_*.cc"))
+SOURCES.extend(path_join("src", "oxli", bn + ".cc") for bn in [
+    "read_parsers", "kmer_hash", "hashtable", "hashgraph",
+    "labelhash", "subset", "read_aligner",
+    "hllcounter", "traversal", "kmer_filters", "assembler", "alphabets",
+    "storage"])
 
 SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
@@ -153,23 +175,45 @@ if sys.platform == 'darwin':
     # force 64bit only builds
     EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64', '-mmacosx-version-min=10.7',
                                '-stdlib=libc++'])
+    EXTRA_LINK_ARGS.append('-mmacosx-version-min=10.7')
 
 if check_for_openmp():
     EXTRA_COMPILE_ARGS.extend(['-fopenmp'])
     EXTRA_LINK_ARGS.extend(['-fopenmp'])
 
-EXTENSION_MOD_DICT = \
+CP_EXTENSION_MOD_DICT = \
     {
         "sources": SOURCES,
         "extra_compile_args": EXTRA_COMPILE_ARGS,
         "extra_link_args": EXTRA_LINK_ARGS,
         "depends": BUILD_DEPENDS,
+        "include_dirs": ["include", "."],
         "language": "c++",
         "define_macros": [("VERSION", versioneer.get_version()), ],
     }
 
-EXTENSION_MOD = Extension("khmer._khmer",  # pylint: disable=W0142
-                          ** EXTENSION_MOD_DICT)
+EXTENSION_MODS = [Extension("khmer._khmer", ** CP_EXTENSION_MOD_DICT)]
+
+for cython_ext in glob.glob(os.path.join("khmer", "_oxli",
+                                         "*.{0}".format(cy_ext))):
+
+    CY_EXTENSION_MOD_DICT = \
+        {
+            "sources": [cython_ext],
+            "extra_compile_args": EXTRA_COMPILE_ARGS,
+            "extra_link_args": EXTRA_LINK_ARGS,
+            "extra_objects": [path_join(build_dir(), splitext(p)[0] + '.o')
+                              for p in SOURCES],
+            "depends": [],
+            "include_dirs": ["include", "."],
+            "language": "c++",
+            "define_macros": [("VERSION", versioneer.get_version()), ],
+        }
+
+    ext_name = "khmer._oxli.{0}".format(
+        splitext(os.path.basename(cython_ext))[0])
+    EXTENSION_MODS.append(Extension(ext_name, ** CY_EXTENSION_MOD_DICT))
+
 SCRIPTS = []
 SCRIPTS.extend([path_join("scripts", script)
                 for script in os_listdir("scripts")
@@ -185,8 +229,8 @@ CLASSIFIERS = [
     "Operating System :: MacOS :: MacOS X",
     "Programming Language :: C++",
     "Programming Language :: Python :: 2.7",
-    "Programming Language :: Python :: 3.3",
     "Programming Language :: Python :: 3.4",
+    "Programming Language :: Python :: 3.5",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
 if "-rc" in versioneer.get_version():
@@ -194,51 +238,47 @@ if "-rc" in versioneer.get_version():
 else:
     CLASSIFIERS.append("Development Status :: 5 - Production/Stable")
 
+
+# This sorts the author list by first name rather than last name. Not worth
+#     fixing for PyPI in my opinion. The sort-authors-list.py handles it
+#     correctly for the citation information, but this requires a non-standard
+#     library that we don't want to add as a dependency for `setup.py`.
+#     -- Daniel Standage, 2017-05-21
+with open('authors.csv', 'r') as csvin:
+    authors = csv.reader(csvin)
+    authorstr = ', '.join([row[0] for row in authors])
+    authorstr = 'Daniel Standage, ' + authorstr + ', C. Titus Brown'
+
+
 SETUP_METADATA = \
     {
         "name": "khmer",
         "version": versioneer.get_version(),
         "description": 'khmer k-mer counting library',
         "long_description": open("README.rst").read(),
-        "author": "Michael R. Crusoe, Hussien F. Alameldin, Sherine Awad, "
-                  "Elmar Bucher, Adam Caldwell, Reed Cartwright, "
-                  "Amanda Charbonneau, Bede Constantinides, Greg Edvenson, "
-                  "Scott Fay, Jacob Fenton, Thomas Fenzl, Jordan Fish, "
-                  "Leonor Garcia-Gutierrez, Phillip Garland, Jonathan Gluck, "
-                  "Iván González, Sarah Guermond, Jiarong Guo, Aditi Gupta, "
-                  "Joshua R. Herr, Adina Howe, Alex Hyer, Andreas Härpfer, "
-                  "Luiz Irber, Rhys Kidd, David Lin, Justin Lippi, "
-                  "Tamer Mansour, Pamela McA'Nulty, Eric McDonald, "
-                  "Jessica Mizzi, Kevin D. Murray, Joshua R. Nahum, "
-                  "Kaben Nanlohy, Alexander Johan Nederbragt, "
-                  "Humberto Ortiz-Zuazaga, Jeramia Ory, Jason Pell, "
-                  "Charles Pepe-Ranney, Zachary N Russ, Erich Schwarz, "
-                  "Camille Scott, Josiah Seaman, Scott Sievert, "
-                  "Jared Simpson, Connor T. Skennerton, James Spencer, "
-                  "Ramakrishnan Srinivasan, Daniel Standage, "
-                  "James A. Stapleton, Joe Stein, Susan R Steinman, "
-                  "Benjamin Taylor, Will Trimble, Heather L. Wiencko, "
-                  "Michael Wright, Brian Wyss, Qingpeng Zhang, en zyme, "
-                  "C. Titus Brown",
+        "author": authorstr,
         "author_email": 'khmer-project@idyll.org',
-        # "maintainer": 'Michael R. Crusoe', # this overrides the author field
-        # "maintainer_email": 'mcrusoe@msu.edu', # so don't include it
+        # "maintainer": 'Daniel Standage', # this overrides the author field
+        # "maintainer_email": 'daniel.standage@gmail.com', # so don't include
         # http://docs.python.org/2/distutils/setupscript.html
         # additional-meta-data note #3
-        "url": 'https://khmer.readthedocs.org/',
-        "packages": ['khmer', 'khmer.tests', 'oxli'],
+        "url": 'https://khmer.readthedocs.io/',
+        "packages": ['khmer', 'khmer.tests', 'oxli', 'khmer._oxli'],
+        "package_data": {'khmer/_oxli': ['*.pxd']},
         "package_dir": {'khmer.tests': 'tests'},
-        "install_requires": ['screed >= 0.9', 'bz2file'],
+        "install_requires": ['screed >= 1.0', 'bz2file', 'Cython>=0.25.2'],
+        "setup_requires": ["pytest-runner>=2.0,<3dev", "setuptools>=18.0"],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
-                           'tests': ['nose >= 1.0']},
+                           'tests': ['pytest>=2.9'],
+                           'read_aligner_training': ['simplesam']},
         "scripts": SCRIPTS,
         # "entry_points": { # Not ready for distribution yet.
         #    'console_scripts': [
         #        "oxli = oxli:main"
         #    ]
         # },
-        "ext_modules": [EXTENSION_MOD, ],
+        "ext_modules": EXTENSION_MODS,
         # "platforms": '', # empty as is conveyed by the classifiers below
         # "license": '', # empty as is conveyed by the classifier below
         "include_package_data": True,
@@ -248,7 +288,6 @@ SETUP_METADATA = \
 
 
 class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
-
     """Specialized Python extension builder for khmer project.
 
     Only run the library setup when needed, not on every invocation.
@@ -263,25 +302,33 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
             raise DistutilsPlatformError("%s require 64-bit operating system" %
                                          SETUP_METADATA["packages"])
 
+        if sys.platform == 'darwin' and 'gcov' in self.libraries:
+            self.libraries.remove('gcov')
+
         if "z" not in self.libraries:
             zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'
                     ' configure || bash ./configure --static ) && make -f '
                     'Makefile.pic PIC']
             spawn(cmd=zcmd, dry_run=self.dry_run)
-            self.extensions[0].extra_objects.extend(
-                path_join("third-party", "zlib", bn + ".lo") for bn in [
-                    "adler32", "compress", "crc32", "deflate", "gzclose",
-                    "gzlib", "gzread", "gzwrite", "infback", "inffast",
-                    "inflate", "inftrees", "trees", "uncompr", "zutil"])
+            # self.extensions[0].extra_objects.extend(
+            for ext in self.extensions:
+                ext.extra_objects.extend(
+                    path_join("third-party", "zlib", bn + ".lo") for bn in [
+                        "adler32", "compress", "crc32", "deflate", "gzclose",
+                        "gzlib", "gzread", "gzwrite", "infback", "inffast",
+                        "inflate", "inftrees", "trees", "uncompr", "zutil"])
         if "bz2" not in self.libraries:
             bz2cmd = ['bash', '-c', 'cd ' + BZIP2DIR + ' && make -f '
                       'Makefile-libbz2_so all']
             spawn(cmd=bz2cmd, dry_run=self.dry_run)
-            self.extensions[0].extra_objects.extend(
-                path_join("third-party", "bzip2", bn + ".o") for bn in [
-                    "blocksort", "huffman", "crctable", "randtable",
-                    "compress", "decompress", "bzlib"])
+            # self.extensions[0].extra_objects.extend(
+            for ext in self.extensions:
+                ext.extra_objects.extend(
+                    path_join("third-party", "bzip2", bn + ".o") for bn in [
+                        "blocksort", "huffman", "crctable", "randtable",
+                        "compress", "decompress", "bzlib"])
         _build_ext.run(self)
+
 
 CMDCLASS.update({'build_ext': KhmerBuildExt})
 
@@ -292,7 +339,7 @@ def reinitialize_command(self, command, reinit_subcommands):
     """Monkeypatch the original version from distutils.
 
     It's supposed to match the behavior of Distribution.get_command_obj()
-    This fixes issues with 'pip install -e' and './setup.py nosetests' not
+    This fixes issues with 'pip install -e' and './setup.py test' not
     respecting the setup.cfg configuration directives for the build_ext
     command.
     """
@@ -302,9 +349,9 @@ def reinitialize_command(self, command, reinit_subcommands):
         self._set_command_options(  # pylint: disable=protected-access
             cmd_obj, options)
     return cmd_obj
+
+
 Distribution.reinitialize_command = reinitialize_command
 
 
-# pylint: disable=W0142
-setup(cmdclass=CMDCLASS,
-      **SETUP_METADATA)
+setup(cmdclass=CMDCLASS, **SETUP_METADATA)

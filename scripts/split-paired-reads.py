@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2013-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -35,7 +35,7 @@
 # Contact: khmer-project@idyll.org
 # pylint: disable=invalid-name,missing-docstring
 """
-De-interleave a file.
+Deinterleave a file.
 
 Take an interleaved set of reads (/1 and /2), and extract them into separate
 files (.1 and .2).
@@ -45,19 +45,19 @@ files (.1 and .2).
 Reads FASTQ and FASTA input, retains format for output.
 """
 from __future__ import print_function
-import screed
 import sys
 import os
 import textwrap
-import argparse
+
 from khmer import __version__
-from khmer.khmer_args import (info, sanitize_help, ComboFormatter,
-                              _VersionStdErrAction)
+from khmer import ReadParser
+from khmer.khmer_args import sanitize_help, KhmerArgumentParser
+from khmer.khmer_args import FileType as khFileType
 from khmer.utils import (write_record, broken_paired_reader,
                          UnpairedReadsError)
 from khmer.kfile import (check_input_files, check_space,
                          add_output_compression_type,
-                         get_file_writer, is_block, describe_file_handle)
+                         get_file_writer, describe_file_handle)
 
 
 def get_parser():
@@ -90,10 +90,9 @@ def get_parser():
 
         split-paired-reads.py -1 reads.1 -2 reads.2 tests/test-data/paired.fq
     """
-    parser = argparse.ArgumentParser(
+    parser = KhmerArgumentParser(
         description='Split interleaved reads into two files, left and right.',
-        epilog=textwrap.dedent(epilog),
-        formatter_class=ComboFormatter)
+        epilog=textwrap.dedent(epilog))
 
     parser.add_argument('infile', nargs='?', default='/dev/stdin')
 
@@ -104,15 +103,13 @@ def get_parser():
     parser.add_argument('-0', '--output-orphaned', metavar='output_orphaned',
                         help='Allow "orphaned" reads and extract them to ' +
                         'this file',
-                        type=argparse.FileType('wb'))
+                        type=khFileType('wb'))
     parser.add_argument('-1', '--output-first', metavar='output_first',
                         default=None, help='Output "left" reads to this '
-                        'file', type=argparse.FileType('wb'))
+                        'file', type=khFileType('wb'))
     parser.add_argument('-2', '--output-second', metavar='output_second',
                         default=None, help='Output "right" reads to this '
-                        'file', type=argparse.FileType('wb'))
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
+                        'file', type=khFileType('wb'))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     add_output_compression_type(parser)
@@ -120,7 +117,6 @@ def get_parser():
 
 
 def main():
-    info('split-paired-reads.py')
     args = sanitize_help(get_parser()).parse_args()
 
     infile = args.infile
@@ -133,6 +129,8 @@ def main():
 
     # decide where to put output files - specific directory? or just default?
     if infile in ('/dev/stdin', '-'):
+        # seqan only treats '-' as "read from stdin"
+        infile = '-'
         if not (args.output_first and args.output_second):
             print("Accepting input from stdin; "
                   "output filenames must be provided.", file=sys.stderr)
@@ -170,10 +168,8 @@ def main():
     counter3 = 0
     index = None
 
-    screed_iter = screed.open(infile)
-
     # walk through all the reads in broken-paired mode.
-    paired_iter = broken_paired_reader(screed_iter,
+    paired_iter = broken_paired_reader(ReadParser(infile),
                                        require_paired=not args.output_orphaned)
 
     try:
@@ -191,7 +187,7 @@ def main():
                 counter3 += 1
     except UnpairedReadsError as e:
         print("Unpaired reads found starting at {name}; exiting".format(
-            name=e.r1.name), file=sys.stderr)
+            name=e.read1.name), file=sys.stderr)
         sys.exit(1)
 
     print("DONE; split %d sequences (%d left, %d right, %d orphans)" %
@@ -200,6 +196,7 @@ def main():
     print("/2 reads in %s" % out2, file=sys.stderr)
     if args.output_orphaned:
         print("orphans in %s" % out0, file=sys.stderr)
+
 
 if __name__ == '__main__':
     main()

@@ -34,9 +34,7 @@
 #
 # Contact: khmer-project@idyll.org
 
-"""
-Single entry point script for khmer
-"""
+"""Single entry point script for khmer."""
 
 import argparse
 import sys
@@ -46,10 +44,7 @@ from oxli import build_graph
 
 
 def get_parser():
-    """
-    returns the parser object for the oxli subcommand handler
-    """
-
+    """Return the parser object for the oxli subcommand handler."""
     parser = argparse.ArgumentParser(
         description='Single entry point script for khmer',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -71,14 +66,13 @@ def get_parser():
 
 
 def main():
-    """
-    main function; does the parsing and kicks off the subcommand
-    """
-    if (len(sys.argv) < 2):
+    """Parse the command line and kick off the subcommand."""
+    if len(sys.argv) < 2:
         args = get_parser().parse_args(['--help'])
     else:
         args = get_parser().parse_args()
     args.func(args)
+
 
 if __name__ == '__main__':
     main()

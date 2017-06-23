@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
 # Copyright (C) 2011-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2015-2016, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -46,16 +46,14 @@ Use '-h' for parameter help.
 from __future__ import print_function
 
 import threading
-import gc
-import os.path
-import argparse
 import textwrap
 import sys
 
-from khmer import __version__, load_nodegraph
-from khmer.khmer_args import (add_threading_args, info, sanitize_help,
-                              ComboFormatter, _VersionStdErrAction)
+from khmer import load_nodegraph
+from khmer.khmer_args import (add_threading_args, sanitize_help,
+                              KhmerArgumentParser)
 from khmer.kfile import check_input_files
+from oxli.partition import worker
 
 # stdlib queue module was renamed on Python 3
 try:
@@ -67,54 +65,26 @@ DEFAULT_SUBSET_SIZE = int(1e5)
 DEFAULT_N_THREADS = 4
 
 
-def worker(tasks, basename, stop_big_traversals):
-    while True:
-        try:
-            (nodegraph, index, start, stop) = tasks.get(False)
-        except queue.Empty:
-            print('exiting', file=sys.stderr)
-            return
-
-        outfile = basename + '.subset.%d.pmap' % (index,)
-        if os.path.exists(outfile):
-            print('SKIPPING', outfile, ' -- already exists', file=sys.stderr)
-            continue
-
-        print('starting:', basename, index, file=sys.stderr)
-
-        # pay attention to stoptags when partitioning; take command line
-        # direction on whether or not to exhaustively traverse.
-        subset = nodegraph.do_subset_partition(start, stop, True,
-                                               stop_big_traversals)
-
-        print('saving:', basename, index, file=sys.stderr)
-        nodegraph.save_subset_partitionmap(subset, outfile)
-        del subset
-        gc.collect()
-
-
 def get_parser():
     epilog = """\
     The resulting partition maps are saved as ``${basename}.subset.#.pmap``
     files.
     """
-    parser = argparse.ArgumentParser(
+    parser = KhmerArgumentParser(
         description="Partition a sequence graph based upon waypoint "
         "connectivity", epilog=textwrap.dedent(epilog),
-        formatter_class=ComboFormatter)
+        citations=['graph'])
 
-    parser.add_argument('basename', help="basename of the input k-mer"
+    parser.add_argument('basename', help="basename of the input k-mer "
                         "nodegraph  + tagset files")
-    parser.add_argument('--stoptags', '-S', metavar='filename', default='',
+    parser.add_argument('-S', '--stoptags', metavar='filename', default='',
                         help="Use stoptags in this file during partitioning")
-    parser.add_argument('--subset-size', '-s', default=DEFAULT_SUBSET_SIZE,
+    parser.add_argument('-s', '--subset-size', default=DEFAULT_SUBSET_SIZE,
                         type=float, help='Set subset size (usually 1e5-1e6 is '
                         'good)')
     parser.add_argument('--no-big-traverse', action='store_true',
                         default=False, help='Truncate graph joins at big '
                         'traversals')
-    parser.add_argument('--version', action=_VersionStdErrAction,
-                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     add_threading_args(parser)
@@ -122,7 +92,6 @@ def get_parser():
 
 
 def main():
-    info('partition-graph.py', ['graph'])
     args = sanitize_help(get_parser()).parse_args()
     basename = args.basename
 
@@ -161,6 +130,7 @@ def main():
 
     # divide the tags up into subsets
     divvy = nodegraph.divide_tags_into_subsets(int(args.subset_size))
+    divvy = list(divvy)
     n_subsets = len(divvy)
     divvy.append(0)
 
@@ -200,6 +170,7 @@ def main():
     print('---', file=sys.stderr)
     print('done making subsets! see %s.subset.*.pmap' %
           (basename,), file=sys.stderr)
+
 
 if __name__ == '__main__':
     main()

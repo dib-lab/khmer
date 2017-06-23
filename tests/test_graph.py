@@ -32,14 +32,15 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
+# pylint: disable=missing-docstring,no-member,invalid-name,no-self-use
+# pylint: disable=protected-access
 from __future__ import print_function
 from __future__ import absolute_import
+
 import khmer
 import screed
 
 from . import khmer_tst_utils as utils
-
-from nose.plugins.attrib import attr
 
 
 def teardown():
@@ -53,7 +54,7 @@ class Test_ExactGraphFu(object):
 
     def test_counts(self):
         ht = self.ht
-        ht.consume_fasta(utils.get_test_data('test-graph.fa'))
+        ht.consume_seqfile(utils.get_test_data('test-graph.fa'))
 
         kmer = "TTAGGACTGCAC"
         x = ht.calc_connected_graph_size(kmer)
@@ -223,12 +224,11 @@ class Test_InexactGraphFu(object):
 class Test_Partitioning(object):
 
     def test_output_unassigned(self):
-        import screed
 
         filename = utils.get_test_data('random-20-a.fa')
 
         ht = khmer._Nodegraph(21, [5, 7, 11, 13])
-        ht.consume_fasta_and_tag(filename)
+        ht.consume_seqfile_and_tag(filename)
 
         output_file = utils.get_temp_filename('part0test')
         ht.output_partitions(filename, output_file, True)
@@ -240,12 +240,11 @@ class Test_Partitioning(object):
         assert len1 == len2, (len1, len2)
 
     def test_not_output_unassigned(self):
-        import screed
 
         filename = utils.get_test_data('random-20-a.fa')
 
         ht = khmer._Nodegraph(21, [5, 7, 11, 13])
-        ht.consume_fasta_and_tag(filename)
+        ht.consume_seqfile_and_tag(filename)
 
         output_file = utils.get_temp_filename('parttest')
         ht.output_partitions(filename, output_file, False)
@@ -260,7 +259,7 @@ class Test_Partitioning(object):
         filename = utils.get_test_data('random-20-a.fq')
 
         ht = khmer.Nodegraph(20, 1e4, 4)
-        ht.consume_fasta_and_tag(filename)
+        ht.consume_seqfile_and_tag(filename)
         subset = ht.do_subset_partition(0, 0)
         ht.merge_subset(subset)
 
@@ -276,7 +275,7 @@ class Test_Partitioning(object):
         filename = utils.get_test_data('random-20-a.fa')
 
         ht = khmer.Nodegraph(21, 1e5, 4)
-        ht.consume_fasta_and_tag(filename)
+        ht.consume_seqfile_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
         x = ht.subset_count_partitions(subset)
@@ -286,7 +285,7 @@ class Test_Partitioning(object):
         filename = utils.get_test_data('random-20-a.fa')
 
         ht = khmer.Nodegraph(20, 1e4, 4)
-        ht.consume_fasta_and_tag(filename)
+        ht.consume_seqfile_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
         x = ht.subset_count_partitions(subset)
@@ -296,7 +295,7 @@ class Test_Partitioning(object):
         filename = utils.get_test_data('random-20-b.fa')
 
         ht = khmer.Nodegraph(21, 1e4, 4)
-        ht.consume_fasta_and_tag(filename)
+        ht.consume_seqfile_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
         x = ht.subset_count_partitions(subset)
@@ -306,7 +305,7 @@ class Test_Partitioning(object):
         filename = utils.get_test_data('random-20-b.fa')
 
         ht = khmer.Nodegraph(20, 1e4, 4)
-        ht.consume_fasta_and_tag(filename)
+        ht.consume_seqfile_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
         x = ht.subset_count_partitions(subset)
@@ -316,7 +315,7 @@ class Test_Partitioning(object):
         filename = utils.get_test_data('random-31-c.fa')
 
         ht = khmer.Nodegraph(32, 1e6, 4)
-        ht.consume_fasta_and_tag(filename)
+        ht.consume_seqfile_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
         x = ht.subset_count_partitions(subset)
@@ -326,7 +325,7 @@ class Test_Partitioning(object):
         filename = utils.get_test_data('random-31-c.fa')
 
         ht = khmer.Nodegraph(31, 1e5, 4)
-        ht.consume_fasta_and_tag(filename)
+        ht.consume_seqfile_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
         x = ht.subset_count_partitions(subset)
@@ -341,18 +340,17 @@ class Test_PythonAPI(object):
         ht = khmer.Nodegraph(20, 4 ** 4 + 1, 2)
 
         a = "ATTGGGACTCTGGGAGCACTTATCATGGAGAT"
-        b = "GAGCACTTTAACCCTGCAGAGTGGCCAAGGCT"
         c = "GGAGCACTTATCATGGAGATATATCCCGTGCTTAAACATCGCACTTTAACCCTGCAGAGT"
 
         print(ht.consume(a))
         try:
-            ppi = ht.find_all_tags(c[:19])
+            ht.find_all_tags(c[:19])
             assert False, "should raise a ValueError for wrong k-mer size"
         except ValueError:
             pass
 
         try:
-            ppi = ht.find_all_tags(c[:21])
+            ht.find_all_tags(c[:21])
             assert False, "should raise a ValueError for wrong k-mer size"
         except ValueError:
             pass
