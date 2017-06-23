@@ -244,7 +244,11 @@ else:
 #     correctly for the citation information, but this requires a non-standard
 #     library that we don't want to add as a dependency for `setup.py`.
 #     -- Daniel Standage, 2017-05-21
-with open('authors.csv', 'r') as csvin:
+if sys.version_info[0] == 2:
+    author_opts = {}
+else:
+    author_opts = { "newline": '', "encoding": 'utf-8'}
+with open('authors.csv', 'r', **author_opts) as csvin:
     authors = csv.reader(csvin)
     authorstr = ', '.join([row[0] for row in authors])
     authorstr = 'Daniel Standage, ' + authorstr + ', C. Titus Brown'
