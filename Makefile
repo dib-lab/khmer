@@ -389,9 +389,9 @@ py-demos: sharedobj
 	python examples/python-api/bloom.py
 	python examples/python-api/consume.py examples/c++-api/reads.fastq
 
-TRAVIS_COMMIT ?= $(shell git rev-parse HEAD)
+COMMIT ?= $(shell git rev-parse HEAD)
 docker-container:
-	cd docker && docker build --build-arg=branch=$(TRAVIS_COMMIT) .
+	cd docker && docker build --build-arg=branch=$(COMMIT) .
 
 FORCE:
 
