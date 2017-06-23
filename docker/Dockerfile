@@ -15,6 +15,8 @@ ENV branch ${branch:-v2.0}
 
 RUN git clone https://github.com/dib-lab/khmer.git && \
     cd khmer && \
+    git config --local --add remote.origin.fetch '+refs/pull/*/head:refs/remotes/origin/pr/*' && \
+    git fetch --all && \
     git checkout ${branch} && \
     make install-dep && \
     python setup.py build_ext --include-dirs third-party/seqan/core/include:third-party/smhasher:lib --libraries z,bz2 install
