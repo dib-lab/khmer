@@ -1,5 +1,5 @@
 FROM debian:stable
-MAINTAINER crusoe@ucdavis.edu
+MAINTAINER khmer-project@idyll.org
 
 ENV PACKAGES python-dev zlib1g-dev libbz2-dev gcc git python-setuptools g++ make ca-certificates python-pip 
 
