@@ -15,6 +15,8 @@ under semantic versioning, but will be in future versions of khmer.
 - New function `consume_fasta_banding` for bulk loading of sequences into
   hashtables. Only k-mers whose hashed values fall within a specified range are
   counted.
+- New storage class using a Counting Quotient Filter with improved cache
+  locality over bloom filters.
 
 ### Changed
 - Non-ACTG handling significantly changed so that only bulk-loading functions
