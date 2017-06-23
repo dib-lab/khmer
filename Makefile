@@ -390,7 +390,7 @@ py-demos: sharedobj
 	python examples/python-api/consume.py examples/c++-api/reads.fastq
 
 docker-container:
-	cd docker && docker build --build-arg branch=$(shell git rev-parse HEAD) .
+	cd docker && docker build --build-arg=branch="$(shell git rev-parse HEAD)" .
 
 FORCE:
 
