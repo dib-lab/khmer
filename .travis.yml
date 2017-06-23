@@ -72,7 +72,7 @@ script:
   - make py-demos
   - make cpp-demos
   - cd examples/stamps && ./do.sh
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cd .. && make docker-container; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cd ../.. && make docker-container; fi
 
 # generate all the diagnostic reports
 after_success:
