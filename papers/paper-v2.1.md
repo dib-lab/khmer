@@ -88,6 +88,7 @@ affiliations:
     - name: Department of Population Health and Reproduction; School of Veterinary Medicine; University of California, Davis
       index: 12
 date: 2017-05-25
+bibliography: paper.bib
 ---
 
 # Summary
@@ -105,3 +106,5 @@ a new optional Count-Min Sketch implementation providing increased storage effic
 support for assembly directly from a *k*-mer graph;
 a script for computing a compact de Bruijn graph from a *k*-mer graph;
 and several examples of khmer's Python and C++ APIs for those interested in using and extending the library.
+
+# References
