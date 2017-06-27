@@ -40,14 +40,14 @@ cdef class QFCounttable:
             raise ValueError("starting_size has to be a power of two.")
         self.c_table.reset(new CpQFCounttable(k, int(log(starting_size, 2))))
 
-    def add(self, kmer):
+    def count(self, kmer):
         """Increment the count of this k-mer.
 
-        Synonym for 'count'.
+        Synonym for 'add'.
         """
-        return self.count(kmer)
+        self.add(kmer)
 
-    def count(self, kmer):
+    def add(self, kmer):
         """Increment the count of this k-mer
 
         `kmer` can be either a string or an integer representing the hashed

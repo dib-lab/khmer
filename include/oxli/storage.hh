@@ -415,6 +415,11 @@ protected:
 
 public:
   QFStorage(int size) {
+    // size is the power of two to specify the number of slots in
+    // the filter (2**size). Third argument sets the number of bits used
+    // in the key (current value of size+8 is copied from the CQF example)
+    // Final argument is the number of bits allocated for the value, which
+    // we do not use.
     qf_init(&cf, (1ULL << size), size+8, 0);
   }
 
