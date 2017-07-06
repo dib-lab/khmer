@@ -30,15 +30,8 @@ cdef CpLabelHash * get_labelhash_ptr(object labels):
     return deref(ptr).labelhash
 
 
-cdef class QFCounttable:
-    cdef unique_ptr[CpQFCounttable] c_table
-    def __cinit__(self, int k, int starting_size):
-        # starting size has to be a power of two
-        power_of_two = ((starting_size & (starting_size - 1) == 0) and
-                        (starting_size != 0))
-        if not power_of_two:
-            raise ValueError("starting_size has to be a power of two.")
-        self.c_table.reset(new CpQFCounttable(k, int(log(starting_size, 2))))
+cdef class Hashtable:
+    cdef unique_ptr[CpHashtable] c_table
 
     def count(self, kmer):
         """Increment the count of this k-mer.
@@ -256,3 +249,13 @@ cdef class QFCounttable:
     def n_tables(self):
         """Number of tables used in the storage."""
         return deref(self.c_table).n_tables()
+
+
+cdef class QFCounttable(Hashtable):
+    def __cinit__(self, int k, int starting_size):
+        # starting size has to be a power of two
+        power_of_two = ((starting_size & (starting_size - 1) == 0) and
+                        (starting_size != 0))
+        if not power_of_two:
+            raise ValueError("starting_size has to be a power of two.")
+        self.c_table.reset(<CpHashtable*>new CpQFCounttable(k, int(log(starting_size, 2))))

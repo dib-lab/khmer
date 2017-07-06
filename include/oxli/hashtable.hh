@@ -140,6 +140,7 @@ protected:
     HashIntoType    bitmask;
     unsigned int    _nbits_sub_1;
 
+public:
     explicit Hashtable( WordLength ksize, Storage * s)
         : KmerFactory( ksize ), store(s),
           _max_count( MAX_KCOUNT ),
