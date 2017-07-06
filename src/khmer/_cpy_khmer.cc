@@ -306,13 +306,6 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
-    if (PyType_Ready(&khmer_KSimpleLabeledAssembler_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-    if (PyType_Ready(&khmer_KJunctionCountAssembler_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
     khmer_KGraphLabels_Type.tp_base = &khmer_KNodegraph_Type;
     khmer_KGraphLabels_Type.tp_methods = khmer_graphlabels_methods;
     khmer_KGraphLabels_Type.tp_new = khmer_graphlabels_new;
@@ -412,18 +405,6 @@ MOD_INIT(_khmer)
     Py_INCREF(&khmer_KGraphLabels_Type);
     if (PyModule_AddObject(m, "GraphLabels",
                            (PyObject *)&khmer_KGraphLabels_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    Py_INCREF(&khmer_KSimpleLabeledAssembler_Type);
-    if (PyModule_AddObject(m, "SimpleLabeledAssembler",
-                           (PyObject *)&khmer_KSimpleLabeledAssembler_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    Py_INCREF(&khmer_KJunctionCountAssembler_Type);
-    if (PyModule_AddObject(m, "JunctionCountAssembler",
-                           (PyObject *)&khmer_KJunctionCountAssembler_Type) < 0) {
         return MOD_ERROR_VAL;
     }
 

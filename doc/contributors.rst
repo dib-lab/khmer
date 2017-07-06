@@ -47,8 +47,10 @@ California, Davis (the succesor to the GED lab at Michigan State University),
 
 ---
 
-C. Titus Brown <titus@idyll.org> wrote the initial ktable and hashtable
-implementations, as well as hashbits and counting_hash.
+C. Titus Brown <titus@idyll.org> wrote the initial Bloom filter and
+Count-Min Sketch implementations, has contributed to their continued
+improvement and refactoring, and has contributed extensively to feature
+development and code review throughout the codebase more generally.
 
 Jason Pell implemented many of the C++ k-mer filtering functions.
 
@@ -65,6 +67,33 @@ Eric McDonald thoroughly revised many aspects of the code base, made
 much of the codebase thread safe, and otherwise improved performance
 dramatically.
 
-Michael R. Crusoe took over maintainership June, 2013.
+Michael R. Crusoe took over maintainership in June 2013, streamlining
+and improving many of khmer's development, deployment, and community
+processes.
 
-Last updated by MRC on 2015-07-31
+Jacob Fenton...
+
+Kevin Murray enabled use of the C++ code-base by external projects,
+fixed numerous bugs and documentation issues, implemented unit tests,
+enabled machine-readable statistics and miscellaneous code cleaning,
+refactoring, and reviewing.
+
+Luiz Irber implemented an efficient HyperLogLog-based cardinality
+estimator, contributed substantially to screed/khmer integration
+(including spearheading the screed 1.0 release), and has contributed
+extensively to code review.
+
+Camille Scott has contributed significantly to khmer's assembly and
+graph traversal functionality, and has contributed to feature
+development and code review throughout the codebase more generally.
+
+Tim Head has contributed to refactoring the core data structures,
+performance benchmarking, and has contributed extensively to feature
+development and code review throughout the codebase more generally.
+
+Daniel Standage took over maintainership in May 2016, has refined the
+documentation extensively, contributed Python and C++ code examples,
+refactored core data structures for a more extensible sequence loading
+functionality, and contributed more generally to the codebase.
+
+Last updated by DSS on 2017-05-22

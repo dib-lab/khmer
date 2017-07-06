@@ -46,7 +46,7 @@ PYSOURCES=$(filter-out khmer/_version.py, \
 SOURCES=$(PYSOURCES) $(CPPSOURCES) $(CYSOURCES) setup.py
 
 DEVPKGS=pep8==1.6.2 diff_cover autopep8 pylint coverage gcovr pytest \
-	pydocstyle screed pyenchant Cython==0.25.2
+	'pytest-runner>=2.0,<3dev' pydocstyle pyenchant
 
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 
@@ -133,7 +133,7 @@ dist/khmer-$(VERSION).tar.gz: $(SOURCES)
 clean: FORCE
 	cd src/oxli && $(MAKE) clean || true
 	cd tests && rm -rf khmertest_* || true
-	rm -f pytest_runner-*.egg pytests.xml
+	rm -f pytests.xml
 	rm -f $(EXTENSION_MODULE)
 	rm -f khmer/*.pyc scripts/*.pyc tests/*.pyc oxli/*.pyc \
 		sandbox/*.pyc khmer/__pycache__/* sandbox/__pycache__/* \
@@ -143,7 +143,7 @@ clean: FORCE
 	rm -Rf .coverage coverage-gcovr.xml coverage.xml
 	rm -f diff-cover.html
 	rm -Rf build dist
-	rm -rf __pycache__/ .eggs/ khmer.egg-info/
+	rm -rf __pycache__/ khmer.egg-info/
 	@find ./ -type d -name __pycache__ -exec rm -rf {} +
 	@find ./khmer/ -type f -name *$(MODEXT) -exec rm -f {} +
 	@find ./khmer/_oxli/ -type f -name *.so -exec rm -f {} +

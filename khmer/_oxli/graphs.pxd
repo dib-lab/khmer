@@ -28,6 +28,9 @@ cdef extern from "khmer/_cpy_khmer.hh":
         CPyHashgraph_Object khashgraph
         CpCountgraph * countgraph
 
+    ctypedef struct CPyGraphLabels_Object "khmer::khmer_KGraphLabels_Object":
+        CpLabelHash * labelhash
+
 
 cdef extern from "oxli/hashtable.hh" namespace "oxli":
     cdef cppclass CpHashtable "oxli::Hashtable":
@@ -175,5 +178,5 @@ cdef extern from "oxli/labelhash.hh" namespace "oxli":
                                              const Label)
 
 cdef CpHashgraph * get_hashgraph_ptr(object graph)
-
+cdef CpLabelHash * get_labelhash_ptr(object graph)
 

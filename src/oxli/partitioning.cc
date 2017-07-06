@@ -154,7 +154,6 @@ uint64_t StreamingPartitioner::consume_fasta(const std::string& filename)
 {
     ReadParserPtr<FastxReader> parser = get_parser<FastxReader>(filename);
     Read read;
-    uint64_t n_invalid = 0;
     uint64_t n_consumed = 0;
 
     while (!parser->is_complete()) {
@@ -167,16 +166,12 @@ uint64_t StreamingPartitioner::consume_fasta(const std::string& filename)
             break;
         }
 
-        bool is_valid = graph->check_and_normalize_read(read.sequence);
-        if (is_valid) {
-            consume(read.sequence);
-        } else {
-            n_invalid++;
-        }
+        read.set_clean_seq();
+        consume(read.sequence);
         n_consumed++;
     }
 
-    return n_invalid;
+    return n_consumed;
 }
 
 
