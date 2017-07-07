@@ -8,6 +8,8 @@ from libc.stdint cimport uint8_t, uint32_t, uint64_t, uintptr_t
 from oxli_types cimport *
 from hashing cimport CpKmer, KmerSet
 from parsing cimport CpReadParser, CpSequence
+from utils cimport oxli_raise_py_error
+
 
 # All we really need are the PyObject struct definitions
 # for our extension objects.
@@ -50,14 +52,14 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
         uint32_t consume_string(const string &)
         bool check_and_normalize_read(string &) const
         uint32_t check_and_process_read(string &, bool &)
-        void consume_seqfile[SeqIO](const string &, uint32_t &, uint64_t &)
+        void consume_seqfile[SeqIO](const string &, uint32_t &, uint64_t &) except +oxli_raise_py_error
         void consume_seqfile[SeqIO](unique_ptr[CpReadParser[SeqIO]]&,
-                                    uint32_t &, uint64_t &)
+                                    uint32_t &, uint64_t &) except +oxli_raise_py_error
         void set_use_bigcount(bool)
         bool get_use_bigcount()
         bool median_at_least(const string &, uint32_t cutoff)
         void get_median_count(const string &, BoundedCounterType &,
-                              float &, float &)
+                              float &, float &) except +oxli_raise_py_error
         const uint64_t n_unique_kmers() const
         const uint64_t n_occupied() const
         vector[uint64_t] get_tablesizes() const
@@ -71,9 +73,9 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
         uint8_t ** get_raw_tables()
         BoundedCounterType get_min_count(const string &)
         BoundedCounterType get_max_count(const string &)
-        uint64_t * abundance_distribution[SeqIO](string, CpHashtable *)
+        uint64_t * abundance_distribution[SeqIO](string, CpHashtable *) except +oxli_raise_py_error
         uint64_t * abundance_distribution[SeqIO](unique_ptr[CpReadParser[SeqIO]]&,
-                                          CpHashtable *)
+                                          CpHashtable *) except +oxli_raise_py_error
         uint64_t trim_on_abundance(string, BoundedCounterType) const
         uint64_t trim_below_abundance(string, BoundedCounterType) const
         vector[uint32_t] find_spectral_error_positions(string,
@@ -86,7 +88,7 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
         CpNodetable(WordLength, vector[uint64_t])
 
     cdef cppclass CpQFCounttable "oxli::QFCounttable" (CpHashtable):
-        CpQFCounttable(WordLength, int) except +
+        CpQFCounttable(WordLength, int) except +oxli_raise_py_error
 
 
 cdef extern from "oxli/hashgraph.hh" namespace "oxli":

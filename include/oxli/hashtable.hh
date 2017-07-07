@@ -177,7 +177,6 @@ public:
         return new_kmer_iterator(s.c_str());
     }
 
-public:
     // accessor to get 'k'
     const WordLength ksize() const
     {
