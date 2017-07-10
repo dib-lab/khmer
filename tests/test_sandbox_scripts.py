@@ -341,3 +341,116 @@ def test_extract_compact_dbg_1():
     assert os.path.exists(outfile)
 
     assert '174 segments, containing 2803 nodes' in out
+
+
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
+def test_error_correct_pass2():
+    script = 'load-into-counting.py'
+    args = ['-x', '1e4', '-N', '2', '-k', '20']
+    hashfile = utils.get_temp_filename('test-abund-read-3.ct')
+    infile = utils.get_test_data('test-abund-read-3.fa')
+    args.extend([hashfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+    assert os.path.exists(hashfile)
+    assert 'fp rate' in err, err
+
+    script = 'error-correct-pass2.py'
+    outfile = utils.get_temp_filename('test-abund-read-3.fa.corr')
+    args = ['--trusted-cov', '5', '-o', outfile]
+    args.extend([hashfile, infile])
+    (status, out, err) = utils.runscript(script, args, sandbox=True)
+    assert 'trusted: 5' in out, out
+    assert os.path.exists(outfile)
+    assert os.stat(outfile).st_size > 2000
+
+
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
+def test_error_correct_pass2_fq():
+    script = 'load-into-counting.py'
+    args = ['-x', '1e4', '-N', '2', '-k', '20']
+    hashfile = utils.get_temp_filename('paired.fq.1.ct')
+    infile = utils.get_test_data('paired.fq.1')
+    args.extend([hashfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+    assert os.path.exists(hashfile)
+    assert 'fp rate' in err, err
+
+    script = 'error-correct-pass2.py'
+    outfile = 'paired.fq.1.corr'  # Warning: output file in cwd
+    args = ['--trusted-cov', '2']
+    args.extend([hashfile, infile])
+    (status, out, err) = utils.runscript(script, args, sandbox=True)
+    assert os.path.exists(outfile)
+    assert os.stat(outfile).st_size > 700
+    os.remove(outfile)
+
+
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
+def test_correct_reads():
+    script = 'correct-reads.py'
+    infile = utils.get_test_data('simple-genome-reads.fa')
+    outfile = utils.get_temp_filename('simple-genome-reads.fa.corr')
+    args = ['-o', outfile]
+    args.extend([infile])
+    (status, out, err) = utils.runscript(script, args, sandbox=True)
+    assert 'fp rate' in err, err
+    assert os.path.exists(outfile)
+    assert os.stat(outfile).st_size > 132000
+
+
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
+def test_correct_reads_other():
+    script = 'correct-reads.py'
+    infile = utils.get_test_data('test-abund-read-paired.fa')
+    outfile = 'test-abund-read-paired.fa.corr'  # Warning output in cwd
+    args = []
+    args.extend([infile])
+    (status, out, err) = utils.runscript(script, args, sandbox=True)
+    assert 'fp rate' in err, err
+    assert os.path.exists(outfile)
+    assert os.stat(outfile).st_size > 800
+    os.remove(outfile)
+
+
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
+def test_correct_reads_duplicate():
+    script = 'correct-reads.py'
+    infile = utils.get_test_data('test-abund-read-paired.fa')
+    outfile = 'test-abund-read-paired.fa.corr'  # Warning output in cwd
+    args = []
+    args.extend([infile, infile])
+    try:
+        (status, out, err) = utils.runscript(script, args, sandbox=True)
+        assert 0  # assert raises error
+    except:
+        pass
+
+
+@pytest.mark.skipif(not IN_REPOSITORY,
+                    reason='executing outside of the repository')
+def test_correct_reads_fq():
+    script = 'correct-reads.py'
+    infile = utils.get_test_data('test-reads.fq.bz2')
+    infile = utils.get_test_data('paired.fq')
+    savegraph = utils.get_temp_filename('test-reads.fq.ct')
+    outfile = utils.get_temp_filename('test-reads.fq.corr')
+    args = ['-o', outfile, '--savegraph', savegraph, '--variable-coverage']
+    args.extend([infile])
+    (status, out, err) = utils.runscript(script, args, sandbox=True)
+    assert 'fp rate' in err, err
+    assert os.path.exists(outfile)
+    assert os.stat(outfile).st_size > 1500
+    os.remove(outfile)
+    args = ['-o', outfile, '--loadgraph', savegraph]
+    args.extend([infile])
+    (status, out, err) = utils.runscript(script, args, sandbox=True)
+    assert 'fp rate' in err, err
+    assert os.path.exists(outfile)
+    assert os.stat(outfile).st_size > 1500
