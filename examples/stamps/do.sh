@@ -46,7 +46,7 @@ normalize-by-median.py -k 20 -C 10 -x 1e8 ../../data/stamps-reads.fa.gz \
 abundance-dist.py stamps-dn.ct stamps-reads.fa.gz.keep stamps-dn.hist
 do-partition.py -k 32 -x 1e8 -s 1e4 -T 8 stamps-part \
 	../../data/stamps-reads.fa.gz
-../../sandbox/error-correct-pass2.py --trusted-cov 10 stamps-dn.ct \
+error-correct-pass2.py --trusted-cov 10 stamps-dn.ct \
 	../../data/stamps-reads.fa.gz
 load-into-counting.py -x 1e8 -k 20 stamps-corr.ct stamps-reads.fa.gz.corr
 abundance-dist.py stamps-corr.ct stamps-reads.fa.gz.corr stamps-corr.hist
