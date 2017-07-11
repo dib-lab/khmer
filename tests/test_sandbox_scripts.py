@@ -426,18 +426,16 @@ def test_correct_reads_duplicate():
     outfile = 'test-abund-read-paired.fa.corr'  # Warning output in cwd
     args = []
     args.extend([infile, infile])
-    try:
-        (status, out, err) = utils.runscript(script, args, sandbox=True)
-        assert 0  # assert raises error
-    except:
-        pass
+    (status, out, err) = utils.runscript(script, args, sandbox=True,
+                                         fail_ok=True)
+    assert 'same filename multiple times' in str(err)
+    assert status == 1
 
 
 @pytest.mark.skipif(not IN_REPOSITORY,
                     reason='executing outside of the repository')
 def test_correct_reads_fq():
     script = 'correct-reads.py'
-    infile = utils.get_test_data('test-reads.fq.bz2')
     infile = utils.get_test_data('paired.fq')
     savegraph = utils.get_temp_filename('test-reads.fq.ct')
     outfile = utils.get_temp_filename('test-reads.fq.corr')
