@@ -360,7 +360,7 @@ def test_error_correct_pass2():
     outfile = utils.get_temp_filename('test-abund-read-3.fa.corr')
     args = ['--trusted-cov', '5', '-o', outfile]
     args.extend([hashfile, infile])
-    (status, out, err) = utils.runscript(script, args, sandbox=True)
+    (status, out, err) = utils.runscript(script, args)
     assert 'trusted: 5' in out, out
     assert os.path.exists(outfile)
     assert os.stat(outfile).st_size > 2000
@@ -383,7 +383,7 @@ def test_error_correct_pass2_fq():
     outfile = 'paired.fq.1.corr'  # Warning: output file in cwd
     args = ['--trusted-cov', '2']
     args.extend([hashfile, infile])
-    (status, out, err) = utils.runscript(script, args, sandbox=True)
+    (status, out, err) = utils.runscript(script, args)
     assert os.path.exists(outfile)
     assert os.stat(outfile).st_size > 700
     os.remove(outfile)
@@ -397,7 +397,7 @@ def test_correct_reads():
     outfile = utils.get_temp_filename('simple-genome-reads.fa.corr')
     args = ['-o', outfile]
     args.extend([infile])
-    (status, out, err) = utils.runscript(script, args, sandbox=True)
+    (status, out, err) = utils.runscript(script, args)
     assert 'fp rate' in err, err
     assert os.path.exists(outfile)
     assert os.stat(outfile).st_size > 132000
@@ -411,7 +411,7 @@ def test_correct_reads_other():
     outfile = 'test-abund-read-paired.fa.corr'  # Warning output in cwd
     args = []
     args.extend([infile])
-    (status, out, err) = utils.runscript(script, args, sandbox=True)
+    (status, out, err) = utils.runscript(script, args)
     assert 'fp rate' in err, err
     assert os.path.exists(outfile)
     assert os.stat(outfile).st_size > 800
@@ -426,8 +426,7 @@ def test_correct_reads_duplicate():
     outfile = 'test-abund-read-paired.fa.corr'  # Warning output in cwd
     args = []
     args.extend([infile, infile])
-    (status, out, err) = utils.runscript(script, args, sandbox=True,
-                                         fail_ok=True)
+    (status, out, err) = utils.runscript(script, args, fail_ok=True)
     assert 'same filename multiple times' in str(err)
     assert status == 1
 
@@ -441,14 +440,14 @@ def test_correct_reads_fq():
     outfile = utils.get_temp_filename('test-reads.fq.corr')
     args = ['-o', outfile, '--savegraph', savegraph, '--variable-coverage']
     args.extend([infile])
-    (status, out, err) = utils.runscript(script, args, sandbox=True)
+    (status, out, err) = utils.runscript(script, args)
     assert 'fp rate' in err, err
     assert os.path.exists(outfile)
     assert os.stat(outfile).st_size > 1500
     os.remove(outfile)
     args = ['-o', outfile, '--loadgraph', savegraph]
     args.extend([infile])
-    (status, out, err) = utils.runscript(script, args, sandbox=True)
+    (status, out, err) = utils.runscript(script, args)
     assert 'fp rate' in err, err
     assert os.path.exists(outfile)
     assert os.stat(outfile).st_size > 1500
