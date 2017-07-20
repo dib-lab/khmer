@@ -49,7 +49,7 @@ import subprocess
 import sys
 import sysconfig
 import tempfile
-import csv
+import codecs
 
 from setuptools import setup
 from setuptools import Extension
@@ -244,10 +244,11 @@ else:
 #     correctly for the citation information, but this requires a non-standard
 #     library that we don't want to add as a dependency for `setup.py`.
 #     -- Daniel Standage, 2017-05-21
-with open('authors.csv', 'r') as csvin:
-    authors = csv.reader(csvin)
-    authorstr = ', '.join([row[0] for row in authors])
-    authorstr = 'Daniel Standage, ' + authorstr + ', C. Titus Brown'
+with codecs.open('authors.csv', 'r', encoding="utf-8") as csvin:
+    authors = csvin.readlines()
+authors = [a.strip().split(',') for a in authors]
+authorstr = ', '.join([row[0] for row in authors])
+authorstr = 'Daniel Standage, ' + authorstr + ', C. Titus Brown'
 
 
 SETUP_METADATA = \
