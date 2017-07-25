@@ -88,13 +88,40 @@ void Hashtable::consume_seqfile_banding(
 }
 
 template<typename SeqIO>
+void consume_seqfile_with_mask(
+    std::string const &filename,
+    Hashtable mask,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+)
+{
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
+    consume_seqfile_with_mask<SeqIO>(parser, mask, total_reads, n_consumed);
+}
+
+template<typename SeqIO>
+void consume_seqfile_banding_with_mask(
+    std::string const &filename,
+    unsigned int num_bands,
+    unsigned int band,
+    Hashtable mask,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+)
+{
+    ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
+    consume_seqfile_banding_with_mask<SeqIO>(parser, num_bands, band, mask,
+                                             total_reads, n_consumed);
+}
+
+template<typename SeqIO>
 void Hashtable::consume_seqfile(
     ReadParserPtr<SeqIO>& parser,
     unsigned int &total_reads,
     unsigned long long &n_consumed
 )
 {
-    Read			  read;
+    Read read;
 
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( )) {
@@ -113,6 +140,42 @@ void Hashtable::consume_seqfile(
     } // while reads left for parser
 
 } // consume_seqfile
+
+template<typename SeqIO>
+void Hashtable::consume_seqfile_with_mask(
+    ReadParserPtr<SeqIO>& parser,
+    Hashtable& mask,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+)
+{
+    Read read;
+
+    // Iterate through the reads and consume their k-mers.
+    while (!parser->is_complete( )) {
+        try {
+            read = parser->get_next_read( );
+        } catch (NoMoreReadsAvailable) {
+            break;
+        }
+
+        read.set_clean_seq();
+        unsigned int this_n_consumed = 0;
+        KmerHashIteratorPtr kmers = new_kmer_iterator(read.cleaned_seq);
+        while(!kmers->done()) {
+            HashIntoType kmer = kmers->next();
+            if (mask.get_count(kmer) == 0) {
+                count(kmer);
+                this_n_consumed++;
+            }
+        }
+
+        __sync_add_and_fetch( &n_consumed, this_n_consumed );
+        __sync_add_and_fetch( &total_reads, 1 );
+
+    } // while reads left for parser
+
+} // consume_seqfile_with_mask
 
 template<typename SeqIO>
 void Hashtable::consume_seqfile_banding(
@@ -151,6 +214,47 @@ void Hashtable::consume_seqfile_banding(
     } // while reads left for parser
 
 } // consume_seqfile_banding
+
+template<typename SeqIO>
+void Hashtable::consume_seqfile_banding_with_mask(
+    ReadParserPtr<SeqIO>& parser,
+    unsigned int num_bands,
+    unsigned int band,
+    Hashtable& mask,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+)
+{
+    Read read;
+    std::pair<uint64_t, uint64_t> interval = compute_band_interval(num_bands,
+                                                                   band);
+
+    while (!parser->is_complete()) {
+        try {
+            read = parser->get_next_read( );
+        } catch (NoMoreReadsAvailable) {
+            break;
+        }
+
+        read.set_clean_seq();
+        unsigned int this_n_consumed = 0;
+        KmerHashIteratorPtr kmers = new_kmer_iterator(read.cleaned_seq);
+        while(!kmers->done()) {
+            HashIntoType kmer = kmers->next();
+            if (kmer >= interval.first && kmer < interval.second) {
+                if (mask.get_count(kmer) == 0) {
+                    count(kmer);
+                    this_n_consumed++;
+                }
+            }
+        }
+
+        __sync_add_and_fetch( &n_consumed, this_n_consumed );
+        __sync_add_and_fetch( &total_reads, 1 );
+
+    } // while reads left for parser
+
+} // consume_seqfile_banding_with_mask
 
 //
 // consume_string: run through every k-mer in the given string, & hash it.
@@ -524,6 +628,40 @@ template void Hashtable::consume_seqfile_banding<FastxReader>(
     ReadParserPtr<FastxReader>& parser,
     unsigned int num_bands,
     unsigned int bands,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+);
+
+template void Hashtable::consume_seqfile_with_mask<FastxReader>(
+    std::string const &filename,
+    Hashtable& mask,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+);
+
+
+template void Hashtable::consume_seqfile_with_mask<FastxReader>(
+    ReadParserPtr<FastxReader>& parser,
+    Hashtable& mask,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+);
+
+template void Hashtable::consume_seqfile_banding_with_mask<FastxReader>(
+    std::string const &filename,
+    unsigned int num_bands,
+    unsigned int bands,
+    Hashtable& mask,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed
+);
+
+
+template void Hashtable::consume_seqfile_banding_with_mask<FastxReader>(
+    ReadParserPtr<FastxReader>& parser,
+    unsigned int num_bands,
+    unsigned int bands,
+    Hashtable& mask,
     unsigned int &total_reads,
     unsigned long long &n_consumed
 );
