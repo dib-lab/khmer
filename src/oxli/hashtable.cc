@@ -632,12 +632,12 @@ template void Hashtable::consume_seqfile_banding<FastxReader>(
     unsigned long long &n_consumed
 );
 
-template void Hashtable::consume_seqfile_with_mask<FastxReader>(
-    std::string const &filename,
-    Hashtable& mask,
-    unsigned int &total_reads,
-    unsigned long long &n_consumed
-);
+//template void Hashtable::consume_seqfile_with_mask<FastxReader>(
+//    std::string const &filename,
+//    Hashtable& mask,
+//    unsigned int &total_reads,
+//    unsigned long long &n_consumed
+//);
 
 
 template void Hashtable::consume_seqfile_with_mask<FastxReader>(
@@ -647,14 +647,14 @@ template void Hashtable::consume_seqfile_with_mask<FastxReader>(
     unsigned long long &n_consumed
 );
 
-template void Hashtable::consume_seqfile_banding_with_mask<FastxReader>(
-    std::string const &filename,
-    unsigned int num_bands,
-    unsigned int bands,
-    Hashtable& mask,
-    unsigned int &total_reads,
-    unsigned long long &n_consumed
-);
+//template void Hashtable::consume_seqfile_banding_with_mask<FastxReader>(
+//    std::string const &filename,
+//    unsigned int num_bands,
+//    unsigned int bands,
+//    Hashtable& mask,
+//    unsigned int &total_reads,
+//    unsigned long long &n_consumed
+//);
 
 
 template void Hashtable::consume_seqfile_banding_with_mask<FastxReader>(
