@@ -80,3 +80,29 @@ def test_reverse_hash(ksize, sketch_allocator):
     with pytest.raises(ValueError) as ve:
         _ = sketch.reverse_hash(kmer_hash)
     assert 'not implemented' in str(ve)
+
+def test_consume_with_mask():
+    """
+    Test bulk loading with a mask
+
+    The top sequence is the mask, the bottom sequence is to be loaded. The
+    bottom 3 k-mers are not present in the mask and therefore should be the
+    only ones loaded into the counttable.
+
+    TAGATCTGCTTGAAACAAGTGGATTTGAGAAAAA        <--- mask
+       ATCTGCTTGAAACAAGTGGATTTGAGAAAAAAGT     <--- sequence
+                          |-----------|
+                           |-----------|
+                            |-----------|
+    """
+    maskfile = utils.get_test_data('seq-a.fa')
+    mask = khmer.Counttable(13, 1e3, 4)
+    mask.consume_seqfile(maskfile)
+
+    infile = utils.get_test_data('seq-b.fa')
+    ct = khmer.Counttable(13, 1e3, 4)
+    nr, nk = ct.consume_seqfile_with_mask(infile, mask)
+    assert nr == 1
+    assert nk == 3
+    for kmer in ['ATTTGAGAAAAAA', 'TTTGAGAAAAAAG', 'TTGAGAAAAAAGT']:
+        assert ct.get(kmer) == 1
