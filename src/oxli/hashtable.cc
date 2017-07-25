@@ -90,7 +90,7 @@ void Hashtable::consume_seqfile_banding(
 template<typename SeqIO>
 void consume_seqfile_with_mask(
     std::string const &filename,
-    Hashtable mask,
+    Hashtable& mask,
     unsigned int &total_reads,
     unsigned long long &n_consumed
 )
@@ -104,7 +104,7 @@ void consume_seqfile_banding_with_mask(
     std::string const &filename,
     unsigned int num_bands,
     unsigned int band,
-    Hashtable mask,
+    Hashtable& mask,
     unsigned int &total_reads,
     unsigned long long &n_consumed
 )
