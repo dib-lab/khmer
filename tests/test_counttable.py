@@ -102,7 +102,9 @@ def test_consume_with_mask():
     infile = utils.get_test_data('seq-b.fa')
     ct = khmer.Counttable(13, 1e3, 4)
     nr, nk = ct.consume_seqfile_with_mask(infile, mask)
+
     assert nr == 1
     assert nk == 3
-    for kmer in ['ATTTGAGAAAAAA', 'TTTGAGAAAAAAG', 'TTGAGAAAAAAGT']:
-        assert ct.get(kmer) == 1
+    assert ct.get('ATTTGAGAAAAAA') == 1
+    assert ct.get('TTTGAGAAAAAAG') == 1
+    assert ct.get('TTGAGAAAAAAGT') == 1
