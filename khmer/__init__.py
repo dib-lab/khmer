@@ -45,6 +45,7 @@ from khmer._khmer import Countgraph as _Countgraph
 from khmer._khmer import SmallCountgraph as _SmallCountgraph
 from khmer._khmer import Counttable as _Counttable
 from khmer._khmer import SmallCounttable as _SmallCounttable
+
 from khmer._khmer import GraphLabels as _GraphLabels
 from khmer._khmer import Nodegraph as _Nodegraph
 from khmer._khmer import Nodetable as _Nodetable
@@ -73,6 +74,9 @@ from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 # scripts/{abundance-dist-single,load-into-counting}.py
 
 from khmer._khmer import FILETYPES
+
+from khmer._oxli.graphs import QFCounttable
+from khmer._oxli.parsing import FastxParser
 
 import sys
 

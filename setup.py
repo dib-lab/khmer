@@ -306,23 +306,27 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
         if sys.platform == 'darwin' and 'gcov' in self.libraries:
             self.libraries.remove('gcov')
 
+        cqfcmd = ['bash', '-c', 'cd third-party/cqf && make']
+        spawn(cmd=cqfcmd, dry_run=self.dry_run)
+        for ext in self.extensions:
+            ext.extra_objects.append(path_join("third-party", "cqf", "gqf.o"))
+
         if "z" not in self.libraries:
             zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'
                     ' configure || bash ./configure --static ) && make -f '
                     'Makefile.pic PIC']
             spawn(cmd=zcmd, dry_run=self.dry_run)
-            # self.extensions[0].extra_objects.extend(
             for ext in self.extensions:
                 ext.extra_objects.extend(
                     path_join("third-party", "zlib", bn + ".lo") for bn in [
                         "adler32", "compress", "crc32", "deflate", "gzclose",
                         "gzlib", "gzread", "gzwrite", "infback", "inffast",
                         "inflate", "inftrees", "trees", "uncompr", "zutil"])
+
         if "bz2" not in self.libraries:
             bz2cmd = ['bash', '-c', 'cd ' + BZIP2DIR + ' && make -f '
                       'Makefile-libbz2_so all']
             spawn(cmd=bz2cmd, dry_run=self.dry_run)
-            # self.extensions[0].extra_objects.extend(
             for ext in self.extensions:
                 ext.extra_objects.extend(
                     path_join("third-party", "bzip2", bn + ".o") for bn in [
