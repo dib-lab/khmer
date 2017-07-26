@@ -102,8 +102,8 @@ help: Makefile
 install-dep: install-dependencies
 
 install-dependencies:
-	pip install --upgrade --ignore-installed $(DEVPKGS)
-	pip install --upgrade --requirement doc/requirements.txt
+	pip install $(DEVPKGS)
+	pip install --requirement doc/requirements.txt
 
 ## sharedobj   : build khmer shared object file
 sharedobj: $(EXTENSION_MODULE)
