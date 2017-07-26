@@ -113,7 +113,7 @@ void BitStorage::save(std::string outfilename, WordLength ksize)
     unsigned char version = SAVED_FORMAT_VERSION;
     outfile.write((const char *) &version, 1);
 
-    unsigned char ht_type = SAVED_HASHBITS;
+    unsigned char ht_type = SAVED_NODEGRAPH;
     outfile.write((const char *) &ht_type, 1);
 
     outfile.write((const char *) &save_ksize, sizeof(save_ksize));
@@ -200,7 +200,7 @@ void BitStorage::load(std::string infilename, WordLength &ksize)
                 << " while reading k-mer graph from " << infilename
                 << "; should be " << (int) SAVED_FORMAT_VERSION;
             throw oxli_file_exception(err.str());
-        } else if (!(ht_type == SAVED_HASHBITS)) {
+        } else if (!(ht_type == SAVED_NODEGRAPH)) {
             std::ostringstream err;
             err << "Incorrect file format type " << (int) ht_type
                 << " while reading k-mer graph from " << infilename;
@@ -330,7 +330,7 @@ ByteStorageFileReader::ByteStorageFileReader(
                 << " while reading k-mer count file from " << infilename
                 << "; should be " << (int) SAVED_FORMAT_VERSION;
             throw oxli_file_exception(err.str());
-        } else if (!(ht_type == SAVED_COUNTING_HT)) {
+        } else if (!(ht_type == SAVED_COUNTGRAPH)) {
             std::ostringstream err;
             err << "Incorrect file format type " << (int) ht_type
                 << " while reading k-mer count file from " << infilename;
@@ -446,7 +446,7 @@ ByteStorageGzFileReader::ByteStorageGzFileReader(
             SAVED_SIGNATURE;
         throw oxli_file_exception(err.str());
     } else if (!(version == SAVED_FORMAT_VERSION)
-               || !(ht_type == SAVED_COUNTING_HT)) {
+               || !(ht_type == SAVED_COUNTGRAPH)) {
         if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
             err << "Incorrect file format version " << (int) version
@@ -454,7 +454,7 @@ ByteStorageGzFileReader::ByteStorageGzFileReader(
                 << "; should be " << (int) SAVED_FORMAT_VERSION;
             gzclose(infile);
             throw oxli_file_exception(err.str());
-        } else if (!(ht_type == SAVED_COUNTING_HT)) {
+        } else if (!(ht_type == SAVED_COUNTGRAPH)) {
             std::ostringstream err;
             err << "Incorrect file format type " << (int) ht_type
                 << " while reading k-mer count file from " << infilename;
@@ -599,7 +599,7 @@ ByteStorageFileWriter::ByteStorageFileWriter(
     unsigned char version = SAVED_FORMAT_VERSION;
     outfile.write((const char *) &version, 1);
 
-    unsigned char ht_type = SAVED_COUNTING_HT;
+    unsigned char ht_type = SAVED_COUNTGRAPH;
     outfile.write((const char *) &ht_type, 1);
 
     unsigned char use_bigcount = 0;
@@ -666,7 +666,7 @@ ByteStorageGzFileWriter::ByteStorageGzFileWriter(
     unsigned char version = SAVED_FORMAT_VERSION;
     gzwrite(outfile, (const char *) &version, 1);
 
-    unsigned char ht_type = SAVED_COUNTING_HT;
+    unsigned char ht_type = SAVED_COUNTGRAPH;
     gzwrite(outfile, (const char *) &ht_type, 1);
 
     unsigned char use_bigcount = 0;
@@ -786,7 +786,7 @@ void NibbleStorage::save(std::string outfilename, WordLength ksize)
     unsigned char version = SAVED_FORMAT_VERSION;
     outfile.write((const char *) &version, 1);
 
-    unsigned char ht_type = SAVED_SMALLCOUNT;
+    unsigned char ht_type = SAVED_SMALLCOUNTGRAPH;
     outfile.write((const char *) &ht_type, 1);
 
     outfile.write((const char *) &save_ksize, sizeof(save_ksize));
@@ -860,7 +860,7 @@ void NibbleStorage::load(std::string infilename, WordLength& ksize)
                 << " while reading k-mer count file from " << infilename
                 << "; should be " << (int) SAVED_FORMAT_VERSION;
             throw oxli_file_exception(err.str());
-        } else if (!(ht_type == SAVED_SMALLCOUNT)) {
+        } else if (!(ht_type == SAVED_SMALLCOUNTGRAPH)) {
             std::ostringstream err;
             err << "Incorrect file format type " << (int) ht_type
                 << " while reading k-mer count file from " << infilename;

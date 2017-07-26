@@ -87,13 +87,20 @@ private:\
 
 #   define SAVED_SIGNATURE "OXLI"
 #   define SAVED_FORMAT_VERSION 4
-#   define SAVED_COUNTING_HT 1
-#   define SAVED_HASHBITS 2
 #   define SAVED_TAGS 3
 #   define SAVED_STOPTAGS 4
 #   define SAVED_SUBSET 5
 #   define SAVED_LABELSET 6
-#   define SAVED_SMALLCOUNT 7
+
+typedef enum saved_sketch_type {
+    SAVED_NODETABLE,
+    SAVED_COUNTTABLE,
+    SAVED_SMALLCOUNTTABLE,
+    // The following are set explicitly for backwards compatibility
+    SAVED_NODEGRAPH = 2,
+    SAVED_COUNTGRAPH = 1,
+    SAVED_SMALLCOUNTGRAPH = 7
+} saved_sketch_type;
 
 #   define TRAVERSAL_LEFT 0
 #   define TRAVERSAL_RIGHT 1
