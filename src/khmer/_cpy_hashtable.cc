@@ -120,7 +120,7 @@ PyMethodDef khmer_hashtable_methods[] = {
         "Consume any k-mers not present in the provided mask"
     },
     {
-        "consume_seqfile_banding",
+        "consume_seqfile_banding_with_mask",
         (PyCFunction)hashtable_consume_seqfile_banding_with_mask, METH_VARARGS,
         "Consume sequences in k-mer banding mode, with a mask"
     },

@@ -105,6 +105,33 @@ def test_consume_with_mask():
 
     assert nr == 1
     assert nk == 3
+    assert ct.get('GATTTGAGAAAAA') == 0  # in the mask
     assert ct.get('ATTTGAGAAAAAA') == 1
     assert ct.get('TTTGAGAAAAAAG') == 1
+    assert ct.get('TTGAGAAAAAAGT') == 1
+
+
+def test_consume_banding_with_mask():
+    """
+    Test bulk loading with a mask *in k-mer banding mode*
+
+    TAGATCTGCTTGAAACAAGTGGATTTGAGAAAAA        <--- mask
+       ATCTGCTTGAAACAAGTGGATTTGAGAAAAAAGT     <--- sequence
+                          |-----------|
+                           |-----------|
+                            |-----------|     <--- only k-mer in band 1/4
+    """
+    maskfile = utils.get_test_data('seq-a.fa')
+    mask = khmer.Counttable(13, 1e3, 4)
+    mask.consume_seqfile(maskfile)
+
+    infile = utils.get_test_data('seq-b.fa')
+    ct = khmer.Counttable(13, 1e3, 4)
+    nr, nk = ct.consume_seqfile_banding_with_mask(infile, 4, 1, mask)
+
+    assert nr == 1
+    assert nk == 1
+    assert ct.get('GATTTGAGAAAAA') == 0  # in the mask
+    assert ct.get('ATTTGAGAAAAAA') == 0  # out of band
+    assert ct.get('TTTGAGAAAAAAG') == 0  # out of band
     assert ct.get('TTGAGAAAAAAGT') == 1
