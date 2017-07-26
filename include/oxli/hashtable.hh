@@ -140,6 +140,7 @@ protected:
     HashIntoType    bitmask;
     unsigned int    _nbits_sub_1;
 
+public:
     explicit Hashtable( WordLength ksize, Storage * s)
         : KmerFactory( ksize ), store(s),
           _max_count( MAX_KCOUNT ),
@@ -176,7 +177,6 @@ protected:
         return new_kmer_iterator(s.c_str());
     }
 
-public:
     // accessor to get 'k'
     const WordLength ksize() const
     {
@@ -514,6 +514,14 @@ class SmallCounttable : public oxli::MurmurHashtable
 public:
     explicit SmallCounttable(WordLength ksize, std::vector<uint64_t> sizes)
           : MurmurHashtable(ksize, new NibbleStorage(sizes)) { };
+};
+
+// Hashtable-derived class with QFStorage.
+class QFCounttable : public oxli::Hashtable
+{
+public:
+    explicit QFCounttable(WordLength ksize, int size)
+        : Hashtable(ksize, new QFStorage(size)) { } ;
 };
 
 // Hashtable-derived class with BitStorage.

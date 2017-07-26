@@ -6,10 +6,7 @@ from libc.stdint cimport uint64_t
 
 from oxli_types cimport *
 from parsing cimport CpReadParser
-
-
-cdef extern from "oxli_exception_convert.hh":
-    cdef void oxli_raise_py_error()
+from utils cimport oxli_raise_py_error
 
 
 cdef extern from "oxli/hllcounter.hh" namespace "oxli":
