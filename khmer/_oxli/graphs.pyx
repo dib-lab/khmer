@@ -188,6 +188,20 @@ cdef class Hashtable:
                                                            total_reads,
                                                            n_consumed)
 
+    def consume_seqfile_banding(self, file_name, num_bands, band):
+        """Count all k-mers from file_name."""
+        cdef unsigned long long n_consumed = 0
+        cdef unsigned int total_reads = 0
+
+        read_parser = ReadParser(file_name)
+        cdef CPyReadParser_Object* parser = <CPyReadParser_Object*>read_parser
+        deref(self.c_table).consume_seqfile_banding[CpFastxReader](parser.parser,
+                                                                   num_bands,
+                                                                   band,
+                                                                   total_reads,
+                                                                   n_consumed)
+        return total_reads, n_consumed
+
     def abundance_distribution(self, file_name, tracking):
         """Calculate the k-mer abundance distribution over reads in file_name."""
         cdef CPyReadParser_Object* parser
@@ -262,7 +276,24 @@ cdef class QFCounttable(Hashtable):
         self.c_table.reset(<CpHashtable*>new CpQFCounttable(k, int(log(starting_size, 2))))
 
 
+cdef class _Counttable(Hashtable):
+    def __cinit__(self, int k, vector[uint64_t] primes):
+        self.c_table.reset(<CpHashtable*>new CpCounttable(k, primes))
+
+    def set_use_bigcount(self, bigcount):
+        deref(self.c_table).set_use_bigcount(bigcount)
+
+    def get_use_bigcount(self):
+        return deref(self.c_table).get_use_bigcount()
+
+
 cdef class Counttable(Hashtable):
     def __cinit__(self, int k, int starting_size, int n_tables):
         primes = get_n_primes_near_x(n_tables, starting_size)
         self.c_table.reset(<CpHashtable*>new CpCounttable(k, primes))
+
+    def set_use_bigcount(self, bigcount):
+        deref(self.c_table).set_use_bigcount(bigcount)
+
+    def get_use_bigcount(self):
+        return deref(self.c_table).get_use_bigcount()

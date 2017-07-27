@@ -75,6 +75,7 @@ from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 
 from khmer._khmer import FILETYPES
 
+from khmer._oxli.graphs import _Counttable
 from khmer._oxli.graphs import Counttable
 from khmer._oxli.graphs import QFCounttable
 from khmer._oxli.parsing import FastxParser
@@ -131,7 +132,7 @@ def load_countgraph(filename, small=False):
         countgraph.load(filename)
 
     else:
-        countgraph = Countgraph(1, [100])
+        countgraph = _Countgraph(1, [1])
         countgraph.load(filename)
 
     return countgraph
@@ -149,7 +150,7 @@ def load_counttable(filename, small=False):
         counttable.load(filename)
 
     else:
-        counttable = Counttable(1, [100])
+        counttable = _Counttable(1, [1])
         counttable.load(filename)
 
     return counttable
