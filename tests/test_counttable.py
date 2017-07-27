@@ -81,6 +81,7 @@ def test_reverse_hash(ksize, sketch_allocator):
         _ = sketch.reverse_hash(kmer_hash)
     assert 'not implemented' in str(ve)
 
+
 def test_consume_with_mask():
     """
     Test bulk loading with a mask
