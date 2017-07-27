@@ -167,15 +167,16 @@ cdef class Hashtable:
         return posns
 
     def consume_seqfile_with_reads_parser(self, read_parser):
-       """Count all k-mers from read_parser."""
-       cdef unsigned long long n_consumed = 0
-       cdef unsigned int total_reads = 0
+        """Count all k-mers from read_parser."""
+        cdef unsigned long long n_consumed = 0
+        cdef unsigned int total_reads = 0
 
-       cdef CPyReadParser_Object* parser = <CPyReadParser_Object*>read_parser
+        cdef CPyReadParser_Object* parser = <CPyReadParser_Object*>read_parser
 
-       deref(self.c_table).consume_seqfile[CpFastxReader](parser.parser,
-                                                          total_reads,
-                                                          n_consumed)
+        deref(self.c_table).consume_seqfile[CpFastxReader](parser.parser,
+                                                           total_reads,
+                                                           n_consumed)
+        return total_reads, n_consumed
 
     def consume_seqfile(self, file_name):
         """Count all k-mers from file_name."""
@@ -187,6 +188,7 @@ cdef class Hashtable:
         deref(self.c_table).consume_seqfile[CpFastxReader](parser.parser,
                                                            total_reads,
                                                            n_consumed)
+        return total_reads, n_consumed
 
     def consume_seqfile_banding(self, file_name, num_bands, band):
         """Count all k-mers from file_name."""
@@ -276,24 +278,20 @@ cdef class QFCounttable(Hashtable):
         self.c_table.reset(<CpHashtable*>new CpQFCounttable(k, int(log(starting_size, 2))))
 
 
-cdef class _Counttable(Hashtable):
+cdef class BigCountHashtable(Hashtable):
+    def set_use_bigcount(self, bigcount):
+        deref(self.c_table).set_use_bigcount(bigcount)
+
+    def get_use_bigcount(self):
+        return deref(self.c_table).get_use_bigcount()
+
+
+cdef class _Counttable(BigCountHashtable):
     def __cinit__(self, int k, vector[uint64_t] primes):
         self.c_table.reset(<CpHashtable*>new CpCounttable(k, primes))
 
-    def set_use_bigcount(self, bigcount):
-        deref(self.c_table).set_use_bigcount(bigcount)
 
-    def get_use_bigcount(self):
-        return deref(self.c_table).get_use_bigcount()
-
-
-cdef class Counttable(Hashtable):
+cdef class Counttable(BigCountHashtable):
     def __cinit__(self, int k, int starting_size, int n_tables):
         primes = get_n_primes_near_x(n_tables, starting_size)
         self.c_table.reset(<CpHashtable*>new CpCounttable(k, primes))
-
-    def set_use_bigcount(self, bigcount):
-        deref(self.c_table).set_use_bigcount(bigcount)
-
-    def get_use_bigcount(self):
-        return deref(self.c_table).get_use_bigcount()

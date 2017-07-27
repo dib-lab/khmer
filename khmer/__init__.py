@@ -43,7 +43,6 @@ import json
 
 from khmer._khmer import Countgraph as _Countgraph
 from khmer._khmer import SmallCountgraph as _SmallCountgraph
-#from khmer._khmer import Counttable as _Counttable
 from khmer._khmer import SmallCounttable as _SmallCounttable
 
 from khmer._khmer import GraphLabels as _GraphLabels
