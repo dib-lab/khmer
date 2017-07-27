@@ -8,6 +8,7 @@ from libcpp.memory cimport unique_ptr
 from libcpp.vector cimport vector
 
 from .utils cimport _bstring
+from .utils import get_n_primes_near_x
 from graphs cimport CpQFCounttable
 from parsing cimport CpFastxReader, CPyReadParser_Object
 from oxli_types cimport MAX_BIGCOUNT
@@ -259,3 +260,9 @@ cdef class QFCounttable(Hashtable):
         if not power_of_two:
             raise ValueError("starting_size has to be a power of two.")
         self.c_table.reset(<CpHashtable*>new CpQFCounttable(k, int(log(starting_size, 2))))
+
+
+cdef class Counttable(Hashtable):
+    def __cinit__(self, int k, int starting_size, int n_tables):
+        primes = get_n_primes_near_x(n_tables, starting_size)
+        self.c_table.reset(<CpHashtable*>new CpCounttable(k, primes))

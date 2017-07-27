@@ -37,10 +37,10 @@ cdef extern from "khmer/_cpy_khmer.hh":
 cdef extern from "oxli/hashtable.hh" namespace "oxli":
     cdef cppclass CpHashtable "oxli::Hashtable":
         const WordLength ksize() const
-        HashIntoType hash_dna(const char *) const
-        HashIntoType hash_dna_top_strand(const char *) const
-        HashIntoType hash_dna_bottom_strand(const char *) const
-        string unhash_dna(HashIntoType) const
+        HashIntoType hash_dna(const char *) except +oxli_raise_py_error
+        HashIntoType hash_dna_top_strand(const char *) except +oxli_raise_py_error
+        HashIntoType hash_dna_bottom_strand(const char *) except +oxli_raise_py_error
+        string unhash_dna(HashIntoType) except +oxli_raise_py_error
         void count(const char *)
         void count(HashIntoType)
         bool add(const char *)

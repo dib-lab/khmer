@@ -43,7 +43,7 @@ import json
 
 from khmer._khmer import Countgraph as _Countgraph
 from khmer._khmer import SmallCountgraph as _SmallCountgraph
-from khmer._khmer import Counttable as _Counttable
+#from khmer._khmer import Counttable as _Counttable
 from khmer._khmer import SmallCounttable as _SmallCounttable
 
 from khmer._khmer import GraphLabels as _GraphLabels
@@ -75,6 +75,7 @@ from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 
 from khmer._khmer import FILETYPES
 
+from khmer._oxli.graphs import Counttable
 from khmer._oxli.graphs import QFCounttable
 from khmer._oxli.parsing import FastxParser
 
@@ -130,7 +131,7 @@ def load_countgraph(filename, small=False):
         countgraph.load(filename)
 
     else:
-        countgraph = _Countgraph(1, [1])
+        countgraph = Countgraph(1, [100])
         countgraph.load(filename)
 
     return countgraph
@@ -148,7 +149,7 @@ def load_counttable(filename, small=False):
         counttable.load(filename)
 
     else:
-        counttable = _Counttable(1, [1])
+        counttable = Counttable(1, [100])
         counttable.load(filename)
 
     return counttable
@@ -342,15 +343,6 @@ class SmallCountgraph(_SmallCountgraph):
         countgraph = _SmallCountgraph.__new__(cls, k, primes)
         countgraph.primes = primes
         return countgraph
-
-
-class Counttable(_Counttable):
-
-    def __new__(cls, k, starting_size, n_tables):
-        primes = get_n_primes_near_x(n_tables, starting_size)
-        counttable = _Counttable.__new__(cls, k, primes)
-        counttable.primes = primes
-        return counttable
 
 
 class SmallCounttable(_SmallCounttable):
