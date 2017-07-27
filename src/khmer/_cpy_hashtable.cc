@@ -405,8 +405,9 @@ hashtable_consume_seqfile_with_mask(khmer_KHashtable_Object * me, PyObject * arg
 
     const char * filename;
     khmer_KHashtable_Object *mask = NULL;
+    unsigned int threshold = 0;
 
-    if (!PyArg_ParseTuple(args, "sO", &filename, &mask)) {
+    if (!PyArg_ParseTuple(args, "sO|I", &filename, &mask, &threshold)) {
         return NULL;
     }
 
@@ -414,7 +415,9 @@ hashtable_consume_seqfile_with_mask(khmer_KHashtable_Object * me, PyObject * arg
     unsigned long long n_consumed = 0;
     unsigned int total_reads = 0;
     try {
-        hashtable->consume_seqfile_with_mask<FastxReader>(filename, mask->hashtable, total_reads, n_consumed);
+        hashtable->consume_seqfile_with_mask<FastxReader>(
+            filename, mask->hashtable, threshold, total_reads, n_consumed
+        );
     } catch (oxli_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;
@@ -435,8 +438,9 @@ hashtable_consume_seqfile_banding_with_mask(khmer_KHashtable_Object * me, PyObje
     unsigned int num_bands;
     unsigned int band;
     khmer_KHashtable_Object *mask = NULL;
+    unsigned int threshold = 0;
 
-    if (!PyArg_ParseTuple(args, "sIIO", &filename, &num_bands, &band, &mask)) {
+    if (!PyArg_ParseTuple(args, "sIIO|I", &filename, &num_bands, &band, &mask, &threshold)) {
         return NULL;
     }
 
@@ -444,7 +448,10 @@ hashtable_consume_seqfile_banding_with_mask(khmer_KHashtable_Object * me, PyObje
     unsigned long long n_consumed = 0;
     unsigned int total_reads = 0;
     try {
-        hashtable->consume_seqfile_banding_with_mask<FastxReader>(filename, num_bands, band, mask->hashtable, total_reads, n_consumed);
+        hashtable->consume_seqfile_banding_with_mask<FastxReader>(
+            filename, num_bands, band, mask->hashtable, threshold, total_reads,
+            n_consumed
+        );
     } catch (oxli_file_exception &exc) {
         PyErr_SetString(PyExc_OSError, exc.what());
         return NULL;

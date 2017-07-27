@@ -281,6 +281,7 @@ public:
     void consume_seqfile_with_mask(
         std::string const &filename,
         Hashtable* mask,
+        unsigned int threshold,
         unsigned int &total_reads,
         unsigned long long &n_consumed
     );
@@ -289,6 +290,7 @@ public:
     void consume_seqfile_with_mask(
         read_parsers::ReadParserPtr<SeqIO>& parser,
         Hashtable* mask,
+        unsigned int threshold,
         unsigned int &total_reads,
         unsigned long long &n_consumed
     );
@@ -319,6 +321,7 @@ public:
         unsigned int num_bands,
         unsigned int band,
         Hashtable* mask,
+        unsigned int threshold,
         unsigned int &total_reads,
         unsigned long long &n_consumed
     );
@@ -329,6 +332,7 @@ public:
         unsigned int num_bands,
         unsigned int band,
         Hashtable* mask,
+        unsigned int threshold,
         unsigned int &total_reads,
         unsigned long long &n_consumed
     );

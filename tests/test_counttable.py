@@ -136,3 +136,41 @@ def test_consume_banding_with_mask():
     assert ct.get('ATTTGAGAAAAAA') == 0  # out of band
     assert ct.get('TTTGAGAAAAAAG') == 0  # out of band
     assert ct.get('TTGAGAAAAAAGT') == 1
+
+
+def test_consume_with_mask_threshold():
+    """
+    Test bulk loading with a mask and an abundance threshold
+
+    The top sequence is the mask, the bottom sequence is to be loaded. The
+    bottom 3 k-mers are not present in the mask and therefore should be the
+    only ones loaded into the counttable.
+
+    TAGATCTGCTTGAAACAAGTGGATTTGAGAAAAA        |
+    TAGATCTGCTTGAAACAAGTGGATTTGAGAAAAA        |
+    TAGATCTGCTTGAAACAAGTGGATTTGAGAAAAA        | <--- mask input
+    TAGATCTGCTTGAAACAAGTGGATTTGAGAAAAAAGT     |
+    TAGATCTGCTTGAAACAAGTGGATTTGAGAAAAAAGT     |
+
+       ATCTGCTTGAAACAAGTGGATTTGAGAAAAAAGT     <--- sequence
+                          |-----------|
+                           |-----------|      <--- only these k-mers are
+                            |-----------|          abundance <= 3 in the mask
+    """
+    maskfile = utils.get_test_data('seq-a.fa')
+    mask = khmer.Counttable(13, 1e3, 4)
+    for _ in range(3):
+        mask.consume('TAGATCTGCTTGAAACAAGTGGATTTGAGAAAAA')
+    for _ in range(2):
+        mask.consume('TAGATCTGCTTGAAACAAGTGGATTTGAGAAAAAAGT')
+
+    infile = utils.get_test_data('seq-b.fa')
+    ct = khmer.Counttable(13, 1e3, 4)
+    nr, nk = ct.consume_seqfile_with_mask(infile, mask, 3)
+
+    assert nr == 1
+    assert nk == 3
+    assert ct.get('GATTTGAGAAAAA') == 0  # in the mask
+    assert ct.get('ATTTGAGAAAAAA') == 1
+    assert ct.get('TTTGAGAAAAAAG') == 1
+    assert ct.get('TTGAGAAAAAAGT') == 1
