@@ -37,13 +37,17 @@
 
 # `SHELL=bash` Will break Titus's laptop, so don't use BASH-isms like
 # `[[` conditional expressions.
-CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmer.cc khmer/*.hh) setup.py
+#
+PREFIX=/usr/local
+CPPSOURCES=$(wildcard src/oxli/*.cc include/oxli/*.hh src/khmer/_cpy_*.cc include/khmer/_cpy_*.hh) setup.py
+CYSOURCES=$(wildcard khmer/_oxli/*.pxd khmer/_oxli/*.pyx)
 PYSOURCES=$(filter-out khmer/_version.py, \
 	  $(wildcard khmer/*.py scripts/*.py oxli/*.py) )
-SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
+SOURCES=$(PYSOURCES) $(CPPSOURCES) $(CYSOURCES) setup.py
 
 DEVPKGS=pep8==1.6.2 diff_cover autopep8 pylint coverage gcovr pytest \
-	pydocstyle screed pyenchant
+	'pytest-runner>=2.0,<3dev' pydocstyle pyenchant
+
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 
 VERSION=$(shell ./setup.py version | grep Version | awk '{print $$4}' \
@@ -58,6 +62,7 @@ INCLUDESTRING=$(shell gcc -E -x c++ - -v < /dev/null 2>&1 >/dev/null \
 	    | grep '^ /' | grep -v cc1plus)
 INCLUDEOPTS=$(shell gcc -E -x c++ - -v < /dev/null 2>&1 >/dev/null \
 	    | grep '^ /' | grep -v cc1plus | awk '{print "-I" $$1 " "}')
+
 PYINCLUDE=$(shell python -c "from __future__ import print_function; \
 	    import sysconfig; flags = ['-I' + sysconfig.get_path('include'), \
 	    '-I' + sysconfig.get_path('platinclude')]; print(' '.join(flags))")
@@ -82,6 +87,7 @@ endif
 MODEXT=$(shell python -c \
        "import sysconfig;print(sysconfig.get_config_var('SO'))")
 EXTENSION_MODULE = khmer/_khmer$(MODEXT)
+CY_MODULES = $($(wildcard khmer/_oxli/*.pyx): .pyx=.$(MODEXT))
 
 PYLINT_TEMPLATE="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"
 
@@ -96,14 +102,13 @@ help: Makefile
 install-dep: install-dependencies
 
 install-dependencies:
-	pip install git+https://github.com/dib-lab/screed.git
-	pip install --upgrade --ignore-installed $(DEVPKGS)
-	pip install --upgrade --requirement doc/requirements.txt
+	pip install $(DEVPKGS)
+	pip install --requirement doc/requirements.txt
 
 ## sharedobj   : build khmer shared object file
 sharedobj: $(EXTENSION_MODULE)
 
-$(EXTENSION_MODULE): $(CPPSOURCES)
+$(EXTENSION_MODULE): $(CPPSOURCES) $(CYSOURCES)
 	./setup.py build_ext --inplace
 
 coverage-debug: $(CPPSOURCES)
@@ -123,18 +128,22 @@ dist/khmer-$(VERSION).tar.gz: $(SOURCES)
 
 ## clean       : clean up all temporary / machine-generated files
 clean: FORCE
-	cd lib && $(MAKE) clean || true
+	cd src/oxli && $(MAKE) clean || true
 	cd tests && rm -rf khmertest_* || true
-	rm -f pytest_runner-*.egg pytests.xml
+	rm -f pytests.xml
+	cd third-party/cqf && make clean || true
 	rm -f $(EXTENSION_MODULE)
-	rm -f khmer/*.pyc lib/*.pyc scripts/*.pyc tests/*.pyc oxli/*.pyc \
-		sandbox/*.pyc khmer/__pycache__/* sandbox/__pycache__/*
+	rm -f khmer/*.pyc scripts/*.pyc tests/*.pyc oxli/*.pyc \
+		sandbox/*.pyc khmer/__pycache__/* sandbox/__pycache__/* \
+		khmer/_oxli/*.cpp
 	./setup.py clean --all || true
 	rm -f coverage-debug
 	rm -Rf .coverage coverage-gcovr.xml coverage.xml
 	rm -f diff-cover.html
 	rm -Rf build dist
-	rm -rf __pycache__/ .eggs/ khmer.egg-info/
+	rm -rf __pycache__/ khmer.egg-info/
+	@find ./ -type d -name __pycache__ -exec rm -rf {} +
+	@find ./khmer/ -type f -name *$(MODEXT) -exec rm -f {} +
 	-rm -f *.gcov
 
 debug: FORCE
@@ -184,7 +193,7 @@ pep8_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
 diff_pep8_report: pep8_report.txt
 	diff-quality --violations=pep8 pep8_report.txt
 
-## pydocstyle      : check Python doc strings
+## pydocstyle  : check Python doc strings
 pydocstyle: $(PYSOURCES) $(wildcard tests/*.py)
 	pydocstyle --ignore=D100,D101,D102,D103,D203 --match='(?!_version).*\.py' \
 		setup.py khmer/ scripts/ oxli/ || true
@@ -264,32 +273,37 @@ doxygen: doc/doxygen/html/index.html
 
 doc/doxygen/html/index.html: $(CPPSOURCES) $(PYSOURCES)
 	mkdir -p doc/doxygen
-	sed "s=\$${VERSION}=$$(python ./lib/get_version.py)=" Doxyfile.in | \
+	sed "s=\$${VERSION}=$(VERSION)=" Doxyfile.in | \
 		sed "s=\$${INCLUDES}=$(INCLUDESTRING)=" > Doxyfile
 	doxygen
 
-lib: FORCE
-	cd lib && \
+liboxli: FORCE
+	cd src/oxli && \
 	$(MAKE)
 
-# Runs a test of ./lib
+install-liboxli: liboxli
+	cd src/oxli && $(MAKE) install PREFIX=$(PREFIX)
+	mkdir -p $(PREFIX)/include/khmer
+	cp -r include/khmer/_cpy_*.hh $(PREFIX)/include/khmer/
+
+# Runs a test of liboxli
 libtest: FORCE
 	rm -rf install_target
 	mkdir -p install_target
-	cd lib && \
+	cd src/oxli && \
 	 $(MAKE) clean && \
 	 $(MAKE) all && \
 	 $(MAKE) install PREFIX=../install_target
 	test -d install_target/include
-	test -f install_target/include/oxli/khmer.hh
+	test -f install_target/include/oxli/oxli.hh
 	test -d install_target/lib
 	test -f install_target/lib/liboxli.a
 	$(CXX) -std=c++11 -o install_target/test-prog-static \
-		-I install_target/include lib/test-compile.cc \
+		-I install_target/include src/oxli/test-compile.cc \
 		install_target/lib/liboxli.a
 	$(CXX) -std=c++11 -o install_target/test-prog-dynamic \
 		-I install_target/include -L install_target/lib \
-		lib/test-compile.cc -loxli
+		src/oxli/test-compile.cc -loxli
 	rm -rf install_target
 
 ## test        : run the khmer test suite
@@ -298,12 +312,12 @@ test: FORCE
 	py.test -m ${TESTATTR}
 
 sloccount.sc: $(CPPSOURCES) $(PYSOURCES) $(wildcard tests/*.py) Makefile
-	sloccount --duplicates --wide --details lib khmer scripts tests \
+	sloccount --duplicates --wide --details include src khmer scripts tests \
 		setup.py Makefile > sloccount.sc
 
 ## sloccount   : count lines of code
 sloccount:
-	sloccount lib khmer scripts tests setup.py Makefile
+	sloccount src include khmer scripts tests setup.py Makefile
 
 coverity-build:
 	if [ -x "${cov_analysis_dir}/bin/cov-build" ]; \
@@ -356,30 +370,25 @@ convert-release-notes:
 		pandoc --from=markdown --to=rst $${file} > $${file%%.md}.rst; \
 		done
 
-list-authors:
-	@echo '\author[1]{Michael R. Crusoe}'
-	@git log --format='\author[]{%aN}' | sort -uk2 | \
-		grep -v 'root\|crusoe\|titus'
-	@echo '\author[]{C. Titus Brown}'
-	@echo '\affil[1]{mcrusoe@msu.edu}'
-	@git log --format='\author[]{%aN} \affil[]{%aE}' | sort -uk2 | \
-		awk -F\\ '{print "\\"$$3}' | grep -v \
-		'root\|crusoe\|titus\|waffle\|boyce\|pickett.rodney'
-	# R. Boyce requested to be removed 2015/05/21
-	# via pers correspondence to MRC
-	# P Rodney requested to be removed 2015/06/22 via pers correspondence
-	# to MRC
-	@echo '\affil[]{titus@idyll.org}'
-
 list-author-emails:
-	@echo 'name, E-Mail Address'
-	@git log --format='%aN,%aE' | sort -u | grep -v 'root\|waffle\|boyce'
+	@echo 'name,E-Mail Address'
+	@echo 'Daniel Standage,daniel.standage@gmail.com'
+	@git log --format='%aN,%aE' | sort -u | grep -v -F -f author-skips.txt
+	@echo 'C. Titus Brown,ctbrown@ucdavis.edu'
 
 list-citation:
-	git log --format='%aN,%aE' | sort -u | grep -v \
-		'root\|crusoe\|titus\|waffleio\|Hello\|boyce\|rodney' \
-		> authors.csv
+	git log --format='%aN,%aE' | sort -u | grep -v -F -f author-skips.txt > authors.csv
 	python sort-authors-list.py
+
+## cpp-demos   : run programs demonstrating access to the (unstable) C++ API
+cpp-demos: sharedobj
+	cd examples/c++-api/ && make all run
+
+## py-demos    : run programs demonstrating access to the Python API
+py-demos: sharedobj
+	python examples/python-api/exact-counting.py
+	python examples/python-api/bloom.py
+	python examples/python-api/consume.py examples/c++-api/reads.fastq
 
 FORCE:
 

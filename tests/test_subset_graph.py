@@ -557,6 +557,7 @@ def test_output_partitions():
     assert parts[1] == '3'
     assert parts[2] == '4'
 
+
 test_output_partitions.runme = True
 
 
@@ -609,6 +610,7 @@ def test_small_real_partitions():
     assert len(parts) == 6, len(parts)
     assert len(set(parts)) == 1
     assert set(parts) != set(['0'])
+
 
 test_small_real_partitions.runme = True
 

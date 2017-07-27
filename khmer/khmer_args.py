@@ -83,7 +83,9 @@ class CitationAction(argparse.Action):
 
     def __init__(self, *args, **kwargs):
         self.citations = kwargs.pop('citations')
-        super(CitationAction, self).__init__(*args, nargs=0, **kwargs)
+        super(CitationAction, self).__init__(*args, nargs=0,
+                                             default=argparse.SUPPRESS,
+                                             **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
         info(parser.prog, self.citations)
@@ -137,6 +139,7 @@ class KhmerArgumentParser(argparse.ArgumentParser):
         self.add_argument('--version', action=_VersionStdErrAction,
                           version='khmer {v}'.format(v=__version__))
         self.add_argument('--info', action=CitationAction,
+                          help='print citation information',
                           citations=self._citations)
         self.add_argument('-h', '--help', action=_HelpAction,
                           default=argparse.SUPPRESS,
@@ -439,7 +442,7 @@ def build_graph_args(descr=None, epilog=None, parser=None, citations=None):
         parser = KhmerArgumentParser(description=descr, epilog=epilog,
                                      citations=citations)
 
-    parser.add_argument('--ksize', '-k', type=int, default=DEFAULT_K,
+    parser.add_argument('-k', '--ksize', type=int, default=DEFAULT_K,
                         help='k-mer size to use')
 
     help = ('number of tables to use in k-mer countgraph' if expert_help
@@ -566,7 +569,10 @@ def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
     else:
         tablesize = calculate_graphsize(args, 'countgraph',
                                         multiplier=multiplier)
-        return khmer.Countgraph(ksize, tablesize, args.n_tables)
+        cg = khmer.Countgraph(ksize, tablesize, args.n_tables)
+        if hasattr(args, 'bigcount'):
+            cg.set_use_bigcount(args.bigcount)
+        return cg
 
 
 def create_matching_nodegraph(countgraph):
@@ -615,7 +621,7 @@ def report_on_config(args, graphtype='countgraph'):
 
 def add_threading_args(parser):
     """Add option for threading to options parser."""
-    parser.add_argument('--threads', '-T', default=DEFAULT_N_THREADS, type=int,
+    parser.add_argument('-T', '--threads', default=DEFAULT_N_THREADS, type=int,
                         help='Number of simultaneous threads to execute')
 
 

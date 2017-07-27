@@ -45,14 +45,12 @@ from khmer._khmer import Countgraph as _Countgraph
 from khmer._khmer import SmallCountgraph as _SmallCountgraph
 from khmer._khmer import Counttable as _Counttable
 from khmer._khmer import SmallCounttable as _SmallCounttable
+
 from khmer._khmer import GraphLabels as _GraphLabels
 from khmer._khmer import Nodegraph as _Nodegraph
 from khmer._khmer import Nodetable as _Nodetable
-from khmer._khmer import HLLCounter as _HLLCounter
 from khmer._khmer import ReadAligner as _ReadAligner
-from khmer._khmer import LinearAssembler
-from khmer._khmer import SimpleLabeledAssembler
-from khmer._khmer import JunctionCountAssembler
+
 from khmer._khmer import HashSet
 from khmer._khmer import Read
 from khmer._khmer import forward_hash
@@ -76,6 +74,9 @@ from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 # scripts/{abundance-dist-single,load-into-counting}.py
 
 from khmer._khmer import FILETYPES
+
+from khmer._oxli.graphs import QFCounttable
+from khmer._oxli.parsing import FastxParser
 
 import sys
 
@@ -103,6 +104,18 @@ def load_nodegraph(filename):
     nodegraph.load(filename)
 
     return nodegraph
+
+
+def load_nodetable(filename):
+    """Load a nodetable object from the given filename and return it.
+
+    Keyword argument:
+    filename -- the name of the nodegraph file
+    """
+    nodetable = _Nodetable(1, [1])
+    nodetable.load(filename)
+
+    return nodetable
 
 
 def load_countgraph(filename, small=False):
@@ -341,6 +354,7 @@ class Counttable(_Counttable):
 
 
 class SmallCounttable(_SmallCounttable):
+
     def __new__(cls, k, starting_size, n_tables):
         primes = get_n_primes_near_x(n_tables, starting_size)
         counttable = _SmallCounttable.__new__(cls, k, primes)
@@ -383,28 +397,6 @@ class Nodetable(_Nodetable):
         nodetable = _Nodetable.__new__(cls, k, primes)
         nodetable.primes = primes
         return nodetable
-
-
-class HLLCounter(_HLLCounter):
-    """HyperLogLog counter.
-
-    A HyperLogLog counter is a probabilistic data structure specialized on
-    cardinality estimation.
-    There is a precision/memory consumption trade-off: error rate determines
-    how much memory is consumed.
-
-    # Creating a new HLLCounter:
-
-    >>> khmer.HLLCounter(error_rate, ksize)
-
-    where the default values are:
-      - error_rate: 0.01
-      - ksize: 20
-    """
-
-    def __len__(self):
-        """Return the cardinality estimate."""
-        return _HLLCounter.estimate_cardinality(self)
 
 
 class ReadAligner(_ReadAligner):
@@ -502,3 +494,8 @@ class ReadAligner(_ReadAligner):
         the traditional way.
         """
         _ReadAligner.__init__(self)
+
+from khmer._oxli.assembly import (LinearAssembler, SimpleLabeledAssembler,
+                                  JunctionCountAssembler)
+
+from khmer._oxli.hllcounter import HLLCounter

@@ -73,7 +73,7 @@ def get_parser():
         description="Annotate sequences with partition IDs.",
         epilog=textwrap.dedent(epilog))
 
-    parser.add_argument('--ksize', '-k', type=int, default=DEFAULT_K,
+    parser.add_argument('-k', '--ksize', type=int, default=DEFAULT_K,
                         help="k-mer size (default: %d)" % DEFAULT_K)
     parser.add_argument('graphbase', help='basename for input and output '
                         'files')
@@ -110,6 +110,7 @@ def main():
         print('output %d partitions for %s' % (
             part_count, infile), file=sys.stderr)
         print('partitions are in', outfile, file=sys.stderr)
+
 
 if __name__ == '__main__':
     main()

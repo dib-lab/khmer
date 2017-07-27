@@ -61,3 +61,22 @@ def test_get_kmer_hashes():
 def test_kmer_revcom_hash(kmer):
     a = khmer.Counttable(21, 1e4, 3)
     assert a.hash(kmer) == a.hash(khmer.reverse_complement(kmer))
+
+
+@pytest.mark.parametrize('ksize,sketch_allocator', [
+    (21, khmer.Nodetable),
+    (21, khmer.Counttable),
+    (21, khmer.SmallCounttable),
+    (49, khmer.Nodetable),
+    (49, khmer.Counttable),
+    (49, khmer.SmallCounttable),
+])
+def test_reverse_hash(ksize, sketch_allocator):
+    multiplier = int(ksize / len('GATTACA'))
+    kmer = 'GATTACA' * multiplier
+
+    sketch = sketch_allocator(ksize, 1e4, 4)
+    kmer_hash = sketch.hash(kmer)
+    with pytest.raises(ValueError) as ve:
+        _ = sketch.reverse_hash(kmer_hash)
+    assert 'not implemented' in str(ve)

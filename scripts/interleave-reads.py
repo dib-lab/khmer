@@ -147,5 +147,6 @@ def main():
     print('final: interleaved %d pairs' % counter, file=sys.stderr)
     print('output written to', describe_file_handle(outfp), file=sys.stderr)
 
+
 if __name__ == '__main__':
     main()

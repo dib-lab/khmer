@@ -7,6 +7,33 @@ The khmer project's command line scripts adhere to
 under semantic versioning, but will be in future versions of khmer.
 
 ## [Unreleased]
+
+### Added
+- Cython wrapper for liboxli.
+- Cython containers for parsing, assembly, and hashing.
+- Header install for liboxli.
+- New function `consume_fasta_banding` for bulk loading of sequences into
+  hashtables. Only k-mers whose hashed values fall within a specified range are
+  counted.
+- New storage class using a Counting Quotient Filter with improved cache
+  locality over bloom filters.
+
+### Changed
+- Non-ACTG handling significantly changed so that only bulk-loading functions
+  "clean" sequences of non-DNA characters. See #1590 for details.
+- Split CPython wrapper file into per-class files under `src/khmer` and
+  `include/khmer`.
+- Moved liboxli headers to include/oxli and implementations to src/oxli.
+- Removed CPython assembler wrappers.
+
+## [2.1.1] - 2017-05-25
+### Added
+- Document for submission to the Journal of Open Source Software.
+
+### Fixed
+- Several typos and outdated content in the documentation.
+
+## [2.1] - 2017-05-21
 ### Added
 - New `--no-reformat` option for `interleave-reads.py` script disables default
   read name correction behavior.
@@ -20,7 +47,8 @@ under semantic versioning, but will be in future versions of khmer.
   terminal output.
 - Support for human-friendly memory requests (2G instead of 2000000000 or 2e9).
 - Support for variable-coverage trimming in the `filter-abund-single.py` script.
-- A simple example of the C++ API in `examples/c++-api`.
+- Several simple examples of the Python API and the C++ API in
+  `examples/python-api` and `examples/c++-api`, respectively.
 - New `assemble_linear_path` function for baiting unambiguous contigs with a
   seed k-mer from a hashtable.
 - Support for assembling directly from k-mer graphs, and a new
@@ -33,6 +61,9 @@ under semantic versioning, but will be in future versions of khmer.
 - Added `cleaned_seq` attribute to `khmer.Read` class which provides a cleaned
   version of the sequence of each read.
 - Added --summary-info to trim-low-abund.py to record run information in a file.
+- `Nodetable`, `Counttable` and `SmallCounttable` use murmur hash 3 as hash
+  function. This means they support kmers longer than 32 bases but means
+  the hashes are not reversible.
 
 ### Changed
 - Suppress display of -x and -N command line options in script help messages.
@@ -46,6 +77,7 @@ under semantic versioning, but will be in future versions of khmer.
   class.
 - Renamed `consume_fasta` and related functions to `consume_seqfile`, with
   support for reading sequences from additional formats pending.
+- Changed Sphinx documentation theme to "guzzle".
 
 ### Fixed
 - Bug in compressed(gzip) streaming output from scripts

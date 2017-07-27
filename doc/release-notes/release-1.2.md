@@ -3,24 +3,24 @@
    Copyright (C) 2014 Michigan State University
    It is licensed under the three-clause BSD license; see LICENSE.
    Contact: khmer-project@idyll.org
-   
+
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are
    met:
-   
+
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
-   
+
     * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the following
       disclaimer in the documentation and/or other materials provided
       with the distribution.
-   
+
     * Neither the name of the Michigan State University nor the names
       of its contributors may be used to endorse or promote products
       derived from this software without specific prior written
       permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -32,7 +32,7 @@
    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-   
+
    Contact: khmer-project@idyll.org
 -->
 
@@ -50,46 +50,46 @@ Docs at: https://khmer.readthedocs.org/en/v1.2/
 @mr-c and @ctb are proud to announce khmer's code of conduct
 http://khmer.readthedocs.org/en/v1.2/dev/CODE_OF_CONDUCT.html #664
 All scripts list which files have been created during their execution #477
-@bocajnotnef 
+@bocajnotnef
 All scripts now only output status messages to STDERR instead of STDOUT #626
-@b-wyss 
+@b-wyss
 docs/ a fairly major re-organization and brand new developer docs @ctb @mr-c
 load-into-counting.py: `--summary-info`: machine readable summary in JSON or
-TSV format #649 @kdmurray91 
+TSV format #649 @kdmurray91
 scripts/extract-partitions.py: added documentation for <base>.dist columns #516
-@chuckpr 
+@chuckpr
 Makefile: a new target `make install-dependencies` is useful for developers
 #539 @mr-c
 Sandbox scripts have been cleaned up, or removed (see the sandbox/README.rst
-for details) #589 @ctb 
+for details) #589 @ctb
 
 ## Notable bugs fixed/issues closed:
-do-partition.py's excessive spawning of threads fixed. #637 @camillescott 
+do-partition.py's excessive spawning of threads fixed. #637 @camillescott
 Fixed unique k-mer count reporting in load-graph, load-into-counting, and
 normalize-by-median. #562 @mr-c
-Clarified and test the requirement for a 64-bit operating system #529 @Echelon9 
-Removed some of the broken multi-threading options #511 @majoras-masque 
-Fix table.get("wrong_length_string") gives core dump #585 @Echelon9 
-filter-abund lists parameters that it doesn't use #524 @jstapleton 
+Clarified and test the requirement for a 64-bit operating system #529 @Echelon9
+Removed some of the broken multi-threading options #511 @majoras-masque
+Fix table.get("wrong_length_string") gives core dump #585 @Echelon9
+filter-abund lists parameters that it doesn't use #524 @jstapleton
 Reduction of memory required to run the test suite #542 @leogargu
 BibTeX included in CITATIONS #541 @HLWiencko
 
 ## Additional fixes/features
-delete ScoringMatrix::assign as it is unused #502 @RodPic 
-Root all of our C++ exceptions to a common base exception #508 @iglpdc 
-deleted KhmerError #503 @drlabratory 
+delete ScoringMatrix::assign as it is unused #502 @RodPic
+Root all of our C++ exceptions to a common base exception #508 @iglpdc
+deleted KhmerError #503 @drlabratory
 normalize-by-median reporting output after main loop exits, in case it
-hadn't been triggered #586 @ctb 
-Many issues discovered by cppcheck cleaned up #506 @brtaylor92 
+hadn't been triggered #586 @ctb
+Many issues discovered by cppcheck cleaned up #506 @brtaylor92
 Developers have a new Makefile target to autofix formatting: `make format` #612
-@brtaylor92 
+@brtaylor92
 normalize-by-median.py test coverage increased #361 @SherineAwad
-Several unused functions were removed #599 @brtaylor92 
+Several unused functions were removed #599 @brtaylor92
 Developer docs now link to the stdc++ docs as appropriate #629 @mr-c
-Added tests for non-sequential access to input files #644 @bocajnotnef 
-Removed khmer/theading_args.py #653 @bocajnotnef 
+Added tests for non-sequential access to input files #644 @bocajnotnef
+Removed khmer/theading_args.py #653 @bocajnotnef
 Improved test for maximum k value #658 @pgarland
-ReadParser no longer crashes if n_threads = 0 #86 @jiarong 
+ReadParser no longer crashes if n_threads = 0 #86 @jiarong
 
 ## Known issues:
 
@@ -129,10 +129,10 @@ https://github.com/dib-lab/khmer/issues/75
 
 ## Contributors
 
-@mr-c, @ctb, \*@bocajnotnef, \*@Echelon9, \*@jlippi, \*@kdmurray91, @qingpeng,
-\*@leogargu, \*@jiarong, \*@brtaylor92, \*@iglpdc, @camillescott, \*@HLWiencko,
-\*@cowguru2000, \*@drlabratory, \*@jstapleton, \*@b-wyss, \*@jgluck, @fishjord,
-\*@SherineAwad, \*@pgarland, \*@majoras-masque, @chuckpr, \*@RodPic, @luizirber,
-\*@jrherr
+@mr-c, @ctb, ‡@bocajnotnef, ‡@Echelon9, ‡@jlippi, ‡@kdmurray91, @qingpeng,
+‡@leogargu, ‡@jiarong, ‡@brtaylor92, ‡@iglpdc, @camillescott, ‡@HLWiencko,
+‡@cowguru2000, ‡@drlabratory, ‡@jstapleton, ‡@b-wyss, ‡@jgluck, @fishjord,
+‡@SherineAwad, ‡@pgarland, ‡@majoras-masque, @chuckpr, ‡@RodPic, @luizirber,
+‡@jrherr
 
-`*` Denotes new contributor
+‡ Denotes new contributor

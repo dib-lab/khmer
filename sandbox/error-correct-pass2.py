@@ -35,7 +35,7 @@
 # Contact: khmer-project@idyll.org
 """
 Error correct reads based on a counting hash from a diginorm step.
-Output sequences will be put in @@@.
+Output sequences will be put in inputfile.corr.
 
 % python scripts/error-correct-pass2 <counting.ct> <data1> [ <data2> <...> ]
 
@@ -43,15 +43,14 @@ Use '-h' for parameter help.
 """
 from __future__ import print_function
 import sys
-import screed
 import os
+import screed
 import khmer
-import argparse
-
-
-###
+from khmer import khmer_args
+from khmer.khmer_args import FileType as khFileType
 
 DEFAULT_CUTOFF = 2
+
 
 def output_single(read, new_sequence):
     name = read.name
@@ -60,7 +59,7 @@ def output_single(read, new_sequence):
     quality = None
     if hasattr(read, 'quality'):
         quality = read.quality[:len(sequence)]
-        sequence = sequence[:len(quality)] # in cases where sequence _lengthened_
+        sequence = sequence[:len(quality)]  # sequence is _lengthened_
 
     if quality:
         assert len(sequence) == len(quality), (sequence, quality)
@@ -70,19 +69,21 @@ def output_single(read, new_sequence):
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = khmer_args.build_counting_args(
+        "Correct reads against an already-computed table",
+        citations=['counting', 'SeqAn'])
 
     parser.add_argument("--trusted-cov", dest="trusted_cov", type=int,
                         default=DEFAULT_CUTOFF)
     parser.add_argument("--theta", dest="bits_theta", type=float, default=1.0)
     parser.add_argument('-o', '--output', dest='output_file',
                         help="output file for histogram; defaults to "
-                             "<first filename>.errhist in cwd.",
-                        type=argparse.FileType('w'), default=None)
+                             "<first filename>.corr in cwd.",
+                        type=khFileType('w'), default=None)
 
     parser.add_argument('counts_table')
     parser.add_argument('readfile')
-    
+
     args = parser.parse_args()
 
     print('loading counts')
@@ -107,8 +108,8 @@ def main():
 
         # build the alignment...
         score, graph_alignment, read_alignment, truncated = \
-               aligner.align(seq)
-        
+            aligner.align(seq)
+
         if not truncated:
             graph_seq = graph_alignment.replace("-", "")
             if graph_seq != seq:
@@ -117,6 +118,7 @@ def main():
             seq = graph_seq
 
         corrfp.write(output_single(read, seq))
+
 
 if __name__ == '__main__':
     main()

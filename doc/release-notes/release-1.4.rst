@@ -282,13 +282,13 @@ Contributors
 ------------
 
 @ctb, @kdmurray91, @mr-c, @drtamermansour, @luizirber, @standage,
-@bocajnotnef, \*@susinmotion, @jessicamizzi, \*@elmbeech,
-\*@anotherthomas, \*@sguermond, \*@ahaerpfer, \*@alameldin,
-\*@TheOneHyer, \*@aditi9783, \*@proteasome, \*@bede, \*@davelin1,
-@Echelon9, \*@reedacartwright, @qingpeng, \*@SchwarzEM, \*@scottsievert,
-@PamelaM, @SherineAwad, \*@josiahseaman, \*@lexnederbragt,
+@bocajnotnef, ‡@susinmotion, @jessicamizzi, ‡@elmbeech, ‡@anotherthomas,
+‡@sguermond, ‡@ahaerpfer, ‡@alameldin, ‡@TheOneHyer, ‡@aditi9783,
+‡@proteasome, ‡@bede, ‡@davelin1, @Echelon9, ‡@reedacartwright,
+@qingpeng, ‡@SchwarzEM, ‡@scottsievert, @PamelaM, @SherineAwad,
+‡@josiahseaman, ‡@lexnederbragt,
 
-\* Indicates new contributors
+‡ Indicates new contributors
 
 Issue reporters
 ---------------
