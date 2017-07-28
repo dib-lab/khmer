@@ -50,7 +50,7 @@ cdef class Hashtable:
         `kmer` can be either a string or an integer representing the hashed
         value of the kmer.
         """
-        if isinstance(kmer, str):
+        if isinstance(kmer, basestring):
             temp = kmer.encode('utf-8')
             return deref(self.c_table).add(<char*>temp)
         # assume kmer is an integer representing the hash value
@@ -78,7 +78,7 @@ cdef class Hashtable:
         For Nodetables and Counttables, this function will fail if the
         supplied k-mer contains non-ACGT characters.
         """
-        if isinstance(kmer, str):
+        if isinstance(kmer, basestring):
             temp = kmer.encode('utf-8')
             return deref(self.c_table).get_count(<char*>temp)
         # assume kmer is an integer representing the hash value
