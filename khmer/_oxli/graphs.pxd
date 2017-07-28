@@ -187,3 +187,21 @@ cdef extern from "oxli/labelhash.hh" namespace "oxli":
 
 cdef CpHashgraph * get_hashgraph_ptr(object graph)
 cdef CpLabelHash * get_labelhash_ptr(object graph)
+
+
+cdef class Hashtable:
+    cdef unique_ptr[CpHashtable] c_table
+
+    cdef _valid_sequence(self, sequence)
+
+cdef class QFCounttable(Hashtable):
+    pass
+
+cdef class BigCountHashtable(Hashtable):
+    pass
+
+cdef class Counttable(BigCountHashtable):
+    pass
+
+cdef class Nodetable(Hashtable):
+    pass

@@ -12,11 +12,15 @@ from .utils import get_n_primes_near_x
 from graphs cimport CpQFCounttable
 from parsing cimport CpFastxReader, CPyReadParser_Object
 from oxli_types cimport MAX_BIGCOUNT
-from .._khmer import Countgraph, Nodegraph, GraphLabels, Nodetable, ReadParser
+from .._khmer import Countgraph as PyCountgraph
+from .._khmer import Nodegraph as PyNodegraph
+from .._khmer import GraphLabels as PyGraphLabels
+from .._khmer import Nodetable as PyNodetable
+from .._khmer import ReadParser
 
 
 cdef CpHashgraph * get_hashgraph_ptr(object graph):
-    if not (isinstance(graph, Countgraph) or isinstance(graph, Nodegraph)):
+    if not (isinstance(graph, PyCountgraph) or isinstance(graph, PyNodegraph)):
         return NULL
 
     cdef CPyHashgraph_Object* ptr = <CPyHashgraph_Object*> graph
@@ -24,7 +28,7 @@ cdef CpHashgraph * get_hashgraph_ptr(object graph):
 
 
 cdef CpLabelHash * get_labelhash_ptr(object labels):
-    if not isinstance(labels, GraphLabels):
+    if not isinstance(labels, PyGraphLabels):
         return NULL
 
     cdef CPyGraphLabels_Object * ptr = <CPyGraphLabels_Object*> labels
@@ -32,7 +36,6 @@ cdef CpLabelHash * get_labelhash_ptr(object labels):
 
 
 cdef class Hashtable:
-    cdef unique_ptr[CpHashtable] c_table
 
     def count(self, kmer):
         """Increment the count of this k-mer.
@@ -216,7 +219,7 @@ cdef class Hashtable:
                              'got {} instead.'.format(type(file_name)))
 
         cdef CPyHashtable_Object* hashtable
-        if isinstance(tracking, (Nodetable, Nodegraph)):
+        if isinstance(tracking, (PyNodetable, PyNodegraph)):
             hashtable = <CPyHashtable_Object*>tracking
         else:
             raise ValueError('Expected `tracking` to be a Nodetable or '
@@ -232,7 +235,7 @@ cdef class Hashtable:
     def abundance_distribution_with_reads_parser(self, read_parser, tracking):
         """Calculate the k-mer abundance distribution over reads."""
         cdef CPyHashtable_Object* hashtable
-        if isinstance(tracking, (Nodetable, Nodegraph)):
+        if isinstance(tracking, (PyNodetable, PyNodegraph)):
             hashtable = <CPyHashtable_Object*>tracking
         else:
             raise ValueError('Expected `tracking` to be a Nodetable or '
