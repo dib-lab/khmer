@@ -410,6 +410,7 @@ def test_filter_abund_1_quiet():
     status, out, err = utils.runscript(script, args, in_dir)
 
     assert len(err) == 0
+    assert len(out) < 1000
 
     outfile = infile + '.abundfilt'
     n_outfile = n_infile + '.abundfilt'
@@ -427,6 +428,7 @@ def test_filter_abund_1_singlefile_quiet():
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert len(err) == 0
+    assert len(out) < 1000
 
     outfile = infile + '.abundfilt'
     assert os.path.exists(outfile), outfile

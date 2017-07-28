@@ -503,7 +503,7 @@ bool HLLCounter::check_and_normalize_read(std::string &read) const
 void HLLCounter::merge(HLLCounter &other)
 {
     if (this->p != other.p || this->_ksize != other._ksize) {
-        throw oxli_exception("HLLCounters to be merged must be created with same parameters");
+        throw InvalidValue("HLLCounters to be merged must be created with same parameters");
     }
     for(unsigned int i=0; i < this->M.size(); ++i) {
         this->M[i] = std::max(other.M[i], this->M[i]);

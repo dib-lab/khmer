@@ -45,10 +45,10 @@ from khmer._khmer import Countgraph as _Countgraph
 from khmer._khmer import SmallCountgraph as _SmallCountgraph
 from khmer._khmer import Counttable as _Counttable
 from khmer._khmer import SmallCounttable as _SmallCounttable
+
 from khmer._khmer import GraphLabels as _GraphLabels
 from khmer._khmer import Nodegraph as _Nodegraph
 from khmer._khmer import Nodetable as _Nodetable
-from khmer._khmer import HLLCounter as _HLLCounter
 from khmer._khmer import ReadAligner as _ReadAligner
 
 #from khmer._khmer import HashSet
@@ -74,6 +74,9 @@ from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 # scripts/{abundance-dist-single,load-into-counting}.py
 
 from khmer._khmer import FILETYPES
+
+from khmer._oxli.graphs import QFCounttable
+from khmer._oxli.parsing import FastxParser
 
 import sys
 
@@ -396,28 +399,6 @@ class Nodetable(_Nodetable):
         return nodetable
 
 
-class HLLCounter(_HLLCounter):
-    """HyperLogLog counter.
-
-    A HyperLogLog counter is a probabilistic data structure specialized on
-    cardinality estimation.
-    There is a precision/memory consumption trade-off: error rate determines
-    how much memory is consumed.
-
-    # Creating a new HLLCounter:
-
-    >>> khmer.HLLCounter(error_rate, ksize)
-
-    where the default values are:
-      - error_rate: 0.01
-      - ksize: 20
-    """
-
-    def __len__(self):
-        """Return the cardinality estimate."""
-        return _HLLCounter.estimate_cardinality(self)
-
-
 class ReadAligner(_ReadAligner):
     """Sequence to graph aligner.
 
@@ -517,3 +498,4 @@ class ReadAligner(_ReadAligner):
 from khmer._oxli.assembly import (LinearAssembler, SimpleLabeledAssembler,
                                   JunctionCountAssembler)
 from khmer._oxli.hashset import HashSet
+from khmer._oxli.hllcounter import HLLCounter

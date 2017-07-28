@@ -49,7 +49,7 @@ import subprocess
 import sys
 import sysconfig
 import tempfile
-import csv
+import codecs
 
 from setuptools import setup
 from setuptools import Extension
@@ -154,7 +154,7 @@ BZIP2DIR = 'third-party/bzip2'
 BUILD_DEPENDS = glob.glob(path_join("include", "khmer", "_cpy_*.hh"))
 BUILD_DEPENDS.extend(path_join("include", "oxli", bn + ".hh") for bn in [
     "khmer", "kmer_hash", "hashtable", "labelhash", "hashgraph",
-    "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers",
+    "hllcounter", "oxli_exception", "read_aligner", "subset", "read_parsers",
     "kmer_filters", "traversal", "assembler", "alphabets", "storage"])
 
 SOURCES = glob.glob(path_join("src", "khmer", "_cpy_*.cc"))
@@ -199,7 +199,7 @@ for cython_ext in glob.glob(os.path.join("khmer", "_oxli",
 
     CY_EXTENSION_MOD_DICT = \
         {
-            "sources": [cython_ext],
+            "sources": [cython_ext, "khmer/_oxli/oxli_exception_convert.cc"],
             "extra_compile_args": EXTRA_COMPILE_ARGS,
             "extra_link_args": EXTRA_LINK_ARGS,
             "extra_objects": [path_join(build_dir(), splitext(p)[0] + '.o')
@@ -244,10 +244,11 @@ else:
 #     correctly for the citation information, but this requires a non-standard
 #     library that we don't want to add as a dependency for `setup.py`.
 #     -- Daniel Standage, 2017-05-21
-with open('authors.csv', 'r') as csvin:
-    authors = csv.reader(csvin)
-    authorstr = ', '.join([row[0] for row in authors])
-    authorstr = 'Daniel Standage, ' + authorstr + ', C. Titus Brown'
+with codecs.open('authors.csv', 'r', encoding="utf-8") as csvin:
+    authors = csvin.readlines()
+authors = [a.strip().split(',') for a in authors]
+authorstr = ', '.join([row[0] for row in authors])
+authorstr = 'Daniel Standage, ' + authorstr + ', C. Titus Brown'
 
 
 SETUP_METADATA = \
@@ -266,9 +267,8 @@ SETUP_METADATA = \
         "packages": ['khmer', 'khmer.tests', 'oxli', 'khmer._oxli'],
         "package_data": {'khmer/_oxli': ['*.pxd']},
         "package_dir": {'khmer.tests': 'tests'},
-        "install_requires": ['screed >= 1.0', 'bz2file'],
-        "setup_requires": ["pytest-runner>=2.0,<3dev", "setuptools>=18.0",
-                           "Cython>=0.25.2"],
+        "install_requires": ['screed >= 1.0', 'bz2file', 'Cython==0.25.2'],
+        "setup_requires": ["pytest-runner>=2.0,<3dev", "setuptools>=18.0"],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
                            'tests': ['pytest>=2.9'],
@@ -306,23 +306,27 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
         if sys.platform == 'darwin' and 'gcov' in self.libraries:
             self.libraries.remove('gcov')
 
+        cqfcmd = ['bash', '-c', 'cd third-party/cqf && make']
+        spawn(cmd=cqfcmd, dry_run=self.dry_run)
+        for ext in self.extensions:
+            ext.extra_objects.append(path_join("third-party", "cqf", "gqf.o"))
+
         if "z" not in self.libraries:
             zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'
                     ' configure || bash ./configure --static ) && make -f '
                     'Makefile.pic PIC']
             spawn(cmd=zcmd, dry_run=self.dry_run)
-            # self.extensions[0].extra_objects.extend(
             for ext in self.extensions:
                 ext.extra_objects.extend(
                     path_join("third-party", "zlib", bn + ".lo") for bn in [
                         "adler32", "compress", "crc32", "deflate", "gzclose",
                         "gzlib", "gzread", "gzwrite", "infback", "inffast",
                         "inflate", "inftrees", "trees", "uncompr", "zutil"])
+
         if "bz2" not in self.libraries:
             bz2cmd = ['bash', '-c', 'cd ' + BZIP2DIR + ' && make -f '
                       'Makefile-libbz2_so all']
             spawn(cmd=bz2cmd, dry_run=self.dry_run)
-            # self.extensions[0].extra_objects.extend(
             for ext in self.extensions:
                 ext.extra_objects.extend(
                     path_join("third-party", "bzip2", bn + ".o") for bn in [

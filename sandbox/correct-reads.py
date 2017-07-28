@@ -44,17 +44,19 @@ Use -h for parameter help.
 
 TODO: add to sandbox/README.
 """
+from __future__ import print_function
 import sys
-import screed
 import os
-import khmer
 import tempfile
 import shutil
 import textwrap
 import argparse
+import screed
+import khmer
 
 from khmer.khmer_args import (build_counting_args, info, add_loadgraph_args,
-                              report_on_config, sanitize_help)
+                              report_on_config, sanitize_help,
+                              calculate_graphsize, create_countgraph)
 from khmer.utils import write_record, write_record_pair, broken_paired_reader
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists)
@@ -66,7 +68,7 @@ DEFAULT_CUTOFF = 2
 def correct_sequence(aligner, sequence):
     # align to graph.
     score, graph_alignment, read_alignment, truncated = \
-           aligner.align(sequence)
+        aligner.align(sequence)
 
     # next, decide whether or to keep it.
     output_corrected = False
@@ -82,7 +84,7 @@ def fix_quality(record):
         record.quality = record.quality[:len(record.sequence)]
 
     while len(record.sequence) > len(record.quality):
-        record.quality += 'I' # @CTB hack
+        record.quality += 'I'  # @CTB hack
 
 
 def get_parser():
@@ -147,8 +149,8 @@ def main():
     ###
 
     if len(set(args.input_filenames)) != len(args.input_filenames):
-        print >>sys.stderr, \
-            "Error: Cannot input the same filename multiple times."
+        print("Error: Cannot input the same filename multiple times.",
+              file=sys.stderr)
         sys.exit(1)
 
     ###
@@ -156,9 +158,11 @@ def main():
     report_on_config(args)
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
+    tablesize = calculate_graphsize(args, 'countgraph')
+
     if args.savegraph:
-        check_space_for_graph(
-            args.n_tables * args.min_tablesize, args.force)
+        check_space_for_graph(args.savegraph, tablesize,
+                              args.force)
 
     K = args.ksize
 
@@ -166,15 +170,14 @@ def main():
     NORMALIZE_LIMIT = args.normalize_to
 
     if args.loadgraph:
-        print >>sys.stderr, 'loading k-mer countgraph from', args.loadgraph
+        print('loading k-mer countgraph from', args.loadgraph, file=sys.stderr)
         ct = khmer.load_countgraph(args.loadgraph)
     else:
-        print >>sys.stderr, 'making k-mer countgraph'
-        ct = khmer.new_countgraph(K, args.min_tablesize, args.n_tables)
-
+        print('making k-mer countgraph', file=sys.stderr)
+        ct = create_countgraph(args, multiplier=8 / (9. + 0.3))
     tempdir = tempfile.mkdtemp('khmer', 'tmp', args.tempdir)
-    print >>sys.stderr, 'created temporary directory %s; ' \
-                        'use -T to change location' % tempdir
+    print('created temporary directory %s; use -T to change location'
+          % tempdir, file=sys.stderr)
 
     aligner = khmer.ReadAligner(ct, args.cutoff, args.bits_theta)
 
@@ -209,8 +212,8 @@ def main():
                                            force_single=args.ignore_pairs)
         for n, is_pair, read1, read2 in paired_iter:
             if n % 10000 == 0:
-                print >>sys.stderr, '...', n, filename, save_pass2, \
-                    n_reads, n_bp, written_reads, written_bp
+                print('...', n, filename, save_pass2, n_reads, n_bp,
+                      written_reads, written_bp, file=sys.stderr)
 
             # we want to track paired reads here, to make sure that pairs
             # are not split between first pass and second pass.
@@ -281,8 +284,8 @@ def main():
 
         pass2fp.close()
 
-        print >>sys.stderr, '%s: kept aside %d of %d from first pass, in %s' \
-            % (filename, save_pass2, n, filename)
+        print('%s: kept aside %d of %d from first pass, in %s'
+              % (filename, save_pass2, n, filename), file=sys.stderr)
         save_pass2_total += save_pass2
 
     # ### SECOND PASS. ###
@@ -290,8 +293,8 @@ def main():
     skipped_n = 0
     skipped_bp = 0
     for _, pass2filename, corrfp in pass2list:
-        print >>sys.stderr, ('second pass: looking at sequences kept aside '
-                             'in %s') % pass2filename
+        print(('second pass: looking at sequences kept aside in %s') %
+              pass2filename, file=sys.stderr)
 
         # note that for this second pass, we don't care about paired
         # reads - they will be output in the same order they're read in,
@@ -301,8 +304,8 @@ def main():
         for n, read in enumerate(screed.open(pass2filename,
                                              parse_description=False)):
             if n % 10000 == 0:
-                print >>sys.stderr, '... x 2', n, pass2filename, \
-                    written_reads, written_bp
+                print('... x 2', n, pass2filename, written_reads,
+                      written_bp, file=sys.stderr)
 
             seq = read.sequence.replace('N', 'A')
             med, _, _ = ct.get_median_count(seq)
@@ -330,10 +333,10 @@ def main():
                     written_reads += 1
                     written_bp += len(new_seq)
 
-        print >>sys.stderr, 'removing %s' % pass2filename
+        print('removing %s' % pass2filename, file=sys.stderr)
         os.unlink(pass2filename)
 
-    print >>sys.stderr, 'removing temp directory & contents (%s)' % tempdir
+    print('removing temp directory & contents (%s)' % tempdir, file=sys.stderr)
     shutil.rmtree(tempdir)
 
     n_passes = 1.0 + (float(save_pass2_total) / n_reads)
@@ -341,32 +344,35 @@ def main():
                                     (n_reads - written_reads)) /\
         n_reads * 100.0
 
-    print >>sys.stderr, 'read %d reads, %d bp' % (n_reads, n_bp,)
-    print >>sys.stderr, 'wrote %d reads, %d bp' % (written_reads, written_bp,)
-    print >>sys.stderr, 'looked at %d reads twice (%.2f passes)' % \
-        (save_pass2_total, n_passes)
-    print >>sys.stderr, 'removed %d reads and corrected %d reads (%.2f%%)' % \
-        (n_reads - written_reads, corrected_reads, percent_reads_corrected)
-    print >>sys.stderr, 'removed %.2f%% of bases (%d total)' % \
-        ((1 - (written_bp / float(n_bp))) * 100.0, n_bp - written_bp)
+    print('read %d reads, %d bp' % (n_reads, n_bp,), file=sys.stderr)
+    print('wrote %d reads, %d bp' % (written_reads, written_bp,),
+          file=sys.stderr)
+    print('looked at %d reads twice (%.2f passes)' %
+          (save_pass2_total, n_passes), file=sys.stderr)
+    print('removed %d reads and corrected %d reads (%.2f%%)' %
+          (n_reads - written_reads, corrected_reads, percent_reads_corrected),
+          file=sys.stderr)
+    print('removed %.2f%% of bases (%d total)' %
+          ((1 - (written_bp / float(n_bp))) * 100.0, n_bp - written_bp),
+          file=sys.stderr)
 
     if args.variable_coverage:
         percent_reads_hicov = 100.0 * float(n_reads - skipped_n) / n_reads
-        print >>sys.stderr, '%d reads were high coverage (%.2f%%);' % \
-            (n_reads - skipped_n, percent_reads_hicov)
-        print >>sys.stderr, ('skipped %d reads/%d bases because of low'
-                             'coverage') % (skipped_n, skipped_bp)
+        print('%d reads were high coverage (%.2f%%);' %
+              (n_reads - skipped_n, percent_reads_hicov), file=sys.stderr)
+        print(('skipped %d reads/%d bases because of low coverage')
+              % (skipped_n, skipped_bp), file=sys.stderr)
 
     fp_rate = \
         khmer.calc_expected_collisions(ct, args.force, max_false_pos=.8)
     # for max_false_pos see Zhang et al., http://arxiv.org/abs/1309.2975
-    print >>sys.stderr, \
-        'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
+    print('fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate),
+          file=sys.stderr)
 
-    print >>sys.stderr, 'output in *.corr'
+    print('output in *.corr', file=sys.stderr)
 
     if args.savegraph:
-        print >>sys.stderr, "Saving k-mer countgraph to", args.savegraph
+        print("Saving k-mer countgraph to", args.savegraph, file=sys.stderr)
         ct.save(args.savegraph)
 
 
