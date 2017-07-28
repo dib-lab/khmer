@@ -36,7 +36,6 @@ cdef CpLabelHash * get_labelhash_ptr(object labels):
 
 
 cdef class Hashtable:
-
     def count(self, kmer):
         """Increment the count of this k-mer.
 
