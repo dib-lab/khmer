@@ -200,7 +200,7 @@ cdef class QFCounttable(Hashtable):
 cdef class BigCountHashtable(Hashtable):
     pass
 
-cdef class Counttable(BigCountHashtable):
+cdef class Counttable(Hashtable):
     pass
 
 cdef class Nodetable(Hashtable):

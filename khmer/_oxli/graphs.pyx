@@ -288,12 +288,24 @@ cdef class BigCountHashtable(Hashtable):
         return deref(self.c_table).get_use_bigcount()
 
 
-cdef class _Counttable(BigCountHashtable):
+cdef class _Counttable(Hashtable):
     def __cinit__(self, int k, vector[uint64_t] primes):
         self.c_table.reset(<CpHashtable*>new CpCounttable(k, primes))
 
+    def set_use_bigcount(self, bigcount):
+        deref(self.c_table).set_use_bigcount(bigcount)
 
-cdef class Counttable(BigCountHashtable):
+    def get_use_bigcount(self):
+        return deref(self.c_table).get_use_bigcount()
+
+
+cdef class Counttable(Hashtable):
     def __cinit__(self, int k, int starting_size, int n_tables):
         primes = get_n_primes_near_x(n_tables, starting_size)
         self.c_table.reset(<CpHashtable*>new CpCounttable(k, primes))
+
+    def set_use_bigcount(self, bigcount):
+        deref(self.c_table).set_use_bigcount(bigcount)
+
+    def get_use_bigcount(self):
+        return deref(self.c_table).get_use_bigcount()
