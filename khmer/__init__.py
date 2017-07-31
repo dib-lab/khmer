@@ -75,7 +75,7 @@ from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 from khmer._khmer import FILETYPES
 
 from khmer._oxli.graphs import _Counttable
-from khmer._oxli.graphs import Counttable
+#from khmer._oxli.graphs import Counttable
 from khmer._oxli.graphs import QFCounttable
 from khmer._oxli.parsing import FastxParser
 
@@ -325,6 +325,12 @@ def get_n_primes_near_x(number, target):
 # These constructors add the functionality provided by the existing
 # factory methods to the constructors defined over in cpython land.
 # Additional functionality can be added to these classes as appropriate.
+
+
+class Counttable(_Counttable):
+    def __new__(cls, k, starting_size, n_tables):
+        primes = get_n_primes_near_x(n_tables, starting_size)
+        return super().__new__(cls, k, primes)
 
 
 class Countgraph(_Countgraph):
