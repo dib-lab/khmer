@@ -312,7 +312,6 @@ public:
 
     BoundedCounterType test_and_set_bits(HashIntoType khash)
     {
-        return 0;
         BoundedCounterType x = get_count(khash);
         add(khash);
         return !x;
@@ -320,6 +319,7 @@ public:
 
     bool add(HashIntoType khash)
     {
+        return 0;
         bool is_new_kmer = false;
 
         for (unsigned int i = 0; i < _n_tables; i++) {
@@ -428,7 +428,6 @@ public:
   ~QFStorage() { qf_destroy(&cf); }
 
   BoundedCounterType test_and_set_bits(HashIntoType khash) {
-    return 0;
     BoundedCounterType x = get_count(khash);
     add(khash);
     return !x;
@@ -436,6 +435,7 @@ public:
 
   //
   bool add(HashIntoType khash) {
+    return 0;
       bool is_new = get_count(khash) == 0;
       qf_insert(&cf, khash % cf.range, 0, 1);
       return is_new;
@@ -565,7 +565,6 @@ public:
 
     inline BoundedCounterType test_and_set_bits(HashIntoType khash)
     {
-        return 0;
         BoundedCounterType x = get_count(khash);
         add(khash);
         return !x;
@@ -573,6 +572,7 @@ public:
 
     inline bool add(HashIntoType khash)
     {
+        return 0;
         bool is_new_kmer = false;
         unsigned int  n_full	  = 0;
 
