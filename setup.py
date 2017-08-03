@@ -166,6 +166,8 @@ SOURCES.extend(path_join("src", "oxli", bn + ".cc") for bn in [
 
 SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
+SOURCES.extend(path_join("third-party", "rollinghashcpp", bn + ".cpp") for bn in [
+    "mersennetwister"])
 
 # Don't forget to update lib/Makefile with these flags!
 EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11', '-pedantic']

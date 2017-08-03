@@ -76,6 +76,7 @@ from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 from khmer._khmer import FILETYPES
 
 from khmer._oxli.graphs import QFCounttable
+from khmer._oxli.graphs import RHCounttable
 from khmer._oxli.parsing import FastxParser
 
 import sys

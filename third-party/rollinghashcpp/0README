@@ -1,0 +1,5 @@
+2017-05-17 Daniel Standage <daniel.standage@gmail.com>
+
+- downloaded latest master from https://github.com/lemire/rollinghashcpp
+- renamed `MERSENNETWISTER_H` to `ROLLINGHASH_MERSENNETWISTER_H` to avoid conflict with seqan
+- created `mersennetwister.cpp` and moved `MTRand` method implementations to this source file to avoid linker errors

@@ -84,6 +84,9 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
     cdef cppclass CpCounttable "oxli::Counttable" (CpHashtable):
         CpCounttable(WordLength, vector[uint64_t])
 
+    cdef cppclass CpRHCounttable "oxli::RHCounttable" (CpHashtable):
+        CpRHCounttable(WordLength, vector[uint64_t])
+
     cdef cppclass CpNodetable "oxli::Nodetable" (CpHashtable):
         CpNodetable(WordLength, vector[uint64_t])
 

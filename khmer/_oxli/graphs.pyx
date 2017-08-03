@@ -14,6 +14,49 @@ from oxli_types cimport MAX_BIGCOUNT
 from .._khmer import Countgraph, Nodegraph, GraphLabels, Nodetable, ReadParser
 
 
+def is_prime(number):
+    """Check if a number is prime."""
+    if number < 2:
+        return False
+    if number == 2:
+        return True
+    if number % 2 == 0:
+        return False
+    for _ in range(3, int(number ** 0.5) + 1, 2):
+        if number % _ == 0:
+            return False
+    return True
+
+
+def get_n_primes_near_x(number, target):
+    """Backward-find primes smaller than target.
+
+    Step backwards until a number of primes (other than 2) have been
+    found that are smaller than the target and return them.
+
+    Keyword arguments:
+    number -- the number of primes to find
+    target -- the number to step backwards from
+    """
+    if target == 1 and number == 1:
+        return [1]
+
+    primes = []
+    i = target - 1
+    if i % 2 == 0:
+        i -= 1
+    while len(primes) != number and i > 0:
+        if is_prime(i):
+            primes.append(int(i))
+        i -= 2
+
+    if len(primes) != number:
+        raise RuntimeError("unable to find %d prime numbers < %d" % (number,
+                                                                     target))
+
+    return primes
+
+
 cdef CpHashgraph * get_hashgraph_ptr(object graph):
     if not (isinstance(graph, Countgraph) or isinstance(graph, Nodegraph)):
         return NULL
@@ -259,3 +302,9 @@ cdef class QFCounttable(Hashtable):
         if not power_of_two:
             raise ValueError("starting_size has to be a power of two.")
         self.c_table.reset(<CpHashtable*>new CpQFCounttable(k, int(log(starting_size, 2))))
+
+
+cdef class RHCounttable(Hashtable):
+    def __cinit__(self, int k, unsigned long table_size, unsigned int num_tables):
+        primes = get_n_primes_near_x(num_tables, table_size)
+        self.c_table.reset(<CpHashtable*>new CpRHCounttable(k, primes))

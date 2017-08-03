@@ -45,12 +45,14 @@ Contact: khmer-project@idyll.org
 #include <iostream>
 #include <list>
 #include <map>
+#include <deque>
 #include <queue>
 #include <set>
 #include <string>
 #include <vector>
 #include <memory>
 #include "MurmurHash3.h"
+#include "cyclichash.h"
 
 #include "oxli.hh"
 #include "oxli_exception.hh"
@@ -530,6 +532,184 @@ class Nodetable : public oxli::MurmurHashtable
 public:
     explicit Nodetable(WordLength ksize, std::vector<uint64_t> sizes)
         : MurmurHashtable(ksize, new BitStorage(sizes)) { } ;
+};
+
+class RollingKmerHashIterator : public KmerHashIterator
+{
+private:
+    const char * _seq;
+    const char _ksize;
+    unsigned int index;
+    unsigned int length;
+    CyclicHash<uint64_t> fhash;
+    CyclicHash<uint64_t> rhash;
+    std::deque<char> buffer;
+
+public:
+    RollingKmerHashIterator(const char * seq, unsigned char k)
+            : _seq(seq), _ksize(k), index(0), fhash(k, 64), rhash(k, 64)
+    {
+        std::cerr << "DEBUG c: " << _seq << " \n";
+        length = strlen(_seq);
+        if (length < _ksize) {
+            throw oxli_exception("Supplied sequence is shorter than k-size.");
+        }
+
+        while (buffer.size() < _ksize) {
+            buffer.push_back(_seq[index]);
+            fhash.eat(_seq[index]);
+            index++;
+        }
+
+        for (int i = buffer.size() - 1; i >= 0; i--) {
+            rhash.eat(read_parsers::_to_valid_dna(buffer[i]));
+        }
+    };
+
+    HashIntoType first()
+    {
+        return next();
+    }
+
+    HashIntoType next()
+    {
+        if (index == 0) {
+            throw oxli_exception("past end of iterator");
+        }
+
+        HashIntoType hashval = fhash.hashvalue ^ rhash.hashvalue;
+        std::cerr << "DEBUG d: ";
+        for (auto c : buffer) {
+            std::cerr << c;
+        }
+        std::cerr << " " << hashval << " \n";
+        if (done()) {
+            index = 0;
+            std::cerr << "DEBUG a\n";
+            return hashval;
+        }
+
+        char nextnucl = _seq[index];
+        index += 1;
+        char nextnuclrc = read_parsers::_to_valid_dna(nextnucl);
+        buffer.push_back(nextnucl);
+        char nucl2go = buffer.front();
+        buffer.pop_front();
+        char nucl2gorc = read_parsers::_to_valid_dna(nucl2go);
+
+        fhash.update(nucl2go, nextnucl);
+        rhash.reverse_update(nucl2gorc, nextnuclrc);
+
+        std::cerr << "DEBUG b\n";
+        return hashval;
+    }
+
+    bool done() const
+    {
+        return (index > length);
+    }
+
+    unsigned int get_start_pos() const
+    {
+        return index - 1;
+    }
+    unsigned int get_end_pos() const
+    {
+        return index + _ksize - 1;
+    }
+};
+
+class RollingHashtable : public oxli::Hashtable
+{
+public:
+    explicit RollingHashtable(WordLength ksize, Storage * s)
+        : Hashtable(ksize, s) { };
+
+    inline
+    virtual
+    HashIntoType
+    hash_dna(const char * kmer) const
+    {
+        CyclicHash<uint64_t> fhash(_ksize, 64);
+        CyclicHash<uint64_t> rhash(_ksize, 64);
+        std::deque<char> buffer;
+        unsigned int length = strlen(kmer);
+        unsigned int index = 0;
+        if (length != _ksize) {
+            throw oxli_exception("Supplied kmer string doesn't match the underlying k-size.");
+        }
+
+        while (buffer.size() < _ksize) {
+            buffer.push_back(kmer[index]);
+            fhash.eat(kmer[index]);
+            index++;
+        }
+
+        for (int i = buffer.size() - 1; i >= 0; i--) {
+            rhash.eat(read_parsers::_to_valid_dna(buffer[i]));
+        }
+        HashIntoType hashval = fhash.hashvalue ^ rhash.hashvalue;
+        std::cerr << "DEBUG f: " << kmer << " " << hashval << "\n";
+        return hashval;
+    }
+
+    inline virtual HashIntoType
+    hash_dna_top_strand(const char * kmer) const
+    {
+        throw oxli_exception("not implemented");
+    }
+
+    inline virtual HashIntoType
+    hash_dna_bottom_strand(const char * kmer) const
+    {
+        throw oxli_exception("not implemented");
+    }
+
+    inline virtual std::string
+    unhash_dna(HashIntoType hashval) const
+    {
+        throw oxli_exception("not implemented");
+    }
+
+    virtual KmerHashIteratorPtr new_kmer_iterator(const char * sp) const
+    {
+        KmerHashIterator * ki = new RollingKmerHashIterator(sp, _ksize);
+        return unique_ptr<KmerHashIterator>(ki);
+    }
+
+    virtual void save(std::string filename)
+    {
+        store->save(filename, _ksize);
+    }
+    virtual void load(std::string filename)
+    {
+        store->load(filename, _ksize);
+        _init_bitstuff();
+    }
+};
+
+// Hashtable-derived class with ByteStorage.
+class RHCounttable : public oxli::RollingHashtable
+{
+public:
+    explicit RHCounttable(WordLength ksize, std::vector<uint64_t> sizes)
+        : RollingHashtable(ksize, new ByteStorage(sizes)) { } ;
+};
+
+// Hashtable-derived class with NibbleStorage.
+class RHSmallCounttable : public oxli::RollingHashtable
+{
+public:
+    explicit RHSmallCounttable(WordLength ksize, std::vector<uint64_t> sizes)
+          : RollingHashtable(ksize, new NibbleStorage(sizes)) { };
+};
+
+// Hashtable-derived class with BitStorage.
+class RHNodetable : public oxli::RollingHashtable
+{
+public:
+    explicit RHNodetable(WordLength ksize, std::vector<uint64_t> sizes)
+        : RollingHashtable(ksize, new BitStorage(sizes)) { } ;
 };
 
 }
