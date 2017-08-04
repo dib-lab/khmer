@@ -630,8 +630,8 @@ public:
     HashIntoType
     hash_dna(const char * kmer) const
     {
-        CyclicHash<uint64_t> fhash(_ksize, 64);
-        CyclicHash<uint64_t> rhash(_ksize, 64);
+        CyclicHash<uint64_t> fhash(_ksize, 42, 1985, 64);
+        CyclicHash<uint64_t> rhash(_ksize, 42, 1985, 64);
         std::deque<char> buffer;
         unsigned int length = strlen(kmer);
         unsigned int index = 0;

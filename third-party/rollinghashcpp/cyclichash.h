@@ -39,6 +39,20 @@ public:
         }
     }
 
+    CyclicHash(int myn, uint32 seed1, uint32 seed2, int mywordsize=19) :
+        hashvalue(0),
+        n(myn), wordsize(mywordsize),
+        hasher(maskfnc<hashvaluetype>(wordsize), seed1, seed2),
+        mask1(maskfnc<hashvaluetype>(wordsize-1)),
+        myr(n%wordsize),
+        maskn(maskfnc<hashvaluetype>(wordsize-myr))
+    {
+        if(static_cast<uint>(wordsize) > 8*sizeof(hashvaluetype)) {
+            cerr<<"Can't create "<<wordsize<<"-bit hash values"<<endl;
+            throw "abord";
+        }
+    }
+
     void fastleftshiftn(hashvaluetype & x) const {
         x =  ((x & maskn) << myr ) | (x >> (wordsize-myr)) ;
     }
