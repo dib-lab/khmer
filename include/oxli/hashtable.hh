@@ -277,6 +277,24 @@ public:
         unsigned long long &n_consumed
     );
 
+    template<typename SeqIO>
+    void consume_seqfile_with_mask(
+        std::string const &filename,
+        Hashtable* mask,
+        unsigned int threshold,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
+    );
+
+    template<typename SeqIO>
+    void consume_seqfile_with_mask(
+        read_parsers::ReadParserPtr<SeqIO>& parser,
+        Hashtable* mask,
+        unsigned int threshold,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
+    );
+
     // Consume sequences in k-mer banding mode.
     template<typename SeqIO>
     void consume_seqfile_banding(
@@ -293,6 +311,28 @@ public:
         read_parsers::ReadParserPtr<SeqIO>& parser,
         unsigned int num_bands,
         unsigned int band,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
+    );
+
+    template<typename SeqIO>
+    void consume_seqfile_banding_with_mask(
+        std::string const &filename,
+        unsigned int num_bands,
+        unsigned int band,
+        Hashtable* mask,
+        unsigned int threshold,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
+    );
+
+    template<typename SeqIO>
+    void consume_seqfile_banding_with_mask(
+        read_parsers::ReadParserPtr<SeqIO>& parser,
+        unsigned int num_bands,
+        unsigned int band,
+        Hashtable* mask,
+        unsigned int threshold,
         unsigned int &total_reads,
         unsigned long long &n_consumed
     );
