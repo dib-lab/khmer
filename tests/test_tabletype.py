@@ -22,7 +22,6 @@ import pytest
 from . import khmer_tst_utils as utils
 import khmer
 
-from khmer._khmer import Nodetable as _Nodetable
 from khmer import _Countgraph, _SmallCountgraph, _Nodegraph
 from khmer import Nodetable, Counttable, SmallCounttable, QFCounttable
 

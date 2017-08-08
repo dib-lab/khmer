@@ -260,15 +260,6 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
-    khmer_KSmallCounttable_Type.tp_base = &khmer_KHashtable_Type;
-    if (PyType_Ready(&khmer_KSmallCounttable_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    khmer_KNodetable_Type.tp_base = &khmer_KHashtable_Type;
-    if (PyType_Ready(&khmer_KNodetable_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
 
     khmer_KHashgraph_Type.tp_base = &khmer_KHashtable_Type;
     khmer_KHashgraph_Type.tp_methods = khmer_hashgraph_methods;
@@ -358,17 +349,6 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
-    Py_INCREF(&khmer_KSmallCounttable_Type);
-    if (PyModule_AddObject( m, "SmallCounttable",
-                            (PyObject *)&khmer_KSmallCounttable_Type ) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    Py_INCREF(&khmer_KNodetable_Type);
-    if (PyModule_AddObject( m, "Nodetable",
-                            (PyObject *)&khmer_KNodetable_Type ) < 0) {
-        return MOD_ERROR_VAL;
-    }
 
     Py_INCREF(&khmer_KCountgraph_Type);
     if (PyModule_AddObject( m, "Countgraph",
