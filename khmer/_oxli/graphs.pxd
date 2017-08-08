@@ -77,7 +77,7 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
         void consume_seqfile_banding[SeqIO](const string &, uint32_t, uint32_t, uint32_t &, uint64_t &) except +oxli_raise_py_error
         void consume_seqfile_banding[SeqIO](unique_ptr[CpReadParser[SeqIO]]&,
                                     uint32_t, uint32_t, uint32_t &, uint64_t &) except +oxli_raise_py_error
-        void set_use_bigcount(bool)
+        void set_use_bigcount(bool) except +ValueError
         bool get_use_bigcount()
         bool median_at_least(const string &, uint32_t cutoff)
         void get_median_count(const string &, BoundedCounterType &,
