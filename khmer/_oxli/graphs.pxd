@@ -34,6 +34,25 @@ cdef extern from "khmer/_cpy_khmer.hh":
         CpLabelHash * labelhash
 
 
+cdef extern from "oxli/storage.hh":
+    cdef cppclass CpStorage "oxli::Storage":
+        CpStorage()
+        
+        vector[uint64_t] get_tablesizes()
+        const size_t n_tables() 
+        void save(string, WordLength)
+        void load(string, WordLength&)
+        const uint64_t n_occupied()
+        const uint64_t n_unique_kmers()
+        BoundedCounterType test_and_set_bits(HashIntoType)
+        bool add(HashIntoType khash)
+        const BoundedCounterType get_count(HashIntoType)
+        uint8_t ** get_raw_tables()
+
+        void set_use_bigcount(bool)
+        bool get_use_bigcount()
+
+
 cdef extern from "oxli/hashtable.hh" namespace "oxli":
     cdef cppclass CpHashtable "oxli::Hashtable":
         const WordLength ksize() const
@@ -84,10 +103,16 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
         vector[uint32_t] find_spectral_error_positions(string,
                                                        BoundedCounterType)
 
-    cdef cppclass CpCounttable "oxli::Counttable" (CpHashtable):
+    cdef cppclass CpMurmurHashtable "oxli::MurmurHashtable" (CpHashtable):
+        CpMurmurHashtable(WordLength, CpStorage *)
+
+    cdef cppclass CpCounttable "oxli::Counttable" (CpMurmurHashtable):
         CpCounttable(WordLength, vector[uint64_t])
 
-    cdef cppclass CpNodetable "oxli::Nodetable" (CpHashtable):
+    cdef cppclass CpSmallCounttable "oxli::SmallCounttable" (CpMurmurHashtable):
+        CpSmallCounttable(WordLength, vector[uint64_t])
+
+    cdef cppclass CpNodetable "oxli::Nodetable" (CpMurmurHashtable):
         CpNodetable(WordLength, vector[uint64_t])
 
     cdef cppclass CpQFCounttable "oxli::QFCounttable" (CpHashtable):
@@ -185,6 +210,7 @@ cdef extern from "oxli/labelhash.hh" namespace "oxli":
                                              set[HashIntoType] &,
                                              const Label)
 
+
 cdef CpHashgraph * get_hashgraph_ptr(object graph)
 cdef CpLabelHash * get_labelhash_ptr(object graph)
 
@@ -194,14 +220,18 @@ cdef class Hashtable:
 
     cdef _valid_sequence(self, sequence)
 
+
 cdef class QFCounttable(Hashtable):
     pass
 
-cdef class BigCountHashtable(Hashtable):
+
+cdef class SmallCounttable(Hashtable):
     pass
 
-cdef class Counttable(BigCountHashtable):
+
+cdef class Counttable(Hashtable):
     pass
+
 
 cdef class Nodetable(Hashtable):
     pass

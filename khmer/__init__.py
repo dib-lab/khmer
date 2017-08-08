@@ -43,11 +43,9 @@ import json
 
 from khmer._khmer import Countgraph as _Countgraph
 from khmer._khmer import SmallCountgraph as _SmallCountgraph
-from khmer._khmer import SmallCounttable as _SmallCounttable
 
 from khmer._khmer import GraphLabels as _GraphLabels
 from khmer._khmer import Nodegraph as _Nodegraph
-from khmer._khmer import Nodetable as _Nodetable
 from khmer._khmer import ReadAligner as _ReadAligner
 
 from khmer._khmer import HashSet
@@ -74,9 +72,8 @@ from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 
 from khmer._khmer import FILETYPES
 
-#from khmer._oxli.graphs import _Counttable
-from khmer._oxli.graphs import Counttable
-from khmer._oxli.graphs import QFCounttable
+from khmer._oxli.graphs import (Counttable, QFCounttable, Nodetable,
+                                SmallCounttable)
 from khmer._oxli.parsing import FastxParser
 
 import sys
@@ -326,6 +323,12 @@ def get_n_primes_near_x(number, target):
 # factory methods to the constructors defined over in cpython land.
 # Additional functionality can be added to these classes as appropriate.
 
+'''
+class Counttable(_Counttable):
+    def __new__(cls, k, starting_size, n_tables):
+        primes = get_n_primes_near_x(n_tables, starting_size)
+        return super().__new__(cls, k, primes)
+'''
 
 class Countgraph(_Countgraph):
 
@@ -344,14 +347,6 @@ class SmallCountgraph(_SmallCountgraph):
         countgraph.primes = primes
         return countgraph
 
-
-class SmallCounttable(_SmallCounttable):
-
-    def __new__(cls, k, starting_size, n_tables):
-        primes = get_n_primes_near_x(n_tables, starting_size)
-        counttable = _SmallCounttable.__new__(cls, k, primes)
-        counttable.primes = primes
-        return counttable
 
 
 class GraphLabels(_GraphLabels):
@@ -381,14 +376,6 @@ class Nodegraph(_Nodegraph):
         nodegraph.primes = primes
         return nodegraph
 
-
-class Nodetable(_Nodetable):
-
-    def __new__(cls, k, starting_size, n_tables):
-        primes = get_n_primes_near_x(n_tables, starting_size)
-        nodetable = _Nodetable.__new__(cls, k, primes)
-        nodetable.primes = primes
-        return nodetable
 
 
 class ReadAligner(_ReadAligner):

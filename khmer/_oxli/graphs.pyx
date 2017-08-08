@@ -7,15 +7,13 @@ from libc.stdint cimport uint64_t
 from libcpp.memory cimport unique_ptr
 from libcpp.vector cimport vector
 
-from .utils cimport _bstring
-from .utils import get_n_primes_near_x
-from graphs cimport CpQFCounttable
+from utils cimport _bstring
+from utils import get_n_primes_near_x
 from parsing cimport CpFastxReader, CPyReadParser_Object
 from oxli_types cimport MAX_BIGCOUNT
 from .._khmer import Countgraph as PyCountgraph
 from .._khmer import Nodegraph as PyNodegraph
 from .._khmer import GraphLabels as PyGraphLabels
-from .._khmer import Nodetable as PyNodetable
 from .._khmer import ReadParser
 
 
@@ -36,7 +34,6 @@ cdef CpLabelHash * get_labelhash_ptr(object labels):
 
 
 cdef class Hashtable:
-
     def count(self, kmer):
         """Increment the count of this k-mer.
 
@@ -50,7 +47,7 @@ cdef class Hashtable:
         `kmer` can be either a string or an integer representing the hashed
         value of the kmer.
         """
-        if isinstance(kmer, str):
+        if isinstance(kmer, basestring):
             temp = kmer.encode('utf-8')
             return deref(self.c_table).add(<char*>temp)
         # assume kmer is an integer representing the hash value
@@ -78,7 +75,7 @@ cdef class Hashtable:
         For Nodetables and Counttables, this function will fail if the
         supplied k-mer contains non-ACGT characters.
         """
-        if isinstance(kmer, str):
+        if isinstance(kmer, basestring):
             temp = kmer.encode('utf-8')
             return deref(self.c_table).get_count(<char*>temp)
         # assume kmer is an integer representing the hash value
@@ -218,15 +215,19 @@ cdef class Hashtable:
             raise ValueError('Expected file_name to be string, '
                              'got {} instead.'.format(type(file_name)))
 
-        cdef CPyHashtable_Object* hashtable
-        if isinstance(tracking, (PyNodetable, PyNodegraph)):
-            hashtable = <CPyHashtable_Object*>tracking
+        cdef CPyHashtable_Object* cpyhashtable
+        cdef CpHashtable * hashtable
+        if isinstance(tracking, PyNodegraph):
+            cpyhashtable = <CPyHashtable_Object*>tracking
+            hashtable = cpyhashtable.hashtable
+        elif isinstance(tracking, Nodetable):
+            hashtable = (<Nodetable>tracking).c_table.get()
         else:
             raise ValueError('Expected `tracking` to be a Nodetable or '
                              'Nodegraph, got {} instead.'.format(type(tracking)))
 
         cdef uint64_t * x = deref(self.c_table).abundance_distribution[CpFastxReader](
-                parser.parser, hashtable.hashtable)
+                parser.parser, hashtable)
         abunds = []
         for i in range(MAX_BIGCOUNT):
             abunds.append(x[i])
@@ -234,9 +235,13 @@ cdef class Hashtable:
 
     def abundance_distribution_with_reads_parser(self, read_parser, tracking):
         """Calculate the k-mer abundance distribution over reads."""
-        cdef CPyHashtable_Object* hashtable
-        if isinstance(tracking, (PyNodetable, PyNodegraph)):
-            hashtable = <CPyHashtable_Object*>tracking
+        cdef CPyHashtable_Object* cpyhashtable
+        cdef CpHashtable * hashtable
+        if isinstance(tracking, PyNodegraph):
+            cpyhashtable = <CPyHashtable_Object*>tracking
+            hashtable = cpyhashtable.hashtable
+        elif isinstance(tracking, Nodetable):
+            hashtable = (<Nodetable>tracking).c_table.get()
         else:
             raise ValueError('Expected `tracking` to be a Nodetable or '
                              'Nodegraph, got {} instead.'.format(type(tracking)))
@@ -244,7 +249,7 @@ cdef class Hashtable:
         cdef CPyReadParser_Object* parser
         parser = <CPyReadParser_Object*>read_parser
         cdef uint64_t * x = deref(self.c_table).abundance_distribution[CpFastxReader](
-                parser.parser, hashtable.hashtable)
+                parser.parser, hashtable)
         abunds = []
         for i in range(MAX_BIGCOUNT):
             abunds.append(x[i])
@@ -270,6 +275,12 @@ cdef class Hashtable:
         """Number of tables used in the storage."""
         return deref(self.c_table).n_tables()
 
+    def set_use_bigcount(self, bigcount):
+        deref(self.c_table).set_use_bigcount(bigcount)
+
+    def get_use_bigcount(self):
+        return deref(self.c_table).get_use_bigcount()
+
 
 cdef class QFCounttable(Hashtable):
     def __cinit__(self, int k, int starting_size):
@@ -282,16 +293,24 @@ cdef class QFCounttable(Hashtable):
             self.c_table.reset(<CpHashtable*>new CpQFCounttable(k, int(log(starting_size, 2))))
 
 
-cdef class BigCountHashtable(Hashtable):
-    def set_use_bigcount(self, bigcount):
-        deref(self.c_table).set_use_bigcount(bigcount)
-
-    def get_use_bigcount(self):
-        return deref(self.c_table).get_use_bigcount()
-
-
-cdef class Counttable(BigCountHashtable):
+cdef class Counttable(Hashtable):
     def __cinit__(self, int k, int starting_size, int n_tables):
         if type(self) is Counttable:
             primes = get_n_primes_near_x(n_tables, starting_size)
             self.c_table.reset(<CpHashtable*>new CpCounttable(k, primes))
+
+
+cdef class SmallCounttable(Hashtable):
+    def __cinit__(self, int k, int starting_size, int n_tables):
+        if type(self) is SmallCounttable:
+            primes = get_n_primes_near_x(n_tables, starting_size)
+            self.c_table.reset(<CpHashtable*>new CpSmallCounttable(k, primes))
+
+
+cdef class Nodetable(Hashtable):
+    def __cinit__(self, int k, int starting_size, int n_tables):
+        if type(self) is Nodetable:
+            primes = get_n_primes_near_x(n_tables, starting_size)
+            self.c_table.reset(<CpHashtable*>new CpCounttable(k, primes))
+
+
