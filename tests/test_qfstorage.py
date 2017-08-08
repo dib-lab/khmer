@@ -23,8 +23,7 @@ def test_read_write():
     qf.save(fname)
 
     # on purpose choose parameters that are different from sct
-    qf2 = QFCounttable(3, 128)
-    qf2.load(fname)
+    qf2 = QFCounttable.load(fname)
     assert qf.ksize() == qf2.ksize()
     for kmer in kmers:
         assert qf.get(kmer) == qf2.get(kmer)

@@ -249,3 +249,4 @@ def copy_test_data(testfile, newfilename=None):
     infile = get_temp_filename(basename)
     shutil.copyfile(get_test_data(testfile), infile)
     return infile
+
