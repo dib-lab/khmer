@@ -110,8 +110,19 @@ PyMethodDef khmer_hashtable_methods[] = {
         "given file"
     },
     {
+        "consume_seqfile_with_reads_parser",
+        (PyCFunction)hashtable_consume_seqfile_with_reads_parser, METH_VARARGS,
+        "Count all k-mers retrieved with this reads parser object."
+    },
+    {
         "consume_seqfile_banding",
         (PyCFunction)hashtable_consume_seqfile_banding, METH_VARARGS,
+        "Consume sequences in k-mer banding mode"
+    },
+    {
+        "consume_seqfile_banding_with_reads_parser",
+        (PyCFunction)hashtable_consume_seqfile_banding_with_reads_parser,
+        METH_VARARGS,
         "Consume sequences in k-mer banding mode"
     },
     {
@@ -120,14 +131,21 @@ PyMethodDef khmer_hashtable_methods[] = {
         "Consume any k-mers not present in the provided mask"
     },
     {
+        "consume_seqfile_with_mask_with_reads_parser",
+        (PyCFunction)hashtable_consume_seqfile_with_mask_with_reads_parser,
+        METH_VARARGS,
+        "Consume any k-mers not present in the provided mask"
+    },
+    {
         "consume_seqfile_banding_with_mask",
         (PyCFunction)hashtable_consume_seqfile_banding_with_mask, METH_VARARGS,
         "Consume sequences in k-mer banding mode, with a mask"
     },
     {
-        "consume_seqfile_with_reads_parser",
-        (PyCFunction)hashtable_consume_seqfile_with_reads_parser, METH_VARARGS,
-        "Count all k-mers retrieved with this reads parser object."
+        "consume_seqfile_banding_with_mask_with_reads_parser",
+        (PyCFunction)hashtable_consume_seqfile_banding_with_mask_with_reads_parser,
+        METH_VARARGS,
+        "Consume sequences in k-mer banding mode, with a mask"
     },
     {
         "get",
@@ -370,100 +388,6 @@ hashtable_consume_seqfile(khmer_KHashtable_Object * me, PyObject * args)
 }
 
 PyObject *
-hashtable_consume_seqfile_banding(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable  = me->hashtable;
-
-    const char * filename;
-    unsigned int num_bands;
-    unsigned int band;
-
-    if (!PyArg_ParseTuple(args, "sII", &filename, &num_bands, &band)) {
-        return NULL;
-    }
-
-    // call the C++ function, and trap signals => Python
-    unsigned long long  n_consumed    = 0;
-    unsigned int          total_reads   = 0;
-    try {
-        hashtable->consume_seqfile_banding<FastxReader>(filename, num_bands, band, total_reads, n_consumed);
-    } catch (oxli_file_exception &exc) {
-        PyErr_SetString(PyExc_OSError, exc.what());
-        return NULL;
-    } catch (oxli_value_exception &exc) {
-        PyErr_SetString(PyExc_ValueError, exc.what());
-        return NULL;
-    }
-
-    return Py_BuildValue("IK", total_reads, n_consumed);
-}
-
-PyObject *
-hashtable_consume_seqfile_with_mask(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable  = me->hashtable;
-
-    const char * filename;
-    khmer_KHashtable_Object *mask = NULL;
-    unsigned int threshold = 0;
-
-    if (!PyArg_ParseTuple(args, "sO|I", &filename, &mask, &threshold)) {
-        return NULL;
-    }
-
-    // call the C++ function, and trap signals => Python
-    unsigned long long n_consumed = 0;
-    unsigned int total_reads = 0;
-    try {
-        hashtable->consume_seqfile_with_mask<FastxReader>(
-            filename, mask->hashtable, threshold, total_reads, n_consumed
-        );
-    } catch (oxli_file_exception &exc) {
-        PyErr_SetString(PyExc_OSError, exc.what());
-        return NULL;
-    } catch (oxli_value_exception &exc) {
-        PyErr_SetString(PyExc_ValueError, exc.what());
-        return NULL;
-    }
-
-    return Py_BuildValue("IK", total_reads, n_consumed);
-}
-
-PyObject *
-hashtable_consume_seqfile_banding_with_mask(khmer_KHashtable_Object * me, PyObject * args)
-{
-    Hashtable * hashtable  = me->hashtable;
-
-    const char * filename;
-    unsigned int num_bands;
-    unsigned int band;
-    khmer_KHashtable_Object *mask = NULL;
-    unsigned int threshold = 0;
-
-    if (!PyArg_ParseTuple(args, "sIIO|I", &filename, &num_bands, &band, &mask, &threshold)) {
-        return NULL;
-    }
-
-    // call the C++ function, and trap signals => Python
-    unsigned long long n_consumed = 0;
-    unsigned int total_reads = 0;
-    try {
-        hashtable->consume_seqfile_banding_with_mask<FastxReader>(
-            filename, num_bands, band, mask->hashtable, threshold, total_reads,
-            n_consumed
-        );
-    } catch (oxli_file_exception &exc) {
-        PyErr_SetString(PyExc_OSError, exc.what());
-        return NULL;
-    } catch (oxli_value_exception &exc) {
-        PyErr_SetString(PyExc_ValueError, exc.what());
-        return NULL;
-    }
-
-    return Py_BuildValue("IK", total_reads, n_consumed);
-}
-
-PyObject *
 hashtable_consume_seqfile_with_reads_parser(khmer_KHashtable_Object * me,
         PyObject * args)
 {
@@ -505,10 +429,206 @@ hashtable_consume_seqfile_with_reads_parser(khmer_KHashtable_Object * me,
         return NULL;
     }
 
+    rparser->close();
     return Py_BuildValue("IK", total_reads, n_consumed);
 }
 
+PyObject *
+hashtable_consume_seqfile_banding(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable  = me->hashtable;
 
+    const char * filename;
+    unsigned int num_bands;
+    unsigned int band;
+
+    if (!PyArg_ParseTuple(args, "sII", &filename, &num_bands, &band)) {
+        return NULL;
+    }
+
+    // call the C++ function, and trap signals => Python
+    unsigned long long  n_consumed    = 0;
+    unsigned int          total_reads   = 0;
+    try {
+        hashtable->consume_seqfile_banding<FastxReader>(filename, num_bands, band, total_reads, n_consumed);
+    } catch (oxli_file_exception &exc) {
+        PyErr_SetString(PyExc_OSError, exc.what());
+        return NULL;
+    } catch (oxli_value_exception &exc) {
+        PyErr_SetString(PyExc_ValueError, exc.what());
+        return NULL;
+    }
+
+    return Py_BuildValue("IK", total_reads, n_consumed);
+}
+
+PyObject *
+hashtable_consume_seqfile_banding_with_reads_parser(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable  = me->hashtable;
+
+    PyObject * rparser_obj = NULL;
+    unsigned int num_bands;
+    unsigned int band;
+
+    if (!PyArg_ParseTuple(args, "OII", &rparser_obj, &num_bands, &band)) {
+        return NULL;
+    }
+
+    FastxParserPtr& rparser = _PyObject_to_khmer_ReadParser( rparser_obj );
+
+    // call the C++ function, and trap signals => Python
+    unsigned long long  n_consumed    = 0;
+    unsigned int          total_reads   = 0;
+    try {
+        hashtable->consume_seqfile_banding<FastxReader>(rparser, num_bands, band, total_reads, n_consumed);
+    } catch (oxli_file_exception &exc) {
+        PyErr_SetString(PyExc_OSError, exc.what());
+        return NULL;
+    } catch (oxli_value_exception &exc) {
+        PyErr_SetString(PyExc_ValueError, exc.what());
+        return NULL;
+    }
+
+    rparser->close();
+    return Py_BuildValue("IK", total_reads, n_consumed);
+}
+
+PyObject *
+hashtable_consume_seqfile_with_mask(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable  = me->hashtable;
+
+    const char * filename;
+    khmer_KHashtable_Object *mask = NULL;
+    unsigned int threshold = 0;
+
+    if (!PyArg_ParseTuple(args, "sO|I", &filename, &mask, &threshold)) {
+        return NULL;
+    }
+
+    // call the C++ function, and trap signals => Python
+    unsigned long long n_consumed = 0;
+    unsigned int total_reads = 0;
+    try {
+        hashtable->consume_seqfile_with_mask<FastxReader>(
+            filename, mask->hashtable, threshold, total_reads, n_consumed
+        );
+    } catch (oxli_file_exception &exc) {
+        PyErr_SetString(PyExc_OSError, exc.what());
+        return NULL;
+    } catch (oxli_value_exception &exc) {
+        PyErr_SetString(PyExc_ValueError, exc.what());
+        return NULL;
+    }
+
+    return Py_BuildValue("IK", total_reads, n_consumed);
+}
+
+PyObject *
+hashtable_consume_seqfile_with_mask_with_reads_parser(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable  = me->hashtable;
+
+    PyObject * rparser_obj = NULL;
+    khmer_KHashtable_Object *mask = NULL;
+    unsigned int threshold = 0;
+
+    if (!PyArg_ParseTuple(args, "OO|I", &rparser_obj, &mask, &threshold)) {
+        return NULL;
+    }
+
+    FastxParserPtr& rparser = _PyObject_to_khmer_ReadParser( rparser_obj );
+
+    // call the C++ function, and trap signals => Python
+    unsigned long long n_consumed = 0;
+    unsigned int total_reads = 0;
+    try {
+        hashtable->consume_seqfile_with_mask<FastxReader>(
+            rparser, mask->hashtable, threshold, total_reads, n_consumed
+        );
+    } catch (oxli_file_exception &exc) {
+        PyErr_SetString(PyExc_OSError, exc.what());
+        return NULL;
+    } catch (oxli_value_exception &exc) {
+        PyErr_SetString(PyExc_ValueError, exc.what());
+        return NULL;
+    }
+
+    rparser->close();
+    return Py_BuildValue("IK", total_reads, n_consumed);
+}
+
+PyObject *
+hashtable_consume_seqfile_banding_with_mask(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable  = me->hashtable;
+
+    const char * filename;
+    unsigned int num_bands;
+    unsigned int band;
+    khmer_KHashtable_Object *mask = NULL;
+    unsigned int threshold = 0;
+
+    if (!PyArg_ParseTuple(args, "sIIO|I", &filename, &num_bands, &band, &mask, &threshold)) {
+        return NULL;
+    }
+
+    // call the C++ function, and trap signals => Python
+    unsigned long long n_consumed = 0;
+    unsigned int total_reads = 0;
+    try {
+        hashtable->consume_seqfile_banding_with_mask<FastxReader>(
+            filename, num_bands, band, mask->hashtable, threshold, total_reads,
+            n_consumed
+        );
+    } catch (oxli_file_exception &exc) {
+        PyErr_SetString(PyExc_OSError, exc.what());
+        return NULL;
+    } catch (oxli_value_exception &exc) {
+        PyErr_SetString(PyExc_ValueError, exc.what());
+        return NULL;
+    }
+
+    return Py_BuildValue("IK", total_reads, n_consumed);
+}
+
+PyObject *
+hashtable_consume_seqfile_banding_with_mask_with_reads_parser(khmer_KHashtable_Object * me, PyObject * args)
+{
+    Hashtable * hashtable  = me->hashtable;
+
+    PyObject * rparser_obj = NULL;
+    unsigned int num_bands;
+    unsigned int band;
+    khmer_KHashtable_Object *mask = NULL;
+    unsigned int threshold = 0;
+
+    if (!PyArg_ParseTuple(args, "OIIO|I", &rparser_obj, &num_bands, &band, &mask, &threshold)) {
+        return NULL;
+    }
+
+    FastxParserPtr& rparser = _PyObject_to_khmer_ReadParser( rparser_obj );
+
+    // call the C++ function, and trap signals => Python
+    unsigned long long n_consumed = 0;
+    unsigned int total_reads = 0;
+    try {
+        hashtable->consume_seqfile_banding_with_mask<FastxReader>(
+            rparser, num_bands, band, mask->hashtable, threshold, total_reads,
+            n_consumed
+        );
+    } catch (oxli_file_exception &exc) {
+        PyErr_SetString(PyExc_OSError, exc.what());
+        return NULL;
+    } catch (oxli_value_exception &exc) {
+        PyErr_SetString(PyExc_ValueError, exc.what());
+        return NULL;
+    }
+
+    rparser->close();
+    return Py_BuildValue("IK", total_reads, n_consumed);
+}
 
 PyObject *
 hashtable_consume(khmer_KHashtable_Object * me, PyObject * args)

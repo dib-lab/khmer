@@ -111,6 +111,12 @@ def test_consume_with_mask():
     assert ct.get('TTTGAGAAAAAAG') == 1
     assert ct.get('TTGAGAAAAAAGT') == 1
 
+    ct = khmer.Counttable(13, 1e3, 4)
+    parser = khmer.ReadParser(infile)
+    nr, nk = ct.consume_seqfile_with_mask_with_reads_parser(parser, mask)
+    assert nr == 1
+    assert nk == 3
+
 
 def test_consume_banding_with_mask():
     """
@@ -136,6 +142,14 @@ def test_consume_banding_with_mask():
     assert ct.get('ATTTGAGAAAAAA') == 0  # out of band
     assert ct.get('TTTGAGAAAAAAG') == 0  # out of band
     assert ct.get('TTGAGAAAAAAGT') == 1
+
+    ct = khmer.Counttable(13, 1e3, 4)
+    parser = khmer.ReadParser(infile)
+    nr, nk = ct.consume_seqfile_banding_with_mask_with_reads_parser(
+        parser, 4, 1, mask
+    )
+    assert nr == 1
+    assert nk == 1
 
 
 def test_consume_with_mask_threshold():

@@ -110,7 +110,8 @@ def test_banding_to_disk(ksize, memory, numbands):
 
     ct = khmer.Counttable(ksize, memory / 4, 4)
     for band in range(numbands):
-        ct.consume_seqfile_banding(infile, numbands, band)
+        parser = khmer.ReadParser(infile)
+        ct.consume_seqfile_banding_with_reads_parser(parser, numbands, band)
     ct.save(path2)
     fpr = khmer.calc_expected_collisions(ct)
     print('FPR', fpr)
