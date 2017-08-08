@@ -278,7 +278,8 @@ cdef class QFCounttable(Hashtable):
                         (starting_size != 0))
         if not power_of_two:
             raise ValueError("starting_size has to be a power of two.")
-        self.c_table.reset(<CpHashtable*>new CpQFCounttable(k, int(log(starting_size, 2))))
+        if type(self) is QFCounttable:
+            self.c_table.reset(<CpHashtable*>new CpQFCounttable(k, int(log(starting_size, 2))))
 
 
 cdef class BigCountHashtable(Hashtable):
@@ -289,12 +290,8 @@ cdef class BigCountHashtable(Hashtable):
         return deref(self.c_table).get_use_bigcount()
 
 
-cdef class _Counttable(BigCountHashtable):
-    def __cinit__(self, int k, vector[uint64_t] primes):
-        self.c_table.reset(<CpHashtable*>new CpCounttable(k, primes))
-
-
 cdef class Counttable(BigCountHashtable):
     def __cinit__(self, int k, int starting_size, int n_tables):
-        primes = get_n_primes_near_x(n_tables, starting_size)
-        self.c_table.reset(<CpHashtable*>new CpCounttable(k, primes))
+        if type(self) is Counttable:
+            primes = get_n_primes_near_x(n_tables, starting_size)
+            self.c_table.reset(<CpHashtable*>new CpCounttable(k, primes))
