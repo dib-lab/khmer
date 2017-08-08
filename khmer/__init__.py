@@ -326,6 +326,7 @@ class Counttable(_Counttable):
         return super().__new__(cls, k, primes)
 '''
 
+
 class Countgraph(_Countgraph):
 
     def __new__(cls, k, starting_size, n_tables):
@@ -342,7 +343,6 @@ class SmallCountgraph(_SmallCountgraph):
         countgraph = _SmallCountgraph.__new__(cls, k, primes)
         countgraph.primes = primes
         return countgraph
-
 
 
 class GraphLabels(_GraphLabels):
@@ -371,7 +371,6 @@ class Nodegraph(_Nodegraph):
         nodegraph = _Nodegraph.__new__(cls, k, primes)
         nodegraph.primes = primes
         return nodegraph
-
 
 
 class ReadAligner(_ReadAligner):
@@ -469,6 +468,7 @@ class ReadAligner(_ReadAligner):
         the traditional way.
         """
         _ReadAligner.__init__(self)
+
 
 from khmer._oxli.assembly import (LinearAssembler, SimpleLabeledAssembler,
                                   JunctionCountAssembler)

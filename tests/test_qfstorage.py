@@ -11,7 +11,7 @@ from . import khmer_tst_utils as utils
 def test_read_write():
     rng = random.Random(1)
 
-    qf = QFCounttable(20, 1024*4)
+    qf = QFCounttable(20, 1024 * 4)
 
     kmers = ["".join(rng.choice("ACGT") for _ in range(20))
              for n in range(400)]

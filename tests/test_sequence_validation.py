@@ -42,7 +42,7 @@ from khmer import Nodetable, Counttable, SmallCounttable
 from khmer._oxli.utils import get_n_primes_near_x
 from khmer import ReadParser, Nodegraph, _GraphLabels
 from . import khmer_tst_utils as utils
-from .table_fixtures import (AnyTabletype, Countingtype, Graphtype, 
+from .table_fixtures import (AnyTabletype, Countingtype, Graphtype,
                              params_1m, PRIMES_1m)
 import pytest
 

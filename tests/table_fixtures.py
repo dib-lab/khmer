@@ -56,7 +56,7 @@ def tablewrapper(tabletype):
             starting_size, n_tables = args
         except:
             starting_size, n_tables = params_1m
-            
+
         if tabletype in (_Countgraph, _SmallCountgraph, _Nodegraph):
             primes = get_n_primes_near_x(n_tables, starting_size)
             return tabletype(k, primes)
