@@ -71,12 +71,28 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
         uint32_t consume_string(const string &)
         bool check_and_normalize_read(string &) const
         uint32_t check_and_process_read(string &, bool &)
+
         void consume_seqfile[SeqIO](const string &, uint32_t &, uint64_t &) except +oxli_raise_py_error
         void consume_seqfile[SeqIO](unique_ptr[CpReadParser[SeqIO]]&,
                                     uint32_t &, uint64_t &) except +oxli_raise_py_error
+
+        void consume_seqfile_with_mask[SeqIO](const string &, CpHashtable *,
+                                              uint32_t, uint32_t &, uint64_t &) except +oxli_raise_py_error
+        void consume_seqfile_with_mask[SeqIO](unique_ptr[CpReadParser[SeqIO]]&, CpHashtable *,
+                                              uint32_t, uint32_t &, uint64_t &) except +oxli_raise_py_error
+
         void consume_seqfile_banding[SeqIO](const string &, uint32_t, uint32_t, uint32_t &, uint64_t &) except +oxli_raise_py_error
         void consume_seqfile_banding[SeqIO](unique_ptr[CpReadParser[SeqIO]]&,
                                     uint32_t, uint32_t, uint32_t &, uint64_t &) except +oxli_raise_py_error
+
+        void consume_seqfile_banding_with_mask[SeqIO](const string &, uint32_t, uint32_t, 
+                                                      CpHashtable *, uint32_t, uint32_t &, 
+                                                      uint64_t &) except +oxli_raise_py_error
+        void consume_seqfile_banding_with_mask[SeqIO](unique_ptr[CpReadParser[SeqIO]]&,
+                                                      uint32_t, uint32_t, 
+                                                      CpHashtable *, uint32_t,
+                                                      uint32_t &, uint64_t &) except +oxli_raise_py_error
+
         void set_use_bigcount(bool) except +ValueError
         bool get_use_bigcount()
         bool median_at_least(const string &, uint32_t cutoff)

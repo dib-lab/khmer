@@ -9,12 +9,17 @@ from libcpp.vector cimport vector
 
 from utils cimport _bstring
 from utils import get_n_primes_near_x
-from parsing cimport CpFastxReader, CPyReadParser_Object
+from parsing cimport CpFastxReader, CPyReadParser_Object, get_parser
 from oxli_types cimport MAX_BIGCOUNT
 from .._khmer import Countgraph as PyCountgraph
 from .._khmer import Nodegraph as PyNodegraph
 from .._khmer import GraphLabels as PyGraphLabels
 from .._khmer import ReadParser
+
+
+CYTHON_TABLES = (Hashtable, Nodetable, Counttable, SmallCounttable,
+                 QFCounttable)
+CPYTHON_TABLES = (PyCountgraph, PyNodegraph)
 
 
 cdef CpHashgraph * get_hashgraph_ptr(object graph):
@@ -31,6 +36,26 @@ cdef CpLabelHash * get_labelhash_ptr(object labels):
 
     cdef CPyGraphLabels_Object * ptr = <CPyGraphLabels_Object*> labels
     return deref(ptr).labelhash
+
+
+cdef CpHashtable * hashtable_arg_shim(object table,
+                                      allowed=(PyNodegraph, PyCountgraph,
+                                               Nodetable, Counttable,
+                                               SmallCounttable, QFCounttable)):
+    cdef CPyHashtable_Object* cpyhashtable
+    cdef CpHashtable * hashtable
+                                          
+    if isinstance(table, allowed):
+        if isinstance(table, CYTHON_TABLES):
+            hashtable = (<Hashtable>table).c_table.get()
+        else:
+            cpyhashtable = <CPyHashtable_Object*>table
+            hashtable = cpyhashtable.hashtable
+    else:
+        raise ValueError('Expected one of {0}, '\
+                         'got {1} instead.'.format(allowed, type(table)))
+
+    return hashtable
 
 
 cdef class Hashtable:
@@ -190,6 +215,22 @@ cdef class Hashtable:
                                                            n_consumed)
         return total_reads, n_consumed
 
+    def consume_seqfile_with_mask(self, file_name, mask, threshold=0):
+        cdef unsigned long long n_consumed = 0
+        cdef unsigned int total_reads = 0
+        cdef unique_ptr[CpReadParser[CpFastxReader]] parser = \
+            get_parser[CpFastxReader](_bstring(file_name))
+        cdef CpHashtable * cmask = hashtable_arg_shim(mask)
+        deref(self.c_table).consume_seqfile_with_mask[CpFastxReader](parser,
+                                                                     cmask,
+                                                                     threshold,
+                                                                     total_reads,
+                                                                     n_consumed)
+        return total_reads, n_consumed
+                                                                     
+
+        
+
     def consume_seqfile_banding(self, file_name, num_bands, band):
         """Count all k-mers from file_name."""
         cdef unsigned long long n_consumed = 0
@@ -202,6 +243,22 @@ cdef class Hashtable:
                                                                    band,
                                                                    total_reads,
                                                                    n_consumed)
+        return total_reads, n_consumed
+
+    def consume_seqfile_banding_with_mask(self, file_name, num_bands, band,
+                                          mask, threshold=0):
+        cdef unsigned long long n_consumed = 0
+        cdef unsigned int total_reads = 0
+        cdef unique_ptr[CpReadParser[CpFastxReader]] parser = \
+            get_parser[CpFastxReader](_bstring(file_name))
+        cdef CpHashtable * cmask = hashtable_arg_shim(mask)
+        deref(self.c_table).consume_seqfile_banding_with_mask[CpFastxReader](parser,
+                                                                     num_bands,
+                                                                     band,
+                                                                     cmask,
+                                                                     threshold,
+                                                                     total_reads,
+                                                                     n_consumed)
         return total_reads, n_consumed
 
     def abundance_distribution(self, file_name, tracking):
