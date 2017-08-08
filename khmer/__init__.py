@@ -110,10 +110,8 @@ def load_nodetable(filename):
     Keyword argument:
     filename -- the name of the nodegraph file
     """
-    nodetable = _Nodetable(1, [1])
-    nodetable.load(filename)
 
-    return nodetable
+    return Nodetable.load(filename)
 
 
 def load_countgraph(filename, small=False):
@@ -142,12 +140,10 @@ def load_counttable(filename, small=False):
     small -- set this to load a SmallCounttable instance
     """
     if small:
-        counttable = _SmallCounttable(1, [1])
-        counttable.load(filename)
+        counttable = SmallCounttable.load(filename)
 
     else:
-        counttable = _Counttable(1, [1])
-        counttable.load(filename)
+        counttable = Counttable.load(filename)
 
     return counttable
 
