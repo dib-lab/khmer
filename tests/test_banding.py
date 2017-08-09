@@ -133,7 +133,7 @@ def test_banding_bad_params(sketchclass):
     assert "'band' must be in the interval [0, 'num_bands')" in str(ve)
 
     # Fails because file does not exist
-    with pytest.raises(RuntimeError) as ose:
+    with pytest.raises(OSError) as ose:
         nreads, kmersconsumed = \
             sketch.consume_seqfile_banding('file-no-exist.fa', 16, 3)
     assert 'does not exist' in str(ose)
