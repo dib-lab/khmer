@@ -328,6 +328,7 @@ cdef class QFCounttable(Hashtable):
         return table
 
 cdef class Counttable(Hashtable):
+
     def __cinit__(self, int k, int starting_size, int n_tables):
         if type(self) is Counttable:
             primes = get_n_primes_near_x(n_tables, starting_size)
@@ -335,6 +336,7 @@ cdef class Counttable(Hashtable):
 
 
 cdef class SmallCounttable(Hashtable):
+
     def __cinit__(self, int k, int starting_size, int n_tables):
         if type(self) is SmallCounttable:
             primes = get_n_primes_near_x(n_tables, starting_size)
@@ -342,9 +344,208 @@ cdef class SmallCounttable(Hashtable):
 
 
 cdef class Nodetable(Hashtable):
+
     def __cinit__(self, int k, int starting_size, int n_tables):
         if type(self) is Nodetable:
             primes = get_n_primes_near_x(n_tables, starting_size)
             self.c_table.reset(<CpHashtable*>new CpNodetable(k, primes))
 
 
+cdef class Hashgraph(Hashtable):
+
+    def neighbors(self):
+        '''Get a list of neighbor nodes for this k-mer.'''
+        pass
+
+    def calc_connected_graph_size(self):
+        '''Find the number of nodes connected to this k-mer.'''
+        pass
+
+    def kmer_degree(self):
+        '''Calculate the number of immediate neighbors this k-mer has
+        the graph.'''
+        pass
+
+    def count_kmers_within_radius(self):
+        '''Calculate the number of neighbors with given radius in the graph.'''
+        pass
+
+    def find_high_degree_nodes(self, kmer):
+        '''Examine the given sequence for degree > 2 nodes and add to
+        list; used in graph contraction.'''
+        pass
+
+    def traverse_linear_path(self):
+        '''Traverse the path through the graph starting with the given
+        "k-mer and avoiding high-degree nodes, finding (and returning)
+        "traversed k-mers and any encountered high-degree nodes.'''
+        pass
+
+    def assemble_linear_path(self):
+        '''Assemble a purely linear path starting with the given
+        "k-mer, returning traversed k-mers and any encountered high-degree
+        "nodes.'''
+        pass
+
+
+    def consume_and_tag(self):
+        "Consume a sequence and tag it."
+        pass
+
+    def get_tags_and_positions(self):
+        "Retrieve tags and their positions in a sequence."
+        pass
+    
+    def find_all_tags_list(self):
+        "Find all tags within range of the given k-mer, return as list"
+        pass
+
+    def consume_seqfile_and_tag(self):
+        "Consume all sequences in a FASTA/FASTQ file and tag the resulting "
+        "graph."
+        pass
+    
+    def print_tagset(self):
+        "Print out all of the tags."
+        pass
+    
+    def add_tag(self):
+        "Add a k-mer to the tagset."
+        pass
+    
+    def get_tagset(self):
+        "Get all tagged k-mers as DNA strings."
+        pass
+
+    def load_tagset(self):
+        "Load tags from a file."
+        pass
+    
+    def save_tagset(self):
+        "Save tags to a file."
+        pass
+    
+    def n_tags(self):
+        "Return the count of all tags."
+        pass
+    
+    def divide_tags_into_subsets(self):
+        "Divide tags equally up into subsets of given size."
+        pass
+    
+    @property
+    def tag_density(self):
+        "Get the tagging density."
+        pass
+    
+    def _set_tag_density(self):
+        "Set the tagging density."
+        pass
+
+    def do_subset_partition(self):
+        "Partition the graph starting from a given subset of tags."
+        pass
+    
+    def find_all_tags(self):
+        "Starting from the given k-mer, find all closely connected tags."
+        pass
+    
+    def assign_partition_id(self):
+        "Assign a partition ID to a given tag."
+        pass
+    
+    def output_partitions(self):
+        "Write out sequences in given filename to another file, annotating "
+        "with partition IDs."
+        pass
+    
+    def load_partitionmap(self):
+        "Load a partitionmap for a given subset."
+        pass
+
+    def save_partitionmap(self):
+        "Save a partitionmap for the given subset."
+        pass
+    
+    def _validate_partitionmap(self):
+        "Run internal validation checks."
+        pass
+    
+    def consume_seqfile_and_tag_with_reads_parser(self):
+        "Count all k-mers using the given reads parser"
+        pass
+    
+    def consume_partitioned_fasta(self):
+        "Count all k-mers in a given file"
+        pass
+    
+    def merge_subset(self):
+        "Merge the given subset into this one."
+        pass
+    
+    def merge_subset_from_disk(self):
+        "Merge the given subset (filename) into this one."
+        pass
+    
+    def count_partitions(self):
+        "Count the number of partitions in the master partitionmap."
+        pass
+    
+    def subset_count_partitions(self):
+        "Count the number of partitions in this subset partitionmap."
+        pass
+
+    def subset_partition_size_distribution(self):
+        "Get the size distribution of partitions in this subset."
+        pass
+
+    def save_subset_partitionmap(self):
+        "Save the partition map for this subset."
+        pass
+
+    def load_subset_partitionmap(self):
+        "Save the partition map for this subset."
+        pass
+    
+    def _validate_subset_partitionmap(self):
+        "Run internal validation checks on this subset."
+        pass
+    
+    def set_partition_id(self):
+        "Set the partition ID for this tag."
+        pass
+
+    def join_partitions(self):
+        "Join the partitions of these two tags."
+        pass
+    
+    def get_partition_id(self):
+        "Get the partition ID of this tag."
+        pass
+    
+    def repartition_largest_partition(self):
+        "Repartition the largest partition (in the face of stop tags)."
+        pass
+
+    def load_stop_tags(self):
+        "Load the set of stop tags."
+        
+    def save_stop_tags(self):
+        "Save the set of stop tags."
+        pass
+
+    def print_stop_tags(self):
+        "Print out the set of stop tags."
+        pass
+    
+    def trim_on_stoptags(self):
+        "Trim the reads on the given stop tags."
+        pass
+
+    def add_stop_tag(self):
+        "Add this k-mer as a stop tag."
+        pass
+
+    def get_stop_tags(self):
+        "Return a DNA list of all of the stop tags."
+        pass
