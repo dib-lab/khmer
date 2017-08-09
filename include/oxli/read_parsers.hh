@@ -159,8 +159,14 @@ public:
         PAIR_MODE_ERROR_ON_UNPAIRED
     };
 
-    explicit ReadParser(std::unique_ptr<SeqIO> pf);
-    explicit ReadParser(ReadParser& other);
+    ReadParser(std::unique_ptr<SeqIO> pf);
+
+    ReadParser(ReadParser& other);
+    ReadParser& operator=(ReadParser& other);
+
+    ReadParser(ReadParser&&) noexcept;
+    ReadParser& operator=(ReadParser&&) noexcept;
+
     virtual ~ReadParser();
 
     Read get_next_read();
@@ -185,7 +191,13 @@ private:
 public:
     FastxReader();
     FastxReader(const std::string& infile);
+
     FastxReader(FastxReader& other);
+    FastxReader& operator=(FastxReader& other);
+
+    FastxReader(FastxReader&&) noexcept;
+    FastxReader& operator=(FastxReader&&) noexcept;
+
     ~FastxReader();
 
     Read get_next_read();
@@ -221,14 +233,16 @@ inline PartitionID _parse_partition_id(std::string name)
 }
 
 // Alias for generic/templated ReadParser pointer
-template<typename T> using ReadParserPtr = std::unique_ptr<ReadParser<T>>;
+template<typename T> using ReadParserPtr = std::shared_ptr<ReadParser<T>>;
+template<typename T> using WeakReadParserPtr = std::shared_ptr<ReadParser<T>>;
 
 // Convenience function
 template<typename SeqIO>
 ReadParserPtr<SeqIO> get_parser(const std::string& filename);
 
 // Alias for instantiated ReadParsers
-typedef std::unique_ptr<ReadParser<FastxReader>> FastxParserPtr;
+typedef std::shared_ptr<ReadParser<FastxReader>> FastxParserPtr;
+typedef std::weak_ptr<ReadParser<FastxReader>> WeakFastxParserPtr;
 
 } // namespace read_parsers
 

@@ -2,7 +2,7 @@ from libcpp cimport bool
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libcpp.set cimport set
-from libcpp.memory cimport unique_ptr
+from libcpp.memory cimport unique_ptr, shared_ptr, weak_ptr
 from libc.stdint cimport uint8_t, uint32_t, uint64_t, uintptr_t
 
 from oxli_types cimport *
@@ -73,22 +73,22 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
         uint32_t check_and_process_read(string &, bool &)
 
         void consume_seqfile[SeqIO](const string &, uint32_t &, uint64_t &) except +oxli_raise_py_error
-        void consume_seqfile[SeqIO](unique_ptr[CpReadParser[SeqIO]]&,
+        void consume_seqfile[SeqIO](shared_ptr[CpReadParser[SeqIO]]&,
                                     uint32_t &, uint64_t &) except +oxli_raise_py_error
 
         void consume_seqfile_with_mask[SeqIO](const string &, CpHashtable *,
                                               uint32_t, uint32_t &, uint64_t &) except +oxli_raise_py_error
-        void consume_seqfile_with_mask[SeqIO](unique_ptr[CpReadParser[SeqIO]]&, CpHashtable *,
+        void consume_seqfile_with_mask[SeqIO](shared_ptr[CpReadParser[SeqIO]]&, CpHashtable *,
                                               uint32_t, uint32_t &, uint64_t &) except +oxli_raise_py_error
 
         void consume_seqfile_banding[SeqIO](const string &, uint32_t, uint32_t, uint32_t &, uint64_t &) except +oxli_raise_py_error
-        void consume_seqfile_banding[SeqIO](unique_ptr[CpReadParser[SeqIO]]&,
+        void consume_seqfile_banding[SeqIO](shared_ptr[CpReadParser[SeqIO]]&,
                                     uint32_t, uint32_t, uint32_t &, uint64_t &) except +oxli_raise_py_error
 
         void consume_seqfile_banding_with_mask[SeqIO](const string &, uint32_t, uint32_t, 
                                                       CpHashtable *, uint32_t, uint32_t &, 
                                                       uint64_t &) except +oxli_raise_py_error
-        void consume_seqfile_banding_with_mask[SeqIO](unique_ptr[CpReadParser[SeqIO]]&,
+        void consume_seqfile_banding_with_mask[SeqIO](shared_ptr[CpReadParser[SeqIO]]&,
                                                       uint32_t, uint32_t, 
                                                       CpHashtable *, uint32_t,
                                                       uint32_t &, uint64_t &) except +oxli_raise_py_error
@@ -112,7 +112,7 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
         BoundedCounterType get_min_count(const string &)
         BoundedCounterType get_max_count(const string &)
         uint64_t * abundance_distribution[SeqIO](string, CpHashtable *) except +oxli_raise_py_error
-        uint64_t * abundance_distribution[SeqIO](unique_ptr[CpReadParser[SeqIO]]&,
+        uint64_t * abundance_distribution[SeqIO](shared_ptr[CpReadParser[SeqIO]]&,
                                           CpHashtable *) except +oxli_raise_py_error
         uint64_t trim_on_abundance(string, BoundedCounterType) const
         uint64_t trim_below_abundance(string, BoundedCounterType) const
@@ -145,7 +145,7 @@ cdef extern from "oxli/hashgraph.hh" namespace "oxli":
         void divide_tags_into_subsets(unsigned int, set[HashIntoType] &)
         void add_kmer_to_tags(HashIntoType)
         void clear_tags()
-        void consume_seqfile_and_tag[SeqIO](unique_ptr[CpReadParser[SeqIO]]&,
+        void consume_seqfile_and_tag[SeqIO](shared_ptr[CpReadParser[SeqIO]]&,
                                    unsigned int &,
                                    unsigned long long)
         void consume_seqfile_and_tag[SeqIO](const string &,
@@ -202,13 +202,13 @@ cdef extern from "oxli/labelhash.hh" namespace "oxli":
                                                uint32_t &,
                                                uint64_t &)
         void consume_seqfile_and_tag_with_labels[SeqIO](
-                               unique_ptr[CpReadParser[SeqIO]]&,
+                               shared_ptr[CpReadParser[SeqIO]]&,
                                uint32_t &,
                                uint64_t &,
                                CallbackFn,
                                void *)
         void consume_seqfile_and_tag_with_labels[SeqIO](
-                               unique_ptr[CpReadParser[SeqIO]]&,
+                               shared_ptr[CpReadParser[SeqIO]]&,
                                uint32_t &,
                                uint64_t &)
         void get_tag_labels(const HashIntoType, LabelSet &)

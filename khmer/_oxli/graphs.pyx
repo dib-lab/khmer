@@ -9,7 +9,8 @@ from libcpp.vector cimport vector
 
 from utils cimport _bstring
 from utils import get_n_primes_near_x
-from parsing cimport CpFastxReader, CPyReadParser_Object, get_parser
+from parsing cimport (CpFastxReader, CPyReadParser_Object, get_parser,
+                      CpReadParser, FastxParserPtr)
 from oxli_types cimport MAX_BIGCOUNT
 from .._khmer import Countgraph as PyCountgraph
 from .._khmer import Nodegraph as PyNodegraph
@@ -208,9 +209,8 @@ cdef class Hashtable:
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
 
-        read_parser = ReadParser(file_name)
-        cdef CPyReadParser_Object* parser = <CPyReadParser_Object*>read_parser
-        deref(self.c_table).consume_seqfile[CpFastxReader](parser.parser,
+        cdef FastxParserPtr parser = get_parser[CpFastxReader](_bstring(file_name))
+        deref(self.c_table).consume_seqfile[CpFastxReader](parser,
                                                            total_reads,
                                                            n_consumed)
         return total_reads, n_consumed
@@ -218,8 +218,7 @@ cdef class Hashtable:
     def consume_seqfile_with_mask(self, file_name, mask, threshold=0):
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
-        cdef unique_ptr[CpReadParser[CpFastxReader]] parser = \
-            get_parser[CpFastxReader](_bstring(file_name))
+        cdef FastxParserPtr parser = get_parser[CpFastxReader](_bstring(file_name))
         cdef CpHashtable * cmask = hashtable_arg_shim(mask)
         deref(self.c_table).consume_seqfile_with_mask[CpFastxReader](parser,
                                                                      cmask,
@@ -228,17 +227,12 @@ cdef class Hashtable:
                                                                      n_consumed)
         return total_reads, n_consumed
                                                                      
-
-        
-
     def consume_seqfile_banding(self, file_name, num_bands, band):
         """Count all k-mers from file_name."""
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
-
-        read_parser = ReadParser(file_name)
-        cdef CPyReadParser_Object* parser = <CPyReadParser_Object*>read_parser
-        deref(self.c_table).consume_seqfile_banding[CpFastxReader](parser.parser,
+        cdef FastxParserPtr parser = get_parser[CpFastxReader](_bstring(file_name))
+        deref(self.c_table).consume_seqfile_banding[CpFastxReader](parser,
                                                                    num_bands,
                                                                    band,
                                                                    total_reads,
@@ -249,8 +243,7 @@ cdef class Hashtable:
                                           mask, threshold=0):
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
-        cdef unique_ptr[CpReadParser[CpFastxReader]] parser = \
-            get_parser[CpFastxReader](_bstring(file_name))
+        cdef FastxParserPtr parser = get_parser[CpFastxReader](_bstring(file_name))
         cdef CpHashtable * cmask = hashtable_arg_shim(mask)
         deref(self.c_table).consume_seqfile_banding_with_mask[CpFastxReader](parser,
                                                                      num_bands,
@@ -263,28 +256,11 @@ cdef class Hashtable:
 
     def abundance_distribution(self, file_name, tracking):
         """Calculate the k-mer abundance distribution over reads in file_name."""
-        cdef CPyReadParser_Object* parser
-        if isinstance(file_name, str):
-            read_parser = ReadParser(file_name)
-            parser = <CPyReadParser_Object*>read_parser
-
-        else:
-            raise ValueError('Expected file_name to be string, '
-                             'got {} instead.'.format(type(file_name)))
-
-        cdef CPyHashtable_Object* cpyhashtable
-        cdef CpHashtable * hashtable
-        if isinstance(tracking, PyNodegraph):
-            cpyhashtable = <CPyHashtable_Object*>tracking
-            hashtable = cpyhashtable.hashtable
-        elif isinstance(tracking, Nodetable):
-            hashtable = (<Nodetable>tracking).c_table.get()
-        else:
-            raise ValueError('Expected `tracking` to be a Nodetable or '
-                             'Nodegraph, got {} instead.'.format(type(tracking)))
-
-        cdef uint64_t * x = deref(self.c_table).abundance_distribution[CpFastxReader](
-                parser.parser, hashtable)
+        cdef FastxParserPtr parser = get_parser[CpFastxReader](_bstring(file_name))
+        cdef CpHashtable * cptracking = hashtable_arg_shim(tracking,
+                                                      allowed=(PyNodegraph, Nodetable))
+        cdef uint64_t * x = deref(self.c_table).\
+                abundance_distribution[CpFastxReader](parser, cptracking)
         abunds = []
         for i in range(MAX_BIGCOUNT):
             abunds.append(x[i])
@@ -292,21 +268,13 @@ cdef class Hashtable:
 
     def abundance_distribution_with_reads_parser(self, read_parser, tracking):
         """Calculate the k-mer abundance distribution over reads."""
-        cdef CPyHashtable_Object* cpyhashtable
-        cdef CpHashtable * hashtable
-        if isinstance(tracking, PyNodegraph):
-            cpyhashtable = <CPyHashtable_Object*>tracking
-            hashtable = cpyhashtable.hashtable
-        elif isinstance(tracking, Nodetable):
-            hashtable = (<Nodetable>tracking).c_table.get()
-        else:
-            raise ValueError('Expected `tracking` to be a Nodetable or '
-                             'Nodegraph, got {} instead.'.format(type(tracking)))
-
+        cdef CpHashtable * cptracking = hashtable_arg_shim(tracking,
+                                                      allowed=(PyNodegraph, Nodetable))
+ 
         cdef CPyReadParser_Object* parser
         parser = <CPyReadParser_Object*>read_parser
         cdef uint64_t * x = deref(self.c_table).abundance_distribution[CpFastxReader](
-                parser.parser, hashtable)
+                parser.parser, cptracking)
         abunds = []
         for i in range(MAX_BIGCOUNT):
             abunds.append(x[i])
