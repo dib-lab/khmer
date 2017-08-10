@@ -6,7 +6,7 @@ from libcpp.memory cimport unique_ptr, shared_ptr, weak_ptr
 from libc.stdint cimport uint8_t, uint32_t, uint64_t, uintptr_t
 
 from oxli_types cimport *
-from hashing cimport CpKmer, KmerSet
+from hashing cimport CpKmer, KmerSet, CpKmerFactory, CpKmerIterator
 from parsing cimport CpReadParser, CpSequence
 from utils cimport oxli_raise_py_error
 
@@ -54,7 +54,7 @@ cdef extern from "oxli/storage.hh":
 
 
 cdef extern from "oxli/hashtable.hh" namespace "oxli":
-    cdef cppclass CpHashtable "oxli::Hashtable":
+    cdef cppclass CpHashtable "oxli::Hashtable" (CpKmerFactory):
         const WordLength ksize() const
         HashIntoType hash_dna(const char *) except +oxli_raise_py_error
         HashIntoType hash_dna_top_strand(const char *) except +oxli_raise_py_error
@@ -147,7 +147,7 @@ cdef extern from "oxli/hashgraph.hh" namespace "oxli":
         void clear_tags()
         void consume_seqfile_and_tag[SeqIO](shared_ptr[CpReadParser[SeqIO]]&,
                                    unsigned int &,
-                                   unsigned long long)
+                                   unsigned long long) except +oxli_raise_py_error
         void consume_seqfile_and_tag[SeqIO](const string &,
                                    unsigned int &,
                                    unsigned long long &)

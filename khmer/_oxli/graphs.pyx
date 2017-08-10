@@ -353,94 +353,171 @@ cdef class Nodetable(Hashtable):
 
 cdef class Hashgraph(Hashtable):
 
-    def neighbors(self):
+
+    def neighbors(self, str kmer):
         '''Get a list of neighbor nodes for this k-mer.'''
-        pass
+        cdef Traverser traverser = Traverser(self)
+        return list(traverser.neighbors(kmer))
 
-    def calc_connected_graph_size(self):
+    def calc_connected_graph_size(self, str kmer, max_size=0,
+                                  break_on_circumference=False):
         '''Find the number of nodes connected to this k-mer.'''
-        pass
+        cdef CpKmer start = deref(self.c_table).build_kmer(_bstring(kmer))
+        cdef uint64_t size = 0
+        cdef KmerSet keeper
+        with nogil:
+            deref(self.c_table).calc_connected_graph_size(start, size,
+                                                          keeper, max_size,
+                                                          break_on_circumference)
+        return size
 
-    def kmer_degree(self):
+    def kmer_degree(self, str kmer):
         '''Calculate the number of immediate neighbors this k-mer has
         the graph.'''
-        pass
+        return deref(self.c_table).kmer_degree(_bstring(kmer))
 
-    def count_kmers_within_radius(self):
+    def count_kmers_within_radius(self, str kmer, int radius, int max_count=0):
         '''Calculate the number of neighbors with given radius in the graph.'''
-        pass
+        cdef unsigned int n
+        cdef CpKmer start = deref(self.c_table).build_kmer(_bstring(kmer))
+        cdef set[HashIntoType] seen
+        with nogil:
+            n = deref(self.c_table).traverse_from_kmer(start, radius,
+                                                       seen, max_count)
+        return n
 
-    def find_high_degree_nodes(self, kmer):
+    def find_high_degree_nodes(self, str sequence):
         '''Examine the given sequence for degree > 2 nodes and add to
         list; used in graph contraction.'''
-        pass
+        cdef HashSet hdns = HashSet(self.ksize())
+        data = self._valid_sequence(sequence)
+        deref(self.c_table).find_high_degree_nodes(data, 
+                                                   hdns.hs)
+        return hdns
 
-    def traverse_linear_path(self):
+
+    def traverse_linear_path(self, str kmer, HashSet hdns, 
+                             Nodegraph stop_filter=None):
         '''Traverse the path through the graph starting with the given
         "k-mer and avoiding high-degree nodes, finding (and returning)
         "traversed k-mers and any encountered high-degree nodes.'''
-        pass
+        cdef set[HashIntoType] adj
+        cdef set[HashIntoType] visited
+        cdef CpKmer cpkmer = CpKmer(_bstring(kmer), self.ksize())
+        cdef int size = deref(self.c_table).traverse_linear_path(cpkmer,
+                                                                 adj,
+                                                                 visited,
+                                                                 stop_filter,
+                                                                 hdns.hs)
+        return size, adj, visited
 
-    def assemble_linear_path(self):
-        '''Assemble a purely linear path starting with the given
-        "k-mer, returning traversed k-mers and any encountered high-degree
-        "nodes.'''
-        pass
+    def extract_unique_paths(self, str sequence, unsigned int min_length, float
+                             min_unique_f):
+        cdef vector[string] results
+        deref(self.c_table).extract_unique_paths(_bstring(sequence), min_length,
+                                                 min_unique_length, results)
+        return results
 
-
-    def consume_and_tag(self):
+    def consume_and_tag(self, str sequence):
         "Consume a sequence and tag it."
-        pass
+        cdef unsigned long long n_consumed = 0
+        deref(self.c_table).consume_sequence_and_tag(_bstring(sequence),
+                                                     n_consumed)
+        return n_consumed
 
-    def get_tags_and_positions(self):
+    def get_tags_and_positions(self, str sequence):
         "Retrieve tags and their positions in a sequence."
-        pass
-    
-    def find_all_tags_list(self):
+        cdef list result
+        cdef int pos
+        cdef WordLength K = deref(self.c_table).ksize()
+        cdef HashIntoType kmer
+        for pos in range(0, len(sequence)-K+1):
+            kmer = deref(self.c_table).hash_dna(_bstring(sequence[pos:pos+K]))
+            if kmer in deref(self.c_table).all_tags:
+                result.append((i+1, kmer))
+        return result
+            
+    def find_all_tags_list(self, str kmer):
         "Find all tags within range of the given k-mer, return as list"
-        pass
+        if len(kmer) != self.ksize():
+            raise ValueError("k-mer length must equal the counting "\
+                             "table k-mer size")
+        cdef HashSet result
+        cdef CpKmer start = deref(self.c_table).build_kmer(_bstring(kmer))
 
-    def consume_seqfile_and_tag(self):
+        with nogil:
+            # partition->find_all_tags(start_kmer, result.hs, all_tags)
+            pass
+
+        return result
+
+
+    def consume_seqfile_and_tag(self, str filename):
         "Consume all sequences in a FASTA/FASTQ file and tag the resulting "
         "graph."
-        pass
+        cdef unsigned long long n_consumed = 0
+        cdef unsigned int total_reads = 0
+
+        deref(self.c_table).consume_seqfile_and_tag[CpFastxReader](_bstring(filename),
+                                                                   total_reads,
+                                                                   n_consumed)
+        return total_reads, n_consumed
     
-    def print_tagset(self):
+    def print_tagset(self, str filename):
         "Print out all of the tags."
-        pass
+        deref(self.c_table).print_tagset(_bstring(filename))
     
-    def add_tag(self):
+    def add_tag(self, object kmer):
         "Add a k-mer to the tagset."
-        pass
+        if isinstance(kmer, basestring):
+            deref(self.c_table).add_tag(deref(self.c_table).hash_dna(_bstring(kmer)))
+        else:
+            return deref(self.c_table).add_tag(<uint64_t>kmer)
     
     def get_tagset(self):
         "Get all tagged k-mers as DNA strings."
-        pass
+        cdef HashIntoType st
+        cdef list all_tags
+        for st in deref(self.c_table).all_tags:
+            all_tags.append(deref(self.c_table).unhash_dna(st))
+        return all_tags
 
-    def load_tagset(self):
+    def iter_tagset(self):
+        "Get all tagged k-mers as DNA strings."
+        cdef HashIntoType st
+        for st in deref(self.c_table).all_tags:
+            yield deref(self.c_table).unhash_dna(st)
+
+    def load_tagset(self, str filename, clear_tags=False):
         "Load tags from a file."
-        pass
-    
-    def save_tagset(self):
+        deref(self.c_table).load_tags(_bstring(filename), clear_tags)
+        
+    def save_tagset(self, str filename):
         "Save tags to a file."
-        pass
+        deref(self.c_table).save_tags(_bstring(filename))
     
+    @property
     def n_tags(self):
         "Return the count of all tags."
-        pass
+        return deref(self.c_table).n_tags()
     
-    def divide_tags_into_subsets(self):
+    def divide_tags_into_subsets(self, int subset_size=0):
         "Divide tags equally up into subsets of given size."
-        pass
+        cdef set[HashIntoType] divvy
+        deref(self.c_table).divide_tags_into_subsets(subset_size, divvy)
+        cdef HashSet hs = HashSet(self.ksize())
+        hs.hs = divvy
+        return hs
     
     @property
     def tag_density(self):
         "Get the tagging density."
-        pass
+        return deref(self.c_table)._get_tag_density()
     
-    def _set_tag_density(self):
+    @tag_density.setter
+    def tag_density(self, int density):
         "Set the tagging density."
-        pass
+        deref(self.c_table)._set_tag_density(density)
 
     def do_subset_partition(self):
         "Partition the graph starting from a given subset of tags."
@@ -471,13 +548,26 @@ cdef class Hashgraph(Hashtable):
         "Run internal validation checks."
         pass
     
-    def consume_seqfile_and_tag_with_reads_parser(self):
+    def consume_seqfile_and_tag_with_reads_parser(self, read_parser):
         "Count all k-mers using the given reads parser"
-        pass
+        cdef unsigned long long n_consumed = 0
+        cdef unsigned int total_reads = 0
+        cdef CPyReadParser_Object* parser = <CPyReadParser_Object*>read_parser
+
+        with nogil:
+            deref(self.c_table).consume_seqfile_and_tag[CpFastxReader](parser.parser,
+                                                                       total_reads,
+                                                                       n_consumed)
+        return total_reads, n_consumed
     
-    def consume_partitioned_fasta(self):
+    def consume_partitioned_fasta(self, filename):
         "Count all k-mers in a given file"
-        pass
+        cdef unsigned long long n_consumed = 0
+        cdef unsigned int total_reads = 0
+        deref(self.c_table).consume_partitioned_fasta[CpFastxReader](_bstring(filename),
+                                                                     total_reads,
+                                                                     n_consumed)
+        return total_reads, n_consumed
     
     def merge_subset(self):
         "Merge the given subset into this one."
@@ -527,25 +617,42 @@ cdef class Hashgraph(Hashtable):
         "Repartition the largest partition (in the face of stop tags)."
         pass
 
-    def load_stop_tags(self):
+    def load_stop_tags(self, object filename, clear_tags=False):
         "Load the set of stop tags."
+        deref(self.c_table).load_stop_tags(_bstring(filename), clear_tags)
         
-    def save_stop_tags(self):
+    def save_stop_tags(self, object filename):
         "Save the set of stop tags."
-        pass
+        deref(self.c_table).save_stop_tags(_bstring(filename))
 
-    def print_stop_tags(self):
+    def print_stop_tags(self, filename):
         "Print out the set of stop tags."
-        pass
+        deref(self.c_table).print_stop_tags(_bstring(filename))
     
-    def trim_on_stoptags(self):
+    def trim_on_stoptags(self, str sequence):
         "Trim the reads on the given stop tags."
-        pass
+        cdef size_t trim_at
+        with nogil:
+            trim_at = deref(self.c_table).trim_on_stoptags(_bstring(sequence))
+        return sequence[:trim_at]
 
-    def add_stop_tag(self):
+    def add_stop_tag(self, object kmer):
         "Add this k-mer as a stop tag."
-        pass
-
+        if isinstance(kmer, basestring):
+            deref(self.c_table).add_stop_tag(deref(self.c_table).hash_dna(_bstring(kmer)))
+        else:
+            return deref(self.c_table).add_stop_tag(<uint64_t>kmer)
+    
     def get_stop_tags(self):
         "Return a DNA list of all of the stop tags."
-        pass
+        cdef HashIntoType st
+        cdef list stop_tags
+        for st in deref(self.c_table).stop_tags:
+            stop_tags.append(deref(self.c_table).unhash_dna(st))
+        return stop_tags
+
+    def iter_stop_tags(self):
+        "Return a DNA list of all of the stop tags."
+        cdef HashIntoType st
+        for st in deref(self.c_table).stop_tags:
+            yield deref(self.c_table).unhash_dna(st)
