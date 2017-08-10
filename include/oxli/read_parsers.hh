@@ -234,7 +234,7 @@ inline PartitionID _parse_partition_id(std::string name)
 
 // Alias for generic/templated ReadParser pointer
 template<typename T> using ReadParserPtr = std::shared_ptr<ReadParser<T>>;
-template<typename T> using WeakReadParserPtr = std::shared_ptr<ReadParser<T>>;
+template<typename T> using WeakReadParserPtr = std::weak_ptr<ReadParser<T>>;
 
 // Convenience function
 template<typename SeqIO>
