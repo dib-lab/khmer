@@ -2,10 +2,12 @@
 from math import log
 
 from cython.operator cimport dereference as deref
-from libc.stdint cimport uint64_t
+from libc.stdint cimport uint64_t, size_t
 
 from libcpp.memory cimport unique_ptr
 from libcpp.vector cimport vector
+from libcpp.set cimport set
+from libcpp.string cimport string
 
 from utils cimport _bstring
 from utils import get_n_primes_near_x
@@ -365,10 +367,12 @@ cdef class Hashgraph(Hashtable):
         cdef CpKmer start = deref(self.c_table).build_kmer(_bstring(kmer))
         cdef uint64_t size = 0
         cdef KmerSet keeper
+        cdef CpHashtable * ptr = self.c_table.get() # need tmp ref for nogil
+
         with nogil:
-            deref(self.c_table).calc_connected_graph_size(start, size,
-                                                          keeper, max_size,
-                                                          break_on_circumference)
+            deref(ptr).calc_connected_graph_size(start, size,
+                                                 keeper, max_size,
+                                                 break_on_circumference)
         return size
 
     def kmer_degree(self, str kmer):
@@ -381,8 +385,9 @@ cdef class Hashgraph(Hashtable):
         cdef unsigned int n
         cdef CpKmer start = deref(self.c_table).build_kmer(_bstring(kmer))
         cdef set[HashIntoType] seen
+        cdef CpHashtable * ptr = self.c_table.get()
         with nogil:
-            n = deref(self.c_table).traverse_from_kmer(start, radius,
+            n = deref(ptr).traverse_from_kmer(start, radius,
                                                        seen, max_count)
         return n
 
@@ -552,12 +557,13 @@ cdef class Hashgraph(Hashtable):
         "Count all k-mers using the given reads parser"
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
-        cdef CPyReadParser_Object* parser = <CPyReadParser_Object*>read_parser
+        cdef CPyReadParser_Object* parser_o = <CPyReadParser_Object*>read_parser
 
+        cdef CpHashgraph * ptr = self.c_table.get()
         with nogil:
-            deref(self.c_table).consume_seqfile_and_tag[CpFastxReader](parser.parser,
-                                                                       total_reads,
-                                                                       n_consumed)
+            deref(ptr).consume_seqfile_and_tag[CpFastxReader](parser.parser,
+                                                            total_reads,
+                                                            n_consumed)
         return total_reads, n_consumed
     
     def consume_partitioned_fasta(self, filename):
@@ -632,8 +638,10 @@ cdef class Hashgraph(Hashtable):
     def trim_on_stoptags(self, str sequence):
         "Trim the reads on the given stop tags."
         cdef size_t trim_at
+        cdef CpHashgraph * ptr = self.c_table.get()
+        cdef string cseq = _bstring(sequence)
         with nogil:
-            trim_at = deref(self.c_table).trim_on_stoptags(_bstring(sequence))
+            trim_at = deref(ptr).trim_on_stoptags(cseq)
         return sequence[:trim_at]
 
     def add_stop_tag(self, object kmer):
