@@ -13,7 +13,9 @@ def main():
 
     assert K % 2 == 1, "K must be odd"
     
-    print('allocating lots of memory for exact counts: {} bytes'.format(SIZE))
+    print('allocating lots of memory for exact counts: {} bytes'.format(8*SIZE))
+    # use Countgraph because we want to use the predictable hash function
+    # that only goes up to 4**K.
     ct = khmer.Countgraph(K, SIZE, 1)
 
     for filename in args.contigs:
