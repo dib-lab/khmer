@@ -685,32 +685,44 @@ cdef class Hashgraph(Hashtable):
 
 cdef class Countgraph(Hashgraph):
 
-    def __cinit__(self, int k, int starting_size, int n_tables):
-        cdef vector[uint64_t] primes
+    def __cinit__(self, int k, int starting_size, int n_tables,
+                  primes=[]):
+        cdef vector[uint64_t] _primes
         if type(self) is Countgraph:
-            primes = get_n_primes_near_x(n_tables, starting_size)
-            self._cg_this = make_shared[CpCountgraph](k, primes)
+            if primes:
+                _primes = primes
+            else:
+                _primes = get_n_primes_near_x(n_tables, starting_size)
+            self._cg_this = make_shared[CpCountgraph](k, _primes)
             self._hg_this = <shared_ptr[CpHashgraph]>self._cg_this
             self._ht_this = <shared_ptr[CpHashtable]>self._hg_this
 
 
 cdef class SmallCountgraph(Hashgraph):
 
-    def __cinit__(self, int k, int starting_size, int n_tables):
-        cdef vector[uint64_t] primes
-        if type(self) is SmallCountgraph:
-            primes = get_n_primes_near_x(n_tables, starting_size)
-            self._sg_this = make_shared[CpSmallCountgraph](k, primes)
+    def __cinit__(self, int k, int starting_size, int n_tables,
+                  primes=[]):
+        cdef vector[uint64_t] _primes
+        if type(self) is Countgraph:
+            if primes:
+                _primes = primes
+            else:
+                _primes = get_n_primes_near_x(n_tables, starting_size)
+            self._sg_this = make_shared[CpSmallCountgraph](k, _primes)
             self._hg_this = <shared_ptr[CpHashgraph]>self._sg_this
             self._ht_this = <shared_ptr[CpHashtable]>self._hg_this
 
 cdef class Nodegraph(Hashgraph):
 
-    def __cinit__(self, int k, int starting_size, int n_tables):
-        cdef vector[uint64_t] primes
-        if type(self) is Nodegraph:
-            primes = get_n_primes_near_x(n_tables, starting_size)
-            self._ng_this = make_shared[CpNodegraph](k, primes)
+    def __cinit__(self, int k, int starting_size, int n_tables,
+                  primes=[]):
+        cdef vector[uint64_t] _primes
+        if type(self) is Countgraph:
+            if primes:
+                _primes = primes
+            else:
+                _primes = get_n_primes_near_x(n_tables, starting_size)
+            self._ng_this = make_shared[CpNodegraph](k, _primes)
             self._hg_this = <shared_ptr[CpHashgraph]>self._ng_this
             self._ht_this = <shared_ptr[CpHashtable]>self._hg_this
 
