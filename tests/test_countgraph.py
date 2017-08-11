@@ -53,6 +53,7 @@ MAX_BIGCOUNT = 65535
 
 # from http://www.rsok.com/~jrm/printprimes.html
 PRIMES_1m = [1000003, 1009837]
+ARGS_1m = (PRIMES_1m[0], 2)
 PRIMES_100m = [100009979, 100000007]
 PRIMES_1b = [1000000007, 1000000919]
 PRIMES_2b = [1999999973, 1999999943]
@@ -67,7 +68,7 @@ def teardown():
 
 
 def test_count_1():
-    hi = khmer._Countgraph(12, PRIMES_1m)
+    hi = khmer.Countgraph(12, *ARGS_1m)
 
     kmer = 'G' * 12
     hashval = hi.hash('G' * 12)
@@ -90,7 +91,7 @@ def test_count_1():
 
 
 def test_count_2():
-    hi = khmer._Countgraph(12, PRIMES_1m)
+    hi = khmer.Countgraph(12, *ARGS_1m)
     kmer = 'G' * 12
     hashval = hi.hash('G' * 12)
 
@@ -107,7 +108,7 @@ def test_count_2():
 
 
 def test_revhash_1():
-    hi = khmer._Countgraph(12, [1])
+    hi = khmer.Countgraph(12, 1, 1)
     kmer = 'C' * 12
     hashval = hi.hash('C' * 12)
 
@@ -117,7 +118,7 @@ def test_revhash_1():
 class Test_Countgraph(object):
 
     def setup(self):
-        self.hi = khmer._Countgraph(12, PRIMES_1m)
+        self.hi = khmer.Countgraph(12, 1, 1, primes=PRIMES_1m)
 
     def test_failed_get(self):
         GG = 'G' * 12                   # forward_hash: 11184810
