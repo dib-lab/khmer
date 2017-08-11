@@ -41,11 +41,7 @@ from collections import namedtuple
 from math import log
 import json
 
-from khmer._khmer import Countgraph as _Countgraph
-from khmer._khmer import SmallCountgraph as _SmallCountgraph
-
 from khmer._khmer import GraphLabels as _GraphLabels
-from khmer._khmer import Nodegraph as _Nodegraph
 from khmer._khmer import ReadAligner as _ReadAligner
 
 #from khmer._khmer import HashSet
@@ -73,7 +69,8 @@ from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 from khmer._khmer import FILETYPES
 
 from khmer._oxli.graphs import (Counttable, QFCounttable, Nodetable,
-                                SmallCounttable)
+                                SmallCounttable, Countgraph, SmallCountgraph,
+                                Nodegraph)
 from khmer._oxli.parsing import FastxParser
 
 import sys
@@ -327,24 +324,6 @@ class Counttable(_Counttable):
 '''
 
 
-class Countgraph(_Countgraph):
-
-    def __new__(cls, k, starting_size, n_tables):
-        primes = get_n_primes_near_x(n_tables, starting_size)
-        countgraph = _Countgraph.__new__(cls, k, primes)
-        countgraph.primes = primes
-        return countgraph
-
-
-class SmallCountgraph(_SmallCountgraph):
-
-    def __new__(cls, k, starting_size, n_tables):
-        primes = get_n_primes_near_x(n_tables, starting_size)
-        countgraph = _SmallCountgraph.__new__(cls, k, primes)
-        countgraph.primes = primes
-        return countgraph
-
-
 class GraphLabels(_GraphLabels):
 
     def __new__(cls, k, starting_size, n_tables):
@@ -362,15 +341,6 @@ class CountingGraphLabels(_GraphLabels):
         class_ = _GraphLabels.__new__(cls, countgraph)
         class_.graph = countgraph
         return class_
-
-
-class Nodegraph(_Nodegraph):
-
-    def __new__(cls, k, starting_size, n_tables):
-        primes = get_n_primes_near_x(n_tables, starting_size)
-        nodegraph = _Nodegraph.__new__(cls, k, primes)
-        nodegraph.primes = primes
-        return nodegraph
 
 
 class ReadAligner(_ReadAligner):
