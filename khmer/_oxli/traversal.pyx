@@ -1,4 +1,4 @@
-from libcpp.memory cimport unique_ptr
+from libcpp.memory cimport make_shared
 from cython.operator cimport dereference as deref
 
 from .oxli_types cimport *
@@ -11,7 +11,8 @@ cdef class Traverser:
 
     def __cinit__(self, Hashgraph graph):
         self._graph_ptr = graph.c_table
-        self._this.reset(new CpTraverser(self._graph_ptr))
+        if type(self) is Traverser:
+            self._this = make_shared[CpTraverser](self._graph_ptr)
 
     def neighbors(self, node):
         cdef Kmer kmer

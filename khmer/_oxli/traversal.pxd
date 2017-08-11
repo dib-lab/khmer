@@ -1,4 +1,5 @@
 from libc.stdint cimport uint32_t
+from libcpp.memory cimport shared_ptr
 
 from hashing cimport CpKmer, KmerFilter, KmerQueue
 from graphs cimport CpHashgraph
@@ -17,3 +18,9 @@ cdef extern from "oxli/traversal.hh" namespace "oxli":
         uint32_t degree(const CpKmer&) const
         uint32_t degree_left(const CpKmer&) const
         uint32_t degree_right(const CpKmer&) const
+
+
+cdef class Traverser:
+    cdef shared_ptr[CpTraverser] _this
+    cdef CpHashgraph * _graph_ptr
+
