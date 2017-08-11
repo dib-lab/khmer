@@ -325,7 +325,7 @@ cdef class QFCounttable(Hashtable):
             raise ValueError("starting_size has to be a power of two.")
         if type(self) is QFCounttable:
             self._qf_this = make_shared[CpQFCounttable](k, <uint64_t>log(starting_size, 2))
-            self._ht_this(self._qf_this)
+            self._ht_this = <shared_ptr[CpHashtable]>self._qf_this
 
     @classmethod
     def load(cls, file_name):
@@ -341,7 +341,7 @@ cdef class Counttable(Hashtable):
         if type(self) is Counttable:
             primes = get_n_primes_near_x(n_tables, starting_size)
             self._ct_this = make_shared[CpCounttable](k, primes)
-            self._ht_this(self._ct_this)
+            self._ht_this = <shared_ptr[CpHashtable]>self._ct_this
 
 
 cdef class SmallCounttable(Hashtable):
@@ -351,7 +351,7 @@ cdef class SmallCounttable(Hashtable):
         if type(self) is SmallCounttable:
             primes = get_n_primes_near_x(n_tables, starting_size)
             self._st_this = make_shared[CpSmallCounttable](k, primes)
-            self._ht_this(self._st_this)
+            self._ht_this = <shared_ptr[CpHashtable]>self._st_this
 
 
 cdef class Nodetable(Hashtable):
@@ -361,7 +361,7 @@ cdef class Nodetable(Hashtable):
         if type(self) is Nodetable:
             primes = get_n_primes_near_x(n_tables, starting_size)
             self._nt_this = make_shared[CpNodetable](k, primes)
-            self._ht_this(self._nt_this)
+            self._ht_this = <shared_ptr[CpHashtable]>self._nt_this
 
 
 cdef class Hashgraph(Hashtable):
@@ -418,8 +418,8 @@ cdef class Hashgraph(Hashtable):
     def traverse_linear_path(self, str kmer, HashSet hdns, 
                              Nodegraph stop_filter=None):
         '''Traverse the path through the graph starting with the given
-        "k-mer and avoiding high-degree nodes, finding (and returning)
-        "traversed k-mers and any encountered high-degree nodes.'''
+        k-mer and avoiding high-degree nodes, finding (and returning)
+        traversed k-mers and any encountered high-degree nodes.'''
         cdef set[HashIntoType] adj
         cdef set[HashIntoType] visited
         cdef CpKmer cpkmer = CpKmer(_bstring(kmer), self.ksize())
@@ -439,14 +439,14 @@ cdef class Hashgraph(Hashtable):
         return results
 
     def consume_and_tag(self, str sequence):
-        "Consume a sequence and tag it."
+        '''Consume a sequence and tag it.'''
         cdef unsigned long long n_consumed = 0
         deref(self._hg_this).consume_sequence_and_tag(_bstring(sequence),
                                                      n_consumed)
         return n_consumed
 
     def get_tags_and_positions(self, str sequence):
-        "Retrieve tags and their positions in a sequence."
+        '''Retrieve tags and their positions in a sequence.'''
         cdef list result = []
         cdef int pos
         cdef WordLength K = deref(self._hg_this).ksize()
@@ -458,7 +458,7 @@ cdef class Hashgraph(Hashtable):
         return result
             
     def find_all_tags_list(self, str kmer):
-        "Find all tags within range of the given k-mer, return as list"
+        '''Find all tags within range of the given k-mer, return as list'''
         if len(kmer) != self.ksize():
             raise ValueError("k-mer length must equal the counting "\
                              "table k-mer size")
@@ -473,29 +473,30 @@ cdef class Hashgraph(Hashtable):
 
 
     def consume_seqfile_and_tag(self, str filename):
-        "Consume all sequences in a FASTA/FASTQ file and tag the resulting "
-        "graph."
+        '''Consume all sequences in a FASTA/FASTQ file and tag the resulting
+        graph.'''
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
+        cdef string _filename = _bstring(filename)
 
-        deref(self._hg_this).consume_seqfile_and_tag[CpFastxReader](_bstring(filename),
+        deref(self._hg_this).consume_seqfile_and_tag[CpFastxReader](_filename,
                                                                    total_reads,
                                                                    n_consumed)
         return total_reads, n_consumed
     
     def print_tagset(self, str filename):
-        "Print out all of the tags."
+        '''Print out all of the tags.'''
         deref(self._hg_this).print_tagset(_bstring(filename))
     
     def add_tag(self, object kmer):
-        "Add a k-mer to the tagset."
+        '''Add a k-mer to the tagset.'''
         if isinstance(kmer, basestring):
             deref(self._hg_this).add_tag(deref(self._hg_this).hash_dna(_bstring(kmer)))
         else:
             return deref(self._hg_this).add_tag(<uint64_t>kmer)
     
     def get_tagset(self):
-        "Get all tagged k-mers as DNA strings."
+        '''Get all tagged k-mers as DNA strings.'''
         cdef HashIntoType st
         cdef list all_tags = []
         for st in deref(self._hg_this).all_tags:
@@ -503,26 +504,26 @@ cdef class Hashgraph(Hashtable):
         return all_tags
 
     def iter_tagset(self):
-        "Get all tagged k-mers as DNA strings."
+        '''Get all tagged k-mers as DNA strings.'''
         cdef HashIntoType st
         for st in deref(self._hg_this).all_tags:
             yield deref(self._hg_this).unhash_dna(st)
 
     def load_tagset(self, str filename, clear_tags=False):
-        "Load tags from a file."
+        '''Load tags from a file.'''
         deref(self._hg_this).load_tagset(_bstring(filename), clear_tags)
         
     def save_tagset(self, str filename):
-        "Save tags to a file."
+        '''Save tags to a file.'''
         deref(self._hg_this).save_tagset(_bstring(filename))
     
     @property
     def n_tags(self):
-        "Return the count of all tags."
+        '''Return the count of all tags.'''
         return deref(self._hg_this).n_tags()
     
     def divide_tags_into_subsets(self, int subset_size=0):
-        "Divide tags equally up into subsets of given size."
+        '''Divide tags equally up into subsets of given size.'''
         cdef set[HashIntoType] divvy
         deref(self._hg_this).divide_tags_into_subsets(subset_size, divvy)
         cdef HashSet hs = HashSet(self.ksize())
@@ -531,128 +532,128 @@ cdef class Hashgraph(Hashtable):
     
     @property
     def tag_density(self):
-        "Get the tagging density."
+        '''Get the tagging density.'''
         return deref(self._hg_this)._get_tag_density()
     
     @tag_density.setter
     def tag_density(self, int density):
-        "Set the tagging density."
+        '''Set the tagging density.'''
         deref(self._hg_this)._set_tag_density(density)
 
     def do_subset_partition(self):
-        "Partition the graph starting from a given subset of tags."
+        '''Partition the graph starting from a given subset of tags.'''
         pass
     
     def find_all_tags(self):
-        "Starting from the given k-mer, find all closely connected tags."
+        '''Starting from the given k-mer, find all closely connected tags.'''
         pass
     
     def assign_partition_id(self):
-        "Assign a partition ID to a given tag."
+        '''Assign a partition ID to a given tag.'''
         pass
     
     def output_partitions(self):
-        "Write out sequences in given filename to another file, annotating "
-        "with partition IDs."
+        '''Write out sequences in given filename to another file, annotating '''
+        '''with partition IDs.'''
         pass
     
     def load_partitionmap(self):
-        "Load a partitionmap for a given subset."
+        '''Load a partitionmap for a given subset.'''
         pass
 
     def save_partitionmap(self):
-        "Save a partitionmap for the given subset."
+        '''Save a partitionmap for the given subset.'''
         pass
     
     def _validate_partitionmap(self):
-        "Run internal validation checks."
+        '''Run internal validation checks.'''
         pass
     
-    def consume_seqfile_and_tag_with_reads_parser(self, read_parser):
-        "Count all k-mers using the given reads parser"
+    def consume_seqfile_and_tag_with_reads_parser(self, object read_parser):
+        '''Count all k-mers using the given reads parser'''
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
-        cdef CPyReadParser_Object* parser_o = <CPyReadParser_Object*>read_parser
-        cdef shared_ptr[CpReadParser[CpFastxReader]] parser = deref(parser_o).parser
+        cdef CPyReadParser_Object * parser_o = <CPyReadParser_Object*>read_parser
+        cdef FastxParserPtr parser = parser_o.parser
         cdef CpHashgraph * ptr = self._hg_this.get()
 
-        with nogil:
-            deref(ptr).consume_seqfile_and_tag[CpFastxReader](parser,
+        deref(ptr).consume_seqfile_and_tag_readparser[CpFastxReader](parser,
                                                             total_reads,
                                                             n_consumed)
         return total_reads, n_consumed
     
     def consume_partitioned_fasta(self, filename):
-        "Count all k-mers in a given file"
+        '''Count all k-mers in a given file'''
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
-        deref(self._hg_this).consume_partitioned_fasta[CpFastxReader](_bstring(filename),
+        cdef string _filename = _bstring(filename)
+        deref(self._hg_this).consume_partitioned_fasta[CpFastxReader](_filename,
                                                                      total_reads,
                                                                      n_consumed)
         return total_reads, n_consumed
     
     def merge_subset(self):
-        "Merge the given subset into this one."
+        '''Merge the given subset into this one.'''
         pass
     
     def merge_subset_from_disk(self):
-        "Merge the given subset (filename) into this one."
+        '''Merge the given subset (filename) into this one.'''
         pass
     
     def count_partitions(self):
-        "Count the number of partitions in the master partitionmap."
+        '''Count the number of partitions in the master partitionmap.'''
         pass
     
     def subset_count_partitions(self):
-        "Count the number of partitions in this subset partitionmap."
+        '''Count the number of partitions in this subset partitionmap.'''
         pass
 
     def subset_partition_size_distribution(self):
-        "Get the size distribution of partitions in this subset."
+        '''Get the size distribution of partitions in this subset.'''
         pass
 
     def save_subset_partitionmap(self):
-        "Save the partition map for this subset."
+        '''Save the partition map for this subset.'''
         pass
 
     def load_subset_partitionmap(self):
-        "Save the partition map for this subset."
+        '''Save the partition map for this subset.'''
         pass
     
     def _validate_subset_partitionmap(self):
-        "Run internal validation checks on this subset."
+        '''Run internal validation checks on this subset.'''
         pass
     
     def set_partition_id(self):
-        "Set the partition ID for this tag."
+        '''Set the partition ID for this tag.'''
         pass
 
     def join_partitions(self):
-        "Join the partitions of these two tags."
+        '''Join the partitions of these two tags.'''
         pass
     
     def get_partition_id(self):
-        "Get the partition ID of this tag."
+        '''Get the partition ID of this tag.'''
         pass
     
     def repartition_largest_partition(self):
-        "Repartition the largest partition (in the face of stop tags)."
+        '''Repartition the largest partition (in the face of stop tags).'''
         pass
 
     def load_stop_tags(self, object filename, clear_tags=False):
-        "Load the set of stop tags."
+        '''Load the set of stop tags.'''
         deref(self._hg_this).load_stop_tags(_bstring(filename), clear_tags)
         
     def save_stop_tags(self, object filename):
-        "Save the set of stop tags."
+        '''Save the set of stop tags.'''
         deref(self._hg_this).save_stop_tags(_bstring(filename))
 
     def print_stop_tags(self, filename):
-        "Print out the set of stop tags."
+        '''Print out the set of stop tags.'''
         deref(self._hg_this).print_stop_tags(_bstring(filename))
     
     def trim_on_stoptags(self, str sequence):
-        "Trim the reads on the given stop tags."
+        '''Trim the reads on the given stop tags.'''
         cdef size_t trim_at
         cdef CpHashgraph * ptr = self._hg_this.get()
         cdef string cseq = _bstring(sequence)
@@ -661,14 +662,14 @@ cdef class Hashgraph(Hashtable):
         return sequence[:trim_at]
 
     def add_stop_tag(self, object kmer):
-        "Add this k-mer as a stop tag."
+        '''Add this k-mer as a stop tag.'''
         if isinstance(kmer, basestring):
             deref(self._hg_this).add_stop_tag(deref(self._hg_this).hash_dna(_bstring(kmer)))
         else:
             return deref(self._hg_this).add_stop_tag(<uint64_t>kmer)
     
     def get_stop_tags(self):
-        "Return a DNA list of all of the stop tags."
+        '''Return a DNA list of all of the stop tags.'''
         cdef HashIntoType st
         cdef list stop_tags = []
         for st in deref(self._hg_this).stop_tags:
@@ -676,7 +677,7 @@ cdef class Hashgraph(Hashtable):
         return stop_tags
 
     def iter_stop_tags(self):
-        "Return a DNA list of all of the stop tags."
+        '''Return a DNA list of all of the stop tags.'''
         cdef HashIntoType st
         for st in deref(self._hg_this).stop_tags:
             yield deref(self._hg_this).unhash_dna(st)

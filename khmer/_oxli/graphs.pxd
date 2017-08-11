@@ -151,13 +151,17 @@ cdef extern from "oxli/hashgraph.hh" namespace "oxli":
         void add_kmer_to_tags(HashIntoType)
         void clear_tags()
 
-        void consume_seqfile_and_tag[SeqIO](shared_ptr[CpReadParser[SeqIO]]&,
-                                   unsigned int &,
-                                   unsigned long long) nogil
-
         void consume_seqfile_and_tag[SeqIO](const string &,
-                                   unsigned int &,
-                                   unsigned long long &) nogil
+                                   unsigned int,
+                                   unsigned long long) 
+
+        # Ugly workaround. For some reason, Cython doesn't like *just this*
+        # templated overload -- it chooses whichever was defined last, breaking
+        # resolution for either strings of FastxParserPtr. So, we rename it on
+        # the Cython side and give it a real name substitution for code gen.
+        void consume_seqfile_and_tag_readparser "consume_seqfile_and_tag" [SeqIO](shared_ptr[CpReadParser[SeqIO]],
+                                   unsigned int,
+                                   unsigned long long) 
 
         void consume_sequence_and_tag(const string &,
                                       unsigned long long &)
