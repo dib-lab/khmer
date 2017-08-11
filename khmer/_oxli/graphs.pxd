@@ -137,41 +137,56 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
 
 cdef extern from "oxli/hashgraph.hh" namespace "oxli":
     cdef cppclass CpHashgraph "oxli::Hashgraph" (CpHashtable):
+        set[HashIntoType] all_tags
+        set[HashIntoType] stop_tags
+        set[HashIntoType] repart_small_tags
         void _set_tag_density(unsigned int)
         unsigned int _get_tag_density() const
         void add_tag(HashIntoType)
         void add_stop_tag(HashIntoType)
+        bool has_tag(HashIntoType)
+        bool hash_stop_tag(HashIntoType)
         uintptr_t n_tags() const
         void divide_tags_into_subsets(unsigned int, set[HashIntoType] &)
         void add_kmer_to_tags(HashIntoType)
         void clear_tags()
+
         void consume_seqfile_and_tag[SeqIO](shared_ptr[CpReadParser[SeqIO]]&,
                                    unsigned int &,
-                                   unsigned long long) except +oxli_raise_py_error
+                                   unsigned long long) nogil
+
         void consume_seqfile_and_tag[SeqIO](const string &,
                                    unsigned int &,
-                                   unsigned long long &)
+                                   unsigned long long &) nogil
+
+        void consume_sequence_and_tag(const string &,
+                                      unsigned long long &)
+
         void consume_sequence_and_tag(const string &,
                                       unsigned long long &,
                                       set[HashIntoType] &)
+
         void consume_partitioned_fasta[SeqIO](const string &,
                                        unsigned int &,
                                        unsigned long long &)
-        uintptr_t trim_on_stoptags(string) const nogil
+
+        uintptr_t trim_on_stoptags(string) nogil
+
         unsigned int traverse_from_kmer(CpKmer,
                                         uint32_t,
                                         KmerSet&,
-                                        uint32_t) const
+                                        uint32_t) nogil
         void print_tagset(string)
         void save_tagset(string)
         void load_tagset(string)
+        void load_tagset(string, bool)
         void print_stop_tags(string)
         void save_stop_tags(string)
         void load_stop_tags(string)
         void load_stop_tags(string, bool)
         void extract_unique_paths(string, uint32_t, float, vector[string])
         void calc_connected_graph_size(CpKmer, uint64_t&, KmerSet&,
-                                       const uint64_t, bool) const
+                                       const uint64_t, bool) nogil
         uint32_t kmer_degree(HashIntoType, HashIntoType)
         uint32_t kmer_degree(const char *)
         void find_high_degree_nodes(const char *, set[HashIntoType] &) const
@@ -237,38 +252,38 @@ cdef CpLabelHash * get_labelhash_ptr(object graph)
 
 
 cdef class Hashtable:
-    cdef unique_ptr[CpHashtable] c_table
+    cdef shared_ptr[CpHashtable] _ht_this
 
     cdef _valid_sequence(self, sequence)
 
 
 cdef class QFCounttable(Hashtable):
-    pass
+    cdef shared_ptr[CpQFCounttable] _qf_this
 
 
 cdef class SmallCounttable(Hashtable):
-    pass
+    cdef shared_ptr[CpSmallCounttable] _st_this
 
 
 cdef class Counttable(Hashtable):
-    pass
+    cdef shared_ptr[CpCounttable] _ct_this
 
 
 cdef class Nodetable(Hashtable):
-    pass
+    cdef shared_ptr[CpNodetable] _nt_this
 
 
 cdef class Hashgraph(Hashtable):
-    cdef 
+    cdef shared_ptr[CpHashgraph] _hg_this
 
 
 cdef class Nodegraph(Hashgraph):
-    pass
+    cdef shared_ptr[CpNodegraph] _ng_this
 
 
 cdef class Countgraph(Hashgraph):
-    pass
+    cdef shared_ptr[CpCountgraph] _cg_this
 
 
 cdef class SmallCountgraph(Hashgraph):
-    pass
+    cdef shared_ptr[CpSmallCountgraph] _sg_this
