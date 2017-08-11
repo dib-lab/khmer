@@ -153,6 +153,16 @@ public:
         stop_tags.insert(tag);
     }
 
+    bool has_tag(HashIntoType tag) const
+    {
+        return set_contains(all_tags, tag);
+    }
+
+    bool has_stop_tag(HashIntoType stop_tag) const
+    {
+        return set_contains(stop_tags, stop_tag);
+    }
+
     size_t n_tags() const
     {
         return all_tags.size();
