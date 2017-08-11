@@ -10,9 +10,9 @@ from .hashing import Kmer
 cdef class Traverser:
 
     def __cinit__(self, Hashgraph graph):
-        self._graph_ptr = graph.c_table
+        self._graph_ptr = graph._hg_this
         if type(self) is Traverser:
-            self._this = make_shared[CpTraverser](self._graph_ptr)
+            self._this = make_shared[CpTraverser](self._graph_ptr.get())
 
     def neighbors(self, node):
         cdef Kmer kmer

@@ -22,5 +22,5 @@ cdef extern from "oxli/traversal.hh" namespace "oxli":
 
 cdef class Traverser:
     cdef shared_ptr[CpTraverser] _this
-    cdef CpHashgraph * _graph_ptr
+    cdef shared_ptr[CpHashgraph] _graph_ptr
 
