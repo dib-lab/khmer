@@ -691,6 +691,7 @@ cdef class Countgraph(Hashgraph):
             primes = get_n_primes_near_x(n_tables, starting_size)
             self._cg_this = make_shared[CpCountgraph](k, primes)
             self._hg_this = <shared_ptr[CpHashgraph]>self._cg_this
+            self._ht_this = <shared_ptr[CpHashtable]>self._hg_this
 
 
 cdef class SmallCountgraph(Hashgraph):
@@ -701,7 +702,7 @@ cdef class SmallCountgraph(Hashgraph):
             primes = get_n_primes_near_x(n_tables, starting_size)
             self._sg_this = make_shared[CpSmallCountgraph](k, primes)
             self._hg_this = <shared_ptr[CpHashgraph]>self._sg_this
-
+            self._ht_this = <shared_ptr[CpHashtable]>self._hg_this
 
 cdef class Nodegraph(Hashgraph):
 
@@ -711,6 +712,7 @@ cdef class Nodegraph(Hashgraph):
             primes = get_n_primes_near_x(n_tables, starting_size)
             self._ng_this = make_shared[CpNodegraph](k, primes)
             self._hg_this = <shared_ptr[CpHashgraph]>self._ng_this
+            self._ht_this = <shared_ptr[CpHashtable]>self._hg_this
 
     def update_from(self, Nodegraph other):
         deref(self._ng_this).update_from(deref(other._ng_this))
