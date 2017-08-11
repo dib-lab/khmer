@@ -681,3 +681,36 @@ cdef class Hashgraph(Hashtable):
         cdef HashIntoType st
         for st in deref(self._hg_this).stop_tags:
             yield deref(self._hg_this).unhash_dna(st)
+
+
+cdef class Countgraph(Hashgraph):
+
+    def __cinit__(self, int k, int starting_size, int n_tables):
+        cdef vector[uint64_t] primes
+        if type(self) is Countgraph:
+            primes = get_n_primes_near_x(n_tables, starting_size)
+            self._cg_this = make_shared[CpCountgraph](k, primes)
+            self._hg_this = <shared_ptr[CpHashgraph]>self._cg_this
+
+
+cdef class SmallCountgraph(Hashgraph):
+
+    def __cinit__(self, int k, int starting_size, int n_tables):
+        cdef vector[uint64_t] primes
+        if type(self) is SmallCountgraph:
+            primes = get_n_primes_near_x(n_tables, starting_size)
+            self._sg_this = make_shared[CpSmallCountgraph](k, primes)
+            self._hg_this = <shared_ptr[CpHashgraph]>self._sg_this
+
+
+cdef class Nodegraph(Hashgraph):
+
+    def __cinit__(self, int k, int starting_size, int n_tables):
+        cdef vector[uint64_t] primes
+        if type(self) is Nodegraph:
+            primes = get_n_primes_near_x(n_tables, starting_size)
+            self._ng_this = make_shared[CpNodegraph](k, primes)
+            self._hg_this = <shared_ptr[CpHashgraph]>self._ng_this
+
+    def update_from(self, Nodegraph other):
+        deref(self._ng_this).update_from(deref(other._ng_this))
