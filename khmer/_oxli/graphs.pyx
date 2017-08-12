@@ -473,6 +473,7 @@ cdef class Hashgraph(Hashtable):
             
     def find_all_tags_list(self, str kmer):
         '''Find all tags within range of the given k-mer, return as list'''
+        raise NotImplementedError()
         if len(kmer) != self.ksize():
             raise ValueError("k-mer length must equal the counting "\
                              "table k-mer size")
