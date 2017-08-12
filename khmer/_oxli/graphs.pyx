@@ -150,6 +150,11 @@ cdef class Hashtable:
         deref(self._ht_this).get_median_count(data, med, average, stddev)
         return (med, average, stddev)
 
+    def median_at_least(self, sequence, int median):
+        '''Check if median k-mer count is at least the given value.'''
+        data = self._valid_sequence(sequence)
+        return <bool>deref(self._ht_this).median_at_least(data, median)
+
     def get_kmer_hashes(self, sequence):
         """Retrieve hashes of all k-mers in sequence.
 
