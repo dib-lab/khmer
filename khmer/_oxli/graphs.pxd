@@ -69,10 +69,10 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
         void count(HashIntoType)
         bool add(const char *)
         bool add(HashIntoType)
-        const BoundedCounterType get_count(const char *) const
-        const BoundedCounterType get_count(HashIntoType) const
+        const BoundedCounterType get_count(const char *) except +oxli_raise_py_error
+        const BoundedCounterType get_count(HashIntoType) except +oxli_raise_py_error
         void save(string)
-        void load(string)
+        void load(string) except +oxli_raise_py_error
         uint32_t consume_string(const string &)
         bool check_and_normalize_read(string &) const
         uint32_t check_and_process_read(string &, bool &)

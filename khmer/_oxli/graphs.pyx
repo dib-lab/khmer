@@ -26,7 +26,7 @@ from .._khmer import ReadParser
 
 
 CYTHON_TABLES = (Hashtable, Nodetable, Counttable, SmallCounttable,
-                 QFCounttable)
+                 QFCounttable, Nodegraph, Countgraph, SmallCountgraph)
 CPYTHON_TABLES = (PyCountgraph, PyNodegraph)
 
 
@@ -44,26 +44,6 @@ cdef CpLabelHash * get_labelhash_ptr(object labels):
 
     cdef CPyGraphLabels_Object * ptr = <CPyGraphLabels_Object*> labels
     return deref(ptr).labelhash
-
-
-cdef CpHashtable * hashtable_arg_shim(object table,
-                                      allowed=(PyNodegraph, PyCountgraph,
-                                               Nodetable, Counttable,
-                                               SmallCounttable, QFCounttable)):
-    cdef CPyHashtable_Object* cpyhashtable
-    cdef CpHashtable * hashtable
-                                          
-    if isinstance(table, allowed):
-        if isinstance(table, CYTHON_TABLES):
-            hashtable = (<Hashtable>table)._ht_this.get()
-        else:
-            cpyhashtable = <CPyHashtable_Object*>table
-            hashtable = cpyhashtable.hashtable
-    else:
-        raise ValueError('Expected one of {0}, '\
-                         'got {1} instead.'.format(allowed, type(table)))
-
-    return hashtable
 
 
 cdef class Hashtable:
@@ -222,11 +202,11 @@ cdef class Hashtable:
                                                            n_consumed)
         return total_reads, n_consumed
 
-    def consume_seqfile_with_mask(self, file_name, mask, threshold=0):
+    def consume_seqfile_with_mask(self, file_name, Hashtable mask, int threshold=0):
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
         cdef FastxParserPtr parser = get_parser[CpFastxReader](_bstring(file_name))
-        cdef CpHashtable * cmask = hashtable_arg_shim(mask)
+        cdef CpHashtable * cmask = mask._ht_this.get()
         deref(self._ht_this).consume_seqfile_with_mask[CpFastxReader](parser,
                                                                      cmask,
                                                                      threshold,
@@ -247,11 +227,11 @@ cdef class Hashtable:
         return total_reads, n_consumed
 
     def consume_seqfile_banding_with_mask(self, file_name, num_bands, band,
-                                          mask, threshold=0):
+                                          Hashtable mask, int threshold=0):
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
         cdef FastxParserPtr parser = get_parser[CpFastxReader](_bstring(file_name))
-        cdef CpHashtable * cmask = hashtable_arg_shim(mask)
+        cdef CpHashtable * cmask = mask._ht_this.get()
         deref(self._ht_this).consume_seqfile_banding_with_mask[CpFastxReader](parser,
                                                                      num_bands,
                                                                      band,
@@ -261,11 +241,10 @@ cdef class Hashtable:
                                                                      n_consumed)
         return total_reads, n_consumed
 
-    def abundance_distribution(self, file_name, tracking):
+    def abundance_distribution(self, file_name, Hashtable tracking):
         """Calculate the k-mer abundance distribution over reads in file_name."""
         cdef FastxParserPtr parser = get_parser[CpFastxReader](_bstring(file_name))
-        cdef CpHashtable * cptracking = hashtable_arg_shim(tracking,
-                                                      allowed=(PyNodegraph, Nodetable))
+        cdef CpHashtable * cptracking = tracking._ht_this.get()
         cdef uint64_t * x = deref(self._ht_this).\
                 abundance_distribution[CpFastxReader](parser, cptracking)
         abunds = []
@@ -273,10 +252,10 @@ cdef class Hashtable:
             abunds.append(x[i])
         return abunds
 
-    def abundance_distribution_with_reads_parser(self, read_parser, tracking):
+    def abundance_distribution_with_reads_parser(self, object read_parser, Hashtable tracking):
         """Calculate the k-mer abundance distribution over reads."""
-        cdef CpHashtable * cptracking = hashtable_arg_shim(tracking,
-                                                      allowed=(PyNodegraph, Nodetable))
+
+        cdef CpHashtable * cptracking = tracking._ht_this.get()
  
         cdef CPyReadParser_Object* parser
         parser = <CPyReadParser_Object*>read_parser
@@ -347,8 +326,8 @@ cdef class QFCounttable(Hashtable):
     @classmethod
     def load(cls, file_name):
         """Load the graph from the specified file."""
-        cdef Hashtable table = cls(1, 1)
-        deref(table._ht_this).load(_bstring(file_name))
+        cdef QFCounttable table = cls(1, 1)
+        deref(table._qf_this).load(_bstring(file_name))
         return table
 
 cdef class Counttable(Hashtable):
@@ -712,7 +691,7 @@ cdef class Countgraph(Hashgraph):
     def __cinit__(self, int k, int starting_size, int n_tables,
                   primes=[]):
         cdef vector[uint64_t] _primes
-        if type(self) is SmallCountgraph:
+        if type(self) is Countgraph:
             if primes:
                 _primes = primes
             else:
@@ -727,7 +706,7 @@ cdef class SmallCountgraph(Hashgraph):
     def __cinit__(self, int k, int starting_size, int n_tables,
                   primes=[]):
         cdef vector[uint64_t] _primes
-        if type(self) is Countgraph:
+        if type(self) is SmallCountgraph:
             if primes:
                 _primes = primes
             else:
