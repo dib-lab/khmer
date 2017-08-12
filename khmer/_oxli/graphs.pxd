@@ -177,7 +177,7 @@ cdef extern from "oxli/hashgraph.hh" namespace "oxli":
 
         void consume_partitioned_fasta[SeqIO](const string &,
                                        unsigned int &,
-                                       unsigned long long &)
+                                       unsigned long long &) except +oxli_raise_py_error
 
         uintptr_t trim_on_stoptags(string) nogil
 
@@ -187,12 +187,12 @@ cdef extern from "oxli/hashgraph.hh" namespace "oxli":
                                         uint32_t) nogil
         void print_tagset(string)
         void save_tagset(string)
-        void load_tagset(string)
-        void load_tagset(string, bool)
+        void load_tagset(string) except +oxli_raise_py_error
+        void load_tagset(string, bool) except +oxli_raise_py_error
         void print_stop_tags(string)
         void save_stop_tags(string)
-        void load_stop_tags(string)
-        void load_stop_tags(string, bool)
+        void load_stop_tags(string) except +oxli_raise_py_error
+        void load_stop_tags(string, bool) except +oxli_raise_py_error
         void extract_unique_paths(string, uint32_t, float, vector[string])
         void calc_connected_graph_size(CpKmer, uint64_t&, KmerSet&,
                                        const uint64_t, bool) nogil
@@ -215,7 +215,7 @@ cdef extern from "oxli/hashgraph.hh" namespace "oxli":
     cdef cppclass CpNodegraph "oxli::Nodegraph" (CpHashgraph):
         CpNodegraph(WordLength, vector[uint64_t])
 
-        void update_from(const CpNodegraph &)
+        void update_from(const CpNodegraph &) except +oxli_raise_py_error
 
 
 cdef extern from "oxli/labelhash.hh" namespace "oxli":
