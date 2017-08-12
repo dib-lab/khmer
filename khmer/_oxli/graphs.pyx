@@ -524,7 +524,7 @@ cdef class Hashgraph(Hashtable):
         for st in deref(self._hg_this).all_tags:
             yield deref(self._hg_this).unhash_dna(st)
 
-    def load_tagset(self, str filename, clear_tags=False):
+    def load_tagset(self, str filename, clear_tags=True):
         '''Load tags from a file.'''
         deref(self._hg_this).load_tagset(_bstring(filename), clear_tags)
         
