@@ -88,63 +88,6 @@ _buckets_per_byte = {
     'nodegraph': 8,
 }
 
-
-def load_nodegraph(filename):
-    """Load a nodegraph object from the given filename and return it.
-
-    Keyword argument:
-    filename -- the name of the nodegraph file
-    """
-    nodegraph = _Nodegraph(1, [1])
-    nodegraph.load(filename)
-
-    return nodegraph
-
-
-def load_nodetable(filename):
-    """Load a nodetable object from the given filename and return it.
-
-    Keyword argument:
-    filename -- the name of the nodegraph file
-    """
-
-    return Nodetable.load(filename)
-
-
-def load_countgraph(filename, small=False):
-    """Load a countgraph object from the given filename and return it.
-
-    Keyword argument:
-    filename -- the name of the countgraph file
-    small -- set this to load a SmallCountgraph instance
-    """
-    if small:
-        countgraph = _SmallCountgraph(1, [1])
-        countgraph.load(filename)
-
-    else:
-        countgraph = _Countgraph(1, [1])
-        countgraph.load(filename)
-
-    return countgraph
-
-
-def load_counttable(filename, small=False):
-    """Load a counttable object from the given filename and return it.
-
-    Keyword argument:
-    filename -- the name of the counttable file
-    small -- set this to load a SmallCounttable instance
-    """
-    if small:
-        counttable = SmallCounttable.load(filename)
-
-    else:
-        counttable = Counttable.load(filename)
-
-    return counttable
-
-
 def extract_nodegraph_info(filename):
     """Open the given nodegraph file and return a tuple of information.
 
