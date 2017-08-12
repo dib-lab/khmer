@@ -557,32 +557,32 @@ cdef class Hashgraph(Hashtable):
 
     def do_subset_partition(self):
         '''Partition the graph starting from a given subset of tags.'''
-        pass
+        raise NotImplementedError()
     
     def find_all_tags(self):
         '''Starting from the given k-mer, find all closely connected tags.'''
-        pass
+        raise NotImplementedError()
     
     def assign_partition_id(self):
         '''Assign a partition ID to a given tag.'''
-        pass
+        raise NotImplementedError()
     
     def output_partitions(self):
         '''Write out sequences in given filename to another file, annotating '''
         '''with partition IDs.'''
-        pass
+        raise NotImplementedError()
     
     def load_partitionmap(self):
         '''Load a partitionmap for a given subset.'''
-        pass
+        raise NotImplementedError()
 
     def save_partitionmap(self):
         '''Save a partitionmap for the given subset.'''
-        pass
+        raise NotImplementedError()
     
     def _validate_partitionmap(self):
         '''Run internal validation checks.'''
-        pass
+        raise NotImplementedError()
     
     def consume_seqfile_and_tag_with_reads_parser(self, object read_parser):
         '''Count all k-mers using the given reads parser'''
@@ -609,51 +609,51 @@ cdef class Hashgraph(Hashtable):
     
     def merge_subset(self):
         '''Merge the given subset into this one.'''
-        pass
+        raise NotImplementedError()
     
     def merge_subset_from_disk(self):
         '''Merge the given subset (filename) into this one.'''
-        pass
+        raise NotImplementedError()
     
     def count_partitions(self):
         '''Count the number of partitions in the master partitionmap.'''
-        pass
+        raise NotImplementedError()
     
     def subset_count_partitions(self):
         '''Count the number of partitions in this subset partitionmap.'''
-        pass
+        raise NotImplementedError()
 
     def subset_partition_size_distribution(self):
         '''Get the size distribution of partitions in this subset.'''
-        pass
+        raise NotImplementedError()
 
     def save_subset_partitionmap(self):
         '''Save the partition map for this subset.'''
-        pass
+        raise NotImplementedError()
 
     def load_subset_partitionmap(self):
         '''Save the partition map for this subset.'''
-        pass
+        raise NotImplementedError()
     
     def _validate_subset_partitionmap(self):
         '''Run internal validation checks on this subset.'''
-        pass
+        raise NotImplementedError()
     
     def set_partition_id(self):
         '''Set the partition ID for this tag.'''
-        pass
+        raise NotImplementedError()
 
     def join_partitions(self):
         '''Join the partitions of these two tags.'''
-        pass
+        raise NotImplementedError()
     
     def get_partition_id(self):
         '''Get the partition ID of this tag.'''
-        pass
+        raise NotImplementedError()
     
     def repartition_largest_partition(self):
         '''Repartition the largest partition (in the face of stop tags).'''
-        pass
+        raise NotImplementedError()
 
     def load_stop_tags(self, object filename, clear_tags=False):
         '''Load the set of stop tags.'''
@@ -750,5 +750,5 @@ cdef class Nodegraph(Hashgraph):
             self._hg_this = <shared_ptr[CpHashgraph]>self._ng_this
             self._ht_this = <shared_ptr[CpHashtable]>self._hg_this
 
-    def update_from(self, Nodegraph other):
+    def update(self, Nodegraph other):
         deref(self._ng_this).update_from(deref(other._ng_this))
