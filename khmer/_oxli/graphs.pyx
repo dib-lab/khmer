@@ -2,6 +2,7 @@
 from math import log
 
 from cython.operator cimport dereference as deref
+from cpython.buffer cimport (PyBuffer_FillInfo, PyBUF_FULL_RO)
 from libc.stdint cimport uint64_t
 from libc.stdint cimport uintptr_t as size_t
 
@@ -310,10 +311,26 @@ cdef class Hashtable:
         return deref(self._ht_this).n_tables()
 
     def set_use_bigcount(self, bigcount):
-        deref(self._ht_this).set_use_bigcount(bigcount)
+        deref(self._ht_this).set_use_bigcount(<bool>bigcount)
 
     def get_use_bigcount(self):
         return deref(self._ht_this).get_use_bigcount()
+
+    cdef list _get_raw_tables(self, uint8_t ** table_ptrs, vector[uint64_t] sizes):
+        cdef Py_buffer buf_info
+        cdef object view
+        cdef list views = []
+        for table_idx in range(0, len(sizes)):
+            PyBuffer_FillInfo(&buf_info, None, table_ptrs[table_idx],
+                              sizes[table_idx], 0, PyBUF_FULL_RO)
+            view = PyMemoryView_FromBuffer(&buf_info)
+            views.append(view)
+        return views
+
+    def get_raw_tables(self):
+        cdef uint8_t ** table_ptrs = deref(self._ht_this).get_raw_tables()
+        cdef vector[uint64_t] sizes = deref(self._ht_this).get_tablesizes()
+        return self._get_raw_tables(table_ptrs, sizes)
 
 
 cdef class QFCounttable(Hashtable):
@@ -352,6 +369,13 @@ cdef class SmallCounttable(Hashtable):
             primes = get_n_primes_near_x(n_tables, starting_size)
             self._st_this = make_shared[CpSmallCounttable](k, primes)
             self._ht_this = <shared_ptr[CpHashtable]>self._st_this
+
+    def get_raw_tables(self):
+        cdef uint8_t ** table_ptrs = deref(self._st_this).get_raw_tables()
+        cdef vector[uint64_t] sizes = deref(self._st_this).get_tablesizes()
+        for i in range(len(sizes)):
+            sizes[i] = sizes[i] / 2 + 1
+        return self._get_raw_tables(table_ptrs, sizes)
 
 
 cdef class Nodetable(Hashtable):
@@ -688,7 +712,7 @@ cdef class Countgraph(Hashgraph):
     def __cinit__(self, int k, int starting_size, int n_tables,
                   primes=[]):
         cdef vector[uint64_t] _primes
-        if type(self) is Countgraph:
+        if type(self) is SmallCountgraph:
             if primes:
                 _primes = primes
             else:
@@ -712,12 +736,21 @@ cdef class SmallCountgraph(Hashgraph):
             self._hg_this = <shared_ptr[CpHashgraph]>self._sg_this
             self._ht_this = <shared_ptr[CpHashtable]>self._hg_this
 
+    def get_raw_tables(self):
+        cdef uint8_t ** table_ptrs = deref(self._sg_this).get_raw_tables()
+        cdef vector[uint64_t] sizes = deref(self._sg_this).get_tablesizes()
+        for i in range(len(sizes)):
+            sizes[i] = sizes[i] // 2 + 1
+        return self._get_raw_tables(table_ptrs, sizes)
+
+
+
 cdef class Nodegraph(Hashgraph):
 
     def __cinit__(self, int k, int starting_size, int n_tables,
                   primes=[]):
         cdef vector[uint64_t] _primes
-        if type(self) is Countgraph:
+        if type(self) is Nodegraph:
             if primes:
                 _primes = primes
             else:

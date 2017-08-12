@@ -11,6 +11,11 @@ from parsing cimport CpReadParser, CpSequence
 from utils cimport oxli_raise_py_error
 
 
+cdef extern from "Python.h":
+    ctypedef struct PyObject
+    object PyMemoryView_FromBuffer(Py_buffer *view)
+
+
 # All we really need are the PyObject struct definitions
 # for our extension objects.
 cdef extern from "khmer/_cpy_khmer.hh":
@@ -259,6 +264,7 @@ cdef class Hashtable:
     cdef shared_ptr[CpHashtable] _ht_this
 
     cdef _valid_sequence(self, sequence)
+    cdef list _get_raw_tables(self, uint8_t **, vector[uint64_t])
 
 
 cdef class QFCounttable(Hashtable):
