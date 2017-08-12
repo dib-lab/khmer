@@ -295,6 +295,12 @@ cdef class Hashtable:
     def get_use_bigcount(self):
         return deref(self._ht_this).get_use_bigcount()
 
+    def get_kmer_hashes_as_hashset(self, str sequence):
+        cdef HashSet hashes = HashSet(self.ksize())
+        deref(self._ht_this).get_kmer_hashes_as_hashset(_bstring(sequence),
+                                                        hashes.hs)
+        return hashes
+
     cdef list _get_raw_tables(self, uint8_t ** table_ptrs, vector[uint64_t] sizes):
         cdef Py_buffer buf_info
         cdef object view
