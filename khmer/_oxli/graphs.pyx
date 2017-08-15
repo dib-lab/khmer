@@ -330,9 +330,9 @@ cdef class QFCounttable(Hashtable):
     size : integer
         Set the number of slots used by the counting quotient filter. This
         determines the amount of memory used and how many k-mers can be entered
-        into the datastructure. Each slot uses about X bytes.
+        into the datastructure. Each slot uses roughly 1.3 bytes.
     """
-    def __cinit__(self, int k, int size):
+    def __cinit__(self, int k, uint64_t size):
         # size has to be a power of two
         power_of_two = ((size & (size - 1) == 0) and
                         (size != 0))
