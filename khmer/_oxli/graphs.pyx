@@ -27,59 +27,56 @@ from .._khmer import ReadParser
 
 CYTHON_TABLES = (Hashtable, Nodetable, Counttable, SmallCounttable,
                  QFCounttable, Nodegraph, Countgraph, SmallCountgraph)
-CPYTHON_TABLES = (PyCountgraph, PyNodegraph)
-
-
-cdef CpHashgraph * get_hashgraph_ptr(object graph):
-    if not (isinstance(graph, PyCountgraph) or isinstance(graph, PyNodegraph)):
-        return NULL
-
-    cdef CPyHashgraph_Object* ptr = <CPyHashgraph_Object*> graph
-    return deref(ptr).hashgraph
-
-
-cdef CpLabelHash * get_labelhash_ptr(object labels):
-    if not isinstance(labels, PyGraphLabels):
-        return NULL
-
-    cdef CPyGraphLabels_Object * ptr = <CPyGraphLabels_Object*> labels
-    return deref(ptr).labelhash
 
 
 cdef class Hashtable:
-    def count(self, kmer):
+
+    cpdef bytes sanitize_kmer(self, object kmer):
+        cdef bytes handled
+        if isinstance(kmer, basestring):
+            if len(kmer) != self.ksize():
+                raise ValueError("Expected k-mer length {}"
+                                 " but got {}.".format(self.ksize(), len(kmer)))
+            handled = _bstring(kmer)
+        elif isinstance(kmer, bytes):
+            if len(kmer) != self.ksize():
+                raise ValueError("Expected k-mer length {}"
+                                 " but got {}.".format(self.ksize(), len(kmer)))
+            handled = kmer
+        else:
+            handled = deref(self._ht_this).unhash_dna(kmer)
+        return handled
+
+    def count(self, object kmer):
         """Increment the count of this k-mer.
 
         Synonym for 'add'.
         """
         self.add(kmer)
 
-    def add(self, kmer):
+    def add(self, object kmer):
         """Increment the count of this k-mer
 
         `kmer` can be either a string or an integer representing the hashed
         value of the kmer.
         """
         if isinstance(kmer, basestring):
-            temp = kmer.encode('utf-8')
+            temp = self.sanitize_kmer(kmer)
             return deref(self._ht_this).add(<char*>temp)
         # assume kmer is an integer representing the hash value
         else:
             return deref(self._ht_this).add(<uint64_t>kmer)
 
-    def hash(self, kmer):
+    def hash(self, str kmer):
         """Compute the hash of this k-mer."""
-        if len(kmer) != self.ksize():
-            raise ValueError("Expected k-mer length {}"
-                             " but got {}.".format(self.ksize(), len(kmer)))
-        data = _bstring(kmer)
+        data = self.sanitize_kmer(kmer)
         return deref(self._ht_this).hash_dna(data)
 
-    def reverse_hash(self, kmer_hash):
+    def reverse_hash(self, int kmer_hash):
         """Turn a k-mer hash back into a DNA k-mer, if possible."""
         return deref(self._ht_this).unhash_dna(kmer_hash)
 
-    def get(self, kmer):
+    def get(self, object kmer):
         """Retrieve the count for the given k-mer.
 
         `kmer` can be either a string or an integer representing the hashed
@@ -89,7 +86,7 @@ cdef class Hashtable:
         supplied k-mer contains non-ACGT characters.
         """
         if isinstance(kmer, basestring):
-            temp = kmer.encode('utf-8')
+            temp = self.sanitize_kmer(kmer)
             return deref(self._ht_this).get_count(<char*>temp)
         # assume kmer is an integer representing the hash value
         else:
@@ -103,7 +100,7 @@ cdef class Hashtable:
         """Size of hash tables used."""
         return deref(self._ht_this).get_tablesizes()
 
-    cdef _valid_sequence(self, sequence):
+    cdef bytes _valid_sequence(self, str sequence):
         """Validate sequence argument and convert it to bytes"""
         if len(sequence) < self.ksize():
             raise ValueError("sequence length ({}) must >= the hashtable "
@@ -111,38 +108,42 @@ cdef class Hashtable:
                                                       self.ksize()))
         return _bstring(sequence)
 
-    def get_kmers(self, sequence):
+    cdef CpKmer _build_kmer(self, object kmer) except *:
+        cdef bytes temp = self.sanitize_kmer(kmer)
+        return deref(self._ht_this).build_kmer(temp)
+
+    def get_kmers(self, str sequence):
         """Generate an ordered list of all k-mers in sequence."""
-        data = self._valid_sequence(sequence)
+        cdef bytes data = self._valid_sequence(sequence)
         cdef vector[string] kmers
         deref(self._ht_this).get_kmers(data, kmers)
         return kmers
 
-    def consume(self, sequence):
+    def consume(self, str sequence):
         """Increment the counts of all of the k-mers in the sequence."""
-        data = self._valid_sequence(sequence)
+        cdef bytes data = self._valid_sequence(sequence)
         return deref(self._ht_this).consume_string(data)
 
-    def get_kmer_counts(self, sequence):
+    def get_kmer_counts(self, str sequence):
         """Retrieve an ordered list of the counts of all k-mers in sequence."""
-        data = self._valid_sequence(sequence)
+        cdef bytes data = self._valid_sequence(sequence)
         cdef vector[BoundedCounterType] counts
         deref(self._ht_this).get_kmer_counts(data, counts)
         return counts
 
-    def get_min_count(self, sequence):
+    def get_min_count(self, str sequence):
         """Get the smallest count of all the k-mers in the string."""
-        data = self._valid_sequence(sequence)
+        cdef bytes data = self._valid_sequence(sequence)
         return deref(self._ht_this).get_min_count(data)
 
-    def get_max_count(self, sequence):
+    def get_max_count(self, str sequence):
         """Get the larget count of all the k-mers in the string."""
-        data = self._valid_sequence(sequence)
+        cdef bytes data = self._valid_sequence(sequence)
         return deref(self._ht_this).get_max_count(data)
 
-    def get_median_count(self, sequence):
+    def get_median_count(self, str sequence):
         """median, average, and stddev of the k-mer counts in sequence."""
-        data = self._valid_sequence(sequence)
+        cdef bytes data = self._valid_sequence(sequence)
         cdef BoundedCounterType med = 0
         cdef float average = 0
         cdef float stddev = 0
@@ -150,36 +151,36 @@ cdef class Hashtable:
         deref(self._ht_this).get_median_count(data, med, average, stddev)
         return (med, average, stddev)
 
-    def median_at_least(self, sequence, int median):
+    def median_at_least(self, str sequence, int median):
         '''Check if median k-mer count is at least the given value.'''
-        data = self._valid_sequence(sequence)
+        cdef bytes data = self._valid_sequence(sequence)
         return <bool>deref(self._ht_this).median_at_least(data, median)
 
-    def get_kmer_hashes(self, sequence):
+    def get_kmer_hashes(self, str sequence):
         """Retrieve hashes of all k-mers in sequence.
 
         Hashes are returned in the same order as k-mers appear in sequence.
         """
-        data = self._valid_sequence(sequence)
+        cdef bytes data = self._valid_sequence(sequence)
         cdef vector[HashIntoType] hashes
         deref(self._ht_this).get_kmer_hashes(data, hashes)
         return hashes
 
-    def trim_on_abundance(self, sequence, abundance):
+    def trim_on_abundance(self, str sequence, int abundance):
         """Trim sequence at first k-mer below the given abundance."""
-        data = self._valid_sequence(sequence)
+        cdef bytes data = self._valid_sequence(sequence)
         trimmed_at = deref(self._ht_this).trim_on_abundance(data, abundance)
         return sequence[:trimmed_at], trimmed_at
 
-    def trim_below_abundance(self, sequence, abundance):
+    def trim_below_abundance(self, str sequence, int abundance):
         """Trim sequence at first k-mer above the given abundance."""
-        data = self._valid_sequence(sequence)
-        trimmed_at = deref(self._ht_this).trim_below_abundance(data, abundance)
+        cdef bytes data = self._valid_sequence(sequence)
+        cdef int trimmed_at = deref(self._ht_this).trim_below_abundance(data, abundance)
         return sequence[:trimmed_at], trimmed_at
 
-    def find_spectral_error_positions(self, sequence, max_count):
+    def find_spectral_error_positions(self, str sequence, int max_count):
         """Identify positions of low-abundance k-mers."""
-        data = self._valid_sequence(sequence)
+        cdef bytes data = self._valid_sequence(sequence)
         posns = (deref(self._ht_this).find_spectral_error_positions(data,
                                                                    max_count))
         return posns
@@ -380,10 +381,10 @@ cdef class Nodetable(Hashtable):
 
 cdef class Hashgraph(Hashtable):
 
-    def neighbors(self, str kmer):
+    def neighbors(self, object kmer):
         '''Get a list of neighbor nodes for this k-mer.'''
         cdef Traverser traverser = Traverser(self)
-        return list(traverser.neighbors(kmer))
+        return [str(n) for n in traverser._neighbors(self._build_kmer(kmer))]
 
     def calc_connected_graph_size(self, str kmer, max_size=0,
                                   break_on_circumference=False):
@@ -555,32 +556,32 @@ cdef class Hashgraph(Hashtable):
         '''Set the tagging density.'''
         deref(self._hg_this)._set_tag_density(density)
 
-    def do_subset_partition(self):
+    def do_subset_partition(self, *args, **kwargs):
         '''Partition the graph starting from a given subset of tags.'''
         raise NotImplementedError()
     
-    def find_all_tags(self):
+    def find_all_tags(self, *args, **kwargs):
         '''Starting from the given k-mer, find all closely connected tags.'''
         raise NotImplementedError()
     
-    def assign_partition_id(self):
+    def assign_partition_id(self, *args, **kwargs):
         '''Assign a partition ID to a given tag.'''
         raise NotImplementedError()
     
-    def output_partitions(self):
+    def output_partitions(self, *args, **kwargs):
         '''Write out sequences in given filename to another file, annotating '''
         '''with partition IDs.'''
         raise NotImplementedError()
     
-    def load_partitionmap(self):
+    def load_partitionmap(self, *args, **kwargs):
         '''Load a partitionmap for a given subset.'''
         raise NotImplementedError()
 
-    def save_partitionmap(self):
+    def save_partitionmap(self, *args, **kwargs):
         '''Save a partitionmap for the given subset.'''
         raise NotImplementedError()
     
-    def _validate_partitionmap(self):
+    def _validate_partitionmap(self, *args, **kwargs):
         '''Run internal validation checks.'''
         raise NotImplementedError()
     
@@ -607,51 +608,51 @@ cdef class Hashgraph(Hashtable):
                                                                      n_consumed)
         return total_reads, n_consumed
     
-    def merge_subset(self):
+    def merge_subset(self, *args, **kwargs):
         '''Merge the given subset into this one.'''
         raise NotImplementedError()
     
-    def merge_subset_from_disk(self):
+    def merge_subset_from_disk(self, *args, **kwargs):
         '''Merge the given subset (filename) into this one.'''
         raise NotImplementedError()
     
-    def count_partitions(self):
+    def count_partitions(self, *args, **kwargs):
         '''Count the number of partitions in the master partitionmap.'''
         raise NotImplementedError()
     
-    def subset_count_partitions(self):
+    def subset_count_partitions(self, *args, **kwargs):
         '''Count the number of partitions in this subset partitionmap.'''
         raise NotImplementedError()
 
-    def subset_partition_size_distribution(self):
+    def subset_partition_size_distribution(self, *args, **kwargs):
         '''Get the size distribution of partitions in this subset.'''
         raise NotImplementedError()
 
-    def save_subset_partitionmap(self):
+    def save_subset_partitionmap(self, *args, **kwargs):
         '''Save the partition map for this subset.'''
         raise NotImplementedError()
 
-    def load_subset_partitionmap(self):
+    def load_subset_partitionmap(self, *args, **kwargs):
         '''Save the partition map for this subset.'''
         raise NotImplementedError()
     
-    def _validate_subset_partitionmap(self):
+    def _validate_subset_partitionmap(self, *args, **kwargs):
         '''Run internal validation checks on this subset.'''
         raise NotImplementedError()
     
-    def set_partition_id(self):
+    def set_partition_id(self, *args, **kwargs):
         '''Set the partition ID for this tag.'''
         raise NotImplementedError()
 
-    def join_partitions(self):
+    def join_partitions(self, *args, **kwargs):
         '''Join the partitions of these two tags.'''
         raise NotImplementedError()
     
-    def get_partition_id(self):
+    def get_partition_id(self, *args, **kwargs):
         '''Get the partition ID of this tag.'''
         raise NotImplementedError()
     
-    def repartition_largest_partition(self):
+    def repartition_largest_partition(self, *args, **kwargs):
         '''Repartition the largest partition (in the face of stop tags).'''
         raise NotImplementedError()
 

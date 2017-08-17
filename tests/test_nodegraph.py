@@ -378,25 +378,25 @@ def test_count_kmer_degree():
 
 def test_kmer_neighbors():
     inpfile = utils.get_test_data('all-A.fa')
-    nodegraph = khmer.Nodegraph(4, 1, 1, primes=[3, 5])
+    nodegraph = khmer.Nodegraph(4, 100, 1)
     nodegraph.consume_seqfile(inpfile)
 
-    h = khmer.forward_hash('AAAA', 4)
+    h = nodegraph.hash('AAAA')
     print(type('AAAA'))
-    assert nodegraph.neighbors(h) == [0, 0]       # AAAA on both sides
-    assert nodegraph.neighbors('AAAA') == [0, 0]  # AAAA on both sides
+    assert nodegraph.neighbors(h) == ['AAAA', 'AAAA']       # AAAA on both sides
+    assert nodegraph.neighbors('AAAA') == ['AAAA', 'AAAA']  # AAAA on both sides
 
-    h = khmer.forward_hash('AAAT', 4)
-    assert nodegraph.neighbors(h) == [0]          # AAAA on one side
-    assert nodegraph.neighbors('AAAT') == [0]     # AAAA on one side
+    h = nodegraph.hash('AAAT')
+    assert nodegraph.neighbors(h) == ['AAAA']          # AAAA on one side
+    assert nodegraph.neighbors('AAAT') == ['AAAA']     # AAAA on one side
 
-    h = khmer.forward_hash('AATA', 4)
+    h = nodegraph.hash('AATA')
     assert nodegraph.neighbors(h) == []           # no neighbors
     assert nodegraph.neighbors('AATA') == []      # AAAA on one side
 
-    h = khmer.forward_hash('TAAA', 4)
-    assert nodegraph.neighbors(h) == [0]          # AAAA on both sides
-    assert nodegraph.neighbors('TAAA') == [0]     # AAAA on both sides
+    h = nodegraph.hash('TAAA')
+    assert nodegraph.neighbors(h) == ['AAAA']          # AAAA on both sides
+    assert nodegraph.neighbors('TAAA') == ['AAAA']     # AAAA on both sides
 
 
 def test_kmer_neighbors_wrong_ksize():
@@ -419,7 +419,7 @@ def test_kmer_neighbors_wrong_ksize():
     try:
         nodegraph.neighbors({})
         assert 0, "neighbors() should fail with non hash/str arg"
-    except ValueError:
+    except TypeError:
         pass
 
 

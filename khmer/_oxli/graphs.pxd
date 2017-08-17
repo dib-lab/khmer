@@ -6,7 +6,7 @@ from libcpp.memory cimport unique_ptr, shared_ptr, weak_ptr
 from libc.stdint cimport uint8_t, uint32_t, uint64_t, uintptr_t
 
 from oxli_types cimport *
-from hashing cimport CpKmer, KmerSet, CpKmerFactory, CpKmerIterator
+from hashing cimport Kmer, CpKmer, KmerSet, CpKmerFactory, CpKmerIterator
 from parsing cimport CpReadParser, CpSequence
 from utils cimport oxli_raise_py_error
 
@@ -256,14 +256,12 @@ cdef extern from "oxli/labelhash.hh" namespace "oxli":
                                              const Label)
 
 
-cdef CpHashgraph * get_hashgraph_ptr(object graph)
-cdef CpLabelHash * get_labelhash_ptr(object graph)
-
-
 cdef class Hashtable:
     cdef shared_ptr[CpHashtable] _ht_this
 
-    cdef _valid_sequence(self, sequence)
+    cpdef bytes sanitize_kmer(self, object kmer)
+    cdef bytes _valid_sequence(self, str sequence)
+    cdef CpKmer _build_kmer(self, object kmer) except *
     cdef list _get_raw_tables(self, uint8_t **, vector[uint64_t])
 
 
