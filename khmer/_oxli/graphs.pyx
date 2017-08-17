@@ -6,7 +6,7 @@ from cpython.buffer cimport (PyBuffer_FillInfo, PyBUF_FULL_RO)
 from libc.stdint cimport uint64_t
 from libc.stdint cimport uintptr_t as size_t
 
-from libcpp.memory cimport unique_ptr, shared_ptr, make_shared
+from libcpp.memory cimport shared_ptr, make_shared
 from libcpp.vector cimport vector
 from libcpp.set cimport set
 from libcpp.string cimport string

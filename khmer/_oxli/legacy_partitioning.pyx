@@ -1,0 +1,66 @@
+# cython: c_string_type=unicode, c_string_encoding=utf8
+from cython.operator cimport dereference as deref
+
+from libcpp.memory cimport make_shared
+
+from graphs cimport CpHashgraph, CpCountgraph, Hashgraph, Countgraph
+
+cdef class PrePartitionInfo:
+
+    @staticmethod
+    cdef PrePartitionInfo wrap(cp_pre_partition_info * ptr):
+        cdef PrePartitionInfo part = PrePartitionInfo()
+        part._this.reset(ptr)
+        return part
+
+
+cdef class SubsetPartition:
+
+    def __cinit__(self, Hashgraph graph):
+        if type(self) is SubsetPartition:
+            self._this = make_shared[CpSubsetPartition](graph._hg_this.get())
+
+    def count_partitions(self):
+        cdef size_t n_partitions = 0
+        cdef size_t n_unassigned = 0
+        deref(self._this).count_partitions(n_partitions, n_unassigned)
+
+        return n_partitions, n_unassigned
+
+    def report_on_partitions(self):
+        deref(self._this).report_on_partitions()
+
+    def partition_size_distribution(self):
+        cdef PartitionCountDistribution d
+        cdef unsigned int n_unassigned = 0
+        deref(self._this).partition_size_distribution(d, n_unassigned)
+
+        cdef list dist = []
+        for pair in d:
+            dist.append((pair.first, pair.second))
+
+        return dist, n_unassigned
+
+    def partition_sizes(self, unsigned int min_size=0):
+        cdef PartitionCountMap cm
+        cdef unsigned int n_unassigned = 0
+        deref(self._this).partition_sizes(cm, n_unassigned)
+
+        cdef list sizes = []
+        for pair in cm:
+            if pair.second >= min_size:
+                sizes.append((pair.first, pair.second))
+
+        return sizes, n_unassigned
+
+    def partition_average_coverages(self, Countgraph graph):
+        cdef PartitionCountMap cm
+        deref(self._this).partition_average_coverages(cm, graph._cg_this.get())
+
+        cdef list covs = []
+        for pair in cm:
+            covs.append((pair.first, pair.second))
+
+        return covs
+
+        
