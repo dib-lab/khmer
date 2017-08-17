@@ -8,30 +8,25 @@ from utils cimport _bstring
 
 cdef class LinearAssembler:
 
-    def __cinit__(self, graph, stop_filter=None):
-        self._graph_ptr = get_hashgraph_ptr(graph)
-        if self._graph_ptr == NULL:
-            raise ValueError('Must take an object with Hashgraph *')
+    def __cinit__(self, Hashgraph graph, Hashgraph stop_filter=None):
         self.graph = graph
+        self._graph_ptr = graph._hg_this
         self.set_stop_filter(stop_filter=stop_filter)
         
         if type(self) is LinearAssembler:
-            self._this.reset(new CpLinearAssembler(self._graph_ptr))
+            self._this = make_shared[CpLinearAssembler](self._graph_ptr.get())
 
-    def set_stop_filter(self, stop_filter=None):
+    def set_stop_filter(self, Hashgraph stop_filter=None):
         self.stop_filter = stop_filter
         if stop_filter is not None:
-            self._stop_filter_ptr = get_hashgraph_ptr(stop_filter)
-            if self._stop_filter_ptr == NULL:
-                raise ValueError('Must take an object with Hashgraph *')
-        else:
-            self._stop_filter_ptr = NULL
+            self._stop_filter_ptr = stop_filter._hg_this
 
     cdef str _assemble(self, Kmer kmer):
         if self.stop_filter is None:
             return deref(self._this).assemble(deref(kmer._this))
         else:
-            return deref(self._this).assemble(deref(kmer._this), self._stop_filter_ptr)
+            return deref(self._this).assemble(deref(kmer._this), 
+                                              self._stop_filter_ptr.get())
 
     def assemble(self, seed):
         if isinstance(seed, Kmer):
@@ -44,7 +39,8 @@ cdef class LinearAssembler:
         if self.stop_filter is None:
             return deref(self._this).assemble_left(deref(kmer._this))
         else:
-            return deref(self._this).assemble_left(deref(kmer._this), self._stop_filter_ptr)
+            return deref(self._this).assemble_left(deref(kmer._this), 
+                                                   self._stop_filter_ptr.get())
 
     def assemble_left(self, seed):
         if isinstance(seed, Kmer):
@@ -57,7 +53,8 @@ cdef class LinearAssembler:
         if self.stop_filter is None:
             return deref(self._this).assemble_right(deref(kmer._this))
         else:
-            return deref(self._this).assemble_right(deref(kmer._this), self._stop_filter_ptr)
+            return deref(self._this).assemble_right(deref(kmer._this), 
+                                                    self._stop_filter_ptr.get())
 
     def assemble_right(self, seed):
         if isinstance(seed, Kmer):
@@ -66,63 +63,59 @@ cdef class LinearAssembler:
             return self._assemble_right(Kmer(str(seed)))
 
 
-cdef class SimpleLabeledAssembler:
+#cdef class SimpleLabeledAssembler:
+#
+#    def __cinit__(self, labels, stop_filter=None):
+#        self._label_ptr = get_labelhash_ptr(labels)
+#        self.labels = labels
+#        self.set_stop_filter(stop_filter=stop_filter)
+#        
+#        if type(self) is SimpleLabeledAssembler:
+#            self._this.reset(new CpSimpleLabeledAssembler(self._label_ptr))
+#
+#    def set_stop_filter(self, stop_filter=None):
+#        self.stop_filter = stop_filter
+#        if stop_filter is not None:
+#            self._stop_filter_ptr = get_hashgraph_ptr(stop_filter)
+#            if self._stop_filter_ptr == NULL:
+#                raise ValueError('Must take an object with Hashgraph *')
+#        else:
+#            self._stop_filter_ptr = NULL
+#
+#    cdef vector[string] _assemble(self, Kmer kmer):
+#        if self.stop_filter is None:
+#            return deref(self._this).assemble(deref(kmer._this))
+#        else:
+#            return deref(self._this).assemble(deref(kmer._this), self._stop_filter_ptr)
+#
+#    def assemble(self, seed):
+#        if isinstance(seed, Kmer):
+#            return self._assemble(seed)
+#        else:
+#            return self._assemble(Kmer(str(seed)))
 
-    def __cinit__(self, labels, stop_filter=None):
-        self._label_ptr = get_labelhash_ptr(labels)
-        self.labels = labels
-        self.set_stop_filter(stop_filter=stop_filter)
-        
-        if type(self) is SimpleLabeledAssembler:
-            self._this.reset(new CpSimpleLabeledAssembler(self._label_ptr))
-
-    def set_stop_filter(self, stop_filter=None):
-        self.stop_filter = stop_filter
-        if stop_filter is not None:
-            self._stop_filter_ptr = get_hashgraph_ptr(stop_filter)
-            if self._stop_filter_ptr == NULL:
-                raise ValueError('Must take an object with Hashgraph *')
-        else:
-            self._stop_filter_ptr = NULL
-
-    cdef vector[string] _assemble(self, Kmer kmer):
-        if self.stop_filter is None:
-            return deref(self._this).assemble(deref(kmer._this))
-        else:
-            return deref(self._this).assemble(deref(kmer._this), self._stop_filter_ptr)
-
-    def assemble(self, seed):
-        if isinstance(seed, Kmer):
-            return self._assemble(seed)
-        else:
-            return self._assemble(Kmer(str(seed)))
 
 cdef class JunctionCountAssembler:
 
-    def __cinit__(self, graph, stop_filter=None):
-        self._graph_ptr = get_hashgraph_ptr(graph)
-        if self._graph_ptr == NULL:
-            raise ValueError('Must take an object with Hashgraph *')
+    def __cinit__(self, Hashgraph graph, Hashgraph stop_filter=None):
         self.graph = graph
+        self._graph_ptr = graph._hg_this
         self.set_stop_filter(stop_filter=stop_filter)
         
         if type(self) is JunctionCountAssembler:
-            self._this.reset(new CpJunctionCountAssembler(self._graph_ptr))
+            self._this = make_shared[CpJunctionCountAssembler](self._graph_ptr.get())
 
-    def set_stop_filter(self, stop_filter=None):
+    def set_stop_filter(self, Hashgraph stop_filter=None):
         self.stop_filter = stop_filter
         if stop_filter is not None:
-            self._stop_filter_ptr = get_hashgraph_ptr(stop_filter)
-            if self._stop_filter_ptr == NULL:
-                raise ValueError('Must take an object with Hashgraph *')
-        else:
-            self._stop_filter_ptr = NULL
+            self._stop_filter_ptr = stop_filter._hg_this
 
     cdef vector[string] _assemble(self, Kmer kmer):
         if self.stop_filter is None:
             return deref(self._this).assemble(deref(kmer._this))
         else:
-            return deref(self._this).assemble(deref(kmer._this), self._stop_filter_ptr)
+            return deref(self._this).assemble(deref(kmer._this),
+                                              self._stop_filter_ptr.get())
 
     def consume(self, sequence):
         return deref(self._this).consume(_bstring(sequence))

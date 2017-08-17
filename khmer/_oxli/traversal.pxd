@@ -1,8 +1,9 @@
 from libc.stdint cimport uint32_t
 from libcpp.memory cimport shared_ptr
+from libcpp cimport bool
 
-from hashing cimport CpKmer, KmerFilter, KmerQueue
-from graphs cimport CpHashgraph
+from hashing cimport Kmer, CpKmer, KmerFilter, KmerQueue
+from graphs cimport Hashgraph, CpHashgraph
 
 cdef extern from "oxli/traversal.hh" namespace "oxli":
     cdef cppclass CpTraverser "oxli::Traverser":
@@ -21,6 +22,9 @@ cdef extern from "oxli/traversal.hh" namespace "oxli":
 
 
 cdef class Traverser:
+    cdef Hashgraph graph
     cdef shared_ptr[CpTraverser] _this
     cdef shared_ptr[CpHashgraph] _graph_ptr
-
+    cdef list _kmerqueue_to_kmer_list(self, KmerQueue * kmers)
+    cdef list _kmerqueue_to_hash_list(self, KmerQueue * kmers)
+    cdef list _neighbors(self, CpKmer start, int direction=*)

@@ -383,7 +383,8 @@ class ReadAligner(_ReadAligner):
         _ReadAligner.__init__(self)
 
 
-from khmer._oxli.assembly import (LinearAssembler, SimpleLabeledAssembler,
-                                  JunctionCountAssembler)
+#from khmer._oxli.assembly import (LinearAssembler, SimpleLabeledAssembler,
+#                                  JunctionCountAssembler)
+from khmer._oxli.assembly import LinearAssembler, JunctionCountAssembler
 from khmer._oxli.hashset import HashSet
 from khmer._oxli.hllcounter import HLLCounter
