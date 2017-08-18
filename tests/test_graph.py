@@ -227,7 +227,7 @@ class Test_Partitioning(object):
 
         filename = utils.get_test_data('random-20-a.fa')
 
-        ht = khmer._Nodegraph(21, [5, 7, 11, 13])
+        ht = khmer.Nodegraph(21, 1, 1, primes=[5, 7, 11, 13])
         ht.consume_seqfile_and_tag(filename)
 
         output_file = utils.get_temp_filename('part0test')
@@ -243,7 +243,7 @@ class Test_Partitioning(object):
 
         filename = utils.get_test_data('random-20-a.fa')
 
-        ht = khmer._Nodegraph(21, [5, 7, 11, 13])
+        ht = khmer.Nodegraph(21, 1, 1, primes=[5, 7, 11, 13])
         ht.consume_seqfile_and_tag(filename)
 
         output_file = utils.get_temp_filename('parttest')
@@ -278,7 +278,7 @@ class Test_Partitioning(object):
         ht.consume_seqfile_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
-        x = ht.subset_count_partitions(subset)
+        x = subset.count_partitions()
         assert x == (99, 0), x             # disconnected @ 21
 
     def test_connected_20_a(self):
@@ -288,7 +288,7 @@ class Test_Partitioning(object):
         ht.consume_seqfile_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
-        x = ht.subset_count_partitions(subset)
+        x = subset.count_partitions()
         assert x == (1, 0)             # connected @ 20
 
     def test_disconnected_20_b(self):
@@ -298,7 +298,7 @@ class Test_Partitioning(object):
         ht.consume_seqfile_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
-        x = ht.subset_count_partitions(subset)
+        x = subset.count_partitions()
         assert x == (99, 0), x             # disconnected @ 21
 
     def test_connected_20_b(self):
@@ -308,7 +308,7 @@ class Test_Partitioning(object):
         ht.consume_seqfile_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
-        x = ht.subset_count_partitions(subset)
+        x = subset.count_partitions()
         assert x == (1, 0)             # connected @ 20
 
     def test_disconnected_31_c(self):
@@ -318,7 +318,7 @@ class Test_Partitioning(object):
         ht.consume_seqfile_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
-        x = ht.subset_count_partitions(subset)
+        x = subset.count_partitions()
         assert x == (999, 0), x            # disconnected @ K = 32
 
     def test_connected_31_c(self):
@@ -328,7 +328,7 @@ class Test_Partitioning(object):
         ht.consume_seqfile_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
-        x = ht.subset_count_partitions(subset)
+        x = subset.count_partitions()
         assert x == (1, 0)             # connected @ K = 31
 
 #
