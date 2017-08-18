@@ -210,48 +210,6 @@ def calc_expected_collisions(graph, force=False, max_false_pos=.2):
     return fp_all
 
 
-def is_prime(number):
-    """Check if a number is prime."""
-    if number < 2:
-        return False
-    if number == 2:
-        return True
-    if number % 2 == 0:
-        return False
-    for _ in range(3, int(number ** 0.5) + 1, 2):
-        if number % _ == 0:
-            return False
-    return True
-
-
-def get_n_primes_near_x(number, target):
-    """Backward-find primes smaller than target.
-
-    Step backwards until a number of primes (other than 2) have been
-    found that are smaller than the target and return them.
-
-    Keyword arguments:
-    number -- the number of primes to find
-    target -- the number to step backwards from
-    """
-    if target == 1 and number == 1:
-        return [1]
-
-    primes = []
-    i = target - 1
-    if i % 2 == 0:
-        i -= 1
-    while len(primes) != number and i > 0:
-        if is_prime(i):
-            primes.append(int(i))
-        i -= 2
-
-    if len(primes) != number:
-        raise RuntimeError("unable to find %d prime numbers < %d" % (number,
-                                                                     target))
-
-    return primes
-
 
 # Expose the cpython objects with __new__ implementations.
 # These constructors add the functionality provided by the existing
