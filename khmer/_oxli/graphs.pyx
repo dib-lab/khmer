@@ -87,7 +87,7 @@ cdef class Hashtable:
         data = self.sanitize_kmer(kmer)
         return deref(self._ht_this).hash_dna(data)
 
-    def reverse_hash(self, int kmer_hash):
+    def reverse_hash(self, HashIntoType kmer_hash):
         """Turn a k-mer hash back into a DNA k-mer, if possible."""
         return deref(self._ht_this).unhash_dna(kmer_hash)
 
