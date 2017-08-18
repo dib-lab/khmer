@@ -60,7 +60,7 @@ cdef extern from "oxli/subset.hh":
                                          bool, bool)
         void count_partitions(size_t&, size_t&)
         size_t output_partitioned_file(string &, string &,
-                                       bool)
+                bool) except +oxli_raise_py_error
 
         void partition_sizes(PartitionCountMap&, unsigned int &) const
         void partition_size_distribution(PartitionCountDistribution &,

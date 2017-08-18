@@ -407,22 +407,6 @@ hashgraph__validate_subset_partitionmap(khmer_KHashgraph_Object * me,
 }
 
 
-PyObject *
-hashgraph_set_partition_id(khmer_KHashgraph_Object * me, PyObject * args)
-{
-    Hashgraph * hashgraph = me->hashgraph;
-
-    const char * kmer = NULL;
-    PartitionID p = 0;
-
-    if (!PyArg_ParseTuple(args, "sI", &kmer, &p)) {
-        return NULL;
-    }
-
-    hashgraph->partition->set_partition_id(kmer, p);
-
-    Py_RETURN_NONE;
-}
 
 
 PyObject *
@@ -442,22 +426,6 @@ hashgraph_join_partitions(khmer_KHashgraph_Object * me, PyObject * args)
 }
 
 
-PyObject *
-hashgraph_get_partition_id(khmer_KHashgraph_Object * me, PyObject * args)
-{
-    Hashgraph * hashgraph = me->hashgraph;
-
-    const char * kmer = NULL;
-
-    if (!PyArg_ParseTuple(args, "s", &kmer)) {
-        return NULL;
-    }
-
-    PartitionID partition_id;
-    partition_id = hashgraph->partition->get_partition_id(kmer);
-
-    return PyLong_FromLong(partition_id);
-}
 
 
 }

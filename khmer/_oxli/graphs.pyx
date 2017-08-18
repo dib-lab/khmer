@@ -610,10 +610,15 @@ cdef class Hashgraph(Hashtable):
         '''Assign a partition ID to a given tag.'''
         raise NotImplementedError()
     
-    def output_partitions(self, *args, **kwargs):
+    def output_partitions(self, str filename, str output, bool
+                                output_unassigned=False):
         '''Write out sequences in given filename to another file, annotating '''
         '''with partition IDs.'''
-        raise NotImplementedError()
+        cdef size_t n_partitions = 0
+        deref(deref(self._hg_this).partition).output_partitioned_file(_bstring(filename),
+                                                                      _bstring(output),
+                                                                      output_unassigned)
+        return n_partitions
     
     def load_partitionmap(self, *args, **kwargs):
         '''Load a partitionmap for a given subset.'''
@@ -682,9 +687,10 @@ cdef class Hashgraph(Hashtable):
         '''Run internal validation checks on this subset.'''
         raise NotImplementedError()
     
-    def set_partition_id(self, *args, **kwargs):
+    def set_partition_id(self, object kmer, PartitionID pid):
         '''Set the partition ID for this tag.'''
-        raise NotImplementedError()
+        cdef string start = self.sanitize_kmer(kmer)
+        deref(deref(self._hg_this).partition).set_partition_id(start, pid)
 
     def join_partitions(self, PartitionID p1, PartitionID p2):
         '''Join the partitions of these two tags.'''
@@ -735,7 +741,7 @@ cdef class Hashgraph(Hashtable):
         cdef string cseq = _bstring(sequence)
         with nogil:
             trim_at = deref(ptr).trim_on_stoptags(cseq)
-        return sequence[:trim_at]
+        return sequence[:trim_at], trim_at
 
     def add_stop_tag(self, object kmer):
         '''Add this k-mer as a stop tag.'''

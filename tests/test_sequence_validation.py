@@ -37,10 +37,10 @@
 # Tests for the ReadParser and Read classes.
 from __future__ import print_function
 from __future__ import absolute_import
-from khmer import _Countgraph, _SmallCountgraph, _Nodegraph
+from khmer import Countgraph, SmallCountgraph, Nodegraph
 from khmer import Nodetable, Counttable, SmallCounttable
 from khmer._oxli.utils import get_n_primes_near_x
-from khmer import ReadParser, Nodegraph, _GraphLabels
+from khmer import ReadParser
 from . import khmer_tst_utils as utils
 from .table_fixtures import (AnyTabletype, Countingtype, Graphtype,
                              params_1m, PRIMES_1m)
