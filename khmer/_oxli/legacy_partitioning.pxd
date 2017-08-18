@@ -1,9 +1,7 @@
 from libcpp cimport bool
 from libcpp.string cimport string
-from libcpp.vector cimport vector
 from libcpp.set cimport set
-from libcpp.memory cimport unique_ptr, shared_ptr, weak_ptr
-from libc.stdint cimport uint8_t, uint32_t, uint64_t
+from libcpp.memory cimport shared_ptr, weak_ptr
 from libc.stdint cimport uintptr_t as size_t
 
 from oxli_types cimport *
@@ -12,7 +10,7 @@ from graphs cimport CpHashgraph, CpCountgraph, Hashgraph, Countgraph
 from utils cimport oxli_raise_py_error
 
 
-cdef extern from "oxli/subset.hh":
+cdef extern from "oxli/subset.hh" nogil:
 
     cdef struct cp_pre_partition_info "oxli::pre_partition_info":
         HashIntoType kmer
@@ -31,16 +29,17 @@ cdef extern from "oxli/subset.hh":
 
         PartitionID * get_new_partition()
         void merge(CpSubsetPartition *)
-        void merge_from_disk(string)
+        void merge_from_disk(string) except +oxli_raise_py_error
         void _merge_from_disk_consolidate(PartitionPtrMap&)
 
-        void save_partitionmap(string)
+        void save_partitionmap(string) except +oxli_raise_py_error 
         void load_partitionmap(string) except +oxli_raise_py_error
         void _validate_pmap()
         
         void find_all_tags(CpKmer, HashIntoTypeSet &, HashIntoTypeSet &,
-                           bool, bool) nogil
-        void find_all_tags(CpKmer, HashIntoTypeSet &, HashIntoTypeSet &) nogil
+                           bool, bool) except +oxli_raise_py_error
+        void find_all_tags(CpKmer, HashIntoTypeSet &, 
+                           HashIntoTypeSet &) except +oxli_raise_py_error
 
         unsigned int sweep_for_tags(const string&, HashIntoTypeSet &,
                                     HashIntoTypeSet &, unsigned int,
@@ -51,17 +50,21 @@ cdef extern from "oxli/subset.hh":
                                                  BoundedCounterType,
                                                  BoundedCounterType,
                                                  bool,
-                                                 bool) nogil
+                                                 bool) except +oxli_raise_py_error
 
-        void do_partition(HashIntoType, HashIntoType, bool, bool) nogil
+        void do_partition(HashIntoType, HashIntoType, 
+                          bool, bool) except +oxli_raise_py_error
 
         void do_partition_with_abundance(HashIntoType, HashIntoType,
                                          BoundedCounterType,
                                          BoundedCounterType,
-                                         bool, bool) nogil
+                                         bool, bool) except +oxli_raise_py_error
+
         void count_partitions(size_t&, size_t&)
-        size_t output_partitioned_file(string &, string &,
-                bool) except +oxli_raise_py_error
+
+        size_t output_partitioned_file(string &, 
+                                       string &, 
+                                       bool) except +oxli_raise_py_error
 
         void partition_sizes(PartitionCountMap&, unsigned int &) const
         void partition_size_distribution(PartitionCountDistribution &,

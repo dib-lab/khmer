@@ -624,18 +624,18 @@ cdef class Hashgraph(Hashtable):
                                 output_unassigned=False):
         '''Write out sequences in given filename to another file, annotating '''
         '''with partition IDs.'''
-        cdef size_t n_partitions = 0
-        deref(deref(self._hg_this).partition).output_partitioned_file(_bstring(filename),
-                                                                      _bstring(output),
-                                                                      output_unassigned)
+        n_partitions = deref(deref(self._hg_this).partition).\
+                            output_partitioned_file(_bstring(filename),
+                                                    _bstring(output),
+                                                    output_unassigned)
         return n_partitions
     
     def load_partitionmap(self, str filename):
-        '''Load a partitionmap for a given subset.'''
+        '''Load a partitionmap for the master subset.'''
         deref(deref(self._hg_this).partition).load_partitionmap(_bstring(filename))
 
     def save_partitionmap(self, str filename):
-        '''Save a partitionmap for the given subset.'''
+        '''Save a partitionmap for the master subset.'''
         deref(deref(self._hg_this).partition).save_partitionmap(_bstring(filename))
     
     def _validate_partitionmap(self):
@@ -669,33 +669,13 @@ cdef class Hashgraph(Hashtable):
         '''Merge the given subset into this one.'''
         deref(deref(self._hg_this).partition).merge(subset._this.get())
 
-    def merge_subset_from_disk(self, *args, **kwargs):
+    def merge_subset_from_disk(self, str filename):
         '''Merge the given subset (filename) into this one.'''
-        raise NotImplementedError()
+        deref(deref(self._hg_this).partition).merge_from_disk(_bstring(filename))
     
     def count_partitions(self):
         '''Count the number of partitions in the master partitionmap.'''
         return self.partition.count_partitions()
-    
-    def subset_count_partitions(self, SubsetPartition subset):
-        '''Count the number of partitions in this subset partitionmap.'''
-        raise NotImplementedError()
-
-    def subset_partition_size_distribution(self, *args, **kwargs):
-        '''Get the size distribution of partitions in this subset.'''
-        raise NotImplementedError()
-
-    def save_subset_partitionmap(self, *args, **kwargs):
-        '''Save the partition map for this subset.'''
-        raise NotImplementedError()
-
-    def load_subset_partitionmap(self, *args, **kwargs):
-        '''Save the partition map for this subset.'''
-        raise NotImplementedError()
-    
-    def _validate_subset_partitionmap(self, *args, **kwargs):
-        '''Run internal validation checks on this subset.'''
-        raise NotImplementedError()
     
     def set_partition_id(self, object kmer, PartitionID pid):
         '''Set the partition ID for this tag.'''
@@ -788,6 +768,30 @@ cdef class Countgraph(Hashgraph):
             self._cg_this = make_shared[CpCountgraph](k, _primes)
             self._hg_this = <shared_ptr[CpHashgraph]>self._cg_this
             self._ht_this = <shared_ptr[CpHashtable]>self._hg_this
+
+    def do_subset_partition_with_abundance(self, BoundedCounterType min_count,
+                                                 BoundedCounterType max_count,
+                                                 object start_kmer=0,
+                                                 object end_kmer=0,
+                                                 bool break_on_stop_tags=False,
+                                                 bool stop_big_traversals=False):
+
+        cdef HashIntoType _start_kmer = self.sanitize_hash_kmer(start_kmer)
+        cdef HashIntoType _end_kmer = self.sanitize_hash_kmer(end_kmer)
+        cdef bool _break_on_stop_tags = break_on_stop_tags
+        cdef bool _stop_big_traversals = stop_big_traversals
+        cdef SubsetPartition subset = SubsetPartition(self)
+        cdef shared_ptr[CpSubsetPartition] subset_ptr = subset._this
+
+        with nogil:
+            deref(subset_ptr).do_partition_with_abundance(_start_kmer,
+                                                          _end_kmer,
+                                                          min_count,
+                                                          max_count,
+                                                          break_on_stop_tags,
+                                                          stop_big_traversals)
+
+        return subset
 
 
 cdef class SmallCountgraph(Hashgraph):

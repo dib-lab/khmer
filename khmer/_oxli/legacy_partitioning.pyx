@@ -3,6 +3,7 @@ from cython.operator cimport dereference as deref
 
 from libcpp.memory cimport make_shared
 
+from utils cimport _bstring
 from graphs cimport CpHashgraph, CpCountgraph, Hashgraph, Countgraph
 
 cdef class PrePartitionInfo:
@@ -69,4 +70,21 @@ cdef class SubsetPartition:
 
         return covs
 
-        
+    def save_partitionmap(self, str filename):
+        cdef string _filename = _bstring(filename)
+        with nogil:
+            deref(self._this).save_partitionmap(_filename)
+
+    def load_partitionmap(self, str filename):
+        cdef string _filename = _bstring(filename)
+        with nogil:
+            deref(self._this).load_partitionmap(_filename)
+
+    @staticmethod
+    def load(str filename, Hashgraph graph):
+        cdef SubsetPartition subset = SubsetPartition(graph)
+        subset.load_partitionmap(filename)
+        return subset
+
+    def _validate_partitionmap(self):
+        deref(self._this)._validate_pmap()

@@ -37,6 +37,7 @@
 from __future__ import print_function, absolute_import
 
 import khmer
+from khmer._oxli.legacy_partitioning import SubsetPartition, PrePartitionInfo
 import screed
 
 import os
@@ -167,8 +168,8 @@ class Test_RandomData(object):
         x = ht.do_subset_partition(divvy[0], divvy[2])
         y = ht.do_subset_partition(divvy[2], 0)
 
-        ht._validate_subset_partitionmap(x)
-        ht._validate_subset_partitionmap(y)
+        x._validate_partitionmap()
+        y._validate_partitionmap()
 
         ht.merge_subset(y)
         ht.merge_subset(x)
@@ -213,7 +214,7 @@ class Test_RandomData(object):
         del ht
         ht = khmer.Nodegraph(20, 4 ** 7 + 1, 2)
 
-        ht.load(savefile_ht)
+        ht = khmer.Nodegraph.load(savefile_ht)
         ht.load_tagset(savefile_tags)
 
         divvy = ht.divide_tags_into_subsets(1)
@@ -249,15 +250,15 @@ class Test_SaveLoadPmap(object):
         outfile2 = utils.get_temp_filename('y.pmap')
 
         x = ht.do_subset_partition(a, b)
-        ht.save_subset_partitionmap(x, outfile1)
+        x.save_partitionmap(outfile1)
         del x
 
         y = ht.do_subset_partition(b, 0)
-        ht.save_subset_partitionmap(y, outfile2)
+        y.save_partitionmap(outfile2)
         del y
 
-        a = ht.load_subset_partitionmap(outfile1)
-        b = ht.load_subset_partitionmap(outfile2)
+        a = SubsetPartition.load(outfile1, ht)
+        b = SubsetPartition.load(outfile2, ht)
 
         ht.merge_subset(a)
         ht.merge_subset(b)
@@ -282,11 +283,11 @@ class Test_SaveLoadPmap(object):
         outfile2 = utils.get_temp_filename('y.pmap')
 
         x = ht.do_subset_partition(a, b)
-        ht.save_subset_partitionmap(x, outfile1)
+        x.save_partitionmap(outfile1)
         del x
 
         y = ht.do_subset_partition(b, 0)
-        ht.save_subset_partitionmap(y, outfile2)
+        y.save_partitionmap(outfile2)
         del y
 
         outfile3 = utils.get_temp_filename('z.pmap')
@@ -298,7 +299,7 @@ class Test_SaveLoadPmap(object):
             fp.close()
 
             try:
-                a = ht.load_subset_partitionmap(outfile3)
+                a = SubsetPartition.load(outfile3, ht)
                 assert 0, "this should not pass"
             except OSError as err:
                 print(str(err), i)
@@ -317,17 +318,17 @@ class Test_SaveLoadPmap(object):
         outfile2 = utils.get_temp_filename('y.pmap')
 
         x = ht.do_subset_partition(divvy[0], divvy[1])
-        ht.save_subset_partitionmap(x, outfile1)
+        x.save_partitionmap(outfile1)
         del x
 
         y = ht.do_subset_partition(divvy[1], 0)
-        ht.save_subset_partitionmap(y, outfile2)
+        y.save_partitionmap(outfile2)
         del y
 
         assert os.path.exists(outfile1)
         assert os.path.exists(outfile2)
-        a = ht.load_subset_partitionmap(outfile1)
-        b = ht.load_subset_partitionmap(outfile2)
+        a = SubsetPartition.load(outfile1, ht)
+        b = SubsetPartition.load(outfile2, ht)
 
         ht.merge_subset(a)
         ht.merge_subset(b)
@@ -337,9 +338,9 @@ class Test_SaveLoadPmap(object):
         assert n_partitions == 1, n_partitions        # combined.
 
     def test_save_load_merge_nexist(self):
-        ht = khmer._Nodegraph(20, [1])
+        ht = khmer.Nodegraph(20, 1, 1)
         try:
-            ht.load_subset_partitionmap('this does not exist')
+            ht.load_partitionmap('this does not exist')
             assert 0, "this should not succeed"
         except OSError as e:
             print(str(e))
@@ -359,11 +360,11 @@ class Test_SaveLoadPmap(object):
         outfile2 = utils.get_temp_filename('y.pmap')
 
         x = ht.do_subset_partition(a, b)
-        ht.save_subset_partitionmap(x, outfile1)
+        x.save_partitionmap(outfile1)
         del x
 
         y = ht.do_subset_partition(b, 0)
-        ht.save_subset_partitionmap(y, outfile2)
+        y.save_partitionmap(outfile2)
         del y
 
         ht.merge_subset_from_disk(outfile1)
@@ -387,11 +388,11 @@ class Test_SaveLoadPmap(object):
         outfile2 = utils.get_temp_filename('y.pmap')
 
         x = ht.do_subset_partition(divvy[0], divvy[1])
-        ht.save_subset_partitionmap(x, outfile1)
+        x.save_partitionmap(outfile1)
         del x
 
         y = ht.do_subset_partition(divvy[1], 0)
-        ht.save_subset_partitionmap(y, outfile2)
+        y.save_partitionmap(outfile2)
         del y
 
         assert os.path.exists(outfile1)
@@ -453,10 +454,10 @@ class Test_SaveLoadPmap(object):
 
         outfile1 = utils.get_temp_filename('x.pmap')
         x = ht.do_subset_partition(a, b)
-        ht.save_subset_partitionmap(x, outfile1)
+        x.save_partitionmap(outfile1)
         del x
 
-        ht = khmer._Nodegraph(19, [1])
+        ht = khmer.Nodegraph(19, 1, 1)
         try:
             ht.merge_subset_from_disk(outfile1)
             assert 0, "this should fail"
@@ -480,15 +481,15 @@ def test_save_load_merge_on_graph():
     outfile2 = utils.get_temp_filename('y.pmap')
 
     x = ht.do_subset_partition(a, b)
-    ht.save_subset_partitionmap(x, outfile1)
+    x.save_partitionmap(outfile1)
     del x
 
     y = ht.do_subset_partition(b, 0)
-    ht.save_subset_partitionmap(y, outfile2)
+    y.save_partitionmap(outfile2)
     del y
 
     a = ht.load_partitionmap(outfile1)  # <-- this is different
-    b = ht.load_subset_partitionmap(outfile2)
+    b = SubsetPartition.load(outfile2, ht)
 
     ht.merge_subset(b)
 
@@ -513,11 +514,11 @@ def test_save_load_on_graph_truncate():
     outfile2 = utils.get_temp_filename('y.pmap')
 
     x = ht.do_subset_partition(a, b)
-    ht.save_subset_partitionmap(x, outfile1)
+    x.save_partitionmap(outfile1)
     del x
 
     y = ht.do_subset_partition(b, 0)
-    ht.save_subset_partitionmap(y, outfile2)
+    y.save_partitionmap(outfile2)
     del y
 
     outfile3 = utils.get_temp_filename('z.pmap')
@@ -538,7 +539,7 @@ def test_save_load_on_graph_truncate():
 def test_output_partitions():
     filename = utils.get_test_data('test-output-partitions.fa')
 
-    ht = khmer._Nodegraph(10, [1])
+    ht = khmer.Nodegraph(10, 1, 1)
     ht.set_partition_id('TTAGGACTGC', 2)
     ht.set_partition_id('TGCGTTTCAA', 3)
     ht.set_partition_id('ATACTGTAAA', 4)
