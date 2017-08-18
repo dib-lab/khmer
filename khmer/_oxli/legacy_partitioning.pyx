@@ -53,7 +53,7 @@ cdef class SubsetPartition:
 
         return sizes, n_unassigned
 
-    def partition_average_coverages(self, Countgraph graph):
+    def partition_average_coverages(self, Countgraph graph not None):
         cdef PartitionCountMap cm
         deref(self._this).partition_average_coverages(cm, graph._cg_this.get())
 

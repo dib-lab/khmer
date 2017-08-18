@@ -359,8 +359,7 @@ void Hashgraph::consume_partitioned_fasta(
     string seq = "";
 
     // reset the master subset partition
-    delete partition;
-    partition = new SubsetPartition(this);
+    partition.reset(new SubsetPartition(this));
 
     //
     // iterate through the FASTA file & consume the reads.

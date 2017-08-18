@@ -151,13 +151,17 @@ def build_dir():
 ZLIBDIR = 'third-party/zlib'
 BZIP2DIR = 'third-party/bzip2'
 
-BUILD_DEPENDS = glob.glob(path_join("include", "khmer", "_cpy_*.hh"))
+BUILD_DEPENDS = [path_join("include", "khmer", bn + ".hh") for bn in [
+    "_cpy_khmer", "_cpy_utils", "_cpy_readparsers"
+    ]]
 BUILD_DEPENDS.extend(path_join("include", "oxli", bn + ".hh") for bn in [
     "khmer", "kmer_hash", "hashtable", "labelhash", "hashgraph",
     "hllcounter", "oxli_exception", "read_aligner", "subset", "read_parsers",
     "kmer_filters", "traversal", "assembler", "alphabets", "storage"])
 
-SOURCES = glob.glob(path_join("src", "khmer", "_cpy_*.cc"))
+SOURCES = [path_join("src", "khmer", bn + ".cc") for bn in [
+    "_cpy_khmer", "_cpy_utils", "_cpy_readparsers"
+    ]]
 SOURCES.extend(path_join("src", "oxli", bn + ".cc") for bn in [
     "read_parsers", "kmer_hash", "hashtable", "hashgraph",
     "labelhash", "subset", "read_aligner",

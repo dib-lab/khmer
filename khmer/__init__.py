@@ -41,10 +41,9 @@ from collections import namedtuple
 from math import log
 import json
 
-from khmer._khmer import GraphLabels as _GraphLabels
-from khmer._khmer import ReadAligner as _ReadAligner
+#from khmer._khmer import GraphLabels as _GraphLabels
+#from khmer._khmer import ReadAligner as _ReadAligner
 
-#from khmer._khmer import HashSet
 from khmer._khmer import Read
 from khmer._khmer import forward_hash
 # tests/test_{functions,countgraph,counting_single}.py
@@ -260,13 +259,6 @@ def get_n_primes_near_x(number, target):
 # Additional functionality can be added to these classes as appropriate.
 
 '''
-class Counttable(_Counttable):
-    def __new__(cls, k, starting_size, n_tables):
-        primes = get_n_primes_near_x(n_tables, starting_size)
-        return super().__new__(cls, k, primes)
-'''
-
-
 class GraphLabels(_GraphLabels):
 
     def __new__(cls, k, starting_size, n_tables):
@@ -287,7 +279,7 @@ class CountingGraphLabels(_GraphLabels):
 
 
 class ReadAligner(_ReadAligner):
-    """Sequence to graph aligner.
+    Sequence to graph aligner.
 
     ReadAligner uses a Countgraph (the counts of k-mers in the target DNA
     sequences) as an implicit De Bruijn graph. Input DNA sequences are aligned
@@ -298,7 +290,7 @@ class ReadAligner(_ReadAligner):
     'defaultScoringMatrix'.
 
     The main method is 'align'.
-    """
+    
 
     defaultTransitionProbabilities = (  # _M, _Ir, _Ig, _Mu, _Iru, _Igu
         (log(0.9848843, 2), log(0.0000735, 2), log(0.0000334, 2),
@@ -344,7 +336,7 @@ class ReadAligner(_ReadAligner):
         return readaligner
 
     def __init__(self, *args, **kwargs):  # pylint: disable=unused-argument
-        """
+        
         Initialize ReadAligner.
 
         HMM state notation abbreviations:
@@ -379,9 +371,9 @@ class ReadAligner(_ReadAligner):
         during the __new__ process and so the class initialization actually
         occurs there. Instatiation is documented here in __init__ as this is
         the traditional way.
-        """
+        
         _ReadAligner.__init__(self)
-
+'''
 
 #from khmer._oxli.assembly import (LinearAssembler, SimpleLabeledAssembler,
 #                                  JunctionCountAssembler)

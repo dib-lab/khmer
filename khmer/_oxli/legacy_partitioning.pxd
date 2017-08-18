@@ -52,7 +52,7 @@ cdef extern from "oxli/subset.hh":
                                                  bool,
                                                  bool)
 
-        void do_partition(HashIntoType, HashIntoType, bool, bool)
+        void do_partition(HashIntoType, HashIntoType, bool, bool) nogil
 
         void do_partition_with_abundance(HashIntoType, HashIntoType,
                                          BoundedCounterType,
@@ -71,7 +71,7 @@ cdef extern from "oxli/subset.hh":
                                                          unsigned int,
                                                          unsigned int,
                                                          CpCountgraph&)
-        void repartition_a_partition(const HashIntoTypeSet &)
+        void repartition_a_partition(const HashIntoTypeSet &) except +oxli_raise_py_error
         void _clear_partition(PartitionID, HashIntoTypeSet &)
         void _merge_other(HashIntoType, PartitionID, PartitionPtrMap &)
         void report_on_partitions()

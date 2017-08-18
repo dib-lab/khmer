@@ -5,38 +5,17 @@ from libcpp.set cimport set
 from libcpp.memory cimport unique_ptr, shared_ptr, weak_ptr
 from libc.stdint cimport uint8_t, uint32_t, uint64_t, uintptr_t
 
-from oxli_types cimport *
-from hashing cimport Kmer, CpKmer, KmerSet, CpKmerFactory, CpKmerIterator
-from parsing cimport CpReadParser, CpSequence
-from utils cimport oxli_raise_py_error
+from .oxli_types cimport *
+from .hashing cimport Kmer, CpKmer, KmerSet, CpKmerFactory, CpKmerIterator
+from .parsing cimport CpReadParser, CpSequence
+from .legacy_partitioning cimport (CpSubsetPartition, cp_pre_partition_info,
+                                   SubsetPartition)
+from .utils cimport oxli_raise_py_error
 
 
 cdef extern from "Python.h":
     ctypedef struct PyObject
     object PyMemoryView_FromBuffer(Py_buffer *view)
-
-
-# All we really need are the PyObject struct definitions
-# for our extension objects.
-cdef extern from "khmer/_cpy_khmer.hh":
-
-    ctypedef struct CPyHashtable_Object "khmer::khmer_KHashtable_Object":
-        CpHashtable * hashtable
-
-    ctypedef struct CPyHashgraph_Object "khmer::khmer_KHashgraph_Object":
-        CPyHashtable_Object khashtable
-        CpHashgraph * hashgraph
-
-    ctypedef struct CPyNodegraph_Object "khmer::khmer_KNodegraph_Object":
-        CPyHashgraph_Object khashgraph
-        CpNodegraph * nodegraph
-
-    ctypedef struct CPyCountgraph_Object "khmer::khmer_KCountgraph_Object":
-        CPyHashgraph_Object khashgraph
-        CpCountgraph * countgraph
-
-    ctypedef struct CPyGraphLabels_Object "khmer::khmer_KGraphLabels_Object":
-        CpLabelHash * labelhash
 
 
 cdef extern from "oxli/storage.hh":
@@ -145,6 +124,8 @@ cdef extern from "oxli/hashgraph.hh" namespace "oxli":
         set[HashIntoType] all_tags
         set[HashIntoType] stop_tags
         set[HashIntoType] repart_small_tags
+        shared_ptr[CpSubsetPartition] partition
+
         void _set_tag_density(unsigned int)
         unsigned int _get_tag_density() const
         void add_tag(HashIntoType)
@@ -260,6 +241,7 @@ cdef class Hashtable:
     cdef shared_ptr[CpHashtable] _ht_this
 
     cpdef bytes sanitize_kmer(self, object kmer)
+    cdef HashIntoType sanitize_hash_kmer(self, object kmer)
     cdef bytes _valid_sequence(self, str sequence)
     cdef CpKmer _build_kmer(self, object kmer) except *
     cdef list _get_raw_tables(self, uint8_t **, vector[uint64_t])
@@ -283,6 +265,10 @@ cdef class Nodetable(Hashtable):
 
 cdef class Hashgraph(Hashtable):
     cdef shared_ptr[CpHashgraph] _hg_this
+    cdef SubsetPartition partitions
+    # We keep an extra ref to the shared_ptr from partitions
+    # to make sure dealloc ordering doesn't get clobbered
+    cdef shared_ptr[CpSubsetPartition] partitions_ptr
 
 
 cdef class Nodegraph(Hashgraph):

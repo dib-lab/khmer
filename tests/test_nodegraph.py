@@ -725,7 +725,7 @@ def _build_testfiles():
     EXCURSION_KMER_COUNT_THRESHOLD = 1
     counting = khmer.Countgraph(32, 100000, 4)
 
-    nodegraph.repartition_largest_partition(None, counting,
+    nodegraph.repartition_largest_partition(counting,
                                             EXCURSION_DISTANCE,
                                             EXCURSION_KMER_THRESHOLD,
                                             EXCURSION_KMER_COUNT_THRESHOLD)

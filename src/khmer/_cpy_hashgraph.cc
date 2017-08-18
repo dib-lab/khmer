@@ -2,7 +2,6 @@
 #include "khmer/_cpy_hashgraph.hh"
 #include "khmer/_cpy_nodegraph.hh"
 #include "khmer/_cpy_countgraph.hh"
-#include "khmer/_cpy_subsetpartition.hh"
 #include "khmer/_cpy_readparsers.hh"
 
 #include <vector>
@@ -57,127 +56,7 @@ PyMethodDef khmer_hashgraph_methods[] = {
 
 
 
-// PyObject * hashgraph_repartition_largest_partition(
-//    khmer_KHashgraph_Object * me,
-//    PyObject * args);
 
-
-PyObject *
-hashgraph_repartition_largest_partition(khmer_KHashgraph_Object * me,
-                                        PyObject * args)
-{
-    Hashgraph * hashgraph = me->hashgraph;
-    khmer_KCountgraph_Object * countgraph_o = NULL;
-    PyObject * subset_o = NULL;
-    SubsetPartition * subset_p;
-    unsigned int distance, threshold, frequency;
-
-    if (!PyArg_ParseTuple(args, "OO!III",
-                          &subset_o,
-                          &khmer_KCountgraph_Type, &countgraph_o,
-                          &distance, &threshold, &frequency)) {
-        return NULL;
-    }
-
-    if (PyObject_TypeCheck(subset_o, &khmer_KSubsetPartition_Type)) {
-        subset_p = ((khmer_KSubsetPartition_Object *) subset_o)->subset;
-    } else {
-        subset_p = hashgraph->partition;
-    }
-
-    Countgraph * countgraph = countgraph_o->countgraph;
-
-    unsigned long next_largest;
-    try {
-        next_largest = subset_p->repartition_largest_partition(distance,
-                       threshold, frequency, *countgraph);
-    } catch (oxli_exception &e) {
-        PyErr_SetString(PyExc_RuntimeError, e.what());
-        return NULL;
-    }
-
-    return PyLong_FromLong(next_largest);
-}
-
-
-
-PyObject *
-hashgraph_do_subset_partition(khmer_KHashgraph_Object * me, PyObject * args)
-{
-    Hashgraph * hashgraph = me->hashgraph;
-
-    PyObject * start_kmer_obj;
-    PyObject * end_kmer_obj;
-    HashIntoType start_kmer, end_kmer;
-    PyObject * break_on_stop_tags_o = NULL;
-    PyObject * stop_big_traversals_o = NULL;
-
-    if (!PyArg_ParseTuple(args, "|OOOO", &start_kmer_obj, &end_kmer_obj,
-                          &break_on_stop_tags_o,
-                          &stop_big_traversals_o)) {
-        return NULL;
-    }
-    if (!ht_convert_PyObject_to_HashIntoType(start_kmer_obj, start_kmer,
-            hashgraph)) {
-        return NULL;
-    }
-    if (!ht_convert_PyObject_to_HashIntoType(end_kmer_obj, end_kmer,
-            hashgraph)) {
-        return NULL;
-    }
-
-    bool break_on_stop_tags = false;
-    if (break_on_stop_tags_o && PyObject_IsTrue(break_on_stop_tags_o)) {
-        break_on_stop_tags = true;
-    }
-    bool stop_big_traversals = false;
-    if (stop_big_traversals_o && PyObject_IsTrue(stop_big_traversals_o)) {
-        stop_big_traversals = true;
-    }
-
-    SubsetPartition * subset_p = NULL;
-    try {
-        Py_BEGIN_ALLOW_THREADS
-        subset_p = new SubsetPartition(hashgraph);
-        subset_p->do_partition(start_kmer, end_kmer, break_on_stop_tags,
-                               stop_big_traversals);
-        Py_END_ALLOW_THREADS
-    } catch (std::bad_alloc &e) {
-        return PyErr_NoMemory();
-    }
-
-    khmer_KSubsetPartition_Object * subset_obj = (khmer_KSubsetPartition_Object *)\
-            PyObject_New(khmer_KSubsetPartition_Object, &khmer_KSubsetPartition_Type);
-
-    if (subset_obj == NULL) {
-        delete subset_p;
-        return NULL;
-    }
-
-    subset_obj->subset = subset_p;
-
-    return (PyObject *) subset_obj;
-}
-
-
-
-PyObject *
-hashgraph_merge_subset(khmer_KHashgraph_Object * me, PyObject * args)
-{
-    Hashgraph * hashgraph = me->hashgraph;
-
-    khmer_KSubsetPartition_Object * subset_obj = NULL;
-    if (!PyArg_ParseTuple(args, "O!", &khmer_KSubsetPartition_Type,
-                          &subset_obj)) {
-        return NULL;
-    }
-
-    SubsetPartition * subset_p = subset_obj->subset;
-
-    hashgraph->partition->merge(subset_p);
-
-    Py_RETURN_NONE;
-}
 
 
 PyObject *
@@ -363,22 +242,6 @@ hashgraph__validate_partitionmap(khmer_KHashgraph_Object * me, PyObject * args)
     Py_RETURN_NONE;
 }
 
-
-PyObject *
-hashgraph_count_partitions(khmer_KHashgraph_Object * me, PyObject * args)
-{
-    Hashgraph * hashgraph = me->hashgraph;
-
-    if (!PyArg_ParseTuple(args, "")) {
-        return NULL;
-    }
-
-    size_t n_partitions = 0, n_unassigned = 0;
-    hashgraph->partition->count_partitions(n_partitions, n_unassigned);
-
-    return Py_BuildValue("nn", (Py_ssize_t) n_partitions,
-                         (Py_ssize_t) n_unassigned);
-}
 
 
 PyObject *

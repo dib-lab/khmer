@@ -16,12 +16,11 @@ from .utils import get_n_primes_near_x
 from .parsing cimport (CpFastxReader, CPyReadParser_Object, get_parser,
                       CpReadParser, FastxParserPtr)
 from .hashset cimport HashSet
+from .legacy_partitioning cimport (CpSubsetPartition, SubsetPartition,
+                                   cp_pre_partition_info, PrePartitionInfo)
 from .oxli_types cimport MAX_BIGCOUNT, HashIntoType
 from .traversal cimport Traverser
 
-from .._khmer import Countgraph as PyCountgraph
-from .._khmer import Nodegraph as PyNodegraph
-from .._khmer import GraphLabels as PyGraphLabels
 from .._khmer import ReadParser
 
 
@@ -45,6 +44,22 @@ cdef class Hashtable:
             handled = kmer
         else:
             handled = deref(self._ht_this).unhash_dna(kmer)
+        return handled
+
+    cdef HashIntoType sanitize_hash_kmer(self, object kmer):
+        cdef HashIntoType handled
+        if isinstance(kmer, basestring):
+            if len(kmer) != self.ksize():
+                raise ValueError("Expected k-mer length {}"
+                                 " but got {}.".format(self.ksize(), len(kmer)))
+            handled = deref(self._ht_this).hash_dna(_bstring(kmer))
+        elif isinstance(kmer, bytes):
+            if len(kmer) != self.ksize():
+                raise ValueError("Expected k-mer length {}"
+                                 " but got {}.".format(self.ksize(), len(kmer)))
+            handled = deref(self._ht_this).hash_dna(kmer)
+        else:
+            handled = <HashIntoType>kmer
         return handled
 
     def count(self, object kmer):
@@ -381,6 +396,18 @@ cdef class Nodetable(Hashtable):
 
 cdef class Hashgraph(Hashtable):
 
+    def __cinit__(self, *args, **kwargs):
+        self.partitions = None
+
+
+    @property
+    def partition(self):
+        if self.partitions is None:
+            self.partitions = SubsetPartition(self)
+            self.partitions._this = deref(self._hg_this).partition
+            self.partitions_ptr = self.partitions._this
+        return self.partitions
+
     def neighbors(self, object kmer):
         '''Get a list of neighbor nodes for this k-mer.'''
         cdef Traverser traverser = Traverser(self)
@@ -556,10 +583,25 @@ cdef class Hashgraph(Hashtable):
         '''Set the tagging density.'''
         deref(self._hg_this)._set_tag_density(density)
 
-    def do_subset_partition(self, *args, **kwargs):
+    def do_subset_partition(self, object start_kmer, object end_kmer,
+                                  bool break_on_stoptags=False,
+                                  bool stop_big_traversals=False):
         '''Partition the graph starting from a given subset of tags.'''
-        raise NotImplementedError()
-    
+
+        cdef SubsetPartition subset = SubsetPartition(self)
+        cdef CpSubsetPartition * subset_ptr = subset._this.get()
+        cdef HashIntoType start = self.sanitize_hash_kmer(start_kmer)
+        cdef HashIntoType end = self.sanitize_hash_kmer(end_kmer)
+        cdef bool cbreak = break_on_stoptags
+        cdef bool cstop = stop_big_traversals
+        
+        with nogil:
+            deref(subset_ptr).do_partition(start, end, cbreak, cstop)
+
+        return subset
+
+        
+
     def find_all_tags(self, *args, **kwargs):
         '''Starting from the given k-mer, find all closely connected tags.'''
         raise NotImplementedError()
@@ -608,19 +650,19 @@ cdef class Hashgraph(Hashtable):
                                                                      n_consumed)
         return total_reads, n_consumed
     
-    def merge_subset(self, *args, **kwargs):
+    def merge_subset(self, SubsetPartition subset):
         '''Merge the given subset into this one.'''
-        raise NotImplementedError()
-    
+        deref(deref(self._hg_this).partition).merge(subset._this.get())
+
     def merge_subset_from_disk(self, *args, **kwargs):
         '''Merge the given subset (filename) into this one.'''
         raise NotImplementedError()
     
-    def count_partitions(self, *args, **kwargs):
+    def count_partitions(self):
         '''Count the number of partitions in the master partitionmap.'''
-        raise NotImplementedError()
+        return self.partition.count_partitions()
     
-    def subset_count_partitions(self, *args, **kwargs):
+    def subset_count_partitions(self, SubsetPartition subset):
         '''Count the number of partitions in this subset partitionmap.'''
         raise NotImplementedError()
 
@@ -644,17 +686,35 @@ cdef class Hashgraph(Hashtable):
         '''Set the partition ID for this tag.'''
         raise NotImplementedError()
 
-    def join_partitions(self, *args, **kwargs):
+    def join_partitions(self, PartitionID p1, PartitionID p2):
         '''Join the partitions of these two tags.'''
-        raise NotImplementedError()
-    
-    def get_partition_id(self, *args, **kwargs):
+        return deref(deref(self._hg_this).partition).join_partitions(p1, p2)
+
+    def get_partition_id(self, object kmer):
         '''Get the partition ID of this tag.'''
-        raise NotImplementedError()
+        cdef string start = self.sanitize_kmer(kmer)
+        return deref(deref(self._hg_this).partition).get_partition_id(start)
     
-    def repartition_largest_partition(self, *args, **kwargs):
+    def repartition_largest_partition(self, Countgraph counts not None,
+                                            unsigned int distance,
+                                            unsigned int threshold,
+                                            unsigned int frequency,
+                                            SubsetPartition subs=None):
         '''Repartition the largest partition (in the face of stop tags).'''
-        raise NotImplementedError()
+
+        cdef shared_ptr[CpSubsetPartition] subs_ptr
+        if subs is None:
+            subs_ptr = deref(self._hg_this).partition
+        else:
+            subs_ptr = subs._this
+
+        cdef unsigned long next_largest
+        next_largest = deref(subs_ptr).\
+                repartition_largest_partition(distance,
+                                              threshold,
+                                              frequency,
+                                              deref(counts._cg_this))
+        return next_largest
 
     def load_stop_tags(self, object filename, clear_tags=False):
         '''Load the set of stop tags.'''
