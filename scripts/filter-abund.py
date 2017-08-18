@@ -51,7 +51,7 @@ import textwrap
 import khmer
 
 from khmer import __version__
-from khmer import ReadParser
+from khmer import ReadParser, Countgraph
 from khmer.utils import (broken_paired_reader, write_record)
 from khmer.khmer_args import (add_threading_args, KhmerArgumentParser,
                               sanitize_help, check_argument_range)
@@ -131,7 +131,7 @@ def main():
     check_space(infiles, args.force)
 
     log_info('loading countgraph: {graph}', graph=args.input_graph)
-    countgraph = khmer.load_countgraph(args.input_graph)
+    countgraph = Countgraph.load(args.input_graph)
     ksize = countgraph.ksize()
 
     log_info("K: {ksize}", ksize=ksize)
