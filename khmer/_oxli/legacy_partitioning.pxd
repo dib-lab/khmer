@@ -35,11 +35,12 @@ cdef extern from "oxli/subset.hh":
         void _merge_from_disk_consolidate(PartitionPtrMap&)
 
         void save_partitionmap(string)
-        void load_partitionmap(string)
+        void load_partitionmap(string) except +oxli_raise_py_error
         void _validate_pmap()
         
         void find_all_tags(CpKmer, HashIntoTypeSet &, HashIntoTypeSet &,
-                           bool, bool)
+                           bool, bool) nogil
+        void find_all_tags(CpKmer, HashIntoTypeSet &, HashIntoTypeSet &) nogil
 
         unsigned int sweep_for_tags(const string&, HashIntoTypeSet &,
                                     HashIntoTypeSet &, unsigned int,
@@ -50,14 +51,14 @@ cdef extern from "oxli/subset.hh":
                                                  BoundedCounterType,
                                                  BoundedCounterType,
                                                  bool,
-                                                 bool)
+                                                 bool) nogil
 
         void do_partition(HashIntoType, HashIntoType, bool, bool) nogil
 
         void do_partition_with_abundance(HashIntoType, HashIntoType,
                                          BoundedCounterType,
                                          BoundedCounterType,
-                                         bool, bool)
+                                         bool, bool) nogil
         void count_partitions(size_t&, size_t&)
         size_t output_partitioned_file(string &, string &,
                 bool) except +oxli_raise_py_error
@@ -80,6 +81,8 @@ cdef class PrePartitionInfo:
     cdef shared_ptr[cp_pre_partition_info] _this
     @staticmethod
     cdef PrePartitionInfo wrap(cp_pre_partition_info *)
+    @staticmethod
+    cdef PrePartitionInfo create(CpKmer kmer)
 
 
 cdef class SubsetPartition:

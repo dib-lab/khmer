@@ -13,6 +13,12 @@ cdef class PrePartitionInfo:
         part._this.reset(ptr)
         return part
 
+    @staticmethod
+    cdef PrePartitionInfo create(CpKmer kmer):
+        cdef PrePartitionInfo part = PrePartitionInfo()
+        part._this = make_shared[cp_pre_partition_info](kmer)
+        return part
+
 
 cdef class SubsetPartition:
 

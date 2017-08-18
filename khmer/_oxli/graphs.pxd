@@ -134,7 +134,7 @@ cdef extern from "oxli/hashgraph.hh" namespace "oxli":
         bool hash_stop_tag(HashIntoType)
         uintptr_t n_tags() const
         void divide_tags_into_subsets(unsigned int, set[HashIntoType] &)
-        void add_kmer_to_tags(HashIntoType)
+        void add_kmer_to_tags(HashIntoType) nogil
         void clear_tags()
 
         void consume_seqfile_and_tag[SeqIO](const string &,

@@ -499,21 +499,18 @@ cdef class Hashgraph(Hashtable):
                 result.append((pos+1, kmer))
         return result
             
-    def find_all_tags_list(self, str kmer):
+    def find_all_tags_list(self, object kmer):
         '''Find all tags within range of the given k-mer, return as list'''
-        raise NotImplementedError()
-        if len(kmer) != self.ksize():
-            raise ValueError("k-mer length must equal the counting "\
-                             "table k-mer size")
+        cdef CpKmer start = self._build_kmer(kmer)
         cdef HashSet result = HashSet(self.ksize())
-        cdef CpKmer start = deref(self._hg_this).build_kmer(_bstring(kmer))
+        cdef set[HashIntoType] * tags = &(result.hs)
+        cdef shared_ptr[CpHashgraph] this = self._hg_this
 
         with nogil:
-            # partition->find_all_tags(start_kmer, result.hs, all_tags)
-            pass
+            deref(deref(self._hg_this).partition).find_all_tags(start, deref(tags), 
+                                                                deref(this).all_tags)
 
         return result
-
 
     def consume_seqfile_and_tag(self, str filename):
         '''Consume all sequences in a FASTA/FASTQ file and tag the resulting
@@ -600,15 +597,28 @@ cdef class Hashgraph(Hashtable):
 
         return subset
 
-        
 
-    def find_all_tags(self, *args, **kwargs):
+    def find_all_tags(self, object kmer):
         '''Starting from the given k-mer, find all closely connected tags.'''
-        raise NotImplementedError()
+        cdef CpKmer start = self._build_kmer(kmer)
+        cdef PrePartitionInfo ppi = PrePartitionInfo.create(start)
+
+        with nogil:
+            deref(deref(self._hg_this).partition).find_all_tags(start,
+                                                                deref(ppi._this).tagged_kmers,
+                                                                deref(self._hg_this).all_tags)
+            deref(self._hg_this).add_kmer_to_tags(start.kmer_u)
+
+        return ppi
+
     
-    def assign_partition_id(self, *args, **kwargs):
+    def assign_partition_id(self, PrePartitionInfo ppi):
         '''Assign a partition ID to a given tag.'''
-        raise NotImplementedError()
+        cdef cp_pre_partition_info * cppi = ppi._this.get()
+        cdef PartitionID pi
+        pi = deref(deref(self._hg_this).partition).assign_partition_id(deref(cppi).kmer,
+                                                                       deref(cppi).tagged_kmers)
+        return pi
     
     def output_partitions(self, str filename, str output, bool
                                 output_unassigned=False):
@@ -620,17 +630,17 @@ cdef class Hashgraph(Hashtable):
                                                                       output_unassigned)
         return n_partitions
     
-    def load_partitionmap(self, *args, **kwargs):
+    def load_partitionmap(self, str filename):
         '''Load a partitionmap for a given subset.'''
-        raise NotImplementedError()
+        deref(deref(self._hg_this).partition).load_partitionmap(_bstring(filename))
 
-    def save_partitionmap(self, *args, **kwargs):
+    def save_partitionmap(self, str filename):
         '''Save a partitionmap for the given subset.'''
-        raise NotImplementedError()
+        deref(deref(self._hg_this).partition).save_partitionmap(_bstring(filename))
     
-    def _validate_partitionmap(self, *args, **kwargs):
+    def _validate_partitionmap(self):
         '''Run internal validation checks.'''
-        raise NotImplementedError()
+        deref(deref(self._hg_this).partition)._validate_pmap()
     
     def consume_seqfile_and_tag_with_reads_parser(self, object read_parser):
         '''Count all k-mers using the given reads parser'''
