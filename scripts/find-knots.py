@@ -48,6 +48,7 @@ import os
 import textwrap
 import khmer
 import sys
+from khmer import Nodegraph, SubsetPartition
 from khmer.kfile import check_input_files, check_space
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, sanitize_help)
@@ -125,7 +126,7 @@ def main():
     check_space(infiles, args.force)
 
     print('loading k-mer nodegraph %s' % graphbase, file=sys.stderr)
-    graph = khmer.load_nodegraph(graphbase)
+    graph = Nodegraph.load(graphbase)
 
     print('loading tagset %s.tagset...' % graphbase, file=sys.stderr)
     graph.load_tagset(graphbase + '.tagset')
@@ -156,21 +157,22 @@ def main():
     # load & merge
     for index, subset_file in enumerate(pmap_files):
         print('<-', subset_file, file=sys.stderr)
-        subset = graph.load_subset_partitionmap(subset_file)
+        subset = SubsetPartition.load(subset_file, graph)
 
         print('** repartitioning subset... %s' % subset_file, file=sys.stderr)
-        graph.repartition_largest_partition(subset, counting,
+        graph.repartition_largest_partition(counting,
                                             EXCURSION_DISTANCE,
                                             EXCURSION_KMER_THRESHOLD,
-                                            EXCURSION_KMER_COUNT_THRESHOLD)
+                                            EXCURSION_KMER_COUNT_THRESHOLD,
+                                            subs=subset)
 
         print('** merging subset... %s' % subset_file, file=sys.stderr)
         graph.merge_subset(subset)
 
         print('** repartitioning, round 2... %s' %
               subset_file, file=sys.stderr)
-        size = graph.repartition_largest_partition(
-            None, counting, EXCURSION_DISTANCE, EXCURSION_KMER_THRESHOLD,
+        size = graph.repartition_largest_partition(counting, 
+            EXCURSION_DISTANCE, EXCURSION_KMER_THRESHOLD,
             EXCURSION_KMER_COUNT_THRESHOLD)
 
         print('** repartitioned size:', size, file=sys.stderr)
