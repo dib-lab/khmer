@@ -45,7 +45,7 @@ cdef CpHashtable * hashtable_arg_shim(object table,
                                                SmallCounttable, QFCounttable)):
     cdef CPyHashtable_Object* cpyhashtable
     cdef CpHashtable * hashtable
-                                          
+
     if isinstance(table, allowed):
         if isinstance(table, CYTHON_TABLES):
             hashtable = (<Hashtable>table).c_table.get()
@@ -226,7 +226,7 @@ cdef class Hashtable:
                                                                      total_reads,
                                                                      n_consumed)
         return total_reads, n_consumed
-                                                                     
+
     def consume_seqfile_banding(self, file_name, num_bands, band):
         """Count all k-mers from file_name."""
         cdef unsigned long long n_consumed = 0
@@ -270,7 +270,7 @@ cdef class Hashtable:
         """Calculate the k-mer abundance distribution over reads."""
         cdef CpHashtable * cptracking = hashtable_arg_shim(tracking,
                                                       allowed=(PyNodegraph, Nodetable))
- 
+
         cdef CPyReadParser_Object* parser
         parser = <CPyReadParser_Object*>read_parser
         cdef uint64_t * x = deref(self.c_table).abundance_distribution[CpFastxReader](
@@ -311,14 +311,36 @@ cdef class Hashtable:
 
 
 cdef class QFCounttable(Hashtable):
-    def __cinit__(self, int k, int starting_size):
-        # starting size has to be a power of two
-        power_of_two = ((starting_size & (starting_size - 1) == 0) and
-                        (starting_size != 0))
+    """Count kmers using a counting quotient filter.
+
+    The counting quotient filter (CQF) is an extension of the quotient filter
+    that supports counting in addition to simple membership testing. A CQF has
+    better cache locality compared to (Small)Counttable which increases
+    performance.
+
+    Each new k-mer uses one slot, and the number of slots used per k-mer
+    increases the more often the same k-mer is entered into the CQF. As a result
+    the CQF can be "full" and will stop accepting calls to `add` and `count`.
+
+    Parameters
+    ----------
+    k : integer
+        k-mer size
+
+    size : integer
+        Set the number of slots used by the counting quotient filter. This
+        determines the amount of memory used and how many k-mers can be entered
+        into the datastructure. Each slot uses roughly 1.3 bytes.
+    """
+    def __cinit__(self, int k, uint64_t size):
+        # size has to be a power of two
+        power_of_two = ((size & (size - 1) == 0) and
+                        (size != 0))
         if not power_of_two:
-            raise ValueError("starting_size has to be a power of two.")
+            raise ValueError("size has to be a power of two, not"
+                             " {}.".format(size))
         if type(self) is QFCounttable:
-            self.c_table.reset(<CpHashtable*>new CpQFCounttable(k, int(log(starting_size, 2))))
+            self.c_table.reset(<CpHashtable*>new CpQFCounttable(k, int(log(size, 2))))
 
     @classmethod
     def load(cls, file_name):
@@ -346,5 +368,3 @@ cdef class Nodetable(Hashtable):
         if type(self) is Nodetable:
             primes = get_n_primes_near_x(n_tables, starting_size)
             self.c_table.reset(<CpHashtable*>new CpNodetable(k, primes))
-
-
