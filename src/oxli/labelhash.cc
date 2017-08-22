@@ -200,7 +200,6 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
     printdbg(deleted parser and exiting)
 }
 
-// @cswelcher: double-check -- is it valid to pull the address from a reference?
 void LabelHash::link_tag_and_label(const HashIntoType kmer,
                                    const Label kmer_label)
 {

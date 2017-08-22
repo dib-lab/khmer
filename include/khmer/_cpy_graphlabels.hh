@@ -62,6 +62,10 @@ labelhash_get_tag_labels(khmer_KGraphLabels_Object * me, PyObject * args);
 
 
 PyObject *
+labelhash_link_tag_and_label(khmer_KGraphLabels_Object * me, PyObject * args);
+
+
+PyObject *
 labelhash_n_labels(khmer_KGraphLabels_Object * me, PyObject * args);
 
 

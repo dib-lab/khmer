@@ -913,13 +913,17 @@ hashgraph_add_tag(khmer_KHashgraph_Object * me, PyObject * args)
 {
     Hashgraph * hashgraph = me->hashgraph;
 
-    const char * kmer_s = NULL;
-    if (!PyArg_ParseTuple(args, "s", &kmer_s)) {
+    PyObject * tag_o;
+    if (!PyArg_ParseTuple(args, "O", &tag_o)) {
         return NULL;
     }
 
-    HashIntoType kmer = hashgraph->hash_dna(kmer_s);
-    hashgraph->add_tag(kmer);
+    HashIntoType tag;
+    if (!ht_convert_PyObject_to_HashIntoType(tag_o, tag, hashgraph)) {
+        return NULL;
+    }
+
+    hashgraph->add_tag(tag);
 
     Py_RETURN_NONE;
 }

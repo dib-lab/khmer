@@ -58,6 +58,7 @@ PyMethodDef khmer_graphlabels_methods[] = {
     {"consume_partitioned_fasta_and_tag_with_labels", (PyCFunction)labelhash_consume_partitioned_fasta_and_tag_with_labels, METH_VARARGS, "" },
     {"sweep_tag_neighborhood", (PyCFunction)labelhash_sweep_tag_neighborhood, METH_VARARGS, "" },
     {"get_tag_labels", (PyCFunction)labelhash_get_tag_labels, METH_VARARGS, ""},
+    {"link_tag_and_label", (PyCFunction)labelhash_link_tag_and_label, METH_VARARGS, ""},
     {"consume_sequence_and_tag_with_labels", (PyCFunction)labelhash_consume_sequence_and_tag_with_labels, METH_VARARGS, "" },
     {"n_labels", (PyCFunction)labelhash_n_labels, METH_VARARGS, ""},
     {"get_all_labels", (PyCFunction)labelhash_get_all_labels, METH_VARARGS, "" },
@@ -387,6 +388,30 @@ labelhash_get_tag_labels(khmer_KGraphLabels_Object * me, PyObject * args)
     }
 
     return x;
+}
+
+
+PyObject *
+labelhash_link_tag_and_label(khmer_KGraphLabels_Object * me, PyObject * args)
+{
+    LabelHash * labelhash = me->labelhash;
+
+    PyObject * tag_o;
+    HashIntoType tag;
+    Label label;
+
+    if (!PyArg_ParseTuple(args, "OK", &tag_o, &label)) {
+        return NULL;
+    }
+    if (!ht_convert_PyObject_to_HashIntoType(tag_o, tag,
+            labelhash->graph)) {
+        return NULL;
+    }
+
+    labelhash->link_tag_and_label(tag, label);
+
+    Py_INCREF(Py_None);
+    return Py_None;
 }
 
 
