@@ -31,6 +31,7 @@ cdef extern from "khmer/_cpy_khmer.hh":
         CpCountgraph * countgraph
 
     ctypedef struct CPyGraphLabels_Object "khmer::khmer_KGraphLabels_Object":
+        CPyHashgraph_Object khashgraph
         CpLabelHash * labelhash
 
 
