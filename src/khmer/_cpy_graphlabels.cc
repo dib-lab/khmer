@@ -85,8 +85,8 @@ void khmer_graphlabels_dealloc(khmer_KGraphLabels_Object * obj)
     Py_TYPE(obj)->tp_free((PyObject*)obj);
 }
 
- PyObject * khmer_graphlabels_new(PyTypeObject *type, PyObject *args,
-                                        PyObject *kwds)
+PyObject * khmer_graphlabels_new(PyTypeObject *type, PyObject *args,
+                                 PyObject *kwds)
 {
     khmer_KGraphLabels_Object *self;
     self = (khmer_KGraphLabels_Object*)type->tp_alloc(type, 0);
@@ -95,6 +95,7 @@ void khmer_graphlabels_dealloc(khmer_KGraphLabels_Object * obj)
         PyObject * hashgraph_o;
         Hashgraph * hashgraph = NULL; // @CTB
 
+        // GraphLabels takes a single argument, a hashgraph descendant.
         if (!PyArg_ParseTuple(args, "O", &hashgraph_o)) {
             Py_DECREF(self);
             return NULL;
@@ -112,6 +113,10 @@ void khmer_graphlabels_dealloc(khmer_KGraphLabels_Object * obj)
             Py_DECREF(self);
             return NULL;
         }
+        // set 'base' for CPython-style inheritance.
+        self->khashgraph.khashtable.hashtable =
+            dynamic_cast<Hashtable*>(hashgraph);
+        self->khashgraph.hashgraph = dynamic_cast<Hashgraph*>(hashgraph);
 
         try {
             self->labelhash = new LabelHash(hashgraph);
