@@ -934,12 +934,15 @@ hashgraph_add_stop_tag(khmer_KHashgraph_Object * me, PyObject * args)
 {
     Hashgraph * hashgraph = me->hashgraph;
 
-    const char * kmer_s = NULL;
-    if (!PyArg_ParseTuple(args, "s", &kmer_s)) {
+    PyObject * kmer_o;
+    if (!PyArg_ParseTuple(args, "O", &kmer_o)) {
         return NULL;
     }
 
-    HashIntoType kmer = hashgraph->hash_dna(kmer_s);
+    HashIntoType kmer;
+    if (!ht_convert_PyObject_to_HashIntoType(kmer_o, kmer, hashgraph)) {
+        return NULL;
+    }
     hashgraph->add_stop_tag(kmer);
 
     Py_RETURN_NONE;

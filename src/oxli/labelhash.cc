@@ -200,6 +200,9 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
     printdbg(deleted parser and exiting)
 }
 
+// Note: this function assumes that 'kmer' is already in graph->all_tags;
+// see usage elsewhere in this code.
+
 void LabelHash::link_tag_and_label(const HashIntoType kmer,
                                    const Label kmer_label)
 {
