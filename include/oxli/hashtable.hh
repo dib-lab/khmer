@@ -540,12 +540,124 @@ public:
     }
 };
 
+
+class FNVKmerHashIterator : public KmerHashIterator
+{
+    const char * _seq;
+    const char _ksize;
+    unsigned int index;
+    unsigned int length;
+    bool _initialized;
+public:
+    FNVKmerHashIterator(const char * seq, unsigned char k) :
+        _seq(seq), _ksize(k), index(0), _initialized(false)
+    {
+        length = strlen(_seq);
+    };
+
+    HashIntoType first()
+    {
+        _initialized = true;
+        return next();
+    }
+
+    HashIntoType next()
+    {
+        if (!_initialized) {
+            _initialized = true;
+        }
+
+        if (done()) {
+            throw oxli_exception("past end of iterator");
+        }
+
+        std::string kmer;
+        kmer.assign(_seq + index, _ksize);
+        index += 1;
+        return _hash_fnv(kmer, _ksize);
+    }
+
+    bool done() const
+    {
+        return (index + _ksize > length);
+    }
+
+    unsigned int get_start_pos() const
+    {
+        if (!_initialized) {
+            return 0;
+        }
+        return index - 1;
+    }
+    unsigned int get_end_pos() const
+    {
+        if (!_initialized) {
+            return _ksize;
+        }
+        return index + _ksize - 1;
+    }
+};
+
+
+class FNVHashtable : public oxli::Hashtable
+{
+public:
+    explicit FNVHashtable(WordLength ksize, Storage * s)
+        : Hashtable(ksize, s) { };
+
+    inline
+    virtual
+    HashIntoType
+    hash_dna(const char * kmer) const
+    {
+        if (!(strlen(kmer) >= _ksize)) {
+            throw oxli_value_exception("Supplied kmer string doesn't match the underlying k-size.");
+        }
+        return _hash_fnv(kmer, _ksize);
+    }
+
+    inline virtual HashIntoType
+    hash_dna_top_strand(const char * kmer) const
+    {
+        throw oxli_value_exception("not implemented");
+    }
+
+    inline virtual HashIntoType
+    hash_dna_bottom_strand(const char * kmer) const
+    {
+        throw oxli_value_exception("not implemented");
+    }
+
+    inline virtual std::string
+    unhash_dna(HashIntoType hashval) const
+    {
+        throw oxli_value_exception("not implemented");
+    }
+
+    virtual KmerHashIteratorPtr new_kmer_iterator(const char * sp) const
+    {
+        KmerHashIterator * ki = new FNVKmerHashIterator(sp, _ksize);
+        return unique_ptr<KmerHashIterator>(ki);
+    }
+
+    virtual void save(std::string filename)
+    {
+        store->save(filename, _ksize);
+    }
+    virtual void load(std::string filename)
+    {
+        store->load(filename, _ksize);
+        _init_bitstuff();
+    }
+};
+
+
 // Hashtable-derived class with ByteStorage.
-class Counttable : public oxli::MurmurHashtable
+class Counttable : public oxli::FNVHashtable
 {
 public:
     explicit Counttable(WordLength ksize, std::vector<uint64_t> sizes)
-        : MurmurHashtable(ksize, new ByteStorage(sizes)) { } ;
+        : FNVHashtable(ksize, new ByteStorage(sizes)) { } ;
 };
 
 // Hashtable-derived class with NibbleStorage.
