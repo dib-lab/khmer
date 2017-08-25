@@ -83,14 +83,14 @@ def test_graph_attribute():
 def test_scoring_matrix():
     ch = khmer.Countgraph(10, 1048576, 1)
     aligner = khmer.ReadAligner(ch, 0, 0)
-    assert aligner.scoring_matrix == khmer.ReadAligner.defaultScoringMatrix
+    assert aligner.scoring_matrix == aligner.defaultScoringMatrix
 
 
 def test_transition_probabilities():
     ch = khmer.Countgraph(10, 1048576, 1)
     aligner = khmer.ReadAligner(ch)
     assert aligner.transition_probabilities == \
-           khmer.ReadAligner.defaultTransitionProbabilities
+           aligner.defaultTransitionProbabilities
 
 
 def test_align_nothing():
@@ -669,8 +669,8 @@ def test_readaligner_load():
     ct = khmer.Countgraph(32, 1048576, 1)
     parameters_json = utils.get_test_data('readaligner-default.json')
     a_aligner = khmer.ReadAligner(ct, 0, 0, filename=parameters_json)
-    a_scoring_matrix = a_aligner.get_scoring_matrix()
-    a_transition_probabilities = a_aligner.get_transition_probabilities()
+    a_scoring_matrix = a_aligner.scoring_matrix
+    a_transition_probabilities = a_aligner.transition_probabilities
     assert a_scoring_matrix[0] == -0.06642736173897607, a_scoring_matrix[0]
     assert a_transition_probabilities[0][0] == -0.021973842014145723, (
         a_transition_probabilities[0][0])
@@ -684,8 +684,8 @@ def test_readaligner_load():
     b_aligner = khmer.ReadAligner(
         ct, 0, 0, transition_probabilities=a_transition_probabilities,
         scoring_matrix=a_scoring_matrix)
-    b_scoring_matrix = b_aligner.get_scoring_matrix()
-    b_transition_probabilities = b_aligner.get_transition_probabilities()
+    b_scoring_matrix = b_aligner.scoring_matrix
+    b_transition_probabilities = b_aligner.transition_probabilities
     assert b_scoring_matrix == a_scoring_matrix, (
         a_scoring_matrix, b_scoring_matrix)
     assert b_transition_probabilities == a_transition_probabilities, (
