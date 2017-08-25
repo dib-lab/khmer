@@ -16,3 +16,6 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
 cdef bytes _bstring(s)
 
 cdef unicode _ustring(s)
+
+cdef void _flatten_fill(double * fill_to, object fill_from)
+cdef void _fill(double * fill_to, object fill_from)

@@ -40,3 +40,16 @@ cdef unicode _ustring(s):
         return unicode(s)
     else:
         raise TypeError(...)
+
+cdef void _flatten_fill(double * fill_to, object fill_from):
+    '''UNSAFE fill from multilevel python iterable to C array.'''
+    cdef list flattened = [x for sublist in fill_from for x in sublist]
+    for idx, item in enumerate(flattened):
+        fill_to[idx] = <double>item
+
+cdef void _fill(double * fill_to, object fill_from):
+    '''UNSAFE fill from flat python iterable to C array.'''
+    for idx, item in enumerate(fill_from):
+        fill_to[idx] = <double>item
+
+

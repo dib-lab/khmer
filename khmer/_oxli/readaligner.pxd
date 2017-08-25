@@ -75,6 +75,9 @@ cdef extern from "oxli/read_aligner.hh" namespace "oxli" nogil:
         double score
         bool truncated
 
+    cdef double trans_default []
+    cdef double freq_default []
+
     cdef cppclass CpReadAligner "oxli::ReadAligner":
         
         Alignment* Align(const string&)
@@ -87,6 +90,15 @@ cdef extern from "oxli/read_aligner.hh" namespace "oxli" nogil:
                       double* scoring_matrix, double* transitions)
         ScoringMatrix getScoringMatrix()
 
+
 cdef class ReadAligner:
     cdef shared_ptr[CpReadAligner] _aln_this
     cdef public Countgraph graph
+    @staticmethod
+    cdef double * _default_transition_probabilities()
+    @staticmethod
+    cdef double * _default_scoring_matrix()
+    @staticmethod
+    cdef list _format_scoring_matrix(double *)
+    @staticmethod
+    cdef tuple _format_transition_probabilities(double *)

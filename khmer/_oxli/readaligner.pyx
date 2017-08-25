@@ -2,6 +2,7 @@
 
 from cython.operator cimport dereference as deref
 
+from libc.math cimport log2
 from libcpp.memory cimport make_shared
 from libcpp.string cimport string
 
@@ -9,6 +10,7 @@ import json
 from math import log
 
 from .graphs cimport Countgraph
+from .utils cimport _flatten_fill, _fill
 
 cdef class ReadAligner:
     '''
@@ -25,26 +27,7 @@ cdef class ReadAligner:
     The main method is 'align'.
     '''
 
-    defaultTransitionProbabilities = (  # _M, _Ir, _Ig, _Mu, _Iru, _Igu
-        (log(0.9848843, 2), log(0.0000735, 2), log(0.0000334, 2),
-         log(0.0150068, 2), log(0.0000017, 2), log(0.0000003, 2)),  # M_
-        (log(0.5196194, 2), log(0.4647955, 2), log(0.0059060, 2),
-         log(0.0096792, 2)),  # Ir_
-        (log(0.7611255, 2), log(0.2294619, 2), log(0.0072673, 2),
-         log(0.0021453, 2)),  # Ig_
-        (log(0.0799009, 2), log(0.0000262, 2), log(0.0001836, 2),
-         log(0.9161349, 2), log(0.0033370, 2), log(0.0004173, 2)),  # Mu_
-        (log(0.1434529, 2), log(0.0036995, 2), log(0.2642928, 2),
-         log(0.5885548, 2)),  # Iru_
-        (log(0.1384551, 2), log(0.0431328, 2), log(0.6362921, 2),
-         log(0.1821200, 2))  # Igu_
-    )
-
-    defaultScoringMatrix = [
-        log(0.955, 2), log(0.04, 2), log(0.004, 2), log(0.001, 2)]
-
-
-    def __cinit__(self, Countgraph count_graph, double trusted_cov_cutoff=2, 
+    def __cinit__(self, Countgraph count_graph, BoundedCounterType trusted_cov_cutoff=2, 
                        double bits_theta=1, *args, **kwargs):
         '''
         Initialize ReadAligner.
@@ -77,24 +60,21 @@ cdef class ReadAligner:
             (default: ReadAligner.defaultTransitionProbabilities)
 
         '''
+        cdef double * _transitions = ReadAligner._default_transition_probabilities()
+        cdef double * _scoring_matrix = ReadAligner._default_scoring_matrix()
+
         if 'filename' in kwargs:
             with open(kwargs.pop('filename')) as paramfile:
                 params = json.load(paramfile)
-            scoring_matrix = params['scoring_matrix']
-            transition_probabilities = params['transition_probabilities']
+            _fill(_scoring_matrix, params['scoring_matrix'])
+            _flatten_fill(_transitions, params['transition_probabilities'])
         else:
             if 'scoring_matrix' in kwargs:
-                scoring_matrix = kwargs.pop('scoring_matrix')
-            else:
-                scoring_matrix = ReadAligner.defaultScoringMatrix
+                _fill(_scoring_matrix,
+                      kwargs.pop('scoring_matrix'))
             if 'transition_probabilities' in kwargs:
-                transition_probabilities = kwargs.pop('transition_probabilities')
-            else:
-                transition_probabilities = \
-                    ReadAligner.defaultTransitionProbabilities
-
-        cdef vector[double] _transitions = [x for sublist in transition_probabilities for x in sublist]
-        cdef vector[double] _scoring_matrix = scoring_matrix
+                _flatten_fill(_transitions,
+                              kwargs.pop('transition_probabilities'))
 
         self._aln_this = make_shared[CpReadAligner](count_graph._cg_this.get(),
                                                     trusted_cov_cutoff,
@@ -103,9 +83,10 @@ cdef class ReadAligner:
                                                     &(_transitions[0]))
         self.graph = count_graph
 
-    def align(self, str sequence, as_dict=False):
+    def align(self, str sequence):
         cdef string _sequence = self.graph._valid_sequence(sequence)
         cdef Alignment * aln = deref(self._aln_this).Align(_sequence)
+
         cdef object score = aln[0].score
         cdef object alignment = aln[0].graph_alignment
         cdef object read_alignment = aln[0].read_alignment
@@ -114,9 +95,12 @@ cdef class ReadAligner:
         return score, alignment.upper(), read_alignment.upper(), truncated
 
 
+
+
     def align_forward(self, str sequence):
         cdef string _sequence = self.graph._valid_sequence(sequence)
         cdef Alignment * aln = deref(self._aln_this).AlignForward(_sequence)
+
         cdef object score = aln[0].score
         cdef object alignment = aln[0].graph_alignment
         cdef object read_alignment = aln[0].read_alignment
@@ -125,6 +109,41 @@ cdef class ReadAligner:
 
         return (score, alignment.upper(), read_alignment.upper(),
                 truncated, covs)
+
+    @staticmethod
+    cdef double * _default_transition_probabilities():
+        return trans_default
+
+    @staticmethod
+    cdef double * _default_scoring_matrix():
+        return freq_default
+
+    @staticmethod
+    cdef list _format_scoring_matrix(double * sm):
+        return [sm[0], sm[1], sm[2], sm[3]]
+
+    @staticmethod
+    cdef tuple _format_transition_probabilities(double * tp):
+         return ((tp[0], tp[1], tp[2],
+                  tp[3], tp[4], tp[5]),
+                 (tp[6], tp[7], tp[8],
+                  tp[9]), 
+                 (tp[10], tp[11], tp[12], 
+                  tp[13]), 
+                 (tp[14], tp[15], tp[16], 
+                  tp[17], tp[18], tp[19]), 
+                 (tp[20], tp[21], tp[22], 
+                  tp[23]),
+                 (tp[24], tp[25], tp[26],
+                  tp[27]))
+
+    @property
+    def defaultScoringMatrix(self):
+        return ReadAligner._format_scoring_matrix(ReadAligner._default_scoring_matrix())
+
+    @property
+    def defaultTransitionProbabilities(self):
+        return ReadAligner._format_transition_probabilities(ReadAligner._default_transition_probabilities())
 
     @property
     def scoring_matrix(self):
@@ -161,21 +180,5 @@ cdef class ReadAligner:
         )'''
         
         cdef ScoringMatrix matrix = deref(self._aln_this).getScoringMatrix()
-        return ((matrix.tsc[0], matrix.tsc[1], matrix.tsc[2],
-                 matrix.tsc[3], matrix.tsc[4], matrix.tsc[5]),
-
-                (matrix.tsc[6], matrix.tsc[7], matrix.tsc[8],
-                 matrix.tsc[9]), 
-
-                (matrix.tsc[10], matrix.tsc[11], matrix.tsc[12], 
-                 matrix.tsc[13]), 
-
-                (matrix.tsc[14], matrix.tsc[15], matrix.tsc[16], 
-                 matrix.tsc[17], matrix.tsc[18], matrix.tsc[19]), 
-                
-                (matrix.tsc[20], matrix.tsc[21], matrix.tsc[22], 
-                 matrix.tsc[23]),
-                
-                (matrix.tsc[24], matrix.tsc[25], matrix.tsc[26],
-                 matrix.tsc[27]))
+        return ReadAligner._format_transition_probabilities(matrix.tsc)
 
