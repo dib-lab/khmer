@@ -38,7 +38,7 @@ from __future__ import absolute_import
 
 import os
 import khmer
-from khmer import GraphLabels, CountingGraphLabels
+from khmer import GraphLabels, Nodegraph, Countgraph
 import screed
 
 import pytest
@@ -57,36 +57,35 @@ def teardown():
 @pytest.mark.huge
 def test_toobig():
     try:
-        GraphLabels(20, 1e13, 1)
+        GraphLabels.NodeGraphLabels(20, 1e13, 1)
         assert 0, "This should fail."
     except MemoryError as err:
         print(str(err))
 
 
 def test_error_create():
-    from khmer import _GraphLabels
     try:
-        _GraphLabels(None)
+        GraphLabels.NodeGraphLabels(None, None, None)
         assert 0, "This should fail."
-    except ValueError as err:
+    except TypeError as err:
         print(str(err))
 
 
 def test_n_labels():
-    lh = GraphLabels(20, 1e7, 4)
+    lh = GraphLabels.NodeGraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lh.consume_seqfile_and_tag_with_labels(filename)
 
-    print(lh.n_labels())
-    assert lh.n_labels() == 4
+    print(lh.n_labels)
+    assert lh.n_labels == 4
 
 
 def test_get_all_labels():
-    lb = GraphLabels(20, 1e7, 4)
+    lb = GraphLabels.NodeGraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lb.consume_seqfile_and_tag_with_labels(filename)
 
-    labels = lb.get_all_labels()
+    labels = list(lb.labels())
     expected = [0, 1, 2, 3]
     for e_label in expected:
         assert e_label in labels
@@ -95,7 +94,7 @@ def test_get_all_labels():
 
 
 def test_get_labels_save_load():
-    lb_pre = GraphLabels(20, 1e7, 4)
+    lb_pre = GraphLabels.NodeGraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lb_pre.consume_seqfile_and_tag_with_labels(filename)
 
@@ -107,10 +106,10 @@ def test_get_labels_save_load():
     del lb_pre
 
     # create new, load labels & tags
-    lb = GraphLabels(20, 1e7, 4)
-    lb.load_labels_and_tags(savepath)
+    graph = Nodegraph(20, 1e7, 4)
+    lb = GraphLabels.load(savepath, graph)
 
-    labels = lb.get_all_labels()
+    labels = list(lb.labels())
     expected = [0, 1, 2, 3]
     for e_label in expected:
         assert e_label in labels
@@ -119,7 +118,7 @@ def test_get_labels_save_load():
 
 
 def test_get_labels_save_load_wrong_ksize():
-    lb_pre = GraphLabels(19, 1e7, 4)
+    lb_pre = GraphLabels.NodeGraphLabels(19, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lb_pre.consume_seqfile_and_tag_with_labels(filename)
 
@@ -131,7 +130,7 @@ def test_get_labels_save_load_wrong_ksize():
     del lb_pre
 
     # create new, load labels & tags
-    lb = GraphLabels(20, 1e7, 4)
+    lb = GraphLabels.NodeGraphLabels(20, 1e7, 4)
     try:
         lb.load_labels_and_tags(savepath)
         assert 0, "this should not succeed - different ksize"
@@ -141,7 +140,7 @@ def test_get_labels_save_load_wrong_ksize():
 
 
 def test_save_load_corrupted():
-    lb_pre = GraphLabels(20, 1e7, 4)
+    lb_pre = GraphLabels.NodeGraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lb_pre.consume_seqfile_and_tag_with_labels(filename)
 
@@ -152,7 +151,7 @@ def test_save_load_corrupted():
     # trash the old GraphLabels
     del lb_pre
 
-    lb = GraphLabels(20, 1e7, 4)
+    lb = GraphLabels.NodeGraphLabels(20, 1e7, 4)
 
     # produce all possible truncated versions of this file
     data = open(savepath, 'rb').read()
@@ -172,7 +171,7 @@ def test_save_load_corrupted():
 # note: if run as root, will fail b/c root can write to anything
 @pytest.mark.noroot
 def test_save_fail_readonly():
-    lb_pre = GraphLabels(20, 1e7, 4)
+    lb_pre = GraphLabels.NodeGraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lb_pre.consume_seqfile_and_tag_with_labels(filename)
 
@@ -191,18 +190,18 @@ def test_save_fail_readonly():
 
 
 def test_get_tag_labels():
-    lb = GraphLabels(20, 1e7, 4)
+    lb = GraphLabels.NodeGraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('single-read.fq')
     lb.consume_seqfile_and_tag_with_labels(filename)
     tag = 173473779682
 
-    labels = lb.get_tag_labels(tag)
+    labels = list(lb.get_tag_labels(tag))
     assert len(labels) == 1
     assert labels.pop() == 0
 
 
 def test_consume_seqfile_and_tag_with_labels():
-    lb = GraphLabels(20, 1e7, 4)
+    lb = GraphLabels.NodeGraphLabels(20, 1e7, 4)
     read_1 = 'ACGTAACCGGTTAAACCCGGGTTTAAAACCCCGGGGTTTT'
     filename = utils.get_test_data('test-transcript.fa')
 
@@ -211,9 +210,9 @@ def test_consume_seqfile_and_tag_with_labels():
     assert lb.graph.get(read_1[:20])
     assert total_reads == 3
     print("doing n_labels")
-    print(lb.n_labels())
+    print(lb.n_labels)
     print("doing all labels")
-    print(lb.get_all_labels())
+    print(lb.labels())
     print("get tagset")
     for tag in lb.graph.get_tagset():
         print("forward hash")
@@ -223,11 +222,11 @@ def test_consume_seqfile_and_tag_with_labels():
         print(lb.sweep_tag_neighborhood(record.sequence, 40))
         print("Sweeping labels...")
         print(lb.sweep_label_neighborhood(record.sequence, 40))
-    assert lb.n_labels() == 3
+    assert lb.n_labels == 3
 
 
 def test_consume_partitioned_fasta_and_tag_with_labels():
-    lb = GraphLabels(20, 1e7, 4)
+    lb = GraphLabels.NodeGraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('real-partition-small.fa')
 
     lb.consume_partitioned_fasta_and_tag_with_labels(
@@ -240,11 +239,11 @@ def test_consume_partitioned_fasta_and_tag_with_labels():
     # print(labels)
     assert len(labels) == 1
     assert labels.pop() == 2
-    assert lb.n_labels() == 1
+    assert lb.n_labels == 1
 
 
 def test_consume_sequence_and_tag_with_labels():
-    lb = GraphLabels(20, 1e6, 4)
+    lb = GraphLabels.NodeGraphLabels(20, 1e6, 4)
     label = 0
     sequence = 'ATGCATCGATCGATCGATCGATCGATCGATCGATCGATCG'
 
@@ -257,7 +256,7 @@ def test_consume_sequence_and_tag_with_labels():
 
 
 def test_sweep_tag_neighborhood():
-    lb = GraphLabels(20, 1e7, 4)
+    lb = GraphLabels.NodeGraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('single-read.fq')
     lb.graph.consume_seqfile_and_tag(filename)
 
@@ -267,11 +266,11 @@ def test_sweep_tag_neighborhood():
 
 
 def test_sweep_label_neighborhood():
-    lb = GraphLabels(20, 1e7, 4)
+    lb = GraphLabels.NodeGraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('single-read.fq')
     lb.consume_seqfile_and_tag_with_labels(filename)
 
-    labels = lb.sweep_label_neighborhood('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
+    labels = list(lb.sweep_label_neighborhood('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT'))
     assert len(labels) == 1
     assert labels.pop() == 0
 
@@ -284,14 +283,14 @@ def test_sweep_label_neighborhood():
 
 
 def test_label_tag_correctness():
-    lb = GraphLabels(20, 1e7, 4)
+    lb = GraphLabels.NodeGraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lb.consume_seqfile_and_tag_with_labels(filename)
 
     # read A
-    labels = lb.sweep_label_neighborhood(
+    labels = list(lb.sweep_label_neighborhood(
         'ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAG'
-        'CTAGGCTAGGTGTGCTCTGCCTAGAGCTAGGCTAGGTGT')
+        'CTAGGCTAGGTGTGCTCTGCCTAGAGCTAGGCTAGGTGT'))
     print(lb.sweep_tag_neighborhood(
         'TTCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAG'
         'CTAGGCTAGGTGTGCTCTGCTAGAGCTAGGCTAGGTGT'))
@@ -302,9 +301,9 @@ def test_label_tag_correctness():
     assert 1 in labels
 
     # read B
-    labels = lb.sweep_label_neighborhood(
+    labels = list(lb.sweep_label_neighborhood(
         'GCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGCTCTGCCTAGAGCTAGGCTAGGTGTTGGGGATAG'
-        'ATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGA')
+        'ATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGA'))
     print(labels)
     assert len(labels) == 3
     assert 0 in labels
@@ -312,32 +311,32 @@ def test_label_tag_correctness():
     assert 2 in labels
 
     # read C
-    labels = lb.sweep_label_neighborhood(
+    labels = list(lb.sweep_label_neighborhood(
         'TGGGATAGATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGACCTAGAG'
         'CTAGGCTAGGTGTTGGGGATAGATAGATAGATGAGTTGGGGATAGATAGATAGATGAGTGTAGATCCA'
-        'ACAACACATACA')
+        'ACAACACATACA'))
     print(labels)
     assert len(labels) == 2
     assert 1 in labels
     assert 2 in labels
 
     # read D
-    labels = lb.sweep_label_neighborhood(
-        'TATATATATAGCTAGCTAGCTAACTAGCTAGCATCGATCGATCGATC')
+    labels = list(lb.sweep_label_neighborhood(
+        'TATATATATAGCTAGCTAGCTAACTAGCTAGCATCGATCGATCGATC'))
     print(labels)
     assert len(labels) == 1
     assert 3 in labels
 
 
 def test_counting_label_tag_correctness():
-    lb = CountingGraphLabels(20, 1e7, 4)
+    lb = GraphLabels.CountGraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lb.consume_seqfile_and_tag_with_labels(filename)
 
     # read A
-    labels = lb.sweep_label_neighborhood(
+    labels = list(lb.sweep_label_neighborhood(
         'ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAG'
-        'CTAGGCTAGGTGTGCTCTGCCTAGAGCTAGGCTAGGTGT')
+        'CTAGGCTAGGTGTGCTCTGCCTAGAGCTAGGCTAGGTGT'))
     print(lb.sweep_tag_neighborhood(
         'TTCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAG'
         'CTAGGCTAGGTGTGCTCTGCTAGAGCTAGGCTAGGTGT'))
@@ -348,9 +347,9 @@ def test_counting_label_tag_correctness():
     assert 1 in labels
 
     # read B
-    labels = lb.sweep_label_neighborhood(
+    labels = list(lb.sweep_label_neighborhood(
         'GCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGCTCTGCCTAGAGCTAGGCTAGGTGTTGGGGATAG'
-        'ATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGA')
+        'ATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGA'))
     print(labels)
     assert len(labels) == 3
     assert 0 in labels
@@ -358,25 +357,25 @@ def test_counting_label_tag_correctness():
     assert 2 in labels
 
     # read C
-    labels = lb.sweep_label_neighborhood(
+    labels = list(lb.sweep_label_neighborhood(
         'TGGGATAGATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGACCTAGAG'
         'CTAGGCTAGGTGTTGGGGATAGATAGATAGATGAGTTGGGGATAGATAGATAGATGAGTGTAGATCCA'
-        'ACAACACATACA')
+        'ACAACACATACA'))
     print(labels)
     assert len(labels) == 2
     assert 1 in labels
     assert 2 in labels
 
     # read D
-    labels = lb.sweep_label_neighborhood(
-        'TATATATATAGCTAGCTAGCTAACTAGCTAGCATCGATCGATCGATC')
+    labels = list(lb.sweep_label_neighborhood(
+        'TATATATATAGCTAGCTAGCTAACTAGCTAGCATCGATCGATCGATC'))
     print(labels)
     assert len(labels) == 1
     assert 3 in labels
 
 
 def test_label_tag_correctness_save_load():
-    lb_pre = GraphLabels(20, 1e7, 4)
+    lb_pre = GraphLabels.NodeGraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')
     lb_pre.consume_seqfile_and_tag_with_labels(filename)
 
@@ -388,13 +387,13 @@ def test_label_tag_correctness_save_load():
     del lb_pre
 
     # create new, load labels & tags
-    lb = GraphLabels(20, 1e7, 4)
+    lb = GraphLabels.NodeGraphLabels(20, 1e7, 4)
     lb.load_labels_and_tags(savepath)
 
     # read A
-    labels = lb.sweep_label_neighborhood(
+    labels = list(lb.sweep_label_neighborhood(
         'ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAG'
-        'CTAGGCTAGGTGTGCTCTGCCTAGAGCTAGGCTAGGTGT')
+        'CTAGGCTAGGTGTGCTCTGCCTAGAGCTAGGCTAGGTGT'))
     print(lb.sweep_tag_neighborhood(
         'TTCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAG'
         'CTAGGCTAGGTGTGCTCTGCTAGAGCTAGGCTAGGTGT'))
@@ -405,9 +404,9 @@ def test_label_tag_correctness_save_load():
     assert 1 in labels
 
     # read B
-    labels = lb.sweep_label_neighborhood(
+    labels = list(lb.sweep_label_neighborhood(
         'GCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGCTCTGCCTAGAGCTAGGCTAGGTGTTGGGGATAG'
-        'ATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGA')
+        'ATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGA'))
     print(labels)
     assert len(labels) == 3
     assert 0 in labels
@@ -415,25 +414,25 @@ def test_label_tag_correctness_save_load():
     assert 2 in labels
 
     # read C
-    labels = lb.sweep_label_neighborhood(
+    labels = list(lb.sweep_label_neighborhood(
         'TGGGATAGATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGACCTAGAG'
         'CTAGGCTAGGTGTTGGGGATAGATAGATAGATGAGTTGGGGATAGATAGATAGATGAGTGTAGATCCA'
-        'ACAACACATACA')
+        'ACAACACATACA'))
     print(labels)
     assert len(labels) == 2
     assert 1 in labels
     assert 2 in labels
 
     # read D
-    labels = lb.sweep_label_neighborhood(
-        'TATATATATAGCTAGCTAGCTAACTAGCTAGCATCGATCGATCGATC')
+    labels = list(lb.sweep_label_neighborhood(
+        'TATATATATAGCTAGCTAGCTAACTAGCTAGCATCGATCGATCGATC'))
     print(labels)
     assert len(labels) == 1
     assert 3 in labels
 
 
 def test_load_wrong_filetype():
-    lb = GraphLabels(20, 1e7, 4)
+    lb = GraphLabels.NodeGraphLabels(20, 1e7, 4)
 
     # try to load a tagset
     filename = utils.get_test_data('goodversion-k32.tagset')
@@ -455,7 +454,7 @@ def test_load_wrong_filetype():
 
 
 def test_load_wrong_fileversion():
-    lb = GraphLabels(20, 1e7, 4)
+    lb = GraphLabels.NodeGraphLabels(20, 1e7, 4)
 
     # try to load a tagset from an old version
     filename = utils.get_test_data('badversion-k32.tagset')

@@ -340,3 +340,4 @@ class ReadAligner(_ReadAligner):
 from khmer._oxli.assembly import LinearAssembler, JunctionCountAssembler
 from khmer._oxli.hashset import HashSet
 from khmer._oxli.hllcounter import HLLCounter
+from khmer._oxli.labeling import GraphLabels

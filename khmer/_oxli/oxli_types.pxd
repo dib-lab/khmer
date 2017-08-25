@@ -22,7 +22,9 @@ cdef extern from "oxli/oxli.hh" namespace "oxli":
     ctypedef unsigned char WordLength
     ctypedef unsigned short int BoundedCounterType
 
+
     ctypedef unsigned long long int Label
+    ctypedef multimap
     ctypedef set[Label] LabelSet
     ctypedef set[HashIntoType] TagSet
 

@@ -7,6 +7,8 @@ from libc.stdint cimport uint8_t, uint32_t, uint64_t, uintptr_t
 
 from .oxli_types cimport *
 from .hashing cimport Kmer, CpKmer, KmerSet, CpKmerFactory, CpKmerIterator
+from .graphs cimport (CpHashgraph, CpCountgraph, CpNodegraph, Hashgraph,
+                      Countgraph, Nodegraph)
 from .parsing cimport CpReadParser, CpSequence
 from .legacy_partitioning cimport (CpSubsetPartition, cp_pre_partition_info,
                                    SubsetPartition)
@@ -19,8 +21,6 @@ cdef extern from "oxli/labelhash.hh":
 
         CpHashgraph * graph
 
-        TagLabelMap tag_labels
-        LabelTagMap label_tag
         LabelSet all_labels
 
         size_t n_labels()
@@ -33,8 +33,8 @@ cdef extern from "oxli/labelhash.hh":
                                               bool, bool)
         void traverse_labels_and_resolve(const HashIntoTypeSet,
                                          LabelSet&)
-        void save_labels_and_tags(string)
-        void load_labels_and_tags(string)
+        void save_labels_and_tags(string) except +oxli_raise_py_error
+        void load_labels_and_tags(string) except +oxli_raise_py_error
 
         void label_across_high_degree_nodes(const char *,
                                             HashIntoTypeSet&,
@@ -44,9 +44,9 @@ cdef extern from "oxli/labelhash.hh":
                                                        unsigned int &,
                                                        unsigned long long &) except +oxli_raise_py_error
 
-        void consume_seqfile_and_tag_with_labels[SeqIO](shared_ptr[CpReadParser[SeqIO]]&
-                                                       unsigned int &,
-                                                       unsigned long long &) except +oxli_raise_py_error
+        void consume_seqfile_and_tag_with_labels_readparser "consume_seqfile_and_tag_with_labels" [SeqIO](shared_ptr[CpReadParser[SeqIO]]&,
+                                                        unsigned int &,
+                                                        unsigned long long &) except +oxli_raise_py_error
         void consume_partitioned_fasta_and_tag_with_labels[SeqIO](string &,
                                                        unsigned int &,
                                                        unsigned long long &) except +oxli_raise_py_error
@@ -58,3 +58,6 @@ cdef extern from "oxli/labelhash.hh":
                                                   Label,
                                                   HashIntoTypeSet *)
 
+cdef class GraphLabels:
+    cdef shared_ptr[CpLabelHash] _lh_this
+    cdef public Hashgraph graph
