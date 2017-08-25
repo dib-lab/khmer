@@ -39,6 +39,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 from khmer import Countgraph, SmallCountgraph, Nodegraph
 from khmer import Nodetable, Counttable, SmallCounttable
+from khmer import GraphLabels
 from khmer._oxli.utils import get_n_primes_near_x
 from khmer import ReadParser
 from . import khmer_tst_utils as utils
@@ -305,10 +306,10 @@ def test_consume_seqfile_and_tag_with_labels(Graphtype):
 
     # read this in consume_and_tag
     graph = Graphtype(15, *params_1m)
-    x = _GraphLabels(graph)
+    x = GraphLabels(graph)
     x.consume_seqfile_and_tag_with_labels(infile)
 
-    assert x.n_labels() == 9
+    assert x.n_labels == 9
 
 
 def test_consume_partitioned_seqfile_and_label(Graphtype):
@@ -316,10 +317,10 @@ def test_consume_partitioned_seqfile_and_label(Graphtype):
 
     # read this in consume_and_tag
     graph = Graphtype(15, *params_1m)
-    x = _GraphLabels(graph)
+    x = GraphLabels(graph)
     x.consume_partitioned_fasta_and_tag_with_labels(infile)
 
-    assert x.n_labels() == 9
+    assert x.n_labels == 9
 
 
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:
