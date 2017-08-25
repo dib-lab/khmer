@@ -41,8 +41,6 @@ from collections import namedtuple
 from math import log
 import json
 
-#from khmer._khmer import GraphLabels as _GraphLabels
-#from khmer._khmer import ReadAligner as _ReadAligner
 
 from khmer._khmer import Read
 from khmer._khmer import forward_hash
@@ -70,6 +68,7 @@ from khmer._khmer import FILETYPES
 from khmer._oxli.graphs import (Counttable, QFCounttable, Nodetable,
                                 SmallCounttable, Countgraph, SmallCountgraph,
                                 Nodegraph)
+from khmer._oxli.labeling import GraphLabels
 from khmer._oxli.legacy_partitioning import SubsetPartition, PrePartitionInfo
 from khmer._oxli.parsing import FastxParser
 
@@ -219,25 +218,6 @@ def calc_expected_collisions(graph, force=False, max_false_pos=.2):
 # Additional functionality can be added to these classes as appropriate.
 
 '''
-class GraphLabels(_GraphLabels):
-
-    def __new__(cls, k, starting_size, n_tables):
-        nodegraph = Nodegraph(k, starting_size, n_tables)
-        graphlabels = _GraphLabels.__new__(cls, nodegraph)
-        graphlabels.graph = nodegraph
-        return graphlabels
-
-
-class CountingGraphLabels(_GraphLabels):
-
-    def __new__(cls, k, starting_size, n_tables):
-        primes = get_n_primes_near_x(n_tables, starting_size)
-        countgraph = _Countgraph(k, primes)
-        class_ = _GraphLabels.__new__(cls, countgraph)
-        class_.graph = countgraph
-        return class_
-
-
 class ReadAligner(_ReadAligner):
     Sequence to graph aligner.
 
@@ -335,9 +315,8 @@ class ReadAligner(_ReadAligner):
         _ReadAligner.__init__(self)
 '''
 
-#from khmer._oxli.assembly import (LinearAssembler, SimpleLabeledAssembler,
-#                                  JunctionCountAssembler)
-from khmer._oxli.assembly import LinearAssembler, JunctionCountAssembler
+from khmer._oxli.assembly import (LinearAssembler, SimpleLabeledAssembler,
+                                  JunctionCountAssembler)
 from khmer._oxli.hashset import HashSet
 from khmer._oxli.hllcounter import HLLCounter
 from khmer._oxli.labeling import GraphLabels

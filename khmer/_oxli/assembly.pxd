@@ -5,7 +5,8 @@ from libc.stdint cimport uint16_t
 
 from oxli_types cimport *
 from hashing cimport CpKmer, Kmer
-from graphs cimport Hashgraph, CpHashgraph, CpHashtable, CpLabelHash 
+from graphs cimport Hashgraph, CpHashgraph, CpHashtable
+from labeling cimport CpLabelHash, GraphLabels
 
 
 cdef extern from "oxli/assembler.hh" namespace "oxli":
@@ -49,18 +50,18 @@ cdef class LinearAssembler:
     cdef str _assemble_left(self, Kmer start)
     cdef str _assemble_right(self, Kmer start)
 
-'''
+
 cdef class SimpleLabeledAssembler:
     cdef shared_ptr[CpSimpleLabeledAssembler] _this
 
-    cdef public LabelHash labels
-    cdef CpLabelHash * _label_ptr
+    cdef public GraphLabels labels
+    cdef shared_ptr[CpLabelHash] _label_ptr
 
     cdef public Hashgraph stop_filter
-    cdef CpHashgraph * _stop_filter_ptr
+    cdef shared_ptr[CpHashgraph] _stop_filter_ptr
     
     cdef vector[string] _assemble(self, Kmer start)
-'''
+
 
 cdef class JunctionCountAssembler:
     cdef shared_ptr[CpJunctionCountAssembler] _this
