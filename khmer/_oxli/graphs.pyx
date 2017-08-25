@@ -42,6 +42,8 @@ cdef class Hashtable:
                 raise ValueError("Expected k-mer length {}"
                                  " but got {}.".format(self.ksize(), len(kmer)))
             handled = kmer
+        elif isinstance(kmer, Kmer):
+            handled = _bstring(kmer.kmer)
         else:
             handled = deref(self._ht_this).unhash_dna(kmer)
         return handled
@@ -58,6 +60,8 @@ cdef class Hashtable:
                 raise ValueError("Expected k-mer length {}"
                                  " but got {}.".format(self.ksize(), len(kmer)))
             handled = deref(self._ht_this).hash_dna(kmer)
+        elif isinstance(kmer, Kmer):
+            handled = kmer.kmer_u
         else:
             handled = <HashIntoType>kmer
         return handled
@@ -428,10 +432,11 @@ cdef class Hashgraph(Hashtable):
                                                  _break)
         return _size
 
-    def kmer_degree(self, str kmer):
+    def kmer_degree(self, object kmer):
         '''Calculate the number of immediate neighbors this k-mer has
         the graph.'''
-        return deref(self._hg_this).kmer_degree(_bstring(kmer))
+        cdef bytes _kmer = self.sanitize_kmer(kmer)
+        return deref(self._hg_this).kmer_degree(_kmer)
 
     def count_kmers_within_radius(self, str kmer, int radius, int max_count=0):
         '''Calculate the number of neighbors with given radius in the graph.'''
