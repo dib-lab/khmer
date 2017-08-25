@@ -21,9 +21,9 @@ cdef extern from "Python.h":
 cdef extern from "oxli/storage.hh":
     cdef cppclass CpStorage "oxli::Storage":
         CpStorage()
-        
+
         vector[uint64_t] get_tablesizes()
-        const size_t n_tables() 
+        const size_t n_tables()
         void save(string, WordLength)
         void load(string, WordLength&)
         const uint64_t n_occupied()
@@ -69,11 +69,11 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
         void consume_seqfile_banding[SeqIO](shared_ptr[CpReadParser[SeqIO]]&,
                                     uint32_t, uint32_t, uint32_t &, uint64_t &) except +oxli_raise_py_error
 
-        void consume_seqfile_banding_with_mask[SeqIO](const string &, uint32_t, uint32_t, 
-                                                      CpHashtable *, uint32_t, uint32_t &, 
+        void consume_seqfile_banding_with_mask[SeqIO](const string &, uint32_t, uint32_t,
+                                                      CpHashtable *, uint32_t, uint32_t &,
                                                       uint64_t &) except +oxli_raise_py_error
         void consume_seqfile_banding_with_mask[SeqIO](shared_ptr[CpReadParser[SeqIO]]&,
-                                                      uint32_t, uint32_t, 
+                                                      uint32_t, uint32_t,
                                                       CpHashtable *, uint32_t,
                                                       uint32_t &, uint64_t &) except +oxli_raise_py_error
 
@@ -116,7 +116,7 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
         CpNodetable(WordLength, vector[uint64_t])
 
     cdef cppclass CpQFCounttable "oxli::QFCounttable" (CpHashtable):
-        CpQFCounttable(WordLength, int) except +oxli_raise_py_error
+        CpQFCounttable(WordLength, uint64_t) except +oxli_raise_py_error
 
 
 cdef extern from "oxli/hashgraph.hh" namespace "oxli":
