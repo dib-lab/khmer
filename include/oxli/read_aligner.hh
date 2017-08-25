@@ -180,12 +180,12 @@ typedef std::priority_queue<AlignmentNode*,
         AlignmentNodeCompare> NodeHeap;
 
 struct ScoringMatrix {
-    const double trusted_match;
-    const double trusted_mismatch;
-    const double untrusted_match;
-    const double untrusted_mismatch;
+    double trusted_match;
+    double trusted_mismatch;
+    double untrusted_match;
+    double untrusted_mismatch;
 
-    const double* tsc;
+    double* tsc;
 
     ScoringMatrix(double trusted_match, double trusted_mismatch,
                   double untrusted_match, double untrusted_mismatch,
@@ -193,6 +193,11 @@ struct ScoringMatrix {
         : trusted_match(trusted_match), trusted_mismatch(trusted_mismatch),
           untrusted_match(untrusted_match),
           untrusted_mismatch(untrusted_mismatch), tsc(trans) {}
+
+    ScoringMatrix() : trusted_match(0), trusted_mismatch(0),
+                      untrusted_match(0), untrusted_mismatch(0),
+                      tsc(trans_default) {}
+
 };
 
 
