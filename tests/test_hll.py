@@ -36,6 +36,8 @@
 from __future__ import division, print_function, unicode_literals
 from __future__ import absolute_import
 
+import pickle
+
 import khmer
 
 from screed.fasta import fasta_iter
@@ -322,3 +324,17 @@ def test_hll_merge_3():
 
     hll.merge(hll2)
     assert len(hll) == 236
+
+
+def test_hll_pickle():
+    hll = khmer.HLLCounter(0.36, 32)
+    filename = utils.get_test_data('paired-mixed.fa')
+    hll.consume_seqfile(filename)
+
+    hll2 = pickle.loads(pickle.dumps(hll))
+
+    #assert hll == hll2
+    assert hll.ksize == hll2.ksize
+    assert hll.alpha == hll2.alpha
+    assert hll.error_rate == hll2.error_rate
+    assert hll.counters == hll2.counters

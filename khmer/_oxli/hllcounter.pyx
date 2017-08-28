@@ -1,5 +1,6 @@
 # cython: c_string_type=unicode, c_string_encoding=utf8
 from cython.operator cimport dereference as deref, address
+from libcpp.vector cimport vector
 
 from parsing cimport CpFastxReader
 from .utils cimport _bstring, _ustring
@@ -101,3 +102,17 @@ cdef class HLLCounter:
     def counters(self):
         """Read-only internal counters."""
         return deref(self._this).get_M()
+
+    @counters.setter
+    def counters(self, object values):
+        cdef vector[int] v = values
+        deref(self._this).set_M(v)
+
+    def __getstate__(self):
+        return (self.ksize, self.error_rate, self.counters)
+
+    def __setstate__(self, tup):
+        (ksize, error_rate, counters) = tup
+        self.ksize = ksize
+        self.error_rate = error_rate
+        self.counters = counters
