@@ -116,6 +116,11 @@ cdef class HLLCounter:
         self.error_rate = error_rate
         self.counters = counters
 
+    def __reduce__(self):
+        return (HLLCounter,
+                (self.error_rate, self.ksize),
+                self.__getstate__())
+
     def __richcmp__(self, other, op):
         if op == 2:
             return self.__getstate__() == other.__getstate__()
