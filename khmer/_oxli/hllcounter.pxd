@@ -35,7 +35,7 @@ cdef extern from "oxli/hllcounter.hh" namespace "oxli":
         void set_ksize(WordLength) except +oxli_raise_py_error
         int get_ksize()
         vector[int] get_M()
-        void set_M(vector[int])
+        void set_M(vector[int]) except +oxli_raise_py_error
         double get_erate()
         void set_erate(double) except +oxli_raise_py_error
 

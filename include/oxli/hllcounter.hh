@@ -99,11 +99,7 @@ public:
     {
         return M;
     }
-    void set_M(std::vector<int> new_M)
-    {
-        // TODO: assert they are the same size!
-        M = new_M;
-    }
+    void set_M(std::vector<int> new_M);
     double get_erate();
     void set_erate(double new_erate);
 private:

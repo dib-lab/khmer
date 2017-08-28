@@ -286,6 +286,22 @@ def test_hll_get_counters():
     assert all(c == 0 for c in counters)
 
 
+def test_hll_set_counters():
+    hll = khmer.HLLCounter(0.36, K)
+    counters = hll.counters
+    new_counters = [c + 2 for c in counters]
+    hll.counters = new_counters
+    assert hll.counters == new_counters
+
+
+def test_hll_set_counters_invalid_size():
+    hll = khmer.HLLCounter(0.36, K)
+    counters = hll.counters
+    new_counters = counters * 2
+    with pytest.raises(ValueError):
+        hll.counters = new_counters
+
+
 def test_hll_merge_1():
     hll = khmer.HLLCounter(0.36, K)
     hll2 = khmer.HLLCounter(0.36, K - 1)
@@ -333,7 +349,7 @@ def test_hll_pickle():
 
     hll2 = pickle.loads(pickle.dumps(hll))
 
-    #assert hll == hll2
+    assert hll == hll2
     assert hll.ksize == hll2.ksize
     assert hll.alpha == hll2.alpha
     assert hll.error_rate == hll2.error_rate

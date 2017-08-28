@@ -100,13 +100,12 @@ cdef class HLLCounter:
 
     @property
     def counters(self):
-        """Read-only internal counters."""
+        """Internal counters."""
         return deref(self._this).get_M()
 
     @counters.setter
     def counters(self, object values):
-        cdef vector[int] v = values
-        deref(self._this).set_M(v)
+        deref(self._this).set_M(values)
 
     def __getstate__(self):
         return (self.ksize, self.error_rate, self.counters)
@@ -116,3 +115,8 @@ cdef class HLLCounter:
         self.ksize = ksize
         self.error_rate = error_rate
         self.counters = counters
+
+    def __richcmp__(self, other, op):
+        if op == 2:
+            return self.__getstate__() == other.__getstate__()
+        return NotImplemented
