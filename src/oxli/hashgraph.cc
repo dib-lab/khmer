@@ -319,6 +319,29 @@ void Hashgraph::consume_seqfile_and_tag(
 
 }
 
+// get_tags_for_sequence: return tags present in the given sequence.
+
+void Hashgraph::get_tags_for_sequence(const std::string& seq,
+                                      SeenSet& found_tags)
+{
+    bool kmer_tagged;
+
+    KmerIterator kmers(seq.c_str(), _ksize);
+    HashIntoType kmer;
+
+    while(!kmers.done()) {
+        kmer = kmers.next();
+
+        ACQUIRE_ALL_TAGS_SPIN_LOCK
+        kmer_tagged = set_contains(all_tags, kmer);
+        RELEASE_ALL_TAGS_SPIN_LOCK
+
+        if (kmer_tagged) {
+            found_tags.insert(kmer);
+        }
+    }
+}
+
 //
 // divide_tags_into_subsets - take all of the tags in 'all_tags', and
 //   divide them into subsets (based on starting tag) of <= given size.

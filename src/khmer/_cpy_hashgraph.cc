@@ -100,6 +100,11 @@ PyMethodDef khmer_hashgraph_methods[] = {
         "Consume a sequence and tag it."
     },
     {
+        "get_tags_for_sequence",
+        (PyCFunction)hashgraph_get_tags_for_sequence, METH_VARARGS,
+        "Get the tags present in a sequence."
+    },
+    {
         "get_tags_and_positions",
         (PyCFunction)hashgraph_get_tags_and_positions, METH_VARARGS,
         "Retrieve tags and their positions in a sequence."
@@ -1504,6 +1509,27 @@ hashgraph_consume_and_tag(khmer_KHashgraph_Object * me, PyObject * args)
     hashgraph->consume_sequence_and_tag(seq, n_consumed);
 
     return Py_BuildValue("K", n_consumed);
+}
+
+
+PyObject *
+hashgraph_get_tags_for_sequence(khmer_KHashgraph_Object * me, PyObject * args)
+{
+    Hashgraph * hashgraph = me->hashgraph;
+
+    const char * seq;
+
+    if (!PyArg_ParseTuple(args, "s", &seq)) {
+        return NULL;
+    }
+
+    SeenSet * tags = new SeenSet;
+
+    hashgraph->get_tags_for_sequence(seq, *tags);
+
+    PyObject * x = (PyObject *) create_HashSet_Object(tags,
+                   hashgraph->ksize());
+    return x;
 }
 
 
