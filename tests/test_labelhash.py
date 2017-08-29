@@ -309,6 +309,19 @@ def test_consume_sequence_and_tag_with_labels():
     assert len(labels) == 1
 
 
+def test_consume_sequence_and_tag_with_labels_2():
+    lb = GraphLabels(20, 1e6, 4)
+    label = 56                            # randomly chosen / non-zero
+    sequence = 'ATGCATCGATCGATCGATCGATCGATCGATCGATCGATCG'
+
+    lb.consume_sequence_and_tag_with_labels(sequence, label)
+    labels = set()
+    labels.update(lb.sweep_label_neighborhood(sequence))
+
+    assert label in labels
+    assert len(labels) == 1
+
+
 def test_sweep_tag_neighborhood():
     lb = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('single-read.fq')
