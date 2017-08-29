@@ -333,9 +333,7 @@ const
     while(!kmers.done()) {
         kmer = kmers.next();
 
-        ACQUIRE_ALL_TAGS_SPIN_LOCK
         kmer_tagged = set_contains(all_tags, kmer);
-        RELEASE_ALL_TAGS_SPIN_LOCK
 
         if (kmer_tagged) {
             found_tags.insert(kmer);
