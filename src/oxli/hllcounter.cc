@@ -510,6 +510,14 @@ void HLLCounter::merge(HLLCounter &other)
     }
 }
 
+void HLLCounter::set_M(std::vector<int> new_M)
+{
+    if (M.size() != new_M.size()) {
+        throw InvalidValue("New counters must match the size of old counters");
+    }
+    M = new_M;
+}
+
 template void HLLCounter::consume_seqfile<FastxReader>(
     std::string const &,
     bool,
