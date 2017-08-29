@@ -206,7 +206,7 @@ def test_get_labels_for_sequence():
     filename = utils.get_test_data('single-read.fq')
     lb.consume_seqfile_and_tag_with_labels(filename)
 
-    seq = [ r.sequence for r in screed.open(filename) ][0]
+    seq = [r.sequence for r in screed.open(filename)][0]
     labels = lb.get_labels_for_sequence(seq)
 
     tag = 173473779682
