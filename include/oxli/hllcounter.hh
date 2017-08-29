@@ -99,6 +99,7 @@ public:
     {
         return M;
     }
+    void set_M(std::vector<int> new_M);
     double get_erate();
     void set_erate(double new_erate);
 private:
