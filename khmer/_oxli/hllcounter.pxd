@@ -2,7 +2,7 @@ from libcpp cimport bool
 from libcpp.memory cimport unique_ptr
 from libcpp.string cimport string
 from libcpp.vector cimport vector
-from libc.stdint cimport uint64_t
+from libc.stdint cimport uint64_t, uint8_t
 
 from oxli_types cimport *
 from parsing cimport CpReadParser
@@ -31,11 +31,11 @@ cdef extern from "oxli/hllcounter.hh" namespace "oxli":
         void merge(CpHLLCounter &) except +oxli_raise_py_error
         double get_alpha()
         int get_p()
-        int get_m()
+        int get_ncounters()
         void set_ksize(WordLength) except +oxli_raise_py_error
         int get_ksize()
-        vector[int] get_M()
-        void set_M(vector[int]) except +oxli_raise_py_error
+        vector[uint8_t] get_counters()
+        void set_counters(vector[uint8_t]) except +oxli_raise_py_error
         double get_erate()
         void set_erate(double) except +oxli_raise_py_error
 
