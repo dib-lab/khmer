@@ -323,6 +323,7 @@ void Hashgraph::consume_seqfile_and_tag(
 
 void Hashgraph::get_tags_for_sequence(const std::string& seq,
                                       SeenSet& found_tags)
+const
 {
     bool kmer_tagged;
 

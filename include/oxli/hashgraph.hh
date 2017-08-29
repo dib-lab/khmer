@@ -195,7 +195,7 @@ public:
 
     // get the tags present in this sequence.
     void get_tags_for_sequence(const std::string& seq,
-                               SeenSet& tags);
+                               SeenSet& tags) const;
 
     // consume an already-partitioned file & load in the partition IDs
     template<typename SeqIO>
