@@ -201,6 +201,59 @@ def test_get_tag_labels():
     assert labels.pop() == 0
 
 
+def test_get_labels_for_sequence():
+    lb = GraphLabels(20, 1e7, 4)
+    filename = utils.get_test_data('single-read.fq')
+    lb.consume_seqfile_and_tag_with_labels(filename)
+
+    seq = [r.sequence for r in screed.open(filename)][0]
+    labels = lb.get_labels_for_sequence(seq)
+
+    tag = 173473779682
+    labels2 = lb.get_tag_labels(tag)
+
+    assert labels == labels2
+    assert len(labels) == 1
+    assert labels.pop() == 0
+
+
+def test_link_tag_and_label():
+    lb = GraphLabels(20, 1, 1)
+
+    tag = 173473779682
+    lb.add_tag(tag)
+    lb.link_tag_and_label(tag, 1)
+
+    labels = lb.get_tag_labels(tag)
+    assert len(labels) == 1
+    assert labels.pop() == 1
+
+
+def test_link_tag_and_label_using_string():
+    lb = GraphLabels(20, 1, 1)
+
+    kmer = lb.reverse_hash(173473779682)
+    lb.add_tag(kmer)
+    lb.link_tag_and_label(kmer, 1)
+
+    labels = lb.get_tag_labels(kmer)
+    assert len(labels) == 1
+    assert labels.pop() == 1
+
+
+def test_link_tag_and_label_using_string_2():
+    lb = GraphLabels(20, 1, 1)
+
+    tag = 173473779682
+    kmer = lb.reverse_hash(tag)
+    lb.add_tag(kmer)
+    lb.link_tag_and_label(kmer, 1)
+
+    labels = lb.get_tag_labels(tag)       # <-- use 'tag' instead of 'kmer'
+    assert len(labels) == 1
+    assert labels.pop() == 1
+
+
 def test_consume_seqfile_and_tag_with_labels():
     lb = GraphLabels(20, 1e7, 4)
     read_1 = 'ACGTAACCGGTTAAACCCGGGTTTAAAACCCCGGGGTTTT'
@@ -208,14 +261,14 @@ def test_consume_seqfile_and_tag_with_labels():
 
     total_reads, _ = lb.consume_seqfile_and_tag_with_labels(filename)
     print("doing get")
-    assert lb.graph.get(read_1[:20])
+    assert lb.get(read_1[:20])
     assert total_reads == 3
     print("doing n_labels")
     print(lb.n_labels())
     print("doing all labels")
     print(lb.get_all_labels())
     print("get tagset")
-    for tag in lb.graph.get_tagset():
+    for tag in lb.get_tagset():
         print("forward hash")
         print(tag, khmer.forward_hash(tag, 20))
     for record in screed.open(filename):
@@ -256,10 +309,23 @@ def test_consume_sequence_and_tag_with_labels():
     assert len(labels) == 1
 
 
+def test_consume_sequence_and_tag_with_labels_2():
+    lb = GraphLabels(20, 1e6, 4)
+    label = 56                            # randomly chosen / non-zero
+    sequence = 'ATGCATCGATCGATCGATCGATCGATCGATCGATCGATCG'
+
+    lb.consume_sequence_and_tag_with_labels(sequence, label)
+    labels = set()
+    labels.update(lb.sweep_label_neighborhood(sequence))
+
+    assert label in labels
+    assert len(labels) == 1
+
+
 def test_sweep_tag_neighborhood():
     lb = GraphLabels(20, 1e7, 4)
     filename = utils.get_test_data('single-read.fq')
-    lb.graph.consume_seqfile_and_tag(filename)
+    lb.consume_seqfile_and_tag(filename)
 
     tags = lb.sweep_tag_neighborhood('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
     assert len(tags) == 1

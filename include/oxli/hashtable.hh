@@ -500,7 +500,7 @@ public:
     hash_dna(const char * kmer) const
     {
         if (!(strlen(kmer) >= _ksize)) {
-            throw oxli_exception("Supplied kmer string doesn't match the underlying k-size.");
+            throw oxli_value_exception("Supplied kmer string doesn't match the underlying k-size.");
         }
         return _hash_murmur(kmer, _ksize);
     }
@@ -508,19 +508,19 @@ public:
     inline virtual HashIntoType
     hash_dna_top_strand(const char * kmer) const
     {
-        throw oxli_exception("not implemented");
+        throw oxli_value_exception("not implemented");
     }
 
     inline virtual HashIntoType
     hash_dna_bottom_strand(const char * kmer) const
     {
-        throw oxli_exception("not implemented");
+        throw oxli_value_exception("not implemented");
     }
 
     inline virtual std::string
     unhash_dna(HashIntoType hashval) const
     {
-        throw oxli_exception("not implemented");
+        throw oxli_value_exception("not implemented");
     }
 
     virtual KmerHashIteratorPtr new_kmer_iterator(const char * sp) const

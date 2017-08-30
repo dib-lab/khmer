@@ -57,7 +57,9 @@ PyMethodDef khmer_graphlabels_methods[] = {
     { "sweep_label_neighborhood", (PyCFunction)labelhash_sweep_label_neighborhood, METH_VARARGS, "" },
     {"consume_partitioned_fasta_and_tag_with_labels", (PyCFunction)labelhash_consume_partitioned_fasta_and_tag_with_labels, METH_VARARGS, "" },
     {"sweep_tag_neighborhood", (PyCFunction)labelhash_sweep_tag_neighborhood, METH_VARARGS, "" },
+    {"get_labels_for_sequence", (PyCFunction)labelhash_get_labels_for_sequence, METH_VARARGS, "Return labels for all the tags found in this sequence." },
     {"get_tag_labels", (PyCFunction)labelhash_get_tag_labels, METH_VARARGS, ""},
+    {"link_tag_and_label", (PyCFunction)labelhash_link_tag_and_label, METH_VARARGS, ""},
     {"consume_sequence_and_tag_with_labels", (PyCFunction)labelhash_consume_sequence_and_tag_with_labels, METH_VARARGS, "" },
     {"n_labels", (PyCFunction)labelhash_n_labels, METH_VARARGS, ""},
     {"get_all_labels", (PyCFunction)labelhash_get_all_labels, METH_VARARGS, "" },
@@ -84,8 +86,8 @@ void khmer_graphlabels_dealloc(khmer_KGraphLabels_Object * obj)
     Py_TYPE(obj)->tp_free((PyObject*)obj);
 }
 
- PyObject * khmer_graphlabels_new(PyTypeObject *type, PyObject *args,
-                                        PyObject *kwds)
+PyObject * khmer_graphlabels_new(PyTypeObject *type, PyObject *args,
+                                 PyObject *kwds)
 {
     khmer_KGraphLabels_Object *self;
     self = (khmer_KGraphLabels_Object*)type->tp_alloc(type, 0);
@@ -94,6 +96,7 @@ void khmer_graphlabels_dealloc(khmer_KGraphLabels_Object * obj)
         PyObject * hashgraph_o;
         Hashgraph * hashgraph = NULL; // @CTB
 
+        // GraphLabels takes a single argument, a hashgraph descendant.
         if (!PyArg_ParseTuple(args, "O", &hashgraph_o)) {
             Py_DECREF(self);
             return NULL;
@@ -111,6 +114,10 @@ void khmer_graphlabels_dealloc(khmer_KGraphLabels_Object * obj)
             Py_DECREF(self);
             return NULL;
         }
+        // set 'base' for CPython-style inheritance.
+        self->khashgraph.khashtable.hashtable =
+            dynamic_cast<Hashtable*>(hashgraph);
+        self->khashgraph.hashgraph = dynamic_cast<Hashgraph*>(hashgraph);
 
         try {
             self->labelhash = new LabelHash(hashgraph);
@@ -360,6 +367,30 @@ labelhash_sweep_tag_neighborhood(khmer_KGraphLabels_Object * me,
 
 
 PyObject *
+labelhash_get_labels_for_sequence(khmer_KGraphLabels_Object * me, PyObject * args)
+{
+    LabelHash * hb = me->labelhash;
+    const char * seq = NULL;
+    if (!PyArg_ParseTuple(args, "s", &seq)) {
+        return NULL;
+    }
+
+    LabelSet labels;
+    hb->get_labels_for_sequence(seq, labels);
+
+    PyObject * x =  PyList_New(labels.size());
+    LabelSet::const_iterator si;
+    unsigned long long i = 0;
+    for (si = labels.begin(); si != labels.end(); ++si) {
+        PyList_SET_ITEM(x, i, Py_BuildValue("K", *si));
+        i++;
+    }
+
+    return x;
+}
+
+
+PyObject *
 labelhash_get_tag_labels(khmer_KGraphLabels_Object * me, PyObject * args)
 {
     LabelHash * labelhash = me->labelhash;
@@ -387,6 +418,30 @@ labelhash_get_tag_labels(khmer_KGraphLabels_Object * me, PyObject * args)
     }
 
     return x;
+}
+
+
+PyObject *
+labelhash_link_tag_and_label(khmer_KGraphLabels_Object * me, PyObject * args)
+{
+    LabelHash * labelhash = me->labelhash;
+
+    PyObject * tag_o;
+    HashIntoType tag;
+    Label label;
+
+    if (!PyArg_ParseTuple(args, "OK", &tag_o, &label)) {
+        return NULL;
+    }
+    if (!ht_convert_PyObject_to_HashIntoType(tag_o, tag,
+            labelhash->graph)) {
+        return NULL;
+    }
+
+    labelhash->link_tag_and_label(tag, label);
+
+    Py_INCREF(Py_None);
+    return Py_None;
 }
 
 
