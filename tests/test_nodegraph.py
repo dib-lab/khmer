@@ -69,6 +69,46 @@ def test_bad_create():
         assert 'tablesizes needs to be one or more numbers' in str(err)
 
 
+def test_add_tag():
+    nodegraph = khmer._Nodegraph(6, [1])
+
+    assert nodegraph.n_tags() == 0
+    nodegraph.add_tag('AATAAG')
+    assert nodegraph.n_tags() == 1
+
+    print(nodegraph.get_tagset())
+    assert nodegraph.get_tagset() == ['AATAAG']
+
+
+def test_add_tag_hashval():
+    nodegraph = khmer._Nodegraph(6, [1])
+
+    assert nodegraph.n_tags() == 0
+    kmer = nodegraph.hash('AATAAG')
+    nodegraph.add_tag(kmer)
+    assert nodegraph.n_tags() == 1
+
+    print(nodegraph.get_tagset())
+    assert nodegraph.get_tagset() == ['AATAAG']
+
+
+def test_add_stop_tag():
+    nodegraph = khmer._Nodegraph(6, [1])
+
+    nodegraph.add_stop_tag('AATAAG')
+    print(nodegraph.get_stop_tags())
+    assert nodegraph.get_stop_tags() == ['AATAAG']
+
+
+def test_add_stop_tag_hashval():
+    nodegraph = khmer._Nodegraph(6, [1])
+
+    kmer = nodegraph.hash('AATAAG')
+    nodegraph.add_stop_tag(kmer)
+    print(nodegraph.get_stop_tags())
+    assert nodegraph.get_stop_tags() == ['AATAAG']
+
+
 def test__get_set_tag_density():
     nodegraph = khmer._Nodegraph(32, [1])
     orig = nodegraph._get_tag_density()

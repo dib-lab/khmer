@@ -102,8 +102,8 @@ help: Makefile
 install-dep: install-dependencies
 
 install-dependencies:
-	pip install --upgrade --ignore-installed $(DEVPKGS)
-	pip install --upgrade --requirement doc/requirements.txt
+	pip install $(DEVPKGS)
+	pip install --requirement doc/requirements.txt
 
 ## sharedobj   : build khmer shared object file
 sharedobj: $(EXTENSION_MODULE)
@@ -131,6 +131,7 @@ clean: FORCE
 	cd src/oxli && $(MAKE) clean || true
 	cd tests && rm -rf khmertest_* || true
 	rm -f pytests.xml
+	cd third-party/cqf && make clean || true
 	rm -f $(EXTENSION_MODULE)
 	rm -f khmer/*.pyc scripts/*.pyc tests/*.pyc oxli/*.pyc \
 		sandbox/*.pyc khmer/__pycache__/* sandbox/__pycache__/* \

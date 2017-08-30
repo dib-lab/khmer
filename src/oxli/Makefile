@@ -68,7 +68,8 @@ PREFIX=/usr/local
 ### NOTE: No user-serviceable parts below this line! ###
 
 INCLUDES= -I ../../include/ -I ../../third-party/seqan/core/include/ \
-	      -I ../../third-party/smhasher/
+	      -I ../../third-party/smhasher/ \
+				-I ../../third-party/cqf/
 
 ifeq ($(USE_SYSTEM_ZLIB), false)
 INCLUDES += -I ../../third-party/zlib/
@@ -218,6 +219,11 @@ BZIP2_OBJS_BASE= \
 
 BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 
+# Counting bloom filter
+CQF_DIR=../../third-party/cqf
+CQF_OBJS_BASE= gqf.o
+
+CQF_OBJS=$(addprefix $(CQF_DIR)/, $(CQF_OBJS_BASE))
 
 #### oxli proper below here ####
 
@@ -252,6 +258,10 @@ PRECOMILE_OBJS += $(BZIP2_OBJS)
 PRECLEAN_TARGS += libbz2clean
 endif
 
+LIBOXLI_OBJS  += $(CQF_OBJS)
+PRECOMILE_OBJS += $(CQF_OBJS)
+PRECLEAN_TARGS += libcqfclean
+
 HEADERS= \
 	hashtable.hh \
 	hashgraph.hh \
@@ -279,6 +289,8 @@ zlibclean:
 	(cd $(ZLIB_DIR) && make distclean)
 libbz2clean:
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
+libcqfclean:
+	(cd $(CQF_DIR) && make clean)
 
 clean: $(PRECLEAN_TARGS)
 	rm -f *.o *.a *.$(SHARED_EXT)* oxli.pc $(TEST_PROGS)
@@ -301,6 +313,9 @@ $(ZLIB_OBJS):
 
 $(BZIP2_OBJS):
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so $(BZIP2_OBJS_BASE))
+
+$(CQF_OBJS):
+	(cd $(CQF_DIR) && make)
 
 # MurMur3
 murmur3.o: ../../third-party/smhasher/MurmurHash3.cc

@@ -140,6 +140,7 @@ protected:
     HashIntoType    bitmask;
     unsigned int    _nbits_sub_1;
 
+public:
     explicit Hashtable( WordLength ksize, Storage * s)
         : KmerFactory( ksize ), store(s),
           _max_count( MAX_KCOUNT ),
@@ -176,7 +177,6 @@ protected:
         return new_kmer_iterator(s.c_str());
     }
 
-public:
     // accessor to get 'k'
     const WordLength ksize() const
     {
@@ -277,6 +277,24 @@ public:
         unsigned long long &n_consumed
     );
 
+    template<typename SeqIO>
+    void consume_seqfile_with_mask(
+        std::string const &filename,
+        Hashtable* mask,
+        unsigned int threshold,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
+    );
+
+    template<typename SeqIO>
+    void consume_seqfile_with_mask(
+        read_parsers::ReadParserPtr<SeqIO>& parser,
+        Hashtable* mask,
+        unsigned int threshold,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
+    );
+
     // Consume sequences in k-mer banding mode.
     template<typename SeqIO>
     void consume_seqfile_banding(
@@ -293,6 +311,28 @@ public:
         read_parsers::ReadParserPtr<SeqIO>& parser,
         unsigned int num_bands,
         unsigned int band,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
+    );
+
+    template<typename SeqIO>
+    void consume_seqfile_banding_with_mask(
+        std::string const &filename,
+        unsigned int num_bands,
+        unsigned int band,
+        Hashtable* mask,
+        unsigned int threshold,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
+    );
+
+    template<typename SeqIO>
+    void consume_seqfile_banding_with_mask(
+        read_parsers::ReadParserPtr<SeqIO>& parser,
+        unsigned int num_bands,
+        unsigned int band,
+        Hashtable* mask,
+        unsigned int threshold,
         unsigned int &total_reads,
         unsigned long long &n_consumed
     );
@@ -460,7 +500,7 @@ public:
     hash_dna(const char * kmer) const
     {
         if (!(strlen(kmer) >= _ksize)) {
-            throw oxli_exception("Supplied kmer string doesn't match the underlying k-size.");
+            throw oxli_value_exception("Supplied kmer string doesn't match the underlying k-size.");
         }
         return _hash_murmur(kmer, _ksize);
     }
@@ -468,19 +508,19 @@ public:
     inline virtual HashIntoType
     hash_dna_top_strand(const char * kmer) const
     {
-        throw oxli_exception("not implemented");
+        throw oxli_value_exception("not implemented");
     }
 
     inline virtual HashIntoType
     hash_dna_bottom_strand(const char * kmer) const
     {
-        throw oxli_exception("not implemented");
+        throw oxli_value_exception("not implemented");
     }
 
     inline virtual std::string
     unhash_dna(HashIntoType hashval) const
     {
-        throw oxli_exception("not implemented");
+        throw oxli_value_exception("not implemented");
     }
 
     virtual KmerHashIteratorPtr new_kmer_iterator(const char * sp) const
@@ -514,6 +554,14 @@ class SmallCounttable : public oxli::MurmurHashtable
 public:
     explicit SmallCounttable(WordLength ksize, std::vector<uint64_t> sizes)
           : MurmurHashtable(ksize, new NibbleStorage(sizes)) { };
+};
+
+// Hashtable-derived class with QFStorage.
+class QFCounttable : public oxli::Hashtable
+{
+public:
+    explicit QFCounttable(WordLength ksize, int size)
+        : Hashtable(ksize, new QFStorage(size)) { } ;
 };
 
 // Hashtable-derived class with BitStorage.

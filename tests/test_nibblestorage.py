@@ -124,8 +124,7 @@ def test_read_write():
     sct.save(fname)
 
     # on purpose choose parameters that are different from sct
-    sct2 = SmallCounttable(3, 1e4, 2)
-    sct2.load(fname)
+    sct2 = SmallCounttable.load(fname)
     assert sct.ksize() == sct2.ksize()
     for kmer in kmers:
         assert sct.get(kmer) == sct2.get(kmer)

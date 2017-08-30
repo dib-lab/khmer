@@ -34,8 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 LICENSE (END)
 
 Contact: khmer-project@idyll.org
-*/
+  */
 #include <fstream>
+#include <utility>  
 #include "seqan/seq_io.h" // IWYU pragma: keep
 #include "seqan/sequence.h" // IWYU pragma: keep
 #include "seqan/stream.h" // IWYU pragma: keep
@@ -180,6 +181,7 @@ bool ReadParser<SeqIO>::_is_valid_read_pair(
                     ==	the_read_pair.second.name.substr( 0, match_1.rm_so ));
 }
 
+
 template<typename SeqIO>
 ReadParser<SeqIO>::ReadParser(std::unique_ptr<SeqIO> pf)
 {
@@ -187,12 +189,24 @@ ReadParser<SeqIO>::ReadParser(std::unique_ptr<SeqIO> pf)
     _init();
 }
 
+
 template<typename SeqIO>
-ReadParser<SeqIO>::ReadParser(ReadParser& other)
+ReadParser<SeqIO>::ReadParser(ReadParser<SeqIO>& other)
 {
     _parser = std::move(other._parser);
     _init();
 }
+
+template<typename SeqIO>
+ReadParser<SeqIO>&
+ReadParser<SeqIO>::operator=(ReadParser<SeqIO>& other) {
+    _parser = std::move(other._parser);
+    return *this;
+}
+
+template<typename SeqIO>
+ReadParser<SeqIO>::ReadParser(ReadParser<SeqIO>&&) noexcept {}
+
 
 template<typename SeqIO>
 ReadParser<SeqIO>::~ReadParser()
@@ -272,14 +286,25 @@ FastxReader::FastxReader(const std::string& infile)
     _init();
 }
 
-FastxReader::FastxReader(FastxReader& other)
-    : _filename(other._filename),
-      _spin_lock(other._spin_lock),
-      _num_reads(other._num_reads),
-      _have_qualities(other._have_qualities)
-{
+FastxReader::FastxReader(FastxReader& other) {
+    _filename = other._filename;
+    _spin_lock = other._spin_lock;
+    _num_reads = other._num_reads;
+    _have_qualities = other._have_qualities;
     _stream = std::move(other._stream);
 }
+
+//FastxReader::FastxReader(const FastxReader& other) = delete;
+FastxReader& FastxReader::operator= (FastxReader& other) {
+    _filename = other._filename;
+    _spin_lock = other._spin_lock;
+    _num_reads = other._num_reads;
+    _have_qualities = other._have_qualities;
+    _stream = std::move(other._stream);
+    return *this;
+}
+
+FastxReader::FastxReader(FastxReader&&) noexcept {}
 
 FastxReader::~FastxReader()
 {

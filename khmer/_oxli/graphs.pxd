@@ -2,12 +2,14 @@ from libcpp cimport bool
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libcpp.set cimport set
-from libcpp.memory cimport unique_ptr
-from libc.stdint cimport uint8_t, uint32_t, uint64_t, uintptr_t 
+from libcpp.memory cimport unique_ptr, shared_ptr, weak_ptr
+from libc.stdint cimport uint8_t, uint32_t, uint64_t, uintptr_t
 
 from oxli_types cimport *
 from hashing cimport CpKmer, KmerSet
 from parsing cimport CpReadParser, CpSequence
+from utils cimport oxli_raise_py_error
+
 
 # All we really need are the PyObject struct definitions
 # for our extension objects.
@@ -29,16 +31,36 @@ cdef extern from "khmer/_cpy_khmer.hh":
         CpCountgraph * countgraph
 
     ctypedef struct CPyGraphLabels_Object "khmer::khmer_KGraphLabels_Object":
+        CPyHashgraph_Object khashgraph
         CpLabelHash * labelhash
+
+
+cdef extern from "oxli/storage.hh":
+    cdef cppclass CpStorage "oxli::Storage":
+        CpStorage()
+
+        vector[uint64_t] get_tablesizes()
+        const size_t n_tables()
+        void save(string, WordLength)
+        void load(string, WordLength&)
+        const uint64_t n_occupied()
+        const uint64_t n_unique_kmers()
+        BoundedCounterType test_and_set_bits(HashIntoType)
+        bool add(HashIntoType khash)
+        const BoundedCounterType get_count(HashIntoType)
+        uint8_t ** get_raw_tables()
+
+        void set_use_bigcount(bool)
+        bool get_use_bigcount()
 
 
 cdef extern from "oxli/hashtable.hh" namespace "oxli":
     cdef cppclass CpHashtable "oxli::Hashtable":
         const WordLength ksize() const
-        HashIntoType hash_dna(const char *) const
-        HashIntoType hash_dna_top_strand(const char *) const
-        HashIntoType hash_dna_bottom_strand(const char *) const
-        string unhash_dna(HashIntoType) const
+        HashIntoType hash_dna(const char *) except +oxli_raise_py_error
+        HashIntoType hash_dna_top_strand(const char *) except +oxli_raise_py_error
+        HashIntoType hash_dna_bottom_strand(const char *) except +oxli_raise_py_error
+        string unhash_dna(HashIntoType) except +oxli_raise_py_error
         void count(const char *)
         void count(HashIntoType)
         bool add(const char *)
@@ -50,40 +72,68 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
         uint32_t consume_string(const string &)
         bool check_and_normalize_read(string &) const
         uint32_t check_and_process_read(string &, bool &)
-        void consume_seqfile[SeqIO](const string &, uint32_t &, uint64_t &)
-        void consume_seqfile[SeqIO](unique_ptr[CpReadParser[SeqIO]]&, 
-                                    uint32_t &, uint64_t &)
-        void set_use_bigcount(bool)
+
+        void consume_seqfile[SeqIO](const string &, uint32_t &, uint64_t &) except +oxli_raise_py_error
+        void consume_seqfile[SeqIO](shared_ptr[CpReadParser[SeqIO]]&,
+                                    uint32_t &, uint64_t &) except +oxli_raise_py_error
+
+        void consume_seqfile_with_mask[SeqIO](const string &, CpHashtable *,
+                                              uint32_t, uint32_t &, uint64_t &) except +oxli_raise_py_error
+        void consume_seqfile_with_mask[SeqIO](shared_ptr[CpReadParser[SeqIO]]&, CpHashtable *,
+                                              uint32_t, uint32_t &, uint64_t &) except +oxli_raise_py_error
+
+        void consume_seqfile_banding[SeqIO](const string &, uint32_t, uint32_t, uint32_t &, uint64_t &) except +oxli_raise_py_error
+        void consume_seqfile_banding[SeqIO](shared_ptr[CpReadParser[SeqIO]]&,
+                                    uint32_t, uint32_t, uint32_t &, uint64_t &) except +oxli_raise_py_error
+
+        void consume_seqfile_banding_with_mask[SeqIO](const string &, uint32_t, uint32_t,
+                                                      CpHashtable *, uint32_t, uint32_t &,
+                                                      uint64_t &) except +oxli_raise_py_error
+        void consume_seqfile_banding_with_mask[SeqIO](shared_ptr[CpReadParser[SeqIO]]&,
+                                                      uint32_t, uint32_t,
+                                                      CpHashtable *, uint32_t,
+                                                      uint32_t &, uint64_t &) except +oxli_raise_py_error
+
+        void set_use_bigcount(bool) except +ValueError
         bool get_use_bigcount()
         bool median_at_least(const string &, uint32_t cutoff)
         void get_median_count(const string &, BoundedCounterType &,
-                              float &, float &)
+                              float &, float &) except +oxli_raise_py_error
         const uint64_t n_unique_kmers() const
         const uint64_t n_occupied() const
         vector[uint64_t] get_tablesizes() const
         const uintptr_t n_tables() const
         void get_kmers(const string &, vector[string] &)
         void get_kmer_hashes(const string &, vector[HashIntoType] &) const
-        void get_kmer_hashes_as_hashset(const string &, 
+        void get_kmer_hashes_as_hashset(const string &,
                                         set[HashIntoType]) const
-        void get_kmer_counts(const string &, 
+        void get_kmer_counts(const string &,
                              vector[BoundedCounterType] &) const
         uint8_t ** get_raw_tables()
         BoundedCounterType get_min_count(const string &)
         BoundedCounterType get_max_count(const string &)
-        uint64_t * abundance_distribution[SeqIO](unique_ptr[CpReadParser[SeqIO]]&, 
-                                          CpHashtable *)
-        uint64_t * abundance_distribution[SeqIO](string, CpHashtable *)
+        uint64_t * abundance_distribution[SeqIO](string, CpHashtable *) except +oxli_raise_py_error
+        uint64_t * abundance_distribution[SeqIO](shared_ptr[CpReadParser[SeqIO]]&,
+                                          CpHashtable *) except +oxli_raise_py_error
         uint64_t trim_on_abundance(string, BoundedCounterType) const
         uint64_t trim_below_abundance(string, BoundedCounterType) const
-        vector[uint32_t] find_spectral_error_positions(string, 
+        vector[uint32_t] find_spectral_error_positions(string,
                                                        BoundedCounterType)
 
-    cdef cppclass CpCounttable "oxli::Counttable" (CpHashtable):
+    cdef cppclass CpMurmurHashtable "oxli::MurmurHashtable" (CpHashtable):
+        CpMurmurHashtable(WordLength, CpStorage *)
+
+    cdef cppclass CpCounttable "oxli::Counttable" (CpMurmurHashtable):
         CpCounttable(WordLength, vector[uint64_t])
 
-    cdef cppclass CpNodetable "oxli::Nodetable" (CpHashtable):
+    cdef cppclass CpSmallCounttable "oxli::SmallCounttable" (CpMurmurHashtable):
+        CpSmallCounttable(WordLength, vector[uint64_t])
+
+    cdef cppclass CpNodetable "oxli::Nodetable" (CpMurmurHashtable):
         CpNodetable(WordLength, vector[uint64_t])
+
+    cdef cppclass CpQFCounttable "oxli::QFCounttable" (CpHashtable):
+        CpQFCounttable(WordLength, uint64_t) except +oxli_raise_py_error
 
 
 cdef extern from "oxli/hashgraph.hh" namespace "oxli":
@@ -96,8 +146,8 @@ cdef extern from "oxli/hashgraph.hh" namespace "oxli":
         void divide_tags_into_subsets(unsigned int, set[HashIntoType] &)
         void add_kmer_to_tags(HashIntoType)
         void clear_tags()
-        void consume_seqfile_and_tag[SeqIO](unique_ptr[CpReadParser[SeqIO]]&, 
-                                   unsigned int &, 
+        void consume_seqfile_and_tag[SeqIO](shared_ptr[CpReadParser[SeqIO]]&,
+                                   unsigned int &,
                                    unsigned long long)
         void consume_seqfile_and_tag[SeqIO](const string &,
                                    unsigned int &,
@@ -109,9 +159,9 @@ cdef extern from "oxli/hashgraph.hh" namespace "oxli":
                                        unsigned int &,
                                        unsigned long long &)
         uintptr_t trim_on_stoptags(string) const
-        unsigned int traverse_from_kmer(CpKmer, 
-                                        uint32_t, 
-                                        KmerSet&, 
+        unsigned int traverse_from_kmer(CpKmer,
+                                        uint32_t,
+                                        KmerSet&,
                                         uint32_t) const
         void print_tagset(string)
         void save_tagset(string)
@@ -153,13 +203,13 @@ cdef extern from "oxli/labelhash.hh" namespace "oxli":
                                                uint32_t &,
                                                uint64_t &)
         void consume_seqfile_and_tag_with_labels[SeqIO](
-                               unique_ptr[CpReadParser[SeqIO]]&,
+                               shared_ptr[CpReadParser[SeqIO]]&,
                                uint32_t &,
                                uint64_t &,
                                CallbackFn,
                                void *)
         void consume_seqfile_and_tag_with_labels[SeqIO](
-                               unique_ptr[CpReadParser[SeqIO]]&,
+                               shared_ptr[CpReadParser[SeqIO]]&,
                                uint32_t &,
                                uint64_t &)
         void get_tag_labels(const HashIntoType, LabelSet &)
@@ -177,6 +227,28 @@ cdef extern from "oxli/labelhash.hh" namespace "oxli":
                                              set[HashIntoType] &,
                                              const Label)
 
+
 cdef CpHashgraph * get_hashgraph_ptr(object graph)
 cdef CpLabelHash * get_labelhash_ptr(object graph)
 
+
+cdef class Hashtable:
+    cdef unique_ptr[CpHashtable] c_table
+
+    cdef _valid_sequence(self, sequence)
+
+
+cdef class QFCounttable(Hashtable):
+    pass
+
+
+cdef class SmallCounttable(Hashtable):
+    pass
+
+
+cdef class Counttable(Hashtable):
+    pass
+
+
+cdef class Nodetable(Hashtable):
+    pass
