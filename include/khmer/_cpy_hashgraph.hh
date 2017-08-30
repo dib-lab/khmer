@@ -259,6 +259,10 @@ hashgraph_consume_and_tag(khmer_KHashgraph_Object * me, PyObject * args);
 
 
 PyObject *
+hashgraph_get_tags_for_sequence(khmer_KHashgraph_Object * me, PyObject * args);
+
+
+PyObject *
 hashgraph_get_tags_and_positions(khmer_KHashgraph_Object * me, PyObject * args);
 
 
