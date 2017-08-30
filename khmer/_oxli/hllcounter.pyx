@@ -101,11 +101,11 @@ cdef class HLLCounter:
     @property
     def counters(self):
         """Internal counters."""
-        return deref(self._this).get_M()
+        return deref(self._this).get_counters()
 
     @counters.setter
-    def counters(self, object values):
-        deref(self._this).set_M(values)
+    def counters(self, list values):
+        deref(self._this).set_counters(values)
 
     def __getstate__(self):
         return (self.ksize, self.error_rate, self.counters)
