@@ -200,7 +200,9 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
     printdbg(deleted parser and exiting)
 }
 
-// @cswelcher: double-check -- is it valid to pull the address from a reference?
+// Note: this function assumes that 'kmer' is already in graph->all_tags;
+// see usage elsewhere in this code.
+
 void LabelHash::link_tag_and_label(const HashIntoType kmer,
                                    const Label kmer_label)
 {
@@ -332,6 +334,34 @@ void LabelHash::get_tag_labels(const HashIntoType tag,
 {
     if (set_contains(graph->all_tags, tag)) {
         _get_tag_labels(tag, tag_labels, labels);
+    }
+}
+
+// get_labels_for_sequence: return labels present in the given sequence.
+
+void LabelHash::get_labels_for_sequence(const std::string& seq,
+                                        LabelSet& found_labels)
+const
+{
+    bool kmer_tagged;
+    TagSet tags;
+
+    KmerIterator kmers(seq.c_str(), graph->_ksize);
+    HashIntoType kmer;
+
+    while(!kmers.done()) {
+        kmer = kmers.next();
+
+        kmer_tagged = set_contains(graph->all_tags, kmer);
+
+        if (kmer_tagged) {
+            tags.insert(kmer);
+        }
+    }
+
+    SeenSet::const_iterator si;
+    for (si = tags.begin(); si != tags.end(); ++si) {
+        _get_tag_labels(*si, tag_labels, found_labels);
     }
 }
 
