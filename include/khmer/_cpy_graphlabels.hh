@@ -45,6 +45,10 @@ labelhash_consume_sequence_and_tag_with_labels(khmer_KGraphLabels_Object * me,
 
 
 PyObject *
+labelhash_get_labels_for_sequence(khmer_KGraphLabels_Object * me, PyObject * args);
+
+
+PyObject *
 labelhash_sweep_label_neighborhood(khmer_KGraphLabels_Object * me,
                                    PyObject * args);
 

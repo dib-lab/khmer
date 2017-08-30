@@ -201,6 +201,22 @@ def test_get_tag_labels():
     assert labels.pop() == 0
 
 
+def test_get_labels_for_sequence():
+    lb = GraphLabels(20, 1e7, 4)
+    filename = utils.get_test_data('single-read.fq')
+    lb.consume_seqfile_and_tag_with_labels(filename)
+
+    seq = [r.sequence for r in screed.open(filename)][0]
+    labels = lb.get_labels_for_sequence(seq)
+
+    tag = 173473779682
+    labels2 = lb.get_tag_labels(tag)
+
+    assert labels == labels2
+    assert len(labels) == 1
+    assert labels.pop() == 0
+
+
 def test_link_tag_and_label():
     lb = GraphLabels(20, 1, 1)
 
@@ -283,6 +299,19 @@ def test_consume_partitioned_fasta_and_tag_with_labels():
 def test_consume_sequence_and_tag_with_labels():
     lb = GraphLabels(20, 1e6, 4)
     label = 0
+    sequence = 'ATGCATCGATCGATCGATCGATCGATCGATCGATCGATCG'
+
+    lb.consume_sequence_and_tag_with_labels(sequence, label)
+    labels = set()
+    labels.update(lb.sweep_label_neighborhood(sequence))
+
+    assert label in labels
+    assert len(labels) == 1
+
+
+def test_consume_sequence_and_tag_with_labels_2():
+    lb = GraphLabels(20, 1e6, 4)
+    label = 56                            # randomly chosen / non-zero
     sequence = 'ATGCATCGATCGATCGATCGATCGATCGATCGATCGATCG'
 
     lb.consume_sequence_and_tag_with_labels(sequence, label)

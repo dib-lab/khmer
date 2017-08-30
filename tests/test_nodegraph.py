@@ -80,7 +80,18 @@ def test_add_tag():
     assert nodegraph.get_tagset() == ['AATAAG']
 
 
-def test_add_tag_hashval():
+def test_add_tag():
+    nodegraph = khmer._Nodegraph(6, [1])
+
+    assert nodegraph.n_tags() == 0
+    nodegraph.add_tag('AATAAG')
+    assert nodegraph.n_tags() == 1
+
+    print(nodegraph.get_tagset())
+    assert nodegraph.get_tagset() == ['AATAAG']
+
+
+def test_get_tag_sequences():
     nodegraph = khmer._Nodegraph(6, [1])
 
     assert nodegraph.n_tags() == 0
@@ -88,8 +99,11 @@ def test_add_tag_hashval():
     nodegraph.add_tag(kmer)
     assert nodegraph.n_tags() == 1
 
-    print(nodegraph.get_tagset())
-    assert nodegraph.get_tagset() == ['AATAAG']
+    tagset = nodegraph.get_tags_for_sequence('GGGAATAAGGGG')
+    tagset = list(tagset)
+
+    assert len(tagset) == 1
+    assert nodegraph.reverse_hash(tagset[0]) == 'AATAAG'
 
 
 def test_add_stop_tag():
