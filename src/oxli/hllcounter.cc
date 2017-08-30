@@ -303,7 +303,7 @@ unsigned int HLLCounter::consume_string(const std::string &inp)
     std::string kmer = "";
 
     for(auto ch: inp) {
-        kmer.push_back(ch & 0xdf);
+        kmer.push_back(ch);
         if (kmer.size() < _ksize) {
             continue;
         }
