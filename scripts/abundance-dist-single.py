@@ -165,8 +165,15 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     log_info('consuming input, round 1 -- {input}',
              input=args.input_sequence_filename)
     for _ in range(args.threads):
-        thread = \
-            threading.Thread(
+        if args.banding:
+            numbands = args.banding[0]
+            bandindex = args.banding[1] - 1  # CLI is 1-based, API is 0-based
+            thread = threading.Thread(
+                target=countgraph.consume_seqfile_banding_with_reads_parser,
+                args=(rparser, numbands, bandindex, )
+            )
+        else:
+            thread = threading.Thread(
                 target=countgraph.consume_seqfile_with_reads_parser,
                 args=(rparser, )
             )
