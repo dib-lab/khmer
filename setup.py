@@ -250,7 +250,6 @@ authors = [a.strip().split(',') for a in authors]
 authorstr = ', '.join([row[0] for row in authors])
 authorstr = 'Daniel Standage, ' + authorstr + ', C. Titus Brown'
 
-
 SETUP_METADATA = \
     {
         "name": "khmer",
