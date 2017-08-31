@@ -52,6 +52,8 @@ except ImportError:
 import screed
 import khmer
 from khmer import extract_countgraph_info
+from khmer import Nodegraph, Countgraph, SmallCountgraph
+from khmer import Nodetable, Counttable, SmallCounttable
 from khmer import __version__
 from .utils import print_error
 from .khmer_logger import log_info, log_warn, configure_logging
@@ -562,14 +564,17 @@ def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
         print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
         sys.exit(1)
 
+    dotable = hasattr(args, 'hash_function') and args.hash_function == 'murmur'
     if args.small_count:
         tablesize = calculate_graphsize(args, 'smallcountgraph',
                                         multiplier=multiplier)
-        return khmer.SmallCountgraph(ksize, tablesize, args.n_tables)
+        constructor = SmallCounttable if dotable else SmallCountgraph
+        return constructor(ksize, tablesize, args.n_tables)
     else:
         tablesize = calculate_graphsize(args, 'countgraph',
                                         multiplier=multiplier)
-        cg = khmer.Countgraph(ksize, tablesize, args.n_tables)
+        constructor = Counttable if dotable else Countgraph
+        cg = constructor(ksize, tablesize, args.n_tables)
         if hasattr(args, 'bigcount'):
             cg.set_use_bigcount(args.bigcount)
         return cg
