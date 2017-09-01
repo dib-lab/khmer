@@ -241,7 +241,8 @@ cdef class Hashtable:
     cdef shared_ptr[CpHashtable] _ht_this
 
     cpdef bytes sanitize_kmer(self, object kmer)
-    cdef HashIntoType sanitize_hash_kmer(self, object kmer)
+    cpdef bytes sanitize_seq_kmer(self, object kmer)
+    cdef HashIntoType sanitize_hash_kmer(self, object kmer) except -1
     cdef bytes _valid_sequence(self, str sequence)
     cdef CpKmer _build_kmer(self, object kmer) except *
     cdef list _get_raw_tables(self, uint8_t **, vector[uint64_t])

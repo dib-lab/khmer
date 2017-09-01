@@ -11,7 +11,7 @@ from libcpp.vector cimport vector
 from libcpp.set cimport set
 from libcpp.string cimport string
 
-from .utils cimport _bstring
+from .utils cimport _bstring, is_str, is_num
 from .utils import get_n_primes_near_x
 from .parsing cimport (CpFastxReader, CPyReadParser_Object, get_parser,
                       CpReadParser, FastxParserPtr)
@@ -30,41 +30,57 @@ CYTHON_TABLES = (Hashtable, Nodetable, Counttable, SmallCounttable,
 
 cdef class Hashtable:
 
+    cpdef bytes sanitize_seq_kmer(self, object kmer):
+        '''Legnth sanitize a string k-mer and return as bytes.'''
+        if len(kmer) != self.ksize():
+            raise ValueError("Expected k-mer length {}"
+                             " but got {}.".format(self.ksize(), len(kmer)))
+        return _bstring(kmer)
+
     cpdef bytes sanitize_kmer(self, object kmer):
+        '''Type and length sanitize a k-mer and return as bytes, reverse
+        hashing if necessary.'''
         cdef bytes handled
-        if isinstance(kmer, basestring):
-            if len(kmer) != self.ksize():
-                raise ValueError("Expected k-mer length {}"
-                                 " but got {}.".format(self.ksize(), len(kmer)))
-            handled = _bstring(kmer)
-        elif isinstance(kmer, bytes):
-            if len(kmer) != self.ksize():
-                raise ValueError("Expected k-mer length {}"
-                                 " but got {}.".format(self.ksize(), len(kmer)))
-            handled = kmer
+        if is_num(kmer):
+            handled = deref(self._ht_this).unhash_dna(<HashIntoType>kmer)
         elif isinstance(kmer, Kmer):
             handled = _bstring(kmer.kmer)
+        elif is_str(kmer):
+            handled = self.sanitize_seq_kmer(kmer)
         else:
-            handled = deref(self._ht_this).unhash_dna(kmer)
+            self._kmer_type_error(kmer)
         return handled
 
-    cdef HashIntoType sanitize_hash_kmer(self, object kmer):
+    cdef HashIntoType sanitize_hash_kmer(self, object kmer) except -1:
+        '''Sanitize a hashed k-mer, or hash if not already.'''
         cdef HashIntoType handled
-        if isinstance(kmer, basestring):
-            if len(kmer) != self.ksize():
-                raise ValueError("Expected k-mer length {}"
-                                 " but got {}.".format(self.ksize(), len(kmer)))
-            handled = deref(self._ht_this).hash_dna(_bstring(kmer))
-        elif isinstance(kmer, bytes):
-            if len(kmer) != self.ksize():
-                raise ValueError("Expected k-mer length {}"
-                                 " but got {}.".format(self.ksize(), len(kmer)))
-            handled = deref(self._ht_this).hash_dna(kmer)
+        if is_num(kmer):
+            handled = <HashIntoType>kmer
         elif isinstance(kmer, Kmer):
             handled = kmer.kmer_u
         else:
-            handled = <HashIntoType>kmer
+            handled = self.hash(kmer)
         return handled
+
+    cdef bytes _valid_sequence(self, str sequence):
+        """Validate sequence argument and convert it to bytes"""
+        if len(sequence) < self.ksize():
+            raise ValueError("sequence length ({}) must >= the hashtable "
+                             "k-mer size ({})".format(len(sequence),
+                                                      self.ksize()))
+        return _bstring(sequence)
+
+    cdef CpKmer _build_kmer(self, object kmer) except *:
+        '''Build a liboxli Kmer (CpKmer) from a hash or string.'''
+        if type(kmer) is Kmer:
+            return deref((<Kmer>kmer)._this.get())
+
+        cdef bytes temp = self.sanitize_kmer(kmer)
+        return deref(self._ht_this).build_kmer(temp)
+
+    def _kmer_type_error(self, object kmer):
+        raise TypeError("Object of type {0} can not be interpretted as "
+                        " a k-mer".format(type(kmer)))
 
     def count(self, object kmer):
         """Increment the count of this k-mer.
@@ -79,16 +95,19 @@ cdef class Hashtable:
         `kmer` can be either a string or an integer representing the hashed
         value of the kmer.
         """
-        if isinstance(kmer, basestring):
-            temp = self.sanitize_kmer(kmer)
-            return deref(self._ht_this).add(<char*>temp)
-        # assume kmer is an integer representing the hash value
+        if is_str(kmer):
+            return deref(self._ht_this).add(self.sanitize_seq_kmer(kmer))
+        elif is_num(kmer):
+            return deref(self._ht_this).add(<HashIntoType>kmer)
         else:
-            return deref(self._ht_this).add(<uint64_t>kmer)
+            self._kmer_type_error(kmer)
 
-    def hash(self, str kmer):
+    def hash(self, object kmer):
         """Compute the hash of this k-mer."""
-        data = self.sanitize_kmer(kmer)
+        if is_num(kmer):
+            return kmer
+
+        data = self.sanitize_seq_kmer(kmer)
         return deref(self._ht_this).hash_dna(data)
 
     def reverse_hash(self, HashIntoType kmer_hash):
@@ -104,12 +123,14 @@ cdef class Hashtable:
         For Nodetables and Counttables, this function will fail if the
         supplied k-mer contains non-ACGT characters.
         """
-        if isinstance(kmer, basestring):
-            temp = self.sanitize_kmer(kmer)
-            return deref(self._ht_this).get_count(<char*>temp)
-        # assume kmer is an integer representing the hash value
+        if is_str(kmer):
+            _kmer = self.sanitize_seq_kmer(kmer)
+            return deref(self._ht_this).get_count(_kmer)
+        elif is_num(kmer):
+            return deref(self._ht_this).get_count(<HashIntoType> kmer)
         else:
-            return deref(self._ht_this).get_count(<uint64_t>kmer)
+            self._kmer_type_error(kmer)
+            
 
     def ksize(self):
         """k-mer size"""
@@ -118,18 +139,6 @@ cdef class Hashtable:
     def hashsizes(self):
         """Size of hash tables used."""
         return deref(self._ht_this).get_tablesizes()
-
-    cdef bytes _valid_sequence(self, str sequence):
-        """Validate sequence argument and convert it to bytes"""
-        if len(sequence) < self.ksize():
-            raise ValueError("sequence length ({}) must >= the hashtable "
-                             "k-mer size ({})".format(len(sequence),
-                                                      self.ksize()))
-        return _bstring(sequence)
-
-    cdef CpKmer _build_kmer(self, object kmer) except *:
-        cdef bytes temp = self.sanitize_kmer(kmer)
-        return deref(self._ht_this).build_kmer(temp)
 
     def get_kmers(self, str sequence):
         """Generate an ordered list of all k-mers in sequence."""
@@ -439,10 +448,10 @@ cdef class Hashgraph(Hashtable):
         cdef Traverser traverser = Traverser(self)
         return [str(n) for n in traverser._neighbors(self._build_kmer(kmer))]
 
-    def calc_connected_graph_size(self, str kmer, max_size=0,
+    def calc_connected_graph_size(self, object kmer, max_size=0,
                                   break_on_circumference=False):
         '''Find the number of nodes connected to this k-mer.'''
-        cdef CpKmer start = deref(self._hg_this).build_kmer(_bstring(kmer))
+        cdef CpKmer _kmer = self._build_kmer(_bstring(kmer))
         cdef uint64_t _size = 0
         cdef uint64_t _max_size = max_size
         cdef bool _break = break_on_circumference
@@ -450,7 +459,7 @@ cdef class Hashgraph(Hashtable):
         cdef CpHashgraph * ptr = self._hg_this.get() # need tmp ref for nogil
 
         with nogil:
-            deref(ptr).calc_connected_graph_size(start, _size,
+            deref(ptr).calc_connected_graph_size(_kmer, _size,
                                                  keeper, _max_size,
                                                  _break)
         return _size
@@ -461,16 +470,16 @@ cdef class Hashgraph(Hashtable):
         cdef bytes _kmer = self.sanitize_kmer(kmer)
         return deref(self._hg_this).kmer_degree(_kmer)
 
-    def count_kmers_within_radius(self, str kmer, int radius, int max_count=0):
+    def count_kmers_within_radius(self, object kmer, int radius, int max_count=0):
         '''Calculate the number of neighbors with given radius in the graph.'''
         cdef unsigned int n
         cdef uint32_t _radius = radius
         cdef uint32_t _max_count = max_count
-        cdef CpKmer start = deref(self._hg_this).build_kmer(_bstring(kmer))
+        cdef CpKmer _kmer = self._build_kmer(kmer)
         cdef KmerSet seen
         cdef CpHashgraph * ptr = self._hg_this.get()
         with nogil:
-            n = deref(ptr).traverse_from_kmer(start, _radius,
+            n = deref(ptr).traverse_from_kmer(_kmer, _radius,
                                               seen, _max_count)
         return n
 
@@ -478,22 +487,22 @@ cdef class Hashgraph(Hashtable):
         '''Examine the given sequence for degree > 2 nodes and add to
         list; used in graph contraction.'''
         cdef HashSet hdns = HashSet(self.ksize())
-        data = self._valid_sequence(sequence)
-        deref(self._hg_this).find_high_degree_nodes(data, 
-                                                   hdns.hs)
+        _sequence = self._valid_sequence(sequence)
+        deref(self._hg_this).find_high_degree_nodes(_sequence, 
+                                                    hdns.hs)
         return hdns
 
 
-    def traverse_linear_path(self, str kmer, HashSet hdns, 
+    def traverse_linear_path(self, object kmer, HashSet hdns, 
                              Nodegraph stop_filter=None):
         '''Traverse the path through the graph starting with the given
         k-mer and avoiding high-degree nodes, finding (and returning)
         traversed k-mers and any encountered high-degree nodes.'''
         cdef set[HashIntoType] adj
         cdef set[HashIntoType] visited
-        cdef CpKmer cpkmer = CpKmer(_bstring(kmer), self.ksize())
+        cdef CpKmer _kmer = self._build_kmer(kmer)
         cdef CpNodegraph * _stop_filter = stop_filter._ng_this.get()
-        cdef int size = deref(self._hg_this).traverse_linear_path(cpkmer,
+        cdef int size = deref(self._hg_this).traverse_linear_path(_kmer,
                                                                  adj,
                                                                  visited,
                                                                  deref(_stop_filter),
@@ -528,13 +537,13 @@ cdef class Hashgraph(Hashtable):
             
     def find_all_tags_list(self, object kmer):
         '''Find all tags within range of the given k-mer, return as list'''
-        cdef CpKmer start = self._build_kmer(kmer)
+        cdef CpKmer _kmer = self._build_kmer(kmer)
         cdef HashSet result = HashSet(self.ksize())
         cdef set[HashIntoType] * tags = &(result.hs)
         cdef shared_ptr[CpHashgraph] this = self._hg_this
 
         with nogil:
-            deref(deref(self._hg_this).partition).find_all_tags(start, deref(tags), 
+            deref(deref(self._hg_this).partition).find_all_tags(_kmer, deref(tags), 
                                                                 deref(this).all_tags)
 
         return result
@@ -568,7 +577,7 @@ cdef class Hashgraph(Hashtable):
             all_tags.append(deref(self._hg_this).unhash_dna(st))
         return all_tags
 
-    def iter_tagset(self):
+    def tags(self):
         '''Get all tagged k-mers as DNA strings.'''
         cdef HashIntoType st
         for st in deref(self._hg_this).all_tags:
@@ -625,14 +634,14 @@ cdef class Hashgraph(Hashtable):
 
     def find_all_tags(self, object kmer):
         '''Starting from the given k-mer, find all closely connected tags.'''
-        cdef CpKmer start = self._build_kmer(kmer)
-        cdef PrePartitionInfo ppi = PrePartitionInfo.create(start)
+        cdef CpKmer _kmer = self._build_kmer(kmer)
+        cdef PrePartitionInfo ppi = PrePartitionInfo.create(_kmer)
 
         with nogil:
-            deref(deref(self._hg_this).partition).find_all_tags(start,
+            deref(deref(self._hg_this).partition).find_all_tags(_kmer,
                                                                 deref(ppi._this).tagged_kmers,
                                                                 deref(self._hg_this).all_tags)
-            deref(self._hg_this).add_kmer_to_tags(start.kmer_u)
+            deref(self._hg_this).add_kmer_to_tags(_kmer.kmer_u)
 
         return ppi
 
@@ -713,8 +722,8 @@ cdef class Hashgraph(Hashtable):
 
     def get_partition_id(self, object kmer):
         '''Get the partition ID of this tag.'''
-        cdef string start = self.sanitize_kmer(kmer)
-        return deref(deref(self._hg_this).partition).get_partition_id(start)
+        cdef string _kmer = self.sanitize_kmer(kmer)
+        return deref(deref(self._hg_this).partition).get_partition_id(_kmer)
     
     def repartition_largest_partition(self, Countgraph counts not None,
                                             unsigned int distance,

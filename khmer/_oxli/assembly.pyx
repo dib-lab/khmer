@@ -21,52 +21,45 @@ cdef class LinearAssembler:
         if stop_filter is not None:
             self._stop_filter_ptr = stop_filter._hg_this
 
-    cdef str _assemble(self, Kmer kmer):
+    cdef str _assemble(self, CpKmer kmer):
         if self.stop_filter is None:
-            return deref(self._this).assemble(deref(kmer._this))
+            return deref(self._this).assemble(kmer)
         else:
-            return deref(self._this).assemble(deref(kmer._this), 
+            return deref(self._this).assemble(kmer, 
                                               self._stop_filter_ptr.get())
 
-    def assemble(self, seed):
-        if isinstance(seed, Kmer):
-            return self._assemble(seed)
-        else:
-            return self._assemble(Kmer(str(seed)))
+    def assemble(self, object seed):
+        cdef CpKmer _seed = self.graph._build_kmer(seed)
+        return self._assemble(_seed)
 
-
-    cdef str _assemble_left(self, Kmer kmer):
+    cdef str _assemble_left(self, CpKmer kmer):
         if self.stop_filter is None:
-            return deref(self._this).assemble_left(deref(kmer._this))
+            return deref(self._this).assemble_left(kmer)
         else:
-            return deref(self._this).assemble_left(deref(kmer._this), 
+            return deref(self._this).assemble_left(kmer, 
                                                    self._stop_filter_ptr.get())
 
-    def assemble_left(self, seed):
-        if isinstance(seed, Kmer):
-            return self._assemble_left(seed)
-        else:
-            return self._assemble_left(Kmer(str(seed)))
+    def assemble_left(self, object seed):
+        cdef CpKmer _seed = self.graph._build_kmer(seed)
+        return self._assemble_left(_seed)
 
-
-    cdef str _assemble_right(self, Kmer kmer):
+    cdef str _assemble_right(self, CpKmer kmer):
         if self.stop_filter is None:
-            return deref(self._this).assemble_right(deref(kmer._this))
+            return deref(self._this).assemble_right(kmer)
         else:
-            return deref(self._this).assemble_right(deref(kmer._this), 
+            return deref(self._this).assemble_right(kmer, 
                                                     self._stop_filter_ptr.get())
 
-    def assemble_right(self, seed):
-        if isinstance(seed, Kmer):
-            return self._assemble_right(seed)
-        else:
-            return self._assemble_right(Kmer(str(seed)))
+    def assemble_right(self, object seed):
+        cdef CpKmer _seed = self.graph._build_kmer(seed)
+        return self._assemble_right(_seed)
 
 
 cdef class SimpleLabeledAssembler:
 
     def __cinit__(self, GraphLabels labels not None, Hashgraph stop_filter=None):
         self.labels = labels
+        self.graph = labels.graph
         self._label_ptr = labels._lh_this
         self.set_stop_filter(stop_filter=stop_filter)
         
@@ -78,18 +71,16 @@ cdef class SimpleLabeledAssembler:
         if stop_filter is not None:
             self._stop_filter_ptr = stop_filter._hg_this
 
-    cdef vector[string] _assemble(self, Kmer kmer):
+    cdef vector[string] _assemble(self, CpKmer kmer):
         if self.stop_filter is None:
-            return deref(self._this).assemble(deref(kmer._this))
+            return deref(self._this).assemble(kmer)
         else:
-            return deref(self._this).assemble(deref(kmer._this),
+            return deref(self._this).assemble(kmer,
                                               self._stop_filter_ptr.get())
 
-    def assemble(self, seed):
-        if isinstance(seed, Kmer):
-            return self._assemble(seed)
-        else:
-            return self._assemble(Kmer(str(seed)))
+    def assemble(self, object seed):
+        cdef CpKmer _seed = self.graph._build_kmer(seed)
+        return self._assemble(_seed)
 
 
 cdef class JunctionCountAssembler:
@@ -107,18 +98,16 @@ cdef class JunctionCountAssembler:
         if stop_filter is not None:
             self._stop_filter_ptr = stop_filter._hg_this
 
-    cdef vector[string] _assemble(self, Kmer kmer):
+    cdef vector[string] _assemble(self, CpKmer kmer):
         if self.stop_filter is None:
-            return deref(self._this).assemble(deref(kmer._this))
+            return deref(self._this).assemble(kmer)
         else:
-            return deref(self._this).assemble(deref(kmer._this),
+            return deref(self._this).assemble(kmer,
                                               self._stop_filter_ptr.get())
 
-    def consume(self, sequence):
+    def consume(self, str sequence):
         return deref(self._this).consume(_bstring(sequence))
 
-    def assemble(self, seed):
-        if isinstance(seed, Kmer):
-            return self._assemble(seed)
-        else:
-            return self._assemble(Kmer(str(seed)))
+    def assemble(self, object seed):
+        cdef CpKmer _seed = self.graph._build_kmer(seed)
+        return self._assemble(_seed)

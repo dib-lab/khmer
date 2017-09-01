@@ -17,5 +17,8 @@ cdef bytes _bstring(s)
 
 cdef unicode _ustring(s)
 
+cpdef bool is_str(object s)
+cpdef bool is_num(object n)
+
 cdef void _flatten_fill(double * fill_to, object fill_from)
 cdef void _fill(double * fill_to, object fill_from)

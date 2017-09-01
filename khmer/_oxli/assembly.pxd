@@ -46,21 +46,22 @@ cdef class LinearAssembler:
     cdef public Hashgraph stop_filter
     cdef shared_ptr[CpHashgraph] _stop_filter_ptr
     
-    cdef str _assemble(self, Kmer start)
-    cdef str _assemble_left(self, Kmer start)
-    cdef str _assemble_right(self, Kmer start)
+    cdef str _assemble(self, CpKmer start)
+    cdef str _assemble_left(self, CpKmer start)
+    cdef str _assemble_right(self, CpKmer start)
 
 
 cdef class SimpleLabeledAssembler:
     cdef shared_ptr[CpSimpleLabeledAssembler] _this
 
     cdef public GraphLabels labels
+    cdef public Hashgraph graph
     cdef shared_ptr[CpLabelHash] _label_ptr
 
     cdef public Hashgraph stop_filter
     cdef shared_ptr[CpHashgraph] _stop_filter_ptr
     
-    cdef vector[string] _assemble(self, Kmer start)
+    cdef vector[string] _assemble(self, CpKmer start)
 
 
 cdef class JunctionCountAssembler:
@@ -72,4 +73,4 @@ cdef class JunctionCountAssembler:
     cdef public Hashgraph stop_filter
     cdef shared_ptr[CpHashgraph] _stop_filter_ptr
     
-    cdef vector[string] _assemble(self, Kmer)
+    cdef vector[string] _assemble(self, CpKmer)

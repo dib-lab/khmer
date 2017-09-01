@@ -10,7 +10,7 @@ from .parsing cimport CpFastxReader
 
 cdef class GraphLabels:
 
-    def __cinit__(self, Hashgraph graph, *args, **kwargs):
+    def __cinit__(self, Hashgraph graph not None, *args, **kwargs):
         self.graph = graph
         self._lh_this = make_shared[CpLabelHash](graph._hg_this.get())
 
@@ -97,6 +97,12 @@ cdef class GraphLabels:
         cdef Label label
         for label in deref(self._lh_this).all_labels:
             yield label
+
+    def tags(self):
+        '''Get all tagged k-mers as DNA strings.'''
+        cdef HashIntoType st
+        for st in deref(self.graph._hg_this).all_tags:
+            yield deref(self.graph._hg_this).unhash_dna(st)
 
     def add_tag(self, object kmer):
         cdef HashIntoType _kmer = self.graph.sanitize_hash_kmer(kmer)

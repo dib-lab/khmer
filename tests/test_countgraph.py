@@ -132,7 +132,7 @@ class Test_Countgraph(object):
         try:
             hi.get(float(GGhash))
             assert "the previous statement should fail"
-        except ValueError as err:
+        except TypeError as err:
             print(str(err))
 
     def test_collision_1(self):
