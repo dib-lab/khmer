@@ -44,9 +44,9 @@ def main():
     for i in range(SIZE):
         # the point of this is to canonicalize k-mers to less of RC.
         kmer = ct.reverse_hash(i)
-        if kmer.startswith('A') or kmer.startswith('C'):
-            if ct.get(kmer) == 0:
-                print(kmer)
+        if ct.get(kmer) == 0:
+            print(kmer)
+            ct.add(kmer)
 
 
 if __name__ == '__main__':
