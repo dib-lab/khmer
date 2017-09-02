@@ -333,7 +333,7 @@ def test_multirename_fasta():
 def test_extract_compact_dbg_1():
     infile = utils.get_test_data('simple-genome.fa')
     outfile = utils.get_temp_filename('out.gml')
-    args = ['-x', '1e4', '-o', outfile, infile]
+    args = ['-x', '1e5', '-o', outfile, infile]
     _, out, err = utils.runscript('extract-compact-dbg.py', args, sandbox=True)
 
     print(out)

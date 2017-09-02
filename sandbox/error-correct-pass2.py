@@ -46,6 +46,7 @@ import sys
 import os
 import screed
 import khmer
+from khmer import Countgraph
 from khmer import khmer_args
 from khmer.khmer_args import FileType as khFileType
 
@@ -87,7 +88,7 @@ def main():
     args = parser.parse_args()
 
     print('loading counts')
-    ht = khmer.load_countgraph(args.counts_table)
+    ht = Countgraph.load(args.counts_table)
 
     aligner = khmer.ReadAligner(ht,
                                 args.trusted_cov,

@@ -48,6 +48,7 @@ import khmer
 import argparse
 import screed
 import csv
+from khmer import Countgraph
 from khmer.khmer_args import info
 
 
@@ -76,13 +77,13 @@ def main():
 
     print ('hashtable from', args.input_count_graph_filename,
            file=sys.stderr)
-    countgraph = khmer.load_countgraph(
+    countgraph = Countgraph.load(
         args.input_count_graph_filename)
 
     kmer_size = countgraph.ksize()
     hashsizes = countgraph.hashsizes()
-    tracking = khmer._Nodegraph(  # pylint: disable=protected-access
-        kmer_size, hashsizes)
+    tracking = khmer.Nodegraph(  # pylint: disable=protected-access
+        kmer_size, 1, 1, primes=hashsizes)
 
     if args.output_file is None:
         args.output_file = sys.stdout
