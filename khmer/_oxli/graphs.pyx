@@ -452,7 +452,7 @@ cdef class Hashgraph(Hashtable):
                                   break_on_circumference=False):
         '''Find the number of nodes connected to this k-mer.'''
         cdef CpKmer _kmer = self._build_kmer(_bstring(kmer))
-        cdef uint64_t _size = 0
+        cdef unsigned long long _size = 0
         cdef uint64_t _max_size = max_size
         cdef bool _break = break_on_circumference
         cdef KmerSet keeper
