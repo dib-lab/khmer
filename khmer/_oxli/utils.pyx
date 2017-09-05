@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-# cython: c_string_type=unicode, c_string_encoding=utf8
 
 from __future__ import unicode_literals
 from cpython.version cimport PY_MAJOR_VERSION

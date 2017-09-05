@@ -1,4 +1,3 @@
-# cython: c_string_type=unicode, c_string_encoding=utf8
 from math import log
 
 from cython.operator cimport dereference as deref
@@ -7,15 +6,15 @@ from libc.stdint cimport uint64_t
 from libcpp.memory cimport unique_ptr
 from libcpp.vector cimport vector
 
-from utils cimport _bstring
-from utils import get_n_primes_near_x
-from parsing cimport (CpFastxReader, CPyReadParser_Object, get_parser,
+from khmer._oxli.utils cimport _bstring
+from khmer._oxli.utils import get_n_primes_near_x
+from khmer._oxli.parsing cimport (CpFastxReader, CPyReadParser_Object, get_parser,
                       CpReadParser, FastxParserPtr)
-from oxli_types cimport MAX_BIGCOUNT
-from .._khmer import Countgraph as PyCountgraph
-from .._khmer import Nodegraph as PyNodegraph
-from .._khmer import GraphLabels as PyGraphLabels
-from .._khmer import ReadParser
+from khmer._oxli.oxli_types cimport MAX_BIGCOUNT
+from khmer._khmer import Countgraph as PyCountgraph
+from khmer._khmer import Nodegraph as PyNodegraph
+from khmer._khmer import GraphLabels as PyGraphLabels
+from khmer._khmer import ReadParser
 
 
 CYTHON_TABLES = (Hashtable, Nodetable, Counttable, SmallCounttable,

@@ -4,9 +4,9 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libc.stdint cimport uint64_t, uint8_t
 
-from oxli_types cimport *
-from parsing cimport CpReadParser
-from utils cimport oxli_raise_py_error
+from khmer._oxli.oxli_types cimport *
+from khmer._oxli.parsing cimport CpReadParser
+from khmer._oxli.utils cimport oxli_raise_py_error
 
 
 cdef extern from "oxli/hllcounter.hh" namespace "oxli":

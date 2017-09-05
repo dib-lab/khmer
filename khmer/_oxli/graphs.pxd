@@ -5,10 +5,10 @@ from libcpp.set cimport set
 from libcpp.memory cimport unique_ptr, shared_ptr, weak_ptr
 from libc.stdint cimport uint8_t, uint32_t, uint64_t, uintptr_t
 
-from oxli_types cimport *
-from hashing cimport CpKmer, KmerSet
-from parsing cimport CpReadParser, CpSequence
-from utils cimport oxli_raise_py_error
+from khmer._oxli.oxli_types cimport *
+from khmer._oxli.hashing cimport CpKmer, KmerSet
+from khmer._oxli.parsing cimport CpReadParser, CpSequence
+from khmer._oxli.utils cimport oxli_raise_py_error
 
 
 # All we really need are the PyObject struct definitions
