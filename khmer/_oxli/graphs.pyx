@@ -1,4 +1,3 @@
-# cython: c_string_type=unicode, c_string_encoding=utf8
 from math import log
 
 from cython.operator cimport dereference as deref
@@ -11,18 +10,17 @@ from libcpp.vector cimport vector
 from libcpp.set cimport set
 from libcpp.string cimport string
 
-from .utils cimport _bstring, is_str, is_num
-from .utils import get_n_primes_near_x
-from .parsing cimport (CpFastxReader, CPyReadParser_Object, get_parser,
+from khmer._oxli.utils cimport _bstring, is_str, is_num
+from khmer._oxli.utils import get_n_primes_near_x
+from khmer._oxli.parsing cimport (CpFastxReader, CPyReadParser_Object, get_parser,
                       CpReadParser, FastxParserPtr)
-from .hashset cimport HashSet
-from .legacy_partitioning cimport (CpSubsetPartition, SubsetPartition,
+from khmer._oxli.hashset cimport HashSet
+from khmer._oxli.legacy_partitioning cimport (CpSubsetPartition, SubsetPartition,
                                    cp_pre_partition_info, PrePartitionInfo)
-from .oxli_types cimport MAX_BIGCOUNT, HashIntoType
-from .traversal cimport Traverser
+from khmer._oxli.oxli_types cimport MAX_BIGCOUNT, HashIntoType
+from khmer._oxli.traversal cimport Traverser
 
-from .._khmer import ReadParser
-
+from khmer._khmer import ReadParser
 
 CYTHON_TABLES = (Hashtable, Nodetable, Counttable, SmallCounttable,
                  QFCounttable, Nodegraph, Countgraph, SmallCountgraph)

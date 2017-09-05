@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-# cython: c_string_type=unicode, c_string_encoding=utf8
 from libcpp.vector cimport vector
 from libc.stdint cimport uint32_t, uint64_t
 from libcpp cimport bool

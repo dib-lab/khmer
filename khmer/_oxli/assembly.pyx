@@ -1,9 +1,8 @@
 # -*- coding: UTF-8 -*-
-# cython: c_string_type=unicode, c_string_encoding=utf8
 
 from cython.operator cimport dereference as deref
 
-from utils cimport _bstring
+from khmer._oxli.utils cimport _bstring
 
 
 cdef class LinearAssembler:

@@ -3,10 +3,10 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libc.stdint cimport uint16_t
 
-from oxli_types cimport *
-from hashing cimport CpKmer, Kmer
-from graphs cimport Hashgraph, CpHashgraph, CpHashtable
-from labeling cimport CpLabelHash, GraphLabels
+from khmer._oxli.oxli_types cimport *
+from khmer._oxli.hashing cimport CpKmer, Kmer
+from khmer._oxli.graphs cimport Hashgraph, CpHashgraph, CpHashtable
+from khmer._oxli.labeling cimport CpLabelHash, GraphLabels
 
 
 cdef extern from "oxli/assembler.hh" namespace "oxli":

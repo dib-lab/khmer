@@ -29,6 +29,8 @@ under semantic versioning, but will be in future versions of khmer.
   `include/khmer`.
 - Moved liboxli headers to include/oxli and implementations to src/oxli.
 - Removed CPython assembler wrappers.
+- Dropped support for Python 2.
+- Changed to absolute imports.
 
 ## [2.1.1] - 2017-05-25
 ### Added

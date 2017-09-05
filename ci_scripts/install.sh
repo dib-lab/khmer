@@ -23,7 +23,7 @@ conda update --yes conda
 popd
 
 # Create a fresh environment
-conda create -n testenv --yes python=2.7
+conda create -n testenv --yes python=3
 
 source activate testenv
 
