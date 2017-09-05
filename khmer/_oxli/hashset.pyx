@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-# cython: c_string_type=unicode, c_string_encoding=utf8
 
 cdef class HashSet:
     def __cinit__(self, ksize, hashes=[]):

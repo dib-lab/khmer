@@ -1,12 +1,11 @@
-# cython: c_string_type=unicode, c_string_encoding=utf8
 from cython.operator cimport dereference as deref
 from libcpp.memory cimport make_shared, shared_ptr
 
-from .graphs cimport Nodegraph, Hashgraph
-from .hashset cimport HashSet
-from .utils cimport _bstring
-from .utils import get_n_primes_near_x
-from .parsing cimport CpFastxReader
+from khmer._oxli.graphs cimport Nodegraph, Hashgraph
+from khmer._oxli.hashset cimport HashSet
+from khmer._oxli.utils cimport _bstring
+from khmer._oxli.utils import get_n_primes_near_x
+from khmer._oxli.parsing cimport CpFastxReader
 
 cdef class GraphLabels:
 

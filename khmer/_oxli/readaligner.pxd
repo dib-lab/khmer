@@ -6,8 +6,8 @@ from libcpp.memory cimport unique_ptr, shared_ptr, weak_ptr
 from libc.stdint cimport uint8_t, uint32_t, uint64_t
 from libc.stdint cimport uintptr_t as size_t
 
-from .oxli_types cimport *
-from .graphs cimport CpCountgraph, Countgraph
+from khmer._oxli.oxli_types cimport *
+from khmer._oxli.graphs cimport CpCountgraph, Countgraph
 
 cdef extern from "oxli/read_aligner.hh" namespace "oxli" nogil:
 

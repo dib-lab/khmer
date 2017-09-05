@@ -414,7 +414,7 @@ cdef class SmallCounttable(Hashtable):
         cdef uint8_t ** table_ptrs = deref(self._st_this).get_raw_tables()
         cdef vector[uint64_t] sizes = deref(self._st_this).get_tablesizes()
         for i in range(len(sizes)):
-            sizes[i] = sizes[i] / 2 + 1
+            sizes[i] = (sizes[i] // 2) + 1
         return self._get_raw_tables(table_ptrs, sizes)
 
 

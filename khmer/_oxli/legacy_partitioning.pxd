@@ -4,10 +4,10 @@ from libcpp.set cimport set
 from libcpp.memory cimport shared_ptr, weak_ptr
 from libc.stdint cimport uintptr_t as size_t
 
-from oxli_types cimport *
-from hashing cimport CpKmer
-from graphs cimport CpHashgraph, CpCountgraph, Hashgraph, Countgraph
-from utils cimport oxli_raise_py_error
+from khmer._oxli.oxli_types cimport *
+from khmer._oxli.hashing cimport CpKmer
+from khmer._oxli.graphs cimport CpHashgraph, CpCountgraph, Hashgraph, Countgraph
+from khmer._oxli.utils cimport oxli_raise_py_error
 
 
 cdef extern from "oxli/subset.hh" nogil:

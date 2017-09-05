@@ -1,11 +1,10 @@
-
 from libcpp.memory cimport make_shared
 from cython.operator cimport dereference as deref
 
-from .oxli_types cimport *
-from .graphs cimport Hashgraph
-from .hashing cimport Kmer
-from .hashing import Kmer
+from khmer._oxli.oxli_types cimport *
+from khmer._oxli.graphs cimport Hashgraph
+from khmer._oxli.hashing cimport Kmer
+from khmer._oxli.hashing import Kmer
 
 
 cdef class Traverser:

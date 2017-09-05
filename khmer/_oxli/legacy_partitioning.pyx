@@ -1,10 +1,9 @@
-# cython: c_string_type=unicode, c_string_encoding=utf8
 from cython.operator cimport dereference as deref
 
 from libcpp.memory cimport make_shared
 
-from utils cimport _bstring
-from graphs cimport CpHashgraph, CpCountgraph, Hashgraph, Countgraph
+from khmer._oxli.utils cimport _bstring
+from khmer._oxli.graphs cimport CpHashgraph, CpCountgraph, Hashgraph, Countgraph
 
 cdef class PrePartitionInfo:
 

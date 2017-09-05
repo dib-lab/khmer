@@ -1,5 +1,3 @@
-# cython: c_string_type=unicode, c_string_encoding=utf8
-
 from cython.operator cimport dereference as deref
 
 from libc.math cimport log2
@@ -9,8 +7,8 @@ from libcpp.string cimport string
 import json
 from math import log
 
-from .graphs cimport Countgraph
-from .utils cimport _flatten_fill, _fill
+from khmer._oxli.graphs cimport Countgraph
+from khmer._oxli.utils cimport _flatten_fill, _fill
 
 cdef class ReadAligner:
     '''
