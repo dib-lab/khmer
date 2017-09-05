@@ -336,7 +336,8 @@ def test_sweep_label_neighborhood():
     filename = utils.get_test_data('single-read.fq')
     lb.consume_seqfile_and_tag_with_labels(filename)
 
-    labels = list(lb.sweep_label_neighborhood('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT'))
+    labels = list(lb.sweep_label_neighborhood(
+        'CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT'))
     assert len(labels) == 1
     assert labels.pop() == 0
 

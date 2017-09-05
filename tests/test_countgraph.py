@@ -1499,4 +1499,3 @@ def test_counting_load_bigcount():
         print(i, count_table.count('ATATATATAT'))
     count = count_table.get('ATATATATAT')
     assert count == 500
-

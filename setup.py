@@ -154,7 +154,7 @@ BZIP2DIR = 'third-party/bzip2'
 
 BUILD_DEPENDS = [path_join("include", "khmer", bn + ".hh") for bn in [
     "_cpy_khmer", "_cpy_utils", "_cpy_readparsers"
-    ]]
+]]
 BUILD_DEPENDS.extend(path_join("include", "oxli", bn + ".hh") for bn in [
     "khmer", "kmer_hash", "hashtable", "labelhash", "hashgraph",
     "hllcounter", "oxli_exception", "read_aligner", "subset", "read_parsers",
@@ -162,7 +162,7 @@ BUILD_DEPENDS.extend(path_join("include", "oxli", bn + ".hh") for bn in [
 
 SOURCES = [path_join("src", "khmer", bn + ".cc") for bn in [
     "_cpy_khmer", "_cpy_utils", "_cpy_readparsers"
-    ]]
+]]
 SOURCES.extend(path_join("src", "oxli", bn + ".cc") for bn in [
     "read_parsers", "kmer_hash", "hashtable", "hashgraph",
     "labelhash", "subset", "read_aligner",

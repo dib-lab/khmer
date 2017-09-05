@@ -90,7 +90,7 @@ def test_transition_probabilities():
     ch = khmer.Countgraph(10, 1048576, 1)
     aligner = khmer.ReadAligner(ch)
     assert aligner.transition_probabilities == \
-           aligner.defaultTransitionProbabilities
+        aligner.defaultTransitionProbabilities
 
 
 def test_align_nothing():
@@ -112,7 +112,7 @@ def test_align_nothing():
 def test_alignnocov():
     ch = khmer.Countgraph(10, 1048576, 1)
     read = "ACCTAGGTTCGACATGTACC"
-    aligner = khmer.ReadAligner(ch, trusted_cov_cutoff=0, 
+    aligner = khmer.ReadAligner(ch, trusted_cov_cutoff=0,
                                 bits_theta=0)
     for _ in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
@@ -128,7 +128,7 @@ def test_alignnocov():
 def test_align_middle():
     ch = khmer.Countgraph(10, 1048576, 1)
     read = "TCGACAAGTCCTTGACAGAT"
-    aligner = khmer.ReadAligner(ch, trusted_cov_cutoff=0, 
+    aligner = khmer.ReadAligner(ch, trusted_cov_cutoff=0,
                                 bits_theta=0)
     for _ in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")

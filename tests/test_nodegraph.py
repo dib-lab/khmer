@@ -328,7 +328,7 @@ def test_bloom_c_2():  # simple one
     assert nodegraph.n_unique_kmers() == 2
 
     # use two hashtables with 11,13
-    other_nodegraph = khmer.Nodegraph(ksize, 1, 1, primes= [11, 13])
+    other_nodegraph = khmer.Nodegraph(ksize, 1, 1, primes=[11, 13])
     other_nodegraph.count('AAAA')  # 00 00 00 00 = 0
 
     other_nodegraph.count('ACTG')  # 00 10 01 11 = 2*16 +4 +3 = 39
@@ -395,7 +395,7 @@ def test_consume_partitioned_fail():
 
 def test_count_within_radius_simple():
     inpfile = utils.get_test_data('all-A.fa')
-    nodegraph = khmer.Nodegraph(4, 1, 1,primes=[3, 5])
+    nodegraph = khmer.Nodegraph(4, 1, 1, primes=[3, 5])
 
     print(nodegraph.consume_seqfile(inpfile))
     n = nodegraph.count_kmers_within_radius('AAAA', 1)
@@ -437,8 +437,10 @@ def test_kmer_neighbors():
 
     h = nodegraph.hash('AAAA')
     print(type('AAAA'))
-    assert nodegraph.neighbors(h) == ['AAAA', 'AAAA']       # AAAA on both sides
-    assert nodegraph.neighbors('AAAA') == ['AAAA', 'AAAA']  # AAAA on both sides
+    assert nodegraph.neighbors(
+        h) == ['AAAA', 'AAAA']       # AAAA on both sides
+    assert nodegraph.neighbors('AAAA') == [
+        'AAAA', 'AAAA']  # AAAA on both sides
 
     h = nodegraph.hash('AAAT')
     assert nodegraph.neighbors(h) == ['AAAA']          # AAAA on one side
@@ -924,7 +926,7 @@ def test_consume_absentfasta_with_reads_parser():
 
 def test_bad_primes():
     try:
-        Nodegraph( 6, 1, 1, primes=["a", "b", "c"])
+        Nodegraph(6, 1, 1, primes=["a", "b", "c"])
         assert 0, "this should fail"
     except TypeError as e:
         print(str(e))
