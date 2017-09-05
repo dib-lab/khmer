@@ -337,6 +337,34 @@ void LabelHash::get_tag_labels(const HashIntoType tag,
     }
 }
 
+// get_labels_for_sequence: return labels present in the given sequence.
+
+void LabelHash::get_labels_for_sequence(const std::string& seq,
+                                        LabelSet& found_labels)
+const
+{
+    bool kmer_tagged;
+    TagSet tags;
+
+    KmerIterator kmers(seq.c_str(), graph->_ksize);
+    HashIntoType kmer;
+
+    while(!kmers.done()) {
+        kmer = kmers.next();
+
+        kmer_tagged = set_contains(graph->all_tags, kmer);
+
+        if (kmer_tagged) {
+            tags.insert(kmer);
+        }
+    }
+
+    SeenSet::const_iterator si;
+    for (si = tags.begin(); si != tags.end(); ++si) {
+        _get_tag_labels(*si, tag_labels, found_labels);
+    }
+}
+
 void LabelHash::get_tags_from_label(const Label label,
                                     TagSet& tags) const
 {

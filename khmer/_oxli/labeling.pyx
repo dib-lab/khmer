@@ -81,6 +81,15 @@ cdef class GraphLabels:
         for label in labels:
             yield label
 
+    def get_labels_for_sequence(self, str sequence):
+        '''Return labels for all the tags found in this sequence.'''
+        cdef string _sequence = self.graph._valid_sequence(sequence)
+        cdef LabelSet labels
+        deref(self._lh_this).get_labels_for_sequence(_sequence, labels)
+        cdef Label label
+        for label in labels:
+            yield label
+
     def consume_sequence_and_tag_with_labels(self, str sequence, unsigned long long label):
         cdef string _sequence = _bstring(sequence)
         cdef unsigned long long n_consumed = 0

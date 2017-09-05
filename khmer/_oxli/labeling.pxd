@@ -14,7 +14,7 @@ from .legacy_partitioning cimport (CpSubsetPartition, cp_pre_partition_info,
                                    SubsetPartition)
 from .utils cimport oxli_raise_py_error
 
-cdef extern from "oxli/labelhash.hh":
+cdef extern from "oxli/labelhash.hh" nogil:
 
     cdef cppclass CpLabelHash "oxli::LabelHash":
         CpLabeHash(CpHashgraph *)
@@ -39,6 +39,7 @@ cdef extern from "oxli/labelhash.hh":
         void label_across_high_degree_nodes(const char *,
                                             HashIntoTypeSet&,
                                             const Label)
+        void get_labels_for_sequence(string&, LabelSet&) const
 
         void consume_seqfile_and_tag_with_labels[SeqIO](string &,
                                                        unsigned int &,

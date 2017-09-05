@@ -390,6 +390,10 @@ py-demos: sharedobj
 	python examples/python-api/bloom.py
 	python examples/python-api/consume.py examples/c++-api/reads.fastq
 
+COMMIT ?= $(shell git rev-parse HEAD)
+docker-container:
+	cd docker && docker build --build-arg=branch=$(COMMIT) .
+
 FORCE:
 
 # Use this to print the value of a Makefile variable

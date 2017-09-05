@@ -37,7 +37,7 @@ cdef extern from "oxli/storage.hh":
         bool get_use_bigcount()
 
 
-cdef extern from "oxli/hashtable.hh" namespace "oxli":
+cdef extern from "oxli/hashtable.hh" namespace "oxli" nogil:
     cdef cppclass CpHashtable "oxli::Hashtable" (CpKmerFactory):
         const WordLength ksize() const
         HashIntoType hash_dna(const char *) except +oxli_raise_py_error
@@ -119,7 +119,7 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
         CpQFCounttable(WordLength, uint64_t) except +oxli_raise_py_error
 
 
-cdef extern from "oxli/hashgraph.hh" namespace "oxli":
+cdef extern from "oxli/hashgraph.hh" namespace "oxli" nogil:
     cdef cppclass CpHashgraph "oxli::Hashgraph" (CpHashtable):
         set[HashIntoType] all_tags
         set[HashIntoType] stop_tags
@@ -160,12 +160,13 @@ cdef extern from "oxli/hashgraph.hh" namespace "oxli":
                                        unsigned int &,
                                        unsigned long long &) except +oxli_raise_py_error
 
-        uintptr_t trim_on_stoptags(string) nogil
+        uintptr_t trim_on_stoptags(string) 
 
         unsigned int traverse_from_kmer(CpKmer,
                                         uint32_t,
                                         KmerSet&,
                                         uint32_t) nogil
+        void get_tags_for_sequence(string&, set[HashIntoType]&)
         void print_tagset(string)
         void save_tagset(string)
         void load_tagset(string) except +oxli_raise_py_error
@@ -176,7 +177,7 @@ cdef extern from "oxli/hashgraph.hh" namespace "oxli":
         void load_stop_tags(string, bool) except +oxli_raise_py_error
         void extract_unique_paths(string, uint32_t, float, vector[string])
         void calc_connected_graph_size(CpKmer, uint64_t&, KmerSet&,
-                                       const uint64_t, bool) nogil
+                                       const uint64_t, bool) 
         uint32_t kmer_degree(HashIntoType, HashIntoType)
         uint32_t kmer_degree(const char *)
         void find_high_degree_nodes(const char *, set[HashIntoType] &) const

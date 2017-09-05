@@ -534,6 +534,13 @@ cdef class Hashgraph(Hashtable):
             if deref(self._hg_this).has_tag(kmer):
                 result.append((pos+1, kmer))
         return result
+
+    def get_tags_for_sequence(self, str sequence):
+        '''Get the tags present in a sequence.'''
+        cdef string _sequence = self._valid_sequence(sequence)
+        cdef HashSet hs = HashSet(self.ksize())
+        deref(self._hg_this).get_tags_for_sequence(_sequence, hs.hs)
+        return hs
             
     def find_all_tags_list(self, object kmer):
         '''Find all tags within range of the given k-mer, return as list'''
