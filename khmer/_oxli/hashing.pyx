@@ -67,7 +67,7 @@ cdef class Kmer:
         return kmer
 
 
-cpdef HashIntoType forward_hash(str kmer, unsigned int K):
+cpdef HashIntoType forward_hash(object kmer, unsigned int K):
     '''Run the 2-bit hash algorithm on the given K-mer.'''
 
     if K > 32:
@@ -78,7 +78,7 @@ cpdef HashIntoType forward_hash(str kmer, unsigned int K):
     return _hash(_bstring(kmer), K)
 
 
-cpdef HashIntoType forward_hash_no_rc(str kmer, WordLength K):
+cpdef HashIntoType forward_hash_no_rc(object kmer, WordLength K):
     '''Run the 2-bit hash function in only the given
     sequence orientation.'''
 
@@ -98,16 +98,16 @@ cpdef str reverse_hash(object h, int K):
     return _revhash(_h, K)
 
 
-cpdef str reverse_complement(str sequence):
+cpdef str reverse_complement(object sequence):
     cdef string s = _revcomp(_bstring(sequence))
     return s
 
 
-cpdef hash_murmur3(str s):
+cpdef hash_murmur3(object s):
     cdef HashIntoType h = _hash_murmur(_bstring(s), len(s))
     return h
 
 
-cpdef hash_no_rc_murmur3(str s):
+cpdef hash_no_rc_murmur3(object s):
     cdef HashIntoType h = _hash_murmur_forward(_bstring(s), len(s))
     return h

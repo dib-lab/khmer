@@ -68,19 +68,19 @@ cdef class Kmer:
     cdef Kmer wrap(CpKmer * cpkmer, WordLength K)
 
 
-cpdef HashIntoType forward_hash(str kmer, unsigned int K)
+cpdef HashIntoType forward_hash(object kmer, unsigned int K)
 
 
-cpdef HashIntoType forward_hash_no_rc(str kmer, WordLength K)
+cpdef HashIntoType forward_hash_no_rc(object kmer, WordLength K)
 
 
 cpdef str reverse_hash(object h, int K)
 
 
-cpdef str reverse_complement(str sequence)
+cpdef str reverse_complement(object sequence)
 
 
-cpdef hash_murmur3(str s)
+cpdef hash_murmur3(object s)
 
 
-cpdef hash_no_rc_murmur3(str s)
+cpdef hash_no_rc_murmur3(object s)
