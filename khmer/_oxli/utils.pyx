@@ -6,6 +6,18 @@ from cpython.version cimport PY_MAJOR_VERSION
 from cython import short, int, long
 
 
+FILETYPES = \
+{
+    "COUNTING_HT": SAVED_COUNTING_HT,
+    "HASHBITS": SAVED_HASHBITS,
+    "TAGS": SAVED_TAGS,
+    "STOPTAGS": SAVED_STOPTAGS,
+    "SUBSET": SAVED_SUBSET,
+    "LABELSET": SAVED_LABELSET,
+    "SMALLCOUNT": SAVED_SMALLCOUNT
+}
+
+
 def is_prime(n):
     return _is_prime(n)
 

@@ -35,8 +35,6 @@
 # pylint: disable=too-few-public-methods,no-init,missing-docstring
 """This is khmer; please see http://khmer.readthedocs.io/."""
 
-
-from __future__ import print_function
 from collections import namedtuple
 from math import log
 import json
@@ -48,8 +46,6 @@ from khmer._khmer import Read
 from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 # tests/test_read_parsers.py,scripts/{filter-abund-single,load-graph}.py
 # scripts/{abundance-dist-single,load-into-counting}.py
-
-from khmer._khmer import FILETYPES
 
 from khmer._oxli.assembly import (LinearAssembler, SimpleLabeledAssembler,
                                   JunctionCountAssembler)
@@ -75,7 +71,7 @@ from khmer._oxli.parsing import FastxParser
 
 from khmer._oxli.readaligner import ReadAligner
 
-from khmer._oxli.utils import get_n_primes_near_x, is_prime
+from khmer._oxli.utils import get_n_primes_near_x, is_prime, FILETYPES
 from khmer._oxli.utils import get_version_cpp as __version_cpp__
 
 import sys

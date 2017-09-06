@@ -13,8 +13,19 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
     cdef bool _is_prime "oxli::is_prime" (uint64_t n)
     cdef vector[uint64_t] _get_n_primes_near_x "oxli::get_n_primes_near_x" (uint32_t, uint64_t)
 
-cdef extern from "oxli/oxli.hh" namespace "oxli":
+cdef extern from "oxli/oxli.hh":
     cdef string _get_version_cpp "oxli::get_version_cpp" ()
+    cdef const char * SAVED_SIGNATURE
+    cdef int SAVED_FORMAT_VERSION
+    cdef int SAVED_COUNTING_HT
+    cdef int SAVED_HASHBITS
+    cdef int SAVED_TAGS
+    cdef int SAVED_STOPTAGS
+    cdef int SAVED_SUBSET
+    cdef int SAVED_LABELSET
+    cdef int SAVED_SMALLCOUNT
+    cdef int SAVED_QFCOUNT
+
 
 cdef bytes _bstring(s)
 

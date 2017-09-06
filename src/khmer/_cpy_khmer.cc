@@ -106,17 +106,6 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
-    PyObject * filetype_dict = Py_BuildValue("{s,i,s,i,s,i,s,i,s,i,s,i,s,i}",
-                               "COUNTING_HT", SAVED_COUNTING_HT,
-                               "HASHBITS", SAVED_HASHBITS,
-                               "TAGS", SAVED_TAGS,
-                               "STOPTAGS", SAVED_STOPTAGS,
-                               "SUBSET", SAVED_SUBSET,
-                               "LABELSET", SAVED_LABELSET,
-                               "SMALLCOUNT", SAVED_SMALLCOUNT);
-    if (PyModule_AddObject( m, "FILETYPES", filetype_dict ) < 0) {
-        return MOD_ERROR_VAL;
-    }
 
     Py_INCREF(&khmer_Read_Type);
     if (PyModule_AddObject( m, "Read",
