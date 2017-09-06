@@ -10,7 +10,7 @@ under semantic versioning, but will be in future versions of khmer.
 
 ### Added
 - Cython wrapper for liboxli.
-- Cython containers for parsing, assembly, and hashing.
+- Cython containers for all liboxli classes.
 - Header install for liboxli.
 - New storage class using a Counting Quotient Filter with improved cache
   locality over bloom filters.
@@ -28,9 +28,13 @@ under semantic versioning, but will be in future versions of khmer.
 - Split CPython wrapper file into per-class files under `src/khmer` and
   `include/khmer`.
 - Moved liboxli headers to include/oxli and implementations to src/oxli.
-- Removed CPython assembler wrappers.
+- Removed all CPython wrappers except ReadParser and the standalone functions.
 - Dropped support for Python 2.
 - Changed to absolute imports.
+- Some methods on LabelHash and Hashgraph have been changed to properties,
+  or generators where appropriate.
+- All constructors have been removed from khmer/__init__.py.
+- GraphLabels does not inherit from Hashgraph.
 
 ## [2.1.1] - 2017-05-25
 ### Added
