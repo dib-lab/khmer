@@ -50,7 +50,8 @@ cdef extern from "oxli/kmer_hash.hh" namespace "oxli":
     HashIntoType _hash_murmur(const string&, const WordLength)
     HashIntoType _hash_murmur(const string&,
                               HashIntoType&, HashIntoType&)
-    HashIntoType _hash_murmur_forward(const string&)
+    HashIntoType _hash_murmur_forward(const string&,
+                                      const WordLength)
 
 
 cdef extern from "oxli/oxli.hh" namespace "oxli":
@@ -65,3 +66,21 @@ cdef class Kmer:
 
     @staticmethod
     cdef Kmer wrap(CpKmer * cpkmer, WordLength K)
+
+
+cpdef HashIntoType forward_hash(str kmer, unsigned int K)
+
+
+cpdef HashIntoType forward_hash_no_rc(str kmer, WordLength K)
+
+
+cpdef str reverse_hash(object h, int K)
+
+
+cpdef str reverse_complement(str sequence)
+
+
+cpdef hash_murmur3(str s)
+
+
+cpdef hash_no_rc_murmur3(str s)

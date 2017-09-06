@@ -43,18 +43,6 @@ import json
 
 
 from khmer._khmer import Read
-from khmer._khmer import forward_hash
-# tests/test_{functions,countgraph,counting_single}.py
-
-from khmer._khmer import forward_hash_no_rc  # tests/test_functions.py
-
-from khmer._khmer import reverse_hash  # tests/test_functions.py
-# tests/counting_single.py
-
-from khmer._khmer import hash_murmur3        # tests/test_functions.py
-from khmer._khmer import hash_no_rc_murmur3  # tests/test_functions.py
-
-from khmer._khmer import reverse_complement
 
 from khmer._khmer import get_version_cpp as __version_cpp__
 # tests/test_version.py
@@ -65,17 +53,33 @@ from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 
 from khmer._khmer import FILETYPES
 
+from khmer._oxli.assembly import (LinearAssembler, SimpleLabeledAssembler,
+                                  JunctionCountAssembler)
+
 from khmer._oxli.graphs import (Counttable, QFCounttable, Nodetable,
                                 SmallCounttable, Countgraph, SmallCountgraph,
                                 Nodegraph)
+
+from khmer._oxli.hashing import (forward_hash, forward_hash_no_rc,
+                                 reverse_hash, hash_murmur3,
+                                 hash_no_rc_murmur3,
+                                 reverse_complement)
+
+from khmer._oxli.hashset import HashSet
+
+from khmer._oxli.hllcounter import HLLCounter
+
 from khmer._oxli.labeling import GraphLabels
+
 from khmer._oxli.legacy_partitioning import SubsetPartition, PrePartitionInfo
+
 from khmer._oxli.parsing import FastxParser
+
 from khmer._oxli.readaligner import ReadAligner
 
 from khmer._oxli.utils import get_n_primes_near_x, is_prime
-import sys
 
+import sys
 from struct import pack, unpack
 
 from ._version import get_versions
@@ -214,9 +218,3 @@ def calc_expected_collisions(graph, force=False, max_false_pos=.2):
 
     return fp_all
 
-
-from khmer._oxli.assembly import (LinearAssembler, SimpleLabeledAssembler,
-                                  JunctionCountAssembler)
-from khmer._oxli.hashset import HashSet
-from khmer._oxli.hllcounter import HLLCounter
-from khmer._oxli.labeling import GraphLabels
