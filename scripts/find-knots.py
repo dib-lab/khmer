@@ -171,9 +171,11 @@ def main():
 
         print('** repartitioning, round 2... %s' %
               subset_file, file=sys.stderr)
-        size = graph.repartition_largest_partition(counting,
-                                                   EXCURSION_DISTANCE, EXCURSION_KMER_THRESHOLD,
-                                                   EXCURSION_KMER_COUNT_THRESHOLD)
+        size = \
+            graph.repartition_largest_partition(counting,
+                                                EXCURSION_DISTANCE,
+                                                EXCURSION_KMER_THRESHOLD,
+                                                EXCURSION_KMER_COUNT_THRESHOLD)
 
         print('** repartitioned size:', size, file=sys.stderr)
 
