@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libc.stdint cimport uint32_t, uint64_t
 from libcpp cimport bool
@@ -12,6 +13,9 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
     cdef bool _is_prime "oxli::is_prime" (uint64_t n)
     cdef vector[uint64_t] _get_n_primes_near_x "oxli::get_n_primes_near_x" (uint32_t, uint64_t)
 
+cdef extern from "oxli/oxli.hh" namespace "oxli":
+    cdef string _get_version_cpp "oxli::get_version_cpp" ()
+
 cdef bytes _bstring(s)
 
 cdef unicode _ustring(s)
@@ -21,3 +25,5 @@ cpdef bool is_num(object n)
 
 cdef void _flatten_fill(double * fill_to, object fill_from)
 cdef void _fill(double * fill_to, object fill_from)
+
+cpdef str get_version_cpp()

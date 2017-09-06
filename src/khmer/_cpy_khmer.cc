@@ -64,20 +64,8 @@ namespace khmer {
 // https://gcc.gnu.org/onlinedocs/gcc-4.9.1/cpp/Stringification.html
 //
 
-PyObject *
-get_version_cpp( PyObject * self, PyObject * args )
-{
-#define xstr(s) str(s)
-#define str(s) #s
-    std::string dVersion = xstr(VERSION);
-    return PyUnicode_FromString(dVersion.c_str());
-}
 
 PyMethodDef KhmerMethods[] = {
-    {
-       "get_version_cpp", get_version_cpp, METH_VARARGS, 
-       "return the VERSION c++ compiler option"
-    },
     { NULL, NULL, 0, NULL } // sentinel
 };
 

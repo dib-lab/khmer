@@ -60,4 +60,5 @@ cdef void _fill(double * fill_to, object fill_from):
     for idx, item in enumerate(fill_from):
         fill_to[idx] = <double>item
 
-
+cpdef str get_version_cpp():
+    return _get_version_cpp()

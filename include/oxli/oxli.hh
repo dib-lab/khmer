@@ -107,6 +107,8 @@ private:\
 namespace oxli
 {
 
+extern std::string get_version_cpp();
+
 // largest number we can count up to, exactly. (8 bytes)
 typedef unsigned long long int ExactCounterType;
 

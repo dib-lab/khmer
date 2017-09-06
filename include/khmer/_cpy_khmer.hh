@@ -77,8 +77,6 @@ Contact: khmer-project@idyll.org
 
 namespace khmer {
 
-PyObject * get_version_cpp( PyObject * self, PyObject * args );
-
 extern PyMethodDef KhmerMethods[];
 
 }

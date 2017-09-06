@@ -43,8 +43,6 @@ import json
 
 
 from khmer._khmer import Read
-
-from khmer._khmer import get_version_cpp as __version_cpp__
 # tests/test_version.py
 
 from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
@@ -78,6 +76,7 @@ from khmer._oxli.parsing import FastxParser
 from khmer._oxli.readaligner import ReadAligner
 
 from khmer._oxli.utils import get_n_primes_near_x, is_prime
+from khmer._oxli.utils import get_version_cpp as __version_cpp__
 
 import sys
 from struct import pack, unpack
