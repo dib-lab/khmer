@@ -53,7 +53,7 @@ def test_bad_construct():
     try:
         hs = khmer.HashSet(5, [{}])
         assert 0, "HashSet constructor should fail w/o list of k-mers"
-    except ValueError:
+    except TypeError:
         pass
 
 
@@ -100,7 +100,7 @@ def test_update_bad():
     try:
         hs.update(x)
         assert 0, "cannot add dict to a HashSet"
-    except ValueError:
+    except TypeError:
         pass
 
 

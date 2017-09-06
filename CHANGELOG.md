@@ -10,11 +10,17 @@ under semantic versioning, but will be in future versions of khmer.
 
 ### Added
 - Cython wrapper for liboxli.
-- Cython containers for parsing, assembly, and hashing.
+- Cython containers for all liboxli classes.
 - Header install for liboxli.
-- New function `consume_fasta_banding` for bulk loading of sequences into
-  hashtables. Only k-mers whose hashed values fall within a specified range are
-  counted.
+- New storage class using a Counting Quotient Filter with improved cache
+  locality over bloom filters.
+- New variants of the sequence bulk loading method with a "banding" mode and a
+  "mask" mode. In "banding" mode, only k-mers whose hashed values fall within a
+  specified range are counted. In "mask" mode, only k-mers not already pressent
+  in the specified mask are counted.
+    - `consume_seqfile_banding`
+    - `consume_seqfile_with_mask`
+    - `consume_seqfile_banding_with_mask`
 
 ### Changed
 - Non-ACTG handling significantly changed so that only bulk-loading functions
@@ -22,7 +28,13 @@ under semantic versioning, but will be in future versions of khmer.
 - Split CPython wrapper file into per-class files under `src/khmer` and
   `include/khmer`.
 - Moved liboxli headers to include/oxli and implementations to src/oxli.
-- Removed CPython assembler wrappers.
+- Removed all CPython wrappers except ReadParser and the standalone functions.
+- Dropped support for Python 2.
+- Changed to absolute imports.
+- Some methods on LabelHash and Hashgraph have been changed to properties,
+  or generators where appropriate.
+- All constructors have been removed from khmer/__init__.py.
+- GraphLabels does not inherit from Hashgraph.
 
 ## [2.1.1] - 2017-05-25
 ### Added

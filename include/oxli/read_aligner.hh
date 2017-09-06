@@ -110,6 +110,12 @@ static double trans_default[] = { log2(0.9848843), log2(0.0000735), log2(0.00003
                                   log2(0.1434529), log2(0.0036995), log2(0.2642928), log2(0.5885548),                        // Ir_u
                                   log2(0.1384551), log2(0.0431328), log2(0.6362921), log2(0.1821200),                        // Ig_u
                                 };
+
+static double freq_default[] = { log2(0.955), 
+                                 log2(0.04), 
+                                 log2(0.004), 
+                                 log2(0.001) };
+
 /*{ log2(.80), log2(.045), log2(.045), log2(.06), log2(.025), log2(.025),
                                   log2(.875), log2(.045), log2(.055), log2(.025),
                                   log2(.875), log2(.045), log2(.055), log2(.025),
@@ -180,12 +186,12 @@ typedef std::priority_queue<AlignmentNode*,
         AlignmentNodeCompare> NodeHeap;
 
 struct ScoringMatrix {
-    const double trusted_match;
-    const double trusted_mismatch;
-    const double untrusted_match;
-    const double untrusted_mismatch;
+    double trusted_match;
+    double trusted_mismatch;
+    double untrusted_match;
+    double untrusted_mismatch;
 
-    const double* tsc;
+    double* tsc;
 
     ScoringMatrix(double trusted_match, double trusted_mismatch,
                   double untrusted_match, double untrusted_mismatch,
@@ -193,6 +199,11 @@ struct ScoringMatrix {
         : trusted_match(trusted_match), trusted_mismatch(trusted_mismatch),
           untrusted_match(untrusted_match),
           untrusted_mismatch(untrusted_mismatch), tsc(trans) {}
+
+    ScoringMatrix() : trusted_match(0), trusted_mismatch(0),
+                      untrusted_match(0), untrusted_mismatch(0),
+                      tsc(trans_default) {}
+
 };
 
 

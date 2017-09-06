@@ -117,7 +117,7 @@ def test_fakelump_repartitioning():
     EXCURSION_KMER_COUNT_THRESHOLD = 1
     counting = khmer.Countgraph(32, 1e5, 4)
 
-    ht.repartition_largest_partition(None, counting,
+    ht.repartition_largest_partition(counting,
                                      EXCURSION_DISTANCE,
                                      EXCURSION_KMER_THRESHOLD,
                                      EXCURSION_KMER_COUNT_THRESHOLD)
@@ -158,9 +158,9 @@ def test_fakelump_load_stop_tags_trunc():
     EXCURSION_DISTANCE = 40
     EXCURSION_KMER_THRESHOLD = 82
     EXCURSION_KMER_COUNT_THRESHOLD = 1
-    counting = khmer._Countgraph(32, [5, 7, 11, 13])
+    counting = khmer.Countgraph(32, 1, 1, primes=[5, 7, 11, 13])
 
-    ht.repartition_largest_partition(None, counting,
+    ht.repartition_largest_partition(counting,
                                      EXCURSION_DISTANCE,
                                      EXCURSION_KMER_THRESHOLD,
                                      EXCURSION_KMER_COUNT_THRESHOLD)
@@ -173,7 +173,7 @@ def test_fakelump_load_stop_tags_trunc():
     fp.close()
 
     # ok, now try loading these stop tags; should fail.
-    ht = khmer._Nodegraph(32, [5, 7, 11, 13])
+    ht = khmer.Nodegraph(32, 1, 1, primes=[5, 7, 11, 13])
     ht.consume_seqfile_and_tag(fakelump_fa)
 
     try:
@@ -187,7 +187,7 @@ def test_fakelump_load_stop_tags_notexist():
     fakelump_fa_foo = utils.get_temp_filename('fakelump.fa.stopfoo')
 
     # ok, now try loading these stop tags; should fail.
-    ht = khmer._Nodegraph(32, [5, 7, 11, 13])
+    ht = khmer.Nodegraph(32, 1, 1, primes=[5, 7, 11, 13])
 
     try:
         ht.load_stop_tags(fakelump_fa_foo)

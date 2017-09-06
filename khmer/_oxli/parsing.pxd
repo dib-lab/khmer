@@ -1,16 +1,16 @@
 # -*- coding: UTF-8 -*-
-# cython: c_string_type=unicode, c_string_encoding=utf8
 
 from __future__ import unicode_literals
 
-from libc.stdint cimport uintptr_t 
+from libc.stdint cimport uintptr_t
 
 from libcpp cimport bool
-from libcpp.memory cimport unique_ptr
+from libcpp.memory cimport unique_ptr, shared_ptr, weak_ptr
 from libcpp.utility cimport pair
 from libcpp.string cimport string
 
-#from .wrapper cimport *
+from khmer._oxli.utils cimport oxli_raise_py_error
+
 
 '''
 extern declarations for liboxli.
@@ -49,14 +49,17 @@ cdef extern from  "oxli/read_parsers.hh" namespace "oxli::read_parsers":
 
         void reset()
         void write_fastx(ostream&)
-        void set_cleaned_seq()        
+        void set_cleaned_seq()
 
     ctypedef pair[CpSequence,CpSequence] CpSequencePair \
         "oxli::read_parsers::ReadPair"
 
     cdef cppclass CpReadParser "oxli::read_parsers::ReadParser" [SeqIO]:
-        CpReadParser(unique_ptr[SeqIO])
+        CpReadParser(unique_ptr[SeqIO]) except+
         CpReadParser(CpReadParser&)
+        CpReadParser& operator=(CpReadParser&)
+        CpReadParser(CpReadParser&&)
+        CpReadParser& operator=(CpReadParser&&)
 
         CpSequence get_next_read()
         CpSequencePair get_next_read_pair()
@@ -67,17 +70,29 @@ cdef extern from  "oxli/read_parsers.hh" namespace "oxli::read_parsers":
         void close()
 
     cdef cppclass CpFastxReader "oxli::read_parsers::FastxReader":
-        CpFastxReader()
-        CpFastxReader(const string&)
+        CpFastxReader() except+
+        CpFastxReader(const string&) except+
+
         CpFastxReader(CpFastxReader&)
+        CpFastxReader& operator=(CpFastxReader&)
+
+        CpFastxReader(CpFastxReader&&)
+        CpFastxReader& operator=(CpFastxReader&&)
 
         CpSequence get_next_read()
         bool is_complete()
         uintptr_t get_num_reads()
         void close()
 
-    unique_ptr[CpReadParser[SeqIO]] get_parser[SeqIO](const string&) 
-    ctypedef unique_ptr[CpReadParser[CpFastxReader]] FastxParserPtr
+
+    shared_ptr[CpReadParser[SeqIO]] get_parser[SeqIO](const string&) except +oxli_raise_py_error
+    ctypedef shared_ptr[CpReadParser[CpFastxReader]] FastxParserPtr
+    ctypedef weak_ptr[CpReadParser[CpFastxReader]] WeakFastxParserPtr
+
+
+cdef extern from "khmer/_cpy_khmer.hh":
+    ctypedef struct CPyReadParser_Object "khmer::khmer_ReadParser_Object":
+        FastxParserPtr parser
 
 
 cdef extern from "oxli/alphabets.hh" namespace "oxli":
@@ -110,7 +125,7 @@ cdef class ReadBundle:
 
 
 cdef class FastxParser:
-    cdef unique_ptr[CpReadParser[CpFastxReader]] _this
+    cdef shared_ptr[CpReadParser[CpFastxReader]] _this
 
     cpdef bool is_complete(self)
     cdef Sequence _next(self)
@@ -161,4 +176,3 @@ cdef inline bool is_valid(const char base, string& alphabet)
 cdef inline bool sanitize_sequence(string& sequence,
                                    string& alphabet,
                                    bool convert_n)
-

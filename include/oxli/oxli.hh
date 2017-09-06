@@ -94,6 +94,7 @@ private:\
 #   define SAVED_SUBSET 5
 #   define SAVED_LABELSET 6
 #   define SAVED_SMALLCOUNT 7
+#   define SAVED_QFCOUNT 8
 
 #   define TRAVERSAL_LEFT 0
 #   define TRAVERSAL_RIGHT 1

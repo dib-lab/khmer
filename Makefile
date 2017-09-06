@@ -102,8 +102,8 @@ help: Makefile
 install-dep: install-dependencies
 
 install-dependencies:
-	pip install --upgrade --ignore-installed $(DEVPKGS)
-	pip install --upgrade --requirement doc/requirements.txt
+	pip install $(DEVPKGS)
+	pip install --requirement doc/requirements.txt
 
 ## sharedobj   : build khmer shared object file
 sharedobj: $(EXTENSION_MODULE) $(CYTHON_MODULE)
@@ -134,10 +134,11 @@ clean: FORCE
 	cd src/oxli && $(MAKE) clean || true
 	cd tests && rm -rf khmertest_* || true
 	rm -f pytests.xml
+	cd third-party/cqf && make clean || true
 	rm -f $(EXTENSION_MODULE)
 	rm -f khmer/*.pyc scripts/*.pyc tests/*.pyc oxli/*.pyc \
 		sandbox/*.pyc khmer/__pycache__/* sandbox/__pycache__/* \
-		khmer/_oxli/*.cpp
+		khmer/_oxli/*.cpp khmer/_oxli/*.so
 	./setup.py clean --all || true
 	rm -f coverage-debug
 	rm -Rf .coverage coverage-gcovr.xml coverage.xml
@@ -392,6 +393,10 @@ py-demos: sharedobj
 	python examples/python-api/exact-counting.py
 	python examples/python-api/bloom.py
 	python examples/python-api/consume.py examples/c++-api/reads.fastq
+
+COMMIT ?= $(shell git rev-parse HEAD)
+docker-container:
+	cd docker && docker build --build-arg=branch=$(COMMIT) .
 
 FORCE:
 

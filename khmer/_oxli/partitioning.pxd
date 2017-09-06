@@ -8,10 +8,10 @@ from libcpp.string cimport string
 from libc.stdint cimport uint32_t, uint8_t, uint64_t
 from libc.stdio cimport FILE
 
-from hashing cimport CpKmer, Kmer, KmerQueue
-from hist cimport CpHistogram
-from graphs cimport CpHashgraph, get_hashgraph_ptr
-from oxli_types cimport *
+from khmer._oxli.hashing cimport CpKmer, Kmer, KmerQueue
+from khmer._oxli.hist cimport CpHistogram
+from khmer._oxli.graphs cimport CpHashgraph, Hashgraph
+from khmer._oxli.oxli_types cimport *
 
 
 cdef extern from "oxli/partitioning.hh" namespace "oxli":
@@ -117,7 +117,6 @@ cdef class StreamingPartitioner:
     cdef shared_ptr[CpStreamingPartitioner] _this
     cdef weak_ptr[ComponentPtrVector] _components
     cdef weak_ptr[CpGuardedHashCompMap] _tag_component_map
-    cdef CpHashgraph * _graph_ptr
-    cdef readonly object graph
+    cdef public Hashgraph graph
     cdef readonly uint64_t n_consumed
 

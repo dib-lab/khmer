@@ -48,6 +48,7 @@ import csv
 import khmer
 import textwrap
 import os
+from khmer import Countgraph
 from khmer.kfile import check_input_files
 from khmer.khmer_args import (sanitize_help, KhmerArgumentParser)
 from khmer.khmer_logger import (configure_logging, log_info, log_error,
@@ -103,8 +104,7 @@ def main():
 
     log_info('Loading counting graph from {graph}',
              graph=args.input_count_graph_filename)
-    countgraph = khmer.load_countgraph(
-        args.input_count_graph_filename)
+    countgraph = Countgraph.load(args.input_count_graph_filename)
 
     if not countgraph.get_use_bigcount() and args.bigcount:
         log_warn("WARNING: The loaded graph has bigcount DISABLED while "
@@ -115,8 +115,8 @@ def main():
 
     kmer_size = countgraph.ksize()
     hashsizes = countgraph.hashsizes()
-    tracking = khmer._Nodegraph(  # pylint: disable=protected-access
-        kmer_size, hashsizes)
+    tracking = khmer.Nodegraph(  # pylint: disable=protected-access
+        kmer_size, 1, 1, primes=hashsizes)
 
     log_info('K: {ksize}', ksize=kmer_size)
     log_info('outputting to {output}', output=args.output_histogram_filename)

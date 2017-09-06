@@ -49,7 +49,7 @@ import subprocess
 import sys
 import sysconfig
 import tempfile
-import csv
+import codecs
 
 from setuptools import setup
 from setuptools import Extension
@@ -67,6 +67,7 @@ CMDCLASS = versioneer.get_cmdclass()
 HAS_CYTHON = False
 try:
     import Cython
+    from Cython.Build import cythonize
     HAS_CYTHON = True
 except ImportError:
     pass
@@ -152,14 +153,18 @@ ZLIBDIR = 'third-party/zlib'
 BZIP2DIR = 'third-party/bzip2'
 
 
-BUILD_DEPENDS = glob.glob(path_join("include", "khmer", "_cpy_*.hh"))
+BUILD_DEPENDS = [path_join("include", "khmer", bn + ".hh") for bn in [
+    "_cpy_khmer", "_cpy_utils", "_cpy_readparsers"
+]]
 BUILD_DEPENDS.extend(path_join("include", "oxli", bn + ".hh") for bn in [
-    "oxli", "kmer_hash", "hashtable", "labelhash", "hashgraph",
-    "hllcounter", "khmer_exception", "read_aligner", "subset", "read_parsers",
+    "khmer", "kmer_hash", "hashtable", "labelhash", "hashgraph",
+    "hllcounter", "oxli_exception", "read_aligner", "subset", "read_parsers",
     "kmer_filters", "traversal", "assembler", "alphabets", "storage",
     "partitioning", "gmap", "hist"])
 
-SOURCES = glob.glob(path_join("src", "khmer", "_cpy_*.cc"))
+SOURCES = [path_join("src", "khmer", bn + ".cc") for bn in [
+    "_cpy_khmer", "_cpy_utils", "_cpy_readparsers"
+]]
 SOURCES.extend(path_join("src", "oxli", bn + ".cc") for bn in [
     "read_parsers", "kmer_hash", "hashtable", "hashgraph",
     "labelhash", "subset", "read_aligner",
@@ -196,12 +201,19 @@ CP_EXTENSION_MOD_DICT = \
 
 EXTENSION_MODS = [Extension("khmer._khmer", ** CP_EXTENSION_MOD_DICT)]
 
+CY_OPTS = {
+    'embedsignature': True,
+    'language_level': 3,
+    'c_string_type': 'unicode',
+    'c_string_encoding': 'utf8'
+}
+
 for cython_ext in glob.glob(os.path.join("khmer", "_oxli",
                                          "*.{0}".format(cy_ext))):
 
     CY_EXTENSION_MOD_DICT = \
         {
-            "sources": [cython_ext],
+            "sources": [cython_ext, "khmer/_oxli/oxli_exception_convert.cc"],
             "extra_compile_args": EXTRA_COMPILE_ARGS,
             "extra_link_args": EXTRA_LINK_ARGS,
             "extra_objects": [path_join(build_dir(), splitext(p)[0] + '.o')
@@ -209,12 +221,16 @@ for cython_ext in glob.glob(os.path.join("khmer", "_oxli",
             "depends": [],
             "include_dirs": ["include", "."],
             "language": "c++",
-            "define_macros": [("VERSION", versioneer.get_version()), ],
+            "define_macros": [("VERSION", versioneer.get_version()), ]
         }
 
     ext_name = "khmer._oxli.{0}".format(
         splitext(os.path.basename(cython_ext))[0])
-    EXTENSION_MODS.append(Extension(ext_name, ** CY_EXTENSION_MOD_DICT))
+    EXTENSION_MODS.append(Extension(ext_name,
+                                    ** CY_EXTENSION_MOD_DICT))
+
+EXTENSION_MODS = cythonize(EXTENSION_MODS,
+                           compiler_directives=CY_OPTS)
 
 SCRIPTS = []
 SCRIPTS.extend([path_join("scripts", script)
@@ -230,8 +246,7 @@ CLASSIFIERS = [
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS :: MacOS X",
     "Programming Language :: C++",
-    "Programming Language :: Python :: 2.7",
-    "Programming Language :: Python :: 3.4",
+    "Programming Language :: Python :: 3.5",
     "Programming Language :: Python :: 3.5",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
@@ -246,11 +261,11 @@ else:
 #     correctly for the citation information, but this requires a non-standard
 #     library that we don't want to add as a dependency for `setup.py`.
 #     -- Daniel Standage, 2017-05-21
-with open('authors.csv', 'r') as csvin:
-    authors = csv.reader(csvin)
-    authorstr = ', '.join([row[0] for row in authors])
-    authorstr = 'Daniel Standage, ' + authorstr + ', C. Titus Brown'
-
+with codecs.open('authors.csv', 'r', encoding="utf-8") as csvin:
+    authors = csvin.readlines()
+authors = [a.strip().split(',') for a in authors]
+authorstr = ', '.join([row[0] for row in authors])
+authorstr = 'Daniel Standage, ' + authorstr + ', C. Titus Brown'
 
 SETUP_METADATA = \
     {
@@ -268,7 +283,7 @@ SETUP_METADATA = \
         "packages": ['khmer', 'khmer.tests', 'oxli', 'khmer._oxli'],
         "package_data": {'khmer/_oxli': ['*.pxd']},
         "package_dir": {'khmer.tests': 'tests'},
-        "install_requires": ['screed >= 1.0', 'bz2file', 'Cython>=0.25.2'],
+        "install_requires": ['screed >= 1.0', 'bz2file', 'Cython==0.25.2'],
         "setup_requires": ["pytest-runner>=2.0,<3dev", "setuptools>=18.0"],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
@@ -285,7 +300,8 @@ SETUP_METADATA = \
         # "license": '', # empty as is conveyed by the classifier below
         "include_package_data": True,
         "zip_safe": False,
-        "classifiers": CLASSIFIERS
+        "classifiers": CLASSIFIERS,
+        "python_requires": '>=3.5'
     }
 
 
@@ -307,23 +323,27 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
         if sys.platform == 'darwin' and 'gcov' in self.libraries:
             self.libraries.remove('gcov')
 
+        cqfcmd = ['bash', '-c', 'cd third-party/cqf && make']
+        spawn(cmd=cqfcmd, dry_run=self.dry_run)
+        for ext in self.extensions:
+            ext.extra_objects.append(path_join("third-party", "cqf", "gqf.o"))
+
         if "z" not in self.libraries:
             zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'
                     ' configure || bash ./configure --static ) && make -f '
                     'Makefile.pic PIC']
             spawn(cmd=zcmd, dry_run=self.dry_run)
-            # self.extensions[0].extra_objects.extend(
             for ext in self.extensions:
                 ext.extra_objects.extend(
                     path_join("third-party", "zlib", bn + ".lo") for bn in [
                         "adler32", "compress", "crc32", "deflate", "gzclose",
                         "gzlib", "gzread", "gzwrite", "infback", "inffast",
                         "inflate", "inftrees", "trees", "uncompr", "zutil"])
+
         if "bz2" not in self.libraries:
             bz2cmd = ['bash', '-c', 'cd ' + BZIP2DIR + ' && make -f '
                       'Makefile-libbz2_so all']
             spawn(cmd=bz2cmd, dry_run=self.dry_run)
-            # self.extensions[0].extra_objects.extend(
             for ext in self.extensions:
                 ext.extra_objects.extend(
                     path_join("third-party", "bzip2", bn + ".o") for bn in [

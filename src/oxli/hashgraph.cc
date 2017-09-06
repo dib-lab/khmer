@@ -319,6 +319,28 @@ void Hashgraph::consume_seqfile_and_tag(
 
 }
 
+// get_tags_for_sequence: return tags present in the given sequence.
+
+void Hashgraph::get_tags_for_sequence(const std::string& seq,
+                                      SeenSet& found_tags)
+const
+{
+    bool kmer_tagged;
+
+    KmerIterator kmers(seq.c_str(), _ksize);
+    HashIntoType kmer;
+
+    while(!kmers.done()) {
+        kmer = kmers.next();
+
+        kmer_tagged = set_contains(all_tags, kmer);
+
+        if (kmer_tagged) {
+            found_tags.insert(kmer);
+        }
+    }
+}
+
 //
 // divide_tags_into_subsets - take all of the tags in 'all_tags', and
 //   divide them into subsets (based on starting tag) of <= given size.
@@ -359,8 +381,7 @@ void Hashgraph::consume_partitioned_fasta(
     string seq = "";
 
     // reset the master subset partition
-    delete partition;
-    partition = new SubsetPartition(this);
+    partition.reset(new SubsetPartition(this));
 
     //
     // iterate through the FASTA file & consume the reads.

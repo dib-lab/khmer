@@ -256,69 +256,7 @@ MOD_INIT(_khmer)
     using namespace oxli;
     using namespace oxli::read_parsers;
 
-    if (PyType_Ready(&khmer_KHashtable_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
 
-    khmer_KCounttable_Type.tp_base = &khmer_KHashtable_Type;
-    if (PyType_Ready(&khmer_KCounttable_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    khmer_KSmallCounttable_Type.tp_base = &khmer_KHashtable_Type;
-    if (PyType_Ready(&khmer_KSmallCounttable_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    khmer_KNodetable_Type.tp_base = &khmer_KHashtable_Type;
-    if (PyType_Ready(&khmer_KNodetable_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    khmer_KHashgraph_Type.tp_base = &khmer_KHashtable_Type;
-    khmer_KHashgraph_Type.tp_methods = khmer_hashgraph_methods;
-    if (PyType_Ready(&khmer_KHashgraph_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    khmer_KCountgraph_Type.tp_base = &khmer_KHashgraph_Type;
-    if (PyType_Ready(&khmer_KCountgraph_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    khmer_KSmallCountgraph_Type.tp_base = &khmer_KHashgraph_Type;
-    if (PyType_Ready(&khmer_KSmallCountgraph_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    if (PyType_Ready(&khmer_PrePartitionInfo_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    khmer_KSubsetPartition_Type.tp_methods = khmer_subset_methods;
-    if (PyType_Ready(&khmer_KSubsetPartition_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    khmer_KNodegraph_Type.tp_base = &khmer_KHashgraph_Type;
-    khmer_KNodegraph_Type.tp_methods = khmer_nodegraph_methods;
-    if (PyType_Ready(&khmer_KNodegraph_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    khmer_KGraphLabels_Type.tp_base = &khmer_KNodegraph_Type;
-    khmer_KGraphLabels_Type.tp_methods = khmer_graphlabels_methods;
-    khmer_KGraphLabels_Type.tp_new = khmer_graphlabels_new;
-    if (PyType_Ready(&khmer_KGraphLabels_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    if (PyType_Ready(&khmer_KHLLCounter_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-    if (PyType_Ready(&khmer_ReadAlignerType) < 0) {
-        return MOD_ERROR_VAL;
-    }
 
     _init_ReadParser_Type_constants();
     if (PyType_Ready( &khmer_ReadParser_Type ) < 0) {
@@ -366,74 +304,6 @@ MOD_INIT(_khmer)
         return MOD_ERROR_VAL;
     }
 
-    Py_INCREF(&khmer_KCounttable_Type);
-    if (PyModule_AddObject( m, "Counttable",
-                            (PyObject *)&khmer_KCounttable_Type ) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    Py_INCREF(&khmer_KSmallCounttable_Type);
-    if (PyModule_AddObject( m, "SmallCounttable",
-                            (PyObject *)&khmer_KSmallCounttable_Type ) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    Py_INCREF(&khmer_KNodetable_Type);
-    if (PyModule_AddObject( m, "Nodetable",
-                            (PyObject *)&khmer_KNodetable_Type ) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    Py_INCREF(&khmer_KCountgraph_Type);
-    if (PyModule_AddObject( m, "Countgraph",
-                            (PyObject *)&khmer_KCountgraph_Type ) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    Py_INCREF(&khmer_KSmallCountgraph_Type);
-    if (PyModule_AddObject( m, "SmallCountgraph",
-                            (PyObject *)&khmer_KSmallCountgraph_Type ) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    Py_INCREF(&khmer_KNodegraph_Type);
-    if (PyModule_AddObject(m, "Nodegraph",
-                           (PyObject *)&khmer_KNodegraph_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    Py_INCREF(&khmer_KGraphLabels_Type);
-    if (PyModule_AddObject(m, "GraphLabels",
-                           (PyObject *)&khmer_KGraphLabels_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    if (PyType_Ready(&_HashSet_iter_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    khmer_HashSet_Type.tp_new = khmer_HashSet_new;
-    if (PyType_Ready(&khmer_HashSet_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    Py_INCREF(&khmer_KHLLCounter_Type);
-    if (PyModule_AddObject(m, "HLLCounter",
-                           (PyObject *)&khmer_KHLLCounter_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    Py_INCREF(&khmer_ReadAlignerType);
-    if (PyModule_AddObject(m, "ReadAligner",
-                           (PyObject *)&khmer_ReadAlignerType) < 0) {
-        return MOD_ERROR_VAL;
-    }
-
-    Py_INCREF(&khmer_HashSet_Type);
-    if (PyModule_AddObject(m, "HashSet",
-                           (PyObject *)&khmer_HashSet_Type) < 0) {
-        return MOD_ERROR_VAL;
-    }
 
     return MOD_SUCCESS_VAL(m);
 }

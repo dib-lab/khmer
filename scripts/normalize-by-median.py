@@ -52,7 +52,7 @@ import screed
 import os
 import khmer
 import textwrap
-from khmer import khmer_args
+from khmer import khmer_args, Countgraph
 from contextlib import contextmanager
 from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
                               report_on_config, calculate_graphsize,
@@ -338,7 +338,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     if args.loadgraph:
         log_info('loading k-mer countgraph from {graph}',
                  graph=args.loadgraph)
-        countgraph = khmer.load_countgraph(args.loadgraph)
+        countgraph = Countgraph.load(args.loadgraph)
     else:
         log_info('making countgraph')
         countgraph = khmer_args.create_countgraph(args)

@@ -1,12 +1,12 @@
-from libcpp.memory cimport unique_ptr
+from libcpp.memory cimport shared_ptr, make_shared
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libc.stdint cimport uint16_t
 
-from oxli_types cimport *
-from hashing cimport CpKmer, Kmer
-from graphs cimport (CpHashgraph, CpHashtable, CpLabelHash, 
-                     get_hashgraph_ptr, get_labelhash_ptr)
+from khmer._oxli.oxli_types cimport *
+from khmer._oxli.hashing cimport CpKmer, Kmer
+from khmer._oxli.graphs cimport Hashgraph, CpHashgraph, CpHashtable
+from khmer._oxli.labeling cimport CpLabelHash, GraphLabels
 
 
 cdef extern from "oxli/assembler.hh" namespace "oxli":
@@ -41,18 +41,17 @@ cdef extern from "oxli/assembler.hh" namespace "oxli":
 
 
 cdef class LinearAssembler:
-    #cdef unique_ptr[CpLinearAssembler] _this
-    cdef CpLinearAssembler * _this
+    cdef shared_ptr[CpLinearAssembler] _this
 
-    cdef public object graph
-    cdef CpHashgraph * _graph_ptr
+    cdef public Hashgraph graph
+    cdef shared_ptr[CpHashgraph] _graph_ptr
 
-    cdef public object stop_filter
-    cdef CpHashgraph * _stop_filter_ptr
+    cdef public Hashgraph stop_filter
+    cdef shared_ptr[CpHashgraph] _stop_filter_ptr
     
-    cdef str _assemble(self, Kmer start)
-    cdef str _assemble_left(self, Kmer start)
-    cdef str _assemble_right(self, Kmer start)
+    cdef str _assemble(self, CpKmer start)
+    cdef str _assemble_left(self, CpKmer start)
+    cdef str _assemble_right(self, CpKmer start)
 
 
 cdef class CompactingAssembler(LinearAssembler):
@@ -60,24 +59,25 @@ cdef class CompactingAssembler(LinearAssembler):
 
 
 cdef class SimpleLabeledAssembler:
-    cdef unique_ptr[CpSimpleLabeledAssembler] _this
+    cdef shared_ptr[CpSimpleLabeledAssembler] _this
 
-    cdef public object labels
-    cdef CpLabelHash * _label_ptr
+    cdef public GraphLabels labels
+    cdef public Hashgraph graph
+    cdef shared_ptr[CpLabelHash] _label_ptr
 
-    cdef public object stop_filter
-    cdef CpHashgraph * _stop_filter_ptr
+    cdef public Hashgraph stop_filter
+    cdef shared_ptr[CpHashgraph] _stop_filter_ptr
     
-    cdef vector[string] _assemble(self, Kmer start)
+    cdef vector[string] _assemble(self, CpKmer start)
 
 
 cdef class JunctionCountAssembler:
-    cdef unique_ptr[CpJunctionCountAssembler] _this
+    cdef shared_ptr[CpJunctionCountAssembler] _this
 
-    cdef public object graph
-    cdef CpHashgraph * _graph_ptr
+    cdef public Hashgraph graph
+    cdef shared_ptr[CpHashgraph] _graph_ptr
 
-    cdef public object stop_filter
-    cdef CpHashgraph * _stop_filter_ptr
+    cdef public Hashgraph stop_filter
+    cdef shared_ptr[CpHashgraph] _stop_filter_ptr
     
-    cdef vector[string] _assemble(self, Kmer)
+    cdef vector[string] _assemble(self, CpKmer)

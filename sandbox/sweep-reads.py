@@ -67,6 +67,7 @@ from collections import defaultdict
 import os
 import time
 import khmer
+from khmer import GraphLabels
 from khmer.khmer_args import (build_nodegraph_args, report_on_config, info,
                               sanitize_help)
 from khmer.kfile import (check_input_files, check_valid_file_exists,
@@ -78,7 +79,7 @@ DEFAULT_NUM_BUFFERS = 50000
 DEFAULT_MAX_READS = 1000000
 DEFAULT_BUFFER_SIZE = 10
 DEFAULT_OUT_PREF = 'reads'
-DEFAULT_RANGE = -1
+DEFAULT_RANGE = None
 
 MAX_HSIZE = 4e7
 MIN_KSIZE = 21
@@ -283,7 +284,7 @@ def main():
         max_buffers, max_reads, buf_size, output_pref, outdir, extension)
 
     # consume the partitioned fasta with which to label the graph
-    ht = khmer.GraphLabels(K, HT_SIZE, N_HT)
+    ht = GraphLabels.NodeGraphLabels(K, HT_SIZE, N_HT)
     try:
         print('consuming input sequences...', file=sys.stderr)
         if args.label_by_pid:
@@ -331,8 +332,8 @@ def main():
 
     print('done consuming input sequence. \
                         added {t} tags and {l} \
-                        labels...'.format(t=ht.graph.n_tags(),
-                                          l=ht.n_labels()))
+                        labels...'.format(t=ht.graph.n_tags,
+                                          l=ht.n_labels))
 
     label_dict = defaultdict(int)
     label_number_dist = []
@@ -369,7 +370,8 @@ def main():
                 seq = record.sequence
                 name = record.name
                 try:
-                    labels = ht.sweep_label_neighborhood(seq, traversal_range)
+                    labels = list(ht.sweep_label_neighborhood(seq,
+                                                              traversal_range))
                 except ValueError as e:
                     pass
                 else:

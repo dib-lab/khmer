@@ -8,20 +8,20 @@ import json
 import os
 import sys
 
-from .._khmer import Countgraph
-from .._khmer import Nodegraph
 from khmer.khmer_args import build_counting_args, create_countgraph
 from khmer.khmer_logger import (configure_logging, log_info, log_error,
                                 log_warn)
 
 from libcpp cimport bool
 
-from partitioning cimport StreamingPartitioner, Component
-from partitioning import StreamingPartitioner, Component
+from khmer._oxli.graphs cimport Nodegraph, Countgraph
 
-from parsing cimport BrokenPairedReader, SplitPairedReader, FastxParser, Sequence
-from parsing import BrokenPairedReader, SplitPairedReader, FastxParser, Sequence
-from utils cimport _bstring
+from khmer._oxli.partitioning cimport StreamingPartitioner, Component
+from khmer._oxli.partitioning import StreamingPartitioner, Component
+
+from khmer._oxli.parsing cimport BrokenPairedReader, SplitPairedReader, FastxParser, Sequence
+from khmer._oxli.parsing import BrokenPairedReader, SplitPairedReader, FastxParser, Sequence
+from khmer._oxli.utils cimport _bstring
 
 def grouper(n, iterable):
     iterable = iter(iterable)

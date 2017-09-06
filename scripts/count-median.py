@@ -56,7 +56,7 @@ import sys
 import csv
 import textwrap
 
-from khmer import __version__, load_countgraph
+from khmer import __version__, Countgraph
 from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import (sanitize_help, KhmerArgumentParser)
 
@@ -107,7 +107,7 @@ def main():
     check_space(infiles, args.force)
 
     print('loading k-mer countgraph from', htfile, file=sys.stderr)
-    countgraph = load_countgraph(htfile)
+    countgraph = Countgraph.load(htfile)
     ksize = countgraph.ksize()
     print('writing to', output.name, file=sys.stderr)
 

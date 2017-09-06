@@ -48,6 +48,7 @@ Contact: khmer-project@idyll.org
 #include <set>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "hashtable.hh"
 #include "traversal.hh"
@@ -97,15 +98,10 @@ protected:
         if (!(_tag_density % 2 == 0)) {
             throw oxli_exception();
         }
-        partition = new SubsetPartition(this);
+        partition = make_shared<SubsetPartition>(this);
         _all_tags_spin_lock = 0;
     }
 
-    // clean up the partition structure.
-    virtual ~Hashgraph( )
-    {
-        delete partition;
-    }
 
     // empty the partition structure
     void _clear_all_partitions()
@@ -118,7 +114,7 @@ protected:
     uint32_t _all_tags_spin_lock;
 public:
     // default master partitioning
-    SubsetPartition * partition;
+    shared_ptr<SubsetPartition> partition;
 
     // tags for sparse graph implementation
     SeenSet all_tags;
@@ -151,6 +147,16 @@ public:
     void add_stop_tag(HashIntoType tag)
     {
         stop_tags.insert(tag);
+    }
+
+    bool has_tag(HashIntoType tag) const
+    {
+        return set_contains(all_tags, tag);
+    }
+
+    bool has_stop_tag(HashIntoType stop_tag) const
+    {
+        return set_contains(stop_tags, stop_tag);
     }
 
     size_t n_tags() const
@@ -193,6 +199,9 @@ public:
                                   unsigned long long& n_consumed,
                                   SeenSet * new_tags = 0);
 
+    // get the tags present in this sequence.
+    void get_tags_for_sequence(const std::string& seq,
+                               SeenSet& tags) const;
 
     // consume an already-partitioned file & load in the partition IDs
     template<typename SeqIO>

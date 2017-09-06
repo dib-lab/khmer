@@ -42,6 +42,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import khmer
+from khmer import Nodegraph, Countgraph
 import screed
 from . import khmer_tst_utils as utils
 from .khmer_tst_utils import scriptpath, run_shell_cmd
@@ -362,7 +363,7 @@ def test_load_into_counting_1():
 
     run_shell_cmd(cmd)
     assert os.path.exists(out1)
-    khmer.load_countgraph(out1)
+    Countgraph.load(out1)
 
 
 def test_load_graph_1():
@@ -380,7 +381,7 @@ def test_load_graph_1():
 
     run_shell_cmd(cmd)
     assert os.path.exists(out1)
-    khmer.load_nodegraph(out1)
+    Nodegraph.load(out1)
 
 
 def test_filter_abund_1():

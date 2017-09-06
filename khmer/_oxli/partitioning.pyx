@@ -20,11 +20,9 @@ from libc.stdio cimport FILE, fopen, fwrite, fclose, stdout, stderr, fprintf
 import json
 import os
 
-from oxli_types cimport *
-from utils cimport _bstring
-from .._khmer import Countgraph
-from .._khmer import Nodegraph
-from khmer import load_countgraph, load_nodegraph
+from khmer._oxli.graphs cimport Countgraph, Nodegraph
+from khmer._oxli.oxli_types cimport *
+from khmer._oxli.utils cimport _bstring
 
 cdef class Component:
 
@@ -79,9 +77,8 @@ cdef class Component:
         return counts
 
     @staticmethod
-    def tag_counts(Component component, graph):
-        cdef CpHashgraph* graph_ptr = get_hashgraph_ptr(graph)
-        return Component._tag_counts(component._this, graph_ptr)
+    def tag_counts(Component component not None, Countgraph graph not None):
+        return Component._tag_counts(component._this, graph._cg_this.get())
 
     @staticmethod
     cdef float _mean_tag_count(ComponentPtr comp, CpHashgraph * graph):
@@ -123,37 +120,35 @@ cdef class Component:
 
 cdef class StreamingPartitioner:
 
-    def __cinit__(self, graph, tag_density=None, *args, **kwargs):
-        self._graph_ptr =  get_hashgraph_ptr(graph)
-        if self._graph_ptr == NULL:
-            raise ValueError('Must take an object with Hashgraph *')
+    def __cinit__(self, Hashgraph graph not None, tag_density=None, *args, **kwargs):
         self.graph = graph
 
         if tag_density is None:
-            self._this.reset(new CpStreamingPartitioner(self._graph_ptr))
+            self._this.reset(new CpStreamingPartitioner(self.graph._hg_this.get()))
         else:
-            self._this.reset(new CpStreamingPartitioner(self._graph_ptr, tag_density))
+            self._this.reset(new CpStreamingPartitioner(self.graph._hg_this.get(), 
+                                                        tag_density))
 
         self._tag_component_map = deref(self._this).get_tag_component_map()
         self._components = deref(self._this).get_components()
         self.n_consumed = 0
 
-    def consume(self, sequence):
+    def consume(self, str sequence):
         self.n_consumed += 1
-        return deref(self._this).consume(sequence.encode('utf-8'))
+        return deref(self._this).consume(_bstring(sequence))
 
-    def consume_pair(self, first, second):
+    def consume_pair(self, str first, str second):
         self.n_consumed += 2
-        return deref(self._this).consume_pair(first.encode('utf-8'),
-                                              second.encode('utf-8'))
+        return deref(self._this).consume_pair(_bstring(first),
+                                              _bstring(second))
 
-    def consume_fasta(self, filename):
-        return deref(self._this).consume_fasta(filename.encode('utf-8'))
+    def consume_fasta(self, object filename):
+        return deref(self._this).consume_fasta(_bstring(filename))
 
     def get(self, kmer):
         cdef ComponentPtr compptr
-        cdef string kmer_s = _bstring(kmer)
-        compptr = deref(self._this).get(kmer_s)
+        cdef string _kmer = _bstring(kmer)
+        compptr = deref(self._this).get(_kmer)
         if compptr == NULL:
             return None
         else:
@@ -206,7 +201,8 @@ cdef class StreamingPartitioner:
                 fprintf(fp, "%llu,%llu,%f\n", 
                         deref(cmpptr).component_id,
                         deref(cmpptr).get_n_tags(),
-                        Component._mean_tag_count(cmpptr, self._graph_ptr))
+                        Component._mean_tag_count(cmpptr,
+                                                  self.graph._hg_this.get()))
         fclose(fp)
 
     def write_component_coverage(self, filename):
@@ -224,7 +220,7 @@ cdef class StreamingPartitioner:
             for cmpptr in deref(lockedptr):
                 if cmpptr == NULL:
                     continue
-                deref(cmpptr).update_coverage(self._graph_ptr)
+                deref(cmpptr).update_coverage(self.graph._hg_this.get())
                 fprintf(fp, "%llu",
                         deref(cmpptr).component_id)
                 for i in range(16):

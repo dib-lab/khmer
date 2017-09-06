@@ -175,12 +175,13 @@ class TestStreamingPartitionerBasic:
         '''
 
         graph, partitioner, seq = single_component
+        asm = khmer.LinearAssembler(graph)
         first = seq[:K-2]
         neighbor = random_sequence(exclude=seq) + first
 
         assert partitioner.n_components == 1
         partitioner.consume(neighbor)
-        print(seq, neighbor, graph.assemble_linear_path(seq[:K]), sep='\n')
+        print(seq, neighbor, asm.assemble(seq[:K]), sep='\n')
         assert partitioner.n_components == 2
 
     @pytest.mark.parametrize("where", ["beginning", "end"])
@@ -190,6 +191,7 @@ class TestStreamingPartitionerBasic:
         '''
 
         graph, partitioner, seq = single_component
+        asm = khmer.LinearAssembler(graph)
         if where == "beginning":
             overlap = seq[:K-1]
             neighbor = random_sequence(exclude=seq) + overlap
@@ -199,7 +201,7 @@ class TestStreamingPartitionerBasic:
 
         assert partitioner.n_components == 1
         partitioner.consume(neighbor)
-        path = graph.assemble_linear_path(seq[:K])
+        path = asm.assemble(seq[:K])
         assert partitioner.n_components == 1
 
     def test_merge_k_overlap(self, single_component, random_sequence):
@@ -207,12 +209,13 @@ class TestStreamingPartitionerBasic:
         '''
 
         graph, partitioner, seq = single_component
+        asm = khmer.LinearAssembler(graph)
         first = seq[:K]
         neighbor = random_sequence(exclude=seq) + first
 
         assert partitioner.n_components == 1
         partitioner.consume(neighbor)
-        print(seq, neighbor, graph.assemble_linear_path(seq[:K]), sep='\n')
+        print(seq, neighbor, asm.assemble(seq[:K]), sep='\n')
         assert partitioner.n_components == 1
         
 
