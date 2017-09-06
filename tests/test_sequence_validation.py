@@ -37,10 +37,11 @@
 # Tests for the ReadParser and Read classes.
 from __future__ import print_function
 from __future__ import absolute_import
-from khmer import _Countgraph, _SmallCountgraph, _Nodegraph
+from khmer import Countgraph, SmallCountgraph, Nodegraph
 from khmer import Nodetable, Counttable, SmallCounttable
+from khmer import GraphLabels
 from khmer._oxli.utils import get_n_primes_near_x
-from khmer import ReadParser, Nodegraph, _GraphLabels
+from khmer import ReadParser
 from . import khmer_tst_utils as utils
 from .table_fixtures import (AnyTabletype, Countingtype, Graphtype,
                              params_1m, PRIMES_1m)
@@ -117,7 +118,7 @@ def test_read_cleaning_abundance_distribution(Countingtype):
     infile = utils.get_test_data('valid-read-testing.fq')
 
     x = Countingtype(15, *params_1m)
-    y = _Nodegraph(15, PRIMES_1m)
+    y = Nodegraph(15, 1, 1, primes=PRIMES_1m)
 
     x.consume_seqfile(infile)
 
@@ -305,10 +306,10 @@ def test_consume_seqfile_and_tag_with_labels(Graphtype):
 
     # read this in consume_and_tag
     graph = Graphtype(15, *params_1m)
-    x = _GraphLabels(graph)
+    x = GraphLabels(graph)
     x.consume_seqfile_and_tag_with_labels(infile)
 
-    assert x.n_labels() == 9
+    assert x.n_labels == 9
 
 
 def test_consume_partitioned_seqfile_and_label(Graphtype):
@@ -316,10 +317,10 @@ def test_consume_partitioned_seqfile_and_label(Graphtype):
 
     # read this in consume_and_tag
     graph = Graphtype(15, *params_1m)
-    x = _GraphLabels(graph)
+    x = GraphLabels(graph)
     x.consume_partitioned_fasta_and_tag_with_labels(infile)
 
-    assert x.n_labels() == 9
+    assert x.n_labels == 9
 
 
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:

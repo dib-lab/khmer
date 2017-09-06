@@ -1,9 +1,8 @@
-# cython: c_string_type=unicode, c_string_encoding=utf8
 from cython.operator cimport dereference as deref, address
 from libcpp.vector cimport vector
 
-from parsing cimport CpFastxReader
-from .utils cimport _bstring, _ustring
+from khmer._oxli.parsing cimport CpFastxReader
+from khmer._oxli.utils cimport _bstring, _ustring
 
 cdef class HLLCounter:
     """HyperLogLog counter.

@@ -41,7 +41,7 @@ def worker(que, basename, stop_big_traversals):
                                                stop_big_traversals)
 
         print('saving:', basename, index, file=sys.stderr)
-        nodegraph.save_subset_partitionmap(subset, outfile)
+        subset.save_partitionmap(outfile)
         del subset
         gc.collect()
 

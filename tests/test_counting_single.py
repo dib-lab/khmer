@@ -56,7 +56,7 @@ def test_toobig():
 
 
 def test_collision():
-    kh = khmer._Countgraph(4, [5])
+    kh = khmer.Countgraph(4, 100, 1)
 
     kh.count('AAAA')
     assert kh.get('AAAA') == 1
@@ -66,7 +66,7 @@ def test_collision():
 
 
 def test_badcount():
-    countgraph = khmer._Countgraph(4, [5])
+    countgraph = khmer.Countgraph(4, 1, 1)
     try:
         countgraph.count()
         assert 0, "count should require one argument"
@@ -80,7 +80,7 @@ def test_badcount():
 
 
 def test_complete_no_collision():
-    kh = khmer._Countgraph(4, [4 ** 4])
+    kh = khmer.Countgraph(4, 1, 1, primes=[4 ** 4])
 
     n_entries = kh.hashsizes()[0]
 
@@ -108,7 +108,7 @@ def test_complete_no_collision():
 
 
 def test_complete_2_collision():
-    kh = khmer._Countgraph(4, [5])
+    kh = khmer.Countgraph(4, 7, 1)
 
     n_entries = kh.hashsizes()[0]
     for i in range(0, n_entries):
@@ -129,7 +129,7 @@ def test_complete_2_collision():
 
 
 def test_complete_4_collision():
-    kh = khmer._Countgraph(4, [3])
+    kh = khmer.Countgraph(4, 5, 1)
 
     n_entries = kh.hashsizes()[0]
 
@@ -152,7 +152,7 @@ def test_complete_4_collision():
 
 def test_maxcount():
     # hashtable should saturate at some point so as not to overflow counter
-    kh = khmer._Countgraph(4, [5])
+    kh = khmer.Countgraph(4, 100, 1)
 
     last_count = None
     for _ in range(0, 10000):
@@ -170,7 +170,7 @@ def test_maxcount():
 
 def test_maxcount_with_bigcount():
     # hashtable should not saturate, if use_bigcount is set.
-    kh = khmer._Countgraph(4, [5])
+    kh = khmer.Countgraph(4, 100, 1)
     kh.set_use_bigcount(True)
 
     last_count = None
@@ -188,7 +188,7 @@ def test_maxcount_with_bigcount():
 
 
 def test_consume_uniqify_first():
-    kh = khmer._Countgraph(4, [5])
+    kh = khmer.Countgraph(4, 100, 1)
 
     s = "TTTT"
     s_rc = "AAAA"
@@ -200,7 +200,7 @@ def test_consume_uniqify_first():
 
 def test_maxcount_consume():
     # hashtable should saturate at some point so as not to overflow counter
-    kh = khmer._Countgraph(4, [5])
+    kh = khmer.Countgraph(4, 100, 1)
 
     s = "A" * 10000
     kh.consume(s)
@@ -211,7 +211,7 @@ def test_maxcount_consume():
 
 def test_maxcount_consume_with_bigcount():
     # use the bigcount hack to avoid saturating the hashtable.
-    kh = khmer._Countgraph(4, [5])
+    kh = khmer.Countgraph(4, 100, 1)
     kh.set_use_bigcount(True)
 
     s = "A" * 10000
@@ -222,7 +222,7 @@ def test_maxcount_consume_with_bigcount():
 
 
 def test_get_mincount():
-    kh = khmer._Countgraph(4, [5])
+    kh = khmer.Countgraph(4, 100, 1)
 
     s = "AAAAACGT"
     kh.consume(s)
@@ -236,7 +236,7 @@ def test_get_mincount():
 
 
 def test_get_maxcount():
-    kh = khmer._Countgraph(4, [7])
+    kh = khmer.Countgraph(4, 9, 1)
 
     s = "AAAAACGT"
     kh.consume(s)
@@ -250,7 +250,7 @@ def test_get_maxcount():
 
 
 def test_get_maxcount_rc():
-    kh = khmer._Countgraph(4, [7])
+    kh = khmer.Countgraph(4, 9, 1)
 
     s = "AAAAACGT"
     src = "ACGTTTTT"
@@ -265,7 +265,7 @@ def test_get_maxcount_rc():
 
 
 def test_get_mincount_rc():
-    kh = khmer._Countgraph(4, [5])
+    kh = khmer.Countgraph(4, 100, 1)
 
     s = "AAAAACGT"
     src = "ACGTTTTT"
@@ -332,7 +332,7 @@ def test_very_short_read():
 class Test_ConsumeString(object):
 
     def setup(self):
-        self.kh = khmer._Countgraph(4, [4 ** 4])
+        self.kh = khmer.Countgraph(4, 1, 1, primes=[4 ** 4])
 
     def test_n_occupied(self):
         assert self.kh.n_occupied() == 0
@@ -377,14 +377,14 @@ class Test_ConsumeString(object):
 class Test_AbundanceDistribution(object):
 
     def setup(self):
-        self.kh = khmer._Countgraph(4, [5])
+        self.kh = khmer.Countgraph(4, 100, 1)
         A_filename = utils.get_test_data('all-A.fa')
         self.kh.consume_seqfile(A_filename)
 
     def test_count_A(self):
         A_filename = utils.get_test_data('all-A.fa')
 
-        tracking = khmer._Nodegraph(4, [5])
+        tracking = khmer.Nodegraph(4, 7, 1)
         dist = self.kh.abundance_distribution(A_filename, tracking)
 
         assert sum(dist) == 1

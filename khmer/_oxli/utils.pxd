@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-# cython: c_string_type=unicode, c_string_encoding=utf8
 from libcpp.vector cimport vector
 from libc.stdint cimport uint32_t, uint64_t
 from libcpp cimport bool
@@ -16,3 +15,9 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli":
 cdef bytes _bstring(s)
 
 cdef unicode _ustring(s)
+
+cpdef bool is_str(object s)
+cpdef bool is_num(object n)
+
+cdef void _flatten_fill(double * fill_to, object fill_from)
+cdef void _fill(double * fill_to, object fill_from)
