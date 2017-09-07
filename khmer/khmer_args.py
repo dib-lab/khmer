@@ -51,8 +51,7 @@ except ImportError:
 
 import screed
 import khmer
-from khmer import extract_countgraph_info
-from khmer import __version__
+from khmer import __version__, Countgraph
 from .utils import print_error
 from .khmer_logger import log_info, log_warn, configure_logging
 
@@ -262,7 +261,7 @@ def check_conflicting_args(args, hashtype):
 
         infoset = None
         if hashtype in ('countgraph', 'smallcountgraph'):
-            infoset = extract_countgraph_info(args.loadgraph)
+            infoset = Countgraph.extract_info(args.loadgraph)
         if infoset is not None:
             ksize = infoset.ksize
             max_tablesize = infoset.table_size
