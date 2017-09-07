@@ -56,8 +56,9 @@ from khmer import __version__
 from khmer import ReadParser
 from khmer.kfile import (check_input_files, add_output_compression_type,
                          get_file_writer)
-from khmer.khmer_args import sanitize_help, KhmerArgumentParser
-from khmer.utils import write_record, broken_paired_reader
+from khmer.khmer_args import (sanitize_help, KhmerArgumentParser,
+                              add_pairing_args)
+from khmer.utils import write_record, paired_fastx_handler
 
 DEFAULT_NUM_READS = int(1e5)
 DEFAULT_MAX_READS = int(1e8)
@@ -93,14 +94,13 @@ def get_parser():
                         default=1)
     parser.add_argument('-R', '--random-seed', type=int, dest='random_seed',
                         help='Provide a random seed for the generator')
-    parser.add_argument('--force_single', default=False, action='store_true',
-                        help='Ignore read pair information if present')
     parser.add_argument('-o', '--output', dest='output_file',
                         type=argparse.FileType('wb'),
                         metavar="filename", default=None)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exits')
     add_output_compression_type(parser)
+    add_pairing_args(parser)
     return parser
 
 
@@ -167,11 +167,10 @@ def main():
         reads.append([])
 
     # read through all the sequences and load/resample the reservoir
-    for filename in args.filenames:
+    for reader in paired_fastx_handler(args.filenames, args.pairing_mode):
         print('opening', filename, 'for reading', file=sys.stderr)
 
-        for count, (_, _, rcrd1, rcrd2) in enumerate(broken_paired_reader(
-                ReadParser(filename), force_single=args.force_single)):
+        for count, (_, _, rcrd1, rcrd2) in enumerate(reader):
             if count % 10000 == 0:
                 print('...', count, 'reads scanned', file=sys.stderr)
                 if count >= args.max_reads:
