@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
 
-from __future__ import unicode_literals
 from cpython.version cimport PY_MAJOR_VERSION
 
 from cython import short, int, long

@@ -34,7 +34,6 @@
 #
 # Contact: khmer-project@idyll.org
 
-from __future__ import print_function
 import sys
 import khmer
 import os.path

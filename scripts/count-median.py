@@ -49,7 +49,6 @@ The output file contains sequence id, median, average, stddev, and seq length.
 
 NOTE: All 'N's in the input sequences are converted to 'A's.
 """
-from __future__ import print_function
 import argparse
 import screed
 import sys

@@ -63,8 +63,8 @@ INCLUDESTRING=$(shell gcc -E -x c++ - -v < /dev/null 2>&1 >/dev/null \
 INCLUDEOPTS=$(shell gcc -E -x c++ - -v < /dev/null 2>&1 >/dev/null \
 	    | grep '^ /' | grep -v cc1plus | awk '{print "-I" $$1 " "}')
 
-PYINCLUDE=$(shell python -c "from __future__ import print_function; \
-	    import sysconfig; flags = ['-I' + sysconfig.get_path('include'), \
+PYINCLUDE=$(shell python -c "import sysconfig; \
+		  flags = ['-I' + sysconfig.get_path('include'), \
 	    '-I' + sysconfig.get_path('platinclude')]; print(' '.join(flags))")
 
 CPPCHECK_SOURCES=$(filter-out lib/test%, $(wildcard lib/*.cc khmer/_khmer.cc) )

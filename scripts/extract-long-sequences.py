@@ -46,7 +46,6 @@ length.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
 import argparse
 import screed
 import textwrap

@@ -54,7 +54,6 @@ For this scenario, use only "-f" and "number of kmers".
 Use '-h' for parameter help.
 
 """
-from __future__ import print_function
 import argparse
 import khmer, oxli
 from khmer.khmer_args import info, optimal_size, sanitize_help
