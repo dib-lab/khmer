@@ -105,6 +105,17 @@ public:
         : oxli_file_exception(msg) {}
 };
 
+
+class EmptyStream : public oxli_file_exception
+{
+public:
+    EmptyStream()
+        : oxli_file_exception("Generic EmptyStream error") {}
+    explicit EmptyStream(const std::string& msg)
+        : oxli_file_exception(msg) {}
+};
+
+
 class StreamReadError : public oxli_file_exception
 {
 public:

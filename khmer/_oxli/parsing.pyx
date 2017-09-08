@@ -40,6 +40,8 @@ cdef class FastxParser:
 
     def __cinit__(self, filename, *args, **kwargs):
         self._this = get_parser[CpFastxReader](_bstring(filename))
+        if self.is_complete():
+            raise RuntimeError('{0} has no sequences!'.format(filename))
 
     cdef Sequence _next(self):
         if not self.is_complete():

@@ -80,8 +80,8 @@ def test_normalize_by_median_empty_file():
     (_, _, err) = utils.runscript(script, args, in_dir)
 
     assert 'WARNING:' in err, err
-    assert 'is empty' in err, err
-    assert 'SKIPPED' in err, err
+    assert 'empty file' in err, err
+    assert 'Skipping' in err, err
 
 
 def test_normalize_by_median():
