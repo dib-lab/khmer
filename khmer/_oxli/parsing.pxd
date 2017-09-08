@@ -16,7 +16,7 @@ from khmer._oxli.sequence cimport Sequence, CpSequence, CpSequencePair
 extern declarations for liboxli.
 '''
 
-cdef extern from  "oxli/read_parsers.hh" namespace "oxli::read_parsers":
+cdef extern from  "oxli/read_parsers.hh" namespace "oxli::read_parsers" nogil:
 
     cdef cppclass CpReadParser "oxli::read_parsers::ReadParser" [SeqIO]:
         CpReadParser(unique_ptr[SeqIO]) except +oxli_raise_py_error
