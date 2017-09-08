@@ -247,7 +247,7 @@ CLASSIFIERS = [
     "Operating System :: MacOS :: MacOS X",
     "Programming Language :: C++",
     "Programming Language :: Python :: 3.5",
-    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
 if "-rc" in versioneer.get_version():
@@ -281,7 +281,7 @@ SETUP_METADATA = \
         # additional-meta-data note #3
         "url": 'https://khmer.readthedocs.io/',
         "packages": ['khmer', 'khmer.tests', 'oxli', 'khmer._oxli'],
-        "package_data": {'khmer/_oxli': ['*.pxd']},
+        "package_data": {'khmer/_oxli': ['*.pxd', 'oxli_exception_convert.hh']},
         "package_dir": {'khmer.tests': 'tests'},
         "install_requires": ['screed >= 1.0', 'bz2file', 'Cython==0.25.2'],
         "setup_requires": ["pytest-runner>=2.0,<3dev", "setuptools>=18.0"],
