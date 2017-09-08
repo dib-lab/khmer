@@ -211,7 +211,7 @@ for cython_ext in glob.glob(os.path.join("khmer", "_oxli",
 
     CY_EXTENSION_MOD_DICT = \
         {
-            "sources": [cython_ext, "khmer/_oxli/oxli_exception_convert.cc"],
+            "sources": [cython_ext, "src/oxli/oxli_exception_convert.cc"],
             "extra_compile_args": EXTRA_COMPILE_ARGS,
             "extra_link_args": EXTRA_LINK_ARGS,
             "extra_objects": [path_join(build_dir(), splitext(p)[0] + '.o')

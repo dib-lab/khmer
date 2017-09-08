@@ -285,6 +285,7 @@ install-liboxli: liboxli
 	cd src/oxli && $(MAKE) install PREFIX=$(PREFIX)
 	mkdir -p $(PREFIX)/include/khmer
 	cp -r include/khmer/_cpy_*.hh $(PREFIX)/include/khmer/
+	cp include/oxli/oxli_exception_convert.hh $(PREFIX)/include/oxli/
 
 # Runs a test of liboxli
 libtest: FORCE
