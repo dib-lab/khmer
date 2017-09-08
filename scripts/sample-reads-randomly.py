@@ -53,7 +53,6 @@ import textwrap
 import sys
 
 from khmer import __version__
-from khmer import ReadParser
 from khmer.kfile import (check_input_files, add_output_compression_type,
                          get_file_writer)
 from khmer.khmer_args import (sanitize_help, KhmerArgumentParser,
