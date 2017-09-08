@@ -4,7 +4,7 @@ from libc.stdint cimport uint32_t, uint64_t
 from libcpp cimport bool
 
 
-cdef extern from "oxli_exception_convert.hh":
+cdef extern from "oxli/oxli_exception_convert.hh":
     cdef void oxli_raise_py_error()
 
 
