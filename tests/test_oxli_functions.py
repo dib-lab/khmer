@@ -32,7 +32,6 @@
 #
 # Contact: khmer-project@idyll.org
 # pylint: disable=missing-docstring,invalid-name,no-member
-from __future__ import print_function, absolute_import, unicode_literals
 
 from . import khmer_tst_utils as utils
 

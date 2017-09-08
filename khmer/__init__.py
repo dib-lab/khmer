@@ -36,154 +36,51 @@
 """This is khmer; please see http://khmer.readthedocs.io/."""
 
 
-from __future__ import print_function
-from collections import namedtuple
 from math import log
 import json
 
 
 from khmer._khmer import Read
-from khmer._khmer import forward_hash
-# tests/test_{functions,countgraph,counting_single}.py
-
-from khmer._khmer import forward_hash_no_rc  # tests/test_functions.py
-
-from khmer._khmer import reverse_hash  # tests/test_functions.py
-# tests/counting_single.py
-
-from khmer._khmer import hash_murmur3        # tests/test_functions.py
-from khmer._khmer import hash_no_rc_murmur3  # tests/test_functions.py
-
-from khmer._khmer import reverse_complement
-
-from khmer._khmer import get_version_cpp as __version_cpp__
 # tests/test_version.py
 
 from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 # tests/test_read_parsers.py,scripts/{filter-abund-single,load-graph}.py
 # scripts/{abundance-dist-single,load-into-counting}.py
 
-from khmer import _oxli
-from khmer._oxli.utils import get_n_primes_near_x
-from khmer._khmer import FILETYPES
+from khmer._oxli.assembly import (LinearAssembler, SimpleLabeledAssembler,
+                                  JunctionCountAssembler)
 
 from khmer._oxli.graphs import (Counttable, QFCounttable, Nodetable,
                                 SmallCounttable, Countgraph, SmallCountgraph,
-                                Nodegraph)
+                                Nodegraph, _buckets_per_byte)
+
+from khmer._oxli.hashing import (forward_hash, forward_hash_no_rc,
+                                 reverse_hash, hash_murmur3,
+                                 hash_no_rc_murmur3,
+                                 reverse_complement)
+
+from khmer._oxli.hashset import HashSet
+
+from khmer._oxli.hllcounter import HLLCounter
+
 from khmer._oxli.labeling import GraphLabels
+
 from khmer._oxli.legacy_partitioning import SubsetPartition, PrePartitionInfo
-from khmer._oxli.parsing import FastxParser
+
+from khmer._oxli.parsing import (FastxParser, SanitizedFastxParser,
+                                 BrokenPairedReader)
+
 from khmer._oxli.readaligner import ReadAligner
 
-from khmer._oxli.assembly import (LinearAssembler, SimpleLabeledAssembler,
-                                  JunctionCountAssembler)
-from khmer._oxli.hashset import HashSet
-from khmer._oxli.hllcounter import HLLCounter
-from khmer._oxli.labeling import GraphLabels
+from khmer._oxli.utils import get_n_primes_near_x, is_prime, FILETYPES
+from khmer._oxli.utils import get_version_cpp as __version_cpp__
 
-from khmer._oxli.utils import get_n_primes_near_x, is_prime
 import sys
 
-from struct import pack, unpack
 
 from ._version import get_versions
 __version__ = get_versions()['version']
 del get_versions
-
-
-_buckets_per_byte = {
-    # calculated by hand from settings in third-part/cqf/gqf.h
-    'qfcounttable': 1 / 1.26,
-    'countgraph': 1,
-    'smallcountgraph': 2,
-    'nodegraph': 8,
-}
-
-
-def extract_nodegraph_info(filename):
-    """Open the given nodegraph file and return a tuple of information.
-
-    Returns: the k-mer size, the table size, the number of tables, the version
-    of the table format, and the type of table flag.
-
-    Keyword argument:
-    filename -- the name of the nodegraph file to inspect
-    """
-    ksize = None
-    n_tables = None
-    table_size = None
-    signature = None
-    version = None
-    ht_type = None
-    occupied = None
-
-    uint_size = len(pack('I', 0))
-    uchar_size = len(pack('B', 0))
-    ulonglong_size = len(pack('Q', 0))
-
-    try:
-        with open(filename, 'rb') as nodegraph:
-            signature, = unpack('4s', nodegraph.read(4))
-            version, = unpack('B', nodegraph.read(1))
-            ht_type, = unpack('B', nodegraph.read(1))
-            ksize, = unpack('I', nodegraph.read(uint_size))
-            n_tables, = unpack('B', nodegraph.read(uchar_size))
-            occupied, = unpack('Q', nodegraph.read(ulonglong_size))
-            table_size, = unpack('Q', nodegraph.read(ulonglong_size))
-        if signature != b"OXLI":
-            raise ValueError("Node graph '{}' is missing file type "
-                             "signature".format(filename) + str(signature))
-    except:
-        raise ValueError("Node graph '{}' is corrupt ".format(filename))
-
-    return ksize, round(table_size, -2), n_tables, version, ht_type, occupied
-
-
-def extract_countgraph_info(filename):
-    """Open the given countgraph file and return a tuple of information.
-
-    Return: the k-mer size, the table size, the number of tables, the bigcount
-    flag, the version of the table format, and the type of table flag.
-
-    Keyword argument:
-    filename -- the name of the countgraph file to inspect
-    """
-    CgInfo = namedtuple("CgInfo", ['ksize', 'n_tables', 'table_size',
-                                   'use_bigcount', 'version', 'ht_type',
-                                   'n_occupied'])
-    ksize = None
-    n_tables = None
-    table_size = None
-    signature = None
-    version = None
-    ht_type = None
-    use_bigcount = None
-    occupied = None
-
-    uint_size = len(pack('I', 0))
-    ulonglong_size = len(pack('Q', 0))
-
-    try:
-        with open(filename, 'rb') as countgraph:
-            signature, = unpack('4s', countgraph.read(4))
-            version, = unpack('B', countgraph.read(1))
-            ht_type, = unpack('B', countgraph.read(1))
-            if ht_type != FILETYPES['SMALLCOUNT']:
-                use_bigcount, = unpack('B', countgraph.read(1))
-            else:
-                use_bigcount = None
-            ksize, = unpack('I', countgraph.read(uint_size))
-            n_tables, = unpack('B', countgraph.read(1))
-            occupied, = unpack('Q', countgraph.read(ulonglong_size))
-            table_size, = unpack('Q', countgraph.read(ulonglong_size))
-        if signature != b'OXLI':
-            raise ValueError("Count graph file '{}' is missing file type "
-                             "signature. ".format(filename) + str(signature))
-    except:
-        raise ValueError("Count graph file '{}' is corrupt ".format(filename))
-
-    return CgInfo(ksize, n_tables, round(table_size, -2), use_bigcount,
-                  version, ht_type, occupied)
 
 
 def calc_expected_collisions(graph, force=False, max_false_pos=.2):
@@ -221,3 +118,4 @@ def calc_expected_collisions(graph, force=False, max_false_pos=.2):
             sys.exit(1)
 
     return fp_all
+

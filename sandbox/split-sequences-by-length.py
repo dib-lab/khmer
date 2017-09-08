@@ -41,7 +41,6 @@ hash table.  Output sequences will be placed in 'infile.abundfilt'.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
 import sys
 import screed.fasta
 import os

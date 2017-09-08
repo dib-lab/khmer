@@ -44,19 +44,18 @@ extract them into separate files (.pe and .se).
 
 Reads FASTQ and FASTA input, retains format for output.
 """
-from __future__ import print_function
 import sys
 import os.path
 import textwrap
 
-from khmer import ReadParser
 from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import sanitize_help, KhmerArgumentParser
 from khmer.khmer_args import FileType as khFileType
 from khmer.kfile import add_output_compression_type
 from khmer.kfile import get_file_writer
 
-from khmer.utils import broken_paired_reader, write_record, write_record_pair
+from khmer.utils import write_record, write_record_pair
+from khmer._oxli.parsing import BrokenPairedReader, FastxParser
 
 
 def get_parser():
@@ -152,8 +151,8 @@ def main():
     n_pe = 0
     n_se = 0
 
-    reads = ReadParser(infile)
-    for index, is_pair, read1, read2 in broken_paired_reader(reads):
+    reads = FastxParser(infile)
+    for index, is_pair, read1, read2 in BrokenPairedReader(reads):
         if index % 100000 == 0 and index > 0:
             print('...', index, file=sys.stderr)
 

@@ -33,7 +33,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-from __future__ import print_function
 import khmer
 import sys
 import gc

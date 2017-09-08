@@ -45,15 +45,14 @@ placed in 'infile.abundfilt'.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
 import os
 import sys
 import threading
 import textwrap
 import khmer
 
-from khmer import ReadParser
-from khmer.utils import broken_paired_reader, write_record
+from khmer.utils import BrokenPairedReader, FastxParser, write_record
+from khmer._oxli.sequence import trim_sequence
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, report_on_config,
                               add_threading_args, calculate_graphsize,
@@ -64,7 +63,6 @@ from khmer.kfile import (check_input_files, check_space,
                          get_file_writer)
 from khmer.khmer_logger import (configure_logging, log_info, log_error,
                                 log_warn)
-from khmer.trimming import (trim_record)
 
 DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
@@ -164,7 +162,7 @@ def main():
     outfp = open(outfile, 'wb')
     outfp = get_file_writer(outfp, args.gzip, args.bzip)
 
-    paired_iter = broken_paired_reader(ReadParser(args.datafile),
+    paired_iter = BrokenPairedReader(FastxParser(args.datafile),
                                        min_length=graph.ksize(),
                                        force_single=True)
 
@@ -172,7 +170,7 @@ def main():
         assert not is_pair
         assert read2 is None
 
-        trimmed_record, _ = trim_record(graph, read1, args.cutoff,
+        trimmed_record, _ = trim_sequence(graph, read1, args.cutoff,
                                         args.variable_coverage,
                                         args.normalize_to)
         if trimmed_record:

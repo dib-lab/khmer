@@ -43,7 +43,6 @@ Partition-annotated sequences will be in <fileN>.part.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
 
 import os
 import textwrap

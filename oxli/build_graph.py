@@ -43,7 +43,6 @@ Build a graph from the given sequences, save in <ptname>.
 Use '-h' for parameter help.
 """
 
-from __future__ import print_function, absolute_import, unicode_literals
 
 import sys
 

@@ -45,7 +45,6 @@ By default take one subsample, but take -S samples if specified.
 
 Reads FASTQ and FASTA input, retains format for output.
 """
-from __future__ import print_function
 
 import argparse
 import os.path
@@ -54,12 +53,11 @@ import textwrap
 import sys
 
 from khmer import __version__
-from khmer import ReadParser
 from khmer.kfile import (check_input_files, add_output_compression_type,
                          get_file_writer)
-from khmer.khmer_args import sanitize_help, KhmerArgumentParser
-from khmer.utils import write_record, grouper
-from khmer._oxli.parsing import FastxParser, BrokenPairedReader, SplitPairedReader
+from khmer.khmer_args import (sanitize_help, KhmerArgumentParser,
+                              add_pairing_args)
+from khmer.utils import write_record, paired_fastx_handler
 
 DEFAULT_NUM_READS = int(1e5)
 DEFAULT_MAX_READS = int(1e8)
@@ -95,17 +93,13 @@ def get_parser():
                         default=1)
     parser.add_argument('-R', '--random-seed', type=int, dest='random_seed',
                         help='Provide a random seed for the generator')
-    parser.add_argument('--force_single', default=False, action='store_true',
-                        help='Ignore read pair information if present')
-    parser.add_argument('--pairing-mode', 
-                        choices=['split', 'interleaved', 'single'],
-                        default='interleaved')
     parser.add_argument('-o', '--output', dest='output_file',
                         type=argparse.FileType('wb'),
                         metavar="filename", default=None)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exits')
     add_output_compression_type(parser)
+    add_pairing_args(parser)
     return parser
 
 
@@ -167,29 +161,13 @@ def main():
               % output_filename, file=sys.stderr)
         print('', file=sys.stderr)
 
-    if args.pairing_mode == 'split':
-        samples = list(grouper(2, args.filenames))
-        for pair in samples:
-            if len(pair) != 2:
-                raise ValueError('Must have even number of samples!')
-    else:
-        samples = args.filenames
-
     reads = []
     for _ in range(num_samples):
         reads.append([])
 
     # read through all the sequences and load/resample the reservoir
-    for group in samples:
-
-        if args.pairing_mode == 'split':
-            print('opening', group[0], 'and', group[1], 'for reading', file=sys.stderr)
-            reader = SplitPairedReader(FastxParser(group[0]),
-                                       FastxParser(group[1]))
-        else:
-            print('opening', group, 'for reading', file=sys.stderr)
-            reader = BrokenPairedReader(FastxParser(group),
-                                        force_single=args.force_single)
+    for reader in paired_fastx_handler(args.filenames, args.pairing_mode):
+        print('opening', filename, 'for reading', file=sys.stderr)
 
         for count, (_, _, rcrd1, rcrd2) in enumerate(reader):
             if count % 10000 == 0:

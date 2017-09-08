@@ -44,23 +44,23 @@ Output sequences will be placed in 'infile.abundfilt'.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
 import sys
 import os
 import textwrap
 import khmer
 
 from khmer import __version__
-from khmer import ReadParser, Countgraph
-from khmer.utils import (broken_paired_reader, write_record)
+from khmer import Countgraph
+from khmer.utils import (paired_fastx_handler, write_record)
 from khmer.khmer_args import (add_threading_args, KhmerArgumentParser,
-                              sanitize_help, check_argument_range)
+                              sanitize_help, check_argument_range,
+                              add_pairing_args)
 from khmer.khmer_args import FileType as khFileType
 from khmer.kfile import (check_input_files, check_space,
                          add_output_compression_type, get_file_writer)
 from khmer.khmer_logger import (configure_logging, log_info, log_error,
                                 log_warn)
-from khmer.trimming import (trim_record)
+from khmer._oxli.sequence import trim_sequence
 
 DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
@@ -110,6 +110,7 @@ def get_parser():
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
     add_output_compression_type(parser)
+    add_pairing_args(parser)
     return parser
 
 
@@ -141,22 +142,21 @@ def main():
         outfp = get_file_writer(args.single_output_file, args.gzip, args.bzip)
 
     # the filtering loop
-    for infile in infiles:
+    for infile, reader in paired_fastx_handler(infiles, 
+                                               'single',
+                                               min_length=ksize,
+                                               yield_filenames=True):
         log_info('filtering {infile}', infile=infile)
         if not args.single_output_file:
             outfile = os.path.basename(infile) + '.abundfilt'
             outfp = open(outfile, 'wb')
             outfp = get_file_writer(outfp, args.gzip, args.bzip)
 
-        paired_iter = broken_paired_reader(ReadParser(infile),
-                                           min_length=ksize,
-                                           force_single=True)
-
-        for n, is_pair, read1, read2 in paired_iter:
+        for n, is_pair, read1, read2 in reader:
             assert not is_pair
             assert read2 is None
 
-            trimmed_record, _ = trim_record(countgraph, read1, args.cutoff,
+            trimmed_record, _ = trim_sequence(countgraph, read1, args.cutoff,
                                             args.variable_coverage,
                                             args.normalize_to)
             if trimmed_record:

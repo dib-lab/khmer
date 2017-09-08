@@ -33,7 +33,6 @@
 # Contact: khmer-project@idyll.org
 """Lightweight logging framework for khmer."""
 
-from __future__ import print_function, unicode_literals
 import sys
 
 __QUIET__ = False

@@ -34,7 +34,6 @@
 # Contact: khmer-project@idyll.org
 # pylint: disable=missing-docstring,invalid-name,no-member,no-self-use
 # pylint: disable=protected-access
-from __future__ import print_function, absolute_import
 
 import khmer
 from khmer._oxli.legacy_partitioning import SubsetPartition, PrePartitionInfo

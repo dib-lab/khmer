@@ -41,7 +41,6 @@ Find all reads connected to the given contigs on a per-partition basis.
 % sweep-files.py -r <range> --db <fasta/q files> \
 --query <fasta/q files separate>
 """
-from __future__ import print_function
 
 EPILOG = """
 Output will be a collection of fasta/q files, each corresponding to a database

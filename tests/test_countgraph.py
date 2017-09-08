@@ -34,15 +34,13 @@
 #
 # Contact: khmer-project@idyll.org
 # pylint: disable=missing-docstring,protected-access,no-member,invalid-name
-from __future__ import print_function
-from __future__ import absolute_import, unicode_literals
 
 import gzip
 
 import os
 
 import khmer
-from khmer import Countgraph, SmallCountgraph, Nodegraph
+from khmer import Countgraph, SmallCountgraph, Nodegraph, FastxParser
 from . import khmer_tst_utils as utils
 from khmer import ReadParser
 import screed
@@ -114,6 +112,38 @@ def test_revhash_1():
     hashval = hi.hash('C' * 12)
 
     assert hi.reverse_hash(hashval) == kmer
+
+
+def test_extract_countgraph_info_badfile():
+    try:
+        Countgraph.extract_info(
+            utils.get_test_data('test-abund-read-2.fa'))
+        assert 0, 'this should fail'
+    except ValueError:
+        pass
+
+
+def test_extract_countgraph_info():
+    fn = utils.get_temp_filename('test_extract_counting.ct')
+    for size in [1e6, 2e6, 5e6, 1e7]:
+        ht = khmer.Countgraph(25, size, 4)
+        ht.save(fn)
+
+        try:
+            info = Countgraph.extract_info(fn)
+        except ValueError as err:
+            assert 0, 'Should not throw a ValueErorr: ' + str(err)
+        ksize, n_tables, table_size, _, _, _, _ = info
+        print(ksize, table_size, n_tables)
+
+        assert(ksize) == 25
+        assert table_size == size
+        assert n_tables == 4
+
+        try:
+            os.remove(fn)
+        except OSError as err:
+            assert 0, '...failed to remove ' + fn + str(err)
 
 
 class Test_Countgraph(object):
@@ -1191,15 +1221,15 @@ def test_consume_absentfasta():
 def test_consume_absentfasta_with_reads_parser():
     countgraph = khmer.Countgraph(4, 4 ** 4, 4)
     try:
-        countgraph.consume_seqfile_with_reads_parser()
+        countgraph.consume_seqfile()
         assert 0, "this should fail"
     except TypeError as err:
         print(str(err))
     try:
-        readparser = ReadParser(utils.get_test_data('empty-file'))
-        countgraph.consume_seqfile_with_reads_parser(readparser)
+        parser = FastxParser(utils.get_test_data('empty-file'))
+        countgraph.consume_seqfile(parser)
         assert 0, "this should fail"
-    except OSError as err:
+    except RuntimeError as err:
         print(str(err))
     except ValueError as err:
         print(str(err))

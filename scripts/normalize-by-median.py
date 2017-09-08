@@ -45,10 +45,8 @@ option to output to STDOUT.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
 
 import sys
-import screed
 import os
 import khmer
 import textwrap
@@ -56,14 +54,15 @@ from khmer import khmer_args, Countgraph
 from contextlib import contextmanager
 from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
                               report_on_config, calculate_graphsize,
-                              sanitize_help, check_argument_range)
+                              sanitize_help, check_argument_range,
+                              add_pairing_args)
 from khmer.khmer_args import FileType as khFileType
 import argparse
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
                          get_file_writer, describe_file_handle)
-from khmer.utils import (write_record, broken_paired_reader, ReadBundle,
-                         clean_input_reads)
+from khmer.utils import write_record, paired_fastx_handler, ReadBundle
+from khmer._oxli.parsing import FastxParser, BrokenPairedReader
 from khmer.khmer_logger import (configure_logging, log_info, log_error)
 
 
@@ -183,6 +182,7 @@ class Normalizer(object):
 @contextmanager
 def catch_io_errors(ifile, out, single_out, force, corrupt_files):
     """Context manager to do boilerplate handling of IOErrors."""
+    import traceback
     try:
         yield
     except (IOError, OSError, ValueError) as error:
@@ -197,6 +197,9 @@ def catch_io_errors(ifile, out, single_out, force, corrupt_files):
         else:
             log_error('*** Skipping error file, moving on...')
             corrupt_files.append(ifile)
+    except RuntimeError as error:
+        log_error('** ERROR: {error}', error=str(error))
+        log_error('*** Skipping empty file, moving on...')
 
 
 def get_parser():
@@ -381,8 +384,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         # failsafe context manager in case an input file breaks
         with catch_io_errors(filename, outfp, args.single_output_file,
                              args.force, corrupt_files):
-            screed_iter = clean_input_reads(screed.open(filename))
-            reader = broken_paired_reader(screed_iter, min_length=args.ksize,
+            parser = FastxParser(filename)
+            reader = BrokenPairedReader(parser, min_length=args.ksize,
                                           force_single=force_single,
                                           require_paired=require_paired)
 

@@ -34,9 +34,6 @@
 # Contact: khmer-project@idyll.org
 # pylint: disable=C0111,C0103,E1103,unused-variable,protected-access
 
-from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import unicode_literals
 
 import csv
 import json
@@ -1691,13 +1688,14 @@ def test_sample_reads_randomly():
     assert seqs == answer
 
 
-def test_sample_reads_randomly_force_single():
+def test_sample_reads_randomly_single_mode():
     infile = utils.copy_test_data('test-reads.fa')
     in_dir = os.path.dirname(infile)
 
     script = 'sample-reads-randomly.py'
     # fix random number seed for reproducibility
-    args = ['-N', '10', '-M', '12000', '-R', '1', '--force_single']
+    args = ['-N', '10', '-M', '12000', '-R', '1', 
+            '--pairing-mode', 'single']
     args.append(infile)
     utils.runscript(script, args, in_dir)
 
@@ -1733,13 +1731,14 @@ def test_sample_reads_randomly_force_single():
     assert seqs == answer
 
 
-def test_sample_reads_randomly_force_single_outfile():
+def test_sample_reads_randomly_single_mode_outfile():
     infile = utils.copy_test_data('test-reads.fa')
     in_dir = os.path.dirname(infile)
 
     script = 'sample-reads-randomly.py'
     # fix random number seed for reproducibility
-    args = ['-N', '10', '-M', '12000', '-R', '1', '--force_single', '-o',
+    args = ['-N', '10', '-M', '12000', '-R', '1', 
+            '--pairing-mode', 'single', '-o',
             in_dir + '/randreads.out']
 
     args.append(infile)

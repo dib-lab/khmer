@@ -41,7 +41,6 @@ k-mers are output into a .stoptags file, for later use in partitioning.
 
 % python scripts/find-knots.py <base>
 """
-from __future__ import print_function
 
 import glob
 import os

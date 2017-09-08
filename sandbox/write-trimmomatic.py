@@ -34,7 +34,6 @@
 #
 # Contact: khmer-project@idyll.org
 
-from __future__ import print_function
 import glob
 
 filelist = glob.glob('*R1*.fastq.gz')

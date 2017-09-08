@@ -263,11 +263,7 @@ void FastxReader::_init()
         message = message + _filename + " contains badly formatted sequence";
         message = message + " or does not exist.";
         throw InvalidStream(message);
-    } else if (seqan::atEnd(*_stream)) {
-        std::string message = "File ";
-        message = message + _filename + " does not contain any sequences!";
-        throw InvalidStream(message);
-    }
+    } 
     __asm__ __volatile__ ("" ::: "memory");
 }
 

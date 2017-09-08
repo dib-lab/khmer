@@ -167,7 +167,7 @@ SOURCES = [path_join("src", "khmer", bn + ".cc") for bn in [
 ]]
 SOURCES.extend(path_join("src", "oxli", bn + ".cc") for bn in [
     "read_parsers", "kmer_hash", "hashtable", "hashgraph",
-    "labelhash", "subset", "read_aligner",
+    "labelhash", "subset", "read_aligner", "oxli",
     "hllcounter", "traversal", "kmer_filters", "assembler", "alphabets",
     "storage", "partitioning"])
 

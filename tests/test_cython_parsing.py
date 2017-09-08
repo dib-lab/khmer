@@ -1,14 +1,13 @@
-from __future__ import print_function
-from __future__ import absolute_import
 
 import gc
 import itertools
 import random
 
 import khmer
-from khmer._oxli.parsing import Sequence, FastxParser, SanitizedFastxParser
-from khmer._oxli.parsing import BrokenPairedReader, Alphabets, check_is_pair
+from khmer._oxli.parsing import FastxParser, SanitizedFastxParser
+from khmer._oxli.parsing import BrokenPairedReader, check_is_pair
 from khmer._oxli.parsing import check_is_right, check_is_left
+from khmer._oxli.sequence import Sequence, Alphabets
 from khmer.khmer_args import estimate_optimal_with_K_and_f as optimal_fp
 from khmer import reverse_complement as revcomp
 from khmer import reverse_hash as revhash
