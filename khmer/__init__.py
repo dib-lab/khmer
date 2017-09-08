@@ -67,7 +67,8 @@ from khmer._oxli.labeling import GraphLabels
 
 from khmer._oxli.legacy_partitioning import SubsetPartition, PrePartitionInfo
 
-from khmer._oxli.parsing import FastxParser
+from khmer._oxli.parsing import (FastxParser, SanitizedFastxParser,
+                                 BrokenPairedReader)
 
 from khmer._oxli.readaligner import ReadAligner
 

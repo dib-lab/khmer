@@ -20,6 +20,7 @@ from khmer._oxli.hashset cimport HashSet
 from khmer._oxli.legacy_partitioning cimport (CpSubsetPartition, SubsetPartition,
                                    cp_pre_partition_info, PrePartitionInfo)
 from khmer._oxli.oxli_types cimport MAX_BIGCOUNT, HashIntoType
+from khmer._oxli.sequence cimport Sequence
 from khmer._oxli.traversal cimport Traverser
 
 from khmer._khmer import ReadParser
@@ -206,6 +207,12 @@ cdef class Hashtable:
         cdef bytes data = self._valid_sequence(sequence)
         trimmed_at = deref(self._ht_this).trim_on_abundance(data, abundance)
         return sequence[:trimmed_at], trimmed_at
+
+    cdef int _trim_on_abundance(self, Sequence sequence, int abundance):
+        trimmed_at = \
+            deref(self._ht_this).trim_on_abundance(sequence._obj.cleaned_seq,
+                                                   abundance)
+        return trimmed_at
 
     def trim_below_abundance(self, str sequence, int abundance):
         """Trim sequence at first k-mer above the given abundance."""

@@ -54,7 +54,9 @@ def print_error(msg):
     print(msg, file=sys.stderr)
 
 
-def paired_fastx_handler(samples, pairing_mode, *args, **kwargs):
+def paired_fastx_handler(samples, pairing_mode, min_length=-1,
+                         force_name_match=False, yield_filenames=False, 
+                         **kwargs):
 
     if pairing_mode not in PAIRING_MODES:
         raise ValueError('Pairing mode must be one of {0}'.format(PAIRING_MODES))
@@ -67,14 +69,27 @@ def paired_fastx_handler(samples, pairing_mode, *args, **kwargs):
     for group in _samples:
         if pairing_mode == 'split':
             reader = SplitPairedReader(FastxParser(group[0]),
-                                       FastxParser(group[1]))
+                                       FastxParser(group[1]),
+                                       min_length=min_length,
+                                       force_name_match=force_name_match)
         elif pairing_mode == 'single':
             reader = BrokenPairedReader(FastxParser(group),
-                                        force_single=True)
+                                        force_single=True,
+                                        min_length=min_length,
+                                        require_paired=force_name_match)
         else:
             reader = BrokenPairedReader(FastxParser(group),
-                                        force_single=False)
-        yield reader
+                                        force_single=False,
+                                        min_length=min_length,
+                                        require_paired=force_name_match)
+        if yield_filenames:
+            if pairing_mode == 'split':
+                _filename = group[0] + '.pair'
+            else:
+                _filename = group
+            yield _filename, reader
+        else:
+            yield reader
 
 
 def write_record(record, fileobj):
