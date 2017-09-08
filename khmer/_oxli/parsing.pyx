@@ -60,6 +60,10 @@ cdef class FastxParser:
             seq = self._next()
             yield seq
 
+    @property
+    def num_reads(self):
+        return deref(self._this).get_num_reads()
+
 
 cdef class SanitizedFastxParser(FastxParser):
 

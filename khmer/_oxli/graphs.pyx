@@ -15,7 +15,7 @@ from libcpp.string cimport string
 from khmer._oxli.utils cimport _bstring, is_str, is_num
 from khmer._oxli.utils import get_n_primes_near_x, FILETYPES
 from khmer._oxli.parsing cimport (CpFastxReader, CPyReadParser_Object, get_parser,
-                      CpReadParser, FastxParserPtr)
+                      CpReadParser, FastxParserPtr, FastxParser)
 from khmer._oxli.hashset cimport HashSet
 from khmer._oxli.legacy_partitioning cimport (CpSubsetPartition, SubsetPartition,
                                    cp_pre_partition_info, PrePartitionInfo)
@@ -25,8 +25,6 @@ from khmer._oxli.traversal cimport Traverser
 
 from khmer._khmer import ReadParser
 
-CYTHON_TABLES = (Hashtable, Nodetable, Counttable, SmallCounttable,
-                 QFCounttable, Nodegraph, Countgraph, SmallCountgraph)
 
 _buckets_per_byte = {
     # calculated by hand from settings in third-part/cqf/gqf.h
@@ -227,87 +225,87 @@ cdef class Hashtable:
                                                                    max_count))
         return posns
 
-    def consume_seqfile_with_reads_parser(self, read_parser):
-        """Count all k-mers from read_parser."""
-        cdef unsigned long long n_consumed = 0
-        cdef unsigned int total_reads = 0
+    cdef FastxParserPtr _get_parser(self, object parser_or_filename) except *:
+        cdef FastxParserPtr _parser
+        if type(parser_or_filename) is FastxParser:
+            _parser = (<FastxParser>parser_or_filename)._this
+        else:
+            _parser = get_parser[CpFastxReader](_bstring(parser_or_filename))
+        return _parser
 
-        cdef CPyReadParser_Object* parser = <CPyReadParser_Object*>read_parser
-
-        deref(self._ht_this).consume_seqfile[CpFastxReader](parser.parser,
-                                                           total_reads,
-                                                           n_consumed)
-        return total_reads, n_consumed
-
-    def consume_seqfile(self, file_name):
+    def consume_seqfile(self, object parser_or_filename):
         """Count all k-mers from file_name."""
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
+        cdef FastxParserPtr _parser = self._get_parser(parser_or_filename)
 
-        cdef FastxParserPtr parser = get_parser[CpFastxReader](_bstring(file_name))
-        deref(self._ht_this).consume_seqfile[CpFastxReader](parser,
-                                                           total_reads,
-                                                           n_consumed)
+        with nogil:
+            deref(self._ht_this).consume_seqfile[CpFastxReader](_parser,
+                                                                total_reads,
+                                                                n_consumed)
         return total_reads, n_consumed
 
-    def consume_seqfile_with_mask(self, file_name, Hashtable mask, int threshold=0):
+    def consume_seqfile_with_mask(self, object parser_or_filename, Hashtable mask, int threshold=0):
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
-        cdef FastxParserPtr parser = get_parser[CpFastxReader](_bstring(file_name))
-        cdef CpHashtable * cmask = mask._ht_this.get()
-        deref(self._ht_this).consume_seqfile_with_mask[CpFastxReader](parser,
-                                                                     cmask,
-                                                                     threshold,
-                                                                     total_reads,
-                                                                     n_consumed)
+        cdef FastxParserPtr _parser = self._get_parser(parser_or_filename)
+        cdef CpHashtable * _mask = mask._ht_this.get()
+
+        with nogil:
+            deref(self._ht_this).\
+                consume_seqfile_with_mask[CpFastxReader](_parser,
+                                                         _mask,
+                                                         threshold,
+                                                         total_reads,
+                                                         n_consumed)
         return total_reads, n_consumed
 
-    def consume_seqfile_banding(self, file_name, num_bands, band):
+    def consume_seqfile_banding(self, object parser_or_filename, int num_bands,
+                                int band):
         """Count all k-mers from file_name."""
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
-        cdef FastxParserPtr parser = get_parser[CpFastxReader](_bstring(file_name))
-        deref(self._ht_this).consume_seqfile_banding[CpFastxReader](parser,
-                                                                   num_bands,
-                                                                   band,
-                                                                   total_reads,
-                                                                   n_consumed)
+        cdef FastxParserPtr _parser = self._get_parser(parser_or_filename)
+
+        with nogil:
+            deref(self._ht_this).\
+                consume_seqfile_banding[CpFastxReader](_parser,
+                                                       num_bands,
+                                                       band,
+                                                       total_reads,
+                                                       n_consumed)
+
         return total_reads, n_consumed
 
-    def consume_seqfile_banding_with_mask(self, file_name, num_bands, band,
-                                          Hashtable mask, int threshold=0):
+    def consume_seqfile_banding_with_mask(self, object parser_or_filename, 
+                                          int num_bands, int band, Hashtable mask, 
+                                          int threshold=0):
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
-        cdef FastxParserPtr parser = get_parser[CpFastxReader](_bstring(file_name))
-        cdef CpHashtable * cmask = mask._ht_this.get()
-        deref(self._ht_this).consume_seqfile_banding_with_mask[CpFastxReader](parser,
-                                                                     num_bands,
-                                                                     band,
-                                                                     cmask,
-                                                                     threshold,
-                                                                     total_reads,
-                                                                     n_consumed)
+        cdef FastxParserPtr _parser = self._get_parser(parser_or_filename)
+        cdef CpHashtable * _mask = mask._ht_this.get()
+
+        with nogil:
+            deref(self._ht_this).\
+                consume_seqfile_banding_with_mask[CpFastxReader](_parser,
+                                                                 num_bands,
+                                                                 band,
+                                                                 _mask,
+                                                                 threshold,
+                                                                 total_reads,
+                                                                 n_consumed)
         return total_reads, n_consumed
 
-    def abundance_distribution(self, file_name, Hashtable tracking):
+    def abundance_distribution(self, object parser_or_filename, 
+                               Hashtable tracking):
         """Calculate the k-mer abundance distribution over reads in file_name."""
-        cdef FastxParserPtr parser = get_parser[CpFastxReader](_bstring(file_name))
-        cdef CpHashtable * cptracking = tracking._ht_this.get()
-        cdef uint64_t * x = deref(self._ht_this).\
-                abundance_distribution[CpFastxReader](parser, cptracking)
-        abunds = []
-        for i in range(MAX_BIGCOUNT):
-            abunds.append(x[i])
-        return abunds
+        cdef FastxParserPtr _parser = self._get_parser(parser_or_filename)
+        cdef CpHashtable * _tracking = tracking._ht_this.get()
+        cdef uint64_t * x
 
-    def abundance_distribution_with_reads_parser(self, object read_parser, Hashtable tracking):
-        """Calculate the k-mer abundance distribution over reads."""
+        with nogil:
+            x = deref(self._ht_this).abundance_distribution[CpFastxReader](_parser, _tracking)
 
-        cdef CpHashtable * cptracking = tracking._ht_this.get()
-        cdef CPyReadParser_Object* parser
-        parser = <CPyReadParser_Object*>read_parser
-        cdef uint64_t * x = deref(self._ht_this).abundance_distribution[CpFastxReader](
-                parser.parser, cptracking)
         abunds = []
         for i in range(MAX_BIGCOUNT):
             abunds.append(x[i])
@@ -661,16 +659,19 @@ cdef class Hashgraph(Hashtable):
 
         return result
 
-    def consume_seqfile_and_tag(self, str filename):
+    def consume_seqfile_and_tag(self, object parser_or_filename):
         '''Consume all sequences in a FASTA/FASTQ file and tag the resulting
         graph.'''
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
-        cdef string _filename = _bstring(filename)
+        cdef FastxParserPtr _parser = self._get_parser(parser_or_filename)
 
-        deref(self._hg_this).consume_seqfile_and_tag[CpFastxReader](_filename,
-                                                                   total_reads,
-                                                                   n_consumed)
+        with nogil:
+            deref(self._hg_this).\
+                consume_seqfile_and_tag_readparser[CpFastxReader](_parser,
+                                                                  total_reads,
+                                                                  n_consumed)
+
         return total_reads, n_consumed
     
     def print_tagset(self, str filename):
@@ -788,19 +789,6 @@ cdef class Hashgraph(Hashtable):
     def _validate_partitionmap(self):
         '''Run internal validation checks.'''
         deref(deref(self._hg_this).partition)._validate_pmap()
-    
-    def consume_seqfile_and_tag_with_reads_parser(self, object read_parser):
-        '''Count all k-mers using the given reads parser'''
-        cdef unsigned long long n_consumed = 0
-        cdef unsigned int total_reads = 0
-        cdef CPyReadParser_Object * parser_o = <CPyReadParser_Object*>read_parser
-        cdef FastxParserPtr parser = parser_o.parser
-        cdef CpHashgraph * ptr = self._hg_this.get()
-
-        deref(ptr).consume_seqfile_and_tag_readparser[CpFastxReader](parser,
-                                                            total_reads,
-                                                            n_consumed)
-        return total_reads, n_consumed
     
     def consume_partitioned_fasta(self, filename):
         '''Count all k-mers in a given file'''

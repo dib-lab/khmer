@@ -40,7 +40,7 @@ import gzip
 import os
 
 import khmer
-from khmer import Countgraph, SmallCountgraph, Nodegraph
+from khmer import Countgraph, SmallCountgraph, Nodegraph, FastxParser
 from . import khmer_tst_utils as utils
 from khmer import ReadParser
 import screed
@@ -1221,15 +1221,15 @@ def test_consume_absentfasta():
 def test_consume_absentfasta_with_reads_parser():
     countgraph = khmer.Countgraph(4, 4 ** 4, 4)
     try:
-        countgraph.consume_seqfile_with_reads_parser()
+        countgraph.consume_seqfile()
         assert 0, "this should fail"
     except TypeError as err:
         print(str(err))
     try:
-        readparser = ReadParser(utils.get_test_data('empty-file'))
-        countgraph.consume_seqfile_with_reads_parser(readparser)
+        parser = FastxParser(utils.get_test_data('empty-file'))
+        countgraph.consume_seqfile(parser)
         assert 0, "this should fail"
-    except OSError as err:
+    except RuntimeError as err:
         print(str(err))
     except ValueError as err:
         print(str(err))

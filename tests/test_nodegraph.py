@@ -36,7 +36,7 @@
 
 import khmer
 from khmer import Nodegraph, Countgraph
-from khmer import ReadParser
+from khmer import FastxParser
 from khmer import reverse_complement as revcomp
 from khmer.khmer_args import create_matching_nodegraph
 
@@ -938,15 +938,15 @@ def test_bad_primes_list():
 def test_consume_absentfasta_with_reads_parser():
     nodegraph = khmer.Nodegraph(31, 1, 1)
     try:
-        nodegraph.consume_seqfile_with_reads_parser()
+        nodegraph.consume_seqfile()
         assert 0, "this should fail"
     except TypeError as err:
         print(str(err))
     try:
-        readparser = ReadParser(utils.get_test_data('empty-file'))
-        nodegraph.consume_seqfile_with_reads_parser(readparser)
+        parser = FastxParser(utils.get_test_data('empty-file'))
+        nodegraph.consume_seqfile(parser)
         assert 0, "this should fail"
-    except OSError as err:
+    except RuntimeError as err:
         print(str(err))
     except ValueError as err:
         print(str(err))
@@ -963,10 +963,10 @@ def test_bad_primes():
 def test_consume_seqfile_and_tag_with_badreads_parser():
     nodegraph = khmer.Nodegraph(6, 1e6, 2)
     try:
-        readsparser = khmer.ReadParser(utils.get_test_data("test-empty.fa"))
-        nodegraph.consume_seqfile_and_tag_with_reads_parser(readsparser)
+        parser = FastxParser(utils.get_test_data("test-empty.fa"))
+        nodegraph.consume_seqfile_and_tag(parser)
         assert 0, "this should fail"
-    except OSError as e:
+    except RuntimeError as e:
         print(str(e))
     except ValueError as e:
         print(str(e))
