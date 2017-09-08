@@ -43,6 +43,7 @@ Contact: khmer-project@idyll.org
 #include "oxli/oxli_exception.hh"
 #include "oxli/hashtable.hh"
 #include "zlib.h"
+#include "gqf.h"
 
 using namespace oxli;
 using namespace std;
@@ -916,6 +917,56 @@ void NibbleStorage::load(std::string infilename, WordLength& ksize)
 }
 
 
+QFStorage::QFStorage(int size) 
+{
+    cf = std::make_shared<QF>();
+    // size is the power of two to specify the number of slots in
+    // the filter (2**size). Third argument sets the number of bits used
+    // in the key (current value of size+8 is copied from the CQF example)
+    // Final argument is the number of bits allocated for the value, which
+    // we do not use.
+    qf_init(cf.get(), (1ULL << size), size+8, 0);
+}
+
+
+QFStorage::~QFStorage() 
+{ 
+    qf_destroy(cf.get());
+}
+
+
+bool QFStorage::add(HashIntoType khash)
+{
+    bool is_new = get_count(khash) == 0;
+    qf_insert(cf.get(), khash % cf->range, 0, 1);
+    return is_new;
+}
+
+
+const BoundedCounterType QFStorage::get_count(HashIntoType khash) const 
+{
+    return qf_count_key_value(cf.get(), khash % cf->range, 0);
+}
+
+
+std::vector<uint64_t> QFStorage::get_tablesizes() const 
+{ 
+    return {cf->xnslots}; 
+}
+
+
+const uint64_t QFStorage::n_unique_kmers() const 
+{ 
+    return cf->ndistinct_elts; 
+}
+
+
+const uint64_t QFStorage::n_occupied() const 
+{ 
+    return cf->noccupied_slots; 
+}
+
+
 void QFStorage::save(std::string outfilename, WordLength ksize)
 {
     ofstream outfile(outfilename.c_str(), ios::binary);
@@ -931,25 +982,25 @@ void QFStorage::save(std::string outfilename, WordLength ksize)
     /* just a hack to handle __uint128_t value. Don't know a better to handle it
      * right now */
     uint64_t tmp_range;
-    tmp_range = cf.range;
+    tmp_range = cf->range;
 
-    outfile.write((const char *) &cf.nslots, sizeof(cf.nslots));
-    outfile.write((const char *) &cf.xnslots, sizeof(cf.xnslots));
-    outfile.write((const char *) &cf.key_bits, sizeof(cf.key_bits));
-    outfile.write((const char *) &cf.value_bits, sizeof(cf.value_bits));
-    outfile.write((const char *) &cf.key_remainder_bits, sizeof(cf.key_remainder_bits));
-    outfile.write((const char *) &cf.bits_per_slot, sizeof(cf.bits_per_slot));
+    outfile.write((const char *) &cf->nslots, sizeof(cf->nslots));
+    outfile.write((const char *) &cf->xnslots, sizeof(cf->xnslots));
+    outfile.write((const char *) &cf->key_bits, sizeof(cf->key_bits));
+    outfile.write((const char *) &cf->value_bits, sizeof(cf->value_bits));
+    outfile.write((const char *) &cf->key_remainder_bits, sizeof(cf->key_remainder_bits));
+    outfile.write((const char *) &cf->bits_per_slot, sizeof(cf->bits_per_slot));
     outfile.write((const char *) &tmp_range, sizeof(tmp_range));
-    outfile.write((const char *) &cf.nblocks, sizeof(cf.nblocks));
-    outfile.write((const char *) &cf.nelts, sizeof(cf.nelts));
-    outfile.write((const char *) &cf.ndistinct_elts, sizeof(cf.ndistinct_elts));
-    outfile.write((const char *) &cf.noccupied_slots, sizeof(cf.noccupied_slots));
+    outfile.write((const char *) &cf->nblocks, sizeof(cf->nblocks));
+    outfile.write((const char *) &cf->nelts, sizeof(cf->nelts));
+    outfile.write((const char *) &cf->ndistinct_elts, sizeof(cf->ndistinct_elts));
+    outfile.write((const char *) &cf->noccupied_slots, sizeof(cf->noccupied_slots));
 
     #if BITS_PER_SLOT == 8 || BITS_PER_SLOT == 16 || BITS_PER_SLOT == 32 || BITS_PER_SLOT == 64
-        outfile.write((const char *) cf.blocks, sizeof(qfblock) * cf.nblocks);
+        outfile.write((const char *) cf->blocks, sizeof(qfblock) * cf->nblocks);
     #else
-        outfile.write((const char *) cf.blocks,
-                      (sizeof(qfblock) + SLOTS_PER_BLOCK * cf.bits_per_slot / 8) * cf.nblocks);
+        outfile.write((const char *) cf->blocks,
+                      (sizeof(qfblock) + SLOTS_PER_BLOCK * cf->bits_per_slot / 8) * cf->nblocks);
     #endif
     outfile.close();
 }
@@ -1011,34 +1062,34 @@ void QFStorage::load(std::string infilename, WordLength &ksize)
     infile.read((char *) &save_ksize, sizeof(save_ksize));
     ksize = save_ksize;
 
-    infile.read((char *) &cf.nslots, sizeof(cf.nslots));
-    infile.read((char *) &cf.xnslots, sizeof(cf.xnslots));
-    infile.read((char *) &cf.key_bits, sizeof(cf.key_bits));
-    infile.read((char *) &cf.value_bits, sizeof(cf.value_bits));
-    infile.read((char *) &cf.key_remainder_bits, sizeof(cf.key_remainder_bits));
-    infile.read((char *) &cf.bits_per_slot, sizeof(cf.bits_per_slot));
+    infile.read((char *) &cf->nslots, sizeof(cf->nslots));
+    infile.read((char *) &cf->xnslots, sizeof(cf->xnslots));
+    infile.read((char *) &cf->key_bits, sizeof(cf->key_bits));
+    infile.read((char *) &cf->value_bits, sizeof(cf->value_bits));
+    infile.read((char *) &cf->key_remainder_bits, sizeof(cf->key_remainder_bits));
+    infile.read((char *) &cf->bits_per_slot, sizeof(cf->bits_per_slot));
     infile.read((char *) &tmp_range, sizeof(tmp_range));
 
-    infile.read((char *) &cf.nblocks, sizeof(cf.nblocks));
-    infile.read((char *) &cf.nelts, sizeof(cf.nelts));
-    infile.read((char *) &cf.ndistinct_elts, sizeof(cf.ndistinct_elts));
-    infile.read((char *) &cf.noccupied_slots, sizeof(cf.noccupied_slots));
+    infile.read((char *) &cf->nblocks, sizeof(cf->nblocks));
+    infile.read((char *) &cf->nelts, sizeof(cf->nelts));
+    infile.read((char *) &cf->ndistinct_elts, sizeof(cf->ndistinct_elts));
+    infile.read((char *) &cf->noccupied_slots, sizeof(cf->noccupied_slots));
     /* just a hack to handle __uint128_t value. Don't know a better to handle it
      * right now */
-    cf.range = tmp_range;
+    cf->range = tmp_range;
     // deallocate previously allocated blocks
-    free(cf.blocks);
+    free(cf->blocks);
     /* allocate the space for the actual qf blocks */
     #if BITS_PER_SLOT == 8 || BITS_PER_SLOT == 16 || BITS_PER_SLOT == 32 || BITS_PER_SLOT == 64
-        cf.blocks = (qfblock *)calloc(cf.nblocks, sizeof(qfblock));
+        cf->blocks = (qfblock *)calloc(cf->nblocks, sizeof(qfblock));
     #else
-        cf.blocks = (qfblock *)calloc(cf.nblocks, sizeof(qfblock) + SLOTS_PER_BLOCK * cf.bits_per_slot / 8);
+        cf->blocks = (qfblock *)calloc(cf->nblocks, sizeof(qfblock) + SLOTS_PER_BLOCK * cf->bits_per_slot / 8);
     #endif
     #if BITS_PER_SLOT == 8 || BITS_PER_SLOT == 16 || BITS_PER_SLOT == 32 || BITS_PER_SLOT == 64
-        infile.read((char *) cf.blocks, sizeof(qfblock) * cf.nblocks);
+        infile.read((char *) cf->blocks, sizeof(qfblock) * cf->nblocks);
     #else
-        infile.read((char *) cf.blocks,
-                    (sizeof(qfblock) + SLOTS_PER_BLOCK * cf.bits_per_slot / 8) * cf.nblocks);
+        infile.read((char *) cf->blocks,
+                    (sizeof(qfblock) + SLOTS_PER_BLOCK * cf->bits_per_slot / 8) * cf->nblocks);
     #endif
     infile.close();
 }
