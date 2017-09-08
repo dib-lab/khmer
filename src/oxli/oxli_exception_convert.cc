@@ -2,7 +2,7 @@
 #include <exception>
 #include <string>
 #include "oxli/oxli_exception.hh"
-#include "oxli_exception_convert.hh"
+#include "oxli/oxli_exception_convert.hh"
 
 
 void oxli_raise_py_error()
