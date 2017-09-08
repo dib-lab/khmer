@@ -1,7 +1,4 @@
 # -*- coding: UTF-8 -*-
-# cython: c_string_type=unicode, c_string_encoding=utf8
-
-from __future__ import print_function
 import argparse
 import itertools
 import json
@@ -19,8 +16,10 @@ from khmer._oxli.graphs cimport Nodegraph, Countgraph
 from khmer._oxli.partitioning cimport StreamingPartitioner, Component
 from khmer._oxli.partitioning import StreamingPartitioner, Component
 
-from khmer._oxli.parsing cimport BrokenPairedReader, SplitPairedReader, FastxParser, Sequence
-from khmer._oxli.parsing import BrokenPairedReader, SplitPairedReader, FastxParser, Sequence
+from khmer._oxli.parsing cimport BrokenPairedReader, SplitPairedReader, FastxParser
+from khmer._oxli.parsing import BrokenPairedReader, SplitPairedReader, FastxParser
+from khmer._oxli.sequence cimport Sequence
+from khmer._oxli.sequence import Sequence
 from khmer._oxli.utils cimport _bstring
 
 def grouper(n, iterable):
