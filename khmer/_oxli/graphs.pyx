@@ -856,7 +856,7 @@ cdef class SmallCountgraph(Hashgraph):
 
 cdef class Nodegraph(Hashgraph):
 
-    def __cinit__(self, int k, int starting_size, int n_tables,
+    def __cinit__(self, int k, uint64_t starting_size, int n_tables,
                   primes=[]):
         cdef vector[uint64_t] _primes
         if type(self) is Nodegraph:
