@@ -653,11 +653,11 @@ public:
 
 
 // Hashtable-derived class with ByteStorage.
-class Counttable : public oxli::FNVHashtable
+class Counttable : public oxli::MurmurHashtable
 {
 public:
     explicit Counttable(WordLength ksize, std::vector<uint64_t> sizes)
-        : FNVHashtable(ksize, new ByteStorage(sizes)) { } ;
+        : MurmurHashtable(ksize, new ByteStorage(sizes)) { } ;
 };
 
 // Hashtable-derived class with NibbleStorage.
