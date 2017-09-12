@@ -1,6 +1,6 @@
 from libcpp cimport bool
 from libcpp.memory cimport unique_ptr, weak_ptr, shared_ptr
-from libcpp.map cimport map
+from libcpp.unordered_map cimport unordered_map
 from libcpp.vector cimport vector
 from libcpp.set cimport set
 from libcpp.queue cimport queue
@@ -43,7 +43,7 @@ cdef extern from "oxli/partitioning.hh" namespace "oxli":
     ctypedef vector[ComponentPtr] ComponentPtrVector
 
     cdef cppclass CpGuardedHashCompMap "oxli::GuardedHashCompMap":
-        map[HashIntoType, ComponentPtr] data
+        unordered_map[HashIntoType, ComponentPtr] data
 
         ComponentPtr get(HashIntoType)
         void set(HashIntoType, ComponentPtr)

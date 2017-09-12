@@ -39,6 +39,7 @@ Contact: khmer-project@idyll.org
 
 #include <functional>
 #include <memory>
+#include <unordered_map>
 
 #include "oxli.hh"
 #include "kmer_hash.hh"
@@ -55,7 +56,7 @@ class GuardedHashMap {
 
         // Filter should be owned exclusively by GuardedKmerMap
         std::unique_ptr<Nodegraph> filter;
-        std::map<HashIntoType, T> data;
+        std::unordered_map<HashIntoType, T> data;
         
         explicit GuardedHashMap(WordLength ksize,
                                 unsigned short n_tables,
