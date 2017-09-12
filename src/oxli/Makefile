@@ -329,6 +329,9 @@ murmur3.o: ../../third-party/smhasher/MurmurHash3.cc
 %.o: %.cc $(PRECOMILE_OBJS) $(OXLI_HEADERS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c -o $@ $<
 
+map_type_test: map_type_test.cc 
+	$(CXX) -o $@ $< $(CXXFLAGS) -loxli -L.
+
 $(LIBOXLISO): $(LIBOXLI_OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(SONAME_FLAGS) -shared -o $@ $^
 	ln -sf $(SONAME) liboxli.$(SHARED_EXT)
