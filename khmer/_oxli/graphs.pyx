@@ -246,9 +246,8 @@ cdef class Hashtable:
                                                                    n_consumed)
         return total_reads, n_consumed
 
-    def consume_seqfile_banding_with_mask(self, object file_name, num_bands,
-                                          band, Hashtable mask,
-                                          int threshold=0):
+    def consume_seqfile_banding_with_mask(self, file_name, num_bands, band,
+                                          Hashtable mask, int threshold=0):
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
         cdef FastxParserPtr parser = get_parser[CpFastxReader](_bstring(file_name))
@@ -262,7 +261,7 @@ cdef class Hashtable:
                                                                      n_consumed)
         return total_reads, n_consumed
 
-    def consume_seqfile_with_parser(self, read_parser):
+    def consume_seqfile_with_parser(self, object read_parser):
         """Count all k-mers from read_parser."""
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
