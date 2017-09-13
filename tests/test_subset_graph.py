@@ -699,10 +699,12 @@ def test_partition_overlap_2():
     assert x == ([(3, 8)], 0), x
 
     x = p2.partition_sizes()
+    x[0].sort(key=lambda pair: pair[0])
     assert x == ([(3, 6), (5, 6)], 0), x
 
     x = p1.partition_average_coverages(kh)
     assert x == [(3, 11)]
 
     x = p2.partition_average_coverages(kh)
+    x.sort(key=lambda pair: pair[0])
     assert x == [(3, 5), (5, 10)], x
