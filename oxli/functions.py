@@ -50,9 +50,9 @@ def build_graph(ifilenames, graph, num_threads=1, tags=False):
     - tags: should there be tags
     """
     if tags:
-        eat = graph.consume_seqfile_and_tag_with_reads_parser
+        eat = graph.consume_seqfile_and_tag_with_parser
     else:
-        eat = graph.consume_seqfile_with_reads_parser
+        eat = graph.consume_seqfile_with_parser
 
     for _, ifile in enumerate(ifilenames):
         rparser = khmer.ReadParser(ifile)
