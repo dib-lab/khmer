@@ -429,7 +429,7 @@ cdef class QFCounttable(Hashtable):
 
 cdef class Counttable(Hashtable):
 
-    def __cinit__(self, int k, int starting_size, int n_tables):
+    def __cinit__(self, int k, uint64_t starting_size, int n_tables):
         cdef vector[uint64_t] primes
         if type(self) is Counttable:
             primes = get_n_primes_near_x(n_tables, starting_size)
@@ -439,7 +439,7 @@ cdef class Counttable(Hashtable):
 
 cdef class SmallCounttable(Hashtable):
 
-    def __cinit__(self, int k, int starting_size, int n_tables):
+    def __cinit__(self, int k, uint64_t starting_size, int n_tables):
         cdef vector[uint64_t] primes
         if type(self) is SmallCounttable:
             primes = get_n_primes_near_x(n_tables, starting_size)
@@ -456,7 +456,7 @@ cdef class SmallCounttable(Hashtable):
 
 cdef class Nodetable(Hashtable):
 
-    def __cinit__(self, int k, int starting_size, int n_tables):
+    def __cinit__(self, int k, uint64_t starting_size, int n_tables):
         cdef vector[uint64_t] primes
         if type(self) is Nodetable:
             primes = get_n_primes_near_x(n_tables, starting_size)
@@ -830,7 +830,7 @@ cdef class Hashgraph(Hashtable):
 
 cdef class Countgraph(Hashgraph):
 
-    def __cinit__(self, int k, int starting_size, int n_tables,
+    def __cinit__(self, int k, uint64_t starting_size, int n_tables,
                   primes=[]):
         cdef vector[uint64_t] _primes
         if type(self) is Countgraph:
@@ -869,7 +869,7 @@ cdef class Countgraph(Hashgraph):
 
 cdef class SmallCountgraph(Hashgraph):
 
-    def __cinit__(self, int k, int starting_size, int n_tables,
+    def __cinit__(self, int k, uint64_t starting_size, int n_tables,
                   primes=[]):
         cdef vector[uint64_t] _primes
         if type(self) is SmallCountgraph:
@@ -892,7 +892,7 @@ cdef class SmallCountgraph(Hashgraph):
 
 cdef class Nodegraph(Hashgraph):
 
-    def __cinit__(self, int k, int starting_size, int n_tables,
+    def __cinit__(self, int k, uint64_t starting_size, int n_tables,
                   primes=[]):
         cdef vector[uint64_t] _primes
         if type(self) is Nodegraph:
