@@ -67,3 +67,6 @@ cdef class GraphLinker:
     def get_junction_choices(self, str sequence):
         cdef list choices = self._get_junction_choices(_bstring(sequence))
         return choices
+
+    cdef void build_links(self, string sequence):
+
