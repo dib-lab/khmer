@@ -1,5 +1,5 @@
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) 2016, The Regents of the University of California.
+# Copyright (C) 2017, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -37,44 +37,18 @@
 import khmer
 
 import pytest
-from . import khmer_tst_utils as utils
 
 
-def test_countgraph_vs_table():
-    x = khmer.Counttable(4, 21, 3)
-    y = khmer.Countgraph(4, 21, 3)
-
-    assert hasattr(x, 'add')
-    assert hasattr(y, 'add')
-
-    assert not hasattr(x, 'consume_and_tag')
-    assert hasattr(y, 'consume_and_tag')
-
-
-def test_nodegraph_vs_table():
-    x = khmer.Nodetable(4, 21, 3)
-    y = khmer.Nodegraph(4, 21, 3)
-
-    assert hasattr(x, 'add')
-    assert hasattr(y, 'add')
-
-    assert not hasattr(x, 'consume_and_tag')
-    assert hasattr(y, 'consume_and_tag')
-
-
-def test_counttable_no_unhash():
-    x = khmer.Counttable(4, 21, 3)
-
-    with pytest.raises(ValueError):
-        x.reverse_hash(1)
-
-
-def test_smallcountgraph_vs_table():
-    x = khmer.SmallCounttable(4, 21, 3)
-    y = khmer.SmallCountgraph(4, 21, 3)
-
-    assert hasattr(x, 'add')
-    assert hasattr(y, 'add')
-
-    assert not hasattr(x, 'consume_and_tag')
-    assert hasattr(y, 'consume_and_tag')
+@pytest.mark.parametrize('sketch_allocator', [
+    khmer.Nodetable,
+    khmer.Counttable,
+    khmer.SmallCounttable,
+    khmer.Nodetable,
+    khmer.Counttable,
+    khmer.SmallCounttable,
+    khmer.GraphLabels.NodeGraphLabels,
+    khmer.GraphLabels.CountGraphLabels
+])
+def test_bigger_than_int(sketch_allocator):
+    'Support GB-sized sketches'
+    sketch = sketch_allocator(32, 2 ** 32, 1)

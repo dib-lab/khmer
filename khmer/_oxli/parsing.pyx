@@ -121,7 +121,7 @@ cdef class SplitPairedReader:
         while found != 0:
             if err is not None:
                 raise err
-            
+
             if self.min_length > 0:
                 if len(first) >= self.min_length and \
                    len(second) >= self.min_length:
@@ -139,7 +139,7 @@ cdef class SplitPairedReader:
 
         cdef Sequence second = self.right_parser._next()
         cdef bool second_complete = self.right_parser.is_complete()
-        
+
 
         if first_complete is not second_complete:
             err = UnpairedReadsError('Differing lengths of left '\
@@ -164,11 +164,11 @@ cdef class SplitPairedReader:
 
 cdef class BrokenPairedReader:
 
-    def __cinit__(self, FastxParser parser, 
+    def __cinit__(self, FastxParser parser,
                   int min_length=-1,
-                  bool force_single=False, 
+                  bool force_single=False,
                   bool require_paired=False):
-        
+
         if force_single and require_paired:
             raise ValueError("force_single and require_paired cannot both be set!")
 
@@ -234,9 +234,9 @@ cdef class BrokenPairedReader:
                     return 1, first, None, None
         else:
             first = self.record
-        
+
         second = self.parser._next()
-        
+
         # check if paired
         if second is not None and first is not None:
             is_pair = _check_is_pair(first, second)
@@ -386,4 +386,3 @@ cpdef bool check_is_right(s):
         return True
 
     return False
-
