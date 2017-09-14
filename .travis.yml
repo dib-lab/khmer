@@ -49,6 +49,20 @@ matrix:
             - cppcheck
             - enchant
 
+    - os: linux
+      python: "3.6"
+      # Tell travis we want debian trusty
+      sudo: required
+      dist: trusty
+      env:
+        - TESTATTR="'not huge and not known_failing'"
+      addons:
+        apt:
+          packages:
+            - astyle
+            - cppcheck
+            - enchant
+
     - os: osx
       language: generic
       osx_image: xcode7.3
