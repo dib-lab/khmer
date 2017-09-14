@@ -217,7 +217,7 @@ cdef class Hashtable:
         if type(parser_or_filename) is FastxParser:
             _parser = (<FastxParser>parser_or_filename)._this
         elif type(parser_or_filename) is ReadParser:
-            _parser = #  Unholy incantation
+            _parser = (<CPyReadParser_Object>parser_or_filename).parser
         else:
             _parser = get_parser[CpFastxReader](_bstring(parser_or_filename))
         return _parser
