@@ -15,12 +15,13 @@ def get_n_primes_near_x(n_primes, x):
     if len(primes) != n_primes:
         msg = "unable to find {0} prime numbers < {1}".format(n_primes, x)
         raise RuntimeError(msg)
-    return primes 
+    return primes
 
 
 cdef bytes _bstring(s):
     if not isinstance(s, (basestring, bytes)):
-        raise TypeError("Requires a string-like sequence")
+        raise TypeError("Requires a string-like sequence, "\
+                        " got {0} of type {1}".format(s, type(s)))
 
     if isinstance(s, unicode):
         s = s.encode('utf-8')
@@ -31,9 +32,6 @@ cdef unicode _ustring(s):
     if type(s) is unicode:
         # fast path for most common case(s)
         return <unicode>s
-    elif PY_MAJOR_VERSION < 3 and isinstance(s, bytes):
-        # only accept byte strings in Python 2.x, not in Py3
-        return (<bytes>s).decode('UTF-8')
     elif isinstance(s, unicode):
         # an evil cast to <unicode> might work here in some(!) cases,
         # depending on what the further processing does.  to be safe,
@@ -59,5 +57,3 @@ cdef void _fill(double * fill_to, object fill_from):
     '''UNSAFE fill from flat python iterable to C array.'''
     for idx, item in enumerate(fill_from):
         fill_to[idx] = <double>item
-
-
