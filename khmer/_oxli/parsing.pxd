@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
 
-from __future__ import unicode_literals
 
 from libc.stdint cimport uintptr_t
 
