@@ -41,8 +41,6 @@ reads.  The output is placed in <infile>.errhist in the cwd by default.
 
 Reads FASTQ and FASTA input.
 """
-from __future__ import division
-from __future__ import print_function
 
 import sys
 import argparse

@@ -34,8 +34,6 @@
 # Contact: khmer-project@idyll.org
 # pylint: disable=C0111,C0103,missing-docstring,no-member,protected-access
 
-from __future__ import print_function
-from __future__ import absolute_import
 
 import khmer
 

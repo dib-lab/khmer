@@ -35,7 +35,6 @@
 
 """A collection of functions for use throughout khmer/oxli."""
 
-from __future__ import print_function
 import threading
 import khmer.utils
 

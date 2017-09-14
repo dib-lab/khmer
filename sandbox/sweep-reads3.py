@@ -42,7 +42,6 @@ Results end up in <search reads>.sweep3.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
 
 import sys
 import os.path

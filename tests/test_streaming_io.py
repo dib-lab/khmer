@@ -37,9 +37,6 @@
 # of the use of subprocess to execute.  Most script tests should go into
 # test_scripts.py for this reason.
 
-from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import unicode_literals
 
 import khmer
 from khmer import Nodegraph, Countgraph

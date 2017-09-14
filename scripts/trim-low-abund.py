@@ -43,7 +43,6 @@ Output sequences will be placed in 'infile.abundtrim'.
 
 Use -h for parameter help.
 """
-from __future__ import print_function
 import csv
 import sys
 import os

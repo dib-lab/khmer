@@ -39,7 +39,6 @@ Find an initial set of highly connected k-mers, to save on repartitioning time.
 
 % python scripts/make-initial-stoptags.py <base>
 """
-from __future__ import print_function
 
 import sys
 import textwrap

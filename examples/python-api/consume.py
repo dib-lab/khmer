@@ -2,7 +2,6 @@
 
 # A demonstration of khmer's primary sequence loading function.
 
-from __future__ import print_function
 import khmer
 import sys
 
