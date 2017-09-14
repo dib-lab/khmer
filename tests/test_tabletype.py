@@ -22,7 +22,7 @@ import pytest
 from . import khmer_tst_utils as utils
 import khmer
 
-from khmer import _Countgraph, _SmallCountgraph, _Nodegraph
+from khmer import Countgraph, SmallCountgraph, Nodegraph
 from khmer import Nodetable, Counttable, SmallCounttable, QFCounttable
 
 from khmer import ReadParser
@@ -409,20 +409,7 @@ def test_save_load(Tabletype):
     kh.save(savefile)
 
     # should we provide a single load function here? yes, probably. @CTB
-    if ttype == _Countgraph:
-        loaded = khmer.load_countgraph(savefile)
-    elif ttype == Counttable:
-        loaded = Counttable.load(savefile)
-    elif ttype == _SmallCountgraph:
-        loaded = khmer.load_countgraph(savefile, small=True)
-    elif ttype == SmallCounttable:
-        loaded = SmallCounttable.load(savefile)
-    elif ttype == _Nodegraph:
-        loaded = khmer.load_nodegraph(savefile)
-    elif ttype == Nodetable:
-        loaded = Nodetable.load(savefile)
-    else:
-        raise Exception("unknown tabletype")
+    loaded = ttype.load(savefile)
 
     z = loaded.get('ATGGC')
     assert z == 1
@@ -436,7 +423,7 @@ def test_get_bigcount(Tabletype):
 
 
 def test_set_bigcount(Tabletype):
-    supports_bigcount = [_Countgraph, Counttable]
+    supports_bigcount = [Countgraph, Counttable]
     tt = Tabletype(12)
 
     if type(tt) in supports_bigcount:
@@ -455,7 +442,7 @@ def test_abund_dist_A(AnyTabletype):
     A_filename = utils.get_test_data('all-A.fa')
 
     kh = AnyTabletype(4)
-    tracking = _Nodegraph(4, PRIMES_1m)
+    tracking = Nodegraph(4, 1, 1, primes=PRIMES_1m)
 
     kh.consume_seqfile(A_filename)
     dist = kh.abundance_distribution(A_filename, tracking)
@@ -470,7 +457,7 @@ def test_abund_dist_A_readparser(AnyTabletype):
     rparser = ReadParser(A_filename)
 
     kh = AnyTabletype(4)
-    tracking = _Nodegraph(4, PRIMES_1m)
+    tracking = Nodegraph(4, 1, 1, primes=PRIMES_1m)
 
     kh.consume_seqfile(A_filename)
     dist = kh.abundance_distribution_with_reads_parser(rparser, tracking)

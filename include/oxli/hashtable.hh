@@ -44,7 +44,6 @@ Contact: khmer-project@idyll.org
 #include <fstream>
 #include <iostream>
 #include <list>
-#include <map>
 #include <queue>
 #include <set>
 #include <string>
@@ -100,7 +99,7 @@ inline bool is_prime(uint64_t n)
 inline std::vector<uint64_t> get_n_primes_near_x(uint32_t n, uint64_t x)
 {
     std::vector<uint64_t> primes;
-    if (x == 1 && n == 1) {
+    if (x == 1) {
         primes.push_back(1);
         return primes;
     }
@@ -109,7 +108,7 @@ inline std::vector<uint64_t> get_n_primes_near_x(uint32_t n, uint64_t x)
     if (i % 2 == 0) {
         i--;
     }
-    while (primes.size() != n && i > 0) {
+    while (primes.size() != n && i >= 0) {
         if (is_prime(i)) {
             primes.push_back(i);
         }

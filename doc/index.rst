@@ -53,7 +53,7 @@ shotgun data.  You can read more about khmer in `our software paper
 khmer is free and open source software.
 
 **To install khmer**, you will need a Linux or Mac computer, together with
-Python 2.7 or Python 3.x.   See :doc:`our installation docs <user/install>`
+Python >= 3.5.   See :doc:`our installation docs <user/install>`
 for detailed instructions.
 
 **To use khmer**, you will generally need to work at the UNIX command

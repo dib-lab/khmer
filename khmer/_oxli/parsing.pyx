@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-# cython: c_string_type=unicode, c_string_encoding=utf8
 
 from __future__ import print_function
 from __future__ import unicode_literals
@@ -11,7 +10,7 @@ from libcpp.string cimport string
 
 import sys
 
-from .utils cimport _bstring, _ustring
+from khmer._oxli.utils cimport _bstring, _ustring
 
 
 cdef class Alphabets:

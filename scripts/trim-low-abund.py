@@ -55,7 +55,7 @@ import shutil
 import textwrap
 
 from khmer import khmer_args
-from khmer import ReadParser
+from khmer import Countgraph, SmallCountgraph, ReadParser
 
 from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
                               report_on_config, calculate_graphsize,
@@ -347,7 +347,10 @@ def main():
 
     if args.loadgraph:
         log_info('loading countgraph from {graph}', graph=args.loadgraph)
-        ct = khmer.load_countgraph(args.loadgraph, args.small_count)
+        if args.small_count:
+            ct = SmallCountgraph.load(args.loadgraph)
+        else:
+            ct = Countgraph.load(args.loadgraph)
     else:
         log_info('making countgraph')
         ct = khmer_args.create_countgraph(args)
