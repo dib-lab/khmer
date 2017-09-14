@@ -41,12 +41,13 @@ Contact: khmer-project@idyll.org
 #include <cassert>
 #include <array>
 #include <mutex>
+#include <unordered_map>
 using MuxGuard = std::lock_guard<std::mutex>;
 
 #include "gqf.h"
 
 namespace oxli {
-typedef std::map<HashIntoType, BoundedCounterType> KmerCountMap;
+typedef std::unordered_map<HashIntoType, BoundedCounterType> KmerCountMap;
 
 //
 // base Storage class for hashtable-related storage of information in memory.

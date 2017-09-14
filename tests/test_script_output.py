@@ -37,8 +37,6 @@
 Test code that verifies current script output md5 hashes against recorded
 hashes, to ensure that script function isn't changing.
 """
-from __future__ import print_function
-from __future__ import absolute_import
 
 import khmer
 from . import khmer_tst_utils as utils

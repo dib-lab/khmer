@@ -44,7 +44,6 @@ will be placed in 'infile.stopfilt'.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
 
 import os
 import textwrap

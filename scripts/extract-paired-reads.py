@@ -44,7 +44,6 @@ extract them into separate files (.pe and .se).
 
 Reads FASTQ and FASTA input, retains format for output.
 """
-from __future__ import print_function
 import sys
 import os.path
 import textwrap

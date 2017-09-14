@@ -34,7 +34,6 @@
 #
 # Contact: khmer-project@idyll.org
 
-from __future__ import print_function
 import screed
 import sys
 import textwrap

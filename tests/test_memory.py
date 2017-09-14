@@ -1,7 +1,5 @@
-#! /usr/bin/env python
 # This file is part of khmer, https://github.com/dib-lab/khmer/, and is
-# Copyright (C) 2011-2015, Michigan State University.
-# Copyright (C) 2015, The Regents of the University of California.
+# Copyright (C) 2017, The Regents of the University of California.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -15,7 +13,7 @@
 #       disclaimer in the documentation and/or other materials provided
 #       with the distribution.
 #
-#     * Neither the name of the Michigan State University nor the names
+#     * Neither the name of the University of California nor the names
 #       of its contributors may be used to endorse or promote products
 #       derived from this software without specific prior written
 #       permission.
@@ -33,36 +31,24 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-import sys
-import screed
-import gzip
-import os.path
+# pylint: disable=C0111,C0103,missing-docstring,no-member,protected-access
 
 
-def main():
-    next_partition = 2
-    filenum = 0
-    for filename in sys.argv[1:]:
-        filenum += 1
-        outfp = gzip.open('group%03d.fa.gz' % filenum, 'w')
+import khmer
 
-        old_to_new = {}
-        for n, record in enumerate(screed.open(filename)):
-            if n > 0 and n % 10000 == 0:
-                print('...', os.path.basename(filename), n)
-            partition = record.name.split()[-1]
-            name = record.name.split()[0]
-
-            new_part = old_to_new.get(partition)
-            if new_part is None:
-                new_part = next_partition
-                next_partition += 1
-                old_to_new[partition] = new_part
-
-            outfp.write('>%s\t%d\n%s\n' % (name, new_part, record.sequence))
-        outfp.close()
-        print('renumbered %d partitions in %s' % (len(old_to_new), filename))
+import pytest
 
 
-if __name__ == '__main__':
-    main()
+@pytest.mark.parametrize('sketch_allocator', [
+    khmer.Nodetable,
+    khmer.Counttable,
+    khmer.SmallCounttable,
+    khmer.Nodetable,
+    khmer.Counttable,
+    khmer.SmallCounttable,
+    khmer.GraphLabels.NodeGraphLabels,
+    khmer.GraphLabels.CountGraphLabels
+])
+def test_bigger_than_int(sketch_allocator):
+    'Support GB-sized sketches'
+    sketch = sketch_allocator(32, 2 ** 32, 1)

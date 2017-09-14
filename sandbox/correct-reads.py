@@ -44,7 +44,6 @@ Use -h for parameter help.
 
 TODO: add to sandbox/README.
 """
-from __future__ import print_function
 import sys
 import os
 import tempfile

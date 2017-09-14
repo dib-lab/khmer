@@ -35,8 +35,6 @@
 # pylint: disable=missing-docstring,invalid-name
 
 # Tests for the ReadParser and Read classes.
-from __future__ import print_function
-from __future__ import absolute_import
 from khmer import Countgraph, SmallCountgraph, Nodegraph
 from khmer import Nodetable, Counttable, SmallCounttable
 from khmer import GraphLabels

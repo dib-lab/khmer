@@ -41,7 +41,6 @@ Build a counting Bloom filter from the given sequences, save in <countgraph>.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function, unicode_literals
 
 import json
 import os
