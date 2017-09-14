@@ -71,6 +71,7 @@ private:\
 
 #include <set>
 #include <map>
+#include <unordered_map>
 #include <queue>
 #include <list>
 #include <functional>
@@ -129,22 +130,22 @@ typedef void (*CallbackFn)(const char * info, void * callback_data,
 typedef unsigned int PartitionID;
 typedef std::set<HashIntoType> SeenSet;
 typedef std::set<PartitionID> PartitionSet;
-typedef std::map<HashIntoType, PartitionID*> PartitionMap;
-typedef std::map<PartitionID, PartitionID*> PartitionPtrMap;
-typedef std::map<PartitionID, SeenSet*> PartitionsToTagsMap;
+typedef std::unordered_map<HashIntoType, PartitionID*> PartitionMap;
+typedef std::unordered_map<PartitionID, PartitionID*> PartitionPtrMap;
+typedef std::unordered_map<PartitionID, SeenSet*> PartitionsToTagsMap;
 typedef std::set<PartitionID *> PartitionPtrSet;
-typedef std::map<PartitionID, PartitionPtrSet*> ReversePartitionMap;
+typedef std::unordered_map<PartitionID, PartitionPtrSet*> ReversePartitionMap;
 typedef std::queue<HashIntoType> NodeQueue;
-typedef std::map<PartitionID, PartitionID*> PartitionToPartitionPMap;
-typedef std::map<HashIntoType, unsigned int> TagCountMap;
-typedef std::map<PartitionID, unsigned int> PartitionCountMap;
+typedef std::unordered_map<PartitionID, PartitionID*> PartitionToPartitionPMap;
+typedef std::unordered_map<HashIntoType, unsigned int> TagCountMap;
+typedef std::unordered_map<PartitionID, unsigned int> PartitionCountMap;
 typedef std::map<unsigned long long, unsigned long long>
 PartitionCountDistribution;
 
 // types used in @camillescott's sparse labeling extension
 typedef unsigned long long int Label;
-typedef std::multimap<HashIntoType, Label> TagLabelMap;
-typedef std::multimap<Label, HashIntoType> LabelTagMap;
+typedef std::unordered_multimap<HashIntoType, Label> TagLabelMap;
+typedef std::unordered_multimap<Label, HashIntoType> LabelTagMap;
 typedef std::pair<HashIntoType, Label> TagLabelPair;
 typedef std::pair<Label, HashIntoType> LabelTagPair;
 typedef std::set<Label> LabelSet;
