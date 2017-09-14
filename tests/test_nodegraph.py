@@ -907,16 +907,16 @@ def test_bad_primes_list():
         print(str(e))
 
 
-def test_consume_absentfasta_with_reads_parser():
+def test_consume_absentfasta():
     nodegraph = khmer.Nodegraph(31, 1, 1)
     try:
-        nodegraph.consume_seqfile_with_reads_parser()
+        nodegraph.consume_seqfile()
         assert 0, "this should fail"
     except TypeError as err:
         print(str(err))
     try:
         readparser = ReadParser(utils.get_test_data('empty-file'))
-        nodegraph.consume_seqfile_with_reads_parser(readparser)
+        nodegraph.consume_seqfile(readparser)
         assert 0, "this should fail"
     except OSError as err:
         print(str(err))
@@ -936,7 +936,7 @@ def test_consume_seqfile_and_tag_with_badreads_parser():
     nodegraph = khmer.Nodegraph(6, 1e6, 2)
     try:
         readsparser = khmer.ReadParser(utils.get_test_data("test-empty.fa"))
-        nodegraph.consume_seqfile_and_tag_with_reads_parser(readsparser)
+        nodegraph.consume_seqfile_and_tag(readsparser)
         assert 0, "this should fail"
     except OSError as e:
         print(str(e))

@@ -141,7 +141,7 @@ def main():
     for _ in range(args.threads):
         cur_thread = \
             threading.Thread(
-                target=graph.consume_seqfile_with_reads_parser,
+                target=graph.consume_seqfile,
                 args=(rparser, )
             )
         threads.append(cur_thread)
