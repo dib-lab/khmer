@@ -1,12 +1,11 @@
 # -*- coding: UTF-8 -*-
-# cython: c_string_type=unicode, c_string_encoding=utf8
 
 from libcpp.string cimport string
 from libcpp.memory cimport make_shared
 from libc.stdint cimport uint64_t
 from cython.operator cimport dereference as deref
 
-from oxli_types cimport *
+from khmer._oxli.oxli_types cimport *
 
 cdef class Kmer:
 

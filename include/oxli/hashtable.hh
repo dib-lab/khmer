@@ -100,7 +100,7 @@ inline bool is_prime(uint64_t n)
 inline std::vector<uint64_t> get_n_primes_near_x(uint32_t n, uint64_t x)
 {
     std::vector<uint64_t> primes;
-    if (x == 1 && n == 1) {
+    if (x == 1) {
         primes.push_back(1);
         return primes;
     }
@@ -109,7 +109,7 @@ inline std::vector<uint64_t> get_n_primes_near_x(uint32_t n, uint64_t x)
     if (i % 2 == 0) {
         i--;
     }
-    while (primes.size() != n && i > 0) {
+    while (primes.size() != n && i >= 0) {
         if (is_prime(i)) {
             primes.push_back(i);
         }
@@ -277,6 +277,24 @@ public:
         unsigned long long &n_consumed
     );
 
+    template<typename SeqIO>
+    void consume_seqfile_with_mask(
+        std::string const &filename,
+        Hashtable* mask,
+        unsigned int threshold,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
+    );
+
+    template<typename SeqIO>
+    void consume_seqfile_with_mask(
+        read_parsers::ReadParserPtr<SeqIO>& parser,
+        Hashtable* mask,
+        unsigned int threshold,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
+    );
+
     // Consume sequences in k-mer banding mode.
     template<typename SeqIO>
     void consume_seqfile_banding(
@@ -293,6 +311,28 @@ public:
         read_parsers::ReadParserPtr<SeqIO>& parser,
         unsigned int num_bands,
         unsigned int band,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
+    );
+
+    template<typename SeqIO>
+    void consume_seqfile_banding_with_mask(
+        std::string const &filename,
+        unsigned int num_bands,
+        unsigned int band,
+        Hashtable* mask,
+        unsigned int threshold,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed
+    );
+
+    template<typename SeqIO>
+    void consume_seqfile_banding_with_mask(
+        read_parsers::ReadParserPtr<SeqIO>& parser,
+        unsigned int num_bands,
+        unsigned int band,
+        Hashtable* mask,
+        unsigned int threshold,
         unsigned int &total_reads,
         unsigned long long &n_consumed
     );
@@ -460,7 +500,7 @@ public:
     hash_dna(const char * kmer) const
     {
         if (!(strlen(kmer) >= _ksize)) {
-            throw oxli_exception("Supplied kmer string doesn't match the underlying k-size.");
+            throw oxli_value_exception("Supplied kmer string doesn't match the underlying k-size.");
         }
         return _hash_murmur(kmer, _ksize);
     }
@@ -468,19 +508,19 @@ public:
     inline virtual HashIntoType
     hash_dna_top_strand(const char * kmer) const
     {
-        throw oxli_exception("not implemented");
+        throw oxli_value_exception("not implemented");
     }
 
     inline virtual HashIntoType
     hash_dna_bottom_strand(const char * kmer) const
     {
-        throw oxli_exception("not implemented");
+        throw oxli_value_exception("not implemented");
     }
 
     inline virtual std::string
     unhash_dna(HashIntoType hashval) const
     {
-        throw oxli_exception("not implemented");
+        throw oxli_value_exception("not implemented");
     }
 
     virtual KmerHashIteratorPtr new_kmer_iterator(const char * sp) const

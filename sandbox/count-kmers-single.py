@@ -84,8 +84,8 @@ def main():
 
     kmer_size = countgraph.ksize()
     hashsizes = countgraph.hashsizes()
-    tracking = khmer._Nodegraph(  # pylint: disable=protected-access
-        kmer_size, hashsizes)
+    tracking = khmer.Nodegraph(  # pylint: disable=protected-access
+        kmer_size, 1, 1, primes=hashsizes)
 
     print ('kmer_size: %s' % countgraph.ksize(), file=sys.stderr)
     print ('k-mer countgraph sizes: %s' % (countgraph.hashsizes(),),
