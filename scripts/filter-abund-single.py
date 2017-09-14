@@ -45,7 +45,6 @@ placed in 'infile.abundfilt'.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
 import os
 import sys
 import threading

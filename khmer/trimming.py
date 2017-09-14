@@ -32,7 +32,6 @@
 #
 # Contact: khmer-project@idyll.org
 """Common methods for trimming short reads on k-mer abundance."""
-from __future__ import print_function, unicode_literals
 import screed
 
 

@@ -41,7 +41,6 @@ Produce the k-mer abundance distribution for the given file.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
 
 import sys
 import csv

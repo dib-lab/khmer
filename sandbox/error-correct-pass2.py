@@ -41,7 +41,6 @@ Output sequences will be put in inputfile.corr.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
 import sys
 import os
 import screed

@@ -41,7 +41,6 @@ Estimate optimal arguments using nodegraph counting.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
 
 import sys
 import math
