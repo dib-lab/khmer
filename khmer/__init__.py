@@ -36,7 +36,6 @@
 """This is khmer; please see http://khmer.readthedocs.io/."""
 
 
-from __future__ import print_function
 from collections import namedtuple
 from math import log
 import json

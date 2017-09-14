@@ -41,7 +41,6 @@ using the given countgraph.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
 
 import sys
 import khmer

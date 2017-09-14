@@ -43,7 +43,6 @@ The script does not load a prebuilt k-mer countgraph.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
 import os
 import sys
 import csv

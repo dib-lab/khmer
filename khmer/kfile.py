@@ -34,7 +34,6 @@
 # Contact: khmer-project@idyll.org
 """File handling/checking utilities for command-line scripts."""
 
-from __future__ import print_function, unicode_literals, division
 
 import os
 import sys

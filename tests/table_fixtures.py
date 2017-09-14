@@ -34,8 +34,6 @@
 # Contact: khmer-project@idyll.org
 # pylint: disable=missing-docstring,invalid-name
 
-from __future__ import print_function
-from __future__ import absolute_import
 
 from khmer import Countgraph, SmallCountgraph, Nodegraph
 from khmer import Nodetable, Counttable, SmallCounttable, QFCounttable

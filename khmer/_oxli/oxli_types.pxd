@@ -1,5 +1,6 @@
 from libcpp cimport bool
 from libcpp.map cimport map
+from libcpp.unordered_map cimport unordered_map
 from libcpp.set cimport set
 from libcpp.string cimport string
 
@@ -13,12 +14,12 @@ cdef extern from "oxli/oxli.hh" namespace "oxli":
 
     ctypedef unsigned int PartitionID
     ctypedef set[PartitionID] PartitionSet
-    ctypedef map[HashIntoType, PartitionID*] PartitionMap
-    ctypedef map[PartitionID, PartitionID*] PartitionPtrMap
-    ctypedef map[PartitionID, HashIntoTypeSet*] PartitionToTagsMap
-    ctypedef map[PartitionID, unsigned int] PartitionCountMap
+    ctypedef unordered_map[HashIntoType, PartitionID*] PartitionMap
+    ctypedef unordered_map[PartitionID, PartitionID*] PartitionPtrMap
+    ctypedef unordered_map[PartitionID, HashIntoTypeSet*] PartitionToTagsMap
+    ctypedef unordered_map[PartitionID, unsigned int] PartitionCountMap
     ctypedef map[unsigned long long, unsigned long long] PartitionCountDistribution
-    ctypedef map[HashIntoType, unsigned int] TagCountMap
+    ctypedef unordered_map[HashIntoType, unsigned int] TagCountMap
     ctypedef unsigned char WordLength
     ctypedef unsigned short int BoundedCounterType
 

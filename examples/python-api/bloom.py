@@ -4,7 +4,6 @@
 # khmer accrues a small false positive rate in order to save substantially on
 # memory requirements.
 
-from __future__ import print_function
 import khmer
 
 ksize = 21

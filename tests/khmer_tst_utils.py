@@ -35,7 +35,6 @@
 # Contact: khmer-project@idyll.org
 # pylint: disable=missing-docstring
 
-from __future__ import print_function
 import tempfile
 import os
 import shutil

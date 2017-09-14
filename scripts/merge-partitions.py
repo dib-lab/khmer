@@ -42,7 +42,6 @@ Merge multiple pmap files into a single one.
 Load <base>.subset.*.pmap and merge into a single pmap file.  Final
 merged pmap file will be in <base>.pmap.merged.
 """
-from __future__ import print_function
 
 import glob
 import os
