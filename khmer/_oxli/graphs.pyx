@@ -214,9 +214,9 @@ cdef class Hashtable:
 
     cdef FastxParserPtr _get_parser(self, object parser_or_filename) except *:
         cdef FastxParserPtr _parser
-        if type(parser_or_filename) is FastxParser:
+        if isinstance(parser_or_filename, FastxParser):
             _parser = (<FastxParser>parser_or_filename)._this
-        elif type(parser_or_filename) is ReadParser:
+        elif isinstance(parser_or_filename, ReadParser):
             _parser = (<CPyReadParser_Object*>parser_or_filename).parser
         else:
             _parser = get_parser[CpFastxReader](_bstring(parser_or_filename))
@@ -545,16 +545,19 @@ cdef class Hashgraph(Hashtable):
 
         return result
 
-    def consume_seqfile_and_tag(self, str filename):
+    def consume_seqfile_and_tag(self, object parser_or_filename):
         '''Consume all sequences in a FASTA/FASTQ file and tag the resulting
         graph.'''
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
-        cdef string _filename = _bstring(filename)
+        cdef FastxParserPtr _parser = self._get_parser(parser_or_filename)
 
-        deref(self._hg_this).consume_seqfile_and_tag[CpFastxReader](_filename,
-                                                                   total_reads,
-                                                                   n_consumed)
+        with nogil:
+            deref(self._hg_this).\
+                consume_seqfile_and_tag_readparser[CpFastxReader](_parser,
+                                                                  total_reads,
+                                                                  n_consumed)
+
         return total_reads, n_consumed
 
     def print_tagset(self, str filename):
@@ -672,19 +675,6 @@ cdef class Hashgraph(Hashtable):
     def _validate_partitionmap(self):
         '''Run internal validation checks.'''
         deref(deref(self._hg_this).partition)._validate_pmap()
-
-    def consume_seqfile_and_tag_with_reads_parser(self, object read_parser):
-        '''Count all k-mers using the given reads parser'''
-        cdef unsigned long long n_consumed = 0
-        cdef unsigned int total_reads = 0
-        cdef CPyReadParser_Object * parser_o = <CPyReadParser_Object*>read_parser
-        cdef FastxParserPtr parser = parser_o.parser
-        cdef CpHashgraph * ptr = self._hg_this.get()
-
-        deref(ptr).consume_seqfile_and_tag_readparser[CpFastxReader](parser,
-                                                            total_reads,
-                                                            n_consumed)
-        return total_reads, n_consumed
 
     def consume_partitioned_fasta(self, filename):
         '''Count all k-mers in a given file'''
