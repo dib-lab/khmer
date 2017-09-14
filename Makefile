@@ -172,6 +172,15 @@ build/sphinx/latex/khmer.pdf: $(SOURCES) doc/conf.py $(wildcard doc/*.rst) \
 	@echo ''
 	@echo '--> pdf in build/sphinx/latex/khmer.pdf'
 
+## man         : render documentation in Linux man
+man: build/sphinx/man/khmer.1
+
+build/sphinx/man/khmer.1: $(SOURCES) doc/conf.py $(wildcard doc/*.rst) $(wildcard doc/*/*.rst)
+	./setup.py build_sphinx --fresh-env --builder man
+	@echo ''
+	@echo '--> docs in build/sphinx/man <--'
+	@echo ''
+
 cppcheck-result.xml: $(CPPSOURCES)
 	$(CPPCHECK) --xml-version=2 2> cppcheck-result.xml
 
