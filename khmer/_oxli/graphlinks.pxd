@@ -10,26 +10,22 @@ cdef enum DBGNucl:
     A, C, G, T
 
 
-cdef class Link:
+cdef class Junction:
     cdef readonly HashIntoType u
     cdef readonly HashIntoType v
-    cdef readonly bool forward
-    cdef list children
-    cdef Link parent
-
-    cpdef bool add_child(self, DBGNucl nuc, Link child_link)
-    cpdef Link get_child(self, DBGNucl nuc)
 
     @staticmethod
-    cdef Link _new(HashIntoType u, 
-                   HashIntoType v, 
-                   bool forward,
-                   Link parent=*)
+    cdef Junction _new(HashIntoType u, 
+                   HashIntoType v)
 
 
-cdef class LinkPath:
+cdef class Link:
 
-    cdef readonly list path
+    cdef readonly list junctions
+    cdef bool forward
+
+    @staticmethod
+    cdef Link _new(list junctions, bool forward)
 
 
 cdef class GraphLinker:
@@ -39,4 +35,6 @@ cdef class GraphLinker:
     cdef WordLength K
     cdef dict links
 
-    cdef list _get_junction_choices(self, string sequence)
+    cdef tuple _get_junctions(self, string sequence)
+    cdef int _add_link(self, string sequence,
+            unsigned int min_link_size=*) except -1

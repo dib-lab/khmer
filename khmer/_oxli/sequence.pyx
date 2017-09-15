@@ -129,6 +129,15 @@ cdef class Sequence:
         return seq
 
 
+cdef string _object_to_string(object sequence) except *:
+    if isinstance(sequence, bytes):
+        return sequence
+    elif isinstance(sequence, Sequence):
+        return (<Sequence>sequence)._obj.cleaned_seq
+    else:
+        return _bstring(sequence)
+
+
 cdef class ReadBundle:
 
     def __cinit__(self, *raw_records):

@@ -7,49 +7,42 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 
 from khmer._oxli.oxli_types cimport *
-from khmer._oxli.hashing cimport CpKmer, CpKmerIterator
+from khmer._oxli.hashing cimport CpKmer, CpKmerIterator, _revcomp
+from khmer._oxli.sequence cimport Sequence, _object_to_string
+from khmer._oxli.sequence import Sequence
 from khmer._oxli.traversal cimport CpTraverser
 from khmer._oxli.utils cimport _bstring
 
 
 @cython.freelist(100)
-cdef class Link:
+cdef class Junction:
 
     def __init__(self, HashIntoType u,
-                       HashIntoType v,
-                       bool forward,
-                       Link parent=None):
+                       HashIntoType v):
         self.u = u
         self.v = v
-        self.forward = forward
-        self.children = [None, None, None, None]
-        self.parent = parent
-
-    @cython.boundscheck(False)
-    cpdef bool add_child(self, DBGNucl nuc, Link child_link):
-        self.children[nuc] = child_link
-
-    @cython.boundscheck(False)
-    cpdef Link get_child(self, DBGNucl nuc):
-        return self.children[nuc]
 
     @staticmethod
-    cdef Link _new(HashIntoType u, 
-                   HashIntoType v, 
-                   bool forward,
-                   Link parent=None):
+    cdef Junction _new(HashIntoType u, 
+                       HashIntoType v):
+        cdef Junction junc = Junction.__new__(Junction)
+        junc.u = u
+        junc.v = v
+        return junc
+
+
+cdef class Link:
+
+    def __init__(self, list junctions, bool forward):
+        self.junctions = junctions
+        self.forward = forward
+
+    @staticmethod
+    cdef Link _new(list junctions, bool forward):
         cdef Link link = Link.__new__(Link)
-        link.u = u
-        link.v = v
+        link.junctions = junctions
         link.forward = forward
-        link.parent = parent
         return link
-
-
-cdef class LinkPath:
-
-    def __cinit__(self):
-        self.path = []
 
 
 cdef class GraphLinker:
@@ -59,35 +52,64 @@ cdef class GraphLinker:
         self._graph = graph._hg_this
         self.K = graph.ksize()
 
-        # mapping from high degree flanking nodes to link paths
         self.links = {}
 
-    cdef list _get_junction_choices(self, string sequence):
+    def check_sequence_length(self, object sequence):
+        if len(sequence) < self.K:
+            raise ValueError("sequence length ({}) must >= the hashtable "
+                             "k-mer size ({})".format(len(sequence),
+                                                      self.K))
+
+    cdef tuple _get_junctions(self, string sequence):
         cdef shared_ptr[CpTraverser] _traverser = make_shared[CpTraverser](self._graph.get())
         cdef CpKmerIterator * _it = new CpKmerIterator(sequence.c_str(),
                                                        self.graph.ksize())
         cdef CpKmer u = deref(_it).next()
+        cdef CpKmer start = u
         if deref(_it).done():
-            return []
+            return [], []
 
-        cdef list choices = []
+        cdef list fw_choices = []
+        cdef list rc_choices = []
         cdef CpKmer v = deref(_it).next()
-        cdef uint64_t kmer_start_idx = 0
-        cdef uint64_t kmer_end_idx = self.K - 1
+        #cdef uint64_t kmer_start_idx = 0
+        #cdef uint64_t kmer_end_idx = self.K - 1
 
         while not deref(_it).done():
+            if deref(_traverser).degree_right(u) > 1:
+                fw_choices.append(Junction._new(<HashIntoType>u, <HashIntoType>v))
             if deref(_traverser).degree_left(v) > 1:
-
-                choices.append(Link._new(<HashIntoType>u, <HashIntoType>v))
+                rc_choices.append(Junction._new(<HashIntoType>v, <HashIntoType>u))
 
             u = v
             v = deref(_it).next()
-            kmer_start_idx += 1
-            kmer_end_idx += 1
-        
-        return choices
+            #kmer_start_idx += 1
+            #kmer_end_idx += 1
+        rc_choices.reverse()
+        return fw_choices, rc_choices
 
-    def get_junction_choices(self, str sequence):
-        cdef list choices = self._get_junction_choices(_bstring(sequence))
-        return choices
+    def get_junctions(self, object sequence):
+        self.check_sequence_length(sequence)
+        return self._get_junctions(_object_to_string(sequence))
+
+    cdef int _add_link(self, string sequence, unsigned int min_link_size=1) except -1:
+
+        cdef Link fw_link, rc_link
+        fw_choices, rc_choices = self._get_junctions(sequence)
+
+        if len(fw_choices) >= min_link_size:
+            fw_link = Link._new(fw_choices, True)
+            self.links[fw_choices[0].u] = fw_link
+        if len(rc_choices) >= min_link_size:
+            rc_link = Link._new(rc_choices, False)
+            self.links[rc_choices[0].u] = rc_link
+
+        return len(fw_choices) + len(rc_choices)
+
+    def add_link(self, object sequence, unsigned int min_link_size=1):
+        if min_link_size < 1:
+            raise ValueError("Minimum link size must be at least 1.")
+        self.check_sequence_length(sequence)
+
+        return self._add_links(_object_to_string(sequence), min_link_size)
 

@@ -69,6 +69,9 @@ cdef class Sequence:
     cdef Sequence _wrap(CpSequence cseq)
 
 
+cdef string _object_to_string(object sequence) except *
+
+
 cdef class ReadBundle:
     cdef list reads
 
