@@ -244,8 +244,9 @@ CLASSIFIERS = [
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS :: MacOS X",
     "Programming Language :: C++",
+    "Programming Language :: Python :: 3.4",
     "Programming Language :: Python :: 3.5",
-    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
 if "-rc" in versioneer.get_version():
@@ -299,7 +300,7 @@ SETUP_METADATA = \
         "include_package_data": True,
         "zip_safe": False,
         "classifiers": CLASSIFIERS,
-        "python_requires": '>=3.5'
+        "python_requires": '>=3.4'
     }
 
 
