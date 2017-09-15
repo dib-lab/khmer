@@ -148,7 +148,7 @@ def main():
         for _ in range(args.threads):
             cur_thrd = \
                 threading.Thread(
-                    target=countgraph.consume_seqfile_with_reads_parser,
+                    target=countgraph.consume_seqfile_with_parser,
                     args=(rparser, )
                 )
             threads.append(cur_thrd)
