@@ -935,7 +935,7 @@ def test_bad_primes_list():
         print(str(e))
 
 
-def test_consume_absentfasta_with_reads_parser():
+def test_consume_absentfasta():
     nodegraph = khmer.Nodegraph(31, 1, 1)
     try:
         nodegraph.consume_seqfile()

@@ -1218,7 +1218,7 @@ def test_consume_absentfasta():
         print(str(err))
 
 
-def test_consume_absentfasta_with_reads_parser():
+def test_consume_absentfasta():
     countgraph = khmer.Countgraph(4, 4 ** 4, 4)
     try:
         countgraph.consume_seqfile()
