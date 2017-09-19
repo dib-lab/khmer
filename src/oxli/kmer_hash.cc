@@ -49,6 +49,11 @@ Contact: khmer-project@idyll.org
 
 using namespace std;
 
+#define tbl \
+  "                                                                "\
+  /*ABCDEFGHIJKLMNOPQRSTUVWXYZ      abcdefghijklmnopqrstuvwxyz    */\
+  " TVGH  CD  M KN   YSAABW R       TVGH  CD  M KN   YSAABW R"
+
 //
 // _hash: hash a k-length DNA sequence into a 64-bit number.
 //
@@ -146,29 +151,15 @@ std::string _revhash(HashIntoType hash, WordLength k)
 std::string _revcomp(const std::string& kmer)
 {
     std::string out = kmer;
-    size_t ksize = out.size();
 
-    for (size_t i=0; i < ksize; ++i) {
-        char complement;
+    auto from = out.begin();
+    auto to = out.end();
 
-        switch(kmer[i]) {
-        case 'A':
-            complement = 'T';
-            break;
-        case 'C':
-            complement = 'G';
-            break;
-        case 'G':
-            complement = 'C';
-            break;
-        case 'T':
-            complement = 'A';
-            break;
-        default:
-            complement = kmer[i]; // leave alone.
-            break;
-        }
-        out[ksize - i - 1] = complement;
+    char c;
+    for (to--; from <= to; from++, to--) {
+        c = tbl[(int)*from];
+        *from = tbl[(int)*to];
+        *to = c;
     }
     return out;
 }
