@@ -280,6 +280,7 @@ unsigned int Hashtable::consume_string(const std::string &s)
         count(kmer);
         n_consumed++;
     }
+
     return n_consumed;
 }
 
