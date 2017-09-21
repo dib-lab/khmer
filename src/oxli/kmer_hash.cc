@@ -52,7 +52,7 @@ using namespace std;
 #define tbl \
   "                                                                "\
   /*ABCDEFGHIJKLMNOPQRSTUVWXYZ      abcdefghijklmnopqrstuvwxyz    */\
-  " TVGH  CD  M KN   YSAABW R       TVGH  CD  M KN   YSAABW R"
+  " TVGH FCD  M KN   YSAABW R       TVGH FCD  M KN   YSAABW R"
 
 //
 // _hash: hash a k-length DNA sequence into a 64-bit number.
