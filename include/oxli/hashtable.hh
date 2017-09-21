@@ -556,11 +556,11 @@ public:
 };
 
 // Hashtable-derived class with QFStorage.
-class QFCounttable : public oxli::Hashtable
+class QFCounttable : public oxli::MurmurHashtable
 {
 public:
     explicit QFCounttable(WordLength ksize, int size)
-        : Hashtable(ksize, new QFStorage(size)) { } ;
+        : MurmurHashtable(ksize, new QFStorage(size)) { } ;
 };
 
 // Hashtable-derived class with BitStorage.
