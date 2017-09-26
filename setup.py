@@ -158,7 +158,8 @@ BUILD_DEPENDS = [path_join("include", "khmer", bn + ".hh") for bn in [
 BUILD_DEPENDS.extend(path_join("include", "oxli", bn + ".hh") for bn in [
     "khmer", "kmer_hash", "hashtable", "labelhash", "hashgraph",
     "hllcounter", "oxli_exception", "read_aligner", "subset", "read_parsers",
-    "kmer_filters", "traversal", "assembler", "alphabets", "storage"])
+    "kmer_filters", "traversal", "assembler", "alphabets", "storage",
+    "hashing"])
 
 SOURCES = [path_join("src", "khmer", bn + ".cc") for bn in [
     "_cpy_khmer", "_cpy_utils", "_cpy_readparsers"
@@ -167,7 +168,7 @@ SOURCES.extend(path_join("src", "oxli", bn + ".cc") for bn in [
     "read_parsers", "kmer_hash", "hashtable", "hashgraph",
     "labelhash", "subset", "read_aligner",
     "hllcounter", "traversal", "kmer_filters", "assembler", "alphabets",
-    "storage"])
+    "storage", "hashing"])
 
 SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])

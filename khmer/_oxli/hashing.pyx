@@ -6,6 +6,7 @@ from libc.stdint cimport uint64_t
 from cython.operator cimport dereference as deref
 
 from khmer._oxli.oxli_types cimport *
+from khmer._oxli.utils cimport _bstring
 
 cdef class Kmer:
 
@@ -63,3 +64,20 @@ cdef class Kmer:
         deref(kmer._this).set_from_unique_hash(tag, K)
         kmer.kmer = _revhash(kmer.kmer_u, K)
         return kmer
+
+
+cdef class SequenceHasher:
+
+    def __cinit__(self, str sequence, WordLength K):
+        self._sequence = _bstring(sequence)
+        self.K = K
+
+        if type(self) is SequenceHasher:
+            print("__cinit__ SequenceHasher({K})".format(K=K))
+            self._hasher = make_shared[CpTwoBitKmerHasher](K)
+            self._sh_this = make_shared[CpSequenceHasher](self._sequence,
+                                                          self._hasher.get())
+
+    def __iter__(self):
+        while not deref(self._sh_this).done():
+            yield deref(self._sh_this).next().key()
