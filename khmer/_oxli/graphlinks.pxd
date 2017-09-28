@@ -1,40 +1,47 @@
 cimport cython
 from libcpp.memory cimport shared_ptr
+from libcpp.list cimport list as stdlist
 from libc.stdint cimport uint8_t, uint32_t, uint64_t
 
 from khmer._oxli.oxli_types cimport *
 from khmer._oxli.graphs cimport CpHashgraph, Hashgraph, Nodegraph, Countgraph
 
 
-cdef enum DBGNucl:
-    A, C, G, T
+cdef extern from "oxli/links.hh" namespace "oxli":
+    ctypedef struct Junction:
+        HashIntoType u
+        HashIntoType v
+        uint64_t count
 
+    ctypedef stdlist[Junction*] JunctionList
 
-cdef class Junction:
-    cdef readonly HashIntoType u
-    cdef readonly HashIntoType v
+    cdef cppclass CpLink "oxli::Link":
+        CpLink(uint64_t, bool)
+        CpLink(uint64_t)
+        bool is_forward()
+        Junction* start_junction()
+        Junction* end_junction()
 
-    @staticmethod
-    cdef Junction _new(HashIntoType u, 
-                   HashIntoType v)
+        stdlist[Junction*].iterator begin()
+        stdlist[Junction*].iterator end()
+        const JunctionList& get_junctions()
 
+    ctypedef stdlist[CpLink*] LinkList
+    
+    cdef cppclass CpGraphLinker "oxli::GraphLinker":
+        CpGraphLinker(shared_ptr[CpHashgraph])
 
-cdef class Link:
+        Junction* get_junction(HashIntoType)
+        Junction* get_junction(HashIntoType, HashIntoType)
+        Junction* get_junction(Junction&)
+        shared_ptr[JunctionList] get_junctions(const string&)
 
-    cdef readonly list junctions
-    cdef bool forward
-
-    @staticmethod
-    cdef Link _new(list junctions, bool forward)
+        void add_links(const string&)
+        shared_ptr[LinkList] get_links(const string&)
+        void report() const
 
 
 cdef class GraphLinker:
 
-    cdef Hashgraph graph
     cdef shared_ptr[CpHashgraph] _graph
-    cdef WordLength K
-    cdef dict links
-
-    cdef tuple _get_junctions(self, string sequence)
-    cdef int _add_link(self, string sequence,
-            unsigned int min_link_size=*) except -1
+    cdef shared_ptr[CpGraphLinker] _gl_this
