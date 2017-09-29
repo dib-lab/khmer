@@ -48,6 +48,7 @@ Contact: khmer-project@idyll.org
 #include "hashgraph.hh"
 #include "kmer_filters.hh"
 #include "traversal.hh"
+#include "assembler.hh"
 
 
 namespace oxli {
@@ -167,15 +168,21 @@ protected:
     LinkMap links;
     // map from junction keys to Junction*
     JunctionMap junctions;
-    std::shared_ptr<Hashgraph> graph;
     uint64_t n_sequences_added;
 
 public:
+
+    std::shared_ptr<Hashgraph> graph;
     
     GraphLinker(std::shared_ptr<Hashgraph> graph) :
         graph(graph), n_sequences_added(0)
     {
 
+    }
+
+    WordLength ksize() const
+    {
+        return graph->ksize();
     }
 
     void report() const
@@ -269,8 +276,8 @@ public:
         v = kmers.next();
     
         std::cout << "  - build_links: allocate new Link*" << std::endl;
-        fw_link = new Link(n_sequences_added);
-        rc_link = new Link(n_sequences_added, false);
+        fw_link = new Link(n_sequences_added, u.is_forward());
+        rc_link = new Link(n_sequences_added, !u.is_forward());
         uint64_t n_new_fw = 0;
         uint64_t n_new_rc = 0;
 
@@ -325,14 +332,19 @@ public:
         }
     }
 
+    void get_links(Kmer hdn, std::shared_ptr<LinkList> found_links)
+    {
+        auto range = links.equal_range(hdn);
+        for (auto it = range.first; it != range.second; ++it) {
+            found_links->push_back(it->second);
+        }
+    }
+
     void get_links(std::list<HashIntoType> high_degree_nodes, 
                    std::shared_ptr<LinkList> found_links)
     {
         for (HashIntoType hdn : high_degree_nodes) {
-            auto range = links.equal_range(hdn);
-            for (auto it = range.first; it != range.second; ++it) {
-                found_links->push_back(it->second);
-            }
+            get_links(hdn, found_links);
         }
     }
 
@@ -360,6 +372,31 @@ public:
         return found_links;
     }
 
+};
+
+
+class LinkedAssembler
+{
+    std::shared_ptr<LinearAssembler> linear_asm;
+
+public:
+
+    const std::shared_ptr<Hashgraph> graph;
+    const std::shared_ptr<GraphLinker> linker;
+    WordLength _ksize;
+
+    explicit LinkedAssembler(std::shared_ptr<GraphLinker> linker) :
+        _ksize(linker->ksize()), graph(linker->graph), linker(linker)
+    {
+        linear_asm = make_shared<LinearAssembler>(graph.get());
+    }
+
+    StringVector assemble(const Kmer seed_kmer,
+                          std::shared_ptr<Hashgraph> stop_bf=nullptr) const;
+
+    template <bool direction>
+    void _assemble_directed(AssemblerTraverser<direction>& start_cursor,
+                            StringVector& paths) const;
 };
 
 

@@ -118,6 +118,12 @@ KmerFilter get_simple_label_intersect_filter(const LabelSet& src_labels,
     return filter;
 }
 
+KmerFilter get_link_filter(std::shared_ptr<LinkList> links,
+                           const unsigned int min_count)
+{
+    
+}
+
 
 KmerFilter get_junction_count_filter(const Kmer& src_node,
                                      Countgraph * junctions,
