@@ -27,8 +27,8 @@ def test_get_junctions_single(right_tip_structure):
     linker.report()
 
     links = list(linker.get_links(contig))
-    assert len(links) == 0
-    
+    assert len(links) == 1
+
     junctions = list(linker.get_junctions(contig))
     assert len(junctions) == 1
     junction = junctions.pop()
@@ -37,11 +37,26 @@ def test_get_junctions_single(right_tip_structure):
     assert junction['v'] == forward_hash(R, K)
 
     linker.add_links(contig)
+    linker.report()
+
     links = list(linker.get_links(contig))
-    assert len(links) == 0
+    print(links)
+    assert len(links) == 1
     junctions = list(linker.get_junctions(contig))
     assert len(junctions) == 1
     junction = junctions.pop()
     assert junction['count'] == 2
 
 
+def test_links_bubble(snp_bubble_structure):
+    graph, wildtype_sequence, _, HDN_L, HDN_R = snp_bubble_structure
+    linker = GraphLinker(graph)
+
+    # thread the wildtype half of the bubble
+    linker.add_links(wildtype_sequence)
+    linker.report()
+
+
+    links = list(linker.get_links(wildtype_sequence))
+    assert len(links) == 2
+    

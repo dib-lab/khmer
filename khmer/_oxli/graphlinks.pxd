@@ -21,10 +21,11 @@ cdef extern from "oxli/links.hh" namespace "oxli":
         bool is_forward()
         Junction* start_junction()
         Junction* end_junction()
+        uint64_t size()
 
         stdlist[Junction*].iterator begin()
         stdlist[Junction*].iterator end()
-        const JunctionList& get_junctions()
+        JunctionList& get_junctions()
 
     ctypedef stdlist[CpLink*] LinkList
     

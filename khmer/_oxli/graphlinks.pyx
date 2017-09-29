@@ -27,13 +27,14 @@ cdef class GraphLinker:
         cdef shared_ptr[LinkList] links = deref(self._gl_this).get_links(_sequence)
         
         cdef CpLink* link
+        cdef Junction* j
         cdef stdlist[Junction*].iterator it
         for link in deref(links):
-            ret = []
-            it = deref(link).begin()
-            while it != deref(link).end():
-                ret.append(deref(deref(it)))
-            yield ret
+            if deref(link).size() > 0:
+                ret = []
+                for j in deref(link).get_junctions():
+                    ret.append(deref(j))
+                yield ret
         
 
     def report(self):

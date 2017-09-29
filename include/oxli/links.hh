@@ -60,9 +60,11 @@ struct Junction {
     Junction() = default;
     HashIntoType id() const { return u ^ v; }
 
+
     friend std::ostream& operator<< (std::ostream& stream,
-                                     const Junction* j);
+                                    const Junction& j);
 };
+
 
 typedef std::list<Junction*> JunctionList;
 
@@ -147,7 +149,7 @@ public:
         return junctions.end();
     }
 
-    const JunctionList& get_junctions() {
+    JunctionList& get_junctions() {
         return junctions;
     }
 
@@ -214,12 +216,13 @@ public:
         return j;
     }
 
-    Junction* fetch_or_new_junction(HashIntoType u, HashIntoType v)
+    Junction* fetch_or_new_junction(HashIntoType u, HashIntoType v, uint64_t& counter)
     {
         Junction* j = get_junction(u, v);
         if (j != nullptr) {
             j->count = j->count + 1;
         } else {
+            counter++;
             j = new_junction(u, v);
             j->count = 1;
         }
@@ -252,8 +255,9 @@ public:
     }
  
     void build_links(const std::string& sequence,
-                     Link* fw_link, Link* rc_link)
+                     Link* &fw_link, Link* &rc_link)
     {
+        std::cout << "build_links()" << std::endl;
         KmerIterator kmers(sequence.c_str(), graph->ksize());
         Kmer u, v;
 
@@ -263,33 +267,41 @@ public:
             return;
         }
         v = kmers.next();
-
+    
+        std::cout << "  - build_links: allocate new Link*" << std::endl;
         fw_link = new Link(n_sequences_added);
         rc_link = new Link(n_sequences_added, false);
-        Traverser traverser(graph.get());
+        uint64_t n_new_fw = 0;
+        uint64_t n_new_rc = 0;
 
+        Traverser traverser(graph.get());
         while(!kmers.done()) {
             if (traverser.degree_right(u) > 1) {
-                fw_link->push_back(fetch_or_new_junction(u, v));
+                std::cout << "  - build_links: found FW HDN " << u << std::endl;
+                fw_link->push_back(fetch_or_new_junction(u, v, n_new_fw));
             }
             if (traverser.degree_left(v) > 1) {
-                rc_link->push_front(fetch_or_new_junction(v, u));
+                std::cout << "  - build_links: found RC HDN " << v << std::endl;
+                rc_link->push_front(fetch_or_new_junction(v, u, n_new_rc));
             }
 
             u = v;
             v = kmers.next();
         }
 
-        if (fw_link->size() < 2) {
+        if (fw_link->size() < 1 || n_new_fw == 0) {
+            std::cout << "  - build_links: (fw_link) no (new) junctions found." << std::endl;
             delete fw_link;
             fw_link = nullptr;
         }
 
-        if (rc_link->size() < 2) {
+        if (rc_link->size() < 1 || n_new_rc == 0) {
+            std::cout << "  - build_links: (rc_link) no (new) junctions found." << std::endl;
             delete rc_link;
             rc_link = nullptr;
         }
     }
+
 
     void add_links(const std::string& sequence)
     {
@@ -300,15 +312,15 @@ public:
         build_links(sequence, fw_link, rc_link);
 
         if (fw_link != nullptr) {
-            std::cout << "  - add_links: found fw_link" << std::endl;
+            std::cout << "  - add_links: insert found fw_link" << std::endl;
             Junction* start = fw_link->start_junction();
-            std::cout << "    * start junction: " << start << std::endl;
+            std::cout << "    * start junction: " << &start << std::endl;
             links.insert(LinkMapPair(start->u, fw_link));
         }
         if (rc_link != nullptr) {
-            std::cout << "  - add_links: found rc_link" << std::endl;
+            std::cout << "  - add_links: insert found rc_link" << std::endl;
             Junction* start = rc_link->start_junction();
-            std::cout << "    * start junction: " << start << std::endl;
+            std::cout << "    * start junction: " << &start << std::endl;
             links.insert(LinkMapPair(start->u, rc_link));
         }
     }
@@ -344,6 +356,7 @@ public:
 
         std::shared_ptr<LinkList> found_links = make_shared<LinkList>();
         get_links(hdns, found_links);
+        std::cout << "  - get_links: returning " << found_links->size() << " links" << std::endl;
         return found_links;
     }
 
