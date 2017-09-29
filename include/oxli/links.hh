@@ -82,12 +82,15 @@ protected:
     uint64_t link_id;
     uint64_t time_created; // in "read space" ie read number
     //size_t extent;
+    uint64_t flanking_distance;
 
 public:
     
-    Link(uint64_t time_created, bool forward=true) :
+    Link(uint64_t time_created,
+         bool forward=true) :
         forward(forward), link_id(n_links),
-        time_created(time_created)
+        time_created(time_created),
+        flanking_distance(0)
     {
         n_links++;
     }
@@ -98,6 +101,11 @@ public:
             //junction->distance_prev = 0;
         //}
         junctions.push_back(junction);
+    }
+
+    inline void set_flanking_distance(uint64_t d)
+    {
+        flanking_distance = d;
     }
 
     inline void push_front(Junction* junction)
@@ -140,6 +148,11 @@ public:
         return junctions.size();
     }
 
+    inline uint64_t time_created() const 
+    {
+        return time_created;
+    }
+
     inline JunctionList::iterator begin() 
     {
         return junctions.begin();
@@ -155,6 +168,46 @@ public:
     }
 
 };
+
+
+class LinkCursor
+{
+public:
+    Link* link;
+    uint64_t age;
+    JunctionList::iterator cursor;
+
+    LinkTraversal(Link* link, uint64_t age) :
+        link(link), age(age), cursor(link->begin())
+    {
+    }
+
+    bool done() {
+        return cursor == link->end();
+    }
+};
+
+
+class LinkTraversal
+{
+    std::shared_ptr<std::list<LinkCursor>> cursors;
+
+    LinkTraversal()
+    {
+        cursors = std::make_shared<std::list<LinkCursor>>();
+
+    }
+
+    void add_links(std::shared_ptr<LinkList> links,
+                   uint64_t age)
+    {
+        for (Link* link: &links) {
+            cursors->push_back(LinkCursor(link, age));
+        }
+    }
+
+};
+
 
 typedef std::unordered_multimap<HashIntoType, Link*> LinkMap;
 typedef std::list<Link*> LinkList;
@@ -267,33 +320,42 @@ public:
         std::cout << "build_links()" << std::endl;
         KmerIterator kmers(sequence.c_str(), graph->ksize());
         Kmer u, v;
+        uint64_t d = 0;
 
         u = kmers.next();
+        ++d;
         if (kmers.done()) {
             fw_link = rc_link = nullptr;
             return;
         }
         v = kmers.next();
+        ++d;
     
         std::cout << "  - build_links: allocate new Link*" << std::endl;
         fw_link = new Link(n_sequences_added, u.is_forward());
         rc_link = new Link(n_sequences_added, !u.is_forward());
         uint64_t n_new_fw = 0;
         uint64_t n_new_rc = 0;
+        uint64_t last_rc_pos = 0;
 
         Traverser traverser(graph.get());
         while(!kmers.done()) {
             if (traverser.degree_right(u) > 1) {
                 std::cout << "  - build_links: found FW HDN " << u << std::endl;
                 fw_link->push_back(fetch_or_new_junction(u, v, n_new_fw));
+                if (n_new_fc == 1) {
+                    fw_link->set_flanking_distance(d);
+                }
             }
             if (traverser.degree_left(v) > 1) {
                 std::cout << "  - build_links: found RC HDN " << v << std::endl;
                 rc_link->push_front(fetch_or_new_junction(v, u, n_new_rc));
+                last_rc_pos = d;
             }
 
             u = v;
             v = kmers.next();
+            ++d;
         }
 
         if (fw_link->size() < 1 || n_new_fw == 0) {
@@ -306,6 +368,8 @@ public:
             std::cout << "  - build_links: (rc_link) no (new) junctions found." << std::endl;
             delete rc_link;
             rc_link = nullptr;
+        } else {
+            rc_link->set_flanking_distance(d - last_rc_pos);
         }
     }
 
@@ -332,20 +396,46 @@ public:
         }
     }
 
-    void get_links(Kmer hdn, std::shared_ptr<LinkList> found_links)
+    uint64_t get_links(Kmer hdn, std::shared_ptr<LinkList> found_links)
     {
         auto range = links.equal_range(hdn);
+        uint64_t n_links_found = 0;
         for (auto it = range.first; it != range.second; ++it) {
             found_links->push_back(it->second);
+            n_link_found++;
         }
+        return n_links_found;
     }
 
-    void get_links(std::list<HashIntoType> high_degree_nodes, 
+    uint64_t get_links_copy(Kmer hdn, std::shared_ptr<std::list<Link>> found_links)
+    {
+        auto range = links.equal_range(hdn);
+        uint64_t n_links_found = 0;
+        for (auto it = range.first; it != range.second; ++it) {
+            found_links->push_back(&(it->second));
+            n_link_found++;
+        }
+        return n_links_found;
+    }
+
+    uint64_t get_links(std::list<HashIntoType> high_degree_nodes, 
                    std::shared_ptr<LinkList> found_links)
     {
+        uint64_t n_links_found = 0;
         for (HashIntoType hdn : high_degree_nodes) {
-            get_links(hdn, found_links);
+            n_links_founnd += get_links(hdn, found_links);
         }
+        return n_links_found;
+    }
+
+    uint64_t get_links_copy(std::list<HashIntoType> high_degree_nodes, 
+                            std::shared_ptr<LinkList> found_links)
+    {
+        uint64_t n_links_found = 0;
+        for (HashIntoType hdn : high_degree_nodes) {
+            n_links_founnd += get_links_copy(hdn, found_links);
+        }
+        return n_links_found;
     }
 
     std::shared_ptr<LinkList> get_links(const std::string& sequence)
@@ -395,7 +485,7 @@ public:
                           std::shared_ptr<Hashgraph> stop_bf=nullptr) const;
 
     template <bool direction>
-    void _assemble_directed(AssemblerTraverser<direction>& start_cursor,
+    void _assemble_directed(AssemblerTraverser<direction>& cursor,
                             StringVector& paths) const;
 };
 
