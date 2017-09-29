@@ -60,3 +60,8 @@ def test_links_bubble(snp_bubble_structure):
     links = list(linker.get_links(wildtype_sequence))
     assert len(links) == 2
     
+    link_a, link_b = links
+    if link_a[0]['u'] == forward_hash(HDN_L, K):
+        assert link_b[0]['u'] == forward_hash(HDN_R, K)
+    elif link_a[0]['u'] == forward_hash(HDN_R, K):
+        assert link_b[0]['u'] == forward_hash(HDN_L, K)
