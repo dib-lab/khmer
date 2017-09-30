@@ -1,6 +1,3 @@
-// XXX insert copyright notice
-// XXX move to third-party/rollinghash/
-//
 #ifndef CHARACTERHASH
 #define CHARACTERHASH
 
