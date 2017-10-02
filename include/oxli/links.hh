@@ -190,11 +190,12 @@ public:
 
 class LinkTraversal
 {
-    std::shared_ptr<std::list<LinkCursor>> cursors;
+    std::shared_ptr<std::list<LinkCursor>> link_cursors;
+    std::shared_ptr<std::set<HashIntoType>> constraints; // constraint junction ids
 
     LinkTraversal()
     {
-        cursors = std::make_shared<std::list<LinkCursor>>();
+        link_cursors = std::make_shared<std::list<LinkCursor>>();
 
     }
 
@@ -202,9 +203,19 @@ class LinkTraversal
                    uint64_t age)
     {
         for (Link* link: &links) {
-            cursors->push_back(LinkCursor(link, age));
+            link_cursors->push_back(LinkCursor(link, age));
         }
     }
+
+    template<bool direction>
+    void try_link_neighbors(AssemblerTraverser<direction> cursor)
+    {
+        KmerQueue neighbors;
+        cursor.neighbors(neighbors);
+        
+    }
+
+
 
 };
 
