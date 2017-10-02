@@ -38,10 +38,13 @@ Contact: khmer-project@idyll.org
 #ifndef KMER_HASH_HH
 #define KMER_HASH_HH
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <algorithm>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <iterator>
+#include <memory>
 #include <string>
 
 #include "oxli.hh"
@@ -328,6 +331,19 @@ protected:
     size_t length;
     bool initialized;
 public:
+    typedef KmerIterator self_type;
+	typedef HashIntoType value_type;
+	typedef HashIntoType& reference;
+	typedef HashIntoType* pointer;
+    typedef std::forward_iterator_tag iterator_category;
+	typedef std::ptrdiff_t difference_type;
+    self_type operator++() { self_type i = *this; ptr_++; return i; }
+    self_type operator++(int junk) { ptr_++; return *this; }
+    reference operator*() { return *ptr_; }
+    pointer operator->() { return ptr_; }
+    bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
+    bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
+
     KmerIterator(const char * seq, unsigned char k);
 
     /** @param[in]  f The forward hash value.
@@ -382,7 +398,7 @@ public:
     virtual bool done() const = 0;
     virtual unsigned int get_start_pos() const = 0;
     virtual unsigned int get_end_pos() const = 0;
-    virtual ~KmerHashIterator() { };
+    virtual ~KmerHashIterator() = default;
 };
 
 // TwoBitKmerHashIterator -- just wrap KmerIterator.
@@ -406,6 +422,64 @@ public:
 
     virtual unsigned int get_end_pos() const {
         return iter.get_end_pos();
+    }
+};
+
+
+class MurmurKmerHashIterator : public KmerHashIterator
+{
+    const char * _seq;
+    const char _ksize;
+    unsigned int index;
+    unsigned int length;
+    bool _initialized;
+public:
+    MurmurKmerHashIterator(const char * seq, unsigned char k) :
+        _seq(seq), _ksize(k), index(0), _initialized(false)
+    {
+        length = strlen(_seq);
+    };
+
+    HashIntoType first()
+    {
+        _initialized = true;
+        return next();
+    }
+
+    HashIntoType next()
+    {
+        if (!_initialized) {
+            _initialized = true;
+        }
+
+        if (done()) {
+            throw oxli_exception("past end of iterator");
+        }
+
+        std::string kmer;
+        kmer.assign(_seq + index, _ksize);
+        index += 1;
+        return _hash_murmur(kmer, _ksize);
+    }
+
+    bool done() const
+    {
+        return (index + _ksize > length);
+    }
+
+    unsigned int get_start_pos() const
+    {
+        if (!_initialized) {
+            return 0;
+        }
+        return index - 1;
+    }
+    unsigned int get_end_pos() const
+    {
+        if (!_initialized) {
+            return _ksize;
+        }
+        return index + _ksize - 1;
     }
 };
 

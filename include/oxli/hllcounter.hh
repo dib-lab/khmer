@@ -60,6 +60,7 @@ public:
     HLLCounter(int p, WordLength ksize);
 
     void add(const std::string &);
+    void add(const HashIntoType);
     unsigned int consume_string(const std::string &);
     template<typename SeqIO>
     void consume_seqfile(std::string const &,

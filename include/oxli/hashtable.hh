@@ -123,8 +123,6 @@ inline std::vector<uint64_t> get_n_primes_near_x(uint32_t n, uint64_t x)
     return primes;
 }
 
-typedef std::unique_ptr<KmerHashIterator> KmerHashIteratorPtr;
-
 class Hashtable: public
     KmerFactory  		// Base class implementation of a Bloom ht.
 {
@@ -427,64 +425,6 @@ public:
     // detect likely positions of errors
     std::vector<unsigned int> find_spectral_error_positions(std::string seq,
             BoundedCounterType min_abund) const;
-};
-
-
-class MurmurKmerHashIterator : public KmerHashIterator
-{
-    const char * _seq;
-    const char _ksize;
-    unsigned int index;
-    unsigned int length;
-    bool _initialized;
-public:
-    MurmurKmerHashIterator(const char * seq, unsigned char k) :
-        _seq(seq), _ksize(k), index(0), _initialized(false)
-    {
-        length = strlen(_seq);
-    };
-
-    HashIntoType first()
-    {
-        _initialized = true;
-        return next();
-    }
-
-    HashIntoType next()
-    {
-        if (!_initialized) {
-            _initialized = true;
-        }
-
-        if (done()) {
-            throw oxli_exception("past end of iterator");
-        }
-
-        std::string kmer;
-        kmer.assign(_seq + index, _ksize);
-        index += 1;
-        return _hash_murmur(kmer, _ksize);
-    }
-
-    bool done() const
-    {
-        return (index + _ksize > length);
-    }
-
-    unsigned int get_start_pos() const
-    {
-        if (!_initialized) {
-            return 0;
-        }
-        return index - 1;
-    }
-    unsigned int get_end_pos() const
-    {
-        if (!_initialized) {
-            return _ksize;
-        }
-        return index + _ksize - 1;
-    }
 };
 
 

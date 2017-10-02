@@ -39,6 +39,7 @@ Contact: khmer-project@idyll.org
 #include <stdlib.h>
 #include <algorithm>
 #include <map>
+#include <memory>
 #include <numeric>
 #include <utility>
 
@@ -259,9 +260,7 @@ uint64_t HLLCounter::estimate_cardinality()
     return E;
 }
 
-void HLLCounter::add(const std::string &value)
-{
-    HashIntoType hashed = oxli::_hash_murmur(value, value.length());
+void HLLCounter::add(const HashIntoType hashed) {
     // Use lowest bits for indexing
     uint64_t index = hashed & (ncounters - 1);
 
@@ -297,19 +296,20 @@ void HLLCounter::add(const std::string &value)
     counters[index] = std::max(counters[index], (uint8_t)new_value);
 }
 
+void HLLCounter::add(const std::string &value)
+{
+    HashIntoType hashed = oxli::_hash_murmur(value, value.length());
+    add(hashed);
+}
+
 unsigned int HLLCounter::consume_string(const std::string &inp)
 {
     unsigned int n_consumed = 0;
-    std::string kmer = "";
 
-    for(auto ch: inp) {
-        kmer.push_back(ch);
-        if (kmer.size() < _ksize) {
-            continue;
-        }
-        add(kmer);
+    auto kmers = MurmurKmerHashIterator(inp.c_str(), _ksize);
 
-        kmer.erase(0, 1);
+    for(auto hashed: kmers) {
+        add(hashed);
         n_consumed++;
     }
     return n_consumed;
