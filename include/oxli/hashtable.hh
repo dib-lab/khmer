@@ -145,14 +145,14 @@ public:
     }
 };
 
-//template <typename LanguagePolicy>
+template <typename LanguagePolicy>
 class Greeter
 {
 public:
     // Behaviour method
     void greet() const
     {
-        std::cout << English::greeting() << std::endl;
+        std::cout << LanguagePolicy::greeting() << std::endl;
     }
 };
 

@@ -857,9 +857,12 @@ cdef class Nodegraph(Hashgraph):
         deref(self._ng_this).update_from(deref(other._ng_this))
 
 
-cdef class Greeter:
-    cdef CpGreeter c_greet
-    def __cinit__(self):
-        self.c_greet = CpGreeter()
+cdef class PyGreeter:
+    cdef Greeter[CpEnglish] c_greet
+    def __cinit__(self, lang='german'):
+        if lang == 'german':
+            self.c_greet = Greeter[CpGerman]()
+        else:
+            self.c_greet = Greeter[CpEnglish]()
     def greet(self):
         self.c_greet.greet()

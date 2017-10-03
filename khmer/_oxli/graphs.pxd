@@ -44,8 +44,8 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli" nogil:
     cdef cppclass CpEnglish "oxli::English":
         string greeting()
 
-    cdef cppclass CpGreeter "oxli::Greeter":
-        CpGreeter()
+    cdef cppclass Greeter[T]:
+        Greeter()
         void greet()
 
     cdef cppclass CpHashtable "oxli::Hashtable" (CpKmerFactory):
