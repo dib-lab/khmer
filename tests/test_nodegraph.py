@@ -1095,6 +1095,12 @@ def test_traverse_linear_path_2():
     assert nodegraph.hash(contig[100:121]) in conns
     assert len(conns) == 1
 
+    for k in conns:                       # everything in connections => stop
+        assert stopgraph.get(k)
+
+    for k in visited:                     # nothing in visited => stop
+        assert not stopgraph.get(k)
+
     # traverse from immediately after 100:121, should end at the end
     size, conns, visited = nodegraph.traverse_linear_path(contig[101:122],
                                                           degree_nodes,
@@ -1106,6 +1112,12 @@ def test_traverse_linear_path_2():
     assert nodegraph.hash(contig[100:121]) in conns
     assert len(conns) == 1
 
+    for k in conns:                       # everything in connections => stop
+        assert stopgraph.get(k)
+
+    for k in visited:                     # nothing in visited => stop
+        assert not stopgraph.get(k)
+
     # traverse from end, should end at 100:121
     size, conns, visited = nodegraph.traverse_linear_path(contig[-21:],
                                                           degree_nodes,
@@ -1116,6 +1128,12 @@ def test_traverse_linear_path_2():
     assert len(visited) == 879
     assert nodegraph.hash(contig[100:121]) in conns
     assert len(conns) == 1
+
+    for k in conns:                       # everything in connections => stop
+        assert stopgraph.get(k)
+
+    for k in visited:                     # nothing in visited => stop
+        assert not stopgraph.get(k)
 
 
 def test_traverse_linear_path_3_stopgraph():
