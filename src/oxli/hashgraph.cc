@@ -875,7 +875,7 @@ const
                 // if there are any adjacent high degree nodes, record;
                 adjacencies.insert(node);
                 // also, add this to the stop Bloom filter.
-                bf.count(kmer);
+                bf.count(node);
             } else if (set_contains(visited, node)) {
                 // do nothing - already visited
                 ;
