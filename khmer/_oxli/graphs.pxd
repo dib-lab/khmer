@@ -38,6 +38,16 @@ cdef extern from "oxli/storage.hh":
 
 
 cdef extern from "oxli/hashtable.hh" namespace "oxli" nogil:
+    cdef cppclass CpGerman "oxli::German":
+        string greeting()
+
+    cdef cppclass CpEnglish "oxli::English":
+        string greeting()
+
+    cdef cppclass CpGreeter "oxli::Greeter":
+        CpGreeter()
+        void greet()
+
     cdef cppclass CpHashtable "oxli::Hashtable" (CpKmerFactory):
         const WordLength ksize() const
         HashIntoType hash_dna(const char *) except +oxli_raise_py_error

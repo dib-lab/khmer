@@ -124,6 +124,39 @@ inline std::vector<uint64_t> get_n_primes_near_x(uint32_t n, uint64_t x)
 
 typedef std::unique_ptr<KmerHashIterator> KmerHashIteratorPtr;
 
+
+class English
+{
+public:
+    static
+    std::string greeting()
+    {
+        return "Hello, World!";
+    }
+};
+
+class German
+{
+public:
+    static
+    std::string greeting()
+    {
+        return "Hallo, Welt!";
+    }
+};
+
+//template <typename LanguagePolicy>
+class Greeter
+{
+public:
+    // Behaviour method
+    void greet() const
+    {
+        std::cout << English::greeting() << std::endl;
+    }
+};
+
+
 class Hashtable: public
     KmerFactory  		// Base class implementation of a Bloom ht.
 {
