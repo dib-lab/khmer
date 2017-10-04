@@ -858,11 +858,9 @@ cdef class Nodegraph(Hashgraph):
 
 
 cdef class PyGreeter:
-    cdef Greeter[CpEnglish] c_greet
-    def __cinit__(self, lang='german'):
-        if lang == 'german':
-            self.c_greet = Greeter[CpGerman]()
-        else:
-            self.c_greet = Greeter[CpEnglish]()
+    cdef GreeterDE c_greet
+    def __cinit__(self):
+        self.c_greet = GreeterDE()
+
     def greet(self):
         self.c_greet.greet()
