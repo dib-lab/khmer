@@ -37,6 +37,7 @@ Contact: khmer-project@idyll.org
 #ifndef LINKS_HH
 #define LINKS_HH
 
+#include <algorithm>
 #include <functional>
 #include <memory>
 #include <list>
@@ -54,21 +55,66 @@ Contact: khmer-project@idyll.org
 namespace oxli {
 
 struct Junction {
+    // [u]-->[v (HDN)]-->[w]
     HashIntoType u;
     HashIntoType v;
-    //uint32_t distance_prev;
+    HashIntoType w;
     uint64_t count;
     Junction() = default;
-    HashIntoType id() const { return u ^ v; }
-
+    HashIntoType id() const { return u ^ v ^ w; }
+    bool matches(HashIntoType u, HashIntoType v) { return (u ^ v ^ w) == id(); }
 
     friend std::ostream& operator<< (std::ostream& stream,
                                     const Junction& j);
+    friend bool operator== (const Junction& lhs,
+                            const Junction& rhs) {
+        return lhs.id() == rhs.id();
+    }
 };
 
 
 typedef std::list<Junction*> JunctionList;
 
+#define FW 1
+#define RC 0
+
+class LinkNode {
+private:
+    static uint64_t counter;
+
+public:
+
+    LinkNode* next;
+    Junction* junction;
+    HashIntoType from;
+    uint64_t node_id;
+
+    LinkNode(Junction* junction, HashIntoType from) :
+        junction(junction), from(from), time_created(time_created),
+        node_id(counter), next(nullptr)
+    {
+        ++counter;
+    }
+};
+
+
+class LinkHead {
+private:
+    static uint64_t counter;
+public:
+    uint64_t link_id;
+    LinkNode* start;
+    HashIntoType from;
+    bool forward;
+
+    LinkHead(LinkNode* start, HashIntoType from, bool forward,
+             uint64_t time_created) : 
+        start(start), from(from), forward(forward), time_created(time_created)
+    {
+        ++counter;
+    }
+};
+             
 
 class Link {
 private:
@@ -174,50 +220,131 @@ class LinkCursor
 {
 public:
     Link* link;
-    uint64_t age;
+    uint64_t traversal_age;
     JunctionList::iterator cursor;
 
     LinkTraversal(Link* link, uint64_t age) :
-        link(link), age(age), cursor(link->begin())
+        link(link), traversal_age(age), cursor(link->begin())
     {
     }
 
     bool done() {
         return cursor == link->end();
     }
+
+    Junction* current() const {
+        return &cursor;
+    }
+
+    bool increment() {
+        ++cursor;
+        return done();
+    }
+
+    friend bool operator==(const LinkCursor& lhs, const LinkCursor& rhs)
+    {
+        return lhs->link == rhs->link;
+    }
 };
 
 
+// Compare the two link cursors first by their age within the
+// traversal, then by their global age. We prefer links
+// that were found earlier in the traversal, but were created
+// most recently.
+bool CompareLinks(const LinkCursor& a, const LinkCursor& b)
+{
+    if (a.traversal_age < b.traversal_age) { return false; }
+    if (b.traversal_age < a.traversal_age) { return true; }
+
+    if ((a.link)->time_created() > (b.link)->time_created()) { return false; }
+    if ((b.link)->time_created() > (a.link)->time_created()) { return true; }
+
+    return false;
+}
+
+/*
 class LinkTraversal
 {
-    std::shared_ptr<std::list<LinkCursor>> link_cursors;
+    typedef std::priority_queue<LinkCursor, 
+                                        std::vector<LinkCursor>,
+                                        CompareLinks> CursorQueue;
+    std::shared_ptr<CursorQueue> link_cursors;
     std::shared_ptr<std::set<HashIntoType>> constraints; // constraint junction ids
+    LinkCursor last_link;
 
-    LinkTraversal()
+    LinkTraversal() : has_active_cursor(false)
     {
-        link_cursors = std::make_shared<std::list<LinkCursor>>();
-
+        link_cursors = std::make_shared<CursorQueue>();
     }
 
     void add_links(std::shared_ptr<LinkList> links,
                    uint64_t age)
     {
         for (Link* link: &links) {
-            link_cursors->push_back(LinkCursor(link, age));
+            link_cursors->push(LinkCursor(link, age));
         }
     }
 
+    void pop_all(Junction* to_pop)
+    {
+        for (LinkCursor cursor : &link_cursors) {
+            if (!cursor.done() && (to_pop == cursor.current())) {
+                cursor.increment();
+            }
+        }
+    }
+
+    bool get_top_link(&LinkCursor result)
+    {
+        while(link_cusors->size() > 0) {
+            if (!link_cusors->top()->done()) {
+                result = link_cusors->top();
+                return true;
+            } else {
+                link_cusors->pop();
+            }
+        }
+        return false;
+    }
+
     template<bool direction>
-    void try_link_neighbors(AssemblerTraverser<direction> cursor)
+    bool try_link_neighbors(AssemblerTraverser<direction> asmt)
     {
         KmerQueue neighbors;
-        cursor.neighbors(neighbors);
+        asmt.neighbors(neighbors);
+        bool decided = false;
+        Kmer src = asmt.cursor;
+        Kmer dst;
+
+        LinkCursor link;
+        bool has_link = get_top_link(link);
+        if (!has_link) {
+            return false;
+        }
+
+        if (has_active_cursor) {
+
+            for (Kmer neighbor : neighbors) {
+                if ((&active_cursor.current())->matches(neighbor.kmer_f,
+                                                        neighbor.kmer_r)) {
+                    decided = true;
+                    dst     = neighbor;
+                }
+            }
+
+
+        } else {
+
+
+        }
         
     }
 
 
 
 };
+*/
 
 
 typedef std::unordered_multimap<HashIntoType, Link*> LinkMap;
@@ -330,7 +457,7 @@ public:
     {
         std::cout << "build_links()" << std::endl;
         KmerIterator kmers(sequence.c_str(), graph->ksize());
-        Kmer u, v;
+        Kmer u, v, w;
         uint64_t d = 0;
 
         u = kmers.next();
@@ -340,6 +467,11 @@ public:
             return;
         }
         v = kmers.next();
+        if (kmers.done()) {
+            fw_link = rc_link = nullptr;
+            return;
+        }
+        w = kmers.next();
         ++d;
     
         std::cout << "  - build_links: allocate new Link*" << std::endl;
@@ -365,7 +497,8 @@ public:
             }
 
             u = v;
-            v = kmers.next();
+            v = w;
+            w = kmers.next();
             ++d;
         }
 
@@ -475,6 +608,7 @@ public:
 
 };
 
+/*
 
 class LinkedAssembler
 {
@@ -499,7 +633,7 @@ public:
     void _assemble_directed(AssemblerTraverser<direction>& cursor,
                             StringVector& paths) const;
 };
-
+*/
 
 
 }

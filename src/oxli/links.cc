@@ -16,6 +16,7 @@ namespace oxli {
 
 uint64_t Link::n_links = 0;
 
+/*
 template <bool direction>
 void LinkedAssembler::
 _assemble_directed(AssemblerTraverser<direction> cursor,
@@ -64,6 +65,6 @@ const
 
     }
 }
-
+*/
 
 }
