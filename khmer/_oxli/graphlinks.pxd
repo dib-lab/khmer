@@ -11,6 +11,7 @@ cdef extern from "oxli/links.hh" namespace "oxli":
     ctypedef struct Junction:
         HashIntoType u
         HashIntoType v
+        HashIntoType w
         uint64_t count
 
     ctypedef stdlist[Junction*] JunctionList

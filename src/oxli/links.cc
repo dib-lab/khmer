@@ -15,7 +15,6 @@ std::ostream& operator<<(std::ostream& stream,
 namespace oxli {
 
 uint64_t Link::n_links = 0;
-
 /*
 template <bool direction>
 void LinkedAssembler::
@@ -66,5 +65,4 @@ const
     }
 }
 */
-
 }

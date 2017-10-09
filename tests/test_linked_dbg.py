@@ -33,8 +33,9 @@ def test_get_junctions_single(right_tip_structure):
     assert len(junctions) == 1
     junction = junctions.pop()
     assert junction['count'] == 1
-    assert junction['u'] == forward_hash(HDN, K)
-    assert junction['v'] == forward_hash(R, K)
+    assert junction['u'] == forward_hash(L, K)
+    assert junction['v'] == forward_hash(HDN, K)
+    assert junction['w'] == forward_hash(R, K)
 
     linker.add_links(contig)
     linker.report()
@@ -61,7 +62,7 @@ def test_links_bubble(snp_bubble_structure):
     assert len(links) == 2
     
     link_a, link_b = links
-    if link_a[0]['u'] == forward_hash(HDN_L, K):
-        assert link_b[0]['u'] == forward_hash(HDN_R, K)
-    elif link_a[0]['u'] == forward_hash(HDN_R, K):
-        assert link_b[0]['u'] == forward_hash(HDN_L, K)
+    if link_a[0]['v'] == forward_hash(HDN_L, K):
+        assert link_b[0]['v'] == forward_hash(HDN_R, K)
+    elif link_a[0]['v'] == forward_hash(HDN_R, K):
+        assert link_b[0]['v'] == forward_hash(HDN_L, K)
