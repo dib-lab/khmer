@@ -28,8 +28,8 @@ public:
     }
 private:
     std::mt19937 mtr;
-    std::uniform_int_distribution<> dist;
-    int n;
+    std::uniform_int_distribution<uint32_t> dist;
+    uint32_t n;
 };
 
 template <typename hashvaluetype>
