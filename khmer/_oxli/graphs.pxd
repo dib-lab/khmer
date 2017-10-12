@@ -106,8 +106,14 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli" nogil:
     cdef cppclass CpMurmurHashtable "oxli::MurmurHashtable" (CpHashtable):
         CpMurmurHashtable(WordLength, CpStorage *)
 
+    cdef cppclass CpCyclicHashtable "oxli::CyclicHashtable" (CpHashtable):
+        CpCyclicHashtable(WordLength, CpStorage *)
+
     cdef cppclass CpCounttable "oxli::Counttable" (CpMurmurHashtable):
         CpCounttable(WordLength, vector[uint64_t])
+
+    cdef cppclass CpCyclicCounttable "oxli::CyclicCounttable" (CpCyclicHashtable):
+        CpCyclicCounttable(WordLength, vector[uint64_t])
 
     cdef cppclass CpSmallCounttable "oxli::SmallCounttable" (CpMurmurHashtable):
         CpSmallCounttable(WordLength, vector[uint64_t])
@@ -260,6 +266,10 @@ cdef class SmallCounttable(Hashtable):
 
 cdef class Counttable(Hashtable):
     cdef shared_ptr[CpCounttable] _ct_this
+
+
+cdef class CyclicCounttable(Hashtable):
+    cdef shared_ptr[CpCyclicCounttable] _cct_this
 
 
 cdef class Nodetable(Hashtable):

@@ -65,6 +65,7 @@ from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 from khmer._khmer import FILETYPES
 
 from khmer._oxli.graphs import (Counttable, QFCounttable, Nodetable,
+                                CyclicCounttable,
                                 SmallCounttable, Countgraph, SmallCountgraph,
                                 Nodegraph)
 from khmer._oxli.labeling import GraphLabels
