@@ -210,15 +210,35 @@ HashIntoType _hash_cyclic(const std::string& kmer, const WordLength k)
     HashIntoType h = 0;
     HashIntoType r = 0;
 
-    return oxli::_hash_cyclic(kmer, k, h, r);
+    const std::string rev = oxli::_revcomp(kmer);
+    CyclicHash<uint64_t> fwd_hasher(k);
+    CyclicHash<uint64_t> rev_hasher(k);
+
+    for (WordLength i = 0; i < k; ++i) {
+        fwd_hasher.eat(kmer[i]);
+    }
+    h = fwd_hasher.hashvalue;
+
+    if (rev == kmer) {
+        // self complement kmer, can't use bitwise XOR
+        r = h;
+        return h;
+    }
+
+    for (WordLength i = 0; i < k; ++i) {
+        rev_hasher.eat(rev[i]);
+    }
+    r = rev_hasher.hashvalue;
+
+    return h ^ r;
 }
 
 HashIntoType _hash_cyclic(const std::string& kmer, const WordLength k,
                           HashIntoType& h, HashIntoType& r)
 {
     const std::string rev = oxli::_revcomp(kmer);
-    static CyclicHash<uint64_t> fwd_hasher(k);
-    static CyclicHash<uint64_t> rev_hasher(k);
+    CyclicHash<uint64_t> fwd_hasher(k);
+    CyclicHash<uint64_t> rev_hasher(k);
 
     for (WordLength i = 0; i < k; ++i) {
         fwd_hasher.eat(kmer[i]);
