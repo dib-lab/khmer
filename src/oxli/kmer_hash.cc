@@ -205,6 +205,62 @@ HashIntoType _hash_murmur_forward(const std::string& kmer, const WordLength k)
     return h;
 }
 
+
+inline const uint64_t hash_64_fnv1a(const char* data, const uint64_t len) {
+    uint64_t hash = 0xcbf29ce484222325;
+    const uint64_t prime = 0x100000001b3;
+
+    for(uint64_t i = 0; i < len; ++i) {
+        //const uint8_t value = data[i];
+        //hash = hash ^ value;
+        hash = hash ^ data[i];
+        hash *= prime;
+    }
+
+    return hash;
+}
+
+constexpr uint64_t val_64_const = 0xcbf29ce484222325;
+constexpr uint64_t prime_64_const = 0x100000001b3;
+inline constexpr uint64_t hash_64_fnv1a_const(const char* const str, const uint64_t value = val_64_const) noexcept {
+    return (str[0] == '\0') ? value : hash_64_fnv1a_const(&str[1], (value ^ uint64_t(str[0])) * prime_64_const);
+}
+
+HashIntoType _hash_fnv(const std::string& kmer, const WordLength k)
+{
+    HashIntoType h = 0;
+    HashIntoType r = 0;
+
+    return oxli::_hash_fnv(kmer, k, h, r);
+}
+
+HashIntoType _hash_fnv(const std::string& kmer, const WordLength k,
+                       HashIntoType& h, HashIntoType& r) {
+  h = hash_64_fnv1a_const(kmer.c_str());
+
+  assert(kmer.length() == k); // an assumption of the below code
+  std::string rev = oxli::_revcomp(kmer);
+  if (rev == kmer) {
+      // self complement kmer, can't use bitwise XOR
+      r = h;
+      return h;
+  }
+  r = hash_64_fnv1a_const(rev.c_str());
+
+  return h ^ r;
+}
+
+HashIntoType _hash_fnv_forward(const std::string& kmer, const WordLength k)
+{
+    HashIntoType h = 0;
+    HashIntoType r = 0;
+
+    oxli::_hash_fnv(kmer, k, h, r);
+
+    return h;
+}
+
+
 std::pair<uint64_t, uint64_t> compute_band_interval(unsigned int num_bands,
                                                     unsigned int band)
 {
