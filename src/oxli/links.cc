@@ -7,14 +7,16 @@ using namespace oxli;
 std::ostream& operator<<(std::ostream& stream,
                          const oxli::Junction& j)
 {
-    stream << "Junction(u=" << j.u << ", v=" << j.v <<
-        ", count=" << j.count << ", id=" << j.id() << ")";
+    stream << "Junction<(" << j.u << ", " << j.v << << ", " << j.w <<
+        "), count=" << j.count << ", index=" << j.index() << ">";
     return stream;
 }
 
 namespace oxli {
 
-uint64_t Link::n_links = 0;
+uint64_t Junction::junction_counter = 0;
+uint64_t LinkTreeSegment::segment_counter = 0;
+
 /*
 template <bool direction>
 void LinkedAssembler::

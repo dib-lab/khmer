@@ -54,21 +54,35 @@ Contact: khmer-project@idyll.org
 
 namespace oxli {
 
-struct Junction {
+class Junction {
+protected:
+    
+    static uint64_t junction_counter;
+
+public:
+
     // [u]-->[v (HDN)]-->[w]
     HashIntoType u;
     HashIntoType v;
     HashIntoType w;
-    uint64_t count;
+    const uint64_t ID;
+
     Junction() = default;
-    HashIntoType id() const { return u ^ v ^ w; }
-    bool matches(HashIntoType u, HashIntoType v) { return (u ^ v ^ w) == id(); }
+
+    Junction(HashIntoType u, HashIntoType v, HashIntoType w) :
+        u(u), v(v), w(w), ID(junction_counter++) {}
+
+    uint64_t index() const { return u ^ v ^ w; }
+
+    bool matches(HashIntoType u,
+                 HashIntoType v,
+                 HashintoType w) { return (u ^ v ^ w) == index(); }
 
     friend std::ostream& operator<< (std::ostream& stream,
                                     const Junction& j);
     friend bool operator== (const Junction& lhs,
                             const Junction& rhs) {
-        return lhs.id() == rhs.id();
+        return lhs.index() == rhs.index();
     }
 };
 
@@ -78,173 +92,27 @@ typedef std::list<Junction*> JunctionList;
 #define FW 1
 #define RC 0
 
-/*
-class LinkNode {
-private:
-    static uint64_t counter;
-
-public:
-
-    LinkNode* next;
-    Junction* junction;
-    HashIntoType from;
-    uint64_t node_id;
-
-    LinkNode(Junction* junction, HashIntoType from) :
-        junction(junction), from(from), time_created(time_created),
-        node_id(counter), next(nullptr)
-    {
-        ++counter;
-    }
-};
-
-
-class LinkHead {
-private:
-    static uint64_t counter;
-public:
-    uint64_t link_id;
-    LinkNode* start;
-    HashIntoType from;
-    bool forward;
-
-    LinkHead(LinkNode* start, HashIntoType from, bool forward,
-             uint64_t time_created) : 
-        start(start), from(from), forward(forward), time_created(time_created)
-    {
-        ++counter;
-    }
-};
-*/             
-
-class Link {
-private:
-
-    static uint64_t n_links;
-
+class LinkTreeSegment {
 protected:
-
-    JunctionList junctions;
-
+    static uint64_t segment_counter;
 public:
+    const uint64_t segment_id;
+    std::vector<uint64_t> 
+    std::vector<uint64_t> junctions; // IDs of junctions in this segment
+    uint64_t children[4]; // child segment IDs
+    uint32_t count;
 
-    const bool forward;
-    const uint64_t link_id;
-    const uint64_t time_created; // in "read space" ie read number
-    //size_t extent;
-    uint64_t flanking_distance;
-    
-    Link(uint64_t time_created,
-         bool forward=true) :
-        forward(forward), link_id(n_links),
-        time_created(time_created),
-        flanking_distance(0)
-    {
-        n_links++;
-    }
-    inline void push_back(Junction* junction)
-    {
-        //if (junctions.size() == 0) {
-        //    junction->start = true;
-            //junction->distance_prev = 0;
-        //}
-        junctions.push_back(junction);
-    }
-
-    inline void push_front(Junction* junction)
-    {
-        //if (junctions.size() > 0) {
-        //    start_junction()->start = false;
-        //}
-        //junction->start = true; // just to be sure
-        //junction->distance_prev = 0;
-        junctions.push_front(junction);
-    }
-
-    void insert_junction(JunctionList::iterator insert_before,
-                         Junction* junction)
-    {
-        if (insert_before == begin()) {
-            push_front(junction);
-        } else {
-            junctions.insert(insert_before, junction);
-        }
-    }
-
-    inline Junction* start_junction() const
-    {
-        return junctions.front();
-    }
-
-    inline Junction* end_junction() const
-    {
-        return junctions.back();
-    }
-
-    inline bool is_forward() const
-    {   
-        return forward;
-    }
-
-    inline size_t size() const
-    {
-        return junctions.size();
-    }
-
-    inline JunctionList::iterator begin() 
-    {
-        return junctions.begin();
-    }
-
-    inline JunctionList::iterator end() 
-    {
-        return junctions.end();
-    }
-
-    JunctionList& get_junctions() {
-        return junctions;
-    }
+    LinkTreeSegment() : segment_id(segment_counter++) {}
 
 };
 
-
-class LinkCursor
-{
-public:
-    Link* link;
-    uint64_t traversal_age;
-    JunctionList::iterator cursor;
-
-    LinkCursor(Link* link, uint64_t age) :
-        link(link), traversal_age(age), cursor(link->begin())
-    {
-    }
-
-    bool done() {
-        return cursor == link->end();
-    }
-
-    const Junction* current() const {
-        const Junction* current = *cursor;
-        return current;
-    }
-
-    bool increment() {
-        ++cursor;
-        return done();
-    }
-
-    friend bool operator==(const LinkCursor& lhs, const LinkCursor& rhs)
-    {
-        return lhs.link == rhs.link;
-    }
-};
 
 
 // Compare the two link cursors first by their age within the
 // traversal, then by their global age. We prefer links
 // that were found earlier in the traversal, but were created
 // most recently.
+/*
 inline bool CompareLinks(const LinkCursor& a, const LinkCursor& b)
 {
     if (a.traversal_age < b.traversal_age) { return false; }
@@ -255,104 +123,44 @@ inline bool CompareLinks(const LinkCursor& a, const LinkCursor& b)
 
     return false;
 }
-
-/*
-class LinkTraversal
-{
-    typedef std::priority_queue<LinkCursor, 
-                                        std::vector<LinkCursor>,
-                                        CompareLinks> CursorQueue;
-    std::shared_ptr<CursorQueue> link_cursors;
-    std::shared_ptr<std::set<HashIntoType>> constraints; // constraint junction ids
-    LinkCursor last_link;
-
-    LinkTraversal() : has_active_cursor(false)
-    {
-        link_cursors = std::make_shared<CursorQueue>();
-    }
-
-    void add_links(std::shared_ptr<LinkList> links,
-                   uint64_t age)
-    {
-        for (Link* link: &links) {
-            link_cursors->push(LinkCursor(link, age));
-        }
-    }
-
-    void pop_all(Junction* to_pop)
-    {
-        for (LinkCursor cursor : &link_cursors) {
-            if (!cursor.done() && (to_pop == cursor.current())) {
-                cursor.increment();
-            }
-        }
-    }
-
-    bool get_top_link(&LinkCursor result)
-    {
-        while(link_cusors->size() > 0) {
-            if (!link_cusors->top()->done()) {
-                result = link_cusors->top();
-                return true;
-            } else {
-                link_cusors->pop();
-            }
-        }
-        return false;
-    }
-
-    template<bool direction>
-    bool try_link_neighbors(AssemblerTraverser<direction> asmt)
-    {
-        KmerQueue neighbors;
-        asmt.neighbors(neighbors);
-        bool decided = false;
-        Kmer src = asmt.cursor;
-        Kmer dst;
-
-        LinkCursor link;
-        bool has_link = get_top_link(link);
-        if (!has_link) {
-            return false;
-        }
-
-        if (has_active_cursor) {
-
-            for (Kmer neighbor : neighbors) {
-                if ((&active_cursor.current())->matches(neighbor.kmer_f,
-                                                        neighbor.kmer_r)) {
-                    decided = true;
-                    dst     = neighbor;
-                }
-            }
-
-
-        } else {
-
-
-        }
-        
-    }
-
-
-
-};
 */
 
 
-typedef std::unordered_multimap<HashIntoType, Link*> LinkMap;
-typedef std::list<Link*> LinkList;
+typedef std::unordered_multimap<HashIntoType, LinkSegment*> LinkSegmentMap;
+typedef std::vector<LinkTreeSegment> LinkSegmentVector;
+typedef std::vector<Junction> JunctionVector;
 typedef std::unordered_map<HashIntoType, Junction*> JunctionMap;
-typedef std::pair<HashIntoType, Link*> LinkMapPair;
+typedef std::pair<HashIntoType, LinkSegment*> LinkMapPair;
 
 class GraphLinker
 {
 protected:
     // map from starting high degree nodes to associated links
-    LinkMap links;
+    LinkSegmentMap link_segments;
+    // linear storage for Junctions
+    JunctionVector junctions;
     // map from junction keys to Junction*
-    JunctionMap junctions;
+    JunctionMap    junction_map;
     uint64_t n_sequences_added;
+
+    // can cause duplicate junctions if we don't check the map first;
+    // this just keeps junctions on the same cache line if they're
+    // allocated one after the other
+    Junction* new_junction(HashIntoType u, HashIntoType v, HashIntoType w)
+    {
+        junctions.emplace_back(u, v, w);
+
+        Junction* j = &(junctions.back);
+        junctions[j->index()] = j;
+        return j;
+    }
+
+    LinkTreeSegment* new_link_tree_segment(uint64_t junction_id)
+    {
+        link_segments.emplace_back();
+        l = &(link_segments.back);
+        return l;
+    }
 
 public:
 
@@ -378,7 +186,7 @@ public:
         std::cout << "  * " << links.size() << " links" << std::endl;
     }
 
-    Junction* get_junction(HashIntoType key) const
+    Junction* get_junction_by_index(HashIntoType key) const
     {
         auto search = junctions.find(key);
         if (search != junctions.end()) {
@@ -387,31 +195,15 @@ public:
         return nullptr;
     }
 
-    Junction* get_junction(HashIntoType u, HashIntoType v, HashIntoType w) const
+    Junction* get_junction_by_index(HashIntoType u, HashIntoType v, HashIntoType w) const
     {
         return get_junction(u ^ v ^ w);
-    }
-
-    Junction* get_junction(Junction& junction) const
-    {
-        return get_junction(junction.id());
-    }
-
-    Junction* new_junction(HashIntoType u, HashIntoType v, HashIntoType w)
-    {
-        Junction* j = new Junction();
-        j->u = u;
-        j->v = v;
-        j->w = w;
-        j->count = 0;
-        junctions[j->id()] = j;
-        return j;
     }
 
     Junction* fetch_or_new_junction(HashIntoType u, HashIntoType v, 
                                     HashIntoType w, uint64_t& counter)
     {
-        Junction* j = get_junction(u, v, w);
+        Junction* j = get_junction_by_index(u, v, w);
         if (j != nullptr) {
             j->count = j->count + 1;
         } else {
@@ -422,10 +214,10 @@ public:
         return j;
     }
 
-    std::shared_ptr<JunctionList> get_junctions(const std::string& sequence) const
+    std::vector<uint64_t> get_junctions_ids(const std::string& sequence) const
     {
         KmerIterator kmers(sequence.c_str(), graph->ksize());
-        std::shared_ptr<JunctionList> junctions = make_shared<JunctionList>();
+        std::vector<uint64_t> junctions;
 
         Kmer u = kmers.next();
         if (kmers.done()) {
@@ -440,9 +232,9 @@ public:
         Junction* j;
 
         while(!kmers.done()) {
-            j = get_junction(u, v, w);
+            j = get_junction_by_index(u, v, w);
             if (j != nullptr) {
-                junctions->push_back(j);
+                junctions->push_back(j->ID);
             }
             u = v;
             v = w;
@@ -451,11 +243,28 @@ public:
 
         return junctions;
     }
+
+    LinkSegment* get_link_segment(uint64_t start_junction_id) {
+        auto saerch = link_starts.find(start_junction_id);
+        if (search != link_starts.end()) {
+            return search->second;
+        }
+        return nullptr;
+    }
+
+    LinkSegment* fetch_or_new_link_segment(uint64_t start_junction_id) {
+        LinkSegment* l = get_link_segment(start_junction_id);
+        if (l != nullptr) {
+
+        } else {
+            l = new LinkTreeSegment();
+        }
+    }
  
-    void build_links(const std::string& sequence,
+    void build_link(const std::string& sequence,
                      Link* &fw_link, Link* &rc_link)
     {
-        std::cout << "build_links()" << std::endl;
+        std::cout << "build_link()" << std::endl;
         KmerIterator kmers(sequence.c_str(), graph->ksize());
         Kmer u, v, w;
         uint64_t d = 0;
@@ -475,26 +284,15 @@ public:
         w = kmers.next();
         ++d;
     
-        std::cout << "  - build_links: allocate new Link*" << std::endl;
-        fw_link = new Link(n_sequences_added, u.is_forward());
-        rc_link = new Link(n_sequences_added, !u.is_forward());
         uint64_t n_new_fw = 0;
-        uint64_t n_new_rc = 0;
-        uint64_t last_rc_pos = 0;
+        Junction* start = nullptr;
 
+        // find starting HDN that will index the Link
         Traverser traverser(graph.get());
-        while(!kmers.done()) {
-            if (traverser.degree_right(v) > 1) {
-                std::cout << "  - build_links: found FW HDN " << u << std::endl;
-                fw_link->push_back(fetch_or_new_junction(u, v, w, n_new_fw));
-                if (n_new_fw == 1) {
-                    fw_link->flanking_distance = d;
-                }
-            }
-            if (traverser.degree_left(v) > 1) {
-                std::cout << "  - build_links: found RC HDN " << v << std::endl;
-                rc_link->push_front(fetch_or_new_junction(w, v, u, n_new_rc));
-                last_rc_pos = d;
+        while(!kmers.done() && start == nullptr) {
+            if (traverser.degree(v) > 2) {
+                std::cout << "  - build_links: found lead HDN" << u << std::endl;
+                start = fetch_or_new_junction(u, v, w, n_new_fw);
             }
 
             u = v;
@@ -502,6 +300,10 @@ public:
             w = kmers.next();
             ++d;
         }
+
+
+
+
 
         if (fw_link->size() < 1) {
             std::cout << "  - build_links: (fw_link) no (new) junctions found." << std::endl;
