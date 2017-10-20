@@ -54,119 +54,99 @@ Contact: khmer-project@idyll.org
 
 namespace oxli {
 
-class Junction {
+using std::make_shared;
+using std::shared_ptr;
+
+typedef std::pair<HashIntoType, uint64_t> HashIDPair;
+typedef std::unordered_set<HashIntoType> HashSet;
+typedef std::vector<HashIntoType> HashVector;
+typedef std::unordered_multimap<HashIntoType, uint64_t> HashIDMap;
+
+class CompactEdge;
+class CompactNode {
 protected:
-    
-    static uint64_t junction_counter;
-
+    static uint64_t node_counter;
 public:
+    Kmer kmer;
+    uint32_t count;
+    const uint64_t node_id;
+    CompactEdge* in_edges[4] = {nullptr, nullptr, nullptr, nullptr};
+    CompactEdge* out_edges[4] = {nullptr, nullptr, nullptr, nullptr};
 
-    // [u]-->[v (HDN)]-->[w]
-    HashIntoType u;
-    HashIntoType v;
-    HashIntoType w;
-    const uint64_t ID;
+    CompactNode(Kmer kmer): kmer(kmer), count(0), node_id(node_counter++) {}
 
-    Junction() = default;
+    friend bool operator== (const CompactNode* lhs, const CompactNode* rhs) {
+        return lhs->node_id == rhs->node_id;
+    }
 
-    Junction(HashIntoType u, HashIntoType v, HashIntoType w) :
-        u(u), v(v), w(w), ID(junction_counter++) {}
+    void add_in_edge(const char base, CompactEdge* edge) {
+        in_edges[twobit_repr(base)] = edge;
+    }
 
-    uint64_t index() const { return u ^ v ^ w; }
+    CompactEdge* get_in_edge(const char base) {
+        return in_edges[twobit_repr(base)];
+    }
 
-    bool matches(HashIntoType u,
-                 HashIntoType v,
-                 HashintoType w) { return (u ^ v ^ w) == index(); }
+    void add_out_edge(const char base, CompactEdge* edge) {
+        out_edges[twobit_repr(base)] = edge;
+    }
 
-    friend std::ostream& operator<< (std::ostream& stream,
-                                    const Junction& j);
-    friend bool operator== (const Junction& lhs,
-                            const Junction& rhs) {
-        return lhs.index() == rhs.index();
+    CompactEdge* get_out_edge(const char base) {
+        return out_edges[twobit_repr(base)];
     }
 };
 
 
-typedef std::list<Junction*> JunctionList;
-
-#define FW 1
-#define RC 0
-
-class LinkTreeSegment {
-protected:
-    static uint64_t segment_counter;
+class CompactEdge {
 public:
-    const uint64_t segment_id;
-    std::vector<uint64_t> 
-    std::vector<uint64_t> junctions; // IDs of junctions in this segment
-    uint64_t children[4]; // child segment IDs
-    uint32_t count;
+    HashIntoType left; // left and right HDNs
+    HashIntoType right;
+    HashSet tags;
+    bool is_tip;
+    bool dirty;
+    std::string sequence; // optional
 
-    LinkTreeSegment() : segment_id(segment_counter++) {}
-
+    CompactEdge(HashIntoType left, HashIntoType right) : 
+        left(left), right(right), is_tip(false), dirty(false) {}
+    CompactEdge(HashIntoType left, HashIntoType right, bool is_tip) :
+        left(left), right(right), is_tip(is_tip), dirty(false) {}
 };
 
 
+typedef std::vector<CompactNode> CompactNodeVector;
+typedef std::unordered_multimap<HashIntpType, CompactEdge*> TagEdgeMap;
+typedef std::pair<HashIntoType, CompactEdge*> TagEdgePair;
+typedef std::set<TagEdgePair> TagEdgePairSet;
 
-// Compare the two link cursors first by their age within the
-// traversal, then by their global age. We prefer links
-// that were found earlier in the traversal, but were created
-// most recently.
-/*
-inline bool CompareLinks(const LinkCursor& a, const LinkCursor& b)
-{
-    if (a.traversal_age < b.traversal_age) { return false; }
-    if (b.traversal_age < a.traversal_age) { return true; }
-
-    if ((a.link)->time_created > (b.link)->time_created) { return false; }
-    if ((b.link)->time_created > (a.link)->time_created) { return true; }
-
-    return false;
-}
-*/
-
-
-typedef std::unordered_multimap<HashIntoType, LinkSegment*> LinkSegmentMap;
-typedef std::vector<LinkTreeSegment> LinkSegmentVector;
-typedef std::vector<Junction> JunctionVector;
-typedef std::unordered_map<HashIntoType, Junction*> JunctionMap;
-typedef std::pair<HashIntoType, LinkSegment*> LinkMapPair;
 
 class GraphLinker
 {
 protected:
-    // map from starting high degree nodes to associated links
-    LinkSegmentMap link_segments;
-    // linear storage for Junctions
-    JunctionVector junctions;
-    // map from junction keys to Junction*
-    JunctionMap    junction_map;
+    // map from HDN hashes to CompactNode IDs
+    HashIDMap hdn_ids;
+    // linear storage for CompactNodes
+    CompactNodeVector compact_nodes;
+    // map from tags to CompactEdges
+    TagEdgeMap tags_to_edges;
+
     uint64_t n_sequences_added;
 
-    // can cause duplicate junctions if we don't check the map first;
-    // this just keeps junctions on the same cache line if they're
-    // allocated one after the other
-    Junction* new_junction(HashIntoType u, HashIntoType v, HashIntoType w)
+    CompactNode* new_compact_node(Kmer hdn)
     {
-        junctions.emplace_back(u, v, w);
-
-        Junction* j = &(junctions.back);
-        junctions[j->index()] = j;
-        return j;
-    }
-
-    LinkTreeSegment* new_link_tree_segment(uint64_t junction_id)
-    {
-        link_segments.emplace_back();
-        l = &(link_segments.back);
-        return l;
+        CompactNode * v = get_compact_node_by_kmer(hdn);
+        if (v == nullptr) {
+            compact_nodes.emplace_back(hdn);
+            v = &(compact_nodes.back);
+            hdn_ids[hdn] = v->node_id;
+        }
+        return v;
     }
 
 public:
 
-    std::shared_ptr<Hashgraph> graph;
+    shared_ptr<Hashgraph> graph;
     
-    GraphLinker(std::shared_ptr<Hashgraph> graph) :
+    GraphLinker(shared_ptr<Hashgraph> graph) :
         graph(graph), n_sequences_added(0)
     {
 
@@ -186,235 +166,190 @@ public:
         std::cout << "  * " << links.size() << " links" << std::endl;
     }
 
-    Junction* get_junction_by_index(HashIntoType key) const
+    CompactNode* get_compact_node_by_kmer(HashIntoType hdn) const
     {
-        auto search = junctions.find(key);
-        if (search != junctions.end()) {
-            return search->second;
+        auto search = hdn_ids.find(hdn);
+        if (search != hdn_ids.end()) {
+            uint64_t ID = search->second;
+            return &(compact_nodes[ID]);
         }
         return nullptr;
     }
 
-    Junction* get_junction_by_index(HashIntoType u, HashIntoType v, HashIntoType w) const
+    CompactNode* fetch_or_new_compact_node(Kmer hdn)
     {
-        return get_junction(u ^ v ^ w);
-    }
-
-    Junction* fetch_or_new_junction(HashIntoType u, HashIntoType v, 
-                                    HashIntoType w, uint64_t& counter)
-    {
-        Junction* j = get_junction_by_index(u, v, w);
-        if (j != nullptr) {
-            j->count = j->count + 1;
+        CompactNode* v = get_compact_node_by_kmer(hdn);
+        if (v != nullptr) {
+            v->count += 1;
         } else {
-            counter++;
-            j = new_junction(u, v, w);
-            j->count = 1;
+            v = new_compact_node(hdn);
+            v->count = 1;
         }
-        return j;
+        return v;
     }
 
-    std::vector<uint64_t> get_junctions_ids(const std::string& sequence) const
+    std::vector<uint64_t> get_compact_node_ids(const std::string& sequence) const
     {
         KmerIterator kmers(sequence.c_str(), graph->ksize());
-        std::vector<uint64_t> junctions;
+        std::vector<uint64_t> ids;
 
-        Kmer u = kmers.next();
-        if (kmers.done()) {
-            return junctions;
-        }
-        Kmer v = kmers.next();
-        if (kmers.done()) {
-            return junctions;
-        }
-        Kmer w = kmers.next();
-
-        Junction* j;
+        CompactNode* node;
 
         while(!kmers.done()) {
-            j = get_junction_by_index(u, v, w);
+            Kmer kmer = kmers.next();
+
+            node = get_compact_node_by_kmer(kmer);
             if (j != nullptr) {
-                junctions->push_back(j->ID);
+                ids->push_back(node->node_id);
             }
-            u = v;
-            v = w;
-            w = kmers.next();
         }
 
-        return junctions;
+        return ids;
     }
 
-    LinkSegment* get_link_segment(uint64_t start_junction_id) {
-        auto saerch = link_starts.find(start_junction_id);
-        if (search != link_starts.end()) {
+    CompactEdge* get_compact_edge(uint64_t tag) {
+        auto search = tags_to_edges.find(tag);
+        if (search != tags_to_edges.end()) {
             return search->second;
         }
         return nullptr;
     }
 
-    LinkSegment* fetch_or_new_link_segment(uint64_t start_junction_id) {
-        LinkSegment* l = get_link_segment(start_junction_id);
-        if (l != nullptr) {
-
-        } else {
-            l = new LinkTreeSegment();
+    TagEdgePair get_tag_edge_pair(uint64_t tag) {
+        auto search = tags_to_edges.find(tag);
+        if (search != tags_to_edges.end()) {
+            return &search;
         }
+        return nullptr;
     }
- 
-    void build_link(const std::string& sequence,
-                     Link* &fw_link, Link* &rc_link)
-    {
-        std::cout << "build_link()" << std::endl;
-        KmerIterator kmers(sequence.c_str(), graph->ksize());
-        Kmer u, v, w;
-        uint64_t d = 0;
 
-        u = kmers.next();
-        ++d;
-        if (kmers.done()) {
-            fw_link = rc_link = nullptr;
-            return;
-        }
-        v = kmers.next();
-        ++d;
-        if (kmers.done()) {
-            fw_link = rc_link = nullptr;
-            return;
-        }
-        w = kmers.next();
-        ++d;
-    
-        uint64_t n_new_fw = 0;
-        Junction* start = nullptr;
-
-        // find starting HDN that will index the Link
-        Traverser traverser(graph.get());
-        while(!kmers.done() && start == nullptr) {
-            if (traverser.degree(v) > 2) {
-                std::cout << "  - build_links: found lead HDN" << u << std::endl;
-                start = fetch_or_new_junction(u, v, w, n_new_fw);
+    CompactEdge* get_edge_froms_tags(HashSet& tags) {
+        CompactEdge * edge = nullptr;
+        for (auto tag: tags) {
+            edge = get_compact_edge(tag);
+            if (edge != nullptr) {
+                break;
             }
-
-            u = v;
-            v = w;
-            w = kmers.next();
-            ++d;
         }
+        return edge;
+    }
 
-
-
-
-
-        if (fw_link->size() < 1) {
-            std::cout << "  - build_links: (fw_link) no (new) junctions found." << std::endl;
-            delete fw_link;
-            fw_link = nullptr;
-        }
-
-        if (rc_link->size() < 1) {
-            std::cout << "  - build_links: (rc_link) no (new) junctions found." << std::endl;
-            delete rc_link;
-            rc_link = nullptr;
-        } else {
-            rc_link->flanking_distance = d - last_rc_pos;
+    void assign_tags_to_edge(HashSet& tags, CompactEdge* edge) {
+        for (auto tag: tags) {
+            tags_to_edges[tag] = edge;
         }
     }
 
-
-    void add_links(const std::string& sequence)
-    {
-        std::cout << "add_links('" << sequence << "')" << std::endl;
-        Link * fw_link = nullptr;
-        Link * rc_link = nullptr;
-        n_sequences_added++;
-        build_links(sequence, fw_link, rc_link);
-
-        if (fw_link != nullptr) {
-            std::cout << "  - add_links: insert found fw_link" << std::endl;
-            Junction* start = fw_link->start_junction();
-            std::cout << "    * start junction: " << &start << std::endl;
-            links.insert(LinkMapPair(start->v, fw_link));
-        }
-        if (rc_link != nullptr) {
-            std::cout << "  - add_links: insert found rc_link" << std::endl;
-            Junction* start = rc_link->start_junction();
-            std::cout << "    * start junction: " << &start << std::endl;
-            links.insert(LinkMapPair(start->v, rc_link));
-        }
+    KmerFilter get_tag_finder(shared_ptr<TagEdgePairSet> found_pairs,
+                              shared_ptr<KmerSet> found_unresolved_tags,
+                              shared_ptr<KmerSet> all_unresolved_tags) {
+        KmerFilter finder = [=] (const Kmer& node) {
+            TagEdgePair edge_pair = get_tag_edge_pair(node);
+            if (edge_pair != nullptr) {
+                found_pairs->insert(edge_pair);
+            }
+            if (set_contains(all_unresolved_tags, node) {
+                found_unresolved_tags->insert(node);
+            }
+            return false; // never filter node, just gather while we're looking
+        }       
     }
 
-    uint64_t get_links(Kmer hdn, std::shared_ptr<LinkList> found_links)
-    {
-        auto range = links.equal_range(hdn);
-        uint64_t n_links_found = 0;
-        for (auto it = range.first; it != range.second; ++it) {
-            found_links->push_back(it->second);
-            n_links_found++;
+    template<bool direction>
+    void update_compact_dbg(shared_ptr<KmerSet> unresolved_tags) {
+
+        HashVector unresolved_q;
+        for (auto tag: unresolved_tags) {
+            unresolved_q.push_back(tag);
         }
-        return n_links_found;
+
+        CompactingAssembler at(graph.get());
+        shared_ptr<SeenSet> visited = make_shared<SeenSet>();
+        while(unresolved_q.size() > 0) {
+            auto start_tag = unresolved_q.back();
+            unresolved_q.pop_back();
+
+            if (!set_contains(&unresolved_tags, start_tag)) {
+                continue;
+            }
+            
+            shared_ptr<TagEdgePairSet> segment_edges = make_shared<TagEdgePairSet>();
+            shared_ptr<HashSet> segment_new_tags = make_shared<HashSet>();
+            CompactingAT<LEFT> lcursor(graph.get(), tag
+
+
+        }
+
+        shared_ptr<TagEdgePairSet> found_edges;
+        shared_ptr<
+        filters.push_back(get_tag_finder(found_edges));
+        CompactingAT<direction> cursor(graph, from, visited);
+        at._assemble_directed<direction>(cursor);
+
+        if (cursor.cursor_degree() == 0) { // at a tip
+            
+        }
+        
     }
 
-    uint64_t get_links(std::list<Kmer> high_degree_nodes, 
-                   std::shared_ptr<LinkList> found_links)
-    {
-        uint64_t n_links_found = 0;
-        for (Kmer hdn : high_degree_nodes) {
-            n_links_found += get_links(hdn, found_links);
-        }
-        return n_links_found;
+    void update_compact_dbg(const std::string& sequence) {
+        std::cout << "update_compact_dbg()" << std::endl;
+
+        shared_ptr<HashSet> new_tags = make_shared<HashSet>();
+        shared_ptr<HashSet> known_tags = make_shared<HashSet>();
+        uint64_t n_consumed = 0;
+        consume_sequence_and_tag(sequence, n_consumed, new_tags, known_tags);
+
+
     }
 
-    std::shared_ptr<LinkList> get_links(const std::string& sequence)
-    {
-        std::cout << "get_links('" << sequence << "')" << std::endl;
-        KmerIterator kmers(sequence.c_str(), graph->ksize());
-        Traverser traverser(graph.get());
-        std::list<Kmer> hdns;
+    // sigh at duplicated code from Hashgraph... perhaps in the future
+    // that function can be templated to accept multiple Set types for tags
+    void consume_sequence_and_tag(const std::string& seq,
+                                  unsigned long long& n_consumed,
+                                  shared_ptr<KmerSet> new_tags,
+                                  shared_ptr<KmerSet> known_tags) {
+        bool kmer_tagged;
 
-        std::cout << "  - get_link: start iterating k-mers" << std::endl;
-        Kmer kmer = kmers.next();
+        KmerIterator kmers(seq.c_str(), _ksize);
+        Kmer kmer;
+
+        unsigned int since = _tag_density / 2 + 1;
+
         while(!kmers.done()) {
-            if (traverser.degree(kmer) > 2) {
-                hdns.push_back(kmer);
-            }
             kmer = kmers.next();
+            bool is_new_kmer;
+
+            if ((is_new_kmer = graph->add(kmer))) {
+                ++n_consumed;
+            }
+
+            if (is_new_kmer) {
+                ++since;
+            } else {
+                kmer_tagged = set_contains(tags_to_edges, kmer);
+                if (kmer_tagged) {
+                    since = 1;
+                    known_tags->insert(kmer);
+                } else {
+                    ++since;
+                }
+            }
+
+            if (since >= _tag_density) {
+                new_tags->insert(kmer);
+                since = 1;
+            }
+
+        } // iteration over kmers
+
+        if (since >= _tag_density/2 - 1) {
+            new_tags->insert(kmer);	// insert the last k-mer, too.
         }
-        std::cout << "  - get_links: found " << hdns.size() << " hdns" << std::endl;
-
-        std::shared_ptr<LinkList> found_links = make_shared<LinkList>();
-        get_links(hdns, found_links);
-        std::cout << "  - get_links: returning " << found_links->size() << " links" << std::endl;
-        return found_links;
     }
 
 };
 
-/*
-
-class LinkedAssembler
-{
-    std::shared_ptr<LinearAssembler> linear_asm;
-
-public:
-
-    const std::shared_ptr<Hashgraph> graph;
-    const std::shared_ptr<GraphLinker> linker;
-    WordLength _ksize;
-
-    explicit LinkedAssembler(std::shared_ptr<GraphLinker> linker) :
-        _ksize(linker->ksize()), graph(linker->graph), linker(linker)
-    {
-        linear_asm = make_shared<LinearAssembler>(graph.get());
-    }
-
-    StringVector assemble(const Kmer seed_kmer,
-                          std::shared_ptr<Hashgraph> stop_bf=nullptr) const;
-
-    template <bool direction>
-    void _assemble_directed(AssemblerTraverser<direction>& cursor,
-                            StringVector& paths) const;
-};
-*/
 
 
 }

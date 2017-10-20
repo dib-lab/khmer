@@ -164,7 +164,7 @@ void deallocate_ptr_set(T& s)
 
 class Kmer;
 typedef std::queue<Kmer> KmerQueue;
-typedef std::set<Kmer> KmerSet;
+typedef std::unordered_set<Kmer> KmerSet;
 
 // A function which takes a Kmer and returns true if it
 // is to be filtered / ignored

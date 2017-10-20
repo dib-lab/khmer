@@ -49,10 +49,11 @@ namespace oxli
  * Simple Linear Assembly
  ********************************/
 
-LinearAssembler::LinearAssembler(const Hashgraph * ht) :
+LinearAssembler::LinearAssembler(const Hashgraph * ht,
+                                 std::shared_ptr<SeenSet> global_visited) :
     graph(ht), _ksize(ht->ksize())
 {
-
+    global_visited = global_visited;
 }
 
 // Starting from the given seed k-mer, assemble the maximal linear path in
@@ -72,7 +73,13 @@ const
         node_filters.push_back(get_stop_bf_filter(stop_bf));
     }
 
-    std::shared_ptr<SeenSet> visited = std::make_shared<SeenSet>();
+    std::shared_ptr<SeenSet> visited;
+    if (global_visited != nullptr) {
+        visited = global_visited;
+    } else {
+        visited = std::make_shared<SeenSet>();
+    }
+
     AssemblerTraverser<TRAVERSAL_RIGHT> rcursor(graph, seed_kmer, node_filters, visited);
     AssemblerTraverser<TRAVERSAL_LEFT> lcursor(graph, seed_kmer, node_filters, visited);
 
@@ -98,7 +105,17 @@ const
         node_filters.push_back(get_stop_bf_filter(stop_bf));
     }
 
-    AssemblerTraverser<TRAVERSAL_RIGHT> cursor(graph, seed_kmer, node_filters);
+    std::shared_ptr<SeenSet> visited;
+    if (global_visited != nullptr) {
+        visited = global_visited;
+    } else {
+        visited = std::make_shared<SeenSet>();
+    }
+
+    AssemblerTraverser<TRAVERSAL_RIGHT> cursor(graph, 
+                                               seed_kmer, 
+                                               node_filters,
+                                               visited);
     return _assemble_directed<TRAVERSAL_RIGHT>(cursor);
 }
 
@@ -112,7 +129,17 @@ const
         node_filters.push_back(get_stop_bf_filter(stop_bf));
     }
 
-    AssemblerTraverser<TRAVERSAL_LEFT> cursor(graph, seed_kmer, node_filters);
+    std::shared_ptr<SeenSet> visited;
+    if (global_visited != nullptr) {
+        visited = global_visited;
+    } else {
+        visited = std::make_shared<SeenSet>();
+    }
+
+    AssemblerTraverser<TRAVERSAL_LEFT> cursor(graph, 
+                                              seed_kmer, 
+                                              node_filters,
+                                              visited);
     return _assemble_directed<TRAVERSAL_LEFT>(cursor);
 }
 
@@ -190,7 +217,13 @@ const
         node_filters.push_back(get_stop_bf_filter(stop_bf));
     }
 
-    std::shared_ptr<SeenSet> visited = std::make_shared<SeenSet>();
+    std::shared_ptr<SeenSet> visited;
+    if (global_visited != nullptr) {
+        visited = global_visited;
+    } else {
+        visited = std::make_shared<SeenSet>();
+    }
+
     CompactingAT<TRAVERSAL_RIGHT> rcursor(graph, seed_kmer, node_filters, visited);
     CompactingAT<TRAVERSAL_LEFT> lcursor(graph, seed_kmer, node_filters, visited);
 
@@ -210,7 +243,14 @@ const
         node_filters.push_back(get_stop_bf_filter(stop_bf));
     }
 
-    CompactingAT<TRAVERSAL_RIGHT> cursor(graph, seed_kmer, node_filters);
+    std::shared_ptr<SeenSet> visited;
+    if (global_visited != nullptr) {
+        visited = global_visited;
+    } else {
+        visited = std::make_shared<SeenSet>();
+    }
+
+    CompactingAT<TRAVERSAL_RIGHT> cursor(graph, seed_kmer, node_filters, visited);
     return LinearAssembler::_assemble_directed<TRAVERSAL_RIGHT>(cursor);
 }
 
@@ -224,7 +264,14 @@ const
         node_filters.push_back(get_stop_bf_filter(stop_bf));
     }
 
-    CompactingAT<TRAVERSAL_LEFT> cursor(graph, seed_kmer, node_filters);
+    std::shared_ptr<SeenSet> visited;
+    if (global_visited != nullptr) {
+        visited = global_visited;
+    } else {
+        visited = std::make_shared<SeenSet>();
+    }
+
+    CompactingAT<TRAVERSAL_LEFT> cursor(graph, seed_kmer, node_filters, visited);
     return LinearAssembler::_assemble_directed<TRAVERSAL_LEFT>(cursor);
 }
 

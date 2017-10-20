@@ -4,18 +4,9 @@
 
 using namespace oxli;
 
-std::ostream& operator<<(std::ostream& stream,
-                         const oxli::Junction& j)
-{
-    stream << "Junction<(" << j.u << ", " << j.v << << ", " << j.w <<
-        "), count=" << j.count << ", index=" << j.index() << ">";
-    return stream;
-}
-
 namespace oxli {
 
-uint64_t Junction::junction_counter = 0;
-uint64_t LinkTreeSegment::segment_counter = 0;
+uint64_t CompactNode::node_counter = 0;
 
 /*
 template <bool direction>

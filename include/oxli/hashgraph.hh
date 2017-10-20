@@ -196,7 +196,8 @@ public:
     // consume a string & add sparse graph nodes.
     void consume_sequence_and_tag(const std::string& seq,
                                   unsigned long long& n_consumed,
-                                  SeenSet * new_tags = 0);
+                                  SeenSet * new_tags = nullptr,
+                                  SeenSet * tag_set = nullptr);
 
     // get the tags present in this sequence.
     void get_tags_for_sequence(const std::string& seq,

@@ -199,9 +199,13 @@ void Hashgraph::load_tagset(std::string infilename, bool clear_tags)
 
 void Hashgraph::consume_sequence_and_tag(const std::string& seq,
         unsigned long long& n_consumed,
-        SeenSet * found_tags)
+        SeenSet * found_tags,
+        SeenSet * tag_set)
 {
     bool kmer_tagged;
+    if (tag_set == nullptr) {
+        tag_set = all_tags;
+    }
 
     KmerIterator kmers(seq.c_str(), _ksize);
     HashIntoType kmer;
@@ -226,11 +230,11 @@ void Hashgraph::consume_sequence_and_tag(const std::string& seq,
             ++since;
         } else {
             ACQUIRE_ALL_TAGS_SPIN_LOCK
-            kmer_tagged = set_contains(all_tags, kmer);
+            kmer_tagged = set_contains(tag_set, kmer);
             RELEASE_ALL_TAGS_SPIN_LOCK
             if (kmer_tagged) {
                 since = 1;
-                if (found_tags) {
+                if (found_tags != nullptr) {
                     found_tags->insert(kmer);
                 }
             } else {
@@ -238,9 +242,9 @@ void Hashgraph::consume_sequence_and_tag(const std::string& seq,
             }
         }
 #else
-        if (!is_new_kmer && set_contains(all_tags, kmer)) {
+        if (!is_new_kmer && set_contains(tag_set, kmer)) {
             since = 1;
-            if (found_tags) {
+            if (found_tags != nullptr) {
                 found_tags->insert(kmer);
             }
         } else {
@@ -250,9 +254,9 @@ void Hashgraph::consume_sequence_and_tag(const std::string& seq,
 
         if (since >= _tag_density) {
             ACQUIRE_ALL_TAGS_SPIN_LOCK
-            all_tags.insert(kmer);
+            tag_set.insert(kmer);
             RELEASE_ALL_TAGS_SPIN_LOCK
-            if (found_tags) {
+            if (found_tags != nullptr) {
                 found_tags->insert(kmer);
             }
             since = 1;
@@ -262,9 +266,9 @@ void Hashgraph::consume_sequence_and_tag(const std::string& seq,
 
     if (since >= _tag_density/2 - 1) {
         ACQUIRE_ALL_TAGS_SPIN_LOCK
-        all_tags.insert(kmer);	// insert the last k-mer, too.
+        tag_set.insert(kmer);	// insert the last k-mer, too.
         RELEASE_ALL_TAGS_SPIN_LOCK
-        if (found_tags) {
+        if (found_tags != nullptr) {
             found_tags->insert(kmer);
         }
     }

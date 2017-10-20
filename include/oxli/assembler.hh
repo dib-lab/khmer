@@ -79,8 +79,10 @@ public:
 
     WordLength _ksize;
     const Hashgraph * graph;
+    std::shared_ptr<SeenSet> global_visited;
 
-    explicit LinearAssembler(const Hashgraph * ht);
+    explicit LinearAssembler(const Hashgraph * ht,
+                             std::shared_ptr<SeenSet> global_visited = nullptr);
 
     virtual std::string assemble(const Kmer seed_kmer,
                                  const Hashgraph * stop_bf = 0) const;
@@ -98,19 +100,18 @@ public:
 // The explicit specializations need to be declared in the same translation unit
 // as their unspecialized declaration.
 template<>
-std::string LinearAssembler::_assemble_directed<TRAVERSAL_LEFT>(AssemblerTraverser<TRAVERSAL_LEFT>
-        &cursor) const;
+std::string LinearAssembler::_assemble_directed<TRAVERSAL_LEFT>(AssemblerTraverser<TRAVERSAL_LEFT> &cursor) const;
 
 template<>
-std::string LinearAssembler::_assemble_directed<TRAVERSAL_RIGHT>(AssemblerTraverser<TRAVERSAL_RIGHT>
-        &cursor) const;
+std::string LinearAssembler::_assemble_directed<TRAVERSAL_RIGHT>(AssemblerTraverser<TRAVERSAL_RIGHT> &cursor) const;
 
 
 class CompactingAssembler: public LinearAssembler
 {
 public:
 
-    explicit CompactingAssembler(const Hashgraph* ht) : LinearAssembler(ht) {}
+    explicit CompactingAssembler(const Hashgraph* ht,
+                                 std::shared_ptr<SeenSet> global_visited=nullptr) : LinearAssembler(ht, global_visited) {}
 
     virtual std::string assemble(const Kmer seed_kmer,
                                           const Hashgraph * stop_bf) const;
@@ -120,6 +121,13 @@ public:
 
     virtual std::string assemble_left(const Kmer seed_kmer,
                               const Hashgraph * stop_bf = 0) const;
+
+    template<bool direction>
+    std::string CompactingAssembler::
+    _assemble_directed(CompactingAT<direction>& cursor) const 
+    {
+        return LinearAssembler::_assemble_directed<direction>(cursor);
+    }
 };
 typedef CompactingAssembler CpCompactingAssembler;
 
