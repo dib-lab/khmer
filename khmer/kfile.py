@@ -135,7 +135,7 @@ def check_space(in_files, force, _testhook_free_space=None):
     size_diff = total_size - free_space
     if size_diff > 0:
         mem_needed = '{:.1f} GB'.format(size_diff / 1e9)
-        mem_requested = '{:.1f} GB'.format(hash_size / 1e9)
+        mem_requested = '{:.1f} GB'.format(total_size / 1e9)
         mem_available = '{:.1f} GB'.format(free_space / 1e9)
         message = 'Not enough free space on disk for output files;'
         message += '\n       Need at least {:s} more.'.format(mem_needed)
