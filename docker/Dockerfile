@@ -11,7 +11,7 @@ RUN apt-get update && \
 WORKDIR /home
 
 ARG branch
-ENV branch ${branch:-v2.1.1}
+ENV branch ${branch:-v2.1.2}
 
 RUN git clone https://github.com/dib-lab/khmer.git && \
     cd khmer && \

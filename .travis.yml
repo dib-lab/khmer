@@ -87,7 +87,9 @@ script:
   - make py-demos
   - make cpp-demos
   - cd examples/stamps && ./do.sh
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cd ../.. && COMMIT=$TRAVIS_PULL_REQUEST_SHA make docker-container; fi
+  # ${TRAVIS_PULL_REQUEST_SHA:-$TRAVIS_COMMIT} makes sure we get the commit
+  # that travis is testing during a PR and when we build master
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cd ../.. && COMMIT=${TRAVIS_PULL_REQUEST_SHA:-$TRAVIS_COMMIT} make docker-container; fi
 
 # generate all the diagnostic reports
 after_success:
