@@ -193,6 +193,8 @@ public:
      * @return Degree of the current cursor position and direction.
      */
     unsigned int cursor_degree() const;
+    unsigned int in_degree() const;
+    unsigned int out_degree() const;
 
 };
 

@@ -245,6 +245,7 @@ public:
     // Calculate the graph degree of the given k-mer.
     unsigned int kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r);
     unsigned int kmer_degree(const char * kmer_s);
+    unsigned int kmer_degree(Kmer kmer);
 
     // Find all nodes with a degree > 2.
     void find_high_degree_nodes(const char * sequence,

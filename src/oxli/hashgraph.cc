@@ -488,6 +488,11 @@ unsigned int Hashgraph::kmer_degree(const char * kmer_s)
     return traverser.degree(node);
 }
 
+unsigned int Hashgraph::kmer_degree(Kmer kmer)
+{
+    return kmer_degree(kmer.kmer_r, kmer.kmer_f);
+}
+
 size_t Hashgraph::trim_on_stoptags(std::string seq) const
 {
     KmerIterator kmers(seq.c_str(), _ksize);
