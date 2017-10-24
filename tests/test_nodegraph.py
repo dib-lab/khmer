@@ -444,16 +444,16 @@ def test_kmer_neighbors():
         'AAAA', 'AAAA']  # AAAA on both sides
 
     h = nodegraph.hash('AAAT')
-    assert n_to_str(nodegraph.neighbors(h)) == ['AAAA']      # AAAA on one side
-    assert n_to_str(nodegraph.neighbors('AAAT')) == ['AAAA'] # AAAA on one side
+    assert n_to_str(nodegraph.neighbors(h)) == ['AAAA']       # AAAA on 1 side
+    assert n_to_str(nodegraph.neighbors('AAAT')) == ['AAAA']  # AAAA on 1 side
 
     h = nodegraph.hash('AATA')
     assert nodegraph.neighbors(h) == []           # no neighbors
     assert n_to_str(nodegraph.neighbors('AATA')) == []      # AAAA on one side
 
     h = nodegraph.hash('TAAA')
-    assert n_to_str(nodegraph.neighbors(h)) == ['AAAA']    # AAAA on both sides
-    assert n_to_str(nodegraph.neighbors('TAAA')) == ['AAAA'] # AAAA on both
+    assert n_to_str(nodegraph.neighbors(h)) == ['AAAA']       # AAAA on both
+    assert n_to_str(nodegraph.neighbors('TAAA')) == ['AAAA']  # AAAA on both
 
 
 def test_kmer_neighbors_wrong_ksize():
