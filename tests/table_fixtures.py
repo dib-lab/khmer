@@ -36,7 +36,8 @@
 
 
 from khmer import Countgraph, SmallCountgraph, Nodegraph
-from khmer import Nodetable, Counttable, SmallCounttable, QFCounttable
+from khmer import (Nodetable, Counttable, CyclicCounttable, SmallCounttable,
+                   QFCounttable)
 from khmer._oxli.utils import get_n_primes_near_x
 
 import math
@@ -64,8 +65,8 @@ def tablewrapper(tabletype):
     return build
 
 
-@pytest.fixture(params=[Countgraph, Counttable, SmallCountgraph,
-                        SmallCounttable, Nodegraph, Nodetable])
+@pytest.fixture(params=[Countgraph, Counttable, CyclicCounttable,
+                        SmallCountgraph, SmallCounttable, Nodegraph, Nodetable])
 def Tabletype(request):
     return tablewrapper(request.param)
 
@@ -79,8 +80,8 @@ def AnyTabletype(request):
 
 
 # all the counting types!
-@pytest.fixture(params=[Countgraph, Counttable, SmallCountgraph,
-                        SmallCounttable])
+@pytest.fixture(params=[Countgraph, Counttable, CyclicCounttable,
+                        SmallCountgraph, SmallCounttable])
 def Countingtype(request):
     return tablewrapper(request.param)
 

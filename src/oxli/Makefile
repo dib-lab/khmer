@@ -84,7 +84,7 @@ endif
 WARNINGS=-Wall
 
 # Flags in common to C and C++
-COMMON_FLAGS=-O3 -fPIC -fno-omit-frame-pointer -march=haswell
+COMMON_FLAGS=-O3 -fPIC -fno-omit-frame-pointer
 SEQAN_FLAGS=-DSEQAN_HAS_ZLIB=1 -DSEQAN_HAS_BZIP2=1
 
 # Base C/CXXFLAGS

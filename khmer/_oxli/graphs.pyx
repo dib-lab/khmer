@@ -31,7 +31,7 @@ CYTHON_TABLES = (Hashtable, Nodetable, Counttable, CyclicCounttable,
 cdef class Hashtable:
 
     cpdef bytes sanitize_seq_kmer(self, object kmer):
-        '''Legnth sanitize a string k-mer and return as bytes.'''
+        '''Length sanitize a string k-mer and return as bytes.'''
         if len(kmer) != self.ksize():
             raise ValueError("Expected k-mer length {}"
                              " but got {}.".format(self.ksize(), len(kmer)))
