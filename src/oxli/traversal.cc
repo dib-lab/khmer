@@ -123,9 +123,11 @@ const
         // Get the putative neighboring Kmer
         Kmer neighbor = get_neighbor(node, base);
         // Now check if it's in the graph and passes the filters
-        if (graph->get_count(neighbor) && !(apply_kmer_filters(neighbor, filters))) {
-            node_q.push(neighbor);
+        if (graph->get_count(neighbor)) {
             ++found;
+            if (!apply_kmer_filters(neighbor, filters)) {
+                node_q.push(neighbor);
+           }
         }
         ++base;
     }
@@ -295,6 +297,18 @@ AssemblerTraverser<direction>::AssemblerTraverser(const Hashgraph * ht,
     AssemblerTraverser<direction>::push_filter(get_visited_filter(visited));
 }
 
+
+template <bool direction>
+AssemblerTraverser<direction>::AssemblerTraverser(const Hashgraph * ht,
+                                                  Kmer start_kmer,
+                                                  KmerFilter filter) :
+    NodeCursor<direction>(ht, start_kmer, filter)
+{
+    visited = std::make_shared<SeenSet>();
+    AssemblerTraverser<direction>::push_filter(get_visited_filter(visited));
+}
+
+
 template<bool direction>
 AssemblerTraverser<direction>::AssemblerTraverser(const AssemblerTraverser<direction>& other) :
     AssemblerTraverser<direction>(other.graph, other.cursor, other.filters, other.visited)
@@ -374,6 +388,14 @@ CompactingAT<direction>::CompactingAT(const Hashgraph * ht,
                                       Kmer start_kmer,
                                       KmerFilterList filters) :
     AssemblerTraverser<direction>(ht, start_kmer, filters), traverser(ht)
+{
+}
+
+template <bool direction>
+CompactingAT<direction>::CompactingAT(const Hashgraph * ht,
+                                      Kmer start_kmer,
+                                      KmerFilter filter) :
+    AssemblerTraverser<direction>(ht, start_kmer, filter), traverser(ht)
 {
 }
 

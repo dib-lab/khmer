@@ -134,7 +134,7 @@ public:
      * @param node The Kmer to start at.
      * @param node_q To collect the results.
      *
-     * @return Number of neighbors found.
+     * @return Number of neighbors total (could be more than those found).
      */
     unsigned int neighbors(const Kmer& node,
                            KmerQueue &node_q) const;
@@ -164,6 +164,7 @@ public:
     // The current position.
     Kmer cursor;
     using NodeGatherer<direction>::push_filter;
+    using NodeGatherer<direction>::neighbors;
 
     explicit NodeCursor(const Hashgraph * ht,
                         Kmer start_kmer,
@@ -253,6 +254,10 @@ protected:
 
 public:
     using NodeCursor<direction>::NodeCursor;
+
+    explicit AssemblerTraverser(const Hashgraph* ht,
+                                Kmer start_kmer,
+                                KmerFilter filter);
     
     explicit AssemblerTraverser(const Hashgraph * ht,
                                 Kmer start_kmer,
@@ -302,6 +307,9 @@ protected:
     Traverser traverser;
 
 public:
+    explicit CompactingAT(const Hashgraph * ht,
+                          Kmer start_kmer,
+                          KmerFilter filter);
 
     explicit CompactingAT(const Hashgraph * ht,
                           Kmer start_kmer,
