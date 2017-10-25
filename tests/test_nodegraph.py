@@ -433,24 +433,27 @@ def test_kmer_neighbors():
     nodegraph = khmer.Nodegraph(4, 100, 1)
     nodegraph.consume_seqfile(inpfile)
 
+    def n_to_str(x):
+        return [str(i) for i in x]
+
     h = nodegraph.hash('AAAA')
     print(type('AAAA'))
-    assert nodegraph.neighbors(
-        h) == ['AAAA', 'AAAA']       # AAAA on both sides
-    assert nodegraph.neighbors('AAAA') == [
+    assert n_to_str(nodegraph.neighbors(
+        h)) == ['AAAA', 'AAAA']       # AAAA on both sides
+    assert n_to_str(nodegraph.neighbors('AAAA')) == [
         'AAAA', 'AAAA']  # AAAA on both sides
 
     h = nodegraph.hash('AAAT')
-    assert nodegraph.neighbors(h) == ['AAAA']          # AAAA on one side
-    assert nodegraph.neighbors('AAAT') == ['AAAA']     # AAAA on one side
+    assert n_to_str(nodegraph.neighbors(h)) == ['AAAA']       # AAAA on 1 side
+    assert n_to_str(nodegraph.neighbors('AAAT')) == ['AAAA']  # AAAA on 1 side
 
     h = nodegraph.hash('AATA')
     assert nodegraph.neighbors(h) == []           # no neighbors
-    assert nodegraph.neighbors('AATA') == []      # AAAA on one side
+    assert n_to_str(nodegraph.neighbors('AATA')) == []      # AAAA on one side
 
     h = nodegraph.hash('TAAA')
-    assert nodegraph.neighbors(h) == ['AAAA']          # AAAA on both sides
-    assert nodegraph.neighbors('TAAA') == ['AAAA']     # AAAA on both sides
+    assert n_to_str(nodegraph.neighbors(h)) == ['AAAA']       # AAAA on both
+    assert n_to_str(nodegraph.neighbors('TAAA')) == ['AAAA']  # AAAA on both
 
 
 def test_kmer_neighbors_wrong_ksize():

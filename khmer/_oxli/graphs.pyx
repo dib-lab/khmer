@@ -439,7 +439,7 @@ cdef class Hashgraph(Hashtable):
     def neighbors(self, object kmer):
         '''Get a list of neighbor nodes for this k-mer.'''
         cdef Traverser traverser = Traverser(self)
-        return [str(n) for n in traverser._neighbors(self._build_kmer(kmer))]
+        return list(traverser._neighbors(self._build_kmer(kmer)))
 
     def calc_connected_graph_size(self, object kmer, max_size=0,
                                   break_on_circumference=False):
@@ -491,13 +491,13 @@ cdef class Hashgraph(Hashtable):
         '''Traverse the path through the graph starting with the given
         k-mer and avoiding high-degree nodes, finding (and returning)
         traversed k-mers and any encountered high-degree nodes.'''
-        cdef set[HashIntoType] adj
-        cdef set[HashIntoType] visited
+        cdef HashSet adj = HashSet(self.ksize())
+        cdef HashSet visited = HashSet(self.ksize())
         cdef CpKmer _kmer = self._build_kmer(kmer)
         cdef CpNodegraph * _stop_filter = stop_filter._ng_this.get()
         cdef int size = deref(self._hg_this).traverse_linear_path(_kmer,
-                                                                 adj,
-                                                                 visited,
+                                                                 adj.hs,
+                                                                 visited.hs,
                                                                  deref(_stop_filter),
                                                                  hdns.hs)
         return size, adj, visited

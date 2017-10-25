@@ -1,4 +1,8 @@
 # -*- coding: UTF-8 -*-
+from khmer._oxli.hashing cimport Kmer, _hash_forward
+from khmer._oxli.oxli_types cimport *
+from khmer._oxli.utils cimport is_str, is_num, _bstring
+
 
 cdef class HashSet:
     def __cinit__(self, ksize, hashes=[]):
@@ -19,6 +23,18 @@ cdef class HashSet:
 
     def __len__(self):
         return self.hs.size()
+
+    def __contains__(self, object kmer):
+        cdef HashIntoType h
+
+        if is_num(kmer):
+            h = kmer
+        elif isinstance(kmer, Kmer):
+            h = kmer.kmer_u
+        elif is_str(kmer):
+            h = _hash_forward(_bstring(kmer), self.ksize)
+
+        return self.hs.find(h) != self.hs.end()
 
     def __add__(self, HashSet other):
         if self.ksize != other.ksize:

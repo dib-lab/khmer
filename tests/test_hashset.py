@@ -129,6 +129,13 @@ def test_contains_1():
     assert 2**35 not in hs
 
 
+def test_contains_2():
+    hs = khmer.HashSet(5, [8, 10])
+    assert khmer.reverse_hash(8, 5) in hs
+    assert khmer.reverse_hash(10, 5) in hs
+    assert khmer.reverse_hash(2**35, 5) not in hs
+
+
 def test_concat_1():
     hs = khmer.HashSet(5, [10, 12])
     hs2 = khmer.HashSet(5, [10, 13])
