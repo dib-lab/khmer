@@ -204,7 +204,7 @@ void Hashgraph::consume_sequence_and_tag(const std::string& seq,
 {
     bool kmer_tagged;
     if (tag_set == nullptr) {
-        tag_set = all_tags;
+        tag_set = &all_tags;
     }
 
     KmerIterator kmers(seq.c_str(), _ksize);
@@ -230,7 +230,7 @@ void Hashgraph::consume_sequence_and_tag(const std::string& seq,
             ++since;
         } else {
             ACQUIRE_ALL_TAGS_SPIN_LOCK
-            kmer_tagged = set_contains(tag_set, kmer);
+            kmer_tagged = set_contains(*tag_set, kmer);
             RELEASE_ALL_TAGS_SPIN_LOCK
             if (kmer_tagged) {
                 since = 1;
@@ -242,7 +242,7 @@ void Hashgraph::consume_sequence_and_tag(const std::string& seq,
             }
         }
 #else
-        if (!is_new_kmer && set_contains(tag_set, kmer)) {
+        if (!is_new_kmer && set_contains(*tag_set, kmer)) {
             since = 1;
             if (found_tags != nullptr) {
                 found_tags->insert(kmer);
@@ -254,7 +254,7 @@ void Hashgraph::consume_sequence_and_tag(const std::string& seq,
 
         if (since >= _tag_density) {
             ACQUIRE_ALL_TAGS_SPIN_LOCK
-            tag_set.insert(kmer);
+            tag_set->insert(kmer);
             RELEASE_ALL_TAGS_SPIN_LOCK
             if (found_tags != nullptr) {
                 found_tags->insert(kmer);
@@ -266,7 +266,7 @@ void Hashgraph::consume_sequence_and_tag(const std::string& seq,
 
     if (since >= _tag_density/2 - 1) {
         ACQUIRE_ALL_TAGS_SPIN_LOCK
-        tag_set.insert(kmer);	// insert the last k-mer, too.
+        tag_set->insert(kmer);	// insert the last k-mer, too.
         RELEASE_ALL_TAGS_SPIN_LOCK
         if (found_tags != nullptr) {
             found_tags->insert(kmer);

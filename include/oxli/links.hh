@@ -42,6 +42,8 @@ Contact: khmer-project@idyll.org
 #include <memory>
 #include <list>
 #include <iostream>
+#include <unordered_set>
+#include <unordered_map>
 
 #include "oxli.hh"
 #include "kmer_hash.hh"
@@ -58,14 +60,12 @@ using std::make_shared;
 using std::shared_ptr;
 
 typedef std::pair<HashIntoType, uint64_t> HashIDPair;
-typedef std::unordered_set<HashIntoType> HashSet;
+typedef std::unordered_set<HashIntoType> UHashSet;
 typedef std::vector<HashIntoType> HashVector;
-typedef std::unordered_multimap<HashIntoType, uint64_t> HashIDMap;
+typedef std::unordered_map<HashIntoType, uint64_t> HashIDMap;
 
 class CompactEdge;
 class CompactNode {
-protected:
-    static uint64_t node_counter;
 public:
     Kmer kmer;
     uint32_t count;
@@ -73,10 +73,11 @@ public:
     CompactEdge* in_edges[4] = {nullptr, nullptr, nullptr, nullptr};
     CompactEdge* out_edges[4] = {nullptr, nullptr, nullptr, nullptr};
 
-    CompactNode(Kmer kmer): kmer(kmer), count(0), node_id(node_counter++) {}
+    CompactNode(Kmer kmer, uint64_t node_id) : 
+        kmer(kmer), count(0), node_id(node_id) {}
 
-    friend bool operator== (const CompactNode* lhs, const CompactNode* rhs) {
-        return lhs->node_id == rhs->node_id;
+    friend bool operator== (const CompactNode& lhs, const CompactNode& rhs) {
+        return lhs.node_id == rhs.node_id;
     }
 
     void add_in_edge(const char base, CompactEdge* edge) {
@@ -128,7 +129,8 @@ enum compact_edge_meta_t {
     IS_FULL_EDGE,
     IS_IN_TIP,
     IS_OUT_TIP,
-    IS_ISLAND
+    IS_ISLAND,
+    IS_TRIVIAL
 };
 
 
@@ -136,7 +138,7 @@ class CompactEdge {
 public:
     HashIntoType in_hash; // left and right HDNs
     HashIntoType out_hash;
-    HashSet tags;
+    UHashSet tags;
     compact_edge_meta_t meta;
     bool dirty;
     std::string sequence; // optional
@@ -144,10 +146,10 @@ public:
     CompactEdge(HashIntoType in_hash, HashIntoType out_hash) : 
         in_hash(in_hash), out_hash(out_hash), meta(IS_FULL_EDGE), dirty(false) {}
     
-    CompactEdge(HashIntoType left, HashIntoType right, compact_edge_meta_t meta) :
+    CompactEdge(HashIntoType in_hash, HashIntoType out_hash, compact_edge_meta_t meta) :
         in_hash(in_hash), out_hash(out_hash), meta(meta), dirty(false) {}
 
-    void add_tags(HashSet& new_tags) {
+    void add_tags(UHashSet& new_tags) {
         for (auto tag: new_tags) {
             tags.insert(tag);
         }
@@ -161,7 +163,7 @@ typedef std::pair<HashIntoType, CompactEdge*> TagEdgePair;
 typedef std::set<TagEdgePair> TagEdgePairSet;
 
 
-class GraphLinker
+class StreamingCompactor
 {
 protected:
     // map from HDN hashes to CompactNode IDs
@@ -173,41 +175,48 @@ protected:
 
     uint64_t n_sequences_added;
     uint64_t n_compact_edges;
+    uint64_t n_compact_nodes;
+    uint32_t tag_density;
 
     // protected linear creation of CompactNode
     // they should never be deleted, so this is straightforward
     CompactNode* new_compact_node(Kmer hdn) {
         CompactNode * v = get_compact_node_by_kmer(hdn);
         if (v == nullptr) {
-            compact_nodes.emplace_back(hdn);
-            v = &(compact_nodes.back);
+            compact_nodes.emplace_back(hdn, n_compact_nodes);
+            n_compact_nodes++;
+            v = &(compact_nodes.back());
             hdn_ids[hdn] = v->node_id;
         }
         return v;
     }
 
     CompactEdge* new_compact_edge(HashIntoType left, HashIntoType right,
-                                   compact_edge_meta_t edge_meta, std::string edge_sequence) {
+                                   compact_edge_meta_t edge_meta,
+                                   std::string edge_sequence) {
          CompactEdge* edge = new CompactEdge(left, right, edge_meta);
          edge->sequence = edge_sequence;
          n_compact_edges++;
+         return edge;
     }
 
     void delete_compact_edge(CompactEdge * edge) {
-        for (auto tag: edge->tags) {
-            tags_to_edges.erase(tag);
+        if (edge != nullptr) {
+            for (auto tag: edge->tags) {
+                tags_to_edges.erase(tag);
+            }
+            delete edge;
+            n_compact_edges--;
         }
-        delete edge;
-        n_compact_edges--;
     }
 
-    void delete_compact_edge(HashSet& tags) {
-        CompactEdge* edge = get_compact_edge_from_tags(tags);
-        delete_compact_edge(edge):
+    void delete_compact_edge(UHashSet& tags) {
+        CompactEdge* edge = get_compact_edge(tags);
+        delete_compact_edge(edge);
     }
 
     void delete_compact_edge(HashIntoType tag) {
-        CompactEdge* edge = get_comapct_edge(tag);
+        CompactEdge* edge = get_compact_edge(tag);
         delete_compact_edge(edge);
     }
 
@@ -215,28 +224,34 @@ public:
 
     shared_ptr<Hashgraph> graph;
     
-    GraphLinker(shared_ptr<Hashgraph> graph) :
-        graph(graph), n_sequences_added(0), n_compact_edges(0)
+    StreamingCompactor(shared_ptr<Hashgraph> graph) :
+        graph(graph), n_sequences_added(0), 
+        n_compact_edges(0), n_compact_nodes(0)
     {
-
+        tag_density = DEFAULT_TAG_DENSITY;
     }
 
-    WordLength ksize() const
-    {
+    WordLength ksize() const {
         return graph->ksize();
     }
 
-    void report() const
-    {
-        std::cout << "GraphLinker (@" << this << " with "
+    uint64_t n_nodes() const {
+        return compact_nodes.size();
+    }
+
+    uint64_t n_edges() const {
+        return n_compact_edges;
+    }
+
+    void report() const {
+        std::cout << "StreamingCompactor(@" << this << " with "
             << "Hashgraph @" << graph.get() << ")" << std::endl;
         std::cout << "  * " << hdn_ids.size() << " cDBG nodes (HDNs)" << std::endl;
         std::cout << "  * " << n_compact_edges << " cDBG edges" << std::endl;
         std::cout << "  * " << n_sequences_added << " sequences added" << std::endl;
     }
 
-    CompactNode* get_compact_node_by_kmer(HashIntoType hdn) const
-    {
+    CompactNode* get_compact_node_by_kmer(HashIntoType hdn)  {
         auto search = hdn_ids.find(hdn);
         if (search != hdn_ids.end()) {
             uint64_t ID = search->second;
@@ -245,8 +260,14 @@ public:
         return nullptr;
     }
 
-    CompactNode* fetch_or_new_compact_node(Kmer hdn)
-    {
+    CompactNode* get_compact_node_by_id(uint64_t id) {
+        if (id < compact_nodes.size()) {
+            return nullptr;
+        }
+        return &(compact_nodes[id]);
+    }
+
+    CompactNode* fetch_or_new_compact_node(Kmer hdn) {
         CompactNode* v = get_compact_node_by_kmer(hdn);
         if (v != nullptr) {
             v->count += 1;
@@ -257,8 +278,7 @@ public:
         return v;
     }
 
-    std::vector<uint64_t> get_compact_node_ids(const std::string& sequence) const
-    {
+    std::vector<uint64_t> get_compact_node_ids(const std::string& sequence)  {
         KmerIterator kmers(sequence.c_str(), graph->ksize());
         std::vector<uint64_t> ids;
 
@@ -268,8 +288,8 @@ public:
             Kmer kmer = kmers.next();
 
             node = get_compact_node_by_kmer(kmer);
-            if (j != nullptr) {
-                ids->push_back(node->node_id);
+            if (node != nullptr) {
+                ids.push_back(node->node_id);
             }
         }
 
@@ -284,15 +304,17 @@ public:
         return nullptr;
     }
 
-    TagEdgePair get_tag_edge_pair(uint64_t tag) {
+    bool get_tag_edge_pair(uint64_t tag, TagEdgePair& pair) {
         auto search = tags_to_edges.find(tag);
         if (search != tags_to_edges.end()) {
-            return &search;
+            pair = *search;
+            return true;
+        } else {
+            return false;
         }
-        return nullptr;
     }
 
-    CompactEdge* get_edge_from_tags(HashSet& tags) {
+    CompactEdge* get_compact_edge(UHashSet& tags) {
         CompactEdge * edge = nullptr;
         for (auto tag: tags) {
             edge = get_compact_edge(tag);
@@ -304,49 +326,59 @@ public:
     }
 
     KmerFilter get_tag_finder(TagEdgePairSet& found_pairs,
-                              KmerSet& found_tags,
-                              KmerSet& all_unresolved_tags) {
+                              UHashSet& found_tags,
+                              UHashSet& all_unresolved_tags) {
 
-        KmerFilter finder = [=] (const Kmer& node) {
-            TagEdgePair edge_pair = get_tag_edge_pair(node);
-            if (edge_pair != nullptr) {
+        KmerFilter finder = [&] (const Kmer& node) {
+
+            TagEdgePair edge_pair;
+            bool found_pair = get_tag_edge_pair(node, edge_pair);
+            if (found_pair) {
                 found_pairs.insert(edge_pair);
                 found_tags.insert(node);
             }
-            if (set_contains(all_unresolved_tags, node) {
+            if (set_contains(all_unresolved_tags, node)) {
                 found_tags.insert(node);
             }
             return false; // never filter node, just gather while we're looking
-        }       
+        };
+
+        return finder;
     }
 
-    void update_compact_dbg(KmerSet& unresolved_tags) {
+    void update_compact_dbg(UHashSet& unresolved_tags) {
 
-        KmerQueue unresolved_q;
+        HashVector unresolved_q;
         for (auto tag: unresolved_tags) {
             unresolved_q.push_back(tag);
         }
 
         CompactingAssembler at(graph.get());
-        Traverser traverser(graph.get());
-        //shared_ptr<KmerSet> visited = make_shared<KmerSet>();
+        
         while(unresolved_q.size() > 0) {
-            Kmer seed_tag = unresolved_q.back();
+            HashIntoType seed_tag = unresolved_q.back();
+            Kmer seed_kmer = graph->build_kmer(seed_tag);
             unresolved_q.pop_back();
 
-            if (!set_contains(*unresolved_tags, start_tag)) {
+            if (!set_contains(unresolved_tags, seed_tag)) {
                 continue;
             }
-            
+
+            // build filters to prepare for traversal...
+            // first, tag gatherer
             TagEdgePairSet segment_edges;
-            KmerSet segment_tags;
-            KmerFilter tag_finder = get_tag_finder(segment_edges,
-                                                   segment_tags,
-                                                   *unresolved_tags);
-            CompactingAT<LEFT> lcursor(graph.get(), seed_tag);
-            lcursor.push_filter(tag_finder);
-            CompactingAT<RIGHT> rcursor(graph.get(), seed_tag);
-            rcursor.push_filter(tag_finder);
+            UHashSet segment_tags;
+            KmerFilterList filters;
+            filters.push_back(get_tag_finder(segment_edges,
+                                             segment_tags,
+                                             unresolved_tags));
+            // ... and a shared list of known k-mers
+            shared_ptr<SeenSet> visited = make_shared<SeenSet>();
+            filters.push_back(get_visited_filter(visited));
+            CompactingAT<TRAVERSAL_LEFT> lcursor(graph.get(), seed_kmer,
+                                                 filters);
+            CompactingAT<TRAVERSAL_RIGHT> rcursor(graph.get(), seed_kmer,
+                                                  filters);
 
             // assemble both dirs until HDN, collecting tags along the way
             std::string left_seq = at._assemble_directed(lcursor);
@@ -354,13 +386,44 @@ public:
             std::string edge_sequence = left_seq + right_seq.substr(graph->ksize());
 
             // Generate new CompactNodes if needed
-            CompactNode* left_node, right_node;
-            left_node = right_node = nullptr;
-            if (traverser.degree(rcursor.cursor) > 2) {
+            CompactNode *left_node = nullptr, *right_node = nullptr;
+            // Check degree and gather neighbors simultaneously
+            // can't just check if total degree >2, as node could be:
+            //        _(neighbor_1)
+            //  (HDN)/
+            //       \_(neighbor_2)
+            // which we'd still like in the cDBG
+            KmerQueue rneighbors;
+            if (rcursor.neighbors(rneighbors) > 1 || 
+                lcursor.neighbors(rcursor.cursor, rneighbors) > 1) {
+
                 right_node = fetch_or_new_compact_node(rcursor.cursor);
+                if (right_node->count == 1) {
+                    while(rneighbors.size() > 0) {
+                        // if it was a new HDN, we it could be between tag and
+                        // nearest existing HDN; so, we have to check from its
+                        // neighbors
+                        auto rn = rneighbors.back();
+                        rneighbors.pop();
+                        unresolved_q.push_back(rn);
+                        unresolved_tags.insert(rn);
+                    }
+                }
             }
-            if (traverser.degree(lcursor.cursor) > 2) {
+            // same for other side
+            KmerQueue lneighbors;
+            if (lcursor.neighbors(lneighbors) > 1 || 
+                rcursor.neighbors(lcursor.cursor, lneighbors) > 1) {
+
                 left_node = fetch_or_new_compact_node(lcursor.cursor);
+                if (left_node->count == 1) {
+                    while(lneighbors.size() > 0) {
+                        auto ln = lneighbors.back();
+                        lneighbors.pop();
+                        unresolved_q.push_back(ln);
+                        unresolved_tags.insert(ln);
+                    }
+                }
             }
 
             // Determine if we've got a tip, full edge, or island
@@ -378,12 +441,17 @@ public:
             // first check if we've got a good Edge to work with
             CompactEdge* consensus_edge = nullptr;
             TagEdgePair consensus_tag_edge_pair;
-            for (consensus_tag_edge_pair: segment_edges) {
-                CompactEdge* intersect_edge = consensus_tag_edge_pair->second;
-                if (intersect_edge->in_hash == <HashIntoType>left_node->kmer &&
-                    intersect_edge->out_hash == <HashIntoType>right_node->kmer) {
+            for (auto tag_edge_pair: segment_edges) {
+                CompactEdge* intersect_edge = tag_edge_pair.second;
+                if (intersect_edge->meta != edge_meta) {
+                    continue;
+                }
+
+                if (intersect_edge->in_hash == (HashIntoType)(left_node->kmer) &&
+                    intersect_edge->out_hash == (HashIntoType)(right_node->kmer)) {
                     
                     consensus_edge = intersect_edge;
+                    consensus_tag_edge_pair = tag_edge_pair;
                     break;
                 }
             }
@@ -391,13 +459,13 @@ public:
             // ... if not, create one
             if (consensus_edge == nullptr) {
                 consensus_edge = new_compact_edge(lcursor.cursor, 
-                                                 rcursor.cursor,
-                                                 edge_meta,
-                                                 edge_sequence);
+                                                  rcursor.cursor,
+                                                  edge_meta,
+                                                  edge_sequence);
             } else {
                 // if so, remove it from the set of found edges 
                 // so we can resolve them
-                segment_edges.remove(consensus_tag_edge_pair);
+                segment_edges.erase(consensus_tag_edge_pair);
             }
 
             // remove all of the tags for this segment from stale edges
@@ -405,12 +473,12 @@ public:
             for (auto segment_tag: segment_tags) {
 
                 for (auto tag_edge_pair: segment_edges) {
-                    CompactEdge* stale_edge = tag_edge_pair->second;
+                    CompactEdge* stale_edge = tag_edge_pair.second;
                     stale_edge->tags.erase(segment_tag);
                 }
 
-                consensus_edge->tags.insert(<HashIntoType>segment_tag);
-                tags_to_edges[<HashIntoType>segment_tag] = consensus_edge;
+                consensus_edge->tags.insert((HashIntoType)segment_tag);
+                tags_to_edges[(HashIntoType)segment_tag] = consensus_edge;
                 // don't forget to remove from the unresolved set
                 unresolved_tags.erase(segment_tag);
             }
@@ -418,24 +486,27 @@ public:
             // one last run through to delete stale edges and add remaining tags
             // to the unresolved set
             for (auto tag_edge_pair: segment_edges) {
-                CompactEdge* edge = tag_edge_pair->second;
-                for (auto stale_tag: edge.tags) {
-                    unresolved_tags.insert(tag_edge_pair->first);
-                    tags_to_edges.erase(stale_tag);
+                CompactEdge* edge = tag_edge_pair.second;
+                if (edge != nullptr) {
+                    for (auto stale_tag: edge->tags) {
+                        unresolved_tags.insert(tag_edge_pair.first);
+                        tags_to_edges.erase(stale_tag);
+                    }
                 }
                 // don't forget to clean up
                 delete_compact_edge(edge);
             }
 
-            if (left_node != nullptr) {
-                left_node->add_in_edge(
-                        edge_sequence[edge_sequence.length()-(graph->ksize())],
-                        edge);
-            }
             if (right_node != nullptr) {
-                right_node->add_out_edge(
+                right_node->add_in_edge(
+                        edge_sequence[edge_sequence.length()-(graph->ksize())],
+                        consensus_edge);
+            }
+
+            if (left_node != nullptr) {
+                left_node->add_out_edge(
                         edge_sequence[graph->ksize()],
-                        edge);
+                        consensus_edge);
             }
 
         }
@@ -444,55 +515,48 @@ public:
     void update_compact_dbg(const std::string& sequence) {
         std::cout << "update_compact_dbg()" << std::endl;
 
-        KmerSet new_tags;
-        KmerSet known_tags;
+        UHashSet new_tags;
+        UHashSet known_tags;
         uint64_t n_consumed = 0;
+        graph->consume_sequence(sequence);
         consume_sequence_and_tag(sequence, n_consumed, new_tags, known_tags);
-
-
+        update_compact_dbg(new_tags);
     }
 
-    // sigh at duplicated code from Hashgraph... perhaps in the future
-    // that function can be templated to accept multiple Set types for tags
-    void consume_sequence_and_tag(const std::string& seq,
-                                  unsigned long long& n_consumed,
-                                  KmerSet& new_tags,
-                                  KmerSet& known_tags) {
+    void index_sequence_tags(const std::string& seq,
+                             KmerQueue unresolved_tags) {
         bool kmer_tagged;
 
-        KmerIterator kmers(seq.c_str(), _ksize);
+        KmerIterator kmers(seq.c_str(), ksize());
+        Traverser traverser(graph.get());
         Kmer kmer;
 
-        unsigned int since = _tag_density / 2 + 1;
+        KmerFilter finder = [&] (const Kmer& node) {
+            
+        };
+
+
+        uint32_t since = tag_density / 2 + 1;
 
         while(!kmers.done()) {
             kmer = kmers.next();
-            bool is_new_kmer;
-
-            if ((is_new_kmer = graph->add(kmer))) {
-                ++n_consumed;
-            }
-
-            if (is_new_kmer) {
-                ++since;
+            kmer_tagged = set_contains(tags_to_edges, kmer);
+            if (kmer_tagged) {
+                since = 1;
             } else {
-                kmer_tagged = set_contains(tags_to_edges, kmer);
-                if (kmer_tagged) {
-                    since = 1;
-                    known_tags.insert(kmer);
-                } else {
-                    ++since;
-                }
+                ++since;
             }
 
-            if (since >= _tag_density) {
+            if (since >= tag_density) {
                 new_tags.insert(kmer);
                 since = 1;
             }
 
+            if (traverser.degree
+
         } // iteration over kmers
 
-        if (since >= _tag_density/2 - 1) {
+        if (since >= tag_density/2 - 1) {
             new_tags.insert(kmer);	// insert the last k-mer, too.
         }
     }

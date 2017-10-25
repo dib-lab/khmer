@@ -8,7 +8,7 @@ from khmer import forward_hash
 from . import khmer_tst_utils as utils
 from .graph_features import *
 
-from khmer._oxli.graphlinks import GraphLinker
+from khmer._oxli.graphlinks import StreamingCompactor
 from khmer import Nodegraph
 import pytest
 
@@ -17,38 +17,26 @@ def teardown():
     utils.cleanup()
 
 
-def test_get_junctions_single(right_tip_structure):
+def test_compact_fork(right_tip_structure):
     '''Should have no links. Need two junctions.
     '''
     graph, contig, L, HDN, R, tip = right_tip_structure
-    linker = GraphLinker(graph)
+    compactor = StreamingCompactor(graph)
+    compactor.update(contig)
+    compactor.report()
 
-    linker.add_links(contig)
-    linker.report()
-
-    links = list(linker.get_links(contig))
-    assert len(links) == 1
-
-    junctions = list(linker.get_junctions(contig))
-    assert len(junctions) == 1
-    junction = junctions.pop()
-    assert junction['count'] == 1
-    assert junction['u'] == forward_hash(L, K)
-    assert junction['v'] == forward_hash(HDN, K)
-    assert junction['w'] == forward_hash(R, K)
-
-    linker.add_links(contig)
-    linker.report()
-
-    links = list(linker.get_links(contig))
-    print(links)
-    assert len(links) == 1
-    junctions = list(linker.get_junctions(contig))
-    assert len(junctions) == 1
-    junction = junctions.pop()
-    assert junction['count'] == 2
+    nodes = list(compactor.sequence_nodes(contig))
+    assert len(nodes) == 0
+    assert compactor.n_nodes == 0
+    assert compactor.n_edges == 0
 
 
+
+    #assert junction['u'] == forward_hash(L, K)
+    #assert junction['v'] == forward_hash(HDN, K)
+    #assert junction['w'] == forward_hash(R, K)
+
+'''
 def test_links_bubble(snp_bubble_structure):
     graph, wildtype_sequence, _, HDN_L, HDN_R = snp_bubble_structure
     linker = GraphLinker(graph)
@@ -66,3 +54,4 @@ def test_links_bubble(snp_bubble_structure):
         assert link_b[0]['v'] == forward_hash(HDN_R, K)
     elif link_a[0]['v'] == forward_hash(HDN_R, K):
         assert link_b[0]['v'] == forward_hash(HDN_L, K)
+'''

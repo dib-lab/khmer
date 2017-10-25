@@ -123,8 +123,7 @@ public:
                               const Hashgraph * stop_bf = 0) const;
 
     template<bool direction>
-    std::string CompactingAssembler::
-    _assemble_directed(CompactingAT<direction>& cursor) const 
+    std::string _assemble_directed(CompactingAT<direction>& cursor) const 
     {
         return LinearAssembler::_assemble_directed<direction>(cursor);
     }
