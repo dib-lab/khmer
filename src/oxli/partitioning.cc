@@ -266,7 +266,7 @@ uint64_t StreamingPartitioner::seed_sequence(const std::string& seq,
                 }*/
                 intersection.clear();
 
-                seeds.push(kmer);
+                seeds.push_back(kmer);
                 in_known_territory = false;
                 found_tag_in_territory = false;
                 ++since;
@@ -297,11 +297,11 @@ uint64_t StreamingPartitioner::seed_sequence(const std::string& seq,
         if (since >= _tag_density / 2) {
             tags.push_back(kmer);
         }
-        seeds.push(kmer);
+        seeds.push_back(kmer);
 
         // now go back and make sure to search from the first k-mer
         kmer = kmers.first();
-        seeds.push(kmer);
+        seeds.push_back(kmer);
 
 #if(DEBUG_SP)
         std::cout << "Done iterating k-mers" << std::endl;
@@ -326,7 +326,7 @@ ComponentPtr StreamingPartitioner::find_nearest_component(Kmer kmer) const
     TagVector tags;
     std::set<HashIntoType> seen;
     KmerQueue node_q;
-    node_q.push(kmer);
+    node_q.push_front(kmer);
 
     find_connected_tags(node_q, tags, seen, true);
     if (tags.size() > 0) {
@@ -364,7 +364,7 @@ void StreamingPartitioner::find_connected_tags(KmerQueue& node_q,
         while(!node_q.empty()) {
 
             Kmer node = node_q.front();
-            node_q.pop();
+            node_q.pop_front();
 
             unsigned int breadth = breadth_q.front();
             breadth_q.pop();

@@ -126,7 +126,7 @@ const
         if (graph->get_count(neighbor)) {
             ++found;
             if (!apply_kmer_filters(neighbor, filters)) {
-                node_q.push(neighbor);
+                node_q.push_back(neighbor);
            }
         }
         ++base;

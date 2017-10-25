@@ -411,7 +411,7 @@ const
                     // spin off a cursor for the new branch
                     AssemblerTraverser<direction> branch_cursor(cursor);
                     branch_cursor.cursor = branch_starts.front();
-                    branch_starts.pop();
+                    branch_starts.pop_front();
 
 #if DEBUG_ASSEMBLY
                     std::cout << "Branch cursor: " << branch_cursor.cursor.repr(
@@ -614,7 +614,7 @@ const
                 AssemblerTraverser<direction> branch_cursor(cursor);
 
                 branch_cursor.cursor = branch_starts.front();
-                branch_starts.pop();
+                branch_starts.pop_front();
 
                 // assemble linearly as far as possible
                 std::string branch = linear_asm._assemble_directed<direction>(branch_cursor);

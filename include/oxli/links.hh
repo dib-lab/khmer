@@ -154,6 +154,10 @@ public:
             tags.insert(tag);
         }
     }
+
+    float tag_density() const {
+        return (float)tags.size() / (float)sequence.length();
+    }
 };
 
 
@@ -165,6 +169,9 @@ typedef std::set<TagEdgePair> TagEdgePairSet;
 
 class StreamingCompactor
 {
+    friend class CompactEdge;
+    friend class CompactNode;
+
 protected:
     // map from HDN hashes to CompactNode IDs
     HashIDMap hdn_ids;
@@ -346,11 +353,12 @@ public:
         return finder;
     }
 
-    void update_compact_dbg(UHashSet& unresolved_tags) {
+    void update_compact_dbg(KmerQueue& unresolved_q) {
 
-        HashVector unresolved_q;
-        for (auto tag: unresolved_tags) {
-            unresolved_q.push_back(tag);
+        UHashSet unresolved_tags;
+        
+        for (auto tag: unresolved_q) {
+            unresolved_tags.insert(tag);
         }
 
         CompactingAssembler at(graph.get());
@@ -404,7 +412,7 @@ public:
                         // nearest existing HDN; so, we have to check from its
                         // neighbors
                         auto rn = rneighbors.back();
-                        rneighbors.pop();
+                        rneighbors.pop_back();
                         unresolved_q.push_back(rn);
                         unresolved_tags.insert(rn);
                     }
@@ -419,7 +427,7 @@ public:
                 if (left_node->count == 1) {
                     while(lneighbors.size() > 0) {
                         auto ln = lneighbors.back();
-                        lneighbors.pop();
+                        lneighbors.pop_back();
                         unresolved_q.push_back(ln);
                         unresolved_tags.insert(ln);
                     }
@@ -515,15 +523,14 @@ public:
     void update_compact_dbg(const std::string& sequence) {
         std::cout << "update_compact_dbg()" << std::endl;
 
-        UHashSet new_tags;
-        UHashSet known_tags;
+        KmerQueue unresolved_tags;
         uint64_t n_consumed = 0;
-        graph->consume_sequence(sequence);
-        consume_sequence_and_tag(sequence, n_consumed, new_tags, known_tags);
-        update_compact_dbg(new_tags);
+        graph->consume_string(sequence);
+        seed_sequence_tags(sequence, unresolved_tags);
+        update_compact_dbg(unresolved_tags);
     }
 
-    void index_sequence_tags(const std::string& seq,
+    void seed_sequence_tags(const std::string& seq,
                              KmerQueue unresolved_tags) {
         bool kmer_tagged;
 
@@ -531,33 +538,35 @@ public:
         Traverser traverser(graph.get());
         Kmer kmer;
 
-        KmerFilter finder = [&] (const Kmer& node) {
-            
-        };
-
-
         uint32_t since = tag_density / 2 + 1;
 
         while(!kmers.done()) {
             kmer = kmers.next();
-            kmer_tagged = set_contains(tags_to_edges, kmer);
-            if (kmer_tagged) {
+            if (set_contains(tags_to_edges, kmer)) {
                 since = 1;
             } else {
                 ++since;
             }
 
             if (since >= tag_density) {
-                new_tags.insert(kmer);
+                unresolved_tags.push_back(kmer);
                 since = 1;
             }
 
-            if (traverser.degree
+            if (traverser.degree_left(kmer) > 1 ||
+                traverser.degree_right(kmer) > 1) {
+                
+                CompactNode* hdn = get_compact_node_by_kmer(kmer);
+                if (hdn == nullptr) { // new HDN
+                    traverser.traverse(kmer, unresolved_tags);
+                }
+
+            }
 
         } // iteration over kmers
 
         if (since >= tag_density/2 - 1) {
-            new_tags.insert(kmer);	// insert the last k-mer, too.
+            unresolved_tags.push_back(kmer);	// insert the last k-mer, too.
         }
     }
 

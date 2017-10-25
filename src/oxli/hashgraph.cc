@@ -435,7 +435,7 @@ const
     }
 
     KmerQueue node_q;
-    node_q.push(start);
+    node_q.push_front(start);
 
     // Avoid high-circumference k-mers
     Traverser traverser(this);
@@ -447,7 +447,7 @@ const
 
     while(!node_q.empty()) {
         Kmer node = node_q.front();
-        node_q.pop();
+        node_q.pop_front();
 
         // have we already seen me? don't count; exit.
         if (set_contains(keeper, node)) {
@@ -527,12 +527,12 @@ const
     };
     Traverser traverser(this, filter);
 
-    node_q.push(start);
+    node_q.push_front(start);
     breadth_q.push(0);
 
     while(!node_q.empty()) {
         Kmer node = node_q.front();
-        node_q.pop();
+        node_q.pop_front();
 
         unsigned int breadth = breadth_q.front();
         breadth_q.pop();
@@ -878,7 +878,7 @@ const
 
         while (node_q.size()) {
             Kmer node = node_q.front();
-            node_q.pop();
+            node_q.pop_front();
 
             if (set_contains(high_degree_nodes, node)) {
                 // if there are any adjacent high degree nodes, record;

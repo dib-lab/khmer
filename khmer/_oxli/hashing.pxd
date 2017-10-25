@@ -1,6 +1,6 @@
 from libcpp cimport bool
 from libcpp.memory cimport shared_ptr
-from libcpp.queue cimport queue
+from libcpp.deque cimport deque
 from libcpp.set cimport set
 from libcpp.string cimport string
 
@@ -55,7 +55,7 @@ cdef extern from "oxli/kmer_hash.hh" namespace "oxli":
 
 
 cdef extern from "oxli/oxli.hh" namespace "oxli":
-    ctypedef queue[CpKmer] KmerQueue
+    ctypedef deque[CpKmer] KmerQueue
     ctypedef set[CpKmer] KmerSet
     ctypedef bool (*KmerFilter) (CpKmer kmer)
 
