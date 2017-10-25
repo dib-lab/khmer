@@ -54,3 +54,4 @@ pep257_report.txt
 .cache/
 khmer/_oxli/*.cpp
 .eggs
+tags
