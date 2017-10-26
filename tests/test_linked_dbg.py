@@ -21,14 +21,19 @@ def test_compact_fork(right_tip_structure):
     '''Should have no links. Need two junctions.
     '''
     graph, contig, L, HDN, R, tip = right_tip_structure
+    print("Contig FWD:", contig)
+    print("Contig RC:", revcomp(contig))
+    print("HDN: ", repr(HDN))
+    print("Tip FW:", tip)
+    print("Tip RC:", revcomp(tip))
     compactor = StreamingCompactor(graph)
     compactor.update(contig)
     compactor.report()
 
     nodes = list(compactor.sequence_nodes(contig))
-    assert len(nodes) == 0
-    assert compactor.n_nodes == 0
-    assert compactor.n_edges == 0
+    assert len(nodes) == 1
+    assert compactor.n_nodes == 1
+    assert compactor.n_edges == 3
 
 
 

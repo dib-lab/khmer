@@ -217,6 +217,14 @@ public:
     {
         return kmer_f == kmer_u;
     }
+
+    void set_forward()
+    {
+        if (!is_forward()) {
+            kmer_r = kmer_f;
+            kmer_f = kmer_u;
+        }
+    }
 };
 
 

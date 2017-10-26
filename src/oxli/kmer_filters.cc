@@ -61,6 +61,18 @@ bool apply_kmer_filters(const Kmer& node, const std::list<KmerFilter>& filters)
 }
 
 
+void apply_kmer_helpers(const Kmer& node, const KmerHelperList& helpers)
+{
+    if (!filters.size()) {
+        return;
+    }
+
+    for (auto helper: helpers) {
+        helper(node);
+    }
+}
+
+
 KmerFilter get_label_filter(const Label label, const LabelHash * lh)
 {
     KmerFilter filter = [=] (const Kmer& node) {

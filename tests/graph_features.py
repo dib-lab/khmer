@@ -64,6 +64,9 @@ class Kmer(str):
             raise ValueError('bad k-mer length')
         return str.__new__(cls, value)
 
+    def __repr__(self):
+        return str(self) + " @" + str(self.pos)
+
 
 def mutate_base(base):
     if base in 'AT':

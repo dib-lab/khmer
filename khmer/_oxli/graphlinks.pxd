@@ -38,6 +38,7 @@ cdef extern from "oxli/links.hh" namespace "oxli" nogil:
         uint8_t out_degree()
         uint8_t in_degree()
 
+
     ctypedef enum compact_edge_meta_t:
         IS_FULL_EDGE
         IS_IN_TIP

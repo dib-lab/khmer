@@ -127,7 +127,7 @@ const
             ++found;
             if (!apply_kmer_filters(neighbor, filters)) {
                 node_q.push_back(neighbor);
-           }
+            }
         }
         ++base;
     }
@@ -342,6 +342,7 @@ char AssemblerTraverser<direction>::next_symbol()
     Kmer cursor_next;
 
     visited->insert(this->cursor);
+    apply_kmer_helpers(this->cursor, this->helpers);
     for (auto base : alphabets::DNA_SIMPLE) {
         // Get the putative neighbor for this base at the cursor position
         neighbor = NodeCursor<direction>::get_neighbor(this->cursor, base);

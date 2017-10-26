@@ -251,6 +251,7 @@ class AssemblerTraverser: public NodeCursor<direction>
 {
 protected:
     std::shared_ptr<SeenSet> visited;
+    KmerHelperList helpers;
 
 public:
     using NodeCursor<direction>::NodeCursor;
@@ -296,6 +297,28 @@ public:
     std::string join_contigs(std::string& contig_a,
                              std::string& contig_b,
                              WordLength offset = 0) const;
+
+    void push_helper(KmerHelper helper)
+    {
+        filters.push_back(helper);
+    }
+
+    KmerHelper pop_helper()
+    {
+        KmerHelper back = this->helpers.back();
+        this->helpers.pop_back();
+        return back;
+    }
+
+    unsigned int n_filters()
+    {
+        return filters.size();
+    }
+
+    unsigned int n_helpers()
+    {
+        return helpers.size();
+    }
 };
 
 
