@@ -445,7 +445,7 @@ public:
         }
         index += 1;
 
-        return 3 * fwd_hasher.hashvalue + bwd_hasher.hashvalue;
+        return fwd_hasher.hashvalue + bwd_hasher.hashvalue;
     }
 
     HashIntoType next() {
@@ -463,7 +463,7 @@ public:
           _rev[length - _ksize - index], _rev[length - index]);
 
         index += 1;
-        return 3 * fwd_hasher.hashvalue + bwd_hasher.hashvalue;
+        return fwd_hasher.hashvalue + bwd_hasher.hashvalue;
     }
 
     bool done() const {
