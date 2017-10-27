@@ -220,18 +220,12 @@ HashIntoType _hash_cyclic(const std::string& kmer, const WordLength k)
     }
     h = fwd_hasher.hashvalue;
 
-    if (rev == kmer) {
-        // self complement kmer, can't use bitwise XOR
-        r = h;
-        return h;
-    }
-
     for (WordLength i = 0; i < k; ++i) {
         rev_hasher.eat(rev[i]);
     }
     r = rev_hasher.hashvalue;
 
-    return h > r ? h : r;
+    return 3 * h + r;
 }
 
 HashIntoType _hash_cyclic(const std::string& kmer, const WordLength k,
@@ -246,18 +240,12 @@ HashIntoType _hash_cyclic(const std::string& kmer, const WordLength k,
     }
     h = fwd_hasher.hashvalue;
 
-    if (rev == kmer) {
-        // self complement kmer, can't use bitwise XOR
-        r = h;
-        return h;
-    }
-
     for (WordLength i = 0; i < k; ++i) {
         rev_hasher.eat(rev[i]);
     }
     r = rev_hasher.hashvalue;
 
-    return h > r ? h : r;
+    return 3 * h + r;
 }
 
 HashIntoType _hash_cyclic_forward(const std::string& kmer, const WordLength k)
