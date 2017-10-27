@@ -766,7 +766,127 @@ void ByteStorage::save(std::string outfilename, WordLength ksize)
 void ByteStorage::load(std::string infilename, WordLength& ksize)
 {
     ByteStorageFile::load(infilename, ksize, *this);
+  ByteStorageFile::load(infilename, ksize, *this);
 }
+
+void ByteStorageMMap::load(std::string infilename, WordLength& ksize)
+{
+  char* dataPtr;
+    try {
+      size_t filesize = getFilesize(infilename.c_str());
+      mmappedDataSize=filesize;
+       int fd = open(infilename.c_str(), O_RDWR , 0);
+       assert(fd != -1);
+       dataPtr = (char*)mmap64(NULL, filesize, PROT_WRITE|PROT_READ, MAP_SHARED , fd, 0);
+       mmappedData=dataPtr;
+       assert(dataPtr != MAP_FAILED);
+    } 
+     catch (const std::exception &e) {
+        std::string err = "Unknown error opening file: " + infilename + " "
+                          + strerror(errno);
+        throw oxli_file_exception(err);
+    }
+
+    if (_counts) {
+        for (unsigned int i = 0; i < _n_tables; i++) {
+            delete[] _counts[i];
+            _counts[i] = NULL;
+        }
+        delete[] _counts;
+        _counts = NULL;
+    }
+    _tablesizes.clear();
+
+    try {
+        unsigned int save_ksize = 0;
+        unsigned char save_n_tables = 0;
+        unsigned long long save_tablesize = 0;
+        unsigned long long save_occupied_bins = 0;
+        char* signature;
+        unsigned char version = 0, ht_type = 0, use_bigcount = 0;
+
+	signature=dataPtr;
+	dataPtr+=4;
+        
+	version=(unsigned char)*dataPtr++;
+	ht_type=(unsigned char)*dataPtr++;
+	
+
+        if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
+            std::ostringstream err;
+            err << "Does not start with signature for a oxli file: 0x";
+            for(size_t i=0; i < 4; ++i) {
+                err << std::hex << (int) signature[i];
+            }
+            err << " Should be: " << SAVED_SIGNATURE;
+            throw oxli_file_exception(err.str());
+        } else if (!(version == SAVED_FORMAT_VERSION)) {
+            std::ostringstream err;
+            err << "Incorrect file format version " << (int) version
+                << " while reading k-mer count file from " << infilename
+                << "; should be " << (int) SAVED_FORMAT_VERSION;
+            throw oxli_file_exception(err.str());
+        } else if (!(ht_type == SAVED_COUNTING_HT)) {
+            std::ostringstream err;
+            err << "Incorrect file format type " << (int) ht_type
+                << " while reading k-mer count file from " << infilename;
+            throw oxli_file_exception(err.str());
+        }
+	use_bigcount=(unsigned char)*dataPtr++;
+	save_ksize=*((unsigned int*)dataPtr);
+	dataPtr+=sizeof(save_ksize);
+	save_n_tables=*((unsigned long long*)dataPtr);
+	dataPtr+=sizeof(save_n_tables);
+        save_occupied_bins=*((unsigned long long*)dataPtr);  
+	dataPtr+=sizeof(save_occupied_bins);
+
+        ksize = (WordLength) save_ksize;
+        _n_tables = (unsigned int) save_n_tables;
+        _occupied_bins = save_occupied_bins;
+
+        _use_bigcount = use_bigcount;
+
+        _counts = new Byte*[_n_tables];
+
+        for (unsigned int i = 0; i < _n_tables; i++) {
+            uint64_t tablesize;
+
+	    save_tablesize=*((unsigned long long*)dataPtr);
+	    dataPtr+=sizeof(save_tablesize);
+            tablesize = save_tablesize;
+            _tablesizes.push_back(tablesize);
+
+            _counts[i] = (Byte*)dataPtr;
+	    dataPtr+=(save_tablesize);
+        }
+
+        uint64_t n_counts = *((uint64_t*)dataPtr);
+	dataPtr+=sizeof(n_counts);
+
+        if (n_counts) {
+            _bigcounts.clear();
+
+            HashIntoType kmer;
+            BoundedCounterType count;
+
+            for (uint64_t n = 0; n < n_counts; n++) {
+	      kmer=*((HashIntoType*)dataPtr);
+	      dataPtr+=sizeof(HashIntoType);
+	      count=*((BoundedCounterType*)dataPtr);
+	      dataPtr+=sizeof(BoundedCounterType);
+	      _bigcounts[kmer] = count;
+            }
+        }
+
+
+    } catch (const std::exception &e) {
+        std::string err = "Error reading from k-mer count file: " + infilename + " "
+                          + strerror(errno);
+        throw oxli_file_exception(err);
+    }
+  
+}
+
 
 
 void NibbleStorage::save(std::string outfilename, WordLength ksize)
