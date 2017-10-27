@@ -40,6 +40,15 @@ Contact: khmer-project@idyll.org
 #include <fstream>
 #include <iostream>
 
+#include <sys/mman.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <assert.h>
+#include <cstdlib>
+#include <ctime>
+
 #include "oxli/oxli_exception.hh"
 #include "oxli/hashtable.hh"
 #include "zlib.h"
@@ -742,6 +751,12 @@ ByteStorageGzFileWriter::ByteStorageGzFileWriter(
     gzclose(outfile);
 }
 
+size_t getFilesize(const char* filename) {
+    struct stat st;
+    stat(filename, &st);
+    return st.st_size;
+}
+
 void ByteStorageFile::load(
     const std::string   &infilename,
     WordLength &ksize,
@@ -766,7 +781,6 @@ void ByteStorage::save(std::string outfilename, WordLength ksize)
 void ByteStorage::load(std::string infilename, WordLength& ksize)
 {
     ByteStorageFile::load(infilename, ksize, *this);
-  ByteStorageFile::load(infilename, ksize, *this);
 }
 
 void ByteStorageMMap::load(std::string infilename, WordLength& ksize)
