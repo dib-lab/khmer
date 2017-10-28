@@ -108,7 +108,7 @@ inline std::vector<uint64_t> get_n_primes_near_x(uint32_t n, uint64_t x)
     if (i % 2 == 0) {
         i--;
     }
-    while (primes.size() != n && i >= 0) {
+    while (primes.size() != n) {
         if (is_prime(i)) {
             primes.push_back(i);
         }
