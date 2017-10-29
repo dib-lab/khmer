@@ -48,6 +48,7 @@ Contact: khmer-project@idyll.org
 #include <assert.h>
 #include <cstdlib>
 #include <ctime>
+#include <algorithm>
 
 #include "oxli/oxli_exception.hh"
 #include "oxli/hashtable.hh"
@@ -783,9 +784,75 @@ void ByteStorage::load(std::string infilename, WordLength& ksize)
     ByteStorageFile::load(infilename, ksize, *this);
 }
 
+void ByteStorageMMap::save(std::string outfilename, WordLength ksize)
+{
+    if(outfilename!=filePath){
+      ByteStorage::save(outfilename,ksize);
+    }
+    if (!_counts[0]) {
+         throw oxli_exception();
+    }
+
+    unsigned int save_ksize = ksize;
+    unsigned char save_n_tables = _n_tables;
+    unsigned long long save_occupied_bins = _occupied_bins;
+    char* dataPtr=mmappedData;
+
+    dataPtr+=6;
+    unsigned char use_bigcount = 0;
+    if (_use_bigcount) {
+        use_bigcount = 1;
+    }
+
+    *dataPtr=(const char )use_bigcount;
+    dataPtr++;
+    copy((const char *) &save_ksize,
+	 (const char *) &save_ksize+sizeof(save_ksize),
+	 dataPtr);
+    dataPtr+=sizeof(save_ksize);
+
+    copy((const char *) &save_n_tables,
+	 (const char *) &save_n_tables+sizeof(save_n_tables),
+	 dataPtr);
+    dataPtr+=sizeof(save_n_tables);
+
+    copy((const char *) &save_occupied_bins,
+	 (const char *) &save_occupied_bins+sizeof(save_occupied_bins),
+	 dataPtr);
+    
+    dataPtr+=sizeof(save_occupied_bins);
+
+    uint64_t n_counts = _bigcounts.size();
+
+    copy((const char *) &n_counts,
+	 (const char *) &n_counts+sizeof(n_counts),
+	 dataPtr);
+    dataPtr+=sizeof(n_counts);
+
+
+    if (n_counts) {
+        size_t offset=dataPtr-mmappedData;
+	ofstream outfile(filePath,ios_base::app);
+	outfile.seekp(offset);
+        KmerCountMap::const_iterator it = _bigcounts.begin();
+        for (; it != _bigcounts.end() ; ++it) {
+            outfile.write((const char *) &it->first, sizeof(it->first));
+            outfile.write((const char *) &it->second, sizeof(it->second));
+        }
+	if (outfile.fail()) {
+	  throw oxli_file_exception(strerror(errno));
+	}
+	outfile.close();
+    }
+
+    int rc=msync(mmappedData,mmappedDataSize,MS_SYNC);
+    assert(rc==0);
+}
+
 void ByteStorageMMap::load(std::string infilename, WordLength& ksize)
 {
   char* dataPtr;
+  filePath=infilename;
     try {
       size_t filesize = getFilesize(infilename.c_str());
       mmappedDataSize=filesize;

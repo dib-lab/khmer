@@ -667,12 +667,13 @@ class ByteStorageMMap: public ByteStorage
 private:
   char* mmappedData;
   size_t mmappedDataSize;
+  std::string filePath;
 public:
   ByteStorageMMap(std::vector<uint64_t> tmp):ByteStorage(tmp)
   {
 
   }
-  //void save(std::string, WordLength);
+  void save(std::string, WordLength);
   void load(std::string, WordLength&);
   ~ByteStorageMMap()
   {
