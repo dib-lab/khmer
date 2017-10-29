@@ -676,7 +676,9 @@ public:
   void load(std::string, WordLength&);
   ~ByteStorageMMap()
   {
-      int rc = munmap(mmappedData, mmappedDataSize);
+      int rc=msync(mmappedData,mmappedDataSize,MS_SYNC);
+      assert(rc==0);
+       rc = munmap(mmappedData, mmappedDataSize);
       assert(rc == 0);
       _counts=NULL;
   }
