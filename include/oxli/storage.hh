@@ -42,6 +42,9 @@ Contact: khmer-project@idyll.org
 #include <array>
 #include <mutex>
 #include <unordered_map>
+#include <sys/mman.h>
+#include <sys/types.h>
+
 using MuxGuard = std::lock_guard<std::mutex>;
 
 #include "gqf.h"
@@ -671,6 +674,12 @@ public:
   }
   //void save(std::string, WordLength);
   void load(std::string, WordLength&);
+  ~ByteStorageMMap()
+  {
+      int rc = munmap(mmappedData, mmappedDataSize);
+      assert(rc == 0);
+      _counts=NULL;
+  }
 
 };
 // Helper classes for saving ByteStorage objs to disk & loading them.
