@@ -659,6 +659,20 @@ public:
 
 };
 
+class ByteStorageMMap: public ByteStorage
+{
+private:
+  char* mmappedData;
+  size_t mmappedDataSize;
+public:
+  ByteStorageMMap(std::vector<uint64_t> tmp):ByteStorage(tmp)
+  {
+
+  }
+  //void save(std::string, WordLength);
+  void load(std::string, WordLength&);
+
+};
 // Helper classes for saving ByteStorage objs to disk & loading them.
 
 class ByteStorageFile
