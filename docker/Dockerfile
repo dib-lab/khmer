@@ -17,4 +17,4 @@ RUN git clone https://github.com/dib-lab/khmer.git && \
     cd khmer && \
     git checkout ${branch} && \
     make install-dep && \
-    python setup.py build_ext --include-dirs include:third-party/seqan/core/include:third-party/smhasher:third-party/cqf --libraries z,bz2 install
+    python setup.py build_ext --include-dirs include:third-party/seqan/core/include:third-party/smhasher:third-party/cqf:third-party/rollinghash --libraries z,bz2 install
