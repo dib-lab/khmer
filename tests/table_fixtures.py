@@ -66,7 +66,8 @@ def tablewrapper(tabletype):
 
 
 @pytest.fixture(params=[Countgraph, Counttable, CyclicCounttable,
-                        SmallCountgraph, SmallCounttable, Nodegraph, Nodetable])
+                        SmallCountgraph, SmallCounttable, Nodegraph,
+                        Nodetable])
 def Tabletype(request):
     return tablewrapper(request.param)
 
