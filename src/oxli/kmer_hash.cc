@@ -184,10 +184,17 @@ HashIntoType _hash_murmur(const std::string& kmer, const WordLength k,
 
     assert(kmer.length() == k); // an assumption of the below code
     std::string rev = oxli::_revcomp(kmer);
+
+    if (rev == kmer) {
+        // self complement kmer, can't use bitwise XOR
+        r = out[0];
+        return h;
+    }
+
     MurmurHash3_x64_128((void *)rev.c_str(), k, seed, &out);
     r = out[0];
 
-    return h + r;
+    return h ^ r;
 }
 
 HashIntoType _hash_murmur_forward(const std::string& kmer, const WordLength k)
