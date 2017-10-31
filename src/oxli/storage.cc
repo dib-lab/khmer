@@ -851,6 +851,7 @@ void ByteStorageMMap::save(std::string outfilename, WordLength ksize)
     copy((const char *) &SAVED_SIGNATURE,
 	 (const char *) &SAVED_SIGNATURE+4,
 	 dataPtr);
+
     dataPtr+=4;
 
     *dataPtr=(char) SAVED_FORMAT_VERSION;
@@ -864,7 +865,7 @@ void ByteStorageMMap::save(std::string outfilename, WordLength ksize)
     unsigned char save_n_tables = _n_tables;
     unsigned long long save_occupied_bins = _occupied_bins;
  
-    dataPtr+=6;
+
     unsigned char use_bigcount = 0;
     if (_use_bigcount) {
         use_bigcount = 1;
@@ -875,8 +876,9 @@ void ByteStorageMMap::save(std::string outfilename, WordLength ksize)
     copy((const char *) &save_ksize,
 	 (const char *) &save_ksize+sizeof(save_ksize),
 	 dataPtr);
-    dataPtr+=sizeof(save_ksize);
 
+    dataPtr+=sizeof(save_ksize);
+    
     copy((const char *) &save_n_tables,
 	 (const char *) &save_n_tables+sizeof(save_n_tables),
 	 dataPtr);
@@ -888,14 +890,15 @@ void ByteStorageMMap::save(std::string outfilename, WordLength ksize)
     
     dataPtr+=sizeof(save_occupied_bins);
 
+
+    
     uint64_t n_counts = _bigcounts.size();
 
-    copy((const char *) &n_counts,
-	 (const char *) &n_counts+sizeof(n_counts),
-	 dataPtr);
-    dataPtr+=sizeof(n_counts);
-
-
+    //copy((const char *) &n_counts,
+    //	 (const char *) &n_counts+sizeof(n_counts),
+    //	 dataPtr);
+//dataPtr+=sizeof(n_counts);
+ 
     if (n_counts) {
         size_t offset=dataPtr-mmappedData;
 	ofstream outfile(filePath,ios_base::app);
@@ -910,7 +913,7 @@ void ByteStorageMMap::save(std::string outfilename, WordLength ksize)
 	}
 	outfile.close();
     }
-
+    
     int rc=msync(mmappedData,mmappedDataSize,MS_SYNC);
     assert(rc==0);
 }
@@ -981,7 +984,7 @@ void ByteStorageMMap::load(std::string infilename, WordLength& ksize)
         }
 	use_bigcount=(unsigned char)*dataPtr++;
 	save_ksize=*((unsigned int*)dataPtr);
-	dataPtr+=sizeof(save_ksize);
+ 	dataPtr+=sizeof(save_ksize);
 	save_n_tables=*((unsigned long long*)dataPtr);
 	dataPtr+=sizeof(save_n_tables);
         save_occupied_bins=*((unsigned long long*)dataPtr);  
