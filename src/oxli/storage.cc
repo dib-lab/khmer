@@ -784,6 +784,60 @@ void ByteStorage::load(std::string infilename, WordLength& ksize)
     ByteStorageFile::load(infilename, ksize, *this);
 }
 
+
+ByteStorageMMap::ByteStorageMMap(vector<uint64_t>& tablesizes,string mapFile)
+{
+ 
+        unsigned int save_ksize = 0;
+        unsigned char save_n_tables = 0;
+        unsigned long long save_tablesize = 0;
+        unsigned long long save_occupied_bins = 0;
+        char* signature;
+        unsigned char version = 0, ht_type = 0, use_bigcount = 0;
+  // calculate needed space
+	size_t headerSize=7
+	  +sizeof(save_ksize)
+	  +sizeof(save_n_tables)
+	  +sizeof(save_occupied_bins);
+
+	
+	mmappedDataSize=headerSize;
+	_n_tables=tablesizes.size();
+	_tablesizes=tablesizes;
+
+	
+	for (unsigned int i = 0; i < _n_tables; i++)
+	 {
+	   mmappedDataSize+=sizeof(tablesizes[i]);
+	   mmappedDataSize+=tablesizes[i];
+	 }
+
+  // create a file of the needed space
+	filePath=mapFile;
+	ofstream outputFile(filePath);
+	outputFile.seekp(mmappedDataSize-1);
+	outputFile<<0;
+	outputFile.close();
+  // mmap
+       int fd = open(filePath.c_str(), O_RDWR , 0);
+       assert(fd != -1);
+       mmappedData = (char*)mmap64(NULL, mmappedDataSize, PROT_WRITE|PROT_READ, MAP_SHARED , fd, 0);
+       assert(mmappedData != MAP_FAILED);
+
+  // make _count point to the mmaped data
+       char* dataPtr=mmappedData+headerSize;
+       _counts = new Byte*[_n_tables];
+       for (unsigned int i = 0; i < _n_tables; i++)
+	 {
+	   copy((const char *) &tablesizes[i],
+		(const char *) &tablesizes[i]+sizeof(tablesizes[i]),
+		dataPtr);
+	   dataPtr+=sizeof(tablesizes[i]);
+	   _counts[i]=(Byte*)dataPtr;
+	   dataPtr+=tablesizes[i];
+	 }
+}
+
 void ByteStorageMMap::save(std::string outfilename, WordLength ksize)
 {
     if(outfilename!=filePath){
@@ -793,11 +847,23 @@ void ByteStorageMMap::save(std::string outfilename, WordLength ksize)
          throw oxli_exception();
     }
 
+    char* dataPtr=mmappedData;
+    copy((const char *) &SAVED_SIGNATURE,
+	 (const char *) &SAVED_SIGNATURE+4,
+	 dataPtr);
+    dataPtr+=4;
+
+    *dataPtr=(char) SAVED_FORMAT_VERSION;
+    dataPtr++;
+    
+    *dataPtr=(char) SAVED_COUNTING_HT;
+    dataPtr++;
+    
+ 
     unsigned int save_ksize = ksize;
     unsigned char save_n_tables = _n_tables;
     unsigned long long save_occupied_bins = _occupied_bins;
-    char* dataPtr=mmappedData;
-
+ 
     dataPtr+=6;
     unsigned char use_bigcount = 0;
     if (_use_bigcount) {

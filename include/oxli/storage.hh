@@ -515,6 +515,9 @@ protected:
 public:
     KmerCountMap _bigcounts;
 
+  ByteStorage():_max_count(MAX_KCOUNT), _max_bigcount(MAX_BIGCOUNT),
+        _bigcount_spin_lock(false),_n_unique_kmers(0), _occupied_bins(0){
+  }
     // constructor: create an empty CountMin sketch.
     ByteStorage(std::vector<uint64_t>& tablesizes ) :
         _max_count(MAX_KCOUNT), _max_bigcount(MAX_BIGCOUNT),
@@ -669,10 +672,13 @@ private:
   size_t mmappedDataSize;
   std::string filePath;
 public:
-  ByteStorageMMap(std::vector<uint64_t> tmp):ByteStorage(tmp)
+  ByteStorageMMap(std::vector<uint64_t> tablesizes):ByteStorage(tablesizes)
   {
+    filePath="";
 
   }
+  ByteStorageMMap(std::vector<uint64_t>& tablesizes,std::string mapFile);
+  //  ByteStorageMMap(std::vector<uint64_t> )
   void save(std::string, WordLength);
   void load(std::string, WordLength&);
   ~ByteStorageMMap()

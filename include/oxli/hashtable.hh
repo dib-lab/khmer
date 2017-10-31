@@ -552,6 +552,8 @@ class CounttableMMap : public oxli::MurmurHashtable
 public:
     explicit CounttableMMap(WordLength ksize, std::vector<uint64_t> sizes)
         : MurmurHashtable(ksize, new ByteStorageMMap(sizes)) { } ;
+  explicit CounttableMMap(WordLength ksize, std::vector<uint64_t> sizes,std::string filePath)
+    : MurmurHashtable(ksize, new ByteStorageMMap(sizes,filePath)) { } ;
 };
   
 // Hashtable-derived class with NibbleStorage.
