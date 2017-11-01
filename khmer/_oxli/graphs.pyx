@@ -24,7 +24,7 @@ from khmer._oxli.traversal cimport Traverser
 from khmer._khmer import ReadParser
 
 CYTHON_TABLES = (Hashtable, Nodetable, Counttable, SmallCounttable,
-                 QFCounttable, Nodegraph, Countgraph, SmallCountgraph)
+                 QFCounttable, Nodegraph, Countgraph, SmallCountgraph, CounttableMMap, CountgraphMMap)
 
 
 cdef class Hashtable:
@@ -394,6 +394,16 @@ cdef class Counttable(Hashtable):
             primes = get_n_primes_near_x(n_tables, starting_size)
             self._ct_this = make_shared[CpCounttable](k, primes)
             self._ht_this = <shared_ptr[CpHashtable]>self._ct_this
+
+
+cdef class CounttableMMap(Hashtable):
+
+    def __cinit__(self, int k, uint64_t starting_size, int n_tables, string filename):
+        cdef vector[uint64_t] primes
+        if type(self) is CounttableMMap:
+            primes = get_n_primes_near_x(n_tables, starting_size)
+            self._ctM_this = make_shared[CpCounttableMMap](k, primes,filename)         
+            self._ht_this = <shared_ptr[CpHashtable]>self._ctM_this
 
 
 cdef class SmallCounttable(Hashtable):
@@ -814,6 +824,22 @@ cdef class Countgraph(Hashgraph):
                                                           stop_big_traversals)
 
         return subset
+
+
+cdef class CountgraphMMap(Hashgraph):
+
+    def __cinit__(self, int k, uint64_t starting_size, int n_tables,
+                  string filename,primes=[]):
+        cdef vector[uint64_t] _primes
+        if type(self) is CountgraphMMap:
+            if primes:
+                _primes = primes
+            else:
+                _primes = get_n_primes_near_x(n_tables, starting_size)
+		
+            self._cgM_this = make_shared[CpCountgraphMMap](k, _primes,filename)
+            self._hg_this = <shared_ptr[CpHashgraph]>self._cgM_this 
+            self._ht_this = <shared_ptr[CpHashtable]>self._hg_this
 
 
 cdef class SmallCountgraph(Hashgraph):
