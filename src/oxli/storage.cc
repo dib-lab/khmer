@@ -787,7 +787,6 @@ void ByteStorage::load(std::string infilename, WordLength& ksize)
 
 ByteStorageMMap::ByteStorageMMap(vector<uint64_t>& tablesizes,string mapFile)
 {
- 
         unsigned int save_ksize = 0;
         unsigned char save_n_tables = 0;
         unsigned long long save_tablesize = 0;
@@ -804,7 +803,7 @@ ByteStorageMMap::ByteStorageMMap(vector<uint64_t>& tablesizes,string mapFile)
 	mmappedDataSize=headerSize;
 	_n_tables=tablesizes.size();
 	_tablesizes=tablesizes;
-
+	
 	
 	for (unsigned int i = 0; i < _n_tables; i++)
 	 {
@@ -894,15 +893,20 @@ void ByteStorageMMap::save(std::string outfilename, WordLength ksize)
     
     uint64_t n_counts = _bigcounts.size();
 
-    //copy((const char *) &n_counts,
-    //	 (const char *) &n_counts+sizeof(n_counts),
-    //	 dataPtr);
-//dataPtr+=sizeof(n_counts);
- 
+    for (unsigned int i = 0; i < _n_tables; i++)
+      {
+	dataPtr+=sizeof(_tablesizes[i]);
+	dataPtr+=_tablesizes[i];
+      }
+    
+    int rc=msync(mmappedData,mmappedDataSize,MS_SYNC);
+    assert(rc==0);
+
     if (n_counts) {
         size_t offset=dataPtr-mmappedData;
 	ofstream outfile(filePath,ios_base::app);
 	outfile.seekp(offset);
+	outfile.write((const char *) &n_counts, sizeof(n_counts));
         KmerCountMap::const_iterator it = _bigcounts.begin();
         for (; it != _bigcounts.end() ; ++it) {
             outfile.write((const char *) &it->first, sizeof(it->first));
@@ -914,8 +918,7 @@ void ByteStorageMMap::save(std::string outfilename, WordLength ksize)
 	outfile.close();
     }
     
-    int rc=msync(mmappedData,mmappedDataSize,MS_SYNC);
-    assert(rc==0);
+
 }
 
 void ByteStorageMMap::load(std::string infilename, WordLength& ksize)
@@ -1011,8 +1014,8 @@ void ByteStorageMMap::load(std::string infilename, WordLength& ksize)
         }
 
         uint64_t n_counts = *((uint64_t*)dataPtr);
-	dataPtr+=sizeof(n_counts);
 
+	dataPtr+=sizeof(n_counts);
         if (n_counts) {
             _bigcounts.clear();
 
