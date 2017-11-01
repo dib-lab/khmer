@@ -49,6 +49,7 @@ except ImportError:
 
 import screed
 import khmer
+import inspect
 from khmer import extract_countgraph_info
 from khmer import __version__
 from .utils import print_error
@@ -567,7 +568,12 @@ def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
     else:
         tablesize = calculate_graphsize(args, 'countgraph',
                                         multiplier=multiplier)
-        cg = khmer.Countgraph(ksize, tablesize, args.n_tables)
+        
+        if args.mmap:
+            outfile=str.encode(args.output_countgraph_filename)
+            cg = khmer.CountgraphMMap(ksize, tablesize, args.n_tables,outfile)
+        else:            
+            cg = khmer.Countgraph(ksize, tablesize, args.n_tables)
         if hasattr(args, 'bigcount'):
             cg.set_use_bigcount(args.bigcount)
         return cg

@@ -101,6 +101,10 @@ def get_parser():
                         help='Overwrite output file if it exists')
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
+    parser.add_argument('-m', '--mmap', dest='mmap', default=False,
+                        action='store_true', help="The default behaviour is "
+                        "to count on memmory. This flag turns "
+                        "memory mapping on to create the sketch on memmory mapped file.")
     return parser
 
 
