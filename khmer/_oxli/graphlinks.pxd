@@ -30,8 +30,10 @@ cdef extern from "oxli/links.hh" namespace "oxli" nogil:
 
         CpCompactNode(CpKmer)
         void add_in_edge(const char, CpCompactEdge*)
+        bool delete_in_edge(CpCompactEdge*)
         CpCompactEdge* get_in_edge(const char)
         void add_out_edge(const char, CpCompactEdge*)
+        bool delete_out_edge(CpCompactEdge*)
         CpCompactEdge* get_out_edge(const char)
 
         uint8_t degree()
@@ -47,8 +49,8 @@ cdef extern from "oxli/links.hh" namespace "oxli" nogil:
         IS_TRIVIAL
 
     cdef cppclass CpCompactEdge "oxli::CompactEdge":
-        HashIntoType in_hash
-        HashIntoType out_hash
+        CpKmer in_node
+        CpKmer out_node
         UHashSet tags
         compact_edge_meta_t meta
         string sequence
@@ -57,6 +59,8 @@ cdef extern from "oxli/links.hh" namespace "oxli" nogil:
         CpComapctEdge(HashIntoType, HashIntoType, compact_edge_meta_t)
 
         void add_tags(UHashSet&)
+        string tag_viz(WordLength)
+        float tag_density()
 
     ctypedef vector[CpCompactNode] CompactNodeVector
     ctypedef umap[HashIntoType, CpCompactEdge*] TagEdgeMap
@@ -81,10 +85,10 @@ cdef extern from "oxli/links.hh" namespace "oxli" nogil:
         CpCompactEdge* get_tag_edge_pair(uint64_t, TagEdgePair&)
         CpCompactEdge* get_compact_edge(UHashSet&)
 
-        void update_compact_dbg(UHashSet&)
-        void update_compact_dbg(const string&)
-        void consume_sequence_and_tag(const string&, uint64_t&, UHashSet&,
-                                      UHashSet&)
+        uint64_t update_compact_dbg(const string&)
+        uint64_t consume_sequence(const string&)
+        uint64_t consume_sequence_and_update(const string&)
+
 
 cdef class CompactNode:
     cdef CpCompactNode* _cn_this
@@ -98,6 +102,7 @@ cdef class CompactEdge:
 
     @staticmethod
     cdef CompactEdge _wrap(CpCompactEdge*)
+
 
 cdef class StreamingCompactor:
 

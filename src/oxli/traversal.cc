@@ -118,14 +118,14 @@ unsigned int NodeGatherer<direction>::neighbors(const Kmer& node,
                                                 Container& found)
 const
 {
-    unsigned int found = 0;
+    unsigned int n_found = 0;
 
     for (auto base : alphabets::DNA_SIMPLE) {
         // Get the putative neighboring Kmer
         Kmer neighbor = get_neighbor(node, base);
         // Now check if it's in the graph and passes the filters
         if (graph->get_count(neighbor)) {
-            ++found;
+            ++n_found;
             if (!apply_kmer_filters(neighbor, filters)) {
                 found.insert(found.end(), neighbor);
             }
@@ -133,7 +133,7 @@ const
         ++base;
     }
 
-    return found;
+    return n_found;
 }
 
 
@@ -279,13 +279,20 @@ unsigned int Traverser::degree_right(const Kmer& node) const
 
 template<bool direction>
 AssemblerTraverser<direction>::AssemblerTraverser(const Hashgraph * ht,
+                                                  Kmer start_kmer) :
+    NodeCursor<direction>(ht, start_kmer)
+{
+    _init_visited();
+}
+
+template<bool direction>
+AssemblerTraverser<direction>::AssemblerTraverser(const Hashgraph * ht,
                                       Kmer start_kmer,
                                       KmerFilterList filters) :
     NodeCursor<direction>(ht, start_kmer, filters)
 
 {
-    visited = std::make_shared<SeenSet>();
-    AssemblerTraverser<direction>::push_filter(get_visited_filter(visited));
+    _init_visited();
 }
 
 template<bool direction>
@@ -305,8 +312,7 @@ AssemblerTraverser<direction>::AssemblerTraverser(const Hashgraph * ht,
                                                   KmerFilter filter) :
     NodeCursor<direction>(ht, start_kmer, filter)
 {
-    visited = std::make_shared<SeenSet>();
-    AssemblerTraverser<direction>::push_filter(get_visited_filter(visited));
+    _init_visited();
 }
 
 
@@ -374,6 +380,13 @@ char AssemblerTraverser<direction>::next_symbol()
 /******************************************
  * CompactingAT
  ******************************************/
+
+template <bool direction>
+CompactingAT<direction>::CompactingAT(const Hashgraph * ht,
+                                      Kmer start_kmer) :
+    AssemblerTraverser<direction>(ht, start_kmer), traverser(ht)
+{
+}
 
 template<bool direction>
 CompactingAT<direction>::CompactingAT(const Hashgraph * ht,

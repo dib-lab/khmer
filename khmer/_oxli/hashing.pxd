@@ -66,6 +66,8 @@ cdef class Kmer:
 
     @staticmethod
     cdef Kmer wrap(CpKmer * cpkmer, WordLength K)
+    @staticmethod
+    cdef Kmer wrap_partial(CpKmer *cpkmer)
 
 
 cpdef HashIntoType forward_hash(object kmer, unsigned int K)

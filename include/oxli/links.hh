@@ -173,7 +173,7 @@ enum compact_edge_meta_t {
 class CompactEdge {
 public:
     Kmer in_node; // left and right HDNs
-    Kmer out_hash;
+    Kmer out_node;
     UHashSet tags;
     compact_edge_meta_t meta;
     std::string sequence;
@@ -182,7 +182,7 @@ public:
         in_node(in_node), out_node(out_node), meta(IS_FULL_EDGE) {}
     
     CompactEdge(Kmer in_node, Kmer out_node, compact_edge_meta_t meta) :
-        CompactEdge(in_node, out_node), meta(meta), {}
+        in_node(in_node), out_node(out_node), meta(meta) {}
 
     void add_tags(UHashSet& new_tags) {
         for (auto tag: new_tags) {
@@ -212,6 +212,7 @@ public:
 
 
 typedef std::vector<CompactNode> CompactNodeVector;
+typedef std::vector<CompactEdge> CompactEdgeVector;
 typedef std::unordered_map<HashIntoType, CompactEdge*> TagEdgeMap;
 typedef std::pair<HashIntoType, CompactEdge*> TagEdgePair;
 typedef std::set<TagEdgePair> TagEdgePairSet;
@@ -230,8 +231,6 @@ protected:
     CompactNodeVector compact_nodes;
     // map from tags to CompactEdges
     TagEdgeMap tags_to_edges;
-
-    KmerFilter compact_node_filter;
 
     uint64_t n_sequences_added;
     uint64_t n_compact_edges;
@@ -294,9 +293,6 @@ public:
     {
         tag_density = DEFAULT_TAG_DENSITY;
 
-        compact_node_filter = [&] (const Kmer& node) {
-            return get_compact_node_by_kmer(node) != nullptr;
-        };
     }
 
     WordLength ksize() const {
@@ -399,14 +395,8 @@ public:
             found_tag = get_tag_edge_pair(node, te_pair);
             return found_tag;
         };
-    }
 
-    KmerHelper get_tag_collector(KmerSet& tags) {
-        KmerHelper collector = [&] (const Kmer& node) {
-            if (set_contains(tags_to_egdes, node)) {
-                tags.insert(node);
-            }
-        };
+        return stopper;
     }
 
     compact_edge_meta_t deduce_edge_meta(CompactNode* in, CompactNode* out) {
@@ -423,6 +413,19 @@ public:
         return edge_meta;
     }
 
+    uint64_t consume_sequence(const std::string& sequence) {
+        uint64_t prev_n_kmers = graph->n_unique_kmers();
+        graph->consume_string(sequence);
+        return graph->n_unique_kmers() - prev_n_kmers;
+    }
+
+    uint64_t consume_sequence_and_update(const std::string& sequence) {
+        if (consume_sequence(sequence) > 0) {
+            return update_compact_dbg(sequence);
+        }
+        return 0;
+    }
+
     /* Update a compact dbg where there are no induced
      * HDNs */
     void update_compact_dbg_linear(std::string& sequence) {
@@ -430,13 +433,7 @@ public:
     }
 
     uint64_t update_compact_dbg(const std::string& sequence) {
-        uint64_t prev_n_kmers = graph->n_unique_kmers();
-        graph->consume_string(sequence);
-        if (graph->n_unique_kmers() - prev_n_kmers == 0) {
-            // only need to update if there's something new
-            return 0;
-        }
-    
+
         // first gather up all k-mers that could have been disturbed --
         // k-mers in the read, and the neighbors of the flanking nodes
         KmerIterator kmers(sequence.c_str(), ksize());
@@ -474,10 +471,11 @@ public:
 
         /* Update from all induced HDNs
          */
+        CompactingAssembler cassem(graph.get());
         KmerQueue neighbors;
         while(!induced_hdns.empty()) {
             Kmer root_kmer = *induced_hdns.begin();
-            induced_hdns.erase(root_hdn);
+            induced_hdns.erase(root_kmer);
             root_kmer.set_forward();
 
             CompactNode* root_node = get_compact_node_by_kmer(root_kmer);
@@ -487,13 +485,13 @@ public:
             while(!neighbors.empty()) {
                 Kmer neighbor = neighbors.back();
                 neighbors.pop_back();
-                lcursor.set_cursor(neighbor);
+                lcursor.cursor = neighbor;
 
                 TagEdgePair left_tag_pair;
                 bool found_left_tag;
 
                 lcursor.push_filter(get_tag_stopper(left_tag_pair, found_left_tag));
-                std::string segment_seq = at._assemble_directed(lcursor);
+                std::string segment_seq = cassem._assemble_directed(lcursor);
 
                 CompactEdge* segment_edge = nullptr;
                 CompactNode* left_node = nullptr;
@@ -503,10 +501,10 @@ public:
                  */
                 if (found_left_tag) {
                     // must be an existing segment
-                    segment_edge = get_compact_edge(tag_edge_pair.first);
+                    segment_edge = get_compact_edge(left_tag_pair.first);
                     left_node = get_compact_node_by_kmer(segment_edge->in_node);
                     // check if we need to split the edge
-                    if (*(segment_edge->out_node) == *root_node) {
+                    if (*get_compact_node_by_kmer(segment_edge->out_node) == *root_node) {
                         // good, we're set
                         continue; // continue through neighbors
                     } else {
@@ -514,10 +512,10 @@ public:
                         // edge we delete could be linked to another induced
                         // HDN...
                         n_updates++;
-                        segment_edge->out_node->delete_in_edge(segment_edge);
+                        get_compact_node_by_kmer(segment_edge->out_node)->delete_in_edge(segment_edge);
                         delete_compact_edge(segment_edge);
                         // deleted tags; assemble out to the HDN
-                        segment_seq = at._assemble_directed(lcursor) +
+                        segment_seq = cassem._assemble_directed(lcursor) +
                                       segment_seq.substr(ksize());
                         if (left_node != nullptr) {
                             // not an IN_TIP
@@ -534,7 +532,7 @@ public:
                 compact_edge_meta_t edge_meta = (left_node == nullptr) ?
                                                   IS_IN_TIP : IS_FULL_EDGE;
 
-                n_update++;
+                n_updates++;
                 segment_edge = new_compact_edge(lcursor.cursor, 
                                                 root_node->kmer,
                                                 edge_meta, 

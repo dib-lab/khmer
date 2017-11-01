@@ -189,7 +189,7 @@ public:
     template <class Container=KmerQueue>
     unsigned int neighbors(Container& found) const
     {
-        return NodeGatherer<direction>::neighbors<Container>(cursor, found);
+        return NodeGatherer<direction>::neighbors(cursor, found);
     }
 
 
@@ -257,7 +257,11 @@ protected:
     KmerHelperList helpers;
 
 public:
-    using NodeCursor<direction>::NodeCursor;
+
+    using NodeCursor<direction>::push_filter;
+
+    explicit AssemblerTraverser(const Hashgraph * ht,
+                                Kmer start_kmer);
 
     explicit AssemblerTraverser(const Hashgraph* ht,
                                 Kmer start_kmer,
@@ -273,6 +277,11 @@ public:
                                 std::shared_ptr<SeenSet> visited);
 
     AssemblerTraverser(const AssemblerTraverser& other);
+
+    void _init_visited() {
+        visited = std::make_shared<SeenSet>();
+        push_filter(get_visited_filter(visited));
+    }
 
 
     /**
@@ -303,7 +312,7 @@ public:
 
     void push_helper(KmerHelper helper)
     {
-        filters.push_back(helper);
+        helpers.push_back(helper);
     }
 
     KmerHelper pop_helper()
@@ -311,11 +320,6 @@ public:
         KmerHelper back = this->helpers.back();
         this->helpers.pop_back();
         return back;
-    }
-
-    unsigned int n_filters()
-    {
-        return filters.size();
     }
 
     unsigned int n_helpers()
@@ -333,6 +337,10 @@ protected:
     Traverser traverser;
 
 public:
+
+    explicit CompactingAT(const Hashgraph * ht,
+                          Kmer start_kmer);
+
     explicit CompactingAT(const Hashgraph * ht,
                           Kmer start_kmer,
                           KmerFilter filter);

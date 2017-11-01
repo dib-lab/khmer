@@ -63,7 +63,7 @@ bool apply_kmer_filters(const Kmer& node, const std::list<KmerFilter>& filters)
 
 void apply_kmer_helpers(const Kmer& node, const KmerHelperList& helpers)
 {
-    if (!filters.size()) {
+    if (!helpers.size()) {
         return;
     }
 

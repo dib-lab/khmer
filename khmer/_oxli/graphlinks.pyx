@@ -42,14 +42,13 @@ cdef class CompactEdge:
         if deref(self._ce_this).meta == IS_IN_TIP or \
            deref(self._ce_this).meta == IS_ISLAND:
             return None
-        return deref(self._ce_this).in_hash
+        return deref(self._ce_this).in_node.kmer_u
 
     def out_node(self):
         if deref(self._ce_this).meta == IS_OUT_TIP or \
            deref(self._ce_this).meta == IS_ISLAND:
             return None
-        return deref(self._ce_this).out_hash
-
+        return deref(self._ce_this).out_node.kmer_u
 
 
 cdef class CompactNode:
@@ -114,6 +113,14 @@ cdef class StreamingCompactor:
     def update(self, str sequence):
         cdef string _sequence = _bstring(sequence)
         deref(self._sc_this).update_compact_dbg(_sequence)
+
+    def consume(self, str sequence):
+        cdef string _sequence = _bstring(sequence)
+        return deref(self._sc_this).consume_sequence(_sequence)
+
+    def consume_and_update(self, str sequence):
+        cdef string _sequence = _bstring(sequence)
+        return deref(self._sc_this).consume_sequence_and_update(sequence)
 
     def sequence_nodes(self, str sequence):
         cdef string _sequence = _bstring(sequence)

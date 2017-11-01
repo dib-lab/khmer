@@ -111,7 +111,8 @@ class CompactingAssembler: public LinearAssembler
 public:
 
     explicit CompactingAssembler(const Hashgraph* ht,
-                                 std::shared_ptr<SeenSet> global_visited=nullptr) : LinearAssembler(ht, global_visited) {}
+                                 std::shared_ptr<SeenSet> global_visited=nullptr) 
+        : LinearAssembler(ht, global_visited) {}
 
     virtual std::string assemble(const Kmer seed_kmer,
                                           const Hashgraph * stop_bf) const;

@@ -60,6 +60,13 @@ cdef class Kmer:
         return kmer
 
     @staticmethod
+    cdef Kmer wrap_partial(CpKmer* cpkmer):
+        cdef Kmer kmer = Kmer()
+        kmer._this.reset(cpkmer)
+        kmer.kmer = ""
+        return kmer
+
+    @staticmethod
     def create(HashIntoType tag, WordLength K):
         cdef Kmer kmer = Kmer()
         deref(kmer._this).set_from_unique_hash(tag, K)
