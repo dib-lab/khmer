@@ -113,8 +113,9 @@ const
 
 
 template<bool direction>
+template<class Container>
 unsigned int NodeGatherer<direction>::neighbors(const Kmer& node,
-        KmerQueue & node_q)
+                                                Container& found)
 const
 {
     unsigned int found = 0;
@@ -126,7 +127,7 @@ const
         if (graph->get_count(neighbor)) {
             ++found;
             if (!apply_kmer_filters(neighbor, filters)) {
-                node_q.push_back(neighbor);
+                found.insert(found.end(), neighbor);
             }
         }
         ++base;

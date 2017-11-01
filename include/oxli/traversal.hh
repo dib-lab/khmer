@@ -136,8 +136,9 @@ public:
      *
      * @return Number of neighbors total (could be more than those found).
      */
+    template <class Container=KmerQueue>
     unsigned int neighbors(const Kmer& node,
-                           KmerQueue &node_q) const;
+                           Container &found) const;
 
     /**
      * @brief Get the degree of the given Kmer in the templated direction.
@@ -185,10 +186,12 @@ public:
      *
      * @return Number of neighbors found.
      */
-    unsigned int neighbors(KmerQueue& node_q) const
+    template <class Container=KmerQueue>
+    unsigned int neighbors(Container& found) const
     {
-        return NodeGatherer<direction>::neighbors(cursor, node_q);
+        return NodeGatherer<direction>::neighbors<Container>(cursor, found);
     }
+
 
     /**
      * @return Degree of the current cursor position and direction.
