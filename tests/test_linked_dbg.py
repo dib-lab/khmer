@@ -18,14 +18,8 @@ def teardown():
     utils.cleanup()
 
 
-def test_compact_fork(right_tip_structure):
-    '''Should have no links. Need two junctions.
-    '''
-    graph, contig, L, HDN, R, tip = right_tip_structure
-
-    compactor = StreamingCompactor(graph)
-    compactor.update(contig)
-    compactor.report()
+def compare_right_tip_with_cdbg(rts, compactor):
+    graph, contig, L, HDN, R, tip = rts
 
     nodes = list(compactor.sequence_nodes(contig))
     assert len(nodes) == 1
@@ -55,6 +49,18 @@ def test_compact_fork(right_tip_structure):
         assert _equals_rc(contig, edge_contig.sequence + node.sequence +
                                   out_edge.sequence)
 
+
+def test_compact_fork(right_tip_structure):
+    '''Should have no links. Need two junctions.
+    '''
+    graph, contig, L, HDN, R, tip = right_tip_structure
+
+    compactor = StreamingCompactor(graph)
+    print(compactor.update(contig), 'cDBG updates...')
+    compactor.report()
+
+    compare_right_tip_with_cdbg(right_tip_structure, compactor)
+
     for node in nodes:
         print(node)
         print('in edges:')
@@ -73,26 +79,28 @@ def test_compact_fork(right_tip_structure):
     print("R FW:", R)
     print("R RC:", revcomp(R))
 
-    #assert junction['u'] == forward_hash(L, K)
-    #assert junction['v'] == forward_hash(HDN, K)
-    #assert junction['w'] == forward_hash(R, K)
 
-'''
-def test_links_bubble(snp_bubble_structure):
-    graph, wildtype_sequence, _, HDN_L, HDN_R = snp_bubble_structure
-    linker = GraphLinker(graph)
+def test_compact_fork_double_update(right_tip_structure):
+    graph, contig, L, HDN, R, tip = right_tip_structure
 
-    # thread the wildtype half of the bubble
-    linker.add_links(wildtype_sequence)
-    linker.report()
+    compactor = StreamingCompactor(graph)
+    print(compactor.update(contig), 'cDBG updates...')
+    compactor.report()
+    print(compactor.update(contig), 'cDBG updates...')
+    compactor.report()
+
+    compare_right_tip_with_cdbg(right_tip_structure, compactor)
 
 
-    links = list(linker.get_links(wildtype_sequence))
-    assert len(links) == 2
-    
-    link_a, link_b = links
-    if link_a[0]['v'] == forward_hash(HDN_L, K):
-        assert link_b[0]['v'] == forward_hash(HDN_R, K)
-    elif link_a[0]['v'] == forward_hash(HDN_R, K):
-        assert link_b[0]['v'] == forward_hash(HDN_L, K)
-'''
+def test_compact_fork_revcomp_update(right_tip_structure):
+    graph, contig, L, HDN, R, tip = right_tip_structure
+
+    compactor = StreamingCompactor(graph)
+    print(compactor.update(contig), 'cDBG updates...')
+    compactor.report()
+
+    print(compactor.update(revcomp(contig)), 'cDBG updates...')
+    compactor.report()
+
+    compare_right_tip_with_cdbg(right_tip_structure, compactor)
+

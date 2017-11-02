@@ -139,7 +139,7 @@ cdef class StreamingCompactor:
 
     def update(self, str sequence):
         cdef string _sequence = _bstring(sequence)
-        deref(self._sc_this).update_compact_dbg(_sequence)
+        return deref(self._sc_this).update_compact_dbg(_sequence)
 
     def consume(self, str sequence):
         cdef string _sequence = _bstring(sequence)

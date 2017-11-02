@@ -178,8 +178,8 @@ public:
     }
 
     void add_in_edge(const char base, CompactEdge* edge) {
-        pdebug("add in edge to " << *this << ", base=" << base
-                << ", edge: " << *edge);
+        //pdebug("add in edge to " << *this << ", base=" << base
+        //        << ", edge: " << *edge);
         in_edges[twobit_repr(base)] = edge;
     }
 
@@ -198,8 +198,8 @@ public:
     }
 
     void add_out_edge(const char base, CompactEdge* edge) {
-        pdebug("add out edge to " << *this << ", base=" << base
-                << ", edge: " << *edge);
+        //pdebug("add out edge to " << *this << ", base=" << base
+        //        << ", edge: " << *edge);
         out_edges[twobit_repr(base)] = edge;
     }
 
@@ -271,7 +271,7 @@ protected:
     // protected linear creation of CompactNode
     // they should never be deleted, so this is straightforward
     CompactNode* new_compact_node(Kmer hdn) {
-        pdebug("new compact node from " << hdn);
+        //pdebug("new compact node from " << hdn);
         CompactNode * v = get_compact_node_by_kmer(hdn);
         if (v == nullptr) {
             hdn.set_forward();
@@ -280,7 +280,7 @@ protected:
             v = &(compact_nodes.back());
             v->sequence = _revhash(hdn, ksize()); // hopefully new k-mer type in future
             hdn_ids[hdn] = v->node_id;
-            pdebug("Allocate: " << *v);
+            //pdebug("Allocate: " << *v);
         }
         return v;
     }
@@ -289,15 +289,15 @@ protected:
                                    compact_edge_meta_t edge_meta,
                                    std::string edge_sequence) {
          CompactEdge* edge = new CompactEdge(left, right, edge_meta);
-         pdebug("new compact edge: left=" << left << " right=" << right
-                << " sequence=" << edge_sequence);
+         //pdebug("new compact edge: left=" << left << " right=" << right
+         //       << " sequence=" << edge_sequence);
          edge->sequence = edge_sequence;
          n_compact_edges++;
          return edge;
     }
 
     void delete_compact_edge(CompactEdge * edge) {
-        pdebug("attempt edge delete @" << edge);
+        //pdebug("attempt edge delete @" << edge);
         if (edge != nullptr) {
             pdebug("edge not null, proceeding");
             for (auto tag: edge->tags) {
@@ -378,7 +378,7 @@ public:
     }
 
     std::vector<CompactNode*> get_compact_nodes(const std::string& sequence)  {
-        pdebug("get compact node IDs");
+        //pdebug("get compact node IDs");
         KmerIterator kmers(sequence.c_str(), graph->ksize());
         std::vector<CompactNode*> nodes;
 
@@ -398,7 +398,7 @@ public:
     }
 
     CompactEdge* get_compact_edge(HashIntoType tag) {
-        pdebug("get compact edge from tag " << tag);
+        //pdebug("get compact edge from tag " << tag);
         auto search = tags_to_edges.find(tag);
         if (search != tags_to_edges.end()) {
             return search->second;
@@ -472,6 +472,7 @@ public:
 
     uint64_t update_compact_dbg(const std::string& sequence) {
         pdebug("update cDBG from " << sequence);
+        n_sequences_added++;
 
         // first gather up all k-mers that could have been disturbed --
         // k-mers in the read, and the neighbors of the flanking nodes
@@ -652,7 +653,9 @@ public:
 
         }
 
-    }
+        return n_updates;
+
+    } // update_compact_dbg
 
 };
 
