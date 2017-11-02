@@ -74,17 +74,94 @@ typedef std::unordered_set<HashIntoType> UHashSet;
 typedef std::vector<HashIntoType> HashVector;
 typedef std::unordered_map<HashIntoType, uint64_t> HashIDMap;
 
-class CompactEdge;
+
+enum compact_edge_meta_t {
+    IS_FULL_EDGE,
+    IS_IN_TIP,
+    IS_OUT_TIP,
+    IS_ISLAND,
+    IS_TRIVIAL
+};
+
+
+inline const char * edge_meta_repr(compact_edge_meta_t meta) {
+    switch(meta) {
+        case IS_FULL_EDGE:
+            return "FULL EDGE";
+        case IS_IN_TIP:
+            return "IN TIP";
+        case IS_OUT_TIP:
+            return "OUT TIP";
+        case IS_ISLAND:
+            return "ISLAND";
+        case IS_TRIVIAL:
+            return "TRIVIAL";
+    }
+}
+
+
+class CompactEdge {
+public:
+    Kmer in_node; // left and right HDNs
+    Kmer out_node;
+    UHashSet tags;
+    compact_edge_meta_t meta;
+    std::string sequence;
+
+    CompactEdge(Kmer in_node, Kmer out_node) : 
+        in_node(in_node), out_node(out_node), meta(IS_FULL_EDGE) {}
+    
+    CompactEdge(Kmer in_node, Kmer out_node, compact_edge_meta_t meta) :
+        in_node(in_node), out_node(out_node), meta(meta) {}
+
+    void add_tags(UHashSet& new_tags) {
+        for (auto tag: new_tags) {
+            tags.insert(tag);
+        }
+    }
+
+    float tag_density() const {
+        return (float)sequence.length() / (float)tags.size();
+    }
+
+    std::string tag_viz(WordLength K) const {
+        uint64_t pos;
+        std::string ret = "L=" + std::to_string(sequence.length()) + " ";
+        const char * _s = sequence.c_str();
+
+        for (pos = 0; pos < sequence.length() - K + 1; pos++) {
+            if (set_contains(tags, _hash(_s+pos, K))) {
+                ret += ("(" + std::to_string(pos) + ")");
+            }
+            ret += sequence[pos];
+        }
+        return ret;
+    }
+
+    friend std::ostream& operator<<(std::ostream& stream,
+                                     const CompactEdge& edge) {
+            stream << "<CompactEdge in_node=" << edge.in_node << " out_node=" << edge.out_node 
+                   << " length=" << edge.sequence.length()
+                   << " meta=" << edge_meta_repr(edge.meta) << " n_tags=" << edge.tags.size() << ">";
+            return stream;
+    }
+
+};
+
 class CompactNode {
 public:
     Kmer kmer;
     uint32_t count;
+    std::string sequence;
     const uint64_t node_id;
     CompactEdge* in_edges[4] = {nullptr, nullptr, nullptr, nullptr};
     CompactEdge* out_edges[4] = {nullptr, nullptr, nullptr, nullptr};
 
     CompactNode(Kmer kmer, uint64_t node_id) : 
         kmer(kmer), count(0), node_id(node_id) {}
+
+    CompactNode(Kmer kmer, std::string sequence, uint64_t node_id) : 
+        kmer(kmer), count(0), sequence(sequence), node_id(node_id) {}
 
     friend bool operator== (const CompactNode& lhs, const CompactNode& rhs) {
         return lhs.node_id == rhs.node_id;
@@ -101,6 +178,8 @@ public:
     }
 
     void add_in_edge(const char base, CompactEdge* edge) {
+        pdebug("add in edge to " << *this << ", base=" << base
+                << ", edge: " << *edge);
         in_edges[twobit_repr(base)] = edge;
     }
 
@@ -119,6 +198,8 @@ public:
     }
 
     void add_out_edge(const char base, CompactEdge* edge) {
+        pdebug("add out edge to " << *this << ", base=" << base
+                << ", edge: " << *edge);
         out_edges[twobit_repr(base)] = edge;
     }
 
@@ -161,56 +242,6 @@ public:
 };
 
 
-enum compact_edge_meta_t {
-    IS_FULL_EDGE,
-    IS_IN_TIP,
-    IS_OUT_TIP,
-    IS_ISLAND,
-    IS_TRIVIAL
-};
-
-
-class CompactEdge {
-public:
-    Kmer in_node; // left and right HDNs
-    Kmer out_node;
-    UHashSet tags;
-    compact_edge_meta_t meta;
-    std::string sequence;
-
-    CompactEdge(Kmer in_node, Kmer out_node) : 
-        in_node(in_node), out_node(out_node), meta(IS_FULL_EDGE) {}
-    
-    CompactEdge(Kmer in_node, Kmer out_node, compact_edge_meta_t meta) :
-        in_node(in_node), out_node(out_node), meta(meta) {}
-
-    void add_tags(UHashSet& new_tags) {
-        for (auto tag: new_tags) {
-            tags.insert(tag);
-        }
-    }
-
-    float tag_density() const {
-        return (float)sequence.length() / (float)tags.size();
-    }
-
-    std::string tag_viz(WordLength K) const {
-        uint64_t pos;
-        std::string ret = "L=" + std::to_string(sequence.length()) + " ";
-        const char * _s = sequence.c_str();
-
-        for (pos = 0; pos < sequence.length() - K + 1; pos++) {
-            if (set_contains(tags, _hash(_s+pos, K))) {
-                ret += ("(" + std::to_string(pos) + ")");
-            }
-            ret += sequence[pos];
-        }
-        return ret;
-    }
-
-};
-
-
 typedef std::vector<CompactNode> CompactNodeVector;
 typedef std::vector<CompactEdge> CompactEdgeVector;
 typedef std::unordered_map<HashIntoType, CompactEdge*> TagEdgeMap;
@@ -240,12 +271,16 @@ protected:
     // protected linear creation of CompactNode
     // they should never be deleted, so this is straightforward
     CompactNode* new_compact_node(Kmer hdn) {
+        pdebug("new compact node from " << hdn);
         CompactNode * v = get_compact_node_by_kmer(hdn);
         if (v == nullptr) {
+            hdn.set_forward();
             compact_nodes.emplace_back(hdn, n_compact_nodes);
             n_compact_nodes++;
             v = &(compact_nodes.back());
+            v->sequence = _revhash(hdn, ksize()); // hopefully new k-mer type in future
             hdn_ids[hdn] = v->node_id;
+            pdebug("Allocate: " << *v);
         }
         return v;
     }
@@ -342,9 +377,10 @@ public:
         return v;
     }
 
-    std::vector<uint64_t> get_compact_node_ids(const std::string& sequence)  {
+    std::vector<CompactNode*> get_compact_nodes(const std::string& sequence)  {
+        pdebug("get compact node IDs");
         KmerIterator kmers(sequence.c_str(), graph->ksize());
-        std::vector<uint64_t> ids;
+        std::vector<CompactNode*> nodes;
 
         CompactNode* node;
 
@@ -353,14 +389,16 @@ public:
 
             node = get_compact_node_by_kmer(kmer);
             if (node != nullptr) {
-                ids.push_back(node->node_id);
+                pdebug("found compact node " << *node);
+                nodes.push_back(node);
             }
         }
 
-        return ids;
+        return nodes;
     }
 
-    CompactEdge* get_compact_edge(uint64_t tag) {
+    CompactEdge* get_compact_edge(HashIntoType tag) {
+        pdebug("get compact edge from tag " << tag);
         auto search = tags_to_edges.find(tag);
         if (search != tags_to_edges.end()) {
             return search->second;
@@ -368,7 +406,7 @@ public:
         return nullptr;
     }
 
-    bool get_tag_edge_pair(uint64_t tag, TagEdgePair& pair) {
+    bool get_tag_edge_pair(HashIntoType tag, TagEdgePair& pair) {
         auto search = tags_to_edges.find(tag);
         if (search != tags_to_edges.end()) {
             pair = *search;
@@ -433,6 +471,7 @@ public:
     }
 
     uint64_t update_compact_dbg(const std::string& sequence) {
+        pdebug("update cDBG from " << sequence);
 
         // first gather up all k-mers that could have been disturbed --
         // k-mers in the read, and the neighbors of the flanking nodes
@@ -463,6 +502,8 @@ public:
                 }
             }
         }
+        pdebug(disturbed_kmers.size() << " k-mers disturbed" << std::endl
+               << induced_hdns.size() << " induced HDNs");
 
         /* If there are no induced HDNs, we must have extended
          * a tip or merged two tips into a linear segment */
@@ -479,9 +520,11 @@ public:
             root_kmer.set_forward();
 
             CompactNode* root_node = get_compact_node_by_kmer(root_kmer);
+            pdebug("searching from induced HDN: " << *root_node);
 
             // check left (in) edges
             lcursor.neighbors(root_kmer, neighbors);
+            pdebug("checking " << neighbors.size() << " left neighbors");
             while(!neighbors.empty()) {
                 Kmer neighbor = neighbors.back();
                 neighbors.pop_back();
@@ -528,9 +571,14 @@ public:
                 }
 
                 // construct the compact edge
-                segment_seq = segment_seq.substr(1);
                 compact_edge_meta_t edge_meta = (left_node == nullptr) ?
                                                   IS_IN_TIP : IS_FULL_EDGE;
+                if (edge_meta == IS_FULL_EDGE) {
+                    segment_seq = segment_seq.substr(ksize()-1,
+                                                     segment_seq.length()-ksize()+1);
+                } else {
+                    segment_seq = segment_seq.substr(0, segment_seq.length()-ksize()+1);
+                }
 
                 n_updates++;
                 segment_edge = new_compact_edge(lcursor.cursor, 
@@ -538,13 +586,69 @@ public:
                                                 edge_meta, 
                                                 segment_seq);
                 if (IS_FULL_EDGE) {
-                    left_node->add_out_edge(segment_seq[ksize()], segment_edge);
-                } 
+                    left_node->add_out_edge(segment_seq.front(), segment_edge);
+                }
 
+                root_node->add_in_edge(segment_seq.back(), segment_edge);
             }
 
             // now the right neighbors...
+            rcursor.neighbors(root_kmer, neighbors);
+            pdebug("checking " << neighbors.size() << " right neighbors");
+            while(!neighbors.empty()) {
+                Kmer neighbor = neighbors.back();
+                neighbors.pop_back();
+                rcursor.cursor = neighbor;
 
+                TagEdgePair right_tag_pair;
+                bool found_right_tag;
+
+                rcursor.push_filter(get_tag_stopper(right_tag_pair, found_right_tag));
+                std::string segment_seq = cassem._assemble_directed(rcursor);
+
+                CompactEdge* segment_edge = nullptr;
+                CompactNode* right_node = nullptr;
+
+                if (found_right_tag) {
+                    segment_edge = get_compact_edge(right_tag_pair.first);
+                    right_node = get_compact_node_by_kmer(segment_edge->out_node);
+                    if (*get_compact_node_by_kmer(segment_edge->in_node) == *root_node) {
+                        continue;
+                    } else {
+                        n_updates++;
+                        get_compact_node_by_kmer(segment_edge->in_node)->delete_out_edge(segment_edge);
+                        delete_compact_edge(segment_edge);
+                        segment_seq = segment_seq + 
+                                       cassem._assemble_directed(rcursor).substr(ksize());
+                        if (right_node != nullptr) {
+                            right_node->delete_in_edge(segment_edge);
+                        }
+                    }
+                } else {
+                    right_node = get_compact_node_by_kmer(rcursor.cursor);
+                }
+
+                compact_edge_meta_t edge_meta = (right_node == nullptr) ?
+                                                  IS_OUT_TIP : IS_FULL_EDGE;
+                if (edge_meta == IS_FULL_EDGE) {
+                    segment_seq = segment_seq.substr(ksize()-1,
+                                                     segment_seq.length()-ksize()+1);
+                } else {
+                    segment_seq = segment_seq.substr(ksize()-1);
+                }
+
+                n_updates++;
+                segment_edge = new_compact_edge(root_node->kmer,
+                                                rcursor.cursor, 
+                                                edge_meta, 
+                                                segment_seq);
+                if (IS_FULL_EDGE) {
+                    right_node->add_in_edge(segment_seq.back(), segment_edge);
+                }
+
+                root_node->add_out_edge(segment_seq.front(), segment_edge);
+
+            }
 
         }
 

@@ -24,6 +24,7 @@ cdef extern from "oxli/links.hh" namespace "oxli" nogil:
         CpKmer kmer
         uint32_t count
         const uint64_t node_id
+        string sequence
 
         CpCompactEdge* in_edges[4]
         CpCompactEdge* out_edges[4]
@@ -79,7 +80,7 @@ cdef extern from "oxli/links.hh" namespace "oxli" nogil:
         CpCompactNode* get_compact_node_by_kmer(HashIntoType)
         CpCompactNode* get_compact_node_by_id(uint64_t)
         CpCompactNode* fetch_or_new_compact_node(CpKmer hdn)
-        vector[uint64_t] get_compact_node_ids(const string&)
+        vector[CpCompactNode*] get_compact_nodes(const string&)
         
         CpCompactEdge* get_compact_edge(uint64_t)
         CpCompactEdge* get_tag_edge_pair(uint64_t, TagEdgePair&)
@@ -92,6 +93,7 @@ cdef extern from "oxli/links.hh" namespace "oxli" nogil:
 
 cdef class CompactNode:
     cdef CpCompactNode* _cn_this
+    cdef public Kmer kmer
 
     @staticmethod
     cdef CompactNode _wrap(CpCompactNode*)
@@ -108,5 +110,4 @@ cdef class StreamingCompactor:
 
     cdef shared_ptr[CpHashgraph] _graph
     cdef shared_ptr[CpStreamingCompactor] _sc_this
-    cdef Kmer kmer
 
