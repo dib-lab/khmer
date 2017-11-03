@@ -134,19 +134,19 @@ def check_space(in_files, force, _testhook_free_space=None):
 
     size_diff = total_size - free_space
     if size_diff > 0:
-        print("ERROR: Not enough free space on disk "
-              "for output files;\n"
-              "       Need at least %.1f GB more."
-              % (float(size_diff) / 1e9), file=sys.stderr)
-        print("       Estimated output size: %.1f GB"
-              % (float(total_size) / 1e9,), file=sys.stderr)
-        print("       Free space: %.1f GB"
-              % (float(free_space) / 1e9,), file=sys.stderr)
-        if not force:
-            print("NOTE: This can be overridden using the --force argument",
-                  file=sys.stderr)
-            sys.exit(1)
-
+        mem_needed = '{:.1f} GB'.format(size_diff / 1e9)
+        mem_requested = '{:.1f} GB'.format(total_size / 1e9)
+        mem_available = '{:.1f} GB'.format(free_space / 1e9)
+        message = 'Not enough free space on disk for output files;'
+        message += '\n       Need at least {:s} more.'.format(mem_needed)
+        message += '\n       Estimated Output size: {:s}'.format(mem_requested)
+        message += '\n       Free space: {:s}'.format(mem_available)
+        if force:
+            print('WARNING:', message, file=sys.stderr)
+        else:
+            message = 'ERROR: ' + message + \
+                '\nNOTE: This can be overridden using the --force argument'
+            raise SystemExit(message)
 
 def check_space_for_graph(outfile_name, hash_size, force,
                           _testhook_free_space=None):
