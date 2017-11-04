@@ -34,16 +34,16 @@
 # Contact: khmer-project@idyll.org
 # pylint: disable=missing-docstring,protected-access,no-member,invalid-name
 
-
 import khmer
 from khmer import Nodegraph, Countgraph
-from khmer import ReadParser
+from khmer import FastxParser
 from khmer import reverse_complement as revcomp
 from khmer.khmer_args import create_matching_nodegraph
 
 import screed
 
 import pytest
+import os
 
 from . import khmer_tst_utils as utils
 
@@ -59,6 +59,36 @@ def test_toobig():
         assert 0, "This should fail"
     except MemoryError as err:
         print(str(err))
+
+
+def test_extract_nodegraph_info_badfile():
+    try:
+        Nodegraph.extract_info(
+            utils.get_test_data('test-abund-read-2.fa'))
+        assert 0, 'this should fail'
+    except ValueError:
+        pass
+
+
+def test_extract_nodegraph_info():
+    fn = utils.get_temp_filename('test_extract_nodegraph.pt')
+    for size in [1e6, 2e6, 5e6, 1e7]:
+        ht = khmer.Nodegraph(25, size, 4)
+        ht.save(fn)
+
+        info = Nodegraph.extract_info(fn)
+        ksize, table_size, n_tables, _, _, _ = info
+        print(ksize, table_size, n_tables)
+
+        assert(ksize) == 25
+        assert table_size == size, table_size
+        assert n_tables == 4
+
+        try:
+            os.remove(fn)
+        except OSError as err:
+            print('...failed to remove {fn}'.format(fn) + str(err),
+                  file=sys.stderr)
 
 
 def test_add_tag():
@@ -916,10 +946,10 @@ def test_consume_absentfasta():
     except TypeError as err:
         print(str(err))
     try:
-        readparser = ReadParser(utils.get_test_data('empty-file'))
-        nodegraph.consume_seqfile(readparser)
+        parser = FastxParser(utils.get_test_data('empty-file'))
+        nodegraph.consume_seqfile(parser)
         assert 0, "this should fail"
-    except OSError as err:
+    except RuntimeError as err:
         print(str(err))
     except ValueError as err:
         print(str(err))
@@ -936,10 +966,10 @@ def test_bad_primes():
 def test_consume_seqfile_and_tag_with_badreads_parser():
     nodegraph = khmer.Nodegraph(6, 1e6, 2)
     try:
-        readsparser = khmer.ReadParser(utils.get_test_data("test-empty.fa"))
-        nodegraph.consume_seqfile_and_tag(readsparser)
+        parser = FastxParser(utils.get_test_data("test-empty.fa"))
+        nodegraph.consume_seqfile_and_tag(parser)
         assert 0, "this should fail"
-    except OSError as e:
+    except RuntimeError as e:
         print(str(e))
     except ValueError as e:
         print(str(e))

@@ -34,8 +34,17 @@
 # Contact: khmer-project@idyll.org
 """Helpful methods for performing common argument-checking tasks in scripts."""
 from khmer._oxli.parsing import (check_is_left, check_is_right, check_is_pair,
-                                 UnpairedReadsError, _split_left_right)
+                                 UnpairedReadsError, _split_left_right,
+                                 FastxParser, SplitPairedReader,
+                                 BrokenPairedReader)
 import itertools
+
+
+PAIRING_MODES = ('split', 'interleaved', 'single')
+
+def grouper(n, iterable):
+    iterable = iter(iterable)
+    return iter(lambda: list(itertools.islice(iterable, n)), [])
 
 
 def print_error(msg):
@@ -45,76 +54,42 @@ def print_error(msg):
     print(msg, file=sys.stderr)
 
 
-def broken_paired_reader(screed_iter, min_length=None,
-                         force_single=False, require_paired=False):
-    """Read pairs from a stream.
+def paired_fastx_handler(samples, pairing_mode, min_length=-1,
+                         force_name_match=False, yield_filenames=False, 
+                         **kwargs):
 
-    A generator that yields singletons and pairs from a stream of FASTA/FASTQ
-    records (yielded by 'screed_iter').  Yields (n, is_pair, r1, r2) where
-    'r2' is None if is_pair is False.
+    if pairing_mode not in PAIRING_MODES:
+        raise ValueError('Pairing mode must be one of {0}'.format(PAIRING_MODES))
+    
+    if pairing_mode == 'split':
+        _samples = grouper(2, samples)
+    else:
+        _samples = samples
 
-    The input stream can be fully single-ended reads, interleaved paired-end
-    reads, or paired-end reads with orphans, a.k.a. "broken paired".
-
-    Usage::
-
-       for n, is_pair, read1, read2 in broken_paired_reader(...):
-          ...
-
-    Note that 'n' behaves like enumerate() and starts at 0, but tracks
-    the number of records read from the input stream, so is
-    incremented by 2 for a pair of reads.
-
-    If 'min_length' is set, all reads under this length are ignored (even
-    if they are pairs).
-
-    If 'force_single' is True, all reads are returned as singletons.
-    """
-    record = None
-    prev_record = None
-    num = 0
-
-    if force_single and require_paired:
-        raise ValueError("force_single and require_paired cannot both be set!")
-
-    # handle the majority of the stream.
-    for record in screed_iter:
-        if prev_record:
-            if check_is_pair(prev_record, record) and not force_single:
-                if min_length and (len(prev_record.sequence) < min_length or
-                                   len(record.sequence) < min_length):
-                    if require_paired:
-                        record = None
-                else:
-                    yield num, True, prev_record, record  # it's a pair!
-                    num += 2
-                    record = None
-            else:                                   # orphan.
-                if require_paired:
-                    err = UnpairedReadsError(
-                        "Unpaired reads when require_paired is set!",
-                        prev_record, record)
-                    raise err
-
-                # ignore short reads
-                if min_length and len(prev_record.sequence) < min_length:
-                    pass
-                else:
-                    yield num, False, prev_record, None
-                    num += 1
-
-        prev_record = record
-        record = None
-
-    # handle the last record, if it exists (i.e. last two records not a pair)
-    if prev_record:
-        if require_paired:
-            raise UnpairedReadsError("Unpaired reads when require_paired "
-                                     "is set!", prev_record, None)
-        if min_length and len(prev_record.sequence) < min_length:
-            pass
+    for group in _samples:
+        if pairing_mode == 'split':
+            reader = SplitPairedReader(FastxParser(group[0]),
+                                       FastxParser(group[1]),
+                                       min_length=min_length,
+                                       force_name_match=force_name_match)
+        elif pairing_mode == 'single':
+            reader = BrokenPairedReader(FastxParser(group),
+                                        force_single=True,
+                                        min_length=min_length,
+                                        require_paired=force_name_match)
         else:
-            yield num, False, prev_record, None
+            reader = BrokenPairedReader(FastxParser(group),
+                                        force_single=False,
+                                        min_length=min_length,
+                                        require_paired=force_name_match)
+        if yield_filenames:
+            if pairing_mode == 'split':
+                _filename = group[0] + '.pair'
+            else:
+                _filename = group
+            yield _filename, reader
+        else:
+            yield reader
 
 
 def write_record(record, fileobj):
@@ -186,11 +161,6 @@ class ReadBundle(object):
     @property
     def total_length(self):
         return sum([len(r.sequence) for r in self.reads])
-
-
-def grouper(n, iterable):
-    iterable = iter(iterable)
-    return iter(lambda: list(itertools.islice(iterable, n)), [])
 
 
 # vim: set filetype=python tabstop=4 softtabstop=4 shiftwidth=4 expandtab:

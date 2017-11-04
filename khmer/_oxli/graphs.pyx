@@ -1,4 +1,6 @@
 from math import log
+from struct import pack, unpack
+from collections import namedtuple
 
 from cython.operator cimport dereference as deref
 from cpython.buffer cimport (PyBuffer_FillInfo, PyBUF_FULL_RO)
@@ -11,7 +13,7 @@ from libcpp.set cimport set
 from libcpp.string cimport string
 
 from khmer._oxli.utils cimport _bstring, is_str, is_num
-from khmer._oxli.utils import get_n_primes_near_x
+from khmer._oxli.utils import get_n_primes_near_x, FILETYPES
 from khmer._oxli.parsing cimport (CpFastxReader, CPyReadParser_Object,
                                   get_parser, CpReadParser, FastxParser,
                                   FastxParserPtr)
@@ -19,13 +21,19 @@ from khmer._oxli.hashset cimport HashSet
 from khmer._oxli.legacy_partitioning cimport (CpSubsetPartition, SubsetPartition,
                                    cp_pre_partition_info, PrePartitionInfo)
 from khmer._oxli.oxli_types cimport MAX_BIGCOUNT, HashIntoType
+from khmer._oxli.sequence cimport Sequence
 from khmer._oxli.traversal cimport Traverser
 
 from khmer._khmer import ReadParser
 
-CYTHON_TABLES = (Hashtable, Nodetable, Counttable, SmallCounttable,
-                 QFCounttable, Nodegraph, Countgraph, SmallCountgraph)
 
+_buckets_per_byte = {
+    # calculated by hand from settings in third-part/cqf/gqf.h
+    'qfcounttable': 1 / 1.26,
+    'countgraph': 1,
+    'smallcountgraph': 2,
+    'nodegraph': 8,
+}
 
 cdef class Hashtable:
 
@@ -198,6 +206,12 @@ cdef class Hashtable:
         cdef bytes data = self._valid_sequence(sequence)
         trimmed_at = deref(self._ht_this).trim_on_abundance(data, abundance)
         return sequence[:trimmed_at], trimmed_at
+
+    cdef int _trim_on_abundance(self, Sequence sequence, int abundance):
+        trimmed_at = \
+            deref(self._ht_this).trim_on_abundance(sequence._obj.cleaned_seq,
+                                                   abundance)
+        return trimmed_at
 
     def trim_below_abundance(self, str sequence, int abundance):
         """Trim sequence at first k-mer above the given abundance."""
@@ -395,6 +409,53 @@ cdef class Counttable(Hashtable):
             self._ct_this = make_shared[CpCounttable](k, primes)
             self._ht_this = <shared_ptr[CpHashtable]>self._ct_this
 
+    @staticmethod
+    def extract_info(filename):
+        """Open the given countgraph file and return a tuple of information.
+
+        Return: the k-mer size, the table size, the number of tables, the bigcount
+        flag, the version of the table format, and the type of table flag.
+
+        Keyword argument:
+        filename -- the name of the countgraph file to inspect
+        """
+        CgInfo = namedtuple("CgInfo", ['ksize', 'n_tables', 'table_size',
+                                       'use_bigcount', 'version', 'ht_type',
+                                       'n_occupied'])
+        ksize = None
+        n_tables = None
+        table_size = None
+        signature = None
+        version = None
+        ht_type = None
+        use_bigcount = None
+        occupied = None
+
+        uint_size = len(pack('I', 0))
+        ulonglong_size = len(pack('Q', 0))
+
+        try:
+            with open(filename, 'rb') as countgraph:
+                signature, = unpack('4s', countgraph.read(4))
+                version, = unpack('B', countgraph.read(1))
+                ht_type, = unpack('B', countgraph.read(1))
+                if ht_type != FILETYPES['SMALLCOUNT']:
+                    use_bigcount, = unpack('B', countgraph.read(1))
+                else:
+                    use_bigcount = None
+                ksize, = unpack('I', countgraph.read(uint_size))
+                n_tables, = unpack('B', countgraph.read(1))
+                occupied, = unpack('Q', countgraph.read(ulonglong_size))
+                table_size, = unpack('Q', countgraph.read(ulonglong_size))
+            if signature != b'OXLI':
+                raise ValueError("Count graph file '{}' is missing file type "
+                                 "signature. ".format(filename) + str(signature))
+        except:
+            raise ValueError("Count graph file '{}' is corrupt ".format(filename))
+
+        return CgInfo(ksize, n_tables, round(table_size, -2), use_bigcount,
+                      version, ht_type, occupied)
+
 
 cdef class SmallCounttable(Hashtable):
 
@@ -412,6 +473,10 @@ cdef class SmallCounttable(Hashtable):
             sizes[i] = (sizes[i] // 2) + 1
         return self._get_raw_tables(table_ptrs, sizes)
 
+    @staticmethod
+    def extract_info(filename):
+        return Counttable.extract_info(filename)
+
 
 cdef class Nodetable(Hashtable):
 
@@ -421,6 +486,47 @@ cdef class Nodetable(Hashtable):
             primes = get_n_primes_near_x(n_tables, starting_size)
             self._nt_this = make_shared[CpNodetable](k, primes)
             self._ht_this = <shared_ptr[CpHashtable]>self._nt_this
+
+    @staticmethod
+    def extract_info(filename):
+        """Open the given nodegraph file and return a tuple of information.
+
+        Returns: the k-mer size, the table size, the number of tables, the version
+        of the table format, and the type of table flag.
+
+        Keyword argument:
+        filename -- the name of the nodegraph file to inspect
+        """
+        ksize = None
+        n_tables = None
+        table_size = None
+        signature = None
+        version = None
+        ht_type = None
+        occupied = None
+
+        uint_size = len(pack('I', 0))
+        uchar_size = len(pack('B', 0))
+        ulonglong_size = len(pack('Q', 0))
+
+        try:
+            with open(filename, 'rb') as nodegraph:
+                signature, = unpack('4s', nodegraph.read(4))
+                version, = unpack('B', nodegraph.read(1))
+                ht_type, = unpack('B', nodegraph.read(1))
+                ksize, = unpack('I', nodegraph.read(uint_size))
+                n_tables, = unpack('B', nodegraph.read(uchar_size))
+                occupied, = unpack('Q', nodegraph.read(ulonglong_size))
+                table_size, = unpack('Q', nodegraph.read(ulonglong_size))
+            if signature != b"OXLI":
+                raise ValueError("Node graph '{}' is missing file type "
+                                 "signature".format(filename) + str(signature))
+        except:
+            raise ValueError("Node graph '{}' is corrupt ".format(filename))
+
+        return ksize, round(table_size, -2), n_tables, version, ht_type, occupied
+
+
 
 
 cdef class Hashgraph(Hashtable):
@@ -815,6 +921,12 @@ cdef class Countgraph(Hashgraph):
 
         return subset
 
+    @staticmethod
+    def extract_info(filename):
+        return Counttable.extract_info(filename)
+
+
+
 
 cdef class SmallCountgraph(Hashgraph):
 
@@ -837,6 +949,9 @@ cdef class SmallCountgraph(Hashgraph):
             sizes[i] = sizes[i] // 2 + 1
         return self._get_raw_tables(table_ptrs, sizes)
 
+    @staticmethod
+    def extract_info(filename):
+        return Counttable.extract_info(filename)
 
 
 cdef class Nodegraph(Hashgraph):
@@ -855,3 +970,7 @@ cdef class Nodegraph(Hashgraph):
 
     def update(self, Nodegraph other):
         deref(self._ng_this).update_from(deref(other._ng_this))
+
+    @staticmethod
+    def extract_info(filename):
+        return Nodetable.extract_info(filename)

@@ -57,6 +57,7 @@ from khmer.kfile import check_input_files
 from khmer.kfile import check_space_for_graph
 from khmer.khmer_logger import (configure_logging, log_info, log_error,
                                 log_warn)
+from khmer._oxli.parsing import FastxParser
 
 
 def get_parser():
@@ -142,7 +143,7 @@ def main():
 
     for index, filename in enumerate(filenames):
 
-        rparser = khmer.ReadParser(filename)
+        rparser = FastxParser(filename)
         threads = []
         log_info('consuming input {input}', input=filename)
         for _ in range(args.threads):

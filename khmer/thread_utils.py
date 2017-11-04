@@ -35,7 +35,6 @@
 # pylint: disable=missing-docstring,too-few-public-methods
 """Utilities for dealing with multithreaded processing of short reads."""
 
-
 import threading
 import sys
 import screed

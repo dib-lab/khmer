@@ -10,6 +10,7 @@ from khmer._oxli.hashing cimport Kmer, CpKmer, KmerSet, CpKmerFactory, CpKmerIte
 from khmer._oxli.parsing cimport CpReadParser, CpSequence, FastxParserPtr
 from khmer._oxli.legacy_partitioning cimport (CpSubsetPartition, cp_pre_partition_info,
                                    SubsetPartition)
+from khmer._oxli.sequence cimport Sequence
 from khmer._oxli.utils cimport oxli_raise_py_error
 
 
@@ -248,6 +249,8 @@ cdef class Hashtable:
     cdef CpKmer _build_kmer(self, object kmer) except *
     cdef FastxParserPtr _get_parser(self, object parser_or_filename) except *
     cdef list _get_raw_tables(self, uint8_t **, vector[uint64_t])
+
+    cdef int _trim_on_abundance(self, Sequence sequence, int abundance)
 
 
 cdef class QFCounttable(Hashtable):

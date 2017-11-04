@@ -49,10 +49,9 @@ import os
 import textwrap
 
 from khmer import __version__
-from khmer import ReadParser
 from khmer.khmer_args import sanitize_help, KhmerArgumentParser
 from khmer.khmer_args import FileType as khFileType
-from khmer.utils import (write_record, broken_paired_reader,
+from khmer.utils import (write_record, BrokenPairedReader, FastxParser,
                          UnpairedReadsError)
 from khmer.kfile import (check_input_files, check_space,
                          add_output_compression_type,
@@ -168,8 +167,8 @@ def main():
     index = None
 
     # walk through all the reads in broken-paired mode.
-    paired_iter = broken_paired_reader(ReadParser(infile),
-                                       require_paired=not args.output_orphaned)
+    paired_iter = BrokenPairedReader(FastxParser(infile),
+                                     require_paired=not args.output_orphaned)
 
     try:
         for index, is_pair, record1, record2 in paired_iter:

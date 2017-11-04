@@ -35,24 +35,19 @@
 # Contact: khmer-project@idyll.org
 """Common argparse constructs."""
 
-
 import sys
 import argparse
 import math
 import textwrap
 from argparse import _VersionAction
 from collections import namedtuple
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
+from io import StringIO
 
 import screed
 import khmer
-from khmer import extract_countgraph_info
-from khmer import __version__
-from .utils import print_error
-from .khmer_logger import log_info, log_warn, configure_logging
+from khmer import __version__, Countgraph
+from khmer.utils import print_error, PAIRING_MODES
+from khmer.khmer_logger import log_info, log_warn, configure_logging
 
 
 DEFAULT_K = 32
@@ -260,7 +255,7 @@ def check_conflicting_args(args, hashtype):
 
         infoset = None
         if hashtype in ('countgraph', 'smallcountgraph'):
-            infoset = extract_countgraph_info(args.loadgraph)
+            infoset = Countgraph.extract_info(args.loadgraph)
         if infoset is not None:
             ksize = infoset.ksize
             max_tablesize = infoset.table_size
@@ -492,6 +487,20 @@ def add_loadgraph_args(parser):
     """Common loadgraph argument."""
     parser.add_argument('-l', '--loadgraph', metavar="filename", default=None,
                         help='load a precomputed k-mer graph from disk')
+
+
+def add_pairing_args(parser):
+    """Common pairing mode argument."""
+    parser.add_argument('--pairing-mode', default='interleaved',
+                        choices=PAIRING_MODES,
+                        help='How to interpret read pairing. With `single`, '\
+                             'reads will be parsed as singletons, regardless'\
+                             ' of pairing or file order. With `interleaved`,'\
+                             ' each file will be assumed to be interleaved '\
+                             'and paired, with singletons allowed to be mixed'\
+                             ' in. With `split`, it will be assumed that each'\
+                             ' group of two files in the input list are '\
+                             'as (LEFT, RIGHT), ...')
 
 
 def calculate_graphsize(args, graphtype, multiplier=1.0):
