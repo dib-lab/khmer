@@ -111,7 +111,8 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli" nogil:
 
     cdef cppclass CpCounttableMMap "oxli::CounttableMMap" (CpMurmurHashtable):
         CpCounttableMMap(WordLength, vector[uint64_t],string)
-
+        CpCounttableMMap(WordLength, vector[uint64_t])
+	
     cdef cppclass CpSmallCounttable "oxli::SmallCounttable" (CpMurmurHashtable):
         CpSmallCounttable(WordLength, vector[uint64_t])
 
@@ -196,6 +197,7 @@ cdef extern from "oxli/hashgraph.hh" namespace "oxli" nogil:
 
     cdef cppclass CpCountgraphMMap "oxli::CountgraphMMap" (CpHashgraph):
         CpCountgraphMMap(WordLength, vector[uint64_t],string)
+        CpCountgraphMMap(WordLength, vector[uint64_t])	
 
     cdef cppclass CpSmallCountgraph "oxli::SmallCountgraph" (CpHashgraph):
         CpSmallCountgraph(WordLength, vector[uint64_t])
