@@ -74,7 +74,7 @@ CPPCHECK=cppcheck --enable=all \
 	 --suppress='*:*/include/python*/Python.h' \
 	 --suppress='*:/usr/*' --platform=unix64 \
 	 --std=c++11 --inline-suppr -Ilib -Ithird-party/bzip2 \
-	 -Ithird-party/zlib -Ithird-party/smhasher \
+	 -Ithird-party/zlib -Ithird-party/smhasher -Ithird-party/rollinghash \
 	 $(DEFINES) $(INCLUDEOPTS) $(PYINCLUDE) $(CPPCHECK_SOURCES) --quiet
 
 UNAME := $(shell uname)

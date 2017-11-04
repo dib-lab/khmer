@@ -24,6 +24,7 @@ import khmer
 
 from khmer import Countgraph, SmallCountgraph, Nodegraph
 from khmer import Nodetable, Counttable, SmallCounttable, QFCounttable
+from khmer import CyclicCounttable
 
 from khmer import ReadParser
 
@@ -423,7 +424,7 @@ def test_get_bigcount(Tabletype):
 
 
 def test_set_bigcount(Tabletype):
-    supports_bigcount = [Countgraph, Counttable]
+    supports_bigcount = [Countgraph, Counttable, CyclicCounttable]
     tt = Tabletype(12)
 
     if type(tt) in supports_bigcount:

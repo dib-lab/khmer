@@ -23,14 +23,15 @@ from khmer._oxli.traversal cimport Traverser
 
 from khmer._khmer import ReadParser
 
-CYTHON_TABLES = (Hashtable, Nodetable, Counttable, SmallCounttable,
+CYTHON_TABLES = (Hashtable, Nodetable, Counttable, CyclicCounttable,
+                 SmallCounttable,
                  QFCounttable, Nodegraph, Countgraph, SmallCountgraph)
 
 
 cdef class Hashtable:
 
     cpdef bytes sanitize_seq_kmer(self, object kmer):
-        '''Legnth sanitize a string k-mer and return as bytes.'''
+        '''Length sanitize a string k-mer and return as bytes.'''
         if len(kmer) != self.ksize():
             raise ValueError("Expected k-mer length {}"
                              " but got {}.".format(self.ksize(), len(kmer)))
@@ -394,6 +395,16 @@ cdef class Counttable(Hashtable):
             primes = get_n_primes_near_x(n_tables, starting_size)
             self._ct_this = make_shared[CpCounttable](k, primes)
             self._ht_this = <shared_ptr[CpHashtable]>self._ct_this
+
+
+cdef class CyclicCounttable(Hashtable):
+
+    def __cinit__(self, int k, uint64_t starting_size, int n_tables):
+        cdef vector[uint64_t] primes
+        if type(self) is CyclicCounttable:
+            primes = get_n_primes_near_x(n_tables, starting_size)
+            self._cct_this = make_shared[CpCyclicCounttable](k, primes)
+            self._ht_this = <shared_ptr[CpHashtable]>self._cct_this
 
 
 cdef class SmallCounttable(Hashtable):

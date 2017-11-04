@@ -69,7 +69,8 @@ PREFIX=/usr/local
 
 INCLUDES= -I ../../include/ -I ../../third-party/seqan/core/include/ \
 	      -I ../../third-party/smhasher/ \
-				-I ../../third-party/cqf/
+				-I ../../third-party/cqf/ \
+				-I ../../third-party/rollinghash
 
 ifeq ($(USE_SYSTEM_ZLIB), false)
 INCLUDES += -I ../../third-party/zlib/
@@ -83,7 +84,7 @@ endif
 WARNINGS=-Wall
 
 # Flags in common to C and C++
-COMMON_FLAGS=-O3 -fPIC
+COMMON_FLAGS=-O3 -fPIC -fno-omit-frame-pointer
 SEQAN_FLAGS=-DSEQAN_HAS_ZLIB=1 -DSEQAN_HAS_BZIP2=1
 
 # Base C/CXXFLAGS
