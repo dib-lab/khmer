@@ -44,6 +44,8 @@ Contact: khmer-project@idyll.org
 #include <string.h>
 #include <string>
 
+#include "cyclichash.h"
+
 #include "oxli.hh"
 
 // test validity
@@ -114,6 +116,12 @@ HashIntoType _hash_murmur(const std::string& kmer, const WordLength k,
                           HashIntoType& h, HashIntoType& r);
 HashIntoType _hash_murmur_forward(const std::string& kmer,
                                   const WordLength k);
+
+// Cyclic hash, a rolling hash that is irreversible
+HashIntoType _hash_cyclic(const std::string& kmer, const WordLength k);
+HashIntoType _hash_cyclic(const std::string& kmer, const WordLength k,
+                          HashIntoType& h, HashIntoType& r);
+HashIntoType _hash_cyclic_forward(const std::string& kmer, const WordLength k);
 
 // Function to support k-mer banding.
 std::pair<uint64_t, uint64_t> compute_band_interval(unsigned int num_bands,
@@ -409,6 +417,67 @@ public:
     }
 };
 
+// RollingHashKmerIterator
+class RollingHashKmerIterator : public KmerHashIterator {
+    const char * _seq;
+    const std::string _rev;
+    const char _ksize;
+    unsigned int index;
+    unsigned int length;
+    bool _initialized;
+    CyclicHash<uint64_t> fwd_hasher;
+    CyclicHash<uint64_t> bwd_hasher;
+
+public:
+    RollingHashKmerIterator(const char * seq, unsigned char k) :
+        _seq(seq), _rev(oxli::_revcomp(seq)), _ksize(k), index(0),
+        _initialized(false), fwd_hasher(k), bwd_hasher(k)
+    {
+        length = strlen(_seq);
+    };
+
+    HashIntoType first() {
+        _initialized = true;
+
+        for (char i = 0; i < _ksize; ++i) {
+            fwd_hasher.eat(*(_seq + i));
+            bwd_hasher.eat(_rev[length - _ksize + i]);
+        }
+        index += 1;
+
+        return fwd_hasher.hashvalue + bwd_hasher.hashvalue;
+    }
+
+    HashIntoType next() {
+        if (!_initialized) {
+            return first();
+        }
+
+        if (done()) {
+            throw oxli_exception("past end of iterator");
+        }
+        fwd_hasher.update(*(_seq + index - 1), *(_seq + index + _ksize - 1));
+
+        // first argument is added, second is removed from the hash
+        bwd_hasher.reverse_update(
+          _rev[length - _ksize - index], _rev[length - index]);
+
+        index += 1;
+        return fwd_hasher.hashvalue + bwd_hasher.hashvalue;
+    }
+
+    bool done() const {
+        return (index + _ksize > length);
+    }
+    unsigned int get_start_pos() const {
+        if (!_initialized) { return 0; }
+        return index - 1;
+    }
+    unsigned int get_end_pos() const {
+        if (!_initialized) { return _ksize; }
+        return index + _ksize - 1;
+    }
+};
 }
 
 #endif // KMER_HASH_HH
