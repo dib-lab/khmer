@@ -18,13 +18,11 @@ def teardown():
     utils.cleanup()
 
 
-def compare_right_tip_with_cdbg(rts, compactor):
+def compare_tip_with_cdbg(rts, compactor):
     graph, contig, L, HDN, R, tip = rts
 
     nodes = list(compactor.sequence_nodes(contig))
     assert len(nodes) == 1
-    assert compactor.n_nodes == 1
-    assert compactor.n_edges == 3
 
     node = nodes[0]
     assert _equals_rc(node.sequence, HDN)
@@ -50,7 +48,7 @@ def compare_right_tip_with_cdbg(rts, compactor):
                                   out_edge.sequence)
 
 
-def test_compact_fork(right_tip_structure):
+def test_compact_tip(right_tip_structure):
     '''Should have no links. Need two junctions.
     '''
     graph, contig, L, HDN, R, tip = right_tip_structure
@@ -59,7 +57,10 @@ def test_compact_fork(right_tip_structure):
     print(compactor.update(contig), 'cDBG updates...')
     compactor.report()
 
-    compare_right_tip_with_cdbg(right_tip_structure, compactor)
+    compare_tip_with_cdbg(right_tip_structure, compactor)
+
+    assert compactor.n_nodes == 1
+    assert compactor.n_edges == 3
 
     for node in nodes:
         print(node)
@@ -80,7 +81,7 @@ def test_compact_fork(right_tip_structure):
     print("R RC:", revcomp(R))
 
 
-def test_compact_fork_double_update(right_tip_structure):
+def test_compact_tip_double_update(right_tip_structure):
     graph, contig, L, HDN, R, tip = right_tip_structure
 
     compactor = StreamingCompactor(graph)
@@ -89,10 +90,12 @@ def test_compact_fork_double_update(right_tip_structure):
     print(compactor.update(contig), 'cDBG updates...')
     compactor.report()
 
-    compare_right_tip_with_cdbg(right_tip_structure, compactor)
+    compare_tip_with_cdbg(right_tip_structure, compactor)
+    assert compactor.n_nodes == 1
+    assert compactor.n_edges == 3
 
 
-def test_compact_fork_revcomp_update(right_tip_structure):
+def test_compact_tip_revcomp_update(right_tip_structure):
     graph, contig, L, HDN, R, tip = right_tip_structure
 
     compactor = StreamingCompactor(graph)
@@ -102,5 +105,45 @@ def test_compact_fork_revcomp_update(right_tip_structure):
     print(compactor.update(revcomp(contig)), 'cDBG updates...')
     compactor.report()
 
-    compare_right_tip_with_cdbg(right_tip_structure, compactor)
+    compare_tip_with_cdbg(right_tip_structure, compactor)
+    assert compactor.n_nodes == 1
+    assert compactor.n_edges == 3
 
+
+def test_compact_two_tip_islands(left_tip_structure, right_tip_structure):
+    graph, contig_r, L_r, HDN_r, R_r, tip_r = right_tip_structure
+    _, contig_l, L_l, HDN_l, R_l, tip_l = left_tip_structure
+    
+    compactor = StreamingCompactor(graph)
+    print(compactor.update(contig_l), 'cDBG updates from left')
+    compactor.report()
+    compare_tip_with_cdbg(left_tip_structure, compactor)
+    assert compactor.n_nodes == 1
+    assert compactor.n_edges == 3
+
+    print(compactor.update(contig_r), 'cDBG updates from right')
+    compactor.report()
+    compare_tip_with_cdbg(right_tip_structure, compactor)
+    assert compactor.n_nodes == 2
+    assert compactor.n_edges == 6
+
+
+def test_compact_tip_x_merge(left_tip_structure, right_tip_structure):
+    graph, contig_r, L_r, HDN_r, R_r, tip_r = right_tip_structure
+    _, contig_l, L_l, HDN_l, R_l, tip_l = left_tip_structure
+
+    contig_merge = contig_l + contig_r
+    
+    compactor = StreamingCompactor(graph)
+    print(compactor.update(contig_l), 'cDBG updates from left')
+    compactor.report()
+    compare_tip_with_cdbg(left_tip_structure, compactor)
+    assert compactor.n_nodes == 1
+    assert compactor.n_edges == 3
+
+    compactor.consume(contig_merge)
+    print(compactor.update(contig_r), 'cDBG updates from right merge')
+    compactor.report()
+    #compare_tip_with_cdbg(right_tip_structure, compactor)
+    assert compactor.n_nodes == 2
+    assert compactor.n_edges == 5

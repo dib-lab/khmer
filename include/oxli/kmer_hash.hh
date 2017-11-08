@@ -307,6 +307,10 @@ public:
         kmer_u = _hash(kmer_c, _ksize, kmer_f, kmer_r);
         return Kmer(kmer_f, kmer_r, kmer_u);
     }
+
+    WordLength K() const {
+        return _ksize;
+    }
 };
 
 /**

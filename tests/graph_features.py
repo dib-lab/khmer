@@ -93,7 +93,7 @@ def mutate_position(sequence, pos):
     return ''.join(sequence)
 
 
-def get_random_sequence(length, exclude=None):
+def get_random_sequence(length, exclude=None, seen=None):
     '''Generate a random (non-looping) nucleotide sequence.
 
     To be non-overlapping, the sequence should not include any repeated
@@ -107,7 +107,7 @@ def get_random_sequence(length, exclude=None):
         str: A random non-looping sequence.
     '''
 
-    seen = set()
+    seen = set() if seen is None else seen.copy()
 
     def add_seen(kmer):
         seen.add(kmer)
@@ -207,9 +207,16 @@ def known_sequence(request):
 @pytest.fixture(params=list(range(500, 1600, 500)),
                 ids=lambda val: '(L={0})'.format(val))
 def random_sequence(request):
+    global_seen = set()
 
     def get(exclude=None):
-        return get_random_sequence(request.param, exclude=exclude)
+        sequence = get_random_sequence(request.param, 
+                                       exclude=exclude,
+                                       seen=global_seen)
+        for i in range(len(sequence)-K):
+            global_seen.add(sequence[i:i+K-1])
+            global_seen.add(revcomp(sequence[i:i+K-1]))
+        return sequence
 
     return get
 
