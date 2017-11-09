@@ -86,7 +86,8 @@ def get_parser():
 
     parser.add_argument('filenames', nargs='+')
     parser.add_argument('-N', '--num_reads', type=int, dest='num_reads',
-                        default=DEFAULT_NUM_READS, help='samples the number of sequences or pairs specified with -N')
+                        default=DEFAULT_NUM_READS, help='samples the number of sequences' 
+                        'or pairs specified with -N')
     parser.add_argument('-M', '--max_reads', type=int, dest='max_reads',
                         default=DEFAULT_MAX_READS)
     parser.add_argument('-S', '--samples', type=int, dest='num_samples',
