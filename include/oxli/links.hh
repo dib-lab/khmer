@@ -38,8 +38,10 @@ Contact: khmer-project@idyll.org
 #define LINKS_HH
 
 #include <algorithm>
+#include <cstdint>
 #include <functional>
 #include <memory>
+#include <limits>
 #include <list>
 #include <iostream>
 #include <unordered_set>
@@ -69,6 +71,8 @@ Contact: khmer-project@idyll.org
                         (ch) == 'C' ? 'G' : 'C')
 
 namespace oxli {
+
+#define NULL_ID ULLONG_MAX
 
 using std::make_shared;
 using std::shared_ptr;
@@ -104,15 +108,14 @@ inline const char * edge_meta_repr(compact_edge_meta_t meta) {
 class CompactEdgeFactory;
 class CompactEdge {
     friend class CompactEdgeFactory;
-protected:
-    uint64_t in_node_id; // left and right HDN IDs
-    uint64_t out_node_id;
 
 public:
 
-    UHashSet tags;
+    const uint64_t in_node_id; // left and right HDN IDs
+    const uint64_t out_node_id;
     compact_edge_meta_t meta;
     std::string sequence;
+    UHashSet tags;
 
     CompactEdge(uint64_t in_node_id, uint64_t out_node_id) : 
         in_node_id(in_node_id), out_node_id(out_node_id), meta(IS_FULL_EDGE) {}
@@ -124,22 +127,6 @@ public:
         for (auto tag: new_tags) {
             tags.insert(tag);
         }
-    }
-
-    Kmer get_fw_in() const {
-        return in_node_id;
-    }
-
-    Kmer get_rc_in() const {
-        return out_node_id;
-    }
-
-    Kmer get_fw_out() const {
-        return out_node_id;
-    }
-
-    Kmer get_rc_out() const {
-        return in_node_id;
     }
 
     std::string rc_sequence() const {
@@ -166,7 +153,10 @@ public:
 
     friend std::ostream& operator<<(std::ostream& stream,
                                      const CompactEdge& edge) {
-            stream << "<CompactEdge in_node_id=" << edge.in_node_id << " out_node_id=" << edge.out_node_id 
+            stream << "<CompactEdge in_node_id=" << 
+                      std::to_string(edge.in_node_id) << 
+                      " out_node_id=" << 
+                      std::to_string(edge.out_node_id)
                    << " length=" << edge.sequence.length()
                    << " meta=" << edge_meta_repr(edge.meta) << " n_tags=" << edge.tags.size() << ">";
             return stream;
@@ -175,6 +165,10 @@ public:
 };
 
 typedef std::vector<CompactEdge> CompactEdgeVector;
+typedef std::unordered_map<HashIntoType, CompactEdge*> TagEdgeMap;
+typedef std::pair<HashIntoType, CompactEdge*> TagEdgePair;
+typedef std::set<TagEdgePair> TagEdgePairSet;
+typedef std::set<CompactEdge*> CompactEdgeSet;
 
 class CompactEdgeFactory : public KmerFactory {
 
@@ -188,7 +182,7 @@ protected:
 
 public:
 
-    CompactEdgeFacory(Wordlength K) :
+    CompactEdgeFactory(WordLength K) :
         KmerFactory(K), n_compact_edges(0) {
 
         tag_density = DEFAULT_TAG_DENSITY;    
@@ -202,7 +196,9 @@ public:
                             compact_edge_meta_t edge_meta,
                             std::string edge_sequence) {
         CompactEdge* edge = new CompactEdge(left_id, right_id, edge_meta);
-        pdebug("new compact edge: left=" << left << " right=" << right
+        pdebug("new compact edge: left=" << 
+                std::to_string(left_id) << " right=" << 
+                std::to_string(right_id)
                 << " sequence=" << edge_sequence);
         edge->sequence = edge_sequence;
         n_compact_edges++;
@@ -223,15 +219,15 @@ public:
 
     void delete_edge(UHashSet& tags) {
         CompactEdge* edge = get_edge(tags);
-        delete_compact_edge(edge);
+        delete_edge(edge);
     }
 
     void delete_edge(HashIntoType tag) {
         CompactEdge* edge = get_edge(tag);
-        delete_compact_edge(edge);
+        delete_edge(edge);
     }
 
-    CompactEdge* get_edge(HashIntoType tag) {
+    CompactEdge* get_edge(HashIntoType tag) const {
         //pdebug("get compact edge from tag " << tag);
         auto search = tags_to_edges.find(tag);
         if (search != tags_to_edges.end()) {
@@ -240,7 +236,7 @@ public:
         return nullptr;
     }
 
-    bool get_tag_edge_pair(HashIntoType tag, TagEdgePair& pair) {
+    bool get_tag_edge_pair(HashIntoType tag, TagEdgePair& pair) const {
         auto search = tags_to_edges.find(tag);
         if (search != tags_to_edges.end()) {
             pair = *search;
@@ -250,7 +246,7 @@ public:
         }
     }
 
-    CompactEdge* get_edge(UHashSet& tags) {
+    CompactEdge* get_edge(UHashSet& tags) const {
         CompactEdge * edge = nullptr;
         for (auto tag: tags) {
             edge = get_edge(tag);
@@ -262,7 +258,7 @@ public:
     }
 
     KmerFilter get_tag_stopper(TagEdgePair& te_pair,
-                               bool& found_tag) {
+                               bool& found_tag) { const
         KmerFilter stopper = [&] (const Kmer& node) {
             found_tag = get_tag_edge_pair(node, te_pair);
             return found_tag;
@@ -270,20 +266,6 @@ public:
 
         return stopper;
     }
-
-    compact_edge_meta_t deduce_meta(CompactNode* in, CompactNode* out) {
-        compact_edge_meta_t edge_meta;
-        if (in == nullptr && out == nullptr) {
-            edge_meta = IS_ISLAND;
-        } else if ((out == nullptr) != (in == nullptr))  {
-            edge_meta = IS_TIP;
-        } else {
-            edge_meta = IS_FULL_EDGE;
-        }
-        return edge_meta;
-    }
-
-
 };
 
 
@@ -292,10 +274,11 @@ class CompactNode {
     friend class CompactNodeFactory;
 public:
     Kmer kmer;
-    bool direction;
     uint32_t count;
-    std::string sequence;
     const uint64_t node_id;
+    std::string sequence;
+    bool direction;
+
     CompactEdge* in_edges[4] = {nullptr, nullptr, nullptr, nullptr};
     CompactEdge* out_edges[4] = {nullptr, nullptr, nullptr, nullptr};
 
@@ -419,20 +402,20 @@ public:
     // they should never be deleted, so this is straightforward
     CompactNode* build_node(Kmer hdn) {
         //pdebug("new compact node from " << hdn);
-        CompactNode * v = get_compact_node_by_kmer(hdn);
+        CompactNode * v = get_node_by_kmer(hdn);
         if (v == nullptr) {
             compact_nodes.emplace_back(hdn, n_compact_nodes);
             n_compact_nodes++;
             v = &(compact_nodes.back());
-            v->sequence = _revhash(hdn, ksize());
+            v->sequence = _revhash(hdn, _ksize);
             kmer_id_map[hdn] = v->node_id;
             //pdebug("Allocate: " << *v);
         }
         return v;
     }
 
-    CompactNode* get_node_by_kmer(HashIntoType hdn)  {
-        auto search = hdn_ids.find(hdn);
+    CompactNode* get_node_by_kmer(HashIntoType hdn) {
+        auto search = kmer_id_map.find(hdn);
         if (search != kmer_id_map.end()) {
             uint64_t ID = search->second;
             return &(compact_nodes[ID]);
@@ -458,7 +441,7 @@ public:
         return v;
     }
 
-    std::vector<CompactNode*> get_nodes(const std::string& sequence)  {
+    std::vector<CompactNode*> get_nodes(const std::string& sequence) {
         //pdebug("get compact node IDs");
         KmerIterator kmers(sequence.c_str(), _ksize);
         std::vector<CompactNode*> nodes;
@@ -477,14 +460,32 @@ public:
         return nodes;
     }
 
+    uint8_t unlink_edge(CompactEdge* edge) {
+        pdebug("unlink edge " << *edge);
+        CompactNode *left, *right;
+        left = get_node_by_id(edge->in_node_id);
+        right = get_node_by_id(edge->out_node_id);
+        uint8_t n_deletes = 0;
+        if (left != nullptr) {
+            // be lazy for now and use bidirectional delete
+            left->delete_edge(edge);
+            n_deletes++;
+        }
+        if (right != nullptr) {
+            right->delete_edge(edge);
+            n_deletes++;
+        }
+        return n_deletes;
+    }
+
     bool get_pivot_from_left(CompactNode* v,
-                                   std::string& segment,
+                                   std::string& sequence,
                                    char& pivot_base) const {
         const char * node_kmer = v->sequence.c_str();
         const char * _segment = sequence.c_str();
-        pivot_base = _segment[segment.size()-_ksize];
+        pivot_base = _segment[sequence.size()-_ksize];
         if (strncmp(node_kmer, 
-                    _segment+(segment.size())-_ksize+1, 
+                    _segment+(sequence.size())-_ksize+1, 
                     _ksize-1) == 0) {
             // same canonical orientation
             return false;
@@ -511,9 +512,9 @@ public:
 
     bool get_edge_from_left(CompactNode* v,
                             CompactEdge* &result_edge,
-                            std::string& segment) const {
+                            std::string& sequence) const {
         char pivot_base;
-        if (!get_pivot_from_left(v, segment, pivot_base)) {
+        if (!get_pivot_from_left(v, sequence, pivot_base)) {
             result_edge = v->get_in_edge(pivot_base);
             return false;
         } else {
@@ -523,7 +524,7 @@ public:
     }
 
     bool get_pivot_from_right(CompactNode* v,
-                              std::string& segment,
+                              std::string& sequence,
                               char& pivot_base) const {
         const char * node_kmer = v->sequence.c_str();
         const char * _segment = sequence.c_str();
@@ -551,13 +552,13 @@ public:
 
     bool get_edge_from_right(CompactNode* v,
                              CompactEdge* &result_edge,
-                             std::string& segment) const {
+                             std::string& sequence) const {
         char pivot_base;
-        if (!get_pivot_base_from_right(v, segment, pivot_base)) {
-            result_edge = get_out_edge(pivot_base);
+        if (!get_pivot_from_right(v, sequence, pivot_base)) {
+            result_edge = v->get_out_edge(pivot_base);
             return false;
         } else {
-            result_edge = get_in_edge(pivot_base, e);
+            result_edge = v->get_in_edge(pivot_base);
             return true;
         }
 
@@ -565,13 +566,7 @@ public:
 };
 
 
-typedef std::unordered_map<HashIntoType, CompactEdge*> TagEdgeMap;
-typedef std::pair<HashIntoType, CompactEdge*> TagEdgePair;
-typedef std::set<TagEdgePair> TagEdgePairSet;
-typedef std::set<CompactEdge*> CompactEdgeSet;
-
-
-class StreamingCompactor
+class StreamingCompactor : public KmerFactory
 {
 
 protected:
@@ -587,13 +582,22 @@ public:
     shared_ptr<Hashgraph> graph;
     
     StreamingCompactor(shared_ptr<Hashgraph> graph) :
-        graph(graph), n_sequences_added(0), 
-        nodes(graph->ksize()), edges(graph->ksize())
+        KmerFactory(graph->ksize()),
+        nodes(graph->ksize()), edges(graph->ksize()),
+        n_sequences_added(0), graph(graph)
     {
     }
 
-    WordLength ksize() const {
-        return graph->ksize();
+    compact_edge_meta_t deduce_meta(CompactNode* in, CompactNode* out) {
+        compact_edge_meta_t edge_meta;
+        if (in == nullptr && out == nullptr) {
+           edge_meta = IS_ISLAND;
+        } else if ((out == nullptr) != (in == nullptr))  {
+            edge_meta = IS_TIP;
+        } else {
+            edge_meta = IS_FULL_EDGE;
+        }
+        return edge_meta;
     }
 
     uint64_t n_nodes() const {
@@ -612,6 +616,31 @@ public:
         std::cout << "  * " << n_sequences_added << " sequences added" << std::endl;
     }
 
+
+    CompactNode* get_node_by_kmer(Kmer hdn) {
+        return nodes.get_node_by_kmer(hdn);
+    }
+
+    CompactNode* get_node_by_id(uint64_t id) {
+        return nodes.get_node_by_id(id);
+    }
+
+    std::vector<CompactNode*> get_nodes(const std::string& sequence) {
+        return nodes.get_nodes(sequence);
+    }
+
+    CompactEdge* get_edge(HashIntoType tag) const {
+        return edges.get_edge(tag);
+    }
+
+    bool get_tag_edge_pair(HashIntoType tag, TagEdgePair& pair) const {
+        return edges.get_tag_edge_pair(tag, pair);
+    }
+
+    CompactEdge* get_edge(UHashSet& tags) const {
+        return edges.get_edge(tags);
+    }
+
     uint64_t consume_sequence(const std::string& sequence) {
         uint64_t prev_n_kmers = graph->n_unique_kmers();
         graph->consume_string(sequence);
@@ -625,15 +654,39 @@ public:
         return 0;
     }
 
-    bool validate_segment(CompactNode* left_node, CompactNode* right_node,
-                          CompactEdge* edge, std::string& segment) {
-        
+    bool validate_segment(CompactNode* root_node, CompactNode* other_node,
+                          CompactEdge* edge, std::string& sequence) {
+        bool edge_invalid;
+        if (edge->meta == IS_TIP) {
+            if (other_node != nullptr) {
+                return false;
+            }
+            if (!((edge->in_node_id == root_node->node_id ||
+                   edge->out_node_id == root_node->node_id) &&
+                  edge->sequence.length() == sequence.length())) {
+                return false;
+            }
+        } else if (edge->meta == IS_FULL_EDGE) {
+            if (other_node == nullptr) {
+                return false;
+            } else {
+                bool nodes_match;
+                nodes_match = (edge->in_node_id == root_node->node_id && 
+                               edge->out_node_id == other_node->node_id) ||
+                              (edge->out_node_id == root_node->node_id &&
+                               edge->in_node_id == other_node->node_id);
+                if (!nodes_match) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /* Update a compact dbg where there are no induced
-     * HDNs */
+     * HDNs
     uint64_t update_compact_dbg_linear(std::string& sequence) {
-        Kmer root_kmer = graph->build_kmer(sequence.substr(0, ksize()));
+        Kmer root_kmer = graph->build_kmer(sequence.substr(0, _ksize));
 
         CompactingAT<TRAVERSAL_LEFT> lcursor(graph.get(), root_kmer);
         CompactingAT<TRAVERSAL_RIGHT> rcursor(graph.get(), root_kmer);
@@ -641,15 +694,15 @@ public:
 
         std::string left_seq = cassem._assemble_directed(lcursor);
         std::string right_seq = cassem._assemble_directed(rcursor);
-        std::string segment_seq = left_seq + right_seq.substr(ksize());
+        std::string segment_seq = left_seq + right_seq.substr(_ksize);
 
         CompactNode *left_node = nullptr, *right_node = nullptr;
         left_node = nodes.get_node_by_kmer(lcursor.cursor);
         right_node = nodes.get_node_by_kmer(rcursor.cursor);
 
         compact_edge_meta_t edge_meta = deduce_edge_meta(left_node, right_node);
-        char in_base = segment_seq[ksize()-1];
-        char out_base = segment_seq[segment_seq.length()-ksize()+1];
+        char in_base = segment_seq[_ksize-1];
+        char out_base = segment_seq[segment_seq.length()-_ksize+1];
 
         switch(edge_meta) {
             case IS_FULL_EDGE:
@@ -664,6 +717,7 @@ public:
                 break;
         }
     }
+    */
 
     uint64_t update_compact_dbg(const std::string& sequence) {
         pdebug("update cDBG from " << sequence);
@@ -671,7 +725,7 @@ public:
 
         // first gather up all k-mers that could have been disturbed --
         // k-mers in the read, and the neighbors of the flanking nodes
-        KmerIterator kmers(sequence.c_str(), ksize());
+        KmerIterator kmers(sequence.c_str(), _ksize);
         KmerQueue disturbed_kmers;
         Kmer kmer = kmers.next();
         CompactingAT<TRAVERSAL_LEFT> lcursor(graph.get(), kmer);
@@ -682,8 +736,10 @@ public:
         }
         CompactingAT<TRAVERSAL_RIGHT> rcursor(graph.get(), kmer);
         rcursor.neighbors(disturbed_kmers);
-
-        // find the induced HDNs in the disturbed k-mers
+        
+        pdebug(disturbed_kmers.size() << " k-mers disturbed" << std::endl);
+        
+                // find the induced HDNs in the disturbed k-mers
         KmerSet induced_hdns;
         uint64_t n_updates = 0;
         while(!disturbed_kmers.empty()) {
@@ -693,6 +749,7 @@ public:
             l_degree = lcursor.degree(kmer);
             r_degree = rcursor.degree(kmer);
             if(l_degree > 1 || r_degree > 1) {
+                pdebug("found HDN... " << kmer);
                 CompactNode* hdn = nodes.get_or_build_node(kmer);
                 if (hdn->count == 1) {
                     induced_hdns.insert(kmer);
@@ -703,8 +760,7 @@ public:
                 }
             }
         }
-        pdebug(disturbed_kmers.size() << " k-mers disturbed" << std::endl
-               << induced_hdns.size() << " induced HDNs");
+        pdebug(induced_hdns.size() << " induced HDNs");
 
         /* If there are no induced HDNs, we must have extended
          * a tip or merged two tips into a linear segment */
@@ -719,7 +775,7 @@ public:
             Kmer root_kmer = *induced_hdns.begin();
             induced_hdns.erase(root_kmer);
 
-            CompactNode* root_node = get_compact_node_by_kmer(root_kmer);
+            CompactNode* root_node = nodes.get_node_by_kmer(root_kmer);
             pdebug("searching from induced HDN: " << *root_node);
 
             // check left (in) edges
@@ -733,7 +789,7 @@ public:
                 TagEdgePair tag_pair;
                 bool found_tag = false;
 
-                lcursor.push_filter(get_tag_stopper(tag_pair, found_tag));
+                lcursor.push_filter(edges.get_tag_stopper(tag_pair, found_tag));
                 std::string segment_seq = cassem._assemble_directed(lcursor);
 
                 // first check for a segment going this direction from root
@@ -744,96 +800,29 @@ public:
                 CompactNode* left_node = nodes.get_node_by_kmer(lcursor.cursor);
 
                 // validate edge leaving root if it exists
-                if (segment_edge != nullptr) {
-                    if (segment_edge->meta == IS_TIP) {
-                        if (left_node != nullptr) {
-                            edge_invalid = true;
-                        }
-                        if (!((segment_edge->in_node_id == root_node->node_id ||
-                               segment_edge->out_node_id == root_node->node_id) &&
-                              segment_edge->sequence.length() == segment_seq.length())) {
-                            edge_invalid = true;
-                        }
-                    } else if (segment_edge->meta == IS_FULL_EDGE) {
-                        if (left_node == nullptr) {
-                            edge_invalid = true;
-                        } else {
-                            bool nodes_match;
-                            nodes_match = (segment_edge->in_node_id == root_node->node_id && 
-                                           segment_edge->out_node_id == left_node->node_id) ||
-                                          (segment_edge->out_node_id == root_node->node_id &&
-                                           segment_edge->in_node_id == left_node->node_id);
-                            edge_invalid = !nodes_match;
-                        }
-                    }
-                }
-                if (!edge_invalid) {
+                if (segment_edge != nullptr && 
+                    validate_segment(root_node, left_node, segment_edge, segment_seq)) {
+
                     continue;
                 }
-                
-
-
                 
                 /*
                  * Should also keep a set of pair<Kmer,Kmer> to track resolved
                  * segments
                  */
 
-                /*
-                if (found_tag) {
-                    if (segment_edge != nullptr) {
-                       if (segment_edge  
-                    }
-                    if (segment_edge == get_compact_edge(tag_pair.first)) {
-                        pdebug("found tag to existing segment on left");
-                    left_node = nodes.get_node_by_id(segment_edge->in_node_id);
-                    } else {
-                    pdebug("tags to left don't match existing segment....?");
-                    }
-                } else {
-                */
-                    //pdebug("no tag to existing segment found...");
-                    // then left node must have been new or does not exist,
-                    // or the segment was too short to be tagged
-
-                //}
-
                 // if there's an existing edge, check if we need to split it
                 if (segment_edge != nullptr) {
-                    pdebug("checking existing edge for comformity");
-                    CompactNode* existing_out_node;
-                    if (left_flipped) {
-                        existing_out_node = nodes.get_node_by_id(segment_edge->in_node_id);
-                    } else {
-                        existing_out_node = nodes.get_node_by_id(segment_edge->out_node_id);
-                    }
-                    if (found_out_node != nullptr && *found_out_node == *root_node) {
-                        // this edge is fine
-                        pdebug("edges conforms, moving to next neighbor");
-                        continue; // continue through neighbors
-                    } else {
-                        // need to be careful here, the out node for the 
-                        // edge we delete could be linked to another induced
-                        // HDN...
-                        n_updates++;
-                        // check that it isn't a TIP from an existing node
-                        // with ROOT being induced; if not, delete its edge
-                        // from the out node
-                        pdebug("edge does not conform, delete it");
-                        if (found_out_node != nullptr) {
-                            pdebug("existing edge out node not root, deleting");
-                            // be lazy for now and use bidirectional delete
-                            existing_out_node->delete_edge(segment_edge);
-                        }
-                        delete_compact_edge(segment_edge);
-                        // deleted tags; assemble out to the HDN
-                        segment_seq = cassem._assemble_directed(lcursor) +
-                                      segment_seq.substr(ksize());
-                        if (left_node != nullptr) {
-                            // not an IN_TIP
-                            left_node->delete_edge(segment_edge);
-                        }
-                    }
+
+                    // check that it isn't a TIP from an existing node
+                    // with ROOT being induced; if not, delete its edge
+                    // from the out node
+                    pdebug("edge does not conform, delete it");
+                    n_updates += nodes.unlink_edge(segment_edge);
+                    edges.delete_edge(segment_edge);
+                    // deleted tags; assemble out to the HDN
+                    segment_seq = cassem._assemble_directed(lcursor) +
+                                  segment_seq.substr(_ksize);
                 }
 
                 // construct the compact edge
@@ -842,24 +831,22 @@ public:
 
                 if (edge_meta == IS_FULL_EDGE) {
                     // left side includes HDN, right side does not
-                    segment_seq = segment_seq.substr(ksize(),
-                                                     segment_seq.length()-ksize()+1);
+
+                    segment_edge = edges.build_edge(left_node->node_id, 
+                                                    root_node->node_id,
+                                                    edge_meta, 
+                                                    segment_seq.substr(1));
+                    nodes.add_edge_from_right(left_node, segment_edge);
                 } else {
-                    // unless there is none, in which case
-                    // we take the whole contig
-                    segment_seq = segment_seq.substr(0, segment_seq.length()-ksize()+1);
+                    segment_edge = edges.build_edge(NULL_ID, 
+                                                    root_node->node_id,
+                                                    edge_meta, 
+                                                    segment_seq);
                 }
+
 
                 n_updates++;
-                segment_edge = new_compact_edge(lcursor.cursor, 
-                                                root_node->kmer,
-                                                edge_meta, 
-                                                segment_seq);
-                if (IS_FULL_EDGE) {
-                    left_node->add_out_edge(segment_seq.front(), segment_edge);
-                }
-
-                root_node->add_in_edge(segment_seq.back(), segment_edge);
+                nodes.add_edge_from_left(root_node, segment_edge);
             }
 
             // now the right neighbors...
@@ -869,69 +856,55 @@ public:
                 Kmer neighbor = neighbors.back();
                 neighbors.pop_back();
                 rcursor.cursor = neighbor;
-                //if (rcursor.cursor.is_forward() != root_node->direction) {
-                //    rcursor.cursor.set_forward();
-                //}
 
-                TagEdgePair right_tag_pair;
-                bool found_right_tag = false;
+                TagEdgePair tag_pair;
+                bool found_tag = false;
 
-                rcursor.push_filter(get_tag_stopper(right_tag_pair, found_right_tag));
+                rcursor.push_filter(edges.get_tag_stopper(tag_pair, found_tag));
                 std::string segment_seq = cassem._assemble_directed(rcursor);
 
+                // first check for a segment going this direction from root
                 CompactEdge* segment_edge = nullptr;
-                CompactNode* right_node = nullptr;
+                bool edge_invalid = false;
+                bool root_flipped = nodes.get_edge_from_right(root_node, segment_edge, segment_seq);
 
-                if (found_right_tag) {
-                    segment_edge = get_compact_edge(right_tag_pair.first);
-                    right_node = get_compact_node_by_kmer(segment_edge->out_node_id);
-                } else {
-                    right_node = get_compact_node_by_kmer(rcursor.cursor);
-                    if (right_node != nullptr) {
-                        // base for hypothetical in-edge
-                        auto base = segment_seq[segment_seq.length()-ksize()];
-                        segment_edge = right_node->get_in_edge(base);
-                    }
+                CompactNode* right_node = nodes.get_node_by_kmer(rcursor.cursor);
+
+                // validate edge leaving root if it exists
+                if (segment_edge != nullptr && 
+                    validate_segment(root_node, right_node, segment_edge, segment_seq)) {
+
+                    continue;
                 }
 
                 if (segment_edge != nullptr) {
-                    CompactNode* found_in_node = get_compact_node_by_kmer(segment_edge->in_node_id);
-                    if (found_in_node != nullptr && *found_in_node == *root_node) {
-                        continue;
-                    } else {
-                        n_updates++;
-                        if (found_in_node != nullptr) {
-                            found_in_node->delete_out_edge(segment_edge);
-                        }
-                        delete_compact_edge(segment_edge);
-                        segment_seq = segment_seq + 
-                                       cassem._assemble_directed(rcursor).substr(ksize());
-                        if (right_node != nullptr) {
-                            right_node->delete_in_edge(segment_edge);
-                        }
-                    }
+                    pdebug("edge does not conform, delete it");
+                    n_updates += nodes.unlink_edge(segment_edge);
+                    edges.delete_edge(segment_edge);
+                    // deleted tags; assemble out to the HDN
+                    segment_seq = segment_seq + 
+                                  cassem._assemble_directed(rcursor).substr(_ksize);
                 }
 
                 compact_edge_meta_t edge_meta = (right_node == nullptr) ?
-                                                  IS_OUT_TIP : IS_FULL_EDGE;
+                                                  IS_TIP : IS_FULL_EDGE;
+
                 if (edge_meta == IS_FULL_EDGE) {
-                    segment_seq = segment_seq.substr(ksize()-1,
-                                                     segment_seq.length()-ksize());
+                    segment_edge = edges.build_edge(root_node->node_id, 
+                                                    right_node->node_id,
+                                                    edge_meta, 
+                                                    segment_seq.substr(0, segment_seq.length()-1));
+                    nodes.add_edge_from_left(right_node, segment_edge);
                 } else {
-                    segment_seq = segment_seq.substr(ksize()-1);
+                    segment_edge = edges.build_edge(root_node->node_id,
+                                                    NULL_ID,
+                                                    edge_meta, 
+                                                    segment_seq);
                 }
+
 
                 n_updates++;
-                segment_edge = new_compact_edge(root_node->kmer,
-                                                rcursor.cursor, 
-                                                edge_meta, 
-                                                segment_seq);
-                if (IS_FULL_EDGE) {
-                    right_node->add_in_edge(segment_seq.back(), segment_edge);
-                }
-
-                root_node->add_out_edge(segment_seq.front(), segment_edge);
-
+                nodes.add_edge_from_right(root_node, segment_edge);
             }
 
         }

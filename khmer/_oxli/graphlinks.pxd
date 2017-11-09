@@ -8,9 +8,12 @@ from libcpp.vector cimport vector
 from libc.stdint cimport uint8_t, uint32_t, uint64_t
 
 from khmer._oxli.oxli_types cimport *
-from khmer._oxli.hashing cimport CpKmer, Kmer
+from khmer._oxli.hashing cimport CpKmer, Kmer, CpKmerFactory
 from khmer._oxli.graphs cimport CpHashgraph, Hashgraph, Nodegraph, Countgraph
 
+
+cdef extern from "oxli/links.hh":
+    cdef uint64_t NULL_ID
 
 cdef extern from "oxli/links.hh" namespace "oxli" nogil:
 
@@ -19,7 +22,46 @@ cdef extern from "oxli/links.hh" namespace "oxli" nogil:
     ctypedef vector[HashIntoType] HashVector
     ctypedef umap[HashIntoType, uint64_t] HashIDMap
 
-    cdef cppclass CpCompactEdge "oxli::CompactEdge"
+    ctypedef enum compact_edge_meta_t:
+        IS_FULL_EDGE
+        IS_TIP
+        IS_ISLAND
+        IS_TRIVIAL
+
+    cdef const char * edge_meta_repr(compact_edge_meta_t)
+
+    cdef cppclass CpCompactEdge "oxli::CompactEdge":
+        uint64_t in_node_id
+        uint64_t out_node_id
+        UHashSet tags
+        compact_edge_meta_t meta
+        string sequence
+
+        CpCompactEdge(uint64_t, uint64_t)
+        CpComapctEdge(uint64_t, uint64_t, compact_edge_meta_t)
+
+        string rc_sequence()
+        void add_tags(UHashSet&)
+        string tag_viz(WordLength)
+        float tag_density()
+
+    ctypedef pair[HashIntoType, CpCompactEdge*] TagEdgePair
+    ctypedef set[TagEdgePair] TagEdgePairSet
+
+    cdef cppclass CpCompactEdgeFactory "oxli::CompactEdgeFactory" (CpKmerFactory):
+        CpCompactEdgeFactory(WordLength)
+
+        uint64_t n_edges()
+        CpCompactEdge* build_edge(uint64_t, uint64_t, compact_edge_meta_t,
+                                  string)
+        void delete_edge(CpCompactEdge*)
+        void delete_edge(UHashSet&)
+        void delete_edge(HashIntoType)
+        CpCompactEdge* get_edge(HashIntoType)
+        bool get_tag_edge_pair(HashIntoType, TagEdgePair&)
+        CpCompactEdge* get_edge(UHashSet&)
+        
+
     cdef cppclass CpCompactNode "oxli::CompactNode":
         CpKmer kmer
         uint32_t count
@@ -36,55 +78,49 @@ cdef extern from "oxli/links.hh" namespace "oxli" nogil:
         void add_out_edge(const char, CpCompactEdge*)
         bool delete_out_edge(CpCompactEdge*)
         CpCompactEdge* get_out_edge(const char)
+        bool delete_edge(const char)
 
         uint8_t degree()
         uint8_t out_degree()
         uint8_t in_degree()
 
-
-    ctypedef enum compact_edge_meta_t:
-        IS_FULL_EDGE
-        IS_IN_TIP
-        IS_OUT_TIP
-        IS_ISLAND
-        IS_TRIVIAL
-
-    cdef cppclass CpCompactEdge "oxli::CompactEdge":
-        CpKmer in_node
-        CpKmer out_node
-        UHashSet tags
-        compact_edge_meta_t meta
-        string sequence
-
-        CpCompactEdge(HashIntoType, HashIntoType)
-        CpComapctEdge(HashIntoType, HashIntoType, compact_edge_meta_t)
-
-        void add_tags(UHashSet&)
-        string tag_viz(WordLength)
-        float tag_density()
-
     ctypedef vector[CpCompactNode] CompactNodeVector
-    ctypedef umap[HashIntoType, CpCompactEdge*] TagEdgeMap
-    ctypedef pair[HashIntoType, CpCompactEdge*] TagEdgePair
-    ctypedef set[TagEdgePair] TagEdgePairSet
+
+    cdef cppclass CpCompactNodeFactory "oxli::CompactNodeFactory" (CpKmerFactory):
+        CpCompactNodeFactory(WordLength)
+        uint64_t n_nodes()
+
+        CpCompactNode* build_node(CpKmer)
+        CpCompactNode* get_node_by_kmer(HashIntoType)
+        CpCompactNode* get_node_by_id(uint64_t)
+        CpCompactNode* get_or_build_node(CpKmer)
+        vector[CpCompactNode*] get_nodes(const string&)
+
+        uint8_t unlink_edge(CpCompactEdge*)
+
+        bool get_pivot_from_left(CpCompactNode*, string&, char&)
+        bool add_edge_from_left(CpCompactNode*, CpCompactEdge*)
+        bool get_edge_from_left(CpCompactNode*, CpCompactEdge* &, string&)
+
+        bool get_pivot_from_right(CpCompactNode*, string&, char&)
+        bool add_edge_from_right(CpCompactNode*, CpCompactEdge*)
+        bool get_edge_from_right(CpCompactNode*, CpCompactEdge* &, string&)
 
     cdef cppclass CpStreamingCompactor "oxli::StreamingCompactor":
         shared_ptr[CpHashgraph] graph
 
         CpStreamingCompactor(shared_ptr[CpHashgraph])
-        WordLength ksize()
         void report()
         uint64_t n_nodes()
         uint64_t n_edges()
 
-        CpCompactNode* get_compact_node_by_kmer(HashIntoType)
-        CpCompactNode* get_compact_node_by_id(uint64_t)
-        CpCompactNode* fetch_or_new_compact_node(CpKmer hdn)
-        vector[CpCompactNode*] get_compact_nodes(const string&)
+        CpCompactNode* get_node_by_kmer(HashIntoType)
+        CpCompactNode* get_node_by_id(uint64_t)
+        vector[CpCompactNode*] get_nodes(const string&)
         
-        CpCompactEdge* get_compact_edge(uint64_t)
-        CpCompactEdge* get_tag_edge_pair(uint64_t, TagEdgePair&)
-        CpCompactEdge* get_compact_edge(UHashSet&)
+        CpCompactEdge* get_edge(HashIntoType)
+        bool get_tag_edge_pair(uint64_t, TagEdgePair&)
+        CpCompactEdge* get_edge(UHashSet&)
 
         uint64_t update_compact_dbg(const string&)
         uint64_t consume_sequence(const string&)

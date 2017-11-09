@@ -23,10 +23,8 @@ cdef class CompactEdge:
         cdef compact_edge_meta_t meta = deref(self._ce_this).meta
         if meta == IS_FULL_EDGE:
             return 'FULL'
-        elif meta == IS_IN_TIP:
-            return 'IN_TIP'
-        elif meta == IS_OUT_TIP:
-            return 'OUT_TIP'
+        elif meta == IS_TIP:
+            return 'TIP'
         elif meta == IS_ISLAND:
             return 'ISLAND'
         elif meta == IS_TRIVIAL:
@@ -38,17 +36,13 @@ cdef class CompactEdge:
     def sequence(self):
         return deref(self._ce_this).sequence
 
-    def in_node(self):
-        if deref(self._ce_this).meta == IS_IN_TIP or \
-           deref(self._ce_this).meta == IS_ISLAND:
-            return None
-        return deref(self._ce_this).in_node.kmer_u
+    def in_node_id(self):
+        cdef uint64_t nid = deref(self._ce_this).in_node_id
+        return None if nid == NULL_ID else nid
 
     def out_node(self):
-        if deref(self._ce_this).meta == IS_OUT_TIP or \
-           deref(self._ce_this).meta == IS_ISLAND:
-            return None
-        return deref(self._ce_this).out_node.kmer_u
+        cdef uint64_t nid = deref(self._ce_this).out_node_id
+        return None if nid == NULL_ID else nid
 
     def __len__(self):
         return deref(self._ce_this).sequence.length()
@@ -147,11 +141,11 @@ cdef class StreamingCompactor:
 
     def consume_and_update(self, str sequence):
         cdef string _sequence = _bstring(sequence)
-        return deref(self._sc_this).consume_sequence_and_update(sequence)
+        return deref(self._sc_this).consume_sequence_and_update(_sequence)
 
     def sequence_nodes(self, str sequence):
         cdef string _sequence = _bstring(sequence)
-        cdef vector[CpCompactNode*] nodes = deref(self._sc_this).get_compact_nodes(_sequence)
+        cdef vector[CpCompactNode*] nodes = deref(self._sc_this).get_nodes(_sequence)
         cdef CpCompactNode* node
         for node in nodes:
             yield CompactNode._wrap(node)
