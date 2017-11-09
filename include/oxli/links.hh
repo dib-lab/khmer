@@ -44,6 +44,7 @@ Contact: khmer-project@idyll.org
 #include <limits>
 #include <list>
 #include <iostream>
+#include <sstream>
 #include <unordered_set>
 #include <unordered_map>
 
@@ -158,7 +159,8 @@ public:
                       " out_node_id=" << 
                       std::to_string(edge.out_node_id)
                    << " length=" << edge.sequence.length()
-                   << " meta=" << edge_meta_repr(edge.meta) << " n_tags=" << edge.tags.size() << ">";
+                   << " meta=" << edge_meta_repr(edge.meta)
+                   << " n_tags=" << edge.tags.size() << ">";
             return stream;
     }
 
@@ -196,10 +198,17 @@ public:
                             compact_edge_meta_t edge_meta,
                             std::string edge_sequence) {
         CompactEdge* edge = new CompactEdge(left_id, right_id, edge_meta);
-        pdebug("new compact edge: left=" << 
-                std::to_string(left_id) << " right=" << 
-                std::to_string(right_id)
-                << " sequence=" << edge_sequence);
+        pdebug("new compact edge: \n left=" << std::to_string(left_id) 
+                << std::endl << " right=" << std::to_string(right_id)
+                << std::endl << " sequence   =" << edge_sequence
+                << std::endl << " rc_sequence=" << _revcomp(edge_sequence)
+                << std::endl << " start   =" << edge_sequence.substr(0, _ksize)
+                << std::endl << " rc_start=" << _revcomp(edge_sequence.substr(0, _ksize))
+                << std::endl << " end    =" 
+                << edge_sequence.substr(edge_sequence.length()-_ksize, _ksize)
+                << std::endl << " rc_end =" 
+                << _revcomp(edge_sequence.substr(edge_sequence.length()-_ksize, _ksize)));
+
         edge->sequence = edge_sequence;
         n_compact_edges++;
         return edge;
@@ -370,10 +379,30 @@ public:
     friend std::ostream& operator<<(std::ostream& stream,
                                      const CompactNode& node) {
             stream << "<CompactNode ID=" << node.node_id << " Kmer=" << node.kmer.kmer_u
+                   << " Sequence=" << node.sequence
                    << " Count=" << node.count << " in_degree=" 
                    << std::to_string(node.in_degree())
                    << " out_degree=" << std::to_string(node.out_degree()) << ">";
             return stream;
+    }
+
+    std::string edges_repr() {
+        std::ostringstream os;
+        os << *this << std::endl << "\tin_edges:" << std::endl;
+        for (const char b : "ACGT") {
+            CompactEdge* e = get_in_edge(b);
+            if (e != nullptr) {
+                os << "\t " << b << "=" << *e << std::endl;
+            }
+        }
+        os << "\tout_edges:" << std::endl;
+        for (const char b : "ACGT") {
+            CompactEdge* e = get_out_edge(b);
+            if (e != nullptr) {
+                os << "\t -" << b << "=" << *e << std::endl;
+            }
+        }
+        return os.str();
     }
 };
 
@@ -500,10 +529,12 @@ public:
         char pivot_base;
         if (!get_pivot_from_left(v, e->sequence, pivot_base)) {
             // same canonical orientation
+            pdebug("add in edge " << *e << " to node " << *v << " from " << pivot_base);
             v->add_in_edge(pivot_base, e);
             return false;
         } else {
             // must have opposite canonical orientation
+            pdebug("add out edge " << *e << " to node " << *v << " from " << pivot_base);
             v->add_out_edge(pivot_base, e);
             return true;
         }
@@ -529,7 +560,7 @@ public:
         const char * node_kmer = v->sequence.c_str();
         const char * _segment = sequence.c_str();
         pivot_base = _segment[_ksize-1];
-        if (strncmp(node_kmer+1, _segment, _ksize-1)) {
+        if (strncmp(node_kmer+1, _segment, _ksize-1) == 0) {
             // same canonical orientation
             return false;
         } else {
@@ -542,9 +573,11 @@ public:
     bool add_edge_from_right(CompactNode* v, CompactEdge* e) const {
         char pivot_base;
         if (!get_pivot_from_right(v, e->sequence, pivot_base)) {
+            pdebug("add out edge " << *e << " to node " << *v << " from " << pivot_base);
             v->add_out_edge(pivot_base, e);
             return false;
         } else {
+            pdebug("add in edge " << *e << " to node " << *v << " from " << pivot_base);
             v->add_in_edge(pivot_base, e);
             return true;
         }
@@ -776,7 +809,7 @@ public:
             induced_hdns.erase(root_kmer);
 
             CompactNode* root_node = nodes.get_node_by_kmer(root_kmer);
-            pdebug("searching from induced HDN: " << *root_node);
+            pdebug("searching from induced HDN: " << root_node->edges_repr());
 
             // check left (in) edges
             lcursor.neighbors(root_kmer, neighbors);
@@ -803,6 +836,8 @@ public:
                 if (segment_edge != nullptr && 
                     validate_segment(root_node, left_node, segment_edge, segment_seq)) {
 
+                    pdebug("validated " << *root_node << ", " << *left_node 
+                            << ", " << *segment_edge << ", " << segment_seq);
                     continue;
                 }
                 
