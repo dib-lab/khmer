@@ -24,6 +24,7 @@ import khmer
 
 from khmer import Countgraph, SmallCountgraph, Nodegraph
 from khmer import Nodetable, Counttable, SmallCounttable, QFCounttable
+from khmer import CyclicCounttable
 
 from khmer import ReadParser
 
@@ -376,7 +377,7 @@ def test_consume_seqfile_reads_parser(AnyTabletype):
     kh = AnyTabletype(5)
     rparser = ReadParser(utils.get_test_data('test-fastq-reads.fq'))
 
-    kh.consume_seqfile_with_reads_parser(rparser)
+    kh.consume_seqfile(rparser)
 
     kh2 = AnyTabletype(5)
     for record in screed.open(utils.get_test_data('test-fastq-reads.fq')):
@@ -423,7 +424,7 @@ def test_get_bigcount(Tabletype):
 
 
 def test_set_bigcount(Tabletype):
-    supports_bigcount = [Countgraph, Counttable]
+    supports_bigcount = [Countgraph, Counttable, CyclicCounttable]
     tt = Tabletype(12)
 
     if type(tt) in supports_bigcount:
@@ -460,7 +461,7 @@ def test_abund_dist_A_readparser(AnyTabletype):
     tracking = Nodegraph(4, 1, 1, primes=PRIMES_1m)
 
     kh.consume_seqfile(A_filename)
-    dist = kh.abundance_distribution_with_reads_parser(rparser, tracking)
+    dist = kh.abundance_distribution(rparser, tracking)
 
     print(dist[:10])
     assert sum(dist) == 1

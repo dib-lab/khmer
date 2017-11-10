@@ -41,8 +41,6 @@ Uses screed to calculate various assembly statistics.
 You can obtain screed by running
    pip install screed
 '''
-from __future__ import division
-from __future__ import print_function
 
 import screed
 import sys

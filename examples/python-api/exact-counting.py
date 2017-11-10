@@ -3,7 +3,6 @@
 # A demonstration of using khmer for exact k-mer counting. The memory required
 # is 4^k, which limits this to small values of k.
 
-from __future__ import print_function
 import khmer
 
 # Note:

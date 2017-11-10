@@ -43,7 +43,6 @@ This will output many <base>.subset.N.pmap files.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
 
 import threading
 import textwrap

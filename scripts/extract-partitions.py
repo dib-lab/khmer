@@ -46,7 +46,6 @@ Use '-h' for parameter help.
 @CTB note that if threshold is != 1, those sequences will not be output
 by output_unassigned...
 """
-from __future__ import print_function
 
 import sys
 import screed

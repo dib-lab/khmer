@@ -41,7 +41,6 @@ Do all the partition steps in one script.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
 
 import khmer
 import sys

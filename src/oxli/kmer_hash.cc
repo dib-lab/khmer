@@ -49,6 +49,12 @@ Contact: khmer-project@idyll.org
 
 using namespace std;
 
+#define tbl \
+  "                                                                "\
+  /*ABCDEFGHIJKLMNOPQRSTUVWXYZ      abcdefghijklmnopqrstuvwxyz    */\
+  " TVGH FCD  M KN   YSAABW R       TVGH FCD  M KN   YSAABW R"
+  //" TVGH FCD  M KA   YSAABWARA      TVGH FCD  M KA   YSAABWARA"
+
 //
 // _hash: hash a k-length DNA sequence into a 64-bit number.
 //
@@ -146,29 +152,15 @@ std::string _revhash(HashIntoType hash, WordLength k)
 std::string _revcomp(const std::string& kmer)
 {
     std::string out = kmer;
-    size_t ksize = out.size();
 
-    for (size_t i=0; i < ksize; ++i) {
-        char complement;
+    auto from = out.begin();
+    auto to = out.end();
 
-        switch(kmer[i]) {
-        case 'A':
-            complement = 'T';
-            break;
-        case 'C':
-            complement = 'G';
-            break;
-        case 'G':
-            complement = 'C';
-            break;
-        case 'T':
-            complement = 'A';
-            break;
-        default:
-            complement = kmer[i]; // leave alone.
-            break;
-        }
-        out[ksize - i - 1] = complement;
+    char c;
+    for (to--; from <= to; from++, to--) {
+        c = tbl[(int)*from];
+        *from = tbl[(int)*to];
+        *to = c;
     }
     return out;
 }
@@ -192,6 +184,7 @@ HashIntoType _hash_murmur(const std::string& kmer, const WordLength k,
 
     assert(kmer.length() == k); // an assumption of the below code
     std::string rev = oxli::_revcomp(kmer);
+
     if (rev == kmer) {
         // self complement kmer, can't use bitwise XOR
         r = out[0];
@@ -213,6 +206,58 @@ HashIntoType _hash_murmur_forward(const std::string& kmer, const WordLength k)
 
     return h;
 }
+
+HashIntoType _hash_cyclic(const std::string& kmer, const WordLength k)
+{
+    HashIntoType h = 0;
+    HashIntoType r = 0;
+
+    const std::string rev = oxli::_revcomp(kmer);
+    CyclicHash<uint64_t> fwd_hasher(k);
+    CyclicHash<uint64_t> rev_hasher(k);
+
+    for (WordLength i = 0; i < k; ++i) {
+        fwd_hasher.eat(kmer[i]);
+    }
+    h = fwd_hasher.hashvalue;
+
+    for (WordLength i = 0; i < k; ++i) {
+        rev_hasher.eat(rev[i]);
+    }
+    r = rev_hasher.hashvalue;
+
+    return h + r;
+}
+
+HashIntoType _hash_cyclic(const std::string& kmer, const WordLength k,
+                          HashIntoType& h, HashIntoType& r)
+{
+    const std::string rev = oxli::_revcomp(kmer);
+    CyclicHash<uint64_t> fwd_hasher(k);
+    CyclicHash<uint64_t> rev_hasher(k);
+
+    for (WordLength i = 0; i < k; ++i) {
+        fwd_hasher.eat(kmer[i]);
+    }
+    h = fwd_hasher.hashvalue;
+
+    for (WordLength i = 0; i < k; ++i) {
+        rev_hasher.eat(rev[i]);
+    }
+    r = rev_hasher.hashvalue;
+
+    return h + r;
+}
+
+HashIntoType _hash_cyclic_forward(const std::string& kmer, const WordLength k)
+{
+    HashIntoType h = 0;
+    HashIntoType r = 0;
+
+    oxli::_hash_cyclic(kmer, k, h, r);
+    return h;
+}
+
 
 std::pair<uint64_t, uint64_t> compute_band_interval(unsigned int num_bands,
                                                     unsigned int band)

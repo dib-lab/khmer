@@ -34,8 +34,6 @@
 # Contact: khmer-project@idyll.org
 # pylint: disable=missing-docstring,protected-access,no-member,invalid-name
 
-from __future__ import print_function
-from __future__ import absolute_import
 
 import khmer
 from khmer import Nodegraph, Countgraph
@@ -435,24 +433,27 @@ def test_kmer_neighbors():
     nodegraph = khmer.Nodegraph(4, 100, 1)
     nodegraph.consume_seqfile(inpfile)
 
+    def n_to_str(x):
+        return [str(i) for i in x]
+
     h = nodegraph.hash('AAAA')
     print(type('AAAA'))
-    assert nodegraph.neighbors(
-        h) == ['AAAA', 'AAAA']       # AAAA on both sides
-    assert nodegraph.neighbors('AAAA') == [
+    assert n_to_str(nodegraph.neighbors(
+        h)) == ['AAAA', 'AAAA']       # AAAA on both sides
+    assert n_to_str(nodegraph.neighbors('AAAA')) == [
         'AAAA', 'AAAA']  # AAAA on both sides
 
     h = nodegraph.hash('AAAT')
-    assert nodegraph.neighbors(h) == ['AAAA']          # AAAA on one side
-    assert nodegraph.neighbors('AAAT') == ['AAAA']     # AAAA on one side
+    assert n_to_str(nodegraph.neighbors(h)) == ['AAAA']       # AAAA on 1 side
+    assert n_to_str(nodegraph.neighbors('AAAT')) == ['AAAA']  # AAAA on 1 side
 
     h = nodegraph.hash('AATA')
     assert nodegraph.neighbors(h) == []           # no neighbors
-    assert nodegraph.neighbors('AATA') == []      # AAAA on one side
+    assert n_to_str(nodegraph.neighbors('AATA')) == []      # AAAA on one side
 
     h = nodegraph.hash('TAAA')
-    assert nodegraph.neighbors(h) == ['AAAA']          # AAAA on both sides
-    assert nodegraph.neighbors('TAAA') == ['AAAA']     # AAAA on both sides
+    assert n_to_str(nodegraph.neighbors(h)) == ['AAAA']       # AAAA on both
+    assert n_to_str(nodegraph.neighbors('TAAA')) == ['AAAA']  # AAAA on both
 
 
 def test_kmer_neighbors_wrong_ksize():
@@ -907,16 +908,16 @@ def test_bad_primes_list():
         print(str(e))
 
 
-def test_consume_absentfasta_with_reads_parser():
+def test_consume_absentfasta():
     nodegraph = khmer.Nodegraph(31, 1, 1)
     try:
-        nodegraph.consume_seqfile_with_reads_parser()
+        nodegraph.consume_seqfile()
         assert 0, "this should fail"
     except TypeError as err:
         print(str(err))
     try:
         readparser = ReadParser(utils.get_test_data('empty-file'))
-        nodegraph.consume_seqfile_with_reads_parser(readparser)
+        nodegraph.consume_seqfile(readparser)
         assert 0, "this should fail"
     except OSError as err:
         print(str(err))
@@ -936,7 +937,7 @@ def test_consume_seqfile_and_tag_with_badreads_parser():
     nodegraph = khmer.Nodegraph(6, 1e6, 2)
     try:
         readsparser = khmer.ReadParser(utils.get_test_data("test-empty.fa"))
-        nodegraph.consume_seqfile_and_tag_with_reads_parser(readsparser)
+        nodegraph.consume_seqfile_and_tag(readsparser)
         assert 0, "this should fail"
     except OSError as e:
         print(str(e))
@@ -1097,6 +1098,12 @@ def test_traverse_linear_path_2():
     assert nodegraph.hash(contig[100:121]) in conns
     assert len(conns) == 1
 
+    for k in conns:                       # everything in connections => stop
+        assert stopgraph.get(k)
+
+    for k in visited:                     # nothing in visited => stop
+        assert not stopgraph.get(k)
+
     # traverse from immediately after 100:121, should end at the end
     size, conns, visited = nodegraph.traverse_linear_path(contig[101:122],
                                                           degree_nodes,
@@ -1108,6 +1115,12 @@ def test_traverse_linear_path_2():
     assert nodegraph.hash(contig[100:121]) in conns
     assert len(conns) == 1
 
+    for k in conns:                       # everything in connections => stop
+        assert stopgraph.get(k)
+
+    for k in visited:                     # nothing in visited => stop
+        assert not stopgraph.get(k)
+
     # traverse from end, should end at 100:121
     size, conns, visited = nodegraph.traverse_linear_path(contig[-21:],
                                                           degree_nodes,
@@ -1118,6 +1131,12 @@ def test_traverse_linear_path_2():
     assert len(visited) == 879
     assert nodegraph.hash(contig[100:121]) in conns
     assert len(conns) == 1
+
+    for k in conns:                       # everything in connections => stop
+        assert stopgraph.get(k)
+
+    for k in visited:                     # nothing in visited => stop
+        assert not stopgraph.get(k)
 
 
 def test_traverse_linear_path_3_stopgraph():

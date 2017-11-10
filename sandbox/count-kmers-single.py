@@ -41,7 +41,6 @@ using the given countgraph.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
 
 import sys
 import khmer
@@ -103,7 +102,7 @@ def main():
     for _ in range(args.threads):
         thread = \
             threading.Thread(
-                target=countgraph.consume_seqfile_with_reads_parser,
+                target=countgraph.consume_seqfile,
                 args=(rparser, )
             )
         threads.append(thread)

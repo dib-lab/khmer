@@ -7,7 +7,6 @@
 #
 # pylint: disable=missing-docstring,no-member
 """Common functions for partitioning."""
-from __future__ import print_function, absolute_import, unicode_literals
 
 import sys
 import gc

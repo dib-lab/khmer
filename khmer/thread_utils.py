@@ -35,7 +35,6 @@
 # pylint: disable=missing-docstring,too-few-public-methods
 """Utilities for dealing with multithreaded processing of short reads."""
 
-from __future__ import print_function, unicode_literals
 
 import threading
 import sys

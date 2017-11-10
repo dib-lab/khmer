@@ -33,7 +33,6 @@
 #
 # Contact: khmer-project@idyll.org
 """Helpful methods for performing common argument-checking tasks in scripts."""
-from __future__ import print_function, unicode_literals
 from khmer._oxli.parsing import (check_is_left, check_is_right, check_is_pair,
                                  UnpairedReadsError, _split_left_right)
 import itertools

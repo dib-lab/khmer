@@ -45,7 +45,6 @@ option to output to STDOUT.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
 
 import sys
 import screed

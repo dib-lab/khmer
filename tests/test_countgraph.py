@@ -34,8 +34,6 @@
 #
 # Contact: khmer-project@idyll.org
 # pylint: disable=missing-docstring,protected-access,no-member,invalid-name
-from __future__ import print_function
-from __future__ import absolute_import, unicode_literals
 
 import gzip
 
@@ -1188,16 +1186,16 @@ def test_consume_absentfasta():
         print(str(err))
 
 
-def test_consume_absentfasta_with_reads_parser():
+def test_consume_absentfasta():
     countgraph = khmer.Countgraph(4, 4 ** 4, 4)
     try:
-        countgraph.consume_seqfile_with_reads_parser()
+        countgraph.consume_seqfile()
         assert 0, "this should fail"
     except TypeError as err:
         print(str(err))
     try:
         readparser = ReadParser(utils.get_test_data('empty-file'))
-        countgraph.consume_seqfile_with_reads_parser(readparser)
+        countgraph.consume_seqfile(readparser)
         assert 0, "this should fail"
     except OSError as err:
         print(str(err))

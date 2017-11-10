@@ -42,7 +42,6 @@ Estimate number of unique k-mers, with precision <= ERROR_RATE.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
 
 import argparse
 import os

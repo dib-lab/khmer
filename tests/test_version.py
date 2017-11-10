@@ -33,7 +33,6 @@
 #
 # Contact: khmer-project@idyll.org
 # pylint: disable=missing-docstring
-from __future__ import print_function, unicode_literals
 
 import khmer
 import pytest
