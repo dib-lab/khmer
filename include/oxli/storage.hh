@@ -73,6 +73,7 @@ public:
     virtual bool add(HashIntoType khash) = 0;
     virtual const BoundedCounterType get_count(HashIntoType khash) const = 0;
     virtual Byte ** get_raw_tables() = 0;
+    virtual void reset() = 0;
 
     void set_use_bigcount(bool b);
     bool get_use_bigcount();
@@ -226,6 +227,8 @@ public:
         return _counts;
     }
 
+    void reset();
+
     void update_from(const BitStorage&);
 };
 
@@ -309,7 +312,15 @@ public:
             memset(_counts[i], 0, tablebytes);
         }
     }
-
+    
+    void reset()
+    {
+        for (unsigned int table_num = 0; table_num < _n_tables; table_num++) {
+            uint64_t tablesize = _tablesizes[table_num];
+            uint64_t tablebytes = tablesize / 2 + 1;
+            memset(_counts[table_num], 0, tablebytes);
+        }
+    }
 
     BoundedCounterType test_and_set_bits(HashIntoType khash)
     {
@@ -443,6 +454,7 @@ public:
   void load(std::string infilename, WordLength &ksize);
 
   Byte **get_raw_tables() { return nullptr; }
+  void reset() {}; //nop
 };
 
 
@@ -525,6 +537,14 @@ public:
             _counts = NULL;
 
             _n_tables = 0;
+        }
+    }
+
+    void reset()
+    {
+        for (unsigned int table_num = 0; table_num < _n_tables; table_num++) {
+            uint64_t tablesize = _tablesizes[table_num];
+            memset(_counts[table_num], 0, tablesize);
         }
     }
 

@@ -397,6 +397,10 @@ public:
         return store->get_raw_tables();
     }
 
+    void reset() {
+        store->reset();
+    }
+
     // find the minimum k-mer count in the given sequence
     BoundedCounterType get_min_count(const std::string &s);
 

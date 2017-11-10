@@ -97,6 +97,16 @@ void BitStorage::update_from(const BitStorage& other)
 }
 
 
+void BitStorage::reset()
+{
+    for (unsigned int table_num = 0; table_num < _n_tables; table_num++) {
+        uint64_t tablesize = _tablesizes[table_num];
+        uint64_t tablebytes = tablesize / 8 + 1;
+        memset(_counts[table_num], 0, tablebytes);
+    }
+}
+
+
 void BitStorage::save(std::string outfilename, WordLength ksize)
 {
     if (!_counts[0]) {

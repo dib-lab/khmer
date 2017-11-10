@@ -362,6 +362,9 @@ cdef class Hashtable:
         cdef vector[uint64_t] sizes = deref(self._ht_this).get_tablesizes()
         return self._get_raw_tables(table_ptrs, sizes)
 
+    def reset(self):
+        deref(self._ht_this).reset()
+
 
 cdef class QFCounttable(Hashtable):
     """Count kmers using a counting quotient filter.
@@ -404,6 +407,9 @@ cdef class QFCounttable(Hashtable):
         cdef QFCounttable table = cls(1, 1)
         deref(table._qf_this).load(_bstring(file_name))
         return table
+
+    def reset(self):
+        raise NotImplementedError()
 
 cdef class Counttable(Hashtable):
 

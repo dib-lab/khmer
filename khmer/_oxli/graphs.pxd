@@ -36,6 +36,7 @@ cdef extern from "oxli/storage.hh":
 
         void set_use_bigcount(bool)
         bool get_use_bigcount()
+        void reset()
 
 
 cdef extern from "oxli/hashtable.hh" namespace "oxli" nogil:
@@ -103,6 +104,7 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli" nogil:
         uint64_t trim_below_abundance(string, BoundedCounterType) const
         vector[uint32_t] find_spectral_error_positions(string,
                                                        BoundedCounterType)
+        void reset()
 
     cdef cppclass CpMurmurHashtable "oxli::MurmurHashtable" (CpHashtable):
         CpMurmurHashtable(WordLength, CpStorage *)

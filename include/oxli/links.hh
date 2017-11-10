@@ -689,19 +689,22 @@ public:
 
     bool validate_segment(CompactNode* root_node, CompactNode* other_node,
                           CompactEdge* edge, std::string& sequence) {
-        bool edge_invalid;
+        pdebug("validating " << *root_node << " with  " << *edge << ", " 
+              << sequence << " and other node ID=" << 
+              ((other_node != nullptr) ? other_node->node_id : NULL_ID));
+        bool edge_valid = true;
         if (edge->meta == IS_TIP) {
             if (other_node != nullptr) {
-                return false;
+                edge_valid = false;
             }
             if (!((edge->in_node_id == root_node->node_id ||
                    edge->out_node_id == root_node->node_id) &&
                   edge->sequence.length() == sequence.length())) {
-                return false;
+                edge_valid = false;
             }
         } else if (edge->meta == IS_FULL_EDGE) {
             if (other_node == nullptr) {
-                return false;
+                edge_valid = false;
             } else {
                 bool nodes_match;
                 nodes_match = (edge->in_node_id == root_node->node_id && 
@@ -709,11 +712,12 @@ public:
                               (edge->out_node_id == root_node->node_id &&
                                edge->in_node_id == other_node->node_id);
                 if (!nodes_match) {
-                    return false;
+                    edge_valid = false;
                 }
             }
         }
-        return true;
+        pdebug("valid? = " << edge_valid);
+        return edge_valid;
     }
 
     /* Update a compact dbg where there are no induced
@@ -827,18 +831,42 @@ public:
 
                 // first check for a segment going this direction from root
                 CompactEdge* segment_edge = nullptr;
-                bool edge_invalid = false;
-                bool root_flipped = nodes.get_edge_from_left(root_node, segment_edge, segment_seq);
+                nodes.get_edge_from_left(root_node, segment_edge, segment_seq);
 
                 CompactNode* left_node = nodes.get_node_by_kmer(lcursor.cursor);
+                CompactEdge* left_out_edge = nullptr;
+                if (left_node != nullptr) {
+                    nodes.get_edge_from_right(left_node, left_out_edge, segment_seq);
+                }
 
                 // validate edge leaving root if it exists
-                if (segment_edge != nullptr && 
-                    validate_segment(root_node, left_node, segment_edge, segment_seq)) {
+                if (segment_edge != nullptr && left_out_edge != nullptr) {
 
-                    pdebug("validated " << *root_node << ", " << *left_node 
-                            << ", " << *segment_edge << ", " << segment_seq);
-                    continue;
+                    
+                    if (segment_edge == left_out_edge && 
+                        validate_segment(root_node, left_node, 
+                                         segment_edge, segment_seq)) {
+                        continue;
+                    } else {
+                        nodes.unlink_edge(segment_edge);
+                        nodes.unlink_edge(left_out_edge);
+                        edges.delete_edge(segment_edge);
+                        edges.delete_edge(left_out_edge);
+                    }
+                } else if (left_out_edge != nullptr) {
+                    // there was no edge from root, must be bad
+                    pdebug("edge from left invalid, delete");
+                    n_updates += nodes.unlink_edge(left_out_edge);
+                    edges.delete_edge(left_out_edge);
+                } else if (segment_edge != nullptr) {
+                    if (validate_segment(root_node, left_node,
+                                         segment_edge, segment_seq)) {
+                        continue;
+                    } else {
+                        pdebug("edge from root invalid, delete");
+                        n_updates += nodes.unlink_edge(segment_edge);
+                        edges.delete_edge(segment_edge);
+                    }
                 }
                 
                 /*
@@ -846,19 +874,9 @@ public:
                  * segments
                  */
 
-                // if there's an existing edge, check if we need to split it
-                if (segment_edge != nullptr) {
-
-                    // check that it isn't a TIP from an existing node
-                    // with ROOT being induced; if not, delete its edge
-                    // from the out node
-                    pdebug("edge does not conform, delete it");
-                    n_updates += nodes.unlink_edge(segment_edge);
-                    edges.delete_edge(segment_edge);
-                    // deleted tags; assemble out to the HDN
-                    segment_seq = cassem._assemble_directed(lcursor) +
-                                  segment_seq.substr(_ksize);
-                }
+                // not needed until tags used again
+                //segment_seq = cassem._assemble_directed(lcursor) +
+                //              segment_seq.substr(_ksize);
 
                 // construct the compact edge
                 compact_edge_meta_t edge_meta = (left_node == nullptr) ?
@@ -900,27 +918,45 @@ public:
 
                 // first check for a segment going this direction from root
                 CompactEdge* segment_edge = nullptr;
-                bool edge_invalid = false;
-                bool root_flipped = nodes.get_edge_from_right(root_node, segment_edge, segment_seq);
+                nodes.get_edge_from_right(root_node, segment_edge, segment_seq);
 
                 CompactNode* right_node = nodes.get_node_by_kmer(rcursor.cursor);
+                CompactEdge* right_in_edge = nullptr;
+                if (right_node != nullptr) {
+                    nodes.get_edge_from_left(right_node, right_in_edge, segment_seq);
+                }
 
                 // validate edge leaving root if it exists
-                if (segment_edge != nullptr && 
-                    validate_segment(root_node, right_node, segment_edge, segment_seq)) {
+                if (segment_edge != nullptr && right_in_edge != nullptr) {
 
-                    continue;
+                    
+                    if (segment_edge == right_in_edge && 
+                        validate_segment(root_node, right_node, 
+                                         segment_edge, segment_seq)) {
+                        continue;
+                    } else {
+                        nodes.unlink_edge(segment_edge);
+                        nodes.unlink_edge(right_in_edge);
+                        edges.delete_edge(segment_edge);
+                        edges.delete_edge(right_in_edge);
+                    }
+                } else if (right_in_edge != nullptr) {
+                    // there was no edge from root, must be bad
+                    pdebug("edge from left invalid, delete");
+                    n_updates += nodes.unlink_edge(right_in_edge);
+                    edges.delete_edge(right_in_edge);
+                } else if (segment_edge != nullptr) {
+                    if (validate_segment(root_node, right_node,
+                                         segment_edge, segment_seq)) {
+                        continue;
+                    } else {
+                        pdebug("edge from root invalid, delete");
+                        n_updates += nodes.unlink_edge(segment_edge);
+                        edges.delete_edge(segment_edge);
+                    }
                 }
 
-                if (segment_edge != nullptr) {
-                    pdebug("edge does not conform, delete it");
-                    n_updates += nodes.unlink_edge(segment_edge);
-                    edges.delete_edge(segment_edge);
-                    // deleted tags; assemble out to the HDN
-                    segment_seq = segment_seq + 
-                                  cassem._assemble_directed(rcursor).substr(_ksize);
-                }
-
+                pdebug("segment sequence length=" << segment_seq.length());
                 compact_edge_meta_t edge_meta = (right_node == nullptr) ?
                                                   IS_TIP : IS_FULL_EDGE;
 
