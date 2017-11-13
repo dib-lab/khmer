@@ -2,6 +2,8 @@ language: python
 
 # Tell travis we want Ubuntu 14.04
 sudo: required
+services:
+  - docker
 dist: trusty
 
 notifications:
@@ -18,8 +20,9 @@ branches:
 matrix:
   fast_finish: true
   include:
+
     - os: linux
-      python: "2.7"
+      python: "3.4"
       # Tell travis we want debian trusty
       sudo: required
       dist: trusty
@@ -34,6 +37,20 @@ matrix:
 
     - os: linux
       python: "3.5"
+      # Tell travis we want debian trusty
+      sudo: required
+      dist: trusty
+      env:
+        - TESTATTR="'not huge and not known_failing'"
+      addons:
+        apt:
+          packages:
+            - astyle
+            - cppcheck
+            - enchant
+
+    - os: linux
+      python: "3.6"
       # Tell travis we want debian trusty
       sudo: required
       dist: trusty
@@ -70,6 +87,9 @@ script:
   - make py-demos
   - make cpp-demos
   - cd examples/stamps && ./do.sh
+  # ${TRAVIS_PULL_REQUEST_SHA:-$TRAVIS_COMMIT} makes sure we get the commit
+  # that travis is testing during a PR and when we build master
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cd ../.. && COMMIT=${TRAVIS_PULL_REQUEST_SHA:-$TRAVIS_COMMIT} make docker-container; fi
 
 # generate all the diagnostic reports
 after_success:

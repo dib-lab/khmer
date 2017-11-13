@@ -34,11 +34,10 @@
 # Contact: khmer-project@idyll.org
 # pylint: disable=missing-docstring,invalid-name
 
-from __future__ import print_function
-from __future__ import absolute_import
 
-from khmer import _Countgraph, _SmallCountgraph, _Nodegraph
-from khmer import Nodetable, Counttable, SmallCounttable, QFCounttable
+from khmer import Countgraph, SmallCountgraph, Nodegraph
+from khmer import (Nodetable, Counttable, CyclicCounttable, SmallCounttable,
+                   QFCounttable)
 from khmer._oxli.utils import get_n_primes_near_x
 
 import math
@@ -57,10 +56,7 @@ def tablewrapper(tabletype):
         except:
             starting_size, n_tables = params_1m
 
-        if tabletype in (_Countgraph, _SmallCountgraph, _Nodegraph):
-            primes = get_n_primes_near_x(n_tables, starting_size)
-            return tabletype(k, primes)
-        elif tabletype is QFCounttable:
+        if tabletype is QFCounttable:
             qf_size = 2**math.ceil(math.log(starting_size, 2))
             return tabletype(k, qf_size)
         else:
@@ -69,28 +65,29 @@ def tablewrapper(tabletype):
     return build
 
 
-@pytest.fixture(params=[_Countgraph, Counttable, _SmallCountgraph,
-                        SmallCounttable, _Nodegraph, Nodetable])
+@pytest.fixture(params=[Countgraph, Counttable, CyclicCounttable,
+                        SmallCountgraph, SmallCounttable, Nodegraph,
+                        Nodetable])
 def Tabletype(request):
     return tablewrapper(request.param)
 
 
 # all the table types!
-@pytest.fixture(params=[_Countgraph, Counttable, _SmallCountgraph,
-                        SmallCounttable, _Nodegraph, Nodetable,
+@pytest.fixture(params=[Countgraph, Counttable, SmallCountgraph,
+                        SmallCounttable, Nodegraph, Nodetable,
                         QFCounttable])
 def AnyTabletype(request):
     return tablewrapper(request.param)
 
 
 # all the counting types!
-@pytest.fixture(params=[_Countgraph, Counttable, _SmallCountgraph,
-                        SmallCounttable])
+@pytest.fixture(params=[Countgraph, Counttable, CyclicCounttable,
+                        SmallCountgraph, SmallCounttable])
 def Countingtype(request):
     return tablewrapper(request.param)
 
 
 # all the graph types!
-@pytest.fixture(params=[_Countgraph, _Nodegraph])
+@pytest.fixture(params=[Countgraph, Nodegraph])
 def Graphtype(request):
     return tablewrapper(request.param)

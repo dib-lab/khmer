@@ -43,13 +43,12 @@ This will output many <base>.subset.N.pmap files.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
 
 import threading
 import textwrap
 import sys
 
-from khmer import load_nodegraph
+from khmer import Nodegraph
 from khmer.khmer_args import (add_threading_args, sanitize_help,
                               KhmerArgumentParser)
 from khmer.kfile import check_input_files
@@ -107,7 +106,7 @@ def main():
     print('--', file=sys.stderr)
 
     print('loading nodegraph %s' % basename, file=sys.stderr)
-    nodegraph = load_nodegraph(basename)
+    nodegraph = Nodegraph.load(basename)
     nodegraph.load_tagset(basename + '.tagset')
 
     # do we want to load stop tags, and do they exist?

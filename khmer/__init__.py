@@ -36,19 +36,11 @@
 """This is khmer; please see http://khmer.readthedocs.io/."""
 
 
-from __future__ import print_function
 from collections import namedtuple
 from math import log
 import json
 
-from khmer._khmer import Countgraph as _Countgraph
-from khmer._khmer import SmallCountgraph as _SmallCountgraph
 
-from khmer._khmer import GraphLabels as _GraphLabels
-from khmer._khmer import Nodegraph as _Nodegraph
-from khmer._khmer import ReadAligner as _ReadAligner
-
-from khmer._khmer import HashSet
 from khmer._khmer import Read
 from khmer._khmer import forward_hash
 # tests/test_{functions,countgraph,counting_single}.py
@@ -73,9 +65,15 @@ from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 from khmer._khmer import FILETYPES
 
 from khmer._oxli.graphs import (Counttable, QFCounttable, Nodetable,
-                                SmallCounttable)
+                                CyclicCounttable,
+                                SmallCounttable, Countgraph, SmallCountgraph,
+                                Nodegraph)
+from khmer._oxli.labeling import GraphLabels
+from khmer._oxli.legacy_partitioning import SubsetPartition, PrePartitionInfo
 from khmer._oxli.parsing import FastxParser
+from khmer._oxli.readaligner import ReadAligner
 
+from khmer._oxli.utils import get_n_primes_near_x, is_prime
 import sys
 
 from struct import pack, unpack
@@ -87,67 +85,11 @@ del get_versions
 
 _buckets_per_byte = {
     # calculated by hand from settings in third-part/cqf/gqf.h
-    'qfcounttable': 1/1.26,
+    'qfcounttable': 1 / 1.26,
     'countgraph': 1,
     'smallcountgraph': 2,
     'nodegraph': 8,
 }
-
-
-def load_nodegraph(filename):
-    """Load a nodegraph object from the given filename and return it.
-
-    Keyword argument:
-    filename -- the name of the nodegraph file
-    """
-    nodegraph = _Nodegraph(1, [1])
-    nodegraph.load(filename)
-
-    return nodegraph
-
-
-def load_nodetable(filename):
-    """Load a nodetable object from the given filename and return it.
-
-    Keyword argument:
-    filename -- the name of the nodegraph file
-    """
-
-    return Nodetable.load(filename)
-
-
-def load_countgraph(filename, small=False):
-    """Load a countgraph object from the given filename and return it.
-
-    Keyword argument:
-    filename -- the name of the countgraph file
-    small -- set this to load a SmallCountgraph instance
-    """
-    if small:
-        countgraph = _SmallCountgraph(1, [1])
-        countgraph.load(filename)
-
-    else:
-        countgraph = _Countgraph(1, [1])
-        countgraph.load(filename)
-
-    return countgraph
-
-
-def load_counttable(filename, small=False):
-    """Load a counttable object from the given filename and return it.
-
-    Keyword argument:
-    filename -- the name of the counttable file
-    small -- set this to load a SmallCounttable instance
-    """
-    if small:
-        counttable = SmallCounttable.load(filename)
-
-    else:
-        counttable = Counttable.load(filename)
-
-    return counttable
 
 
 def extract_nodegraph_info(filename):
@@ -273,206 +215,8 @@ def calc_expected_collisions(graph, force=False, max_false_pos=.2):
     return fp_all
 
 
-def is_prime(number):
-    """Check if a number is prime."""
-    if number < 2:
-        return False
-    if number == 2:
-        return True
-    if number % 2 == 0:
-        return False
-    for _ in range(3, int(number ** 0.5) + 1, 2):
-        if number % _ == 0:
-            return False
-    return True
-
-
-def get_n_primes_near_x(number, target):
-    """Backward-find primes smaller than target.
-
-    Step backwards until a number of primes (other than 2) have been
-    found that are smaller than the target and return them.
-
-    Keyword arguments:
-    number -- the number of primes to find
-    target -- the number to step backwards from
-    """
-    if target == 1 and number == 1:
-        return [1]
-
-    primes = []
-    i = target - 1
-    if i % 2 == 0:
-        i -= 1
-    while len(primes) != number and i > 0:
-        if is_prime(i):
-            primes.append(int(i))
-        i -= 2
-
-    if len(primes) != number:
-        raise RuntimeError("unable to find %d prime numbers < %d" % (number,
-                                                                     target))
-
-    return primes
-
-
-# Expose the cpython objects with __new__ implementations.
-# These constructors add the functionality provided by the existing
-# factory methods to the constructors defined over in cpython land.
-# Additional functionality can be added to these classes as appropriate.
-
-'''
-class Counttable(_Counttable):
-    def __new__(cls, k, starting_size, n_tables):
-        primes = get_n_primes_near_x(n_tables, starting_size)
-        return super().__new__(cls, k, primes)
-'''
-
-
-class Countgraph(_Countgraph):
-
-    def __new__(cls, k, starting_size, n_tables):
-        primes = get_n_primes_near_x(n_tables, starting_size)
-        countgraph = _Countgraph.__new__(cls, k, primes)
-        countgraph.primes = primes
-        return countgraph
-
-
-class SmallCountgraph(_SmallCountgraph):
-
-    def __new__(cls, k, starting_size, n_tables):
-        primes = get_n_primes_near_x(n_tables, starting_size)
-        countgraph = _SmallCountgraph.__new__(cls, k, primes)
-        countgraph.primes = primes
-        return countgraph
-
-
-class GraphLabels(_GraphLabels):
-
-    def __new__(cls, k, starting_size, n_tables):
-        nodegraph = Nodegraph(k, starting_size, n_tables)
-        graphlabels = _GraphLabels.__new__(cls, nodegraph)
-        graphlabels.graph = nodegraph
-        return graphlabels
-
-
-class CountingGraphLabels(_GraphLabels):
-
-    def __new__(cls, k, starting_size, n_tables):
-        primes = get_n_primes_near_x(n_tables, starting_size)
-        countgraph = _Countgraph(k, primes)
-        class_ = _GraphLabels.__new__(cls, countgraph)
-        class_.graph = countgraph
-        return class_
-
-
-class Nodegraph(_Nodegraph):
-
-    def __new__(cls, k, starting_size, n_tables):
-        primes = get_n_primes_near_x(n_tables, starting_size)
-        nodegraph = _Nodegraph.__new__(cls, k, primes)
-        nodegraph.primes = primes
-        return nodegraph
-
-
-class ReadAligner(_ReadAligner):
-    """Sequence to graph aligner.
-
-    ReadAligner uses a Countgraph (the counts of k-mers in the target DNA
-    sequences) as an implicit De Bruijn graph. Input DNA sequences are aligned
-    to this graph via a paired Hidden Markov Model.
-
-    The HMM is configured upon class instantiation; default paramaters for the
-    HMM are provided in 'defaultTransitionProbablitites' and
-    'defaultScoringMatrix'.
-
-    The main method is 'align'.
-    """
-
-    defaultTransitionProbabilities = (  # _M, _Ir, _Ig, _Mu, _Iru, _Igu
-        (log(0.9848843, 2), log(0.0000735, 2), log(0.0000334, 2),
-         log(0.0150068, 2), log(0.0000017, 2), log(0.0000003, 2)),  # M_
-        (log(0.5196194, 2), log(0.4647955, 2), log(0.0059060, 2),
-         log(0.0096792, 2)),  # Ir_
-        (log(0.7611255, 2), log(0.2294619, 2), log(0.0072673, 2),
-         log(0.0021453, 2)),  # Ig_
-        (log(0.0799009, 2), log(0.0000262, 2), log(0.0001836, 2),
-         log(0.9161349, 2), log(0.0033370, 2), log(0.0004173, 2)),  # Mu_
-        (log(0.1434529, 2), log(0.0036995, 2), log(0.2642928, 2),
-         log(0.5885548, 2)),  # Iru_
-        (log(0.1384551, 2), log(0.0431328, 2), log(0.6362921, 2),
-         log(0.1821200, 2))  # Igu_
-    )
-
-    defaultScoringMatrix = [
-        log(0.955, 2), log(0.04, 2), log(0.004, 2), log(0.001, 2)]
-
-    def __new__(cls, count_graph, trusted_cov_cutoff, bits_theta,
-                **kwargs):
-
-        if 'filename' in kwargs:
-            with open(kwargs.pop('filename')) as paramfile:
-                params = json.load(paramfile)
-            scoring_matrix = params['scoring_matrix']
-            transition_probabilities = params['transition_probabilities']
-        else:
-            if 'scoring_matrix' in kwargs:
-                scoring_matrix = kwargs.pop('scoring_matrix')
-            else:
-                scoring_matrix = ReadAligner.defaultScoringMatrix
-            if 'transition_probabilities' in kwargs:
-                transition_probabilities = kwargs.pop(
-                    'transition_probabilities')
-            else:
-                transition_probabilities = \
-                    ReadAligner.defaultTransitionProbabilities
-        readaligner = _ReadAligner.__new__(
-            cls, count_graph, trusted_cov_cutoff, bits_theta, scoring_matrix,
-            transition_probabilities)
-        readaligner.graph = count_graph
-        return readaligner
-
-    def __init__(self, *args, **kwargs):  # pylint: disable=unused-argument
-        """
-        Initialize ReadAligner.
-
-        HMM state notation abbreviations:
-        M_t - trusted match; M_u - untrusted match
-        Ir_t - trusted read insert; Ir_u - untrusted read insert
-        Ig_t - trusted graph insert; Ig_u - untrusted graph insert
-
-        Keyword arguments:
-        filename - a path to a JSON encoded file providing the scoring matrix
-            for the HMM in an entry named 'scoring_matrix' and the transition
-            probabilities for the HMM in an entry named
-            'transition_probabilities'. If provided the remaining keyword
-            arguments are ignored. (default: None)
-        scoring_matrix - a list of floats: trusted match, trusted mismatch,
-            unstrusted match, untrusted mismatch. (default:
-                ReadAligner.defaultScoringMatrix)
-        transition_probabilities - A sparse matrix as a tuple of six tuples.
-            The inner tuples contain 6, 4, 4, 6, 4, and 4 floats respectively.
-            Transition are notated as 'StartState-NextState':
-            (
-              ( M_t-M_t,  M_t-Ir_t,  M_t-Ig_t,  M_t-M_u,  M_t-Ir_u,  M_t-Ig_u),
-              (Ir_t-M_t, Ir_t-Ir_t,            Ir_t-M_u, Ir_t-Ir_u           ),
-              (Ig_t-M_t,          , Ig_t-Ig_t, Ig_t-M_u,            Ig_t-Ig_u),
-              ( M_u-M_t,  M_u-Ir_t,  M_u-Ig_t,  M_u-M_u,  M_u-Ir_u,  M_u-Ig_u),
-              (Ir_u-M_t, Ir_u-Ir_t,            Ir_u-M_u, Ir_u-Ir_u           ),
-              (Ig_u-M_t,          , Ig_u-Ig_t, Ig_u-M_u,            Ig_u-Ig_u)
-            )
-            (default: ReadAligner.defaultTransitionProbabilities)
-
-
-        Note: the underlying CPython implementation creates the ReadAligner
-        during the __new__ process and so the class initialization actually
-        occurs there. Instatiation is documented here in __init__ as this is
-        the traditional way.
-        """
-        _ReadAligner.__init__(self)
-
-
 from khmer._oxli.assembly import (LinearAssembler, SimpleLabeledAssembler,
                                   JunctionCountAssembler)
-
+from khmer._oxli.hashset import HashSet
 from khmer._oxli.hllcounter import HLLCounter
+from khmer._oxli.labeling import GraphLabels

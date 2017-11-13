@@ -64,13 +64,14 @@ ez_setup.use_setuptools(version="3.4.1")
 
 CMDCLASS = versioneer.get_cmdclass()
 
-HAS_CYTHON = False
 try:
     import Cython
+    from Cython.Build import cythonize
     HAS_CYTHON = True
+    cy_ext = 'pyx'
 except ImportError:
-    pass
-cy_ext = 'pyx' if HAS_CYTHON else 'cpp'
+    HAS_CYTHON = False
+    cy_ext = 'cpp'
 
 # strip out -Wstrict-prototypes; a hack suggested by
 # http://stackoverflow.com/a/9740721
@@ -151,13 +152,17 @@ def build_dir():
 ZLIBDIR = 'third-party/zlib'
 BZIP2DIR = 'third-party/bzip2'
 
-BUILD_DEPENDS = glob.glob(path_join("include", "khmer", "_cpy_*.hh"))
+BUILD_DEPENDS = [path_join("include", "khmer", bn + ".hh") for bn in [
+    "_cpy_khmer", "_cpy_utils", "_cpy_readparsers"
+]]
 BUILD_DEPENDS.extend(path_join("include", "oxli", bn + ".hh") for bn in [
     "khmer", "kmer_hash", "hashtable", "labelhash", "hashgraph",
     "hllcounter", "oxli_exception", "read_aligner", "subset", "read_parsers",
     "kmer_filters", "traversal", "assembler", "alphabets", "storage"])
 
-SOURCES = glob.glob(path_join("src", "khmer", "_cpy_*.cc"))
+SOURCES = [path_join("src", "khmer", bn + ".cc") for bn in [
+    "_cpy_khmer", "_cpy_utils", "_cpy_readparsers"
+]]
 SOURCES.extend(path_join("src", "oxli", bn + ".cc") for bn in [
     "read_parsers", "kmer_hash", "hashtable", "hashgraph",
     "labelhash", "subset", "read_aligner",
@@ -168,8 +173,9 @@ SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
 
 # Don't forget to update lib/Makefile with these flags!
-EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11', '-pedantic']
-EXTRA_LINK_ARGS = []
+EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11', '-pedantic',
+                      '-fno-omit-frame-pointer']
+EXTRA_LINK_ARGS = ['-fno-omit-frame-pointer']
 
 if sys.platform == 'darwin':
     # force 64bit only builds
@@ -194,6 +200,13 @@ CP_EXTENSION_MOD_DICT = \
 
 EXTENSION_MODS = [Extension("khmer._khmer", ** CP_EXTENSION_MOD_DICT)]
 
+CY_OPTS = {
+    'embedsignature': True,
+    'language_level': 3,
+    'c_string_type': 'unicode',
+    'c_string_encoding': 'utf8'
+}
+
 for cython_ext in glob.glob(os.path.join("khmer", "_oxli",
                                          "*.{0}".format(cy_ext))):
 
@@ -207,12 +220,16 @@ for cython_ext in glob.glob(os.path.join("khmer", "_oxli",
             "depends": [],
             "include_dirs": ["include", "."],
             "language": "c++",
-            "define_macros": [("VERSION", versioneer.get_version()), ],
+            "define_macros": [("VERSION", versioneer.get_version()), ]
         }
 
     ext_name = "khmer._oxli.{0}".format(
-        splitext(os.path.basename(cython_ext))[0])
+        splitext(os.path.basename(cython_ext))[0]
+    )
     EXTENSION_MODS.append(Extension(ext_name, ** CY_EXTENSION_MOD_DICT))
+
+if HAS_CYTHON:
+    EXTENSION_MODS = cythonize(EXTENSION_MODS, compiler_directives=CY_OPTS)
 
 SCRIPTS = []
 SCRIPTS.extend([path_join("scripts", script)
@@ -228,9 +245,9 @@ CLASSIFIERS = [
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS :: MacOS X",
     "Programming Language :: C++",
-    "Programming Language :: Python :: 2.7",
     "Programming Language :: Python :: 3.4",
     "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
 if "-rc" in versioneer.get_version():
@@ -250,7 +267,6 @@ authors = [a.strip().split(',') for a in authors]
 authorstr = ', '.join([row[0] for row in authors])
 authorstr = 'Daniel Standage, ' + authorstr + ', C. Titus Brown'
 
-
 SETUP_METADATA = \
     {
         "name": "khmer",
@@ -267,8 +283,9 @@ SETUP_METADATA = \
         "packages": ['khmer', 'khmer.tests', 'oxli', 'khmer._oxli'],
         "package_data": {'khmer/_oxli': ['*.pxd']},
         "package_dir": {'khmer.tests': 'tests'},
-        "install_requires": ['screed >= 1.0', 'bz2file', 'Cython==0.25.2'],
-        "setup_requires": ["pytest-runner>=2.0,<3dev", "setuptools>=18.0"],
+        "install_requires": ['screed >= 1.0', 'bz2file', 'Cython>=0.25.2'],
+        "setup_requires": ["pytest-runner>=2.0,<3dev", "setuptools>=18.0",
+                           "Cython>=0.25.2"],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
                            'tests': ['pytest>=2.9'],
@@ -284,7 +301,8 @@ SETUP_METADATA = \
         # "license": '', # empty as is conveyed by the classifier below
         "include_package_data": True,
         "zip_safe": False,
-        "classifiers": CLASSIFIERS
+        "classifiers": CLASSIFIERS,
+        "python_requires": '>=3.4'
     }
 
 

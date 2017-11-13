@@ -41,7 +41,6 @@ using the given countgraph.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
 
 import sys
 import khmer
@@ -84,8 +83,8 @@ def main():
 
     kmer_size = countgraph.ksize()
     hashsizes = countgraph.hashsizes()
-    tracking = khmer._Nodegraph(  # pylint: disable=protected-access
-        kmer_size, hashsizes)
+    tracking = khmer.Nodegraph(  # pylint: disable=protected-access
+        kmer_size, 1, 1, primes=hashsizes)
 
     print ('kmer_size: %s' % countgraph.ksize(), file=sys.stderr)
     print ('k-mer countgraph sizes: %s' % (countgraph.hashsizes(),),
@@ -103,7 +102,7 @@ def main():
     for _ in range(args.threads):
         thread = \
             threading.Thread(
-                target=countgraph.consume_seqfile_with_reads_parser,
+                target=countgraph.consume_seqfile,
                 args=(rparser, )
             )
         threads.append(thread)

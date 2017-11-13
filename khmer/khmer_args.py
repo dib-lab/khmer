@@ -35,8 +35,6 @@
 # Contact: khmer-project@idyll.org
 """Common argparse constructs."""
 
-from __future__ import unicode_literals
-from __future__ import print_function
 
 import sys
 import argparse
@@ -588,7 +586,7 @@ def create_matching_nodegraph(countgraph):
     tables as `countgraph`.
     """
     tablesizes = countgraph.hashsizes()
-    return khmer._Nodegraph(countgraph.ksize(), tablesizes)
+    return khmer.Nodegraph(countgraph.ksize(), 1, 1, primes=tablesizes)
 
 
 def report_on_config(args, graphtype='countgraph'):

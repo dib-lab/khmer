@@ -36,8 +36,6 @@
 # Contact: khmer-project@idyll.org
 # pylint: disable=missing-docstring,protected-access,no-member,invalid-name
 
-from __future__ import print_function
-from __future__ import absolute_import
 
 import itertools
 import random
@@ -101,6 +99,13 @@ class TestNonBranching:
         print(path, ',', contig)
         assert utils._equals_rc(path, contig[:len(path)])
 
+    def test_hash_as_seed(self, linear_structure, assembler):
+        graph, contig = linear_structure
+        asm = assembler(graph)
+
+        left = graph.hash(contig[:K])
+        assert utils._equals_rc(asm.assemble(left), contig)
+
 
 class TestLinearAssembler_RightBranching:
 
@@ -114,6 +119,15 @@ class TestLinearAssembler_RightBranching:
         graph, contig, L, HDN, R, tip = right_tip_structure
         asm = khmer.LinearAssembler(graph)
         path = asm.assemble(contig[0:K])
+
+        assert len(path) == HDN.pos + K
+        assert utils._equals_rc(path, contig[:len(path)])
+
+    def test_assemble_takes_hash(self, right_tip_structure):
+        # assemble from beginning of contig, up until branch point
+        graph, contig, L, HDN, R, tip = right_tip_structure
+        asm = khmer.LinearAssembler(graph)
+        path = asm.assemble(graph.hash(contig[0:K]))
 
         assert len(path) == HDN.pos + K
         assert utils._equals_rc(path, contig[:len(path)])
@@ -255,10 +269,18 @@ class TestLinearAssembler_LeftBranching:
 
 class TestLabeledAssembler:
 
+    def test_hash_as_seed(self, linear_structure):
+        graph, contig = linear_structure
+        lh = khmer.GraphLabels(graph)
+        asm = khmer.SimpleLabeledAssembler(lh)
+
+        left = graph.hash(contig[:K])
+        assert utils._equals_rc(asm.assemble(left).pop(), contig)
+
     def test_beginning_to_end_across_tip(self, right_tip_structure):
         # assemble entire contig, ignoring branch point b/c of labels
         graph, contig, L, HDN, R, tip = right_tip_structure
-        lh = khmer._GraphLabels(graph)
+        lh = khmer.GraphLabels(graph)
         asm = khmer.SimpleLabeledAssembler(lh)
         hdn = graph.find_high_degree_nodes(contig)
         # L, HDN, and R will be labeled with 1
@@ -275,7 +297,7 @@ class TestLabeledAssembler:
     def test_assemble_right_double_fork(self, right_double_fork_structure):
         # assemble two contigs from a double forked structure
         graph, contig, L, HDN, R, branch = right_double_fork_structure
-        lh = khmer._GraphLabels(graph)
+        lh = khmer.GraphLabels(graph)
         asm = khmer.SimpleLabeledAssembler(lh)
 
         hdn = graph.find_high_degree_nodes(contig)
@@ -297,7 +319,7 @@ class TestLabeledAssembler:
         # assemble three contigs from a trip fork
         (graph, contig, L, HDN, R,
          top_sequence, bottom_sequence) = right_triple_fork_structure
-        lh = khmer._GraphLabels(graph)
+        lh = khmer.GraphLabels(graph)
         asm = khmer.SimpleLabeledAssembler(lh)
 
         hdn = graph.find_high_degree_nodes(contig)
@@ -321,7 +343,7 @@ class TestLabeledAssembler:
     def test_assemble_left_double_fork(self, left_double_fork_structure):
         # assemble entire contig + branch points b/c of labels; start from end
         graph, contig, L, HDN, R, branch = left_double_fork_structure
-        lh = khmer._GraphLabels(graph)
+        lh = khmer.GraphLabels(graph)
         asm = khmer.SimpleLabeledAssembler(lh)
 
         # first try without the labels
@@ -349,7 +371,7 @@ class TestLabeledAssembler:
     def test_assemble_snp_bubble_single(self, snp_bubble_structure):
         # assemble entire contig + one of two paths through a bubble
         graph, wildtype, mutant, HDN_L, HDN_R = snp_bubble_structure
-        lh = khmer._GraphLabels(graph)
+        lh = khmer.GraphLabels(graph)
         asm = khmer.SimpleLabeledAssembler(lh)
 
         hdn = graph.find_high_degree_nodes(wildtype)
@@ -364,7 +386,7 @@ class TestLabeledAssembler:
     def test_assemble_snp_bubble_both(self, snp_bubble_structure):
         # assemble entire contig + both paths
         graph, wildtype, mutant, HDN_L, HDN_R = snp_bubble_structure
-        lh = khmer._GraphLabels(graph)
+        lh = khmer.GraphLabels(graph)
         asm = khmer.SimpleLabeledAssembler(lh)
 
         hdn = graph.find_high_degree_nodes(wildtype)
@@ -390,7 +412,7 @@ class TestLabeledAssembler:
         # stop_filter should trip a filter failure, negating the label spanning
         graph, wildtype, mutant, HDN_L, HDN_R = snp_bubble_structure
         stop_filter = khmer.Nodegraph(K, 1e5, 4)
-        lh = khmer._GraphLabels(graph)
+        lh = khmer.GraphLabels(graph)
         asm = khmer.SimpleLabeledAssembler(lh, stop_filter=stop_filter)
 
         hdn = graph.find_high_degree_nodes(wildtype)
@@ -410,7 +432,7 @@ class TestLabeledAssembler:
     def test_assemble_tandem_repeats(self, tandem_repeat_structure):
         # assemble one copy of a tandem repeat
         graph, repeat, tandem_repeats = tandem_repeat_structure
-        lh = khmer._GraphLabels(graph)
+        lh = khmer.GraphLabels(graph)
         asm = khmer.SimpleLabeledAssembler(lh)
         paths = asm.assemble(repeat[:K])
 

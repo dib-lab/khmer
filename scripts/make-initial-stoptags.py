@@ -39,11 +39,11 @@ Find an initial set of highly connected k-mers, to save on repartitioning time.
 
 % python scripts/make-initial-stoptags.py <base>
 """
-from __future__ import print_function
 
 import sys
 import textwrap
 import khmer
+from khmer import Nodegraph
 from khmer import khmer_args
 from khmer.khmer_args import (build_counting_args, sanitize_help)
 from khmer.kfile import check_input_files
@@ -112,7 +112,7 @@ def main():
         check_input_files(_, args.force)
 
     print('loading nodegraph %s.pt' % graphbase, file=sys.stderr)
-    nodegraph = khmer.load_nodegraph(graphbase)
+    nodegraph = Nodegraph.load(graphbase)
 
     # do we want to load stop tags, and do they exist?
     if args.stoptags:
@@ -140,10 +140,11 @@ def main():
 
     # now, repartition...
     print('repartitioning to find HCKs.', file=sys.stderr)
-    nodegraph.repartition_largest_partition(subset, counting,
+    nodegraph.repartition_largest_partition(counting,
                                             EXCURSION_DISTANCE,
                                             EXCURSION_KMER_THRESHOLD,
-                                            EXCURSION_KMER_COUNT_THRESHOLD)
+                                            EXCURSION_KMER_COUNT_THRESHOLD,
+                                            subs=subset)
 
     print('saving stop tags', file=sys.stderr)
     nodegraph.save_stop_tags(graphbase + '.stoptags')

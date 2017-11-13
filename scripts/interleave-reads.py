@@ -44,7 +44,6 @@ and interleave them.
 
 By default, output is sent to stdout; or use -o. Use '-h' for parameter help.
 """
-from __future__ import print_function
 
 import screed
 import sys

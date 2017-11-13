@@ -63,9 +63,9 @@ INCLUDESTRING=$(shell gcc -E -x c++ - -v < /dev/null 2>&1 >/dev/null \
 INCLUDEOPTS=$(shell gcc -E -x c++ - -v < /dev/null 2>&1 >/dev/null \
 	    | grep '^ /' | grep -v cc1plus | awk '{print "-I" $$1 " "}')
 
-PYINCLUDE=$(shell python -c "from __future__ import print_function; \
-	    import sysconfig; flags = ['-I' + sysconfig.get_path('include'), \
-	    '-I' + sysconfig.get_path('platinclude')]; print(' '.join(flags))")
+PYINCLUDE=$(shell python -c "import sysconfig; \
+            flags = ['-I' + sysconfig.get_path('include'), \
+            '-I' + sysconfig.get_path('platinclude')]; print(' '.join(flags))")
 
 CPPCHECK_SOURCES=$(filter-out lib/test%, $(wildcard lib/*.cc khmer/_khmer.cc) )
 CPPCHECK=cppcheck --enable=all \
@@ -74,7 +74,7 @@ CPPCHECK=cppcheck --enable=all \
 	 --suppress='*:*/include/python*/Python.h' \
 	 --suppress='*:/usr/*' --platform=unix64 \
 	 --std=c++11 --inline-suppr -Ilib -Ithird-party/bzip2 \
-	 -Ithird-party/zlib -Ithird-party/smhasher \
+	 -Ithird-party/zlib -Ithird-party/smhasher -Ithird-party/rollinghash \
 	 $(DEFINES) $(INCLUDEOPTS) $(PYINCLUDE) $(CPPCHECK_SOURCES) --quiet
 
 UNAME := $(shell uname)
@@ -135,7 +135,7 @@ clean: FORCE
 	rm -f $(EXTENSION_MODULE)
 	rm -f khmer/*.pyc scripts/*.pyc tests/*.pyc oxli/*.pyc \
 		sandbox/*.pyc khmer/__pycache__/* sandbox/__pycache__/* \
-		khmer/_oxli/*.cpp
+		khmer/_oxli/*.cpp khmer/_oxli/*.so
 	./setup.py clean --all || true
 	rm -f coverage-debug
 	rm -Rf .coverage coverage-gcovr.xml coverage.xml
@@ -389,6 +389,10 @@ py-demos: sharedobj
 	python examples/python-api/exact-counting.py
 	python examples/python-api/bloom.py
 	python examples/python-api/consume.py examples/c++-api/reads.fastq
+
+COMMIT ?= $(shell git rev-parse HEAD)
+docker-container:
+	cd docker && docker build --build-arg=branch=$(COMMIT) .
 
 FORCE:
 

@@ -4,7 +4,7 @@ from libcpp.queue cimport queue
 from libcpp.set cimport set
 from libcpp.string cimport string
 
-from oxli_types cimport *
+from khmer._oxli.oxli_types cimport *
 
 cdef extern from "oxli/kmer_hash.hh" namespace "oxli":
     cdef cppclass CpKmer "oxli::Kmer":

@@ -44,7 +44,6 @@ files (.1 and .2).
 
 Reads FASTQ and FASTA input, retains format for output.
 """
-from __future__ import print_function
 import sys
 import os
 import textwrap

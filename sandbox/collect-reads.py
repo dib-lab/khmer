@@ -43,8 +43,6 @@ Place reads into -o output_file.
 
 Use '-h' for parameter help.
 """
-from __future__ import division
-from __future__ import print_function
 
 import sys
 import textwrap

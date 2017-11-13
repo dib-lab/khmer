@@ -36,8 +36,6 @@
 """
 Tests for various argument-handling code.
 """
-from __future__ import print_function, unicode_literals
-from __future__ import absolute_import
 
 import sys
 import io

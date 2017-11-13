@@ -41,8 +41,6 @@ DESIRED_COVERAGE.  Output sequences will be placed in 'infile.keep'.
 
 Use '-h' for parameter help.
 """
-from __future__ import division
-from __future__ import print_function
 
 import sys
 import screed

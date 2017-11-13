@@ -42,7 +42,6 @@ Convert FASTQ files to FASTA format.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function, unicode_literals
 import sys
 import screed
 from khmer import __version__

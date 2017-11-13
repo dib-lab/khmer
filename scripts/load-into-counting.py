@@ -41,7 +41,6 @@ Build a counting Bloom filter from the given sequences, save in <countgraph>.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function, unicode_literals
 
 import json
 import os
@@ -149,7 +148,7 @@ def main():
         for _ in range(args.threads):
             cur_thrd = \
                 threading.Thread(
-                    target=countgraph.consume_seqfile_with_reads_parser,
+                    target=countgraph.consume_seqfile,
                     args=(rparser, )
                 )
             threads.append(cur_thrd)

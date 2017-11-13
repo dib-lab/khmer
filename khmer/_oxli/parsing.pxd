@@ -1,7 +1,5 @@
 # -*- coding: UTF-8 -*-
-# cython: c_string_type=unicode, c_string_encoding=utf8
 
-from __future__ import unicode_literals
 
 from libc.stdint cimport uintptr_t
 
@@ -10,7 +8,7 @@ from libcpp.memory cimport unique_ptr, shared_ptr, weak_ptr
 from libcpp.utility cimport pair
 from libcpp.string cimport string
 
-from .utils cimport oxli_raise_py_error
+from khmer._oxli.utils cimport oxli_raise_py_error
 
 
 '''

@@ -36,8 +36,6 @@
 """
 Test code for HashSet objects.
 """
-from __future__ import print_function
-from __future__ import absolute_import
 
 import khmer
 from . import khmer_tst_utils as utils
@@ -53,7 +51,7 @@ def test_bad_construct():
     try:
         hs = khmer.HashSet(5, [{}])
         assert 0, "HashSet constructor should fail w/o list of k-mers"
-    except ValueError:
+    except TypeError:
         pass
 
 
@@ -100,7 +98,7 @@ def test_update_bad():
     try:
         hs.update(x)
         assert 0, "cannot add dict to a HashSet"
-    except ValueError:
+    except TypeError:
         pass
 
 
@@ -129,6 +127,13 @@ def test_contains_1():
     assert 8 in hs
     assert 10 in hs
     assert 2**35 not in hs
+
+
+def test_contains_2():
+    hs = khmer.HashSet(5, [8, 10])
+    assert khmer.reverse_hash(8, 5) in hs
+    assert khmer.reverse_hash(10, 5) in hs
+    assert khmer.reverse_hash(2**35, 5) not in hs
 
 
 def test_concat_1():

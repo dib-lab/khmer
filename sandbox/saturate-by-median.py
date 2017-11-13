@@ -40,8 +40,6 @@ Count saturation curve for reads with a coverage of 1, but collect
 reads whether or not they have high coverage.  This is better for
 assessing saturation of (esp) low-coverage data sets.
 """
-from __future__ import division
-from __future__ import print_function
 
 import sys
 import screed

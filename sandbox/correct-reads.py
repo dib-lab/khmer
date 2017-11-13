@@ -44,7 +44,6 @@ Use -h for parameter help.
 
 TODO: add to sandbox/README.
 """
-from __future__ import print_function
 import sys
 import os
 import tempfile
@@ -54,6 +53,7 @@ import argparse
 import screed
 import khmer
 
+from khmer import Countgraph
 from khmer.khmer_args import (build_counting_args, info, add_loadgraph_args,
                               report_on_config, sanitize_help,
                               calculate_graphsize, create_countgraph)
@@ -171,7 +171,7 @@ def main():
 
     if args.loadgraph:
         print('loading k-mer countgraph from', args.loadgraph, file=sys.stderr)
-        ct = khmer.load_countgraph(args.loadgraph)
+        ct = Countgraph.load(args.loadgraph)
     else:
         print('making k-mer countgraph', file=sys.stderr)
         ct = create_countgraph(args, multiplier=8 / (9. + 0.3))

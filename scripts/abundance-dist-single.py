@@ -43,7 +43,6 @@ The script does not load a prebuilt k-mer countgraph.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
 import os
 import sys
 import csv
@@ -169,12 +168,12 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
             numbands = args.banding[0]
             bandindex = args.banding[1] - 1  # CLI is 1-based, API is 0-based
             thread = threading.Thread(
-                target=countgraph.consume_seqfile_banding_with_reads_parser,
+                target=countgraph.consume_seqfile_banding,
                 args=(rparser, numbands, bandindex, )
             )
         else:
             thread = threading.Thread(
-                target=countgraph.consume_seqfile_with_reads_parser,
+                target=countgraph.consume_seqfile,
                 args=(rparser, )
             )
         threads.append(thread)
@@ -189,7 +188,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     abundance_lists = []
 
     def __do_abundance_dist__(read_parser):
-        abundances = countgraph.abundance_distribution_with_reads_parser(
+        abundances = countgraph.abundance_distribution(
             read_parser, tracking)
         abundance_lists.append(abundances)
 

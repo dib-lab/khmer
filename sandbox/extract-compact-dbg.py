@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-from __future__ import print_function
 import khmer
 import screed
 import argparse
@@ -53,7 +52,7 @@ class Pathfinder(object):
 
 def traverse_and_mark_linear_paths(graph, nk, stop_bf, pathy, degree_nodes):
     size, conns, visited = graph.traverse_linear_path(nk, degree_nodes,
-                                                      stop_bf)
+                                                      stop_filter=stop_bf)
     if not size:
         return
 
@@ -86,6 +85,7 @@ def main():
     # if memory is a problem.
 
     graph = khmer.Nodegraph(args.ksize, args.tablesize, 2)
+    print(graph.ksize(), graph.hashsizes())
     stop_bf = khmer.Nodegraph(args.ksize, args.tablesize, 2)
     stop_bf2 = khmer.Nodegraph(args.ksize, args.tablesize, 2)
     n = 0

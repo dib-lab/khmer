@@ -44,7 +44,6 @@ Contact: khmer-project@idyll.org
 #include <fstream>
 #include <iostream>
 #include <list>
-#include <map>
 #include <queue>
 #include <set>
 #include <string>
@@ -100,7 +99,7 @@ inline bool is_prime(uint64_t n)
 inline std::vector<uint64_t> get_n_primes_near_x(uint32_t n, uint64_t x)
 {
     std::vector<uint64_t> primes;
-    if (x == 1 && n == 1) {
+    if (x == 1) {
         primes.push_back(1);
         return primes;
     }
@@ -109,7 +108,7 @@ inline std::vector<uint64_t> get_n_primes_near_x(uint32_t n, uint64_t x)
     if (i % 2 == 0) {
         i--;
     }
-    while (primes.size() != n && i > 0) {
+    while (primes.size() != n) {
         if (is_prime(i)) {
             primes.push_back(i);
         }
@@ -528,6 +527,49 @@ public:
         KmerHashIterator * ki = new MurmurKmerHashIterator(sp, _ksize);
         return unique_ptr<KmerHashIterator>(ki);
     }
+};
+
+
+class CyclicHashtable : public oxli::Hashtable
+{
+public:
+    explicit CyclicHashtable(WordLength ksize, Storage * s)
+        : Hashtable(ksize, s) { };
+
+    inline
+    virtual
+    HashIntoType
+    hash_dna(const char * kmer) const
+    {
+        if (!(strlen(kmer) >= _ksize)) {
+            throw oxli_value_exception("Supplied kmer string doesn't match the underlying k-size.");
+        }
+        return _hash_cyclic(kmer, _ksize);
+    }
+
+    inline virtual HashIntoType
+    hash_dna_top_strand(const char * kmer) const
+    {
+        throw oxli_value_exception("not implemented");
+    }
+
+    inline virtual HashIntoType
+    hash_dna_bottom_strand(const char * kmer) const
+    {
+        throw oxli_value_exception("not implemented");
+    }
+
+    inline virtual std::string
+    unhash_dna(HashIntoType hashval) const
+    {
+        throw oxli_value_exception("not implemented");
+    }
+
+    virtual KmerHashIteratorPtr new_kmer_iterator(const char * sp) const
+    {
+        KmerHashIterator * ki = new RollingHashKmerIterator(sp, _ksize);
+        return unique_ptr<KmerHashIterator>(ki);
+    }
 
     virtual void save(std::string filename)
     {
@@ -540,12 +582,20 @@ public:
     }
 };
 
+
 // Hashtable-derived class with ByteStorage.
 class Counttable : public oxli::MurmurHashtable
 {
 public:
     explicit Counttable(WordLength ksize, std::vector<uint64_t> sizes)
         : MurmurHashtable(ksize, new ByteStorage(sizes)) { } ;
+};
+
+class CyclicCounttable : public oxli::CyclicHashtable
+{
+public:
+    explicit CyclicCounttable(WordLength ksize, std::vector<uint64_t> sizes)
+        : CyclicHashtable(ksize, new ByteStorage(sizes)) { } ;
 };
 
 // Hashtable-derived class with NibbleStorage.
@@ -557,11 +607,11 @@ public:
 };
 
 // Hashtable-derived class with QFStorage.
-class QFCounttable : public oxli::Hashtable
+class QFCounttable : public oxli::MurmurHashtable
 {
 public:
     explicit QFCounttable(WordLength ksize, int size)
-        : Hashtable(ksize, new QFStorage(size)) { } ;
+        : MurmurHashtable(ksize, new QFStorage(size)) { } ;
 };
 
 // Hashtable-derived class with BitStorage.
