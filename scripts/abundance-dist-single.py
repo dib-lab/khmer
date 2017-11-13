@@ -84,13 +84,15 @@ def get_parser():
                         'output histogram file. The columns are: (1) k-mer '
                         'abundance, (2) k-mer count, (3) cumulative count, '
                         '(4) fraction of total distinct k-mers.')
-    parser.add_argument('-H', '--hash-function', choices=['2bit', 'murmur'],
-                        default='2bit', help='Indicate the hash function to '
-                        'be used; "2bit" is faster, is reversible, and '
-                        'supports subsequent graph operations, but is limited '
-                        'to k <= 32; "murmur" supports arbitrarily large '
-                        'values of k and is compatible with k-mer banding, '
-                        'but is slower and does not support graph operations')
+    parser.add_argument('-H', '--hash-function', choices=['2bit', 'murmur',
+                        'cyclic'], default='2bit', help='Indicate the hash '
+                        'function to be used; "2bit" is faster, is reversible,'
+                        ' and supports subsequent graph operations, but is '
+                        'limited to k <= 32; "murmur" supports arbitrarily '
+                        'large values of k and is compatible with k-mer '
+                        'banding, but is slower and does not support graph '
+                        'operations; "cyclic" is fast and supports banding, '
+                        'but does not support graph operations')
     parser.add_argument('-z', '--no-zero', dest='output_zero', default=True,
                         action='store_false',
                         help='Do not output zero-count bins')
@@ -122,7 +124,7 @@ def get_parser():
 def main():  # pylint: disable=too-many-locals,too-many-branches
     args = sanitize_help(get_parser()).parse_args()
     graph_type = 'smallcountgraph' if args.small_count else 'countgraph'
-    if args.banding and args.hash_function != 'murmur':
+    if args.banding and args.hash_function == '2bit':
         message = 'can only process in "banding" mode with "murmur" hash'
         raise ValueError(message)
 

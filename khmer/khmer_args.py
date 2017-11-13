@@ -51,7 +51,7 @@ import screed
 import khmer
 from khmer import extract_countgraph_info
 from khmer import Nodegraph, Countgraph, SmallCountgraph
-from khmer import Nodetable, Counttable, SmallCounttable
+from khmer import Nodetable, Counttable, CyclicCounttable, SmallCounttable
 from khmer import __version__
 from .utils import print_error
 from .khmer_logger import log_info, log_warn, configure_logging
@@ -563,6 +563,7 @@ def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
         sys.exit(1)
 
     dotable = hasattr(args, 'hash_function') and args.hash_function == 'murmur'
+    docyclic = hasattr(args, 'hash_function') and args.hash_function == 'cyclic'
     if args.small_count:
         tablesize = calculate_graphsize(args, 'smallcountgraph',
                                         multiplier=multiplier)
@@ -571,7 +572,11 @@ def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
     else:
         tablesize = calculate_graphsize(args, 'countgraph',
                                         multiplier=multiplier)
-        constructor = Counttable if dotable else Countgraph
+        constructor = Countgraph
+        if dotable:
+            constructor = Counttable
+        elif docyclic:
+            constructor = CyclicCounttable
         cg = constructor(ksize, tablesize, args.n_tables)
         if hasattr(args, 'bigcount'):
             cg.set_use_bigcount(args.bigcount)
