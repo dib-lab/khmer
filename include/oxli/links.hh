@@ -198,6 +198,14 @@ public:
                             compact_edge_meta_t edge_meta,
                             std::string edge_sequence) {
         CompactEdge* edge = new CompactEdge(left_id, right_id, edge_meta);
+        if (edge_meta == IS_TIP) {
+            if (left_id == NULL_ID) {
+                edge_sequence = edge_sequence.substr(0, edge_sequence.length() - 1);
+            }
+            if (right_id == NULL_ID) {
+                edge_sequence = edge_sequence.substr(1);
+            }
+        }
         pdebug("new compact edge: \n left=" << std::to_string(left_id) 
                 << std::endl << " right=" << std::to_string(right_id)
                 << std::endl << " sequence   =" << edge_sequence
@@ -879,16 +887,18 @@ public:
                 //              segment_seq.substr(_ksize);
 
                 // construct the compact edge
-                compact_edge_meta_t edge_meta = (left_node == nullptr) ?
-                                                  IS_TIP : IS_FULL_EDGE;
+                compact_edge_meta_t edge_meta = (left_node == nullptr) 
+                                                ? IS_TIP : IS_FULL_EDGE;
+                edge_meta = (segment_seq.length() == ksize())
+                            ? IS_TRIVIAL : edge_meta;
 
-                if (edge_meta == IS_FULL_EDGE) {
+                if (edge_meta == IS_FULL_EDGE || edge_meta == IS_TRIVIAL) {
                     // left side includes HDN, right side does not
 
                     segment_edge = edges.build_edge(left_node->node_id, 
                                                     root_node->node_id,
                                                     edge_meta, 
-                                                    segment_seq.substr(1));
+                                                    segment_seq);
                     nodes.add_edge_from_right(left_node, segment_edge);
                 } else {
                     segment_edge = edges.build_edge(NULL_ID, 
@@ -959,12 +969,14 @@ public:
                 pdebug("segment sequence length=" << segment_seq.length());
                 compact_edge_meta_t edge_meta = (right_node == nullptr) ?
                                                   IS_TIP : IS_FULL_EDGE;
+                edge_meta = (segment_seq.length() == ksize())
+                            ? IS_TRIVIAL : edge_meta;
 
                 if (edge_meta == IS_FULL_EDGE) {
                     segment_edge = edges.build_edge(root_node->node_id, 
                                                     right_node->node_id,
                                                     edge_meta, 
-                                                    segment_seq.substr(0, segment_seq.length()-1));
+                                                    segment_seq);
                     nodes.add_edge_from_left(right_node, segment_edge);
                 } else {
                     segment_edge = edges.build_edge(root_node->node_id,
