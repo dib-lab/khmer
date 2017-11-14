@@ -100,6 +100,8 @@ def get_parser():
                         help='Override sanity checks')
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
+    parser.add_argument('--filter', metavar='NT', help='only track abundance '
+                        'of k-mers in the given nodetable')
     return parser
 
 
@@ -139,17 +141,28 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     log_info('k-mer countgraph sizes: {sizes}', sizes=countgraph.hashsizes())
     log_info('outputting to {output}', output=args.output_histogram_filename)
 
+    if args.filter:
+        filt = khmer.Nodetable.load(args.filter)
+
     # start loading
     rparser = khmer.ReadParser(args.input_sequence_filename)
     threads = []
     log_info('consuming input, round 1 -- {input}',
              input=args.input_sequence_filename)
     for _ in range(args.threads):
-        thread = \
-            threading.Thread(
-                target=countgraph.consume_seqfile,
-                args=(rparser, )
-            )
+        if args.filter:
+            thread = \
+                threading.Thread(
+                    target=countgraph.consume_seqfile_with_mask,
+                    args=(rparser, filt, ),
+                    kwargs={'threshold': 1, 'complement': True},
+                )
+        else:
+            thread = \
+                threading.Thread(
+                    target=countgraph.consume_seqfile,
+                    args=(rparser, )
+                )
         threads.append(thread)
         thread.start()
 
