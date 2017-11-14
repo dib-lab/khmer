@@ -137,15 +137,25 @@ def test_compact_tip_x_merge(left_tip_structure, right_tip_structure):
     
     compactor = StreamingCompactor(graph)
     compactor.consume(str(tip_l))
-    print(compactor.consume_and_update(contig_l), 'cDBG updates from left')
+    print(compactor.consume_and_update(contig_l),
+          'cDBG updates from left')
     compactor.report()
     compare_tip_with_cdbg(left_tip_structure, compactor)
     assert compactor.n_nodes == 1
     assert compactor.n_edges == 3
 
     compactor.consume(str(tip_r))
-    print(compactor.consume_and_update(contig_merge), 'cDBG updates from right merge')
+    print(compactor.consume_and_update(contig_merge), 
+          'cDBG updates from right merge')
     compactor.report()
-    #compare_tip_with_cdbg(right_tip_structure, compactor)
+    compare_tip_with_cdbg(right_tip_structure, compactor)
     assert compactor.n_nodes == 2
     assert compactor.n_edges == 5
+
+
+def test_flanking_hdns():
+    pass
+
+
+def test_compact_tip_split_merge():
+    pass
