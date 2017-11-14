@@ -239,14 +239,15 @@ cdef class Hashtable:
         return total_reads, n_consumed
 
     def consume_seqfile_with_mask(self, object parser_or_filename,
-                                  Hashtable mask, int threshold=0):
+                                  Hashtable mask, int threshold=0,
+                                  bool complement=False):
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
         cdef FastxParserPtr _parser = self._get_parser(parser_or_filename)
         cdef CpHashtable * cmask = mask._ht_this.get()
         with nogil:
             deref(self._ht_this).consume_seqfile_with_mask[CpFastxReader](\
-                _parser, cmask, threshold, total_reads, n_consumed
+                _parser, cmask, threshold, total_reads, n_consumed, complement
             )
         return total_reads, n_consumed
 
@@ -264,7 +265,8 @@ cdef class Hashtable:
 
     def consume_seqfile_banding_with_mask(self, object parser_or_filename,
                                           int num_bands, int band,
-                                          Hashtable mask, int threshold=0):
+                                          Hashtable mask, int threshold=0,
+                                          bool complement=False):
         cdef unsigned long long n_consumed = 0
         cdef unsigned int total_reads = 0
         cdef FastxParserPtr _parser = self._get_parser(parser_or_filename)
@@ -273,7 +275,7 @@ cdef class Hashtable:
             deref(self._ht_this).\
                 consume_seqfile_banding_with_mask[CpFastxReader](\
                     _parser, num_bands, band, cmask, threshold, total_reads,
-                    n_consumed
+                    n_consumed, complement
                 )
         return total_reads, n_consumed
 
