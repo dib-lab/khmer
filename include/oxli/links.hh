@@ -197,15 +197,9 @@ public:
     CompactEdge* build_edge(uint64_t left_id, uint64_t right_id,
                             compact_edge_meta_t edge_meta,
                             std::string edge_sequence) {
+
         CompactEdge* edge = new CompactEdge(left_id, right_id, edge_meta);
-        if (edge_meta == IS_TIP) {
-            if (left_id == NULL_ID) {
-                edge_sequence = edge_sequence.substr(0, edge_sequence.length() - 1);
-            }
-            if (right_id == NULL_ID) {
-                edge_sequence = edge_sequence.substr(1);
-            }
-        }
+
         pdebug("new compact edge: \n left=" << std::to_string(left_id) 
                 << std::endl << " right=" << std::to_string(right_id)
                 << std::endl << " sequence   =" << edge_sequence
@@ -516,13 +510,13 @@ public:
     }
 
     bool get_pivot_from_left(CompactNode* v,
-                                   std::string& sequence,
-                                   char& pivot_base) const {
+                             std::string& sequence,
+                             char& pivot_base) const {
         const char * node_kmer = v->sequence.c_str();
         const char * _segment = sequence.c_str();
-        pivot_base = _segment[sequence.size()-_ksize];
+        pivot_base = _segment[sequence.size()-_ksize-1];
         if (strncmp(node_kmer, 
-                    _segment+(sequence.size())-_ksize+1, 
+                    _segment+(sequence.size())-_ksize, 
                     _ksize-1) == 0) {
             // same canonical orientation
             return false;
@@ -567,8 +561,8 @@ public:
                               char& pivot_base) const {
         const char * node_kmer = v->sequence.c_str();
         const char * _segment = sequence.c_str();
-        pivot_base = _segment[_ksize-1];
-        if (strncmp(node_kmer+1, _segment, _ksize-1) == 0) {
+        pivot_base = _segment[_ksize];
+        if (strncmp(node_kmer+1, _segment+1, _ksize-1) == 0) {
             // same canonical orientation
             return false;
         } else {
@@ -818,6 +812,10 @@ public:
         KmerQueue neighbors;
         while(!induced_hdns.empty()) {
             Kmer root_kmer = *induced_hdns.begin();
+            std::string root_kmer_seq = root_kmer.get_string_rep(_ksize);
+            char root_front = root_kmer_seq.front();
+            char root_back = root_kmer_seq.back();
+
             induced_hdns.erase(root_kmer);
 
             CompactNode* root_node = nodes.get_node_by_kmer(root_kmer);
@@ -835,7 +833,8 @@ public:
                 bool found_tag = false;
 
                 lcursor.push_filter(edges.get_tag_stopper(tag_pair, found_tag));
-                std::string segment_seq = cassem._assemble_directed(lcursor);
+                std::string segment_seq = cassem._assemble_directed(lcursor)
+                                          + root_back;
 
                 // first check for a segment going this direction from root
                 CompactEdge* segment_edge = nullptr;
@@ -889,7 +888,7 @@ public:
                 // construct the compact edge
                 compact_edge_meta_t edge_meta = (left_node == nullptr) 
                                                 ? IS_TIP : IS_FULL_EDGE;
-                edge_meta = (segment_seq.length() == ksize())
+                edge_meta = (segment_seq.length() == _ksize)
                             ? IS_TRIVIAL : edge_meta;
 
                 if (edge_meta == IS_FULL_EDGE || edge_meta == IS_TRIVIAL) {
@@ -924,7 +923,7 @@ public:
                 bool found_tag = false;
 
                 rcursor.push_filter(edges.get_tag_stopper(tag_pair, found_tag));
-                std::string segment_seq = cassem._assemble_directed(rcursor);
+                std::string segment_seq = root_front + cassem._assemble_directed(rcursor);
 
                 // first check for a segment going this direction from root
                 CompactEdge* segment_edge = nullptr;
@@ -969,7 +968,7 @@ public:
                 pdebug("segment sequence length=" << segment_seq.length());
                 compact_edge_meta_t edge_meta = (right_node == nullptr) ?
                                                   IS_TIP : IS_FULL_EDGE;
-                edge_meta = (segment_seq.length() == ksize())
+                edge_meta = (segment_seq.length() == _ksize)
                             ? IS_TRIVIAL : edge_meta;
 
                 if (edge_meta == IS_FULL_EDGE) {
