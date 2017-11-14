@@ -888,7 +888,7 @@ public:
                 // construct the compact edge
                 compact_edge_meta_t edge_meta = (left_node == nullptr) 
                                                 ? IS_TIP : IS_FULL_EDGE;
-                edge_meta = (segment_seq.length() == _ksize)
+                edge_meta = (segment_seq.length() == _ksize + 1)
                             ? IS_TRIVIAL : edge_meta;
 
                 if (edge_meta == IS_FULL_EDGE || edge_meta == IS_TRIVIAL) {
@@ -968,7 +968,7 @@ public:
                 pdebug("segment sequence length=" << segment_seq.length());
                 compact_edge_meta_t edge_meta = (right_node == nullptr) ?
                                                   IS_TIP : IS_FULL_EDGE;
-                edge_meta = (segment_seq.length() == _ksize)
+                edge_meta = (segment_seq.length() == _ksize + 1)
                             ? IS_TRIVIAL : edge_meta;
 
                 if (edge_meta == IS_FULL_EDGE) {
