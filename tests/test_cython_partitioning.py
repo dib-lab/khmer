@@ -11,7 +11,7 @@ from khmer.khmer_args import estimate_optimal_with_K_and_f as optimal_fp
 from khmer import reverse_complement as revcomp
 from khmer import reverse_hash as revhash
 from . import khmer_tst_utils as utils
-from .graph_stucture_fixtures import *
+from .graph_structure_fixtures import *
 
 import pytest
 import screed
@@ -46,20 +46,20 @@ class TestStreamingPartitionerBasic:
         # real memory leaks.
         gc.collect()
 
-    def test_one_component(self, known_sequence):
+    def test_one_component(self, ksize, known_sequence):
         inpath = utils.get_test_data('random-20-a.fa')
 
-        cg = khmer.Countgraph(K, 1e5, 4)
+        cg = khmer.Countgraph(ksize, 1e5, 4)
         sp = StreamingPartitioner(cg)
         sp.consume(known_sequence)
 
         assert sp.n_components == 1
 
-    def test_two_components(self, random_sequence):
+    def test_two_components(self, ksize, random_sequence):
         comp1 = random_sequence()
         comp2 = random_sequence(exclude=comp1)
 
-        cg = khmer.Nodegraph(K, 1e5, 4)
+        cg = khmer.Nodegraph(ksize, 1e5, 4)
         sp = StreamingPartitioner(cg)
         
         sp.consume(comp1)
@@ -68,11 +68,11 @@ class TestStreamingPartitionerBasic:
         sp.consume(comp2)
         assert sp.n_components == 2
 
-    def test_components_iter(self, random_sequence):
+    def test_components_iter(self, ksize, random_sequence):
         comp1 = random_sequence()
         comp2 = random_sequence(exclude=comp1)
 
-        cg = khmer.Nodegraph(K, 1e5, 4)
+        cg = khmer.Nodegraph(ksize, 1e5, 4)
         sp = StreamingPartitioner(cg)
         
         sp.consume(comp1)
@@ -82,22 +82,22 @@ class TestStreamingPartitionerBasic:
         comps = list(sp.components())
         assert len(comps) == 2
 
-    def test_component_n_tags(self, random_sequence):
+    def test_component_n_tags(self, ksize, random_sequence):
         seq = random_sequence()
 
-        cg = khmer.Nodegraph(K, 1e5, 4)
+        cg = khmer.Nodegraph(ksize, 1e5, 4)
         sp = StreamingPartitioner(cg)
         sp.consume(seq)
 
         tags = [t for t,c in sp.tag_components()]
-        comp = sp.find_nearest_component(seq[:K])
+        comp = sp.find_nearest_component(seq[:ksize])
         assert len(tags) == len(comp)
 
-    def test_tag_components_iter(self, random_sequence):
+    def test_tag_components_iter(self, ksize, random_sequence):
         comp1 = random_sequence()
         comp2 = random_sequence(exclude=comp1)
 
-        cg = khmer.Nodegraph(K, 1e5, 4)
+        cg = khmer.Nodegraph(ksize, 1e5, 4)
         sp = StreamingPartitioner(cg)
         
         sp.consume(comp1)
@@ -114,33 +114,33 @@ class TestStreamingPartitionerBasic:
         assert len(comps) == 2
         assert len(tags) == sum([len(c) for c in comps])
 
-    def test_find_nearest_component(self, random_sequence):
+    def test_find_nearest_component(self, ksize, random_sequence):
         seq1 =  random_sequence()
         seq2 = random_sequence(exclude=seq1)
 
-        cg = khmer.Nodegraph(K, 1e5, 4)
+        cg = khmer.Nodegraph(ksize, 1e5, 4)
         sp = StreamingPartitioner(cg)
         
         sp.consume(seq1)
         sp.consume(seq2)
 
-        c1 = sp.find_nearest_component(seq1[:K])
-        c2 = sp.find_nearest_component(seq2[:K])
+        c1 = sp.find_nearest_component(seq1[:ksize])
+        c2 = sp.find_nearest_component(seq2[:ksize])
         assert c1.component_id != c2.component_id
 
         for tag in c1:
-            assert utils._contains_rc(seq1, revhash(tag, K))
-            assert not utils._contains_rc(seq2, revhash(tag, K))
+            assert utils._contains_rc(seq1, revhash(tag, ksize))
+            assert not utils._contains_rc(seq2, revhash(tag, ksize))
 
         for tag in c2:
-            assert utils._contains_rc(seq2, revhash(tag, K))
-            assert not utils._contains_rc(seq1, revhash(tag, K))
+            assert utils._contains_rc(seq2, revhash(tag, ksize))
+            assert not utils._contains_rc(seq1, revhash(tag, ksize))
 
-    def test_merge_components(self, random_sequence):
+    def test_merge_components(self, ksize, random_sequence):
         seq1 = random_sequence()
         seq2 = random_sequence(exclude=seq1)
 
-        cg = khmer.Nodegraph(K, 1e5, 4)
+        cg = khmer.Nodegraph(ksize, 1e5, 4)
         sp = StreamingPartitioner(cg)
         
         sp.consume(seq1)
@@ -154,12 +154,12 @@ class TestStreamingPartitionerBasic:
         assert len(comps) == 1
 
 
-    def test_multi_merge_components(self, random_sequence):
+    def test_multi_merge_components(self, ksize, random_sequence):
         seq1 = random_sequence()
         seq2 = random_sequence(exclude=seq1)
         seq3 = random_sequence(exclude=seq1+seq2)
 
-        cg = khmer.Nodegraph(K, 1e5, 4)
+        cg = khmer.Nodegraph(ksize, 1e5, 4)
         sp = StreamingPartitioner(cg)
         
         sp.consume(seq1)
@@ -170,69 +170,72 @@ class TestStreamingPartitionerBasic:
         sp.consume(seq1 + seq2 + seq3)
         assert sp.n_components == 1
 
-    def test_nomerge_k_minus_2_overlap(self, single_component, random_sequence):
+    def test_nomerge_k_minus_2_overlap(self, ksize, single_component, 
+                                       random_sequence):
         '''Test that components are not merged when they have a length K-2 overlap.
         '''
 
         graph, partitioner, seq = single_component
         asm = khmer.LinearAssembler(graph)
-        first = seq[:K-2]
+        first = seq[:ksize-2]
         neighbor = random_sequence(exclude=seq) + first
 
         assert partitioner.n_components == 1
         partitioner.consume(neighbor)
-        print(seq, neighbor, asm.assemble(seq[:K]), sep='\n')
+        print(seq, neighbor, asm.assemble(seq[:ksize]), sep='\n')
         assert partitioner.n_components == 2
 
     @pytest.mark.parametrize("where", ["beginning", "end"])
-    def test_merge_k_minus_1_overlap(self, single_component, random_sequence,
-                                     where):
+    def test_merge_k_minus_1_overlap(self, single_component, ksize, 
+                                     random_sequence, where):
         '''Test that components are merged when they have a length K-1 overlap.
         '''
 
         graph, partitioner, seq = single_component
         asm = khmer.LinearAssembler(graph)
         if where == "beginning":
-            overlap = seq[:K-1]
+            overlap = seq[:ksize-1]
             neighbor = random_sequence(exclude=seq) + overlap
         else:
-            overlap = seq[-K+1:]
+            overlap = seq[-ksize+1:]
             neighbor = overlap + random_sequence(exclude=seq)
 
         assert partitioner.n_components == 1
         partitioner.consume(neighbor)
-        path = asm.assemble(seq[:K])
+        path = asm.assemble(seq[:ksize])
         assert partitioner.n_components == 1
 
-    def test_merge_k_overlap(self, single_component, random_sequence):
+    def test_merge_k_overlap(self, single_component, 
+                             random_sequence, ksize):
         '''Test that components are merged when they have a length K overlap.
         '''
 
         graph, partitioner, seq = single_component
         asm = khmer.LinearAssembler(graph)
-        first = seq[:K]
+        first = seq[:ksize]
         neighbor = random_sequence(exclude=seq) + first
 
         assert partitioner.n_components == 1
         partitioner.consume(neighbor)
-        print(seq, neighbor, asm.assemble(seq[:K]), sep='\n')
+        print(seq, neighbor, asm.assemble(seq[:ksize]), sep='\n')
         assert partitioner.n_components == 1
         
 
-    @pytest.mark.parametrize("n_reads", list(range(100, 1001, 100)))
-    def test_one_component_from_reads(self, random_sequence, n_reads):
+    @pytest.mark.parametrize("n_reads", [100, 500, 1000])
+    def test_one_component_from_reads(self, random_sequence, ksize, n_reads):
         seq = random_sequence()
-        seq_reads = list(reads(seq, dbg_cover=True, N=n_reads))
+        seq_reads = list(reads(seq, ksize, dbg_cover=True, N=n_reads))
 
-        G = khmer.Nodegraph(K, 1e6, 4)
+        G = khmer.Nodegraph(ksize, 1e6, 4)
         sp = StreamingPartitioner(G)
         for read in seq_reads:
             sp.consume(read)
 
         assert sp.n_components == 1
 
-    @pytest.mark.parametrize("n_components", list(range(1, 10)))
-    def test_streaming_multicomponents(self, random_sequence, n_components):
+    @pytest.mark.parametrize("n_components", [3, 5, 10])
+    def test_streaming_multicomponents(self, random_sequence, 
+                                       ksize, n_components):
         '''Test with many components from reads, and check for memory leaks.'''
         seqs = []
         for _ in range(n_components):
@@ -240,14 +243,14 @@ class TestStreamingPartitionerBasic:
 
         seq_reads = []
         for seq in seqs:
-            seq_reads.extend(list(reads(seq, dbg_cover=True, N=100)))
+            seq_reads.extend(list(reads(seq, ksize, dbg_cover=True, N=100)))
         random.shuffle(seq_reads)
 
-        G = khmer.Nodegraph(K, 1e6, 4)
+        G = khmer.Nodegraph(ksize, 1e6, 4)
         sp = StreamingPartitioner(G)
 
         for read in seq_reads:
-            assert len(read) >= K
+            assert len(read) >= ksize
             sp.consume(read)
         assert sp.n_components == n_components
 
@@ -257,14 +260,15 @@ class TestStreamingPartitionerBasic:
         #assert sp.n_components == (comp._n_created - comp._n_destroyed)
         assert sp.n_consumed == len(seq_reads)
 
-    @pytest.mark.parametrize("n_components", list(range(1,101, 20)))
+    @pytest.mark.parametrize("n_components", [3, 5, 10])
     @pytest.mark.parametrize("cov", [1,10,20])
-    def test_write_components(self, random_sequence, cov, n_components, tmpdir):
+    def test_write_components(self, random_sequence, cov, 
+                              ksize, n_components, tmpdir):
         outfn = tmpdir.join('counts.csv')
         seqs = []
         for _ in range(n_components):
             seqs.append(random_sequence(exclude=''.join(seqs)))
-        G = khmer.Countgraph(K, 1e6, 4)
+        G = khmer.Countgraph(ksize, 1e6, 4)
         sp = StreamingPartitioner(G)
 
         for seq in seqs:
@@ -281,14 +285,15 @@ class TestStreamingPartitionerBasic:
         for row in results:
             assert abs(float(row[2])-float(cov)) < 2
 
-    @pytest.mark.parametrize("n_components", [1, 10, 50, 100])
-    def test_save_partitioner(self, random_sequence, n_components, tmpdir):
+    @pytest.mark.parametrize("n_components", [1, 3, 5, 10])
+    def test_save_partitioner(self, random_sequence, ksize,
+                              n_components, tmpdir):
         import json
         out_prefix = str(tmpdir.join('test_save'))
         seqs = []
         for _ in range(n_components):
             seqs.append(random_sequence(exclude=''.join(seqs)))
-        G = khmer.Countgraph(K, 1e6, 4)
+        G = khmer.Countgraph(ksize, 1e6, 4)
         sp = StreamingPartitioner(G)
         for seq in seqs:
             sp.consume(seq)
@@ -308,14 +313,16 @@ class TestStreamingPartitionerBasic:
         for comp in sp.components():
             assert comp.component_id in result_comps
 
-    @pytest.mark.parametrize("n_components", [1, 10, 50, 100])
-    def test_load_partitioner(self, random_sequence, n_components, tmpdir):
+    @pytest.mark.xfail
+    @pytest.mark.parametrize("n_components", [1, 3, 5, 10])
+    def test_load_partitioner(self, random_sequence, ksize,
+                              n_components, tmpdir):
         import json
         out_prefix = str(tmpdir.join('test_save'))
         seqs = []
         for _ in range(n_components):
             seqs.append(random_sequence(exclude=''.join(seqs)))
-        G = khmer.Countgraph(K, 1e6, 4)
+        G = khmer.Countgraph(ksize, 1e6, 4)
         sp = StreamingPartitioner(G)
         for seq in seqs:
             sp.consume(seq)
@@ -342,21 +349,21 @@ class TestStreamingPartitionerPaired:
         # real memory leaks.
         gc.collect()
 
-    def test_one_paired_component(self, random_sequence):
+    def test_one_paired_component(self, ksize, random_sequence):
         first = random_sequence()
         second = random_sequence(exclude=first)
 
-        cg = khmer.Countgraph(K, 1e5, 4)
+        cg = khmer.Countgraph(ksize, 1e5, 4)
         sp = StreamingPartitioner(cg)
         sp.consume_pair(first, second)
 
         assert sp.n_components == 1
 
-    def test_two_paired_components_merge(self, random_sequence):
+    def test_two_paired_components_merge(self, ksize, random_sequence):
         comp1 = random_sequence()
         comp2 = random_sequence(exclude=comp1)
 
-        cg = khmer.Nodegraph(K, 1e5, 4)
+        cg = khmer.Nodegraph(ksize, 1e5, 4)
         sp = StreamingPartitioner(cg)
         
         sp.consume(comp1)
@@ -368,12 +375,12 @@ class TestStreamingPartitionerPaired:
         sp.consume_pair(comp1, comp2)
         assert sp.n_components == 1
 
-    def test_multi_paired_components_merge(self, random_sequence):
+    def test_multi_paired_components_merge(self, ksize, random_sequence):
         seq1 = random_sequence()
         seq2 = random_sequence(exclude=seq1)
         seq3 = random_sequence(exclude=seq1+seq2)
 
-        cg = khmer.Nodegraph(K, 1e5, 4)
+        cg = khmer.Nodegraph(ksize, 1e5, 4)
         sp = StreamingPartitioner(cg)
         
         sp.consume(seq1)
