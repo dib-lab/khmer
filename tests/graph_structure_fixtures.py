@@ -52,7 +52,7 @@ import screed
 # We just define this globally rather than in a module-level fixture,
 # as we need it during parameterization and whatnot.
 
-def set_ksize(K=21):
+def using_ksize(K=21):
     def wrap(func):
         setattr(func, '_ksize', K)
         return func
@@ -70,12 +70,12 @@ def test_ksize(ksize):
     assert ksize == 21
 
 
-@set_ksize(31)
+@using_ksize(31)
 def test_ksize_override(ksize):
     assert ksize == 31
 
 
-@set_ksize([25, 29])
+@using_ksize([25, 29])
 def test_ksize_override_param(ksize):
     print('ksize is', ksize)
     assert ksize in [25, 29]
@@ -183,7 +183,7 @@ def kmers(sequence, K):
         yield sequence[i:i + K]
 
 
-@set_ksize([5, 7])
+@using_ksize([5, 7])
 def test_kmers(ksize):
     S = 'A' * ksize + 'T'
     res = list(kmers(S, ksize))
