@@ -51,7 +51,36 @@ import screed
 
 # We just define this globally rather than in a module-level fixture,
 # as we need it during parameterization and whatnot.
-K = 21
+
+def set_ksize(K=21):
+    def wrap(func):
+        setattr(func, 'ksize', K)
+        return func
+    return wrap
+
+
+@pytest.fixture
+def ksize(request):
+    print('ksize:', request.param)
+    return request.param
+
+def test_ksize(ksize):
+    assert ksize == 21
+
+
+@set_ksize(31)
+def test_ksize_override(ksize):
+    assert ksize == 31
+
+
+@set_ksize([21, 25, 29])
+def test_ksize_override_param(ksize):
+    assert ksize in [21, 25, 29]
+
+
+@pytest.fixture(params=[2, -2], ids=['Start', 'End'])
+def flank_coords(request, ksize):
+    return (request.param * ksize) + request.param
 
 
 class Kmer(str):
@@ -60,8 +89,6 @@ class Kmer(str):
         self.pos = pos
 
     def __new__(cls, value, pos=0):
-        if not len(value) == K:
-            raise ValueError('bad k-mer length')
         return str.__new__(cls, value)
 
     def __repr__(self):
@@ -93,7 +120,7 @@ def mutate_position(sequence, pos):
     return ''.join(sequence)
 
 
-def get_random_sequence(length, exclude=None, seen=None):
+def get_random_sequence(length, ksize, exclude=None, seen=None):
     '''Generate a random (non-looping) nucleotide sequence.
 
     To be non-overlapping, the sequence should not include any repeated
@@ -114,16 +141,16 @@ def get_random_sequence(length, exclude=None, seen=None):
         seen.add(revcomp(kmer))
 
     if exclude is not None:
-        for pos in range(0, len(exclude) - K):
-            add_seen(exclude[pos:pos + K - 1])
+        for pos in range(0, len(exclude) - ksize):
+            add_seen(exclude[pos:pos + ksize - 1])
 
-    seq = [random.choice('ACGT') for _ in range(K - 1)]  # do first K-1 bases
+    seq = [random.choice('ACGT') for _ in range(ksize - 1)]  # do first K-1 bases
     add_seen(''.join(seq))
 
     while(len(seq) < length):
         next_base = random.choice('ACGT')
-        next_kmer = ''.join(seq[-K + 2:] + [next_base])
-        assert len(next_kmer) == K - 1
+        next_kmer = ''.join(seq[-ksize + 2:] + [next_base])
+        assert len(next_kmer) == ksize - 1
         if (next_kmer) not in seen:
             seq.append(next_base)
             add_seen(next_kmer)
@@ -132,12 +159,12 @@ def get_random_sequence(length, exclude=None, seen=None):
     return ''.join(seq)
 
 
-def reads(sequence, L=100, N=100, dbg_cover=False):
+def reads(sequence, ksize, L=100, N=100, dbg_cover=False):
     positions = list(range(len(sequence) - L))
     if dbg_cover is True:
-        for start in range(0, len(sequence), K):
+        for start in range(0, len(sequence), ksize):
             read = sequence[start:start + L]
-            if len(read) < K:
+            if len(read) < ksize:
                 read = sequence[-L:]
             yield read
             N -= 1
@@ -148,10 +175,17 @@ def reads(sequence, L=100, N=100, dbg_cover=False):
         yield sequence[start:start + L]
 
 
-def kmers(sequence):
+def kmers(sequence, K=21):
     for i in range(len(sequence) - K + 1):
         yield sequence[i:i + K]
 
+
+@set_ksize([5, 7])
+def test_kmers(ksize):
+    S = 'A' * ksize + 'T'
+    res = list(kmers(S, ksize))
+    assert res[0] == 'A' * ksize
+    assert res[-1] == ('A' * (ksize - 1)) + 'T'
 
 def test_mutate_sequence():
     for _ in range(100):
@@ -168,14 +202,14 @@ def test_mutate_position():
     assert mutate_position('GGGG', 2) in ['GGAG', 'GGTG']
 
 
-def test_reads():
+def test_reads(ksize):
     contigfile = utils.get_test_data('simple-genome.fa')
     contig = list(screed.open(contigfile))[0].sequence
 
-    for read in reads(contig):
+    for read in reads(contig, ksize):
         assert read in contig
 
-    for read in reads(contig):
+    for read in reads(contig, ksize):
         assert mutate_sequence(read) not in contig
 
 
@@ -206,16 +240,17 @@ def known_sequence(request):
 
 @pytest.fixture(params=list(range(500, 1600, 500)),
                 ids=lambda val: '(L={0})'.format(val))
-def random_sequence(request):
+def random_sequence(request, ksize):
     global_seen = set()
 
     def get(exclude=None):
         sequence = get_random_sequence(request.param, 
+                                       ksize,
                                        exclude=exclude,
                                        seen=global_seen)
-        for i in range(len(sequence)-K):
-            global_seen.add(sequence[i:i+K-1])
-            global_seen.add(revcomp(sequence[i:i+K-1]))
+        for i in range(len(sequence)-ksize):
+            global_seen.add(sequence[i:i+ksize-1])
+            global_seen.add(revcomp(sequence[i:i+ksize-1]))
         return sequence
 
     return get
@@ -223,14 +258,14 @@ def random_sequence(request):
 
 @pytest.fixture(params=[khmer.Nodegraph, khmer.Countgraph],
                 ids=['(Type=Nodegraph)', '(Type=Countgraph)'])
-def graph(request):
+def graph(request, ksize):
 
     num_kmers = 50000
     des_fp = 0.00001
     args = optimal_fp(num_kmers, des_fp)
     print('Graph Params:', args)
 
-    return request.param(K, args.htable_size, args.num_htables)
+    return request.param(ksize, args.htable_size, args.num_htables)
 
 
 def hdn_counts(sequence, graph):
@@ -247,7 +282,7 @@ def hdn_counts(sequence, graph):
 
 
 @pytest.fixture
-def linear_structure(request, graph, random_sequence):
+def linear_structure(request, graph, ksize, random_sequence):
     '''Sets up a simple linear path graph structure.
 
     sequence
@@ -264,9 +299,8 @@ def linear_structure(request, graph, random_sequence):
     return graph, sequence
 
 
-@pytest.fixture(params=[K * 2, -K * 2],
-                ids=['(Where={0})'.format(i) for i in ['Start', 'End']])
-def right_tip_structure(request, graph, random_sequence):
+@pytest.fixture
+def right_tip_structure(request, graph, ksize, flank_coords, random_sequence):
     '''
     Sets up a graph structure like so:
                                  ([S+1:S+K]+B tip)
@@ -277,15 +311,15 @@ def right_tip_structure(request, graph, random_sequence):
     That is, it has a single branch at the Sth K-mer.
     '''
     sequence = random_sequence()
-    S = request.param
+    S = flank_coords
     if S < 0:
         S = len(sequence) + S
     # the HDN
-    HDN = Kmer(sequence[S:S + K], pos=S)
+    HDN = Kmer(sequence[S:S + ksize], pos=S)
     # left of the HDN
-    L = Kmer(sequence[S - 1:S - 1 + K], pos=S - 1)
+    L = Kmer(sequence[S - 1:S - 1 + ksize], pos=S - 1)
     # right of the HDN
-    R = Kmer(sequence[S + 1:S + 1 + K], pos=S + 1)
+    R = Kmer(sequence[S + 1:S + 1 + ksize], pos=S + 1)
     # the branch kmer
     tip = Kmer(mutate_position(R, -1),
                pos=R.pos)
@@ -300,9 +334,9 @@ def right_tip_structure(request, graph, random_sequence):
     return graph, sequence, L, HDN, R, tip
 
 
-@pytest.fixture(params=[K * 2, -K * 2],
-                ids=['(Where={0})'.format(i) for i in ['Start', 'End']])
-def right_double_fork_structure(request, linear_structure, random_sequence):
+@pytest.fixture
+def right_double_fork_structure(request, ksize, flank_coords, 
+                                linear_structure, random_sequence):
     '''
     Sets up a graph structure like so:
                                                branch
@@ -320,15 +354,15 @@ def right_double_fork_structure(request, linear_structure, random_sequence):
     print('Branch len:', len(branch_sequence))
 
     # start position of the HDN
-    S = request.param
+    S = flank_coords
     if S < 0:
         S = len(core_sequence) + S
     # the HDN
-    HDN = Kmer(core_sequence[S:S + K], pos=S)
+    HDN = Kmer(core_sequence[S:S + ksize], pos=S)
     # left of the HDN
-    L = Kmer(core_sequence[S - 1:S - 1 + K], pos=S - 1)
+    L = Kmer(core_sequence[S - 1:S - 1 + ksize], pos=S - 1)
     # right of the HDN
-    R = Kmer(core_sequence[S + 1:S + 1 + K], pos=S + 1)
+    R = Kmer(core_sequence[S + 1:S + 1 + ksize], pos=S + 1)
     # the branch sequence, mutated at position S+1
     branch_start = core_sequence[:R.pos] + mutate_position(R, -1)
     branch_sequence = branch_start + branch_sequence
@@ -351,7 +385,7 @@ def right_double_fork_structure(request, linear_structure, random_sequence):
 
 @pytest.fixture
 def right_triple_fork_structure(request, right_double_fork_structure,
-                                random_sequence):
+                                random_sequence, ksize):
     '''
     Sets up a graph structure like so:
 
@@ -373,9 +407,9 @@ def right_triple_fork_structure(request, right_double_fork_structure,
     # the branch sequence, mutated at position S+1
     # choose a base not already represented at that position
     bases = {'A', 'C', 'G', 'T'}
-    mutated = random.choice(list(bases - {R[-1], top_sequence[R.pos + K - 1]}))
+    mutated = random.choice(list(bases - {R[-1], top_sequence[R.pos + ksize - 1]}))
 
-    bottom_sequence = core_sequence[:HDN.pos + K] + mutated + bottom_branch
+    bottom_sequence = core_sequence[:HDN.pos + ksize] + mutated + bottom_branch
 
     graph.consume(bottom_sequence)
 
@@ -393,9 +427,8 @@ def right_triple_fork_structure(request, right_double_fork_structure,
     return graph, core_sequence, L, HDN, R, top_sequence, bottom_sequence
 
 
-@pytest.fixture(params=[K * 2, -K * 2],
-                ids=['(Where={0})'.format(i) for i in ['Start', 'End']])
-def left_tip_structure(request, graph, random_sequence):
+@pytest.fixture
+def left_tip_structure(request, graph, ksize, flank_coords, random_sequence):
     '''
     Sets up a graph structure like so:
 
@@ -407,14 +440,14 @@ def left_tip_structure(request, graph, random_sequence):
     Where S is the start position of the HDN.
     '''
     sequence = random_sequence()
-    S = request.param
+    S = flank_coords
     if S < 0:
         S = len(sequence) + S
-    tip = Kmer(mutate_position(sequence[S - 1:S - 1 + K], 0),
-               pos=S - 1 + K)
-    HDN = Kmer(sequence[S:S + K], pos=S)
-    L = Kmer(sequence[S - 1:S - 1 + K], pos=S - 1)
-    R = Kmer(sequence[S + 1:S + 1 + K], pos=S + 1)
+    tip = Kmer(mutate_position(sequence[S - 1:S - 1 + ksize], 0),
+               pos=S - 1 + ksize)
+    HDN = Kmer(sequence[S:S + ksize], pos=S)
+    L = Kmer(sequence[S - 1:S - 1 + ksize], pos=S - 1)
+    R = Kmer(sequence[S + 1:S + 1 + ksize], pos=S + 1)
 
     graph.consume(sequence)
     graph.count(tip)
@@ -426,9 +459,9 @@ def left_tip_structure(request, graph, random_sequence):
     return graph, sequence, L, HDN, R, tip
 
 
-@pytest.fixture(params=[K * 2, -K * 2],
-                ids=['(Where={0})'.format(i) for i in ['Start', 'End']])
-def left_double_fork_structure(request, linear_structure, random_sequence):
+@pytest.fixture
+def left_double_fork_structure(request, linear_structure, ksize,
+                               flank_coords, random_sequence):
     '''
     Sets up a graph structure like so:
 
@@ -443,20 +476,20 @@ def left_double_fork_structure(request, linear_structure, random_sequence):
     branch_sequence = random_sequence(exclude=core_sequence)
 
     # start position of the HDN
-    S = request.param
+    S = flank_coords
     if S < 0:
         S = len(core_sequence) + S
     # the HDN
-    HDN = Kmer(core_sequence[S:S + K], pos=S)
+    HDN = Kmer(core_sequence[S:S + ksize], pos=S)
     # left of the HDN
-    L = Kmer(core_sequence[S - 1:S - 1 + K], pos=S - 1)
+    L = Kmer(core_sequence[S - 1:S - 1 + ksize], pos=S - 1)
     # right of the HDN
-    R = Kmer(core_sequence[S + 1:S + 1 + K], pos=S + 1)
+    R = Kmer(core_sequence[S + 1:S + 1 + ksize], pos=S + 1)
     # the branch sequence, mutated at position 0 in L,
     # whih is equivalent to the K-1 prefix of HDN prepended with a new base
     branch_start = mutate_position(L, 0)
     branch_sequence = branch_sequence + \
-        branch_start + core_sequence[L.pos + K:]
+        branch_start + core_sequence[L.pos + ksize:]
 
     graph.consume(core_sequence)
     graph.consume(branch_sequence)
@@ -473,9 +506,8 @@ def left_double_fork_structure(request, linear_structure, random_sequence):
     return graph, core_sequence, L, HDN, R, branch_sequence
 
 
-@pytest.fixture(params=[K * 2, (-K * 2) - 2],
-                ids=['(Where={0})'.format(i) for i in ['Start', 'End']])
-def snp_bubble_structure(request, linear_structure):
+@pytest.fixture
+def snp_bubble_structure(request, linear_structure, ksize):
     '''
     Sets up a graph structure resulting from a SNP (Single Nucleotide
     Polymorphism).
@@ -496,12 +528,11 @@ def snp_bubble_structure(request, linear_structure):
     '''
 
     graph, wildtype_sequence = linear_structure
-    S = request.param
-    if S < 0:
-        S = len(wildtype_sequence) + S
-    snp_sequence = mutate_position(wildtype_sequence, S + K)
-    HDN_L = Kmer(wildtype_sequence[S:S + K], pos=S)
-    HDN_R = Kmer(wildtype_sequence[S + K + 1:S + 2 * K + 1], pos=S + K + 1)
+    S = int(len(wildtype_sequence) / 2)
+    snp_sequence = mutate_position(wildtype_sequence, S + ksize)
+    HDN_L = Kmer(wildtype_sequence[S:S + ksize], pos=S)
+    HDN_R = Kmer(wildtype_sequence[S + ksize + 1:S + 2 * ksize + 1], pos=S +
+                 ksize + 1)
 
     graph.consume(wildtype_sequence)
     graph.consume(snp_sequence)
@@ -512,8 +543,8 @@ def snp_bubble_structure(request, linear_structure):
     if not (w_hdns == snp_hdns == {3: 2}):
         print(w_hdns, snp_hdns)
         print(HDN_L, HDN_R)
-        print(wildtype_sequence[HDN_L.pos + K + 1])
-        print(snp_sequence[HDN_L.pos + K + 1])
+        print(wildtype_sequence[HDN_L.pos + ksize + 1])
+        print(snp_sequence[HDN_L.pos + ksize + 1])
         request.applymarker(pytest.mark.xfail)
 
     return graph, wildtype_sequence, snp_sequence, HDN_L, HDN_R

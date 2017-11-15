@@ -11,7 +11,7 @@ from khmer.khmer_args import estimate_optimal_with_K_and_f as optimal_fp
 from khmer import reverse_complement as revcomp
 from khmer import reverse_hash as revhash
 from . import khmer_tst_utils as utils
-from .graph_features import *
+from .graph_stucture_fixtures import *
 
 import pytest
 import screed
