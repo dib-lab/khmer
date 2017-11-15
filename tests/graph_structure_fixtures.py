@@ -54,15 +54,17 @@ import screed
 
 def set_ksize(K=21):
     def wrap(func):
-        setattr(func, 'ksize', K)
+        setattr(func, '_ksize', K)
         return func
     return wrap
 
-
+'''
 @pytest.fixture
 def ksize(request):
     print('ksize:', request.param)
     return request.param
+'''
+
 
 def test_ksize(ksize):
     assert ksize == 21
@@ -73,9 +75,10 @@ def test_ksize_override(ksize):
     assert ksize == 31
 
 
-@set_ksize([21, 25, 29])
+@set_ksize([25, 29])
 def test_ksize_override_param(ksize):
-    assert ksize in [21, 25, 29]
+    print('ksize is', ksize)
+    assert ksize in [25, 29]
 
 
 @pytest.fixture(params=[2, -2], ids=['Start', 'End'])
@@ -175,7 +178,7 @@ def reads(sequence, ksize, L=100, N=100, dbg_cover=False):
         yield sequence[start:start + L]
 
 
-def kmers(sequence, K=21):
+def kmers(sequence, K):
     for i in range(len(sequence) - K + 1):
         yield sequence[i:i + K]
 
@@ -186,6 +189,7 @@ def test_kmers(ksize):
     res = list(kmers(S, ksize))
     assert res[0] == 'A' * ksize
     assert res[-1] == ('A' * (ksize - 1)) + 'T'
+
 
 def test_mutate_sequence():
     for _ in range(100):
@@ -263,7 +267,7 @@ def graph(request, ksize):
     num_kmers = 50000
     des_fp = 0.00001
     args = optimal_fp(num_kmers, des_fp)
-    print('Graph Params:', args)
+    print('Graph Params:', args,'K =', ksize)
 
     return request.param(ksize, args.htable_size, args.num_htables)
 
@@ -273,7 +277,7 @@ def hdn_counts(sequence, graph):
     '''
 
     hdns = {}
-    for kmer in kmers(sequence):
+    for kmer in kmers(sequence, graph.ksize()):
         d = graph.kmer_degree(kmer)
         if d > 2:
             hdns[d] = hdns.get(d, 0) + 1
