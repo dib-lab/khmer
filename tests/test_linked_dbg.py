@@ -7,7 +7,7 @@ from khmer import reverse_hash as revhash
 from khmer import forward_hash
 from . import khmer_tst_utils as utils
 from .khmer_tst_utils import _equals_rc, _contains_rc
-from .graph_features import *
+from .graph_structure_fixtures import *
 
 from khmer._oxli.graphlinks import StreamingCompactor
 from khmer import Nodegraph
@@ -48,7 +48,8 @@ def compare_tip_with_cdbg(rts, compactor):
         #                  out_edge.sequence[K-1:])
 
 
-def test_compact_tip(right_tip_structure):
+@using_ksize([21,25,31])
+def test_compact_tip(ksize, right_tip_structure):
     '''Should have no links. Need two junctions.
     '''
     graph, contig, L, HDN, R, tip = right_tip_structure
@@ -153,7 +154,19 @@ def test_compact_tip_x_merge(left_tip_structure, right_tip_structure):
     assert compactor.n_edges == 5
 
 
-def test_flanking_hdns():
+@using_ksize([21, 31])
+def test_compact_triple_fork(right_triple_fork_structure):
+    graph, core, L, HDN, R, top, bottom = right_triple_fork_structure
+
+    compactor = StreamingCompactor(graph)
+    compactor.update(core)
+    compactor.report()
+
+    assert compactor.n_nodes == 1
+    assert compactor.n_edges == 4
+
+
+def test_compact_trivial_edge():
     pass
 
 
