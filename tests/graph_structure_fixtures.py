@@ -58,13 +58,6 @@ def using_ksize(K=21):
         return func
     return wrap
 
-'''
-@pytest.fixture
-def ksize(request):
-    print('ksize:', request.param)
-    return request.param
-'''
-
 
 def test_ksize(ksize):
     assert ksize == 21
@@ -271,7 +264,6 @@ def graph(request, ksize):
 
     return request.param(ksize, args.htable_size, args.num_htables)
 
-
 def hdn_counts(sequence, graph):
     '''Get the degree distribution of nodes with degree more than 2.
     '''
@@ -292,15 +284,17 @@ def linear_structure(request, graph, ksize, random_sequence):
     sequence
     [0]→o→o~~o→o→[-1]
     '''
-    sequence = random_sequence()
-    graph.consume(sequence)
+    def get():
+        sequence = random_sequence()
+        graph.consume(sequence)
 
-    # Check for false positive neighbors in our graph
-    # Mark as an expected failure if any are found
-    if hdn_counts(sequence, graph):
-        request.applymarker(pytest.mark.xfail)
+        # Check for false positive neighbors in our graph
+        # Mark as an expected failure if any are found
+        if hdn_counts(sequence, graph):
+            request.applymarker(pytest.mark.xfail)
 
-    return graph, sequence
+        return graph, sequence
+    return get
 
 
 @pytest.fixture
@@ -314,28 +308,30 @@ def right_tip_structure(request, graph, ksize, flank_coords, random_sequence):
     Where S is the start position of the high degreen node (HDN).
     That is, it has a single branch at the Sth K-mer.
     '''
-    sequence = random_sequence()
-    S = flank_coords
-    if S < 0:
-        S = len(sequence) + S
-    # the HDN
-    HDN = Kmer(sequence[S:S + ksize], pos=S)
-    # left of the HDN
-    L = Kmer(sequence[S - 1:S - 1 + ksize], pos=S - 1)
-    # right of the HDN
-    R = Kmer(sequence[S + 1:S + 1 + ksize], pos=S + 1)
-    # the branch kmer
-    tip = Kmer(mutate_position(R, -1),
-               pos=R.pos)
+    def get():
+        sequence = random_sequence()
+        S = flank_coords
+        if S < 0:
+            S = len(sequence) + S
+        # the HDN
+        HDN = Kmer(sequence[S:S + ksize], pos=S)
+        # left of the HDN
+        L = Kmer(sequence[S - 1:S - 1 + ksize], pos=S - 1)
+        # right of the HDN
+        R = Kmer(sequence[S + 1:S + 1 + ksize], pos=S + 1)
+        # the branch kmer
+        tip = Kmer(mutate_position(R, -1),
+                   pos=R.pos)
 
-    graph.consume(sequence)
-    graph.count(tip)
+        graph.consume(sequence)
+        graph.count(tip)
 
-    # Check for false positive neighbors and mark as expected failure if found
-    if hdn_counts(sequence, graph) != {3: 1}:
-        request.applymarker(pytest.mark.xfail)
+        # Check for false positive neighbors and mark as expected failure if found
+        if hdn_counts(sequence, graph) != {3: 1}:
+            request.applymarker(pytest.mark.xfail)
 
-    return graph, sequence, L, HDN, R, tip
+        return graph, sequence, L, HDN, R, tip
+    return get
 
 
 @pytest.fixture
@@ -352,39 +348,41 @@ def right_double_fork_structure(request, ksize, flank_coords,
     and B is the mutated base starting the branch.
     '''
 
-    graph, core_sequence = linear_structure
-    print('\nCore Len:', len(core_sequence))
-    branch_sequence = random_sequence(exclude=core_sequence)
-    print('Branch len:', len(branch_sequence))
+    def get():
+        graph, core_sequence = linear_structure()
+        print('\nCore Len:', len(core_sequence))
+        branch_sequence = random_sequence(exclude=core_sequence)
+        print('Branch len:', len(branch_sequence))
 
-    # start position of the HDN
-    S = flank_coords
-    if S < 0:
-        S = len(core_sequence) + S
-    # the HDN
-    HDN = Kmer(core_sequence[S:S + ksize], pos=S)
-    # left of the HDN
-    L = Kmer(core_sequence[S - 1:S - 1 + ksize], pos=S - 1)
-    # right of the HDN
-    R = Kmer(core_sequence[S + 1:S + 1 + ksize], pos=S + 1)
-    # the branch sequence, mutated at position S+1
-    branch_start = core_sequence[:R.pos] + mutate_position(R, -1)
-    branch_sequence = branch_start + branch_sequence
+        # start position of the HDN
+        S = flank_coords
+        if S < 0:
+            S = len(core_sequence) + S
+        # the HDN
+        HDN = Kmer(core_sequence[S:S + ksize], pos=S)
+        # left of the HDN
+        L = Kmer(core_sequence[S - 1:S - 1 + ksize], pos=S - 1)
+        # right of the HDN
+        R = Kmer(core_sequence[S + 1:S + 1 + ksize], pos=S + 1)
+        # the branch sequence, mutated at position S+1
+        branch_start = core_sequence[:R.pos] + mutate_position(R, -1)
+        branch_sequence = branch_start + branch_sequence
 
-    graph.consume(core_sequence)
-    graph.consume(branch_sequence)
+        graph.consume(core_sequence)
+        graph.consume(branch_sequence)
 
-    # Check for false positive neighbors and mark as expected failure if found
-    core_hdns = hdn_counts(core_sequence, graph)
-    branch_hdns = hdn_counts(branch_sequence, graph)
+        # Check for false positive neighbors and mark as expected failure if found
+        core_hdns = hdn_counts(core_sequence, graph)
+        branch_hdns = hdn_counts(branch_sequence, graph)
 
-    # the core and branch sequences should each have exactly
-    # ONE node of degree 3 (HDN)
-    if core_hdns != {3: 1} or branch_hdns != {3: 1}:
-        print(core_hdns, branch_hdns)
-        request.applymarker(pytest.mark.xfail)
+        # the core and branch sequences should each have exactly
+        # ONE node of degree 3 (HDN)
+        if core_hdns != {3: 1} or branch_hdns != {3: 1}:
+            print(core_hdns, branch_hdns)
+            request.applymarker(pytest.mark.xfail)
 
-    return graph, core_sequence, L, HDN, R, branch_sequence
+        return graph, core_sequence, L, HDN, R, branch_sequence
+    return get
 
 
 @pytest.fixture
@@ -403,32 +401,35 @@ def right_triple_fork_structure(request, right_double_fork_structure,
 
     Where S is the start position of the high degreen node (HDN).
     '''
+    
+    def get():
+        graph, core_sequence, L, HDN, R, top_sequence = \
+            right_double_fork_structure()
+        bottom_branch = random_sequence(exclude=core_sequence + top_sequence)
+        print(len(core_sequence), len(top_sequence), len(bottom_branch))
 
-    graph, core_sequence, L, HDN, R, top_sequence = right_double_fork_structure
-    bottom_branch = random_sequence(exclude=core_sequence + top_sequence)
-    print(len(core_sequence), len(top_sequence), len(bottom_branch))
+        # the branch sequence, mutated at position S+1
+        # choose a base not already represented at that position
+        bases = {'A', 'C', 'G', 'T'}
+        mutated = random.choice(list(bases - {R[-1], top_sequence[R.pos + ksize - 1]}))
 
-    # the branch sequence, mutated at position S+1
-    # choose a base not already represented at that position
-    bases = {'A', 'C', 'G', 'T'}
-    mutated = random.choice(list(bases - {R[-1], top_sequence[R.pos + ksize - 1]}))
+        bottom_sequence = core_sequence[:HDN.pos + ksize] + mutated + bottom_branch
 
-    bottom_sequence = core_sequence[:HDN.pos + ksize] + mutated + bottom_branch
+        graph.consume(bottom_sequence)
 
-    graph.consume(bottom_sequence)
+        # Check for false positive neighbors and mark as expected failure if found
+        core_hdns = hdn_counts(core_sequence, graph)
+        top_hdns = hdn_counts(top_sequence, graph)
+        bottom_hdns = hdn_counts(bottom_sequence, graph)
 
-    # Check for false positive neighbors and mark as expected failure if found
-    core_hdns = hdn_counts(core_sequence, graph)
-    top_hdns = hdn_counts(top_sequence, graph)
-    bottom_hdns = hdn_counts(bottom_sequence, graph)
+        # the core, top, and bottom sequences should each have exactly
+        # ONE node of degree 4 (HDN)
+        if not (core_hdns == top_hdns == bottom_hdns == {4: 1}):
+            print(core_hdns, top_hdns, bottom_hdns)
+            request.applymarker(pytest.mark.xfail)
 
-    # the core, top, and bottom sequences should each have exactly
-    # ONE node of degree 4 (HDN)
-    if not (core_hdns == top_hdns == bottom_hdns == {4: 1}):
-        print(core_hdns, top_hdns, bottom_hdns)
-        request.applymarker(pytest.mark.xfail)
-
-    return graph, core_sequence, L, HDN, R, top_sequence, bottom_sequence
+        return graph, core_sequence, L, HDN, R, top_sequence, bottom_sequence
+    return get
 
 
 @pytest.fixture
@@ -443,24 +444,26 @@ def left_tip_structure(request, graph, ksize, flank_coords, random_sequence):
 
     Where S is the start position of the HDN.
     '''
-    sequence = random_sequence()
-    S = flank_coords
-    if S < 0:
-        S = len(sequence) + S
-    tip = Kmer(mutate_position(sequence[S - 1:S - 1 + ksize], 0),
-               pos=S - 1 + ksize)
-    HDN = Kmer(sequence[S:S + ksize], pos=S)
-    L = Kmer(sequence[S - 1:S - 1 + ksize], pos=S - 1)
-    R = Kmer(sequence[S + 1:S + 1 + ksize], pos=S + 1)
+    def get():
+        sequence = random_sequence()
+        S = flank_coords
+        if S < 0:
+            S = len(sequence) + S
+        tip = Kmer(mutate_position(sequence[S - 1:S - 1 + ksize], 0),
+                   pos=S - 1 + ksize)
+        HDN = Kmer(sequence[S:S + ksize], pos=S)
+        L = Kmer(sequence[S - 1:S - 1 + ksize], pos=S - 1)
+        R = Kmer(sequence[S + 1:S + 1 + ksize], pos=S + 1)
 
-    graph.consume(sequence)
-    graph.count(tip)
+        graph.consume(sequence)
+        graph.count(tip)
 
-    # Check for false positive neighbors and mark as expected failure if found
-    if hdn_counts(sequence, graph) != {3: 1}:
-        request.applymarker(pytest.mark.xfail)
+        # Check for false positive neighbors and mark as expected failure if found
+        if hdn_counts(sequence, graph) != {3: 1}:
+            request.applymarker(pytest.mark.xfail)
 
-    return graph, sequence, L, HDN, R, tip
+        return graph, sequence, L, HDN, R, tip
+    return get
 
 
 @pytest.fixture
@@ -476,38 +479,40 @@ def left_double_fork_structure(request, linear_structure, ksize,
     Where S is the start position of the high degreen node (HDN).
     '''
 
-    graph, core_sequence = linear_structure
-    branch_sequence = random_sequence(exclude=core_sequence)
+    def get():
+        graph, core_sequence = linear_structure()
+        branch_sequence = random_sequence(exclude=core_sequence)
 
-    # start position of the HDN
-    S = flank_coords
-    if S < 0:
-        S = len(core_sequence) + S
-    # the HDN
-    HDN = Kmer(core_sequence[S:S + ksize], pos=S)
-    # left of the HDN
-    L = Kmer(core_sequence[S - 1:S - 1 + ksize], pos=S - 1)
-    # right of the HDN
-    R = Kmer(core_sequence[S + 1:S + 1 + ksize], pos=S + 1)
-    # the branch sequence, mutated at position 0 in L,
-    # whih is equivalent to the K-1 prefix of HDN prepended with a new base
-    branch_start = mutate_position(L, 0)
-    branch_sequence = branch_sequence + \
-        branch_start + core_sequence[L.pos + ksize:]
+        # start position of the HDN
+        S = flank_coords
+        if S < 0:
+            S = len(core_sequence) + S
+        # the HDN
+        HDN = Kmer(core_sequence[S:S + ksize], pos=S)
+        # left of the HDN
+        L = Kmer(core_sequence[S - 1:S - 1 + ksize], pos=S - 1)
+        # right of the HDN
+        R = Kmer(core_sequence[S + 1:S + 1 + ksize], pos=S + 1)
+        # the branch sequence, mutated at position 0 in L,
+        # whih is equivalent to the K-1 prefix of HDN prepended with a new base
+        branch_start = mutate_position(L, 0)
+        branch_sequence = branch_sequence + \
+            branch_start + core_sequence[L.pos + ksize:]
 
-    graph.consume(core_sequence)
-    graph.consume(branch_sequence)
+        graph.consume(core_sequence)
+        graph.consume(branch_sequence)
 
-    # Check for false positive neighbors and mark as expected failure if found
-    core_hdns = hdn_counts(core_sequence, graph)
-    branch_hdns = hdn_counts(branch_sequence, graph)
+        # Check for false positive neighbors and mark as expected failure if found
+        core_hdns = hdn_counts(core_sequence, graph)
+        branch_hdns = hdn_counts(branch_sequence, graph)
 
-    # the core and branch sequences should each have exactly
-    # ONE node of degree 3 (HDN)
-    if not (core_hdns == branch_hdns == {3: 1}):
-        request.applymarker(pytest.mark.xfail)
+        # the core and branch sequences should each have exactly
+        # ONE node of degree 3 (HDN)
+        if not (core_hdns == branch_hdns == {3: 1}):
+            request.applymarker(pytest.mark.xfail)
 
-    return graph, core_sequence, L, HDN, R, branch_sequence
+        return graph, core_sequence, L, HDN, R, branch_sequence
+    return get
 
 
 @pytest.fixture
@@ -531,50 +536,61 @@ def snp_bubble_structure(request, linear_structure, ksize):
     so we bring the rightmost SNP a tad left.
     '''
 
-    graph, wildtype_sequence = linear_structure
-    S = int(len(wildtype_sequence) / 2)
-    snp_sequence = mutate_position(wildtype_sequence, S + ksize)
-    HDN_L = Kmer(wildtype_sequence[S:S + ksize], pos=S)
-    HDN_R = Kmer(wildtype_sequence[S + ksize + 1:S + 2 * ksize + 1], pos=S +
-                 ksize + 1)
+    def get():
+        graph, wildtype_sequence = linear_structure()
+        S = int(len(wildtype_sequence) / 2)
+        snp_sequence = mutate_position(wildtype_sequence, S + ksize)
+        HDN_L = Kmer(wildtype_sequence[S:S + ksize], pos=S)
+        HDN_R = Kmer(wildtype_sequence[S + ksize + 1:S + 2 * ksize + 1], pos=S +
+                     ksize + 1)
 
-    graph.consume(wildtype_sequence)
-    graph.consume(snp_sequence)
+        graph.consume(wildtype_sequence)
+        graph.consume(snp_sequence)
 
-    # Check for false positive neighbors and mark as expected failure if found
-    w_hdns = hdn_counts(wildtype_sequence, graph)
-    snp_hdns = hdn_counts(snp_sequence, graph)
-    if not (w_hdns == snp_hdns == {3: 2}):
-        print(w_hdns, snp_hdns)
-        print(HDN_L, HDN_R)
-        print(wildtype_sequence[HDN_L.pos + ksize + 1])
-        print(snp_sequence[HDN_L.pos + ksize + 1])
-        request.applymarker(pytest.mark.xfail)
+        # Check for false positive neighbors and mark as expected failure if found
+        w_hdns = hdn_counts(wildtype_sequence, graph)
+        snp_hdns = hdn_counts(snp_sequence, graph)
+        if not (w_hdns == snp_hdns == {3: 2}):
+            print(w_hdns, snp_hdns)
+            print(HDN_L, HDN_R)
+            print(wildtype_sequence[HDN_L.pos + ksize + 1])
+            print(snp_sequence[HDN_L.pos + ksize + 1])
+            request.applymarker(pytest.mark.xfail)
 
-    return graph, wildtype_sequence, snp_sequence, HDN_L, HDN_R
+        return graph, wildtype_sequence, snp_sequence, HDN_L, HDN_R
+    return get
+
+
+@pytest.fixture
+def tandem_forks(request, left_fork_structure, right_fork_structure):
+    pass
 
 
 @pytest.fixture(params=[2, 3, 4, 5, 6, 7, 8])
 def tandem_repeat_structure(request, linear_structure):
 
-    graph, sequence = linear_structure
+    def get():
+        graph, sequence = linear_structure()
 
-    tandem_repeats = sequence * request.param
-    graph.consume(tandem_repeats)
+        tandem_repeats = sequence * request.param
+        graph.consume(tandem_repeats)
 
-    if hdn_counts(tandem_repeats, graph):
-        request.applymarker(pytest.mark.xfail)
+        if hdn_counts(tandem_repeats, graph):
+            request.applymarker(pytest.mark.xfail)
 
-    return graph, sequence, tandem_repeats
+        return graph, sequence, tandem_repeats
+    return get
 
 
 @pytest.fixture
 def circular_linear_structure(request, linear_structure):
-    graph, sequence = linear_structure
+    def get():
+        graph, sequence = linear_structure()
 
-    sequence += sequence
+        sequence += sequence
 
-    if hdn_counts(sequence, graph):
-        request.applymarker(pytest.mark.xfail)
+        if hdn_counts(sequence, graph):
+            request.applymarker(pytest.mark.xfail)
 
-    return graph, sequence
+        return graph, sequence
+    return get

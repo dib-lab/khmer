@@ -52,6 +52,7 @@ def compare_tip_with_cdbg(rts, compactor):
 def test_compact_tip(ksize, right_tip_structure):
     '''Should have no links. Need two junctions.
     '''
+    right_tip_structure = right_tip_structure()
     graph, contig, L, HDN, R, tip = right_tip_structure
 
     compactor = StreamingCompactor(graph)
@@ -83,6 +84,7 @@ def test_compact_tip(ksize, right_tip_structure):
 
 
 def test_compact_tip_double_update(right_tip_structure):
+    right_tip_structure = right_tip_structure()
     graph, contig, L, HDN, R, tip = right_tip_structure
 
     compactor = StreamingCompactor(graph)
@@ -97,6 +99,7 @@ def test_compact_tip_double_update(right_tip_structure):
 
 
 def test_compact_tip_revcomp_update(right_tip_structure):
+    right_tip_structure = right_tip_structure()
     graph, contig, L, HDN, R, tip = right_tip_structure
 
     compactor = StreamingCompactor(graph)
@@ -112,7 +115,9 @@ def test_compact_tip_revcomp_update(right_tip_structure):
 
 
 def test_compact_two_tip_islands(left_tip_structure, right_tip_structure):
+    right_tip_structure = right_tip_structure()
     graph, contig_r, L_r, HDN_r, R_r, tip_r = right_tip_structure
+    left_tip_structure = left_tip_structure()
     _, contig_l, L_l, HDN_l, R_l, tip_l = left_tip_structure
     
     compactor = StreamingCompactor(graph)
@@ -130,7 +135,9 @@ def test_compact_two_tip_islands(left_tip_structure, right_tip_structure):
 
 
 def test_compact_tip_x_merge(left_tip_structure, right_tip_structure):
+    right_tip_structure = right_tip_structure()
     graph, contig_r, L_r, HDN_r, R_r, tip_r = right_tip_structure
+    left_tip_structure = left_tip_structure()
     _, contig_l, L_l, HDN_l, R_l, tip_l = left_tip_structure
     
     contig_merge = contig_l + contig_r
@@ -156,6 +163,7 @@ def test_compact_tip_x_merge(left_tip_structure, right_tip_structure):
 
 @using_ksize([21, 31])
 def test_compact_triple_fork(right_triple_fork_structure):
+    right_triple_fork_structure = right_triple_fork_structure()
     graph, core, L, HDN, R, top, bottom = right_triple_fork_structure
 
     compactor = StreamingCompactor(graph)

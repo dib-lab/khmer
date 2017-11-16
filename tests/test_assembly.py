@@ -62,7 +62,7 @@ class TestNonBranching:
 
     def test_all_start_positions(self, ksize, linear_structure, assembler):
         # assemble entire contig, starting from wherever
-        graph, contig = linear_structure
+        graph, contig = linear_structure()
         asm = assembler(graph)
 
         for start in range(0, len(contig), 150):
@@ -71,7 +71,7 @@ class TestNonBranching:
 
     def test_all_left_to_beginning(self, ksize, linear_structure, assembler):
         # assemble directed left
-        graph, contig = linear_structure
+        graph, contig = linear_structure()
         asm = assembler(graph)
 
         for start in range(0, len(contig), 150):
@@ -81,7 +81,7 @@ class TestNonBranching:
 
     def test_all_right_to_end(self, ksize, linear_structure, assembler):
         # assemble directed right
-        graph, contig = linear_structure
+        graph, contig = linear_structure()
         asm = assembler(graph)
 
         for start in range(0, len(contig), 150):
@@ -91,7 +91,7 @@ class TestNonBranching:
 
     def test_circular(self, ksize, circular_linear_structure, assembler):
 
-        graph, contig = circular_linear_structure
+        graph, contig = circular_linear_structure()
         asm = assembler(graph)
 
         path = asm.assemble_right(contig[:ksize])
@@ -99,7 +99,7 @@ class TestNonBranching:
         assert utils._equals_rc(path, contig[:len(path)])
 
     def test_hash_as_seed(self, ksize, linear_structure, assembler):
-        graph, contig = linear_structure
+        graph, contig = linear_structure()
         asm = assembler(graph)
 
         left = graph.hash(contig[:ksize])
@@ -110,7 +110,7 @@ class TestCompactingAssembler:
 
     def test_beginning_to_branch_right(self, ksize, right_tip_structure):
         # assemble from beginning of contig, up until branch point
-        graph, contig, L, HDN, R, tip = right_tip_structure
+        graph, contig, L, HDN, R, tip = right_tip_structure()
         asm = CompactingAssembler(graph)
         path = asm.assemble(contig[0:ksize])
 
@@ -121,26 +121,26 @@ class TestCompactingAssembler:
         # in the LinearAsembler, this would continue all the way
         # to the beginning. The CompactingAssembler does an extra
         # check of the node degree in the reverse direction.
-        graph, contig, L, HDN, R, tip = right_tip_structure
+        graph, contig, L, HDN, R, tip = right_tip_structure()
         asm = CompactingAssembler(graph)
 
 
 class TestLinearAssembler_RightBranching:
 
     def test_branch_point(self, ksize, right_tip_structure):
-        graph, contig, L, HDN, R, tip = right_tip_structure
+        graph, contig, L, HDN, R, tip = right_tip_structure()
 
         assert graph.kmer_degree(HDN) == 3
 
     def test_beginning_to_branch(self, ksize, right_tip_structure):
         # assemble from beginning of contig, up until branch point
-        graph, contig, L, HDN, R, tip = right_tip_structure
+        graph, contig, L, HDN, R, tip = right_tip_structure()
         asm = khmer.LinearAssembler(graph)
 
     def test_beginning_to_branch_revcomp(self, ksize, right_tip_structure):
         # assemble from beginning of contig, up until branch point
         # starting from rev comp
-        graph, contig, L, HDN, R, tip = right_tip_structure
+        graph, contig, L, HDN, R, tip = right_tip_structure()
         asm = khmer.LinearAssembler(graph)
         path = asm.assemble(revcomp(contig[0:ksize]))
 
@@ -149,7 +149,7 @@ class TestLinearAssembler_RightBranching:
 
     def test_left_of_branch_to_beginning(self, ksize, right_tip_structure):
         # start from HDN (left of branch)
-        graph, contig, L, HDN, R, tip = right_tip_structure
+        graph, contig, L, HDN, R, tip = right_tip_structure()
         asm = khmer.LinearAssembler(graph)
         path = asm.assemble(L)
 
@@ -158,7 +158,7 @@ class TestLinearAssembler_RightBranching:
 
     def test_left_of_branch_to_beginning_revcomp(self, ksize, right_tip_structure):
         # start from revcomp of HDN (left of branch)
-        graph, contig, L, HDN, R, tip = right_tip_structure
+        graph, contig, L, HDN, R, tip = right_tip_structure()
         asm = khmer.LinearAssembler(graph)
         path = asm.assemble(revcomp(L))
 
@@ -170,7 +170,7 @@ class TestLinearAssembler_RightBranching:
         # Should get the *entire* original contig, as the assembler
         # will move left relative to the branch, and not consider it
         # as a high degree node
-        graph, contig, L, HDN, R, tip = right_tip_structure
+        graph, contig, L, HDN, R, tip = right_tip_structure()
         asm = khmer.LinearAssembler(graph)
         path = asm.assemble(R)
 
@@ -179,7 +179,7 @@ class TestLinearAssembler_RightBranching:
 
     def test_end_to_beginning(self, ksize, right_tip_structure):
         # should have exact same behavior as right_of_branch_outwards
-        graph, contig, L, HDN, R, tip = right_tip_structure
+        graph, contig, L, HDN, R, tip = right_tip_structure()
         asm = khmer.LinearAssembler(graph)
         path = asm.assemble(contig[-ksize:])
 
@@ -190,14 +190,14 @@ class TestLinearAssembler_RightBranching:
 class TestLinearAssembler_LeftBranching:
 
     def test_branch_point(self, ksize, left_tip_structure):
-        graph, contig, L, HDN, R, tip = left_tip_structure
+        graph, contig, L, HDN, R, tip = left_tip_structure()
 
         assert graph.kmer_degree(HDN) == 3
 
     def test_end_to_branch(self, ksize, left_tip_structure):
         # assemble from end until branch point
         # should include HDN
-        graph, contig, L, HDN, R, tip = left_tip_structure
+        graph, contig, L, HDN, R, tip = left_tip_structure()
         asm = khmer.LinearAssembler(graph)
         path = asm.assemble(contig[-ksize:])
 
@@ -206,7 +206,7 @@ class TestLinearAssembler_LeftBranching:
 
     def test_branch_to_end(self, ksize, left_tip_structure):
         # assemble from branch point until end
-        graph, contig, L, HDN, R, tip = left_tip_structure
+        graph, contig, L, HDN, R, tip = left_tip_structure()
         asm = khmer.LinearAssembler(graph)
         path = asm.assemble(HDN)
 
@@ -216,7 +216,7 @@ class TestLinearAssembler_LeftBranching:
     def test_from_branch_to_ends_with_stopbf(self, ksize, left_tip_structure):
         # block the tip with the stop_filter. should return a full length
         # contig.
-        graph, contig, L, HDN, R, tip = left_tip_structure
+        graph, contig, L, HDN, R, tip = left_tip_structure()
 
         stop_filter = khmer.Nodegraph(ksize, 1e5, 4)
         stop_filter.count(tip)
@@ -231,7 +231,7 @@ class TestLinearAssembler_LeftBranching:
     def test_from_branch_to_ends_with_stopbf_revcomp(self, ksize, left_tip_structure):
         # block the tip with the stop_filter. should return a full length
         # contig.
-        graph, contig, L, HDN, R, tip = left_tip_structure
+        graph, contig, L, HDN, R, tip = left_tip_structure()
 
         stop_filter = khmer.Nodegraph(ksize, 1e5, 4)
         stop_filter.count(tip)
@@ -245,7 +245,7 @@ class TestLinearAssembler_LeftBranching:
     def test_end_thru_tip_with_stopbf(self, ksize, left_tip_structure):
         # assemble up to branch point, and include introduced branch b/c
         # of stop bf
-        graph, contig, L, HDN, R, tip = left_tip_structure
+        graph, contig, L, HDN, R, tip = left_tip_structure()
 
         stop_filter = khmer.Nodegraph(ksize, 1e5, 4)
         stop_filter.count(L)          # ...and block original path
@@ -261,7 +261,7 @@ class TestLinearAssembler_LeftBranching:
     def test_single_node_flanked_by_hdns(self, ksize, left_tip_structure):
         # assemble single node flanked by high-degree nodes
         # we'll copy the main nodegraph before mutating it
-        graph, contig, L, HDN, R, tip = left_tip_structure
+        graph, contig, L, HDN, R, tip = left_tip_structure()
         asm = khmer.LinearAssembler(graph)
 
         graph.consume(mutate_position(contig, HDN.pos + ksize))
@@ -275,7 +275,7 @@ class TestLinearAssembler_LeftBranching:
 class TestLabeledAssembler:
 
     def test_hash_as_seed(self, ksize, linear_structure):
-        graph, contig = linear_structure
+        graph, contig = linear_structure()
         lh = khmer.GraphLabels(graph)
         asm = khmer.SimpleLabeledAssembler(lh)
 
@@ -284,7 +284,7 @@ class TestLabeledAssembler:
 
     def test_beginning_to_end_across_tip(self, ksize, right_tip_structure):
         # assemble entire contig, ignoring branch point b/c of labels
-        graph, contig, L, HDN, R, tip = right_tip_structure
+        graph, contig, L, HDN, R, tip = right_tip_structure()
         lh = khmer.GraphLabels(graph)
         asm = khmer.SimpleLabeledAssembler(lh)
         hdn = graph.find_high_degree_nodes(contig)
@@ -301,7 +301,7 @@ class TestLabeledAssembler:
 
     def test_assemble_right_double_fork(self, ksize, right_double_fork_structure):
         # assemble two contigs from a double forked structure
-        graph, contig, L, HDN, R, branch = right_double_fork_structure
+        graph, contig, L, HDN, R, branch = right_double_fork_structure()
         lh = khmer.GraphLabels(graph)
         asm = khmer.SimpleLabeledAssembler(lh)
 
@@ -323,7 +323,7 @@ class TestLabeledAssembler:
     def test_assemble_right_triple_fork(self, ksize, right_triple_fork_structure):
         # assemble three contigs from a trip fork
         (graph, contig, L, HDN, R,
-         top_sequence, bottom_sequence) = right_triple_fork_structure
+         top_sequence, bottom_sequence) = right_triple_fork_structure()
         lh = khmer.GraphLabels(graph)
         asm = khmer.SimpleLabeledAssembler(lh)
 
@@ -347,7 +347,7 @@ class TestLabeledAssembler:
 
     def test_assemble_left_double_fork(self, ksize, left_double_fork_structure):
         # assemble entire contig + branch points b/c of labels; start from end
-        graph, contig, L, HDN, R, branch = left_double_fork_structure
+        graph, contig, L, HDN, R, branch = left_double_fork_structure()
         lh = khmer.GraphLabels(graph)
         asm = khmer.SimpleLabeledAssembler(lh)
 
@@ -375,7 +375,7 @@ class TestLabeledAssembler:
 
     def test_assemble_snp_bubble_single(self, ksize, snp_bubble_structure):
         # assemble entire contig + one of two paths through a bubble
-        graph, wildtype, mutant, HDN_L, HDN_R = snp_bubble_structure
+        graph, wildtype, mutant, HDN_L, HDN_R = snp_bubble_structure()
         lh = khmer.GraphLabels(graph)
         asm = khmer.SimpleLabeledAssembler(lh)
 
@@ -390,7 +390,7 @@ class TestLabeledAssembler:
 
     def test_assemble_snp_bubble_both(self, ksize, snp_bubble_structure):
         # assemble entire contig + both paths
-        graph, wildtype, mutant, HDN_L, HDN_R = snp_bubble_structure
+        graph, wildtype, mutant, HDN_L, HDN_R = snp_bubble_structure()
         lh = khmer.GraphLabels(graph)
         asm = khmer.SimpleLabeledAssembler(lh)
 
@@ -415,7 +415,7 @@ class TestLabeledAssembler:
         # assemble one side of bubble, blocked with stop_filter,
         # when labels on both branches
         # stop_filter should trip a filter failure, negating the label spanning
-        graph, wildtype, mutant, HDN_L, HDN_R = snp_bubble_structure
+        graph, wildtype, mutant, HDN_L, HDN_R = snp_bubble_structure()
         stop_filter = khmer.Nodegraph(ksize, 1e5, 4)
         lh = khmer.GraphLabels(graph)
         asm = khmer.SimpleLabeledAssembler(lh, stop_filter=stop_filter)
@@ -436,7 +436,7 @@ class TestLabeledAssembler:
     # @pytest.mark.skip(reason='destroys your computer and then the world')
     def test_assemble_tandem_repeats(self, ksize, tandem_repeat_structure):
         # assemble one copy of a tandem repeat
-        graph, repeat, tandem_repeats = tandem_repeat_structure
+        graph, repeat, tandem_repeats = tandem_repeat_structure()
         lh = khmer.GraphLabels(graph)
         asm = khmer.SimpleLabeledAssembler(lh)
         paths = asm.assemble(repeat[:ksize])
@@ -451,7 +451,7 @@ class TestJunctionCountAssembler:
 
     def test_beginning_to_end_across_tip(self, ksize, right_tip_structure):
         # assemble entire contig, ignoring branch point b/c of labels
-        graph, contig, L, HDN, R, tip = right_tip_structure
+        graph, contig, L, HDN, R, tip = right_tip_structure()
         asm = khmer.JunctionCountAssembler(graph)
         asm.consume(contig)
         asm.consume(contig)
