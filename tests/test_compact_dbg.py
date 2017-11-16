@@ -174,9 +174,42 @@ def test_compact_triple_fork(right_triple_fork_structure):
     assert compactor.n_edges == 4
 
 
-def test_compact_trivial_edge():
-    pass
+@pytest.mark.parametrize('random_sequence', [100, 200], indirect=True)
+def test_compact_trivial_edge(tandem_triple_forks, ksize):
+    ttf = tandem_triple_forks()
+    graph, core, L, HDN_l, HDN_r, R, top_l, bottom_l, top_r, bottom_r = ttf
 
+    print('Core:', core[HDN_l.pos:], '\nHDN_l:', HDN_l, '\nHDN_r:', HDN_r,
+          '\ntop_l:', top_l[HDN_l.pos:HDN_l.pos+2*ksize], 
+          '\nbottom_l:', bottom_l[HDN_l.pos:HDN_l.pos+2*ksize],
+          '\ntop_r:', top_r[HDN_r.pos:HDN_r.pos+2*ksize],
+          '\nbottom_r:', bottom_r[HDN_r.pos:HDN_r.pos+2*ksize])
+    br = '=' * 20
+    graph.reset()
+    compactor = StreamingCompactor(graph)
+    print(br, 'ADD CORE', br) 
+    compactor.consume_and_update(core)
+    assert compactor.n_nodes == 0
+
+    print(br, 'ADD top_l', br)
+    compactor.consume_and_update(top_l)
+    assert compactor.n_nodes == 1
+    assert compactor.n_edges == 3
+
+    print(br, 'ADD bottom_l', br)
+    compactor.consume_and_update(bottom_l)
+    assert compactor.n_nodes == 1
+    assert compactor.n_edges == 4
+
+    print(br, 'ADD top_r', br)
+    compactor.consume_and_update(top_r)
+    assert compactor.n_nodes == 2
+    assert compactor.n_edges == 6
+
+    print(br, 'ADD bottom_r', br)
+    compactor.consume_and_update(bottom_r)
+    assert compactor.n_nodes == 2
+    assert compactor.n_edges == 7
 
 def test_compact_tip_split_merge():
     pass
