@@ -562,8 +562,46 @@ def snp_bubble_structure(request, linear_structure, ksize):
 
 
 @pytest.fixture
-def tandem_forks(request, left_fork_structure, right_fork_structure):
-    pass
+def tandem_triple_forks(request, right_triple_fork_structure,
+                        random_sequence, ksize, flank_coords):
+
+    def get():
+        rtfs = right_triple_fork_structure()
+        graph, core, L, HDN, R, top_l, bottom_l = rtfs
+        S_l = flank_coords
+        if S_l < 0:
+            S_l = len(core) + S_l
+        S_r = S_l + 1
+
+        # top sequence for new HDN
+        top_r = random_sequence()
+        new_HDN = R
+        new_R = Kmer(core[S_r + 1:S_r + 1 + ksize], pos=S_r+1)
+        top_r_start = core[:new_R.pos] + mutate_position(new_R, -1)
+        top_r = top_r_start + top_r
+
+        graph.consume(top_r)
+
+        # now the bottom sequence for new HDN
+        bases = {'A', 'C', 'G', 'T'}
+        mutated = random.choice(list(bases - {new_R[-1], top_r[new_R.pos + ksize - 1]}))
+        bottom_r = random_sequence()
+        bottom_r = core[:new_HDN.pos + ksize] + mutated + bottom_r
+
+        graph.consume(bottom_r)
+
+        exp_2_hdns = [hdn_counts(s, graph) for s in (top_r, bottom_r, core)]
+        exp_1_hdn = [hdn_counts(s, graph) for s in (top_l, bottom_l)]
+
+        if not all(map(lambda c: c == {4:2}, exp_2_hdns)) or \
+           not all(map(lambda c: c == {4:1}, exp_1_hdn)):
+
+            print(exp_2_hdns, exp_1_hdns)
+            request.applymarker(pytest.mark.xfail)
+
+        return graph, core, L, HDN, new_HDN, new_R, top_l, bottom_l, top_r, bottom_r
+    
+    return get
 
 
 @pytest.fixture(params=[2, 3, 4, 5, 6, 7, 8])
