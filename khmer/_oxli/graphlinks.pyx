@@ -21,13 +21,13 @@ cdef class CompactEdge:
     @property
     def edge_type(self):
         cdef compact_edge_meta_t meta = deref(self._ce_this).meta
-        if meta == IS_FULL_EDGE:
+        if meta == FULL:
             return 'FULL'
-        elif meta == IS_TIP:
+        elif meta == TIP:
             return 'TIP'
-        elif meta == IS_ISLAND:
+        elif meta == ISLAND:
             return 'ISLAND'
-        elif meta == IS_TRIVIAL:
+        elif meta == TRIVIAL:
             return 'TRIVIAL'
         else:
             raise ValueError('Malformed edge metadata')

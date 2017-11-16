@@ -23,10 +23,10 @@ cdef extern from "oxli/links.hh" namespace "oxli" nogil:
     ctypedef umap[HashIntoType, uint64_t] HashIDMap
 
     ctypedef enum compact_edge_meta_t:
-        IS_FULL_EDGE
-        IS_TIP
-        IS_ISLAND
-        IS_TRIVIAL
+        FULL
+        TIP
+        ISLAND
+        TRIVIAL
 
     cdef const char * edge_meta_repr(compact_edge_meta_t)
 

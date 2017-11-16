@@ -55,6 +55,7 @@ Contact: khmer-project@idyll.org
 #include "kmer_filters.hh"
 #include "traversal.hh"
 #include "assembler.hh"
+#include "alphabets.hh"
 
 
 # define DEBUG_LINKS
@@ -85,22 +86,22 @@ typedef std::unordered_map<HashIntoType, uint64_t> HashIDMap;
 
 
 enum compact_edge_meta_t {
-    IS_FULL_EDGE,
-    IS_TIP,
-    IS_ISLAND,
-    IS_TRIVIAL
+    FULL,
+    TIP,
+    ISLAND,
+    TRIVIAL
 };
 
 
 inline const char * edge_meta_repr(compact_edge_meta_t meta) {
     switch(meta) {
-        case IS_FULL_EDGE:
-            return "FULL EDGE";
-        case IS_TIP:
+        case FULL:
+            return "FULL";
+        case TIP:
             return "TIP";
-        case IS_ISLAND:
+        case ISLAND:
             return "ISLAND";
-        case IS_TRIVIAL:
+        case TRIVIAL:
             return "TRIVIAL";
     }
 }
@@ -119,7 +120,7 @@ public:
     UHashSet tags;
 
     CompactEdge(uint64_t in_node_id, uint64_t out_node_id) : 
-        in_node_id(in_node_id), out_node_id(out_node_id), meta(IS_FULL_EDGE) {}
+        in_node_id(in_node_id), out_node_id(out_node_id), meta(FULL) {}
     
     CompactEdge(uint64_t in_node_id, uint64_t out_node_id, compact_edge_meta_t meta) :
         in_node_id(in_node_id), out_node_id(out_node_id), meta(meta) {}
@@ -202,14 +203,15 @@ public:
 
         pdebug("new compact edge: \n left=" << std::to_string(left_id) 
                 << std::endl << " right=" << std::to_string(right_id)
+                << std::endl << " meta=" << edge_meta_repr(edge_meta)
                 << std::endl << " sequence   =" << edge_sequence
                 << std::endl << " rc_sequence=" << _revcomp(edge_sequence)
-                << std::endl << " start   =" << edge_sequence.substr(0, _ksize)
-                << std::endl << " rc_start=" << _revcomp(edge_sequence.substr(0, _ksize))
+                << std::endl << " start   =" << edge_sequence.substr(0, _ksize+1)
+                << std::endl << " rc_start=" << _revcomp(edge_sequence.substr(0, _ksize+1))
                 << std::endl << " end    =" 
-                << edge_sequence.substr(edge_sequence.length()-_ksize, _ksize)
+                << edge_sequence.substr(edge_sequence.length()-_ksize-1, _ksize+1)
                 << std::endl << " rc_end =" 
-                << _revcomp(edge_sequence.substr(edge_sequence.length()-_ksize, _ksize)));
+                << _revcomp(edge_sequence.substr(edge_sequence.length()-_ksize-1, _ksize+1)));
 
         edge->sequence = edge_sequence;
         n_compact_edges++;
@@ -305,13 +307,14 @@ public:
     }
 
     bool delete_edge(CompactEdge* edge) {
+        bool deleted = false;
         if (delete_in_edge(edge)) {
-            return true;
+            deleted = true;
         }
         if (delete_out_edge(edge)) {
-            return true;
+            deleted = true;
         }
-        return false;
+        return deleted;
     }
 
     bool delete_in_edge(CompactEdge* edge) {
@@ -391,17 +394,17 @@ public:
     std::string edges_repr() {
         std::ostringstream os;
         os << *this << std::endl << "\tin_edges:" << std::endl;
-        for (const char b : "ACGT") {
+        for (auto b : alphabets::DNA_SIMPLE) {
             CompactEdge* e = get_in_edge(b);
             if (e != nullptr) {
                 os << "\t " << b << "=" << *e << std::endl;
             }
         }
         os << "\tout_edges:" << std::endl;
-        for (const char b : "ACGT") {
+        for (auto b : alphabets::DNA_SIMPLE) {
             CompactEdge* e = get_out_edge(b);
             if (e != nullptr) {
-                os << "\t -" << b << "=" << *e << std::endl;
+                os << "\t " << b << "=" << *e << std::endl;
             }
         }
         return os.str();
@@ -626,11 +629,11 @@ public:
     compact_edge_meta_t deduce_meta(CompactNode* in, CompactNode* out) {
         compact_edge_meta_t edge_meta;
         if (in == nullptr && out == nullptr) {
-           edge_meta = IS_ISLAND;
+           edge_meta = ISLAND;
         } else if ((out == nullptr) != (in == nullptr))  {
-            edge_meta = IS_TIP;
+            edge_meta = TIP;
         } else {
-            edge_meta = IS_FULL_EDGE;
+            edge_meta = FULL;
         }
         return edge_meta;
     }
@@ -695,7 +698,7 @@ public:
               << sequence << " and other node ID=" << 
               ((other_node != nullptr) ? other_node->node_id : NULL_ID));
         bool edge_valid = true;
-        if (edge->meta == IS_TIP) {
+        if (edge->meta == TIP) {
             if (other_node != nullptr) {
                 edge_valid = false;
             }
@@ -704,7 +707,7 @@ public:
                   edge->sequence.length() == sequence.length())) {
                 edge_valid = false;
             }
-        } else if (edge->meta == IS_FULL_EDGE) {
+        } else if (edge->meta == FULL) {
             if (other_node == nullptr) {
                 edge_valid = false;
             } else {
@@ -744,14 +747,14 @@ public:
         char out_base = segment_seq[segment_seq.length()-_ksize+1];
 
         switch(edge_meta) {
-            case IS_FULL_EDGE:
+            case FULL:
                 // then we merged two tips
                 pdebug("merge TIPs");
                 break;
-            case IS_TIP:
+            case TIP:
                 pdebug("extend TIP");
                 break;
-            case IS_ISLAND:
+            case ISLAND:
                 pdebug("created or extended ISLAND");
                 break;
         }
@@ -835,6 +838,8 @@ public:
                 lcursor.push_filter(edges.get_tag_stopper(tag_pair, found_tag));
                 std::string segment_seq = cassem._assemble_directed(lcursor)
                                           + root_back;
+                pdebug("assembled segment: " << segment_seq << " length: " << 
+                       segment_seq.length());
 
                 // first check for a segment going this direction from root
                 CompactEdge* segment_edge = nullptr;
@@ -843,12 +848,13 @@ public:
                 CompactNode* left_node = nodes.get_node_by_kmer(lcursor.cursor);
                 CompactEdge* left_out_edge = nullptr;
                 if (left_node != nullptr) {
+                    pdebug("found existing left node");
                     nodes.get_edge_from_right(left_node, left_out_edge, segment_seq);
                 }
 
                 // validate edge leaving root if it exists
                 if (segment_edge != nullptr && left_out_edge != nullptr) {
-
+                    pdebug("found edges leaving root and left node");
                     
                     if (segment_edge == left_out_edge && 
                         validate_segment(root_node, left_node, 
@@ -866,6 +872,7 @@ public:
                     n_updates += nodes.unlink_edge(left_out_edge);
                     edges.delete_edge(left_out_edge);
                 } else if (segment_edge != nullptr) {
+                    pdebug("found end leaving root node");
                     if (validate_segment(root_node, left_node,
                                          segment_edge, segment_seq)) {
                         continue;
@@ -887,11 +894,11 @@ public:
 
                 // construct the compact edge
                 compact_edge_meta_t edge_meta = (left_node == nullptr) 
-                                                ? IS_TIP : IS_FULL_EDGE;
-                edge_meta = (segment_seq.length() == _ksize + 1)
-                            ? IS_TRIVIAL : edge_meta;
+                                                ? TIP : FULL;
+                edge_meta = (segment_seq.length() == _ksize + 1 && edge_meta == FULL)
+                            ? TRIVIAL : edge_meta;
 
-                if (edge_meta == IS_FULL_EDGE || edge_meta == IS_TRIVIAL) {
+                if (edge_meta == FULL || edge_meta == TRIVIAL) {
                     // left side includes HDN, right side does not
 
                     segment_edge = edges.build_edge(left_node->node_id, 
@@ -967,11 +974,11 @@ public:
 
                 pdebug("segment sequence length=" << segment_seq.length());
                 compact_edge_meta_t edge_meta = (right_node == nullptr) ?
-                                                  IS_TIP : IS_FULL_EDGE;
-                edge_meta = (segment_seq.length() == _ksize + 1)
-                            ? IS_TRIVIAL : edge_meta;
+                                                  TIP : FULL;
+                edge_meta = (segment_seq.length() == _ksize + 1 && edge_meta == FULL)
+                            ? TRIVIAL : edge_meta;
 
-                if (edge_meta == IS_FULL_EDGE) {
+                if (edge_meta == FULL || edge_meta == TRIVIAL) {
                     segment_edge = edges.build_edge(root_node->node_id, 
                                                     right_node->node_id,
                                                     edge_meta, 
