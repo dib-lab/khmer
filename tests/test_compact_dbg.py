@@ -227,5 +227,36 @@ def test_compact_trivial_edge(tandem_triple_forks, ksize):
     assert node_2.degree == 4
 
 
-def test_compact_tip_split_merge():
-    pass
+def test_compact_tip_linear_merge(left_tip_structure, right_tip_structure,
+                                   ksize):
+    right_tip_structure = right_tip_structure()
+    graph, contig_r, L_r, HDN_r, R_r, tip_r = right_tip_structure
+    left_tip_structure = left_tip_structure()
+    _, contig_l, L_l, HDN_l, R_l, tip_l = left_tip_structure
+    
+    contig_merge = contig_l[-ksize:] + contig_r[0:ksize]
+    graph.reset()
+
+    compactor = StreamingCompactor(graph)
+
+    compactor.consume(str(tip_l))
+    print(compactor.consume_and_update(contig_l),
+          'cDBG updates from left')
+    compactor.report()
+    compare_tip_with_cdbg(left_tip_structure, compactor)
+    assert compactor.n_nodes == 1
+    assert compactor.n_edges == 3
+
+    compactor.consume(str(tip_r))
+    print(compactor.consume_and_update(contig_r), 
+          'cDBG updates from right')
+    compactor.report()
+    compare_tip_with_cdbg(right_tip_structure, compactor)
+    assert compactor.n_nodes == 2
+    assert compactor.n_edges == 6
+
+    print(compactor.consume_and_update(contig_merge),
+          'cDBG updates from linear merge')
+    
+    assert compactor.n_nodes == 2
+    assert compactor.n_edges == 5

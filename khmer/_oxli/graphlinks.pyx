@@ -164,3 +164,7 @@ cdef class StreamingCompactor:
     @property
     def n_edges(self):
         return deref(self._sc_this).n_edges()
+
+    @property
+    def n_updates(self):
+        return deref(self._sc_this).n_updates()

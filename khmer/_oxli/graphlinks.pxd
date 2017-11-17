@@ -52,6 +52,8 @@ cdef extern from "oxli/links.hh" namespace "oxli" nogil:
         CpCompactEdgeFactory(WordLength)
 
         uint64_t n_edges()
+        uint64_t n_updates()
+
         CpCompactEdge* build_edge(uint64_t, uint64_t, compact_edge_meta_t,
                                   string)
         void delete_edge(CpCompactEdge*)
@@ -89,6 +91,7 @@ cdef extern from "oxli/links.hh" namespace "oxli" nogil:
     cdef cppclass CpCompactNodeFactory "oxli::CompactNodeFactory" (CpKmerFactory):
         CpCompactNodeFactory(WordLength)
         uint64_t n_nodes()
+        uint64_t n_updates()
 
         CpCompactNode* build_node(CpKmer)
         CpCompactNode* get_node_by_kmer(HashIntoType)
@@ -96,7 +99,7 @@ cdef extern from "oxli/links.hh" namespace "oxli" nogil:
         CpCompactNode* get_or_build_node(CpKmer)
         vector[CpCompactNode*] get_nodes(const string&)
 
-        uint8_t unlink_edge(CpCompactEdge*)
+        void unlink_edge(CpCompactEdge*)
 
         bool get_pivot_from_left(CpCompactNode*, string&, char&)
         bool add_edge_from_left(CpCompactNode*, CpCompactEdge*)
@@ -113,6 +116,7 @@ cdef extern from "oxli/links.hh" namespace "oxli" nogil:
         void report()
         uint64_t n_nodes()
         uint64_t n_edges()
+        uint64_t n_updates()
 
         CpCompactNode* get_node_by_kmer(HashIntoType)
         CpCompactNode* get_node_by_id(uint64_t)

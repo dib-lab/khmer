@@ -178,6 +178,7 @@ class CompactEdgeFactory : public KmerFactory {
 protected:
 
     uint64_t n_compact_edges;
+    uint64_t _n_updates;
     uint32_t tag_density;
 
     TagEdgeMap tags_to_edges;
@@ -186,13 +187,18 @@ protected:
 public:
 
     CompactEdgeFactory(WordLength K) :
-        KmerFactory(K), n_compact_edges(0) {
+        KmerFactory(K), n_compact_edges(0),
+        _n_updates(0) {
 
         tag_density = DEFAULT_TAG_DENSITY;    
     }
 
     uint64_t n_edges() const {
         return n_compact_edges;
+    }
+
+    uint64_t n_updates() const {
+        return _n_updates;
     }
 
     CompactEdge* build_edge(uint64_t left_id, uint64_t right_id,
@@ -215,6 +221,7 @@ public:
 
         edge->sequence = edge_sequence;
         n_compact_edges++;
+        _n_updates++;
         return edge;
     }
 
@@ -227,6 +234,7 @@ public:
             }
             delete edge;
             n_compact_edges--;
+            _n_updates++;
         }
     }
 
@@ -427,15 +435,20 @@ protected:
     // linear storage for CompactNodes
     CompactNodeVector compact_nodes;
     uint64_t n_compact_nodes;
+    uint64_t _n_updates;
 
 public:
     CompactNodeFactory(WordLength K) : 
-        KmerFactory(K), n_compact_nodes(0) {}
+        KmerFactory(K), n_compact_nodes(0),
+        _n_updates(0) {}
 
     uint64_t n_nodes() const {
         return n_compact_nodes;
     }
     
+    uint64_t n_updates() const {
+        return _n_updates;
+    }
 
     // protected linear creation of CompactNode
     // they should never be deleted, so this is straightforward
@@ -448,6 +461,7 @@ public:
             v = &(compact_nodes.back());
             v->sequence = _revhash(hdn, _ksize);
             kmer_id_map[hdn] = v->node_id;
+            _n_updates++;
             //pdebug("Allocate: " << *v);
         }
         return v;
@@ -499,22 +513,20 @@ public:
         return nodes;
     }
 
-    uint8_t unlink_edge(CompactEdge* edge) {
+    void unlink_edge(CompactEdge* edge) {
         pdebug("unlink edge " << *edge);
         CompactNode *left, *right;
         left = get_node_by_id(edge->in_node_id);
         right = get_node_by_id(edge->out_node_id);
-        uint8_t n_deletes = 0;
         if (left != nullptr) {
             // be lazy for now and use bidirectional delete
             left->delete_edge(edge);
-            n_deletes++;
+            _n_updates++;
         }
         if (right != nullptr) {
             right->delete_edge(edge);
-            n_deletes++;
+            _n_updates++;
         }
-        return n_deletes;
     }
 
     bool is_rc_from_left(CompactNode* v, std::string& sequence) const {
@@ -551,17 +563,19 @@ public:
         }
     }
 
-    bool add_edge_from_left(CompactNode* v, CompactEdge* e) const {
+    bool add_edge_from_left(CompactNode* v, CompactEdge* e) {
         char pivot_base;
         if (!get_pivot_from_left(v, e->sequence, pivot_base)) {
             // same canonical orientation
             pdebug("add in edge " << *e << " to node " << *v << " from " << pivot_base);
             v->add_in_edge(pivot_base, e);
+            _n_updates++;
             return false;
         } else {
             // must have opposite canonical orientation
             pdebug("add out edge " << *e << " to node " << *v << " from " << pivot_base);
             v->add_out_edge(pivot_base, e);
+            _n_updates++;
             return true;
         }
     }
@@ -611,15 +625,17 @@ public:
         }
     }
 
-    bool add_edge_from_right(CompactNode* v, CompactEdge* e) const {
+    bool add_edge_from_right(CompactNode* v, CompactEdge* e) {
         char pivot_base;
         if (!get_pivot_from_right(v, e->sequence, pivot_base)) {
             pdebug("add out edge " << *e << " to node " << *v << " from " << pivot_base);
             v->add_out_edge(pivot_base, e);
+            _n_updates++;
             return false;
         } else {
             pdebug("add in edge " << *e << " to node " << *v << " from " << pivot_base);
             v->add_in_edge(pivot_base, e);
+            _n_updates++;
             return true;
         }
     }
@@ -662,7 +678,7 @@ public:
     {
     }
 
-    compact_edge_meta_t deduce_meta(CompactNode* in, CompactNode* out) {
+    compact_edge_meta_t deduce_edge_meta(CompactNode* in, CompactNode* out) {
         compact_edge_meta_t edge_meta;
         if (in == nullptr && out == nullptr) {
            edge_meta = ISLAND;
@@ -680,6 +696,10 @@ public:
 
     uint64_t n_edges() const {
         return edges.n_edges();
+    }
+
+    uint64_t n_updates() const {
+        return nodes.n_updates() + edges.n_updates();
     }
 
     void report() const {
@@ -763,7 +783,9 @@ public:
 
     /* Update a compact dbg where there are no induced
      * HDNs
-    uint64_t update_compact_dbg_linear(std::string& sequence) {
+     */
+    uint64_t update_compact_dbg_linear(const std::string& sequence) {
+        uint64_t n_ops_before = n_updates();
         Kmer root_kmer = graph->build_kmer(sequence.substr(0, _ksize));
 
         CompactingAT<TRAVERSAL_LEFT> lcursor(graph.get(), root_kmer);
@@ -777,29 +799,48 @@ public:
         CompactNode *left_node = nullptr, *right_node = nullptr;
         left_node = nodes.get_node_by_kmer(lcursor.cursor);
         right_node = nodes.get_node_by_kmer(rcursor.cursor);
+        
+        CompactEdge *left_edge = nullptr, *right_edge = nullptr;
+        if (left_node != nullptr) {
+            nodes.get_edge_from_right(left_node, left_edge, segment_seq);
+        }
+        if (right_node != nullptr) {
+            nodes.get_edge_from_left(right_node, right_edge, segment_seq);
+        }
+        
+        if (left_edge != nullptr) {
+            nodes.unlink_edge(left_edge);
+            edges.delete_edge(left_edge);
+        }
+        if (right_edge != nullptr) {
+            nodes.unlink_edge(right_edge);
+            edges.delete_edge(right_edge);
+        }
 
         compact_edge_meta_t edge_meta = deduce_edge_meta(left_node, right_node);
-        char in_base = segment_seq[_ksize-1];
-        char out_base = segment_seq[segment_seq.length()-_ksize+1];
-
-        switch(edge_meta) {
-            case FULL:
-                // then we merged two tips
-                pdebug("merge TIPs");
-                break;
-            case TIP:
-                pdebug("extend TIP");
-                break;
-            case ISLAND:
-                pdebug("created or extended ISLAND");
-                break;
+        if (edge_meta == ISLAND) { // don't deal with islands for now
+            return n_updates() - n_ops_before;
         }
+        uint64_t left_id, right_id;
+        left_id = (left_node != nullptr) ? left_node->node_id : NULL_ID;
+        right_id = (right_node != nullptr) ? right_node->node_id : NULL_ID;
+        CompactEdge *new_edge = edges.build_edge(left_id, right_id,
+                                                 edge_meta, segment_seq);
+        if (left_node != nullptr) {
+            nodes.add_edge_from_right(left_node, new_edge);
+        }
+        if (right_node != nullptr) {
+            nodes.add_edge_from_left(right_node, new_edge);
+        }
+        
+        return n_updates() - n_ops_before;
     }
-    */
+
 
     uint64_t update_compact_dbg(const std::string& sequence) {
         pdebug("update cDBG from " << sequence);
         n_sequences_added++;
+        uint64_t n_ops_before = n_updates();
 
         // first gather up all k-mers that could have been disturbed --
         // k-mers in the read, and the neighbors of the flanking nodes
@@ -819,7 +860,6 @@ public:
         
                 // find the induced HDNs in the disturbed k-mers
         KmerSet induced_hdns;
-        uint64_t n_updates = 0;
         while(!disturbed_kmers.empty()) {
             Kmer kmer = disturbed_kmers.back();
             disturbed_kmers.pop_back();
@@ -829,12 +869,10 @@ public:
             if(l_degree > 1 || r_degree > 1) {
                 pdebug("found HDN... " << kmer);
                 CompactNode* hdn = nodes.get_or_build_node(kmer);
-                if (hdn->count == 1) {
+                if (hdn->count == 1) { // just created
                     induced_hdns.insert(kmer);
-                    n_updates++;
                 } else if (hdn->degree() != (l_degree + r_degree)) {
                     induced_hdns.insert(kmer);
-                    n_updates++;
                 }
             }
         }
@@ -842,8 +880,9 @@ public:
 
         /* If there are no induced HDNs, we must have extended
          * a tip or merged two tips into a linear segment */
-        // handle_merge()
-
+        if (induced_hdns.size() == 0) {
+            return update_compact_dbg_linear(sequence);
+        }
 
         /* Update from all induced HDNs
          */
@@ -907,7 +946,7 @@ public:
                 } else if (left_out_edge != nullptr) {
                     // there was no edge from root, must be bad
                     pdebug("edge from left invalid, delete");
-                    n_updates += nodes.unlink_edge(left_out_edge);
+                    nodes.unlink_edge(left_out_edge);
                     edges.delete_edge(left_out_edge);
                 } else if (segment_edge != nullptr) {
                     pdebug("found end leaving root node");
@@ -916,7 +955,7 @@ public:
                         continue;
                     } else {
                         pdebug("edge from root invalid, delete");
-                        n_updates += nodes.unlink_edge(segment_edge);
+                        nodes.unlink_edge(segment_edge);
                         edges.delete_edge(segment_edge);
                     }
                 }
@@ -951,8 +990,6 @@ public:
                                                     segment_seq);
                 }
 
-
-                n_updates++;
                 nodes.add_edge_from_left(root_node, segment_edge);
             }
 
@@ -1001,7 +1038,7 @@ public:
                 } else if (right_in_edge != nullptr) {
                     // there was no edge from root, must be bad
                     pdebug("edge from left invalid, delete");
-                    n_updates += nodes.unlink_edge(right_in_edge);
+                    nodes.unlink_edge(right_in_edge);
                     edges.delete_edge(right_in_edge);
                 } else if (segment_edge != nullptr) {
                     if (validate_segment(root_node, right_node,
@@ -1009,7 +1046,7 @@ public:
                         continue;
                     } else {
                         pdebug("edge from root invalid, delete");
-                        n_updates += nodes.unlink_edge(segment_edge);
+                        nodes.unlink_edge(segment_edge);
                         edges.delete_edge(segment_edge);
                     }
                 }
@@ -1033,14 +1070,12 @@ public:
                                                     segment_seq);
                 }
 
-
-                n_updates++;
                 nodes.add_edge_from_right(root_node, segment_edge);
             }
 
         }
 
-        return n_updates;
+        return n_updates() - n_ops_before;
 
     } // update_compact_dbg
 
