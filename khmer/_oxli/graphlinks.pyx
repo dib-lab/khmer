@@ -82,6 +82,10 @@ cdef class CompactNode:
         return deref(self._cn_this).in_degree()
 
     @property
+    def degree(self):
+        return deref(self._cn_this).degree()
+
+    @property
     def ID(self):
         return deref(self._cn_this).node_id
 

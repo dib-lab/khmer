@@ -223,6 +223,8 @@ def test_compact_trivial_edge(tandem_triple_forks, ksize):
 
     assert HDN_l in trivial.sequence
     assert HDN_r in trivial.sequence
+    assert node_1.degree == 4
+    assert node_2.degree == 4
 
 
 def test_compact_tip_split_merge():
