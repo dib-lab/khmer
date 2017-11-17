@@ -518,6 +518,10 @@ public:
     }
 
     bool is_rc_from_left(CompactNode* v, std::string& sequence) const {
+        /* Check if sequence shares same canonical orientation with
+         * v when coming from graph left, assuming sequence
+         * does NOT include v.
+         */
         const char * node_kmer = v->sequence.c_str();
         const char * _sequence = sequence.c_str();
         return strncmp(node_kmer, 
@@ -528,6 +532,10 @@ public:
     bool get_pivot_from_left(CompactNode* v,
                              std::string& sequence,
                              char& pivot_base) const {
+        /* Check if sequence shared same canonical
+         * orientation with v from graph left, assuming
+         * sequence does NOT include v
+         */
         const char * node_kmer = v->sequence.c_str();
         const char * _segment = sequence.c_str();
         pivot_base = _segment[sequence.size()-_ksize-1];
@@ -575,7 +583,7 @@ public:
     bool is_rc_from_right(CompactNode* v,
                           std::string& sequence) const {
         /* Check if sequence shared same canonical
-         * orientation with v from "right," assuming
+         * orientation with v from graph right, assuming
          * sequence does NOT include v
          */
         const char * node_kmer = v->sequence.c_str();
@@ -586,6 +594,10 @@ public:
     bool get_pivot_from_right(CompactNode* v,
                               std::string& sequence,
                               char& pivot_base) const {
+        /* Find the "pivot base" between sequence and v
+         * when sequence is from graph right, assuming
+         * v contained in sequence
+         */
         const char * node_kmer = v->sequence.c_str();
         const char * _segment = sequence.c_str();
         pivot_base = _segment[_ksize];
