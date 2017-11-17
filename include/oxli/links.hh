@@ -306,6 +306,10 @@ public:
         return lhs.node_id == rhs.node_id;
     }
 
+    std::string rc_sequence() const {
+        return _revcomp(sequence);
+    }
+
     bool delete_edge(CompactEdge* edge) {
         bool deleted = false;
         if (delete_in_edge(edge)) {
@@ -385,6 +389,7 @@ public:
                                      const CompactNode& node) {
             stream << "<CompactNode ID=" << node.node_id << " Kmer=" << node.kmer.kmer_u
                    << " Sequence=" << node.sequence
+                   << " rc_Sequence=" << node.rc_sequence()
                    << " Count=" << node.count << " in_degree=" 
                    << std::to_string(node.in_degree())
                    << " out_degree=" << std::to_string(node.out_degree()) << ">";
@@ -512,6 +517,14 @@ public:
         return n_deletes;
     }
 
+    bool is_rc_from_left(CompactNode* v, std::string& sequence) const {
+        const char * node_kmer = v->sequence.c_str();
+        const char * _sequence = sequence.c_str();
+        return strncmp(node_kmer, 
+                       _sequence + sequence.size()-_ksize+1,
+                       _ksize - 1) != 0;
+    }
+
     bool get_pivot_from_left(CompactNode* v,
                              std::string& sequence,
                              char& pivot_base) const {
@@ -557,6 +570,17 @@ public:
             result_edge = v->get_out_edge(pivot_base);
             return true;
         }
+    }
+
+    bool is_rc_from_right(CompactNode* v,
+                          std::string& sequence) const {
+        /* Check if sequence shared same canonical
+         * orientation with v from "right," assuming
+         * sequence does NOT include v
+         */
+        const char * node_kmer = v->sequence.c_str();
+        const char * _sequence = sequence.c_str();
+        return strncmp(node_kmer+1, _sequence, _ksize-1) != 0;
     }
 
     bool get_pivot_from_right(CompactNode* v,
@@ -815,13 +839,11 @@ public:
         KmerQueue neighbors;
         while(!induced_hdns.empty()) {
             Kmer root_kmer = *induced_hdns.begin();
-            std::string root_kmer_seq = root_kmer.get_string_rep(_ksize);
-            char root_front = root_kmer_seq.front();
-            char root_back = root_kmer_seq.back();
-
             induced_hdns.erase(root_kmer);
 
             CompactNode* root_node = nodes.get_node_by_kmer(root_kmer);
+            char root_front = root_node->sequence.front();
+            char root_back = root_node->sequence.back();
             pdebug("searching from induced HDN: " << root_node->edges_repr());
 
             // check left (in) edges
@@ -836,8 +858,12 @@ public:
                 bool found_tag = false;
 
                 lcursor.push_filter(edges.get_tag_stopper(tag_pair, found_tag));
-                std::string segment_seq = cassem._assemble_directed(lcursor)
-                                          + root_back;
+                std::string segment_seq = cassem._assemble_directed(lcursor);
+                if (nodes.is_rc_from_left(root_node, segment_seq)) {
+                    segment_seq = segment_seq  + complement(root_front);
+                } else {
+                    segment_seq = segment_seq + root_back;
+                }
                 pdebug("assembled segment: " << segment_seq << " length: " << 
                        segment_seq.length());
 
@@ -848,7 +874,7 @@ public:
                 CompactNode* left_node = nodes.get_node_by_kmer(lcursor.cursor);
                 CompactEdge* left_out_edge = nullptr;
                 if (left_node != nullptr) {
-                    pdebug("found existing left node");
+                    pdebug("found existing left node: " << *left_node);
                     nodes.get_edge_from_right(left_node, left_out_edge, segment_seq);
                 }
 
@@ -930,8 +956,12 @@ public:
                 bool found_tag = false;
 
                 rcursor.push_filter(edges.get_tag_stopper(tag_pair, found_tag));
-                std::string segment_seq = root_front + cassem._assemble_directed(rcursor);
-
+                std::string segment_seq = cassem._assemble_directed(rcursor);
+                if (nodes.is_rc_from_right(root_node, segment_seq)) {
+                    segment_seq = complement(root_back) + segment_seq;
+                } else {
+                    segment_seq = root_front + segment_seq;
+                }
                 // first check for a segment going this direction from root
                 CompactEdge* segment_edge = nullptr;
                 nodes.get_edge_from_right(root_node, segment_edge, segment_seq);
