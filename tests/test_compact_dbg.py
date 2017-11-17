@@ -211,5 +211,19 @@ def test_compact_trivial_edge(tandem_triple_forks, ksize):
     assert compactor.n_nodes == 2
     assert compactor.n_edges == 7
 
+    nodes = list(compactor.sequence_nodes(core))
+    node_1, node_2 = nodes
+    trivial, node_2_out = list(node_2.in_edges()), list(node_2.out_edges())
+    if len(trivial) != 1:
+        trivial, node_2_out = node_2_out, trivial
+    _, trivial = trivial[0]
+
+    assert trivial.edge_type == 'TRIVIAL'
+    assert len(trivial) == ksize + 1
+
+    assert HDN_l in trivial.sequence
+    assert HDN_r in trivial.sequence
+
+
 def test_compact_tip_split_merge():
     pass
