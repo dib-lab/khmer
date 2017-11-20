@@ -40,8 +40,8 @@
 Installing and running khmer
 ============================
 
-You'll need a 64-bit operating system, internet access, and Python
-2.7.x OR Python 3.3 or greater.
+You'll need a 64-bit operating system, internet access, a C++11 compatible
+compiler (e.g. GCC 4.8 or greater) and Python 2.7.x OR Python 3.3 or greater.
 
 If you are running khmer in a HPC environment or for other reasons do not
 have root access try creating a virtual environment as described in the OS X

@@ -123,6 +123,15 @@ class TestLinearAssembler_RightBranching:
         assert len(path) == HDN.pos + K
         assert utils._equals_rc(path, contig[:len(path)])
 
+    def test_assemble_takes_hash(self, right_tip_structure):
+        # assemble from beginning of contig, up until branch point
+        graph, contig, L, HDN, R, tip = right_tip_structure
+        asm = khmer.LinearAssembler(graph)
+        path = asm.assemble(graph.hash(contig[0:K]))
+
+        assert len(path) == HDN.pos + K
+        assert utils._equals_rc(path, contig[:len(path)])
+
     def test_beginning_to_branch_revcomp(self, right_tip_structure):
         # assemble from beginning of contig, up until branch point
         # starting from rev comp

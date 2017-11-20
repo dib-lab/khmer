@@ -828,13 +828,15 @@ const
     while(!kmers.done()) {
         n++;
         if (n % 10000 == 0) {
-            std::cout << "... find_high_degree_nodes: " << n << "\n";
-            std::cout << std::flush;
+            std::cout << "\r... find_high_degree_nodes: " << n;
         }
         Kmer kmer = kmers.next();
         if ((traverser.degree(kmer)) > 2) {
             high_degree_nodes.insert(kmer);
         }
+    }
+    if (n >= 10000) {
+        std::cout << "\rfound " << n << " high degree nodes.\n";
     }
 }
 

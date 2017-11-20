@@ -53,6 +53,7 @@ using namespace std;
   "                                                                "\
   /*ABCDEFGHIJKLMNOPQRSTUVWXYZ      abcdefghijklmnopqrstuvwxyz    */\
   " TVGH FCD  M KN   YSAABW R       TVGH FCD  M KN   YSAABW R"
+  //" TVGH FCD  M KA   YSAABWARA      TVGH FCD  M KA   YSAABWARA"
 
 //
 // _hash: hash a k-length DNA sequence into a 64-bit number.
@@ -183,6 +184,7 @@ HashIntoType _hash_murmur(const std::string& kmer, const WordLength k,
 
     assert(kmer.length() == k); // an assumption of the below code
     std::string rev = oxli::_revcomp(kmer);
+
     if (rev == kmer) {
         // self complement kmer, can't use bitwise XOR
         r = out[0];
@@ -204,6 +206,58 @@ HashIntoType _hash_murmur_forward(const std::string& kmer, const WordLength k)
 
     return h;
 }
+
+HashIntoType _hash_cyclic(const std::string& kmer, const WordLength k)
+{
+    HashIntoType h = 0;
+    HashIntoType r = 0;
+
+    const std::string rev = oxli::_revcomp(kmer);
+    CyclicHash<uint64_t> fwd_hasher(k);
+    CyclicHash<uint64_t> rev_hasher(k);
+
+    for (WordLength i = 0; i < k; ++i) {
+        fwd_hasher.eat(kmer[i]);
+    }
+    h = fwd_hasher.hashvalue;
+
+    for (WordLength i = 0; i < k; ++i) {
+        rev_hasher.eat(rev[i]);
+    }
+    r = rev_hasher.hashvalue;
+
+    return h + r;
+}
+
+HashIntoType _hash_cyclic(const std::string& kmer, const WordLength k,
+                          HashIntoType& h, HashIntoType& r)
+{
+    const std::string rev = oxli::_revcomp(kmer);
+    CyclicHash<uint64_t> fwd_hasher(k);
+    CyclicHash<uint64_t> rev_hasher(k);
+
+    for (WordLength i = 0; i < k; ++i) {
+        fwd_hasher.eat(kmer[i]);
+    }
+    h = fwd_hasher.hashvalue;
+
+    for (WordLength i = 0; i < k; ++i) {
+        rev_hasher.eat(rev[i]);
+    }
+    r = rev_hasher.hashvalue;
+
+    return h + r;
+}
+
+HashIntoType _hash_cyclic_forward(const std::string& kmer, const WordLength k)
+{
+    HashIntoType h = 0;
+    HashIntoType r = 0;
+
+    oxli::_hash_cyclic(kmer, k, h, r);
+    return h;
+}
+
 
 std::pair<uint64_t, uint64_t> compute_band_interval(unsigned int num_bands,
                                                     unsigned int band)

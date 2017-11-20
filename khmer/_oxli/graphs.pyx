@@ -23,14 +23,15 @@ from khmer._oxli.traversal cimport Traverser
 
 from khmer._khmer import ReadParser
 
-CYTHON_TABLES = (Hashtable, Nodetable, Counttable, SmallCounttable,
-                 QFCounttable, Nodegraph, Countgraph, SmallCountgraph, CounttableMMap, CountgraphMMap)
+CYTHON_TABLES = (Hashtable, Nodetable, Counttable, CyclicCounttable,
+                 SmallCounttable,
+                 QFCounttable, Nodegraph, Countgraph, SmallCountgraph)
 
 
 cdef class Hashtable:
 
     cpdef bytes sanitize_seq_kmer(self, object kmer):
-        '''Legnth sanitize a string k-mer and return as bytes.'''
+        '''Length sanitize a string k-mer and return as bytes.'''
         if len(kmer) != self.ksize():
             raise ValueError("Expected k-mer length {}"
                              " but got {}.".format(self.ksize(), len(kmer)))
@@ -396,18 +397,14 @@ cdef class Counttable(Hashtable):
             self._ht_this = <shared_ptr[CpHashtable]>self._ct_this
 
 
-cdef class CounttableMMap(Hashtable):
+cdef class CyclicCounttable(Hashtable):
 
-    def __cinit__(self, int k, uint64_t starting_size, int n_tables, string filename=b''):
+    def __cinit__(self, int k, uint64_t starting_size, int n_tables):
         cdef vector[uint64_t] primes
-        if type(self) is CounttableMMap:
-	   
+        if type(self) is CyclicCounttable:
             primes = get_n_primes_near_x(n_tables, starting_size)
-            if filename==b'':
-                self._ctM_this = make_shared[CpCounttableMMap](k, primes)         	    
-            else:
-                self._ctM_this = make_shared[CpCounttableMMap](k, primes,filename)         
-            self._ht_this = <shared_ptr[CpHashtable]>self._ctM_this
+            self._cct_this = make_shared[CpCyclicCounttable](k, primes)
+            self._ht_this = <shared_ptr[CpHashtable]>self._cct_this
 
 
 cdef class SmallCounttable(Hashtable):
@@ -453,7 +450,7 @@ cdef class Hashgraph(Hashtable):
     def neighbors(self, object kmer):
         '''Get a list of neighbor nodes for this k-mer.'''
         cdef Traverser traverser = Traverser(self)
-        return [str(n) for n in traverser._neighbors(self._build_kmer(kmer))]
+        return list(traverser._neighbors(self._build_kmer(kmer)))
 
     def calc_connected_graph_size(self, object kmer, max_size=0,
                                   break_on_circumference=False):
@@ -505,13 +502,13 @@ cdef class Hashgraph(Hashtable):
         '''Traverse the path through the graph starting with the given
         k-mer and avoiding high-degree nodes, finding (and returning)
         traversed k-mers and any encountered high-degree nodes.'''
-        cdef set[HashIntoType] adj
-        cdef set[HashIntoType] visited
+        cdef HashSet adj = HashSet(self.ksize())
+        cdef HashSet visited = HashSet(self.ksize())
         cdef CpKmer _kmer = self._build_kmer(kmer)
         cdef CpNodegraph * _stop_filter = stop_filter._ng_this.get()
         cdef int size = deref(self._hg_this).traverse_linear_path(_kmer,
-                                                                 adj,
-                                                                 visited,
+                                                                 adj.hs,
+                                                                 visited.hs,
                                                                  deref(_stop_filter),
                                                                  hdns.hs)
         return size, adj, visited
