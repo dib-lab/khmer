@@ -47,7 +47,7 @@ import csv
 import khmer
 import textwrap
 import os
-from khmer import Countgraph
+from khmer import Countgraph,QFCounttable
 from khmer.kfile import check_input_files
 from khmer.khmer_args import (sanitize_help, KhmerArgumentParser)
 from khmer.khmer_logger import (configure_logging, log_info, log_error,
@@ -88,6 +88,9 @@ def get_parser():
                         'do not exist or are empty.')
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
+    parser.add_argument('-c', '--use-CQF', dest='useCQF', default=False,
+                        action='store_true')
+    
     return parser
 
 
@@ -103,7 +106,10 @@ def main():
 
     log_info('Loading counting graph from {graph}',
              graph=args.input_count_graph_filename)
-    countgraph = Countgraph.load(args.input_count_graph_filename)
+    if args.useCQF:
+        countgraph = QFCounttable.load(args.input_count_graph_filename)
+    else:
+        countgraph = Countgraph.load(args.input_count_graph_filename)
 
     if not countgraph.get_use_bigcount() and args.bigcount:
         log_warn("WARNING: The loaded graph has bigcount DISABLED while "

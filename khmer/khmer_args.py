@@ -501,6 +501,8 @@ def calculate_graphsize(args, graphtype, multiplier=1.0):
     The return value refers to the target size (in buckets, not bytes) of each
     individual table in the graph.
     """
+    if graphtype == 'QFCounttable':
+        return int(args.max_tablesize);
     if graphtype not in khmer._buckets_per_byte:
         raise ValueError('unknown graph type: ' + graphtype)
 
@@ -564,6 +566,10 @@ def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
         tablesize = calculate_graphsize(args, 'smallcountgraph',
                                         multiplier=multiplier)
         return khmer.SmallCountgraph(ksize, tablesize, args.n_tables)
+    if args.useCQF:
+        tablesize = calculate_graphsize(args, 'QFCounttable',
+                                        multiplier=multiplier)
+        return khmer.QFCounttable(ksize, tablesize)
     else:
         tablesize = calculate_graphsize(args, 'countgraph',
                                         multiplier=multiplier)
