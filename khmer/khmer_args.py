@@ -602,11 +602,19 @@ def report_on_config(args, graphtype='countgraph'):
 
     tablesize = calculate_graphsize(args, graphtype)
     maxmem = args.n_tables * tablesize / khmer._buckets_per_byte[graphtype]
+
+    
     log_info("\nPARAMETERS:")
     log_info(" - kmer size =     {ksize} \t\t(-k)", ksize=args.ksize)
-    log_info(" - n tables =      {ntables} \t\t(-N)", ntables=args.n_tables)
-    log_info(" - max tablesize = {tsize:5.2g} \t(-x)", tsize=tablesize)
-    log_info("Estimated memory usage is {mem:.1f} Gb "
+    log_info(" - use cqf =     {bool} ", bool=args.useCQF)
+    if args.useCQF:
+        log_info(" - n tables =      {ntables} \t\t(-N)", ntables=1)
+        log_info(" - max tablesize = {tsize:5.2g} \t(-x)", tsize=tablesize*1.3)
+        log_info("Estimated memory usage is {mem:.1f} Gb " , mem=(tablesize*1.3)/(1000000000.0))
+    else:
+        log_info(" - n tables =      {ntables} \t\t(-N)", ntables=args.n_tables)
+        log_info(" - max tablesize = {tsize:5.2g} \t(-x)", tsize=tablesize)
+        log_info("Estimated memory usage is {mem:.1f} Gb "
              "({bytes:.2g} bytes = {ntables} bytes x {tsize:5.2g} entries "
              "/ {div:d} entries per byte)", bytes=maxmem, mem=maxmem / 1e9,
              div=khmer._buckets_per_byte[graphtype], ntables=args.n_tables,

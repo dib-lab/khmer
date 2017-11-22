@@ -1,0 +1,3 @@
+To run the scripts you need:
+1) Parallel gnu tool sudo apt-get install parallel
+2) numpy,matplotlib pip install numpy matplotlib
