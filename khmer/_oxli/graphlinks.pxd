@@ -17,10 +17,11 @@ cdef extern from "oxli/links.hh":
 
 cdef extern from "oxli/links.hh" namespace "oxli" nogil:
 
-    ctypedef pair[HashIntoType, uint64_t] HashIDPair
+    ctypedef uint64_t id_t
+    ctypedef pair[HashIntoType, id_t] HashIDPair
     ctypedef uset[HashIntoType] UHashSet
     ctypedef vector[HashIntoType] HashVector
-    ctypedef umap[HashIntoType, uint64_t] HashIDMap
+    ctypedef umap[HashIntoType, id_t] HashIDMap
 
     ctypedef enum compact_edge_meta_t:
         FULL
@@ -31,14 +32,15 @@ cdef extern from "oxli/links.hh" namespace "oxli" nogil:
     cdef const char * edge_meta_repr(compact_edge_meta_t)
 
     cdef cppclass CpCompactEdge "oxli::CompactEdge":
-        uint64_t in_node_id
-        uint64_t out_node_id
+        const id_t in_node_id
+        const id_t out_node_id
+        const id_t edge_id
         UHashSet tags
         compact_edge_meta_t meta
         string sequence
 
-        CpCompactEdge(uint64_t, uint64_t)
-        CpComapctEdge(uint64_t, uint64_t, compact_edge_meta_t)
+        CpCompactEdge(id_t, id_t)
+        CpComapctEdge(id_t, id_t, compact_edge_meta_t)
 
         string rc_sequence()
         void add_tags(UHashSet&)
@@ -54,7 +56,7 @@ cdef extern from "oxli/links.hh" namespace "oxli" nogil:
         uint64_t n_edges()
         uint64_t n_updates()
 
-        CpCompactEdge* build_edge(uint64_t, uint64_t, compact_edge_meta_t,
+        CpCompactEdge* build_edge(id_t, id_t, compact_edge_meta_t,
                                   string)
         void delete_edge(CpCompactEdge*)
         void delete_edge(UHashSet&)
@@ -62,18 +64,19 @@ cdef extern from "oxli/links.hh" namespace "oxli" nogil:
         CpCompactEdge* get_edge(HashIntoType)
         bool get_tag_edge_pair(HashIntoType, TagEdgePair&)
         CpCompactEdge* get_edge(UHashSet&)
-        
 
     cdef cppclass CpCompactNode "oxli::CompactNode":
         CpKmer kmer
         uint32_t count
-        const uint64_t node_id
+        const id_t node_id
         string sequence
 
         CpCompactEdge* in_edges[4]
         CpCompactEdge* out_edges[4]
 
-        CpCompactNode(CpKmer)
+        CpCompactNode(CpKmer, id_t)
+        CpCompactNode(CpKmer, string, id_t)
+
         void add_in_edge(const char, CpCompactEdge*)
         bool delete_in_edge(CpCompactEdge*)
         CpCompactEdge* get_in_edge(const char)
@@ -95,7 +98,7 @@ cdef extern from "oxli/links.hh" namespace "oxli" nogil:
 
         CpCompactNode* build_node(CpKmer)
         CpCompactNode* get_node_by_kmer(HashIntoType)
-        CpCompactNode* get_node_by_id(uint64_t)
+        CpCompactNode* get_node_by_id(id_t)
         CpCompactNode* get_or_build_node(CpKmer)
         vector[CpCompactNode*] get_nodes(const string&)
 
@@ -119,16 +122,18 @@ cdef extern from "oxli/links.hh" namespace "oxli" nogil:
         uint64_t n_updates()
 
         CpCompactNode* get_node_by_kmer(HashIntoType)
-        CpCompactNode* get_node_by_id(uint64_t)
+        CpCompactNode* get_node_by_id(id_t)
         vector[CpCompactNode*] get_nodes(const string&)
         
         CpCompactEdge* get_edge(HashIntoType)
-        bool get_tag_edge_pair(uint64_t, TagEdgePair&)
+        bool get_tag_edge_pair(id_t, TagEdgePair&)
         CpCompactEdge* get_edge(UHashSet&)
 
         uint64_t update_compact_dbg(const string&)
         uint64_t consume_sequence(const string&)
         uint64_t consume_sequence_and_update(const string&)
+
+        void write_gml(string)
 
 
 cdef class CompactNode:

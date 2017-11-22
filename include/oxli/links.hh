@@ -74,15 +74,17 @@ Contact: khmer-project@idyll.org
 
 namespace oxli {
 
+typedef uint64_t id_t;
 #define NULL_ID ULLONG_MAX
 
 using std::make_shared;
 using std::shared_ptr;
 
-typedef std::pair<HashIntoType, uint64_t> HashIDPair;
+typedef std::pair<HashIntoType, id_t> HashIDPair;
 typedef std::unordered_set<HashIntoType> UHashSet;
 typedef std::vector<HashIntoType> HashVector;
-typedef std::unordered_map<HashIntoType, uint64_t> HashIDMap;
+typedef std::unordered_map<HashIntoType, id_t> HashIDMap;
+typedef std::unordered_set<id_t> IDSet;
 
 
 enum compact_edge_meta_t {
@@ -113,17 +115,21 @@ class CompactEdge {
 
 public:
 
-    const uint64_t in_node_id; // left and right HDN IDs
-    const uint64_t out_node_id;
+    const id_t in_node_id; // left and right HDN IDs
+    const id_t out_node_id;
+    const id_t edge_id;
     compact_edge_meta_t meta;
     std::string sequence;
     UHashSet tags;
 
-    CompactEdge(uint64_t in_node_id, uint64_t out_node_id) : 
-        in_node_id(in_node_id), out_node_id(out_node_id), meta(FULL) {}
+    CompactEdge(id_t in_node_id, id_t out_node_id, id_t edge_id) : 
+        in_node_id(in_node_id), out_node_id(out_node_id), 
+        meta(FULL), edge_id(edge_id) {}
     
-    CompactEdge(uint64_t in_node_id, uint64_t out_node_id, compact_edge_meta_t meta) :
-        in_node_id(in_node_id), out_node_id(out_node_id), meta(meta) {}
+    CompactEdge(id_t in_node_id, id_t out_node_id, id_t edge_id,
+                compact_edge_meta_t meta) :
+        in_node_id(in_node_id), out_node_id(out_node_id),
+        meta(meta), edge_id(edge_id) {}
 
     void add_tags(UHashSet& new_tags) {
         for (auto tag: new_tags) {
@@ -169,12 +175,14 @@ public:
 
 typedef std::vector<CompactEdge> CompactEdgeVector;
 typedef std::unordered_map<HashIntoType, CompactEdge*> TagEdgeMap;
+typedef std::unordered_map<id_t, CompactEdge*> IDEdgeMap;
 typedef std::pair<HashIntoType, CompactEdge*> TagEdgePair;
 typedef std::set<TagEdgePair> TagEdgePairSet;
 typedef std::set<CompactEdge*> CompactEdgeSet;
 
+class CompactNodeFactory;
 class CompactEdgeFactory : public KmerFactory {
-
+    friend class CompactNodeFactory;
 protected:
 
     uint64_t n_compact_edges;
@@ -182,7 +190,7 @@ protected:
     uint32_t tag_density;
 
     TagEdgeMap tags_to_edges;
-    CompactEdgeVector compact_edges;
+    IDEdgeMap compact_edges;
 
 public:
 
@@ -201,11 +209,13 @@ public:
         return _n_updates;
     }
 
-    CompactEdge* build_edge(uint64_t left_id, uint64_t right_id,
+    CompactEdge* build_edge(id_t left_id, id_t right_id,
                             compact_edge_meta_t edge_meta,
                             std::string edge_sequence) {
 
-        CompactEdge* edge = new CompactEdge(left_id, right_id, edge_meta);
+        CompactEdge* edge = new CompactEdge(left_id, right_id,
+                                            _n_updates, edge_meta);
+        compact_edges[_n_updates] = edge;
 
         pdebug("new compact edge: \n left=" << std::to_string(left_id) 
                 << std::endl << " right=" << std::to_string(right_id)
@@ -225,6 +235,14 @@ public:
         return edge;
     }
 
+    CompactEdge* get_edge_by_id(id_t id) {
+        auto search = compact_edges.find(id);
+        if (search != compact_edges.end()) {
+            return search->second;
+        }
+        return nullptr;
+    }
+
     void delete_edge(CompactEdge * edge) {
         //pdebug("attempt edge delete @" << edge);
         if (edge != nullptr) {
@@ -232,18 +250,24 @@ public:
             for (auto tag: edge->tags) {
                 tags_to_edges.erase(tag);
             }
+            compact_edges.erase(edge->edge_id);
             delete edge;
             n_compact_edges--;
             _n_updates++;
         }
     }
 
-    void delete_edge(UHashSet& tags) {
+    void delete_edge_by_id(id_t id) {
+        CompactEdge* e = get_edge_by_id(id);
+        delete_edge(e);
+    }
+
+    void delete_edge_by_tag(UHashSet& tags) {
         CompactEdge* edge = get_edge(tags);
         delete_edge(edge);
     }
 
-    void delete_edge(HashIntoType tag) {
+    void delete_edge_by_tag(HashIntoType tag) {
         CompactEdge* edge = get_edge(tag);
         delete_edge(edge);
     }
@@ -287,6 +311,9 @@ public:
 
         return stopper;
     }
+
+    void write_gml(const std::string filename,
+                   const CompactNodeFactory& nodes) const;
 };
 
 
@@ -296,17 +323,17 @@ class CompactNode {
 public:
     Kmer kmer;
     uint32_t count;
-    const uint64_t node_id;
+    const id_t node_id;
     std::string sequence;
     bool direction;
 
     CompactEdge* in_edges[4] = {nullptr, nullptr, nullptr, nullptr};
     CompactEdge* out_edges[4] = {nullptr, nullptr, nullptr, nullptr};
 
-    CompactNode(Kmer kmer, uint64_t node_id) : 
+    CompactNode(Kmer kmer, id_t node_id) : 
         kmer(kmer), count(0), node_id(node_id), direction(kmer.is_forward()) {}
 
-    CompactNode(Kmer kmer, std::string sequence, uint64_t node_id) : 
+    CompactNode(Kmer kmer, std::string sequence, id_t node_id) : 
         kmer(kmer), count(0), sequence(sequence), node_id(node_id),
         direction(kmer.is_forward()) {}
 
@@ -427,7 +454,7 @@ public:
 typedef std::vector<CompactNode> CompactNodeVector;
 
 class CompactNodeFactory : public KmerFactory {
-
+    friend class CompactEdgeFactory;
 protected:
 
     // map from HDN hashes to CompactNode IDs
@@ -470,13 +497,13 @@ public:
     CompactNode* get_node_by_kmer(HashIntoType hdn) {
         auto search = kmer_id_map.find(hdn);
         if (search != kmer_id_map.end()) {
-            uint64_t ID = search->second;
+            id_t ID = search->second;
             return &(compact_nodes[ID]);
         }
         return nullptr;
     }
 
-    CompactNode* get_node_by_id(uint64_t id) {
+    CompactNode* get_node_by_id(id_t id) {
         if (id >= compact_nodes.size()) {
             return nullptr;
         }
@@ -715,7 +742,7 @@ public:
         return nodes.get_node_by_kmer(hdn);
     }
 
-    CompactNode* get_node_by_id(uint64_t id) {
+    CompactNode* get_node_by_id(id_t id) {
         return nodes.get_node_by_id(id);
     }
 
@@ -821,7 +848,7 @@ public:
         if (edge_meta == ISLAND) { // don't deal with islands for now
             return n_updates() - n_ops_before;
         }
-        uint64_t left_id, right_id;
+        id_t left_id, right_id;
         left_id = (left_node != nullptr) ? left_node->node_id : NULL_ID;
         right_id = (right_node != nullptr) ? right_node->node_id : NULL_ID;
         CompactEdge *new_edge = edges.build_edge(left_id, right_id,
@@ -1078,6 +1105,10 @@ public:
         return n_updates() - n_ops_before;
 
     } // update_compact_dbg
+
+    void write_gml(const std::string filename) const {
+        edges.write_gml(filename, nodes);
+    }
 
 };
 

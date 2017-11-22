@@ -168,3 +168,7 @@ cdef class StreamingCompactor:
     @property
     def n_updates(self):
         return deref(self._sc_this).n_updates()
+
+    def write_gml(self, str filename):
+        cdef string _filename = _bstring(filename)
+        deref(self._sc_this).write_gml(_filename)
