@@ -87,6 +87,15 @@ def get_parser():
     parser.add_argument('-z', '--no-zero', dest='output_zero', default=True,
                         action='store_false',
                         help='Do not output zero-count bins')
+    parser.add_argument('-H', '--hash-function', choices=['2bit', 'murmur',
+                        'cyclic'], default='2bit', help='Indicate the hash '
+                        'function to be used; "2bit" is faster, is reversible,'
+                        ' and supports subsequent graph operations, but is '
+                        'limited to k <= 32; "murmur" supports arbitrarily '
+                        'large values of k and is compatible with k-mer '
+                        'banding, but is slower and does not support graph '
+                        'operations; "cyclic" is fast and supports banding, '
+                        'but does not support graph operations')
     parser.add_argument('-b', '--no-bigcount', dest='bigcount', default=True,
                         action='store_false',
                         help='Do not count k-mers past 255')
