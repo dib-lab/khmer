@@ -113,36 +113,6 @@ def test_count_2(getSketch):
 
 
 
-def test_consume_with_mask(getSketch):
-    """
-    Test bulk loading with a mask
-
-    The top sequence is the mask, the bottom sequence is to be loaded. The
-    bottom 3 k-mers are not present in the mask and therefore should be the
-    only ones loaded into the counttable.
-
-    TAGATCTGCTTGAAACAAGTGGATTTGAGAAAAA        <--- mask
-       ATCTGCTTGAAACAAGTGGATTTGAGAAAAAAGT     <--- sequence
-                          |-----------|
-                           |-----------|
-                            |-----------|
-    """
-    maskfile = utils.get_test_data('seq-a.fa')
-    mask = getSketch(13, sketchSize)
-    mask.consume_seqfile(maskfile)
-
-    infile = utils.get_test_data('seq-b.fa')
-    ct =getSketch(12, sketchSize)
-    nr, nk = ct.consume_seqfile_with_mask(infile, mask)
-
-    assert nr == 1
-    assert nk == 3
-    assert ct.get('GATTTGAGAAAAA') == 0  # in the mask
-    assert ct.get('ATTTGAGAAAAAA') == 1
-    assert ct.get('TTTGAGAAAAAAG') == 1
-    assert ct.get('TTGAGAAAAAAGT') == 1
-
-
 
  
 def test_read_write(getSketch):
@@ -186,96 +156,12 @@ def test_maxcount_with_bigcount(getSketch):
 
 
 
-# def test_maxcount_with_bigcount_save(getSketch):
-#     # hashtable should not saturate, if use_bigcount is set.
-#     fname = str.encode(utils.get_temp_filename('zzz'))
-#     kh = getSketch(4, 4 ** 4, 4,fname)
-#     kh.set_use_bigcount(True)
 
-#     for _ in range(0, 1000):
-#         kh.count('AAAA')
-#         c = kh.get('AAAA')
-
-#     savepath = utils.get_temp_filename('tempcountingsave.ht')
-#     kh.save(savepath)
-
-#     try:
-#         kh = Countgraph.load(savepath)
-#     except OSError as err:
-#         assert 0, "Should not produce an OSError: " + str(err)
-
-#     c = kh.get('AAAA')
-#     assert c == 1000, "should be able to count to 1000: %d" % c
-#     assert c != MAX_COUNT, c
-
-
-# def test_bigcount_save():
-#     # hashtable should not saturate, if use_bigcount is set.
-#     kh = khmer.Countgraph(4, 4 ** 4, 4)
-#     kh.set_use_bigcount(True)
-
-#     savepath = utils.get_temp_filename('tempcountingsave.ht')
-#     kh.save(savepath)
-
-#     try:
-#         kh = Countgraph.load(savepath)
-#     except OSError as err:
-#         assert 0, "Should not produce an OSError: " + str(err)
-
-#     # set_use_bigcount should still be True after load (i.e. should be saved)
-
-#     assert kh.get('AAAA') == 0
-
-#     for _ in range(0, 1000):
-#         kh.count('AAAA')
-#         kh.get('AAAA')
-
-#     assert kh.get('AAAA') == 1000
-
-
-# def test_nobigcount_save():
-#     kh = khmer.Countgraph(4, 4 ** 4, 4)
-#     # kh.set_use_bigcount(False) <-- this is the default
-
-#     savepath = utils.get_temp_filename('tempcountingsave.ht')
-#     kh.save(savepath)
-
-#     try:
-#         kh = Countgraph.load(savepath)
-#     except OSError as err:
-#         assert 0, 'Should not produce an OSError: ' + str(err)
-
-#     # set_use_bigcount should still be False after load (i.e. should be saved)
-
-#     assert kh.get('AAAA') == 0
-
-#     for _ in range(0, 1000):
-#         kh.count('AAAA')
-#         kh.get('AAAA')
-
-#     assert kh.get('AAAA') == MAX_COUNT
-
-
-def test_bigcount_abund_dist(getSketch):
-    kh =getSketch(18, sketchSize)
-    tracking = khmer.Nodegraph(18, 1e2, 4)
-    kh.set_use_bigcount(True)
-
-    seqpath = utils.get_test_data('test-abund-read-2.fa')
-
-    kh.consume_seqfile(seqpath)
-
-    dist = kh.abundance_distribution(seqpath, tracking)
-    print(kh.get('GGTTGACGGGGCTCAGGG'))
-
-    pdist = [(i, dist[i]) for i in range(len(dist)) if dist[i]]
-    assert dist[1002] == 1, pdist
 
 
 
 def test_bigcount_overflow(getSketch):
     kh = getSketch(18,1024)
-    kh.set_use_bigcount(True)
 
     for _ in range(0, 65536):
         kh.count('GGTTGACGGGGCTCAGGG')
