@@ -21,7 +21,6 @@ def noSlotsIncrease(nslots):
 
 dataset=open(sys.argv[1])
 size=int(sys.argv[2]) #cqf
-counterName='Unknown'
 kmers=[x.strip() for x in dataset.readlines()]
 noSlots=size
 trueSize=noSlotsIncrease(noSlots)
