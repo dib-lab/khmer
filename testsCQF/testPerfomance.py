@@ -27,7 +27,7 @@ for size in Sizes:
         size=2**size
         counter=QFCounttable(20,size)
         counterName='CQF'
-    else:
+    else:    
         size=2**(size-2)
         counter=Counttable(20,size,4)
         size*=4

@@ -3,6 +3,16 @@ from itertools import product
 import random
 import numpy as np
 
+
+def help():
+    print("python3 generateSeq.py <NumberOfUniqeKmers> <K> <NumberOfUnseenKmers> <outputPrefix> ")
+    print("Script generate 3 files:\n"
+          "1) Gold: Kmers with the true count\n"
+          "2) Dataset: Kmers to be  counted\n"
+          "3) Unseen: kmers that are not in the dataset"
+    )
+
+
 # N number of uniq kmers
 # k is kmer length
 # M number of kmers in the nonexisted dataset
@@ -43,13 +53,6 @@ def GenerateKmers(N,k,outPrefix,M,s=1.5):
 
 
     
-def help():
-    print("python3 generateSeq.py <NumberOfUniqeKmers> <K> <NumberOfUnseenKmers> <outputPrefix> ")
-    print("Script generate 3 files:\n"
-          "1) Gold: Kmers with the true count\n"
-          "2) Dataset: Kmers to be  counted\n"
-          "3) Unseen: kmers that are not in the dataset"
-    )
     
 if __name__ =='__main__':
     if sys.argv[1] in ['-h','--h', '--help' ]:
