@@ -21,4 +21,7 @@ inputFile=open(outputPrefix+".gold")
 counts=[int(l.split("\t")[1]) for l in inputFile]
 
 n, bins, patches = plt.hist(counts, 50, normed=1, facecolor='g', alpha=0.75)
+plt.xlabel('Kmers count')
+plt.ylabel('Frequency')
+plt.title("Kmers Frequency Distribution")
 plt.savefig(outputPrefix+".goldHist.png")
