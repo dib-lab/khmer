@@ -74,7 +74,7 @@ for i,box in enumerate(bp['boxes']):
     box.set(hatch = '/')
     
 plt.xticks(list(range(1,len(boxnames)+1)),boxnames)
-plt.title("Kmers exists in the sketch")
+plt.title("Kmers doesnt exist in the sketch")
 plt.savefig(outImagePrefix+'.NonExist.png')
 
 
