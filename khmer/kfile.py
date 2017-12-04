@@ -148,6 +148,7 @@ def check_space(in_files, force, _testhook_free_space=None):
                 '\nNOTE: This can be overridden using the --force argument'
             raise SystemExit(message)
 
+
 def check_space_for_graph(outfile_name, hash_size, force,
                           _testhook_free_space=None):
     """
