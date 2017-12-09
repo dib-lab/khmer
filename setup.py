@@ -67,9 +67,10 @@ CMDCLASS = versioneer.get_cmdclass()
 HAS_CYTHON = False
 try:
     import Cython
-    from Cython.Build import cythonize
+    from Cython.Distutils import Extension as CyExtension
     HAS_CYTHON = True
 except ImportError:
+    from setuptools import Extension as CyExtension
     pass
 cy_ext = 'pyx' if HAS_CYTHON else 'cpp'
 
@@ -224,13 +225,14 @@ for cython_ext in glob.glob(os.path.join("khmer", "_oxli",
             "define_macros": [("VERSION", versioneer.get_version()), ]
         }
 
+    if HAS_CYTHON:
+        CY_EXTENSION_MOD_DICT['cython_directives'] = CY_OPTS
+
     ext_name = "khmer._oxli.{0}".format(
         splitext(os.path.basename(cython_ext))[0])
-    EXTENSION_MODS.append(Extension(ext_name,
+    EXTENSION_MODS.append(CyExtension(ext_name,
                                     ** CY_EXTENSION_MOD_DICT))
 
-EXTENSION_MODS = cythonize(EXTENSION_MODS,
-                           compiler_directives=CY_OPTS)
 
 SCRIPTS = []
 SCRIPTS.extend([path_join("scripts", script)
