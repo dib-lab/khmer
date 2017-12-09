@@ -195,6 +195,7 @@ protected:
 public:
 
     CompactEdgeFactory(WordLength K) :
+
         KmerFactory(K), n_compact_edges(0),
         _n_updates(0) {
 
@@ -314,6 +315,8 @@ public:
 
     void write_gml(const std::string filename,
                    const CompactNodeFactory& nodes) const;
+    void write_fasta(const std::string filename) const;
+
 };
 
 
@@ -573,13 +576,13 @@ public:
                              char& pivot_base) const {
         /* Check if sequence shared same canonical
          * orientation with v from graph left, assuming
-         * sequence does NOT include v
+         * sequence includes v
          */
         const char * node_kmer = v->sequence.c_str();
         const char * _segment = sequence.c_str();
         pivot_base = _segment[sequence.size()-_ksize-1];
         if (strncmp(node_kmer, 
-                    _segment+(sequence.size())-_ksize, 
+                    _segment+sequence.size()-_ksize, 
                     _ksize-1) == 0) {
             // same canonical orientation
             return false;
@@ -1108,6 +1111,10 @@ public:
 
     void write_gml(const std::string filename) const {
         edges.write_gml(filename, nodes);
+    }
+
+    void write_fasta(const std::string filename) const {
+        edges.write_fasta(filename);
     }
 
 };

@@ -1,7 +1,7 @@
 from cython.operator cimport dereference as deref
 from libcpp.memory cimport make_shared
 
-from khmer._oxli.utils cimport _bstring
+from khmer._oxli.utils cimport _bstring, _ustring
 from khmer._oxli.sequence cimport Alphabets
 
 
@@ -172,3 +172,7 @@ cdef class StreamingCompactor:
     def write_gml(self, str filename):
         cdef string _filename = _bstring(filename)
         deref(self._sc_this).write_gml(_filename)
+
+    def write_fasta(self, str filename):
+        cdef string _filename = _bstring(filename)
+        deref(self._sc_this).write_fasta(_filename)

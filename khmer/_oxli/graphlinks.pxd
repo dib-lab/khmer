@@ -134,6 +134,7 @@ cdef extern from "oxli/links.hh" namespace "oxli" nogil:
         uint64_t consume_sequence_and_update(const string&)
 
         void write_gml(string)
+        void write_fasta(string)
 
 
 cdef class CompactNode:
