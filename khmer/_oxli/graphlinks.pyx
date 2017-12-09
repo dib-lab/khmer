@@ -54,6 +54,15 @@ cdef class CompactEdge:
         return str(self)
 
 
+cdef class CompactEdgeFactory:
+
+    @staticmethod
+    cdef CompactEdgeFactory _wrap(CpCompactEdgeFactory* _this):
+        cdef CompactEdgeFactory factory = CompactEdgeFactory()
+        factory._cef_this = _this
+        return factory
+
+
 cdef class CompactNode:
 
     def __cinit__(self):
@@ -126,6 +135,44 @@ cdef class CompactNode:
                                                      self.in_degree,
                                                      self.out_degree,
                                                      self.sequence)
+
+
+cdef class CompactNodeFactory:
+
+    @staticmethod
+    def new(WordLength ksize):
+        cdef CpCompactNodeFactory* factory = new CpCompactNodeFactory(ksize)
+        return CompactNodeFactory._wrap(factory)
+
+    @staticmethod
+    cdef CompactNodeFactory _wrap(CpCompactNodeFactory* _this):
+        cdef CompactNodeFactory factory = CompactNodeFactory()
+        factory._cnf_this = _this
+        return factory
+
+    def build_node(self, Kmer kmer):
+        cdef CpCompactNode* _node = \
+            deref(self._cnf_this).build_node(deref(kmer._this.get()))
+        return CompactNode._wrap(_node)
+
+    def get_pivot_from_left(self, CompactNode node, str sequence):
+        cdef string _sequence = _bstring(sequence)
+        cdef char pivot
+        cdef bool pivoted
+        pivoted = deref(self._cnf_this).get_pivot_from_left(node._cn_this,
+                                                            _sequence,
+                                                            pivot)
+        return (<bytes>pivot).decode('UTF-8'), pivoted
+
+    def get_pivot_from_right(self, CompactNode node, str sequence):
+        cdef string _sequence = _bstring(sequence)
+        cdef char pivot
+        cdef bool pivoted
+        pivoted = deref(self._cnf_this).get_pivot_from_right(node._cn_this,
+                                                             _sequence,
+                                                             pivot)
+        return (<bytes>pivot).decode('UTF-8'), pivoted
+
 
 cdef class StreamingCompactor:
 

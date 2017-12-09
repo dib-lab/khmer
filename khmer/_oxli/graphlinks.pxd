@@ -104,10 +104,12 @@ cdef extern from "oxli/links.hh" namespace "oxli" nogil:
 
         void unlink_edge(CpCompactEdge*)
 
+        bool is_rc_from_left(CpCompactNode* v, string&)
         bool get_pivot_from_left(CpCompactNode*, string&, char&)
         bool add_edge_from_left(CpCompactNode*, CpCompactEdge*)
         bool get_edge_from_left(CpCompactNode*, CpCompactEdge* &, string&)
 
+        bool is_rc_from_right(CpCompactNode* v, string&)
         bool get_pivot_from_right(CpCompactNode*, string&, char&)
         bool add_edge_from_right(CpCompactNode*, CpCompactEdge*)
         bool get_edge_from_right(CpCompactNode*, CpCompactEdge* &, string&)
@@ -145,11 +147,23 @@ cdef class CompactNode:
     cdef CompactNode _wrap(CpCompactNode*)
 
 
+cdef class CompactNodeFactory:
+    cdef CpCompactNodeFactory * _cnf_this
+    @staticmethod
+    cdef CompactNodeFactory _wrap(CpCompactNodeFactory*)
+
+
 cdef class CompactEdge:
     cdef CpCompactEdge* _ce_this
 
     @staticmethod
     cdef CompactEdge _wrap(CpCompactEdge*)
+
+
+cdef class CompactEdgeFactory:
+    cdef CpCompactEdgeFactory* _cef_this
+    @staticmethod
+    cdef CompactEdgeFactory _wrap(CpCompactEdgeFactory*)
 
 
 cdef class StreamingCompactor:

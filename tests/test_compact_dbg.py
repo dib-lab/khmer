@@ -9,13 +9,47 @@ from . import khmer_tst_utils as utils
 from .khmer_tst_utils import _equals_rc, _contains_rc
 from .graph_structure_fixtures import *
 
-from khmer._oxli.graphlinks import StreamingCompactor
+from khmer._oxli.graphlinks import (StreamingCompactor, CompactNode,
+                                    CompactNodeFactory)
+from khmer._oxli.hashing import Kmer as CyKmer
 from khmer import Nodegraph
 import pytest
 
 
 def teardown():
     utils.cleanup()
+
+
+def test_get_pivot_from_right(ksize, linear_structure):
+    graph, sequence = linear_structure()
+    print(sequence)
+    factory = CompactNodeFactory.new(ksize)
+    kmer = CyKmer(sequence[:ksize])
+    node = factory.build_node(kmer)
+    print(node)
+    
+    if kmer.is_forward:
+        assert factory.get_pivot_from_right(node, sequence) == \
+               (sequence[ksize], False)
+    else:
+        assert factory.get_pivot_from_right(node, sequence) == \
+               (revcomp(sequence[ksize]), True)
+
+
+def test_get_pivot_from_left(ksize, linear_structure):
+    graph, sequence = linear_structure()
+    print(sequence)
+    factory = CompactNodeFactory.new(ksize)
+    kmer = CyKmer(sequence[-ksize:])
+    node = factory.build_node(kmer)
+    print(node)
+    
+    if kmer.is_forward:
+        assert factory.get_pivot_from_left(node, sequence) == \
+               (sequence[-ksize-1], False)
+    else:
+        assert factory.get_pivot_from_left(node, sequence) == \
+               (revcomp(sequence[-ksize-1]), True)
 
 
 def compare_tip_with_cdbg(rts, compactor):
