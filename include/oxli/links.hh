@@ -57,8 +57,7 @@ Contact: khmer-project@idyll.org
 #include "assembler.hh"
 #include "alphabets.hh"
 
-
-# define DEBUG_LINKS
+#define DEBUG_LINKS
 # ifdef DEBUG_LINKS
 #   define pdebug(x) do { std::cout << std::endl << "@ " << __FILE__ <<\
                           ":" << __FUNCTION__ << ":" <<\
@@ -483,7 +482,7 @@ public:
     // protected linear creation of CompactNode
     // they should never be deleted, so this is straightforward
     CompactNode* build_node(Kmer hdn) {
-        //pdebug("new compact node from " << hdn);
+        pdebug("new compact node from " << hdn);
         CompactNode * v = get_node_by_kmer(hdn);
         if (v == nullptr) {
             compact_nodes.emplace_back(hdn, n_compact_nodes);
@@ -492,7 +491,7 @@ public:
             v->sequence = _revhash(hdn, _ksize);
             kmer_id_map[hdn] = v->node_id;
             _n_updates++;
-            //pdebug("Allocate: " << *v);
+            pdebug("Allocate: " << *v);
         }
         return v;
     }
@@ -815,6 +814,7 @@ public:
      * HDNs
      */
     uint64_t update_compact_dbg_linear(const std::string& sequence) {
+        pdebug("no induced HDNs, update linear...");
         uint64_t n_ops_before = n_updates();
         Kmer root_kmer = graph->build_kmer(sequence.substr(0, _ksize));
 
@@ -890,6 +890,7 @@ public:
         
                 // find the induced HDNs in the disturbed k-mers
         KmerSet induced_hdns;
+        KmerSet disturbed_hdns;
         while(!disturbed_kmers.empty()) {
             Kmer kmer = disturbed_kmers.back();
             disturbed_kmers.pop_back();
@@ -903,6 +904,8 @@ public:
                     induced_hdns.insert(kmer);
                 } else if (hdn->degree() != (l_degree + r_degree)) {
                     induced_hdns.insert(kmer);
+                } else {
+                    disturbed_hdns.insert(kmer);
                 }
             }
         }
@@ -910,8 +913,10 @@ public:
 
         /* If there are no induced HDNs, we must have extended
          * a tip or merged two tips into a linear segment */
-        if (induced_hdns.size() == 0) {
+        if (induced_hdns.size() == 0 && disturbed_hdns.size() == 0) {
             return update_compact_dbg_linear(sequence);
+        } else if (induced_hdns.size() == 0) {
+            induced_hdns.insert(disturbed_hdns.begin(), disturbed_hdns.end());
         }
 
         /* Update from all induced HDNs
@@ -1006,8 +1011,6 @@ public:
                             ? TRIVIAL : edge_meta;
 
                 if (edge_meta == FULL || edge_meta == TRIVIAL) {
-                    // left side includes HDN, right side does not
-
                     segment_edge = edges.build_edge(left_node->node_id, 
                                                     root_node->node_id,
                                                     edge_meta, 
@@ -1030,6 +1033,7 @@ public:
                 Kmer neighbor = neighbors.back();
                 neighbors.pop_back();
                 rcursor.cursor = neighbor;
+                pdebug("right neighbor: " << neighbor.repr(_ksize));
 
                 TagEdgePair tag_pair;
                 bool found_tag = false;
@@ -1041,6 +1045,8 @@ public:
                 } else {
                     segment_seq = root_front + segment_seq;
                 }
+                pdebug("assembled segment: " << segment_seq << " length: " << 
+                       segment_seq.length());
                 // first check for a segment going this direction from root
                 CompactEdge* segment_edge = nullptr;
                 nodes.get_edge_from_right(root_node, segment_edge, segment_seq);
@@ -1081,7 +1087,6 @@ public:
                     }
                 }
 
-                pdebug("segment sequence length=" << segment_seq.length());
                 compact_edge_meta_t edge_meta = (right_node == nullptr) ?
                                                   TIP : FULL;
                 edge_meta = (segment_seq.length() == _ksize + 1 && edge_meta == FULL)
