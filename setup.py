@@ -66,14 +66,18 @@ CMDCLASS = versioneer.get_cmdclass()
 
 try:
     import Cython
-    from Cython.Distutil import Extension as CyExtension
-    from Cython.Build import cythonize
+    from Cython.Distutils import Extension as CyExtension
     HAS_CYTHON = True
     cy_ext = 'pyx'
+    print('*** NOTE: Found Cython, extension files will be '
+          'transpiled if this is an install invocation.',
+          file=sys.stderr)
 except ImportError:
     from setuptools import Extension as CyExtension
     HAS_CYTHON = False
     cy_ext = 'cpp'
+    print('*** WARNING: Cython not found, assuming cythonized '
+          'files available for compilation.', file=sys.stderr)
 
 # strip out -Wstrict-prototypes; a hack suggested by
 # http://stackoverflow.com/a/9740721
