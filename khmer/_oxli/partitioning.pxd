@@ -77,11 +77,11 @@ cdef extern from "oxli/partitioning.hh" namespace "oxli":
         uint64_t seed_sequence(string&, TagVector&, KmerQueue&,
                            set[HashIntoType]&) except +MemoryError
 
-        void find_connected_tags(queue[CpKmer]&, 
+        void find_connected_tags(KmerQueue&, 
                                  TagVector&,
                                  set[HashIntoType]&) except +MemoryError
 
-        void find_connected_tags(queue[CpKmer]&, 
+        void find_connected_tags(KmerQueue&, 
                                  TagVector&,
                                  set[HashIntoType]&,
                                  bool) except +MemoryError
