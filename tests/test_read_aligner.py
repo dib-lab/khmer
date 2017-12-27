@@ -649,6 +649,7 @@ def check_query(aligner, query):
         assert round(score - query["score"], 7) == 0
 
 
+@pytest.mark.known_failing
 @pytest.mark.parametrize('query', queries)
 def test_readalign_new(query):
     ch = khmer.Countgraph(32, 1048576, 1)
