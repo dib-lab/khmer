@@ -391,8 +391,9 @@ py-demos: sharedobj
 	python examples/python-api/consume.py examples/c++-api/reads.fastq
 
 COMMIT ?= $(shell git rev-parse HEAD)
+SLUG ?= "dib-lab/khmer"
 docker-container:
-	cd docker && docker build --build-arg=branch=$(COMMIT) .
+	cd docker && docker build --build-arg=branch=$(COMMIT) --build-arg=slug=$(SLUG) .
 
 FORCE:
 
