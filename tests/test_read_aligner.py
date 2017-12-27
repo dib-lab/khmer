@@ -34,6 +34,7 @@
 # Contact: khmer-project@idyll.org
 # pylint: disable=missing-docstring,no-member,invalid-name,unused-variable
 
+import pytest
 import khmer
 from . import khmer_tst_utils as utils
 
@@ -139,9 +140,8 @@ def test_align_middle():
     assert not trunc
 
 
+@pytest.mark.known_failing
 def test_align_middle_trunc():
-    return  # @CTB
-
     ch = khmer.Countgraph(10, 1048576, 1)
     read = "TCGACAAGTCCTTGACAGATGGGGGG"
     aligner = khmer.ReadAligner(ch, 0, 0)
@@ -163,9 +163,8 @@ def test_align_middle_trunc():
     assert trunc
 
 
+@pytest.mark.known_failing
 def test_align_middle_trunc_2():
-    return  # @CTB
-
     ch = khmer.Countgraph(10, 1048576, 1)
     read = "GGGGGGGGGGGGTCGACAAGTCCTTGACAGAT"
     aligner = khmer.ReadAligner(ch, 0, 0)
@@ -233,8 +232,8 @@ def test_align_fwd_middle():
     assert not trunc
 
 
+@pytest.mark.known_failing
 def test_align_fwd_middle_trunc():
-    return  # @CTB
     ch = khmer.Countgraph(10, 1048576, 1)
     read = "TCGACAAGTCCTTGACAGATGGGGGG"
     aligner = khmer.ReadAligner(ch, 0, 0)
@@ -397,8 +396,8 @@ def test_align_fwd_covs_5():
     assert max(covs) == 20, covs
 
 
+@pytest.mark.known_failing
 def test_simple_readalign():
-    return  # @CTB
     ch = khmer.Countgraph(10, 1048576, 1)
     aligner = khmer.ReadAligner(ch, 2, 0)
     for i in range(20):
@@ -417,8 +416,8 @@ def test_simple_readalign():
     eq_(readAlign, 'ACCTAGGTTCGACAAGTACC')
 
 
+@pytest.mark.known_failing
 def test_readalign():
-    return  # @CTB
     ch = khmer.Countgraph(10, 1048576, 1)
     aligner = khmer.ReadAligner(ch, 1, 0)
     for i in range(20):
@@ -650,17 +649,14 @@ def check_query(aligner, query):
         assert round(score - query["score"], 7) == 0
 
 
-def test_readalign_new():
-    return  # @CTB
+@pytest.mark.parametrize('query', queries)
+def test_readalign_new(query):
     ch = khmer.Countgraph(32, 1048576, 1)
     aligner = khmer.ReadAligner(ch, 1, 0)
     for seq in ht_seqs:
         ch.consume(seq)
 
-    for query in queries:
-        if "description" in query:
-            check_query.description = query["description"]
-        yield check_query, aligner, query
+    check_query(aligner, query)
 
 
 def test_readaligner_load():
