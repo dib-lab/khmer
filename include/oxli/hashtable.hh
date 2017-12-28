@@ -87,7 +87,8 @@ inline bool is_prime(uint64_t n)
     if (n % 2 == 0) {
         return false;
     }
-    for (unsigned long long i=3; i < sqrt(n) + 1; i += 2) {
+    const float lim = sqrt(n) + 1;
+    for (unsigned long long i=3; i < lim; i += 2) {
         if (n % i == 0) {
             return false;
         }
