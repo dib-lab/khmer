@@ -109,8 +109,14 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli" nogil:
     cdef cppclass CpMurmurHashtable "oxli::MurmurHashtable" (CpHashtable):
         CpMurmurHashtable(WordLength, CpStorage *)
 
+    cdef cppclass CpCyclicHashtable "oxli::CyclicHashtable" (CpHashtable):
+        CpCyclicHashtable(WordLength, CpStorage *)
+
     cdef cppclass CpCounttable "oxli::Counttable" (CpMurmurHashtable):
         CpCounttable(WordLength, vector[uint64_t])
+
+    cdef cppclass CpCyclicCounttable "oxli::CyclicCounttable" (CpCyclicHashtable):
+        CpCyclicCounttable(WordLength, vector[uint64_t])
 
     cdef cppclass CpSmallCounttable "oxli::SmallCounttable" (CpMurmurHashtable):
         CpSmallCounttable(WordLength, vector[uint64_t])
@@ -142,7 +148,7 @@ cdef extern from "oxli/hashgraph.hh" namespace "oxli" nogil:
 
         void consume_seqfile_and_tag[SeqIO](const string &,
                                    unsigned int,
-                                   unsigned long long) 
+                                   unsigned long long)
 
         # Ugly workaround. For some reason, Cython doesn't like *just this*
         # templated overload -- it chooses whichever was defined last, breaking
@@ -150,7 +156,7 @@ cdef extern from "oxli/hashgraph.hh" namespace "oxli" nogil:
         # the Cython side and give it a real name substitution for code gen.
         void consume_seqfile_and_tag_readparser "consume_seqfile_and_tag" [SeqIO](shared_ptr[CpReadParser[SeqIO]],
                                    unsigned int,
-                                   unsigned long long) 
+                                   unsigned long long)
 
         void consume_sequence_and_tag(const string &,
                                       unsigned long long &)
@@ -163,7 +169,7 @@ cdef extern from "oxli/hashgraph.hh" namespace "oxli" nogil:
                                        unsigned int &,
                                        unsigned long long &) except +oxli_raise_py_error
 
-        uintptr_t trim_on_stoptags(string) 
+        uintptr_t trim_on_stoptags(string)
 
         unsigned int traverse_from_kmer(CpKmer,
                                         uint32_t,
@@ -180,7 +186,7 @@ cdef extern from "oxli/hashgraph.hh" namespace "oxli" nogil:
         void load_stop_tags(string, bool) except +oxli_raise_py_error
         void extract_unique_paths(string, uint32_t, float, vector[string])
         void calc_connected_graph_size(CpKmer, uint64_t&, KmerSet&,
-                                       const uint64_t, bool) 
+                                       const uint64_t, bool)
         uint32_t kmer_degree(HashIntoType, HashIntoType)
         uint32_t kmer_degree(const char *)
         void find_high_degree_nodes(const char *, set[HashIntoType] &) const
@@ -265,6 +271,10 @@ cdef class SmallCounttable(Hashtable):
 
 cdef class Counttable(Hashtable):
     cdef shared_ptr[CpCounttable] _ct_this
+
+
+cdef class CyclicCounttable(Hashtable):
+    cdef shared_ptr[CpCyclicCounttable] _cct_this
 
 
 cdef class Nodetable(Hashtable):

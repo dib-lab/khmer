@@ -837,13 +837,15 @@ const
     while(!kmers.done()) {
         n++;
         if (n % 10000 == 0) {
-            std::cout << "... find_high_degree_nodes: " << n << "\n";
-            std::cout << std::flush;
+            std::cout << "\r... find_high_degree_nodes: " << n;
         }
         Kmer kmer = kmers.next();
         if ((traverser.degree(kmer)) > 2) {
             high_degree_nodes.insert(kmer);
         }
+    }
+    if (n >= 10000) {
+        std::cout << "\rfound " << n << " high degree nodes.\n";
     }
 }
 
@@ -884,7 +886,7 @@ const
                 // if there are any adjacent high degree nodes, record;
                 adjacencies.insert(node);
                 // also, add this to the stop Bloom filter.
-                bf.count(kmer);
+                bf.count(node);
             } else if (set_contains(visited, node)) {
                 // do nothing - already visited
                 ;

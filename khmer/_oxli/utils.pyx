@@ -26,7 +26,7 @@ def get_n_primes_near_x(n_primes, x):
     if len(primes) != n_primes:
         msg = "unable to find {0} prime numbers < {1}".format(n_primes, x)
         raise RuntimeError(msg)
-    return primes 
+    return primes
 
 
 cdef bytes _bstring(s):
@@ -75,3 +75,4 @@ cdef void _fill(double * fill_to, object fill_from):
 
 cpdef str get_version_cpp():
     return _get_version_cpp()
+

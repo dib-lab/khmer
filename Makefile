@@ -64,8 +64,8 @@ INCLUDEOPTS=$(shell gcc -E -x c++ - -v < /dev/null 2>&1 >/dev/null \
 	    | grep '^ /' | grep -v cc1plus | awk '{print "-I" $$1 " "}')
 
 PYINCLUDE=$(shell python -c "import sysconfig; \
-		  flags = ['-I' + sysconfig.get_path('include'), \
-	    '-I' + sysconfig.get_path('platinclude')]; print(' '.join(flags))")
+            flags = ['-I' + sysconfig.get_path('include'), \
+            '-I' + sysconfig.get_path('platinclude')]; print(' '.join(flags))")
 
 CPPCHECK_SOURCES=$(filter-out lib/test%, $(wildcard lib/*.cc khmer/_khmer.cc) )
 CPPCHECK=cppcheck --enable=all \
@@ -74,7 +74,7 @@ CPPCHECK=cppcheck --enable=all \
 	 --suppress='*:*/include/python*/Python.h' \
 	 --suppress='*:/usr/*' --platform=unix64 \
 	 --std=c++11 --inline-suppr -Ilib -Ithird-party/bzip2 \
-	 -Ithird-party/zlib -Ithird-party/smhasher \
+	 -Ithird-party/zlib -Ithird-party/smhasher -Ithird-party/rollinghash \
 	 $(DEFINES) $(INCLUDEOPTS) $(PYINCLUDE) $(CPPCHECK_SOURCES) --quiet
 
 UNAME := $(shell uname)

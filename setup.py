@@ -64,15 +64,20 @@ ez_setup.use_setuptools(version="3.4.1")
 
 CMDCLASS = versioneer.get_cmdclass()
 
-HAS_CYTHON = False
 try:
     import Cython
     from Cython.Distutils import Extension as CyExtension
     HAS_CYTHON = True
+    cy_ext = 'pyx'
+    print('*** NOTE: Found Cython, extension files will be '
+          'transpiled if this is an install invocation.',
+          file=sys.stderr)
 except ImportError:
     from setuptools import Extension as CyExtension
-    pass
-cy_ext = 'pyx' if HAS_CYTHON else 'cpp'
+    HAS_CYTHON = False
+    cy_ext = 'cpp'
+    print('*** WARNING: Cython not found, assuming cythonized '
+          'files available for compilation.', file=sys.stderr)
 
 # strip out -Wstrict-prototypes; a hack suggested by
 # http://stackoverflow.com/a/9740721
@@ -176,8 +181,9 @@ SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
 
 # Don't forget to update lib/Makefile with these flags!
-EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11', '-pedantic', '-fdiagnostics-color']
-EXTRA_LINK_ARGS = []
+EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11', '-pedantic',
+                      '-fno-omit-frame-pointer', '-fdiagnostics-color']
+EXTRA_LINK_ARGS = ['-fno-omit-frame-pointer']
 
 if sys.platform == 'darwin':
     # force 64bit only builds
@@ -229,10 +235,9 @@ for cython_ext in glob.glob(os.path.join("khmer", "_oxli",
         CY_EXTENSION_MOD_DICT['cython_directives'] = CY_OPTS
 
     ext_name = "khmer._oxli.{0}".format(
-        splitext(os.path.basename(cython_ext))[0])
-    EXTENSION_MODS.append(CyExtension(ext_name,
-                                    ** CY_EXTENSION_MOD_DICT))
-
+        splitext(os.path.basename(cython_ext))[0]
+    )
+    EXTENSION_MODS.append(CyExtension(ext_name, ** CY_EXTENSION_MOD_DICT))
 
 SCRIPTS = []
 SCRIPTS.extend([path_join("scripts", script)
@@ -248,6 +253,7 @@ CLASSIFIERS = [
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS :: MacOS X",
     "Programming Language :: C++",
+    "Programming Language :: Python :: 3.4",
     "Programming Language :: Python :: 3.5",
     "Programming Language :: Python :: 3.6",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
@@ -285,8 +291,9 @@ SETUP_METADATA = \
         "packages": ['khmer', 'khmer.tests', 'oxli', 'khmer._oxli'],
         "package_data": {'khmer/_oxli': ['*.pxd', 'oxli_exception_convert.hh']},
         "package_dir": {'khmer.tests': 'tests'},
-        "install_requires": ['screed >= 1.0', 'bz2file', 'Cython==0.25.2'],
-        "setup_requires": ["pytest-runner>=2.0,<3dev", "setuptools>=18.0"],
+        "install_requires": ['screed >= 1.0', 'bz2file', 'Cython>=0.25.2'],
+        "setup_requires": ["pytest-runner>=2.0,<3dev", "setuptools>=18.0",
+                           "Cython>=0.25.2"],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
                            'tests': ['pytest>=2.9'],
@@ -303,7 +310,7 @@ SETUP_METADATA = \
         "include_package_data": True,
         "zip_safe": False,
         "classifiers": CLASSIFIERS,
-        "python_requires": '>=3.5'
+        "python_requires": '>=3.4'
     }
 
 

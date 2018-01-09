@@ -36,6 +36,7 @@
 """This is khmer; please see http://khmer.readthedocs.io/."""
 
 
+from collections import namedtuple
 from math import log
 import json
 
@@ -51,6 +52,7 @@ from khmer._oxli.assembly import (LinearAssembler, SimpleLabeledAssembler,
                                   JunctionCountAssembler)
 
 from khmer._oxli.graphs import (Counttable, QFCounttable, Nodetable,
+                                CyclicCounttable,
                                 SmallCounttable, Countgraph, SmallCountgraph,
                                 Nodegraph, _buckets_per_byte)
 

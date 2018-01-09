@@ -4,7 +4,6 @@ from cython.operator cimport dereference as deref
 from khmer._oxli.oxli_types cimport *
 from khmer._oxli.graphs cimport Hashgraph
 from khmer._oxli.hashing cimport Kmer
-from khmer._oxli.hashing import Kmer
 
 
 cdef class Traverser:
