@@ -3,7 +3,7 @@
  *
  *       Filename:  main_release.c
  *
- *    Description:  
+ *    Description:
  *
  *        Version:  1.0
  *        Created:  2017-02-04 03:40:58 PM
@@ -34,7 +34,7 @@ int main(int argc, char **argv)
 {
         QF cf,cf1,cf2;
 	QFi cfi;
-	uint64_t qbits = atoi(argv[1]);
+	uint64_t qbits = 18;
 	uint64_t small_qbits=qbits;
 	qbits+=1;
 	uint64_t nhashbits = qbits + 8;
@@ -70,14 +70,14 @@ int main(int argc, char **argv)
 
 	}
 	printf("Merging\n");
-	
+
 	qf_merge(&cf1,&cf2,&cf);
 	printf("Inserting again\n");
 	for (uint64_t i = (nvals*2)/3; i <nvals; i++) {
 	  vals[i]=vals[i]%cf.range;
 	    qf_insert(&cf, vals[i], 0, 50);
 	  }
-	
+
 	for (uint64_t i = 0; i < nvals; i++) {
 		uint64_t count = qf_count_key_value(&cf, vals[i], 0);
 		if (count < 50) {
@@ -101,4 +101,3 @@ int main(int argc, char **argv)
 
 	fprintf(stdout, "Validated the CQF.\n");
 }
-
