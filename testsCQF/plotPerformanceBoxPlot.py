@@ -26,13 +26,14 @@ results=[]
 line=performanceFile.readline()
 while line!='':
     tmp=[]
+    
     counterName,size,err1,err2,NonExist=line.strip().split(" ")
     tmp.append(int(size))
     tmp.append(counterName)
     line=performanceFile.readline()
     tmp.append([int(s) for s in line.strip().split(',')])
     line=performanceFile.readline()
-    tmp.append([int(s) for s in line.strip().split(',')])    
+    tmp.append([int(s) for s in line.strip().split(',')])
 
     results.append(tmp)
 
@@ -51,7 +52,7 @@ for i,box in enumerate(bp['boxes']):
     else:
         box.set(color='blue', linewidth=2)
     box.set(hatch = '/')
-    
+
 plt.xticks(list(range(1,len(boxnames)+1)),boxnames)
 plt.title("Kmers exists in the sketch")
 plt.savefig(outImagePrefix+'.Exist.png')
@@ -72,9 +73,7 @@ for i,box in enumerate(bp['boxes']):
     # change fill color
     # change hatch
     box.set(hatch = '/')
-    
+
 plt.xticks(list(range(1,len(boxnames)+1)),boxnames)
 plt.title("Kmers doesnt exist in the sketch")
 plt.savefig(outImagePrefix+'.NonExist.png')
-
-
