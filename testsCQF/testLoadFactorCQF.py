@@ -10,11 +10,6 @@ def help():
 
 
 
-def noSlotsIncrease(nslots):
-    nslots+=10*math.sqrt(nslots)
-    nblocks=int(float(nslots+64-1)/(64.0))
-    return nblocks*64
-
 
 
 if len(sys.argv)!=4 or  sys.argv[1] in ['-h','--h', '--help' ]:
@@ -26,7 +21,6 @@ size=int(sys.argv[2]) #cqf
 nrepeat=int(sys.argv[3])
 kmers=[x.strip() for x in dataset.readlines()]
 noSlots=size
-trueSize=noSlotsIncrease(noSlots)
 
 counter=QFCounttable(20,noSlots)
 
@@ -38,5 +32,3 @@ for kmer in kmers:
         countedKmers+=1
         print("%d\t%d"%(nrepeat,countedKmers))
         sys.stdout.flush()
-            
-    

@@ -1,4 +1,4 @@
-TARGETS= mergeTest_SameSize mergeTest_DifferentSize mergeTest_Resize
+TARGETS= mergeTest_SameSize mergeTest_DifferentSize mergeTest_Resize mergeTest_Qbits
 
 
 DEBUG=-g
@@ -27,6 +27,7 @@ all:	$(TARGETS)
 mergeTest_SameSize:	mergeTest_SameSize.o
 mergeTest_DifferentSize: mergeTest_DifferentSize.o
 mergeTest_Resize:	mergeTest_Resize.o
+mergeTest_Qbits:	mergeTest_Qbits.o
 # dependencies between .o files and .h files
 
 

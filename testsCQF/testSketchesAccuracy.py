@@ -34,12 +34,12 @@ NotSeenKmers=[x.strip() for x in testingDataset.readlines()]
 
 
 cqfSize=2**int(math.log2(len(kmers)))
-print(cqfSize)
+
 accuracy=0.1
 k=20
 bitsPerElement=-1.44*math.log2(accuracy)
 bloomSize=int(bloomEquivleantSize(cqfSize)/7)
-print(bloomSize)
+
 
 
 def createQF(size):
@@ -53,6 +53,8 @@ def createBloom(size):
 
 counterQF=createQF(cqfSize)
 counterBloom=createBloom(bloomSize)
+
+print("No kmers\tCQF FP\tBloom FP")
 
 countedKmers=0
 for kmer in kmers:
@@ -68,5 +70,5 @@ for kmer in kmers:
                 qfError+=1
             if counterBloom.get(newkmer):
                 bloomError+=1
-        print("%d\t%.2f\t%.2f"%(countedKmers,float(qfError)/len(NotSeenKmers),float(bloomError)/len(NotSeenKmers)))
+        print("%d\t%d\t%d"%(countedKmers,(qfError),(bloomError)))
         sys.stdout.flush()
