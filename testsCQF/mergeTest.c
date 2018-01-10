@@ -45,11 +45,11 @@ int main(int argc, char **argv)
 	uint64_t *vals;
 
 	/* Initialise the CQF */
-	printf("Initialize first cqf size =%d, hasbits=%d\n", nslots, nhashbits);
+	printf("Initialize first cqf size =%d, hashbits=%d\n", nslots, nhashbits);
 	qf_init(&cf, nslots, nhashbits, 0);
-	printf("Initialize Second cqf size =%d, hasbits=%d\n",small_nslots,small_nhashbits);
+	printf("Initialize Second cqf size =%d, hashbits=%d\n",small_nslots,small_nhashbits);
 	qf_init(&cf1, small_nslots,small_nhashbits, 0);
-	printf("Initialize Third cqf size =%d, hasbits=%d\n",small_nslots,small_nhashbits);
+	printf("Initialize Third cqf size =%d, hashbits=%d\n",small_nslots,small_nhashbits);
 	qf_init(&cf2,small_nslots,small_nhashbits, 0);
 	/* Generate random values */
 	vals = (uint64_t*)malloc(nvals*sizeof(vals[0]));
