@@ -9,8 +9,8 @@ from . import khmer_tst_utils as utils
 from .khmer_tst_utils import _equals_rc, _contains_rc
 from .graph_structure_fixtures import *
 
-from khmer._oxli.graphlinks import (StreamingCompactor, CompactNode,
-                                    CompactNodeFactory)
+from khmer._oxli.cdbg import (StreamingCompactor, CompactNode,
+                              CompactNodeFactory)
 from khmer._oxli.hashing import Kmer as CyKmer
 from khmer import Nodegraph
 import pytest
@@ -84,8 +84,6 @@ def compare_tip_with_cdbg(rts, compactor):
 
 @using_ksize([21,25,31])
 def test_compact_tip(ksize, right_tip_structure):
-    '''Should have no links. Need two junctions.
-    '''
     right_tip_structure = right_tip_structure()
     graph, contig, L, HDN, R, tip = right_tip_structure
 

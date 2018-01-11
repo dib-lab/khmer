@@ -12,10 +12,10 @@ from khmer._oxli.hashing cimport CpKmer, Kmer, CpKmerFactory
 from khmer._oxli.graphs cimport CpHashgraph, Hashgraph, Nodegraph, Countgraph
 
 
-cdef extern from "oxli/links.hh":
+cdef extern from "oxli/cdbg.hh":
     cdef uint64_t NULL_ID
 
-cdef extern from "oxli/links.hh" namespace "oxli" nogil:
+cdef extern from "oxli/cdbg.hh" namespace "oxli" nogil:
 
     ctypedef uint64_t id_t
     ctypedef pair[HashIntoType, id_t] HashIDPair

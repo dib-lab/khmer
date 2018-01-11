@@ -34,8 +34,8 @@ LICENSE (END)
 
 Contact: khmer-project@idyll.org
 */
-#ifndef LINKS_HH
-#define LINKS_HH
+#ifndef CDBG_HH
+#define CDBG_HH
 
 #include <algorithm>
 #include <cstdint>
@@ -57,8 +57,8 @@ Contact: khmer-project@idyll.org
 #include "assembler.hh"
 #include "alphabets.hh"
 
-#define DEBUG_LINKS
-# ifdef DEBUG_LINKS
+#define DEBUG_CDBG
+# ifdef DEBUG_CDBG
 #   define pdebug(x) do { std::cout << std::endl << "@ " << __FILE__ <<\
                           ":" << __FUNCTION__ << ":" <<\
                           __LINE__  << std::endl << x << std::endl;\
