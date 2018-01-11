@@ -74,7 +74,7 @@ cdef extern from "oxli/subset.hh" nogil:
         unsigned long long repartition_largest_partition(unsigned int,
                                                          unsigned int,
                                                          unsigned int,
-                                                         CpCountgraph&)
+                                                         CpCountgraph&) except +oxli_raise_py_error
         void repartition_a_partition(const HashIntoTypeSet &) except +oxli_raise_py_error
         void _clear_partition(PartitionID, HashIntoTypeSet &)
         void _merge_other(HashIntoType, PartitionID, PartitionPtrMap &)

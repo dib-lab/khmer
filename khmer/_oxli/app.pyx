@@ -5,7 +5,8 @@ import json
 import os
 import sys
 
-from khmer.khmer_args import build_counting_args, create_countgraph
+from khmer.khmer_args import (build_counting_args, create_countgraph,
+                              sanitize_help)
 from khmer.khmer_logger import (configure_logging, log_info, log_error,
                                 log_warn)
 
@@ -48,7 +49,7 @@ cdef class PartitioningApp:
         parser.add_argument('--output-interval', default=0, type=int)
         parser.add_argument('--tag-density', default=None, type=int)
         
-        return parser.parse_args(args)
+        return sanitize_help(parser).parse_args(args)
 
     def write_results(self, folder, n, new_kmers):
         filename = os.path.join(folder, '{0}.csv'.format(n))

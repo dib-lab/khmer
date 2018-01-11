@@ -2866,9 +2866,10 @@ def test_unique_kmers_multiple_inputs():
                           if entry.endswith('.py')])
 def test_version_and_basic_citation(scriptname):
     with open(os.path.join(utils.scriptpath(), scriptname)) as script:
+        print(script)
         line = script.readline()
         line = script.readline()
-        if 'khmer' in line:
+        if 'khmer' in line and '_oxli.app' not in line:
             # check citation information appears when using --info
             status, out, err = utils.runscript(scriptname, ["--info"])
             assert status == 0, status
