@@ -973,6 +973,7 @@ def test_partition_graph_no_big_traverse():
     assert x[0] == 4, x       # should be four partitions, broken at knot.
 
 
+@pytest.mark.xfail(reason='Deprecated legacy partitioning.')
 def test_partition_find_knots_execute():
     graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
 
@@ -989,6 +990,7 @@ def test_partition_find_knots_execute():
     assert os.path.exists(stoptags_file)
 
 
+@pytest.mark.xfail(reason='Deprecated legacy partitioning.')
 def test_partition_find_knots_existing_stoptags():
     graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
 
@@ -2129,7 +2131,7 @@ def _execute_load_graph_streaming(filename):
     infile = utils.copy_test_data(filename)
     in_dir = os.path.dirname(infile)
 
-    args = '-x 1e7 -N 2 -k 20 out /dev/stdin'
+    args = '-x 1e7 -N 2 -k 20 out -'
 
     cmd = 'cat {infile} | {scripts}/load-graph.py {args}'.format(
         infile=infile, scripts=scripts, args=args)
