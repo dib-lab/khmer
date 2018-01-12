@@ -184,7 +184,7 @@ cppcheck-long: FORCE
 
 ## pep8        : check Python code style
 pep8: $(PYSOURCES) $(wildcard tests/*.py)
-	pep8 setup.py khmer/*.py scripts/*.py tests/*.py oxli/*.py
+	pep8 setup.py khmer/*.py scripts/*.py tests/*.py oxli/*.py examples/python-api/*.py
 
 pep8_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
 	pep8 setup.py khmer/ scripts/ tests/ oxli/ \
