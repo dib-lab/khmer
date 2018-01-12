@@ -87,9 +87,6 @@ script:
   - make py-demos
   - make cpp-demos
   - cd examples/stamps && ./do.sh
-  # ${TRAVIS_PULL_REQUEST_SHA:-$TRAVIS_COMMIT} makes sure we get the commit
-  # that travis is testing during a PR and when we build master
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cd ../.. && COMMIT=${TRAVIS_PULL_REQUEST_SHA:-$TRAVIS_COMMIT} make docker-container; fi
 
 # generate all the diagnostic reports
 after_success:
@@ -103,8 +100,6 @@ after_success:
   - make diff_pylint_report
   - make cppcheck
   - make pydocstyle
-  # XXX Do not upload results from travis yet. Currently jenkins is considered
-  # XXX the source of truth about coverage
   # only upload one coverage report to codecov as it merges all reports
   # from all builds into one.
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pip install codecov; fi

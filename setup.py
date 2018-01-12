@@ -66,12 +66,18 @@ CMDCLASS = versioneer.get_cmdclass()
 
 try:
     import Cython
-    from Cython.Build import cythonize
+    from Cython.Distutils import Extension as CyExtension
     HAS_CYTHON = True
     cy_ext = 'pyx'
+    print('*** NOTE: Found Cython, extension files will be '
+          'transpiled if this is an install invocation.',
+          file=sys.stderr)
 except ImportError:
+    from setuptools import Extension as CyExtension
     HAS_CYTHON = False
     cy_ext = 'cpp'
+    print('*** WARNING: Cython not found, assuming cythonized '
+          'files available for compilation.', file=sys.stderr)
 
 # strip out -Wstrict-prototypes; a hack suggested by
 # http://stackoverflow.com/a/9740721
@@ -223,13 +229,13 @@ for cython_ext in glob.glob(os.path.join("khmer", "_oxli",
             "define_macros": [("VERSION", versioneer.get_version()), ]
         }
 
+    if HAS_CYTHON:
+        CY_EXTENSION_MOD_DICT['cython_directives'] = CY_OPTS
+
     ext_name = "khmer._oxli.{0}".format(
         splitext(os.path.basename(cython_ext))[0]
     )
-    EXTENSION_MODS.append(Extension(ext_name, ** CY_EXTENSION_MOD_DICT))
-
-if HAS_CYTHON:
-    EXTENSION_MODS = cythonize(EXTENSION_MODS, compiler_directives=CY_OPTS)
+    EXTENSION_MODS.append(CyExtension(ext_name, ** CY_EXTENSION_MOD_DICT))
 
 SCRIPTS = []
 SCRIPTS.extend([path_join("scripts", script)
