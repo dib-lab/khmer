@@ -1,8 +1,6 @@
-########################################
-#The following program uses khmer to 
-#find unique kmers to only one sequence. 
-########################################
 #!/usr/bin/env python
+# The following program uses khmer to
+# find unique kmers to only one sequence.
 import khmer
 d1 = "ATGTACGGGCATTACGATTACCGATGTAG"
 d2 = "ATGACCAAACTCATTACGATTAGATATAG"
