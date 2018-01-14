@@ -36,7 +36,7 @@ int main(int argc, char **argv)
 	QFi cfi;
 	uint64_t qbits = 18;
 	uint64_t small_qbits=qbits;
-	qbits+=1;
+	qbits+=2;
 	uint64_t nhashbits = qbits + 8;
 	uint64_t small_nhashbits=small_qbits+8;
 	uint64_t nslots = (1ULL << qbits);

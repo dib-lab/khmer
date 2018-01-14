@@ -24,6 +24,7 @@ echo ""
 echo "Load Factor"
 echo "M\tMaximum Number of Unique Kmers" > $outputPrefix.loadfactor.res.tsv
 seq 1 16| awk '{print (2^$1)-1}' | parallel --gnu -k "python3 testLoadFactorCQF.py $outputPrefix.uniq.dat  8192  {} 2>> $outputPrefix.log |tail -n1" >> $outputPrefix.loadfactor.res.tsv
+seq 1 10  | parallel --gnu -k "python3 testLoadFactorCQF.py $outputPrefix.uniq.dat  8192  {}  |tail -n1" >> $outputPrefix.loadfactor1-10.res.tsv
 
 
 ### Accuracy Test

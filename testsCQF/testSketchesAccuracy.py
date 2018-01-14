@@ -10,11 +10,6 @@ def help():
 
 
 
-def noSlotsCalculate(nbits):
-    nbits=float(nbits/8)
-    return int(
-    ((-10.0+math.sqrt(100+4*nbits))/2.0)**2
-    )
 
 def bloomEquivleantSize(nslots):
     nslots+=10*math.sqrt(nslots)
