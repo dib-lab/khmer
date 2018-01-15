@@ -14,6 +14,10 @@ echo ""
 echo "Compile CQF tests"
 make
 
+
+### CQF construction test
+./cqfConstruction
+
 ### CQF UNIT TEST
 echo ""
 echo "Unit Test"
@@ -37,7 +41,7 @@ python testSketchesAccuracy.py $outputPrefix.uniq.dat $outputPrefix.none.dat 2>>
 parallel --gnu  -k "python3 testPerfomance.py $outputPrefix {1} {2} 2>> $outputPrefix.log" :::     23 24 25 26 27 28  :::  --cqf --cm > $outputPrefix.result
 python3 plotPerformanceBoxPlot.py $outputPrefix
 
-### Merge Test
+### Merge and possible resizing
 echo ""
 echo "Merge Test Same Size"
 ./mergeTest_SameSize
@@ -45,10 +49,6 @@ echo ""
 echo "Merge Test Different Size"
 ./mergeTest_DifferentSize
 
-#### Resize Test
-echo ""
-echo "Change reminder size"
-./mergeTest_Qbits
 echo ""
 echo "Resize Test"
 ./mergeTest_Resize

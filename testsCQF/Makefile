@@ -1,4 +1,4 @@
-TARGETS= mergeTest_SameSize mergeTest_DifferentSize mergeTest_Resize mergeTest_Qbits
+TARGETS= mergeTest_SameSize mergeTest_DifferentSize mergeTest_Resize mergeTest_Qbits cqfConstruction
 
 
 DEBUG=-g
@@ -28,6 +28,7 @@ mergeTest_SameSize:	mergeTest_SameSize.o
 mergeTest_DifferentSize: mergeTest_DifferentSize.o
 mergeTest_Resize:	mergeTest_Resize.o
 mergeTest_Qbits:	mergeTest_Qbits.o
+cqfConstruction:	cqfConstruction.o
 # dependencies between .o files and .h files
 
 
