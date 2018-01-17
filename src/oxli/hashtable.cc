@@ -682,3 +682,20 @@ template uint64_t * Hashtable::abundance_distribution<FastxReader>(
     std::string filename,
     Hashtable * tracking
 );
+
+void QFCounttable::update_from(const QFCounttable &otherBASE)
+{
+    if (_ksize != otherBASE._ksize) {
+        throw oxli_exception("both QFCounttables must have same k size");
+    }
+    QFStorage * myself = dynamic_cast<QFStorage *>(this->store);
+    const QFStorage * other;
+    other = dynamic_cast<const QFStorage*>(otherBASE.store);
+
+    // if dynamic_cast worked, then the pointers will be not null.
+    if (myself && other) {
+        myself->update_from(*other);
+    } else {
+        throw oxli_exception("update_from failed with incompatible objects");
+    }
+}

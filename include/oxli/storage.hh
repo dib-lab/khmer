@@ -455,6 +455,8 @@ public:
   void load(std::string infilename, WordLength &ksize);
 
   Byte **get_raw_tables() { return nullptr; }
+
+  void update_from(const QFStorage&);
 };
 
 

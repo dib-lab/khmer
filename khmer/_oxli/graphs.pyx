@@ -387,6 +387,11 @@ cdef class QFCounttable(Hashtable):
         deref(table._qf_this).load(_bstring(file_name))
         return table
 
+
+    def update(self, QFCounttable other):
+        deref(self._qf_this).update_from(deref(other._qf_this))
+
+
 cdef class Counttable(Hashtable):
 
     def __cinit__(self, int k, uint64_t starting_size, int n_tables):

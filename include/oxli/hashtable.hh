@@ -612,6 +612,8 @@ class QFCounttable : public oxli::MurmurHashtable
 public:
     explicit QFCounttable(WordLength ksize, int size)
         : MurmurHashtable(ksize, new QFStorage(size)) { } ;
+
+    void update_from(const QFCounttable &other);
 };
 
 // Hashtable-derived class with BitStorage.

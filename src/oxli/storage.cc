@@ -1042,3 +1042,11 @@ void QFStorage::load(std::string infilename, WordLength &ksize)
     #endif
     infile.close();
 }
+
+void QFStorage::update_from(const QFStorage& other)
+{
+    QF new_cf;
+    qf_init(&new_cf, cf.nslots, cf.key_bits, cf.value_bits);
+    qf_merge(&cf, &other.cf, &new_cf);
+    cf = new_cf;
+}

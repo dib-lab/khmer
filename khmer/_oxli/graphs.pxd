@@ -124,6 +124,8 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli" nogil:
     cdef cppclass CpQFCounttable "oxli::QFCounttable" (CpHashtable):
         CpQFCounttable(WordLength, uint64_t) except +oxli_raise_py_error
 
+        void update_from(const CpQFCounttable &) except +oxli_raise_py_error
+
 
 cdef extern from "oxli/hashgraph.hh" namespace "oxli" nogil:
     cdef cppclass CpHashgraph "oxli::Hashgraph" (CpHashtable):
