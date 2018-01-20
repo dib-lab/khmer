@@ -41,7 +41,7 @@ import os
 
 import khmer
 from khmer import QFCounttable
-from . import khmer_tst_utils as utils
+from tests import khmer_tst_utils as utils
 from khmer import ReadParser
 import screed
 import random

@@ -5,7 +5,7 @@ outputPrefix=new
 
 ###DATASet Generation
 echo "Generate DataSet"
-python generateSeq.py $NoKmers $K  $NoUnseenKmers $outputPrefix
+python3 generateSeq.py $NoKmers $K  $NoUnseenKmers $outputPrefix
 python3 plotGoldHist.py $outputPrefix
 cat $outputPrefix.dat |uniq > $outputPrefix.uniq.dat
 
@@ -21,15 +21,16 @@ make
 ### CQF UNIT TEST
 echo ""
 echo "Unit Test"
+ln -s ../tests ./
 py.test test_CQF.py
 
 ### Load Factor Test
 echo ""
 echo "Load Factor"
-echo "M\tMaximum Number of Unique Kmers" > $outputPrefix.loadfactor.res.tsv
-seq 1 16| awk '{print (2^$1)-1}' | parallel --gnu -k "python3 testLoadFactorCQF.py $outputPrefix.uniq.dat  8192  {} 2>> $outputPrefix.log |tail -n1" >> $outputPrefix.loadfactor.res.tsv
-seq 1 10  | parallel --gnu -k "python3 testLoadFactorCQF.py $outputPrefix.uniq.dat  8192  {}  |tail -n1" >> $outputPrefix.loadfactor1-10.res.tsv
-
+echo "M\tMaximum Number of Unique Kmers" > loadfactor1-10.res.tsv
+seq 1 10  | parallel --gnu -k "python3 testLoadFactorCQF.py $outputPrefix.uniq.dat  8192  {} 2>> LoadFactor1.log |tail -n1" >> loadfactor1-10.res.tsv
+echo "M\tMaximum Number of Unique Kmers" > loadfactor_log1-16.res.tsv
+seq 1 16| awk '{print (2^$1)-1}' | parallel --gnu -k "python3 testLoadFactorCQF.py $outputPrefix.uniq.dat  8192  {} 2>> LoadFactor2.log |tail -n1" >> loadfactor_log1-16.res.tsv
 
 ### Accuracy Test
 echo ""

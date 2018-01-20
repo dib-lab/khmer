@@ -39,12 +39,14 @@ int main(int argc, char **argv)
 	uint64_t nslots = (1ULL << qbits);
 
 	/* Initialise the CQF q=15 r= 8 */
-	printf("Constructing CQF q=15 and r=8");
+	printf("Constructing CQF q=15 and r=8\n");
 	qf_init(&cf, nslots, nhashbits, 0);
+        printf("Constructing CQF with q=15 and r=8 was done successfully\n");
 
 	nhashbits=qbits+3;
 	/* Initialise the CQF q=15 r= 3 */
-	printf("Constructing CQF q=15 and r=3");
+	printf("Constructing CQF q=15 and r=3\n");
 	qf_init(&cf, nslots, nhashbits, 0);
+        printf("Constructing CQF with q=15 and r=3 was done successfully\n");
 
 }
