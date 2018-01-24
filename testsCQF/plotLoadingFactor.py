@@ -9,7 +9,7 @@ def help():
     print("Usage: python3 plotLoadingFactor.py results.tsv (normal|log) outputImg.jpg\n"
           "results.tsv produced using commands at run.sh under Load factor test\n"
           "normal|log describes the type of scale of the xaxis\n"
-          "Outputs one images: \n"
+          "Outputs one image: \n"
           "     1) Line Graph for the maximum loading \n"
     )
 
