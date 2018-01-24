@@ -1,4 +1,4 @@
-## initialize the parameters needed to generate the test data 
+## initialize the parameters needed to generate the test data
 K=20                  ## k-mer size
 NoKmers=1000000       ## number of unique kmers used for the Unique and Zipifan datasets
 NoUnseenKmers=10000   ## number of unique kmers used to generate the Unseen dataset
@@ -32,8 +32,13 @@ echo ""
 echo "Load Factor Test"
 echo "M\tMaximum Number of Unique Kmers" > loadfactor1-10.res.tsv
 seq 1 10  | parallel --gnu -k "python3 testLoadFactorCQF.py $outputPrefix.uniq.dat  8192  {} 2>> LoadFactor1.log |tail -n1" >> loadfactor1-10.res.tsv
+python plotLoadingFactor.py  loadfactor1-10.res.tsv normal loadfa
+ctor1-10.res.png
+
 echo "M\tMaximum Number of Unique Kmers" > loadfactor_log1-16.res.tsv
 seq 1 16| awk '{print (2^$1)-1}' | parallel --gnu -k "python3 testLoadFactorCQF.py $outputPrefix.uniq.dat  8192  {} 2>> LoadFactor2.log |tail -n1" >> loadfactor_log1-16.res.tsv
+python plotLoadingFactor.py loadfactor_log1-16.res.tsv log loadfa
+ctor_log1-16.res.png
 
 ### Accuracy Test
 echo ""
