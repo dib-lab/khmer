@@ -116,6 +116,7 @@ HashIntoType _hash_murmur(const std::string& kmer, const WordLength k,
                           HashIntoType& h, HashIntoType& r);
 HashIntoType _hash_murmur_forward(const std::string& kmer,
                                   const WordLength k);
+uint64_t _hash_murmur_uni(const std::string& sequence);
 
 // Cyclic hash, a rolling hash that is irreversible
 HashIntoType _hash_cyclic(const std::string& kmer, const WordLength k);
