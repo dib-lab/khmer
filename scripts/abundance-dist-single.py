@@ -111,6 +111,9 @@ def get_parser():
                         action='store_true')
     parser.add_argument('--filter', metavar='NT', help='only track abundance '
                         'of k-mers in the given nodetable')
+    parser.add_argument('--max-fpr', metavar='FPR', type=float, default=0.2,
+                        help='terminate if expected false positive rate > '
+                        '`FPR`; default is 0.2')
     return parser
 
 
@@ -180,6 +183,9 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
 
     log_info('Total number of unique k-mers: {nk}',
              nk=countgraph.n_unique_kmers())
+    fpr = khmer.calc_expected_collisions(countgraph,
+                                         max_false_pos=args.max_fpr)
+    log_info('Expected FPR: {fpr:.3f}', fpr=fpr)
 
     abundance_lists = []
 
