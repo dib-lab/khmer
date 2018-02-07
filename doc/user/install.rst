@@ -40,70 +40,79 @@
 Installing and running khmer
 ============================
 
-You'll need a 64-bit operating system, internet access, a C++11 compatible
-compiler (e.g. GCC 4.8 or greater) and Python 2.7.x OR Python 3.3 or greater.
-
-If you are running khmer in a HPC environment or for other reasons do not
-have root access try creating a virtual environment as described in the OS X
-instructions below (even if you are on linux) and then installing khmer in
-that newly created virtual environment.
-
-.. _osx-label:
 
 Build requirements
 ------------------
 
+You'll need a 64-bit operating system, internet access, a C++11 compatible compiler (e.g. GCC 4.8 or greater), GNU Make, and Python version 3.3 or greater.
+
+.. note::
+
+    The khmer package is no longer compatible with Python 2!
+
+.. note::
+
+    If you are running khmer in a HPC environment or for other reasons do not have administrative privileges, we strongly suggest installing khmer in a virtual environment.
+    See the relevant instructions below.
+
+
+Prerequisites
+-------------
 
 OS X
 ^^^^
 
-#) From a terminal download the virtualenv package and create a
-   virtual environment with it::
+#) Start by installing the Xcode command line tools if they are not already installed.
 
-      curl -O https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.11.6.tar.gz
-      tar xzf virtualenv*
-      cd virtualenv-*; python2.7 virtualenv.py ../khmerEnv; cd ..
-      source khmerEnv/bin/activate
+      xcode-select --install
 
-#) Go to :ref:`install-in-venv` to install khmer itself.
+#) If it's not already installed, install Python version 3 using `Homebrew <http://brew.sh/>`_ or `Anaconda <https://www.anaconda.com/download/>`.
 
 Linux
 ^^^^^
 
-#) Install the python development environment, virtualenv, pip, gcc, and g++.
+#) Use your Linux distribution's package manager to install Python 3 and essential build tools such as ``Make`` and ``g++``.
 
-   - On recent Debian and Ubuntu this can be done with::
+   - On recent versions of Debian and Ubuntu this can be done with::
 
-         sudo apt-get install python2.7-dev python-virtualenv python-pip gcc \
-                g++
+         sudo apt-get install python3-dev python3-venv build-essential
 
-   - For RHEL6::
+   - For recent versions of Red Hat and Fedora you can invoke::
 
-         sudo yum install -y python-devel python-pip git gcc gcc-c++ make
-         sudo pip install virtualenv
-
-#) Create a virtualenv and activate it::
-
-      cd a/writable/directory/
-      python2.7 -m virtualenv khmerEnv
-      source khmerEnv/bin/activate
-
-   Linux users without root access can try the OS X instructions above.
+         sudo yum install -y python3-devel gcc-c++ make
 
 
-.. _install-in-venv:
+Create a virtual environment
+----------------------------
 
-Installing khmer inside the virtualenv
---------------------------------------
+Anaconda Python
+^^^^^^^^^^^^^^^
 
-#) Use pip to download, build, and install khmer and its dependencies::
+If you are using the Anaconda Python distribution::
 
-      pip2 install khmer
+    conda create --name khmerEnv python=3.6
+    source activate khmerEnv
 
-#) The scripts are now in the ``env/bin`` directory and ready for your
-   use. You can directly use them by name, see :doc:`scripts`.
+The first command *creates* the virtual environment in a dedicated location in your home directory and only needs to be invoked once.
+The second command *activates* the environment and must be invoked every time you begin a new terminal session.
+The *activate* command can be invoked from any directory in your system.
 
-#) When returning to khmer after installing it you will need to
-   reactivate the virtualenv first::
+System/Homebrew Python
+^^^^^^^^^^^^^^^^^^^^^^
 
-      source khmerEnv/bin/activate
+If you are using the system or Homebrew Python distribution::
+
+    python3 -m venv khmerEnv
+    source khmerEnv/bin/activate
+
+The first command *creates* the virtual environment in your current directory and only needs to be invoked once.
+The second command *activates* the environment and must be invoked every time you begin a new terminal session.
+The *activate* command will only work if you provide the correct relative or absolute path of the *activate* file.
+
+
+Installing khmer
+----------------
+
+Once the virtual environment is created and activated, you can use pip to install khmer and its dependencies.
+
+    pip install khmer
