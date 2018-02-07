@@ -55,39 +55,28 @@ particular, check out the
 `git-scm book <http://git-scm.com/book/en/Git-Branching>`__. We've also provided
 a quick guide to the khmer code base here: :doc:`codebase-guide`.
 
-One-time Preparation
+One-time preparation
 --------------------
 
-#. Install the dependencies.
+#. Install prerequisites and set up a virtual environment following the :ref:`installation instructions in the user documentation <user_install_prereqs>`.
 
-   i. Mac users
+   .. note::
 
-      a.  Install Xcode with::
+       DO NOT proceed to the final step and install khmer with pip!
 
-             xcode-select --install
+#. Install additional prerequisites using your system's package manager.
 
-      #.  Install `Homebrew <http://brew.sh/>`__ with::
+   a. Mac OS X
 
-             /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+       brew install astyle gcovr cppcheck enchant
 
-      #.  Install the python development environment and some additional development packages::
+   #. Debian / Ubuntu
 
-             brew install python astyle gcovr cppcheck enchant
-             sudo pip install --upgrade pip virtualenv
+       sudo apt-get install -y git astyle gcovr cppcheck enchant
 
-   ii. Linux users
+   #. Red Hat / Fedora / CentOS
 
-       Install the python development environment and some additional
-       development packages. On recent versions of Debian or Ubuntu this can
-       be done with::
-
-          sudo apt-get install python2.7-dev python-virtualenv python-pip \
-          gcc g++ git astyle gcovr cppcheck enchant
-
-       For Red Hat, Fedora, and CentOS::
-
-          sudo yum install -y python-devel python-pip git gcc gcc-c++ make enchant
-          sudo pip install virtualenv
+       sudo yum install -y git astyle gcovr cppcheck enchant
 
 #. Create a `GitHub <http://github.com>`__ account.
 
@@ -95,8 +84,8 @@ One-time Preparation
 
 #. Fork `github.com/dib-lab/khmer <https://github.com/dib-lab/khmer>`__.
 
-   Visit that page, and then click on the 'fork' button (upper right). This
-   makes a copy of the khmer source code in your own GitHub account.
+   Visit that page, and then click on the 'fork' button (upper right).
+   This makes a copy of the khmer source code in your own GitHub account.
 
 #. Clone your copy of khmer to your local development environment.
 
@@ -114,19 +103,14 @@ One-time Preparation
    This makes it easy for you to pull down the latest changes in the
    main repository.
 
-#. Optional: create a virtual Python environment for khmer development
+#. Install Python developement dependencies
 
-   See the **Virtual Environments** heading in :doc:`guidelines-continued-dev`
-   for more details on creating and using a virtual environment for development.
-   This is not strictly required but highly recommended, especially if you plan
-   to make continued contributions.
+   From within the khmer directory, invoke::
 
-#. Install Python dependencies
+       make install-dep
 
-   From within the khmer directory, invoke the ``make install-dep`` command. If
-   you are not using a virtual environment, you may need to invoke ``sudo make
-   install-dep`` instead. This will install several packages used in khmer
-   testing and development.
+   If you have chosen not using a virtual environment, you may need to invoke ``sudo make install-dep`` instead.
+   This will install several packages used in khmer testing and development.
 
 
 Building khmer and running the tests
@@ -136,17 +120,16 @@ Building khmer and running the tests
 
       make
 
-   This compiles the C++ source code into something that Python can run. If the
-   command fails, we apologize—please `go create a new issue
-   <https://github.com/dib-lab/khmer/issues?direction=desc&sort=created&state=open>`__,
-   paste in the failure message, and we'll try to help you work through it!
+   This compiles the C++ source code into something that Python can run.
+   If the command fails, we apologize!
+   Please `go create a new issue <https://github.com/dib-lab/khmer/issues?direction=desc&sort=created&state=open>`__, paste in the failure message, and we'll try to help you work through it!
 
 #. Run the tests::
 
       make test
 
-   This will run all of the Python tests in the ``tests/`` directory. You should
-   see lots of output, with something like::
+   This will run all of the Python tests in the ``tests/`` directory.
+   You should see lots of output, with something like::
 
       ====== 1289 passed, 1 skipped, 25 deselected, 1 xpassed in 50.98 seconds =======
 
@@ -160,50 +143,40 @@ Claiming an issue and starting to develop
 
 #. Find an open issue and claim it.
 
-   Go to `the list of open khmer issues
-   <https://github.com/dib-lab/khmer/issues?direction=desc&sort=created&state=open>`__
-   and find one you like; we suggest starting with `the low-hanging fruit issues <https://github.com/dib-lab/khmer/issues?direction=desc&labels=low-hanging-fruit&page=1&sort=created&state=open>`__).
+   Go to `the list of open khmer issues <https://github.com/dib-lab/khmer/issues?direction=desc&sort=created&state=open>`__ and find one you like; we suggest starting with `the low-hanging fruit issues <https://github.com/dib-lab/khmer/issues?direction=desc&labels=low-hanging-fruit&page=1&sort=created&state=open>`__).
 
-   Once you've found an issue you like, make sure that no one has been
-   assigned to it (see "assignee", bottom right near "notifications").
-   Then, add a comment "I am working on this issue." You've staked
-   your claim!
+   Once you've found an issue you like, make sure that no one has been assigned to it (see "assignee", bottom right near "notifications").
+   Then, add a comment "I am working on this issue."
+   You've staked your claim!
 
    (We're trying to avoid having multiple people working on the same issue.)
 
-#. In your local copy of the source code, update your master branch
-   from the main khmer master branch::
+#. In your local copy of the source code, update your master branch from the main khmer master branch::
 
       git checkout master
       git pull dib master
 
-   (This pulls in all of the latest changes from whatever we've been
-   doing on dib-lab.)
+   (This pulls in all of the latest changes from whatever we've been doing on ``dib-lab``.)
 
-   If git complains about a "merge conflict" when you execute ``git pull``,
-   refer to the **Resolving merge conflicts** section of
-   :doc:`guidelines-continued-dev`.
+   If git complains about a "merge conflict" when you execute ``git pull``, refer to the **Resolving merge conflicts** section of :doc:`guidelines-continued-dev`.
 
 #. Create a new branch and link it to your fork on GitHub::
 
       git checkout -b fix/brief_issue_description
       git push -u origin fix/brief_issue_description
 
-   where you replace "fix/brief_issue_description" with 2-3 words, separated
-   by underscores, describing the issue.
+   where you replace "fix/brief_issue_description" with 2-3 words, separated by underscores, describing the issue.
 
    (This is the set of changes you're going to ask to be merged into khmer.)
 
 #. Make some changes and commit them.
 
-   Though this will largely be issue-dependent the basics of committing are
-   simple. After you've made a cohesive set of changes, run the command `git
-   status`. This will display a list of all the files git has noticed you
-   changed. A file in the 'untracked' section are files that haven't existed
-   previously in the repository but git has noticed.
+   Though this will largely be issue-dependent the basics of committing are simple.
+   After you've made a cohesive set of changes, run the command `git status`.
+   This will display a list of all the files git has noticed you changed. A file
+   in the 'untracked' section are files that haven't existed previously in the repository but git has noticed.
 
-   To commit changes you have to 'stage' them—this is done by issuing the
-   following command::
+   To commit changes you have to 'stage' them—this is done by issuing the following command::
 
       git add path/to/file
 
@@ -211,8 +184,7 @@ Claiming an issue and starting to develop
 
       git commit -m 'Here you provide a brief description of your changes'
 
-   Please make your commit message informative but concise - these messages
-   become part of the 'official' history of the project.
+   Please make your commit message informative but concise - these messages become part of the 'official' history of the project.
 
    Once your changes have been committed, push them up to the remote branch::
 
@@ -224,9 +196,7 @@ Claiming an issue and starting to develop
 
       git pull dib master
 
-   (This pulls in all of the latest changes from whatever we've been
-   doing on dib-lab - important especially during periods of fast change
-   or for long-running pull requests.)
+   (This pulls in all of the latest changes from whatever we've been doing on ``dib-lab`` - important especially during periods of fast change or for long-running pull requests.)
 
 #. Run the tests and/or build the docs *before* pushing to GitHub::
 
@@ -249,77 +219,59 @@ Claiming an issue and starting to develop
 
       https://github.com/your-github-username/khmer
 
-   and you will see a list of "recently pushed branches" just above the
-   source code listing.  On the right side of that should be a
-   "Compare & pull request" green button.  Click on it. This will open up a
-   submission form with a pull request checklist. In this form:
+   and you will see a list of "recently pushed branches" just above the source code listing.
+   On the right side of that should be a "Compare & pull request" green button.
+   Click on it.
+   This will open up a submission form with a pull request checklist.
+   In this form:
 
-     * add a descriptive title (e.g. "updated tests for XXX")
-     * include any relevant comments about your submission in the main body of
-       the pull request text, above the checklist
-     * make sure to include any relevant issue numbers in the comments (e.g.
-       "fixes issue #532")
+     - add a descriptive title (e.g. "updated tests for XXX")
+     - include any relevant comments about your submission in the main body of the pull request text, above the checklist
+     - make sure to include any relevant issue numbers in the comments (e.g. "fixes issue #532")
 
    then click "Create pull request."
 
-   (This creates a new issue where we can all discuss your proposed
-   changes; the khmer team will be automatically notified and you will
-   receive e-mail notifications as we add comments.  See `GitHub flow
-   <http://scottchacon.com/2011/08/31/github-flow.html>`__ for more
-   info.)
+   (This creates a new issue where we can all discuss your proposed changes;
+   the khmer team will be automatically notified and you will receive e-mail notifications as we add comments.
+   See `GitHub flow <http://scottchacon.com/2011/08/31/github-flow.html>`__ for more info.)
 
 #. Review the pull request checklist and make any necessary additional changes.
 
-   Check off as many of the boxes as you can from the checklist that is
-   automatically added to the first comment of the Pull Request
-   discussion. If you have an `ORCID ID<https://orcid.org/>` post that
-   as well. This will make it much easier for the khmer team to include
-   you in khmer publications.
+   Check off as many of the boxes as you can from the checklist that is automatically added to the first comment of the Pull Request discussion.
+   If you have an `ORCID ID<https://orcid.org/>` post that as well.
+   This will make it much easier for the khmer team to include you in khmer publications.
 
-   As you add new commits to address bugs or formatting issues, you can keep
-   pushing your changes to the pull request by doing::
+   As you add new commits to address bugs or formatting issues, you can keep pushing your changes to the pull request by doing::
 
       git push origin
 
-#. When you are ready to have the pull request reviewed, please mention
-   @luizirber, @camillescott, @standage, @betatim, and/or @ctb with the comment
-   'Ready for review!'
+#. When you are ready to have the pull request reviewed, please mention @luizirber, @camillescott, @standage, @betatim, and/or @ctb with the comment 'Ready for review!'
 
-#. The khmer team will now review your pull request and communicate
-   with you through the pull request page.  Please feel free to add
-   'ping!' and an @ in the comments if you are looking for feedback—this
-   will alert us that you are still on the line.
+#. The khmer team will now review your pull request and communicate with you through the pull request page.
+   Please feel free to add 'ping!' and an @ in the comments if you are looking for feedback—this will alert us that you are still on the line.
 
-   If this is your first issue, please *don't* take another issue until
-   we've merged your first one. Thanks!
+   If this is your first issue, please *don't* take another issue until we've merged your first one. Thanks!
 
-#. If we request changes, return to the step "Make some changes and
-   commit them" and go from there.  Any additional commits you make and
-   push to your branch will automatically be added to the pull request.
+#. If we request changes, return to the step "Make some changes and commit them" and go from there.
+   Any additional commits you make and push to your branch will automatically be added to the pull request.
 
-After your submission passes peer review and the test suite (``make test`` is
-run on continuous integration server automatically for each pull request), your
-contribution will be merged into the main codebase. Congratulations on making
-your first contribution to the khmer library! You're now an experienced GitHub
-user and an official khmer contributor!
+After your submission passes peer review and the test suite (``make test`` is run on continuous integration server automatically for each pull request), your contribution will be merged into the main codebase.
+Congratulations on making your first contribution to the khmer library!
+You're now an experienced GitHub user and an official khmer contributor!
+
 
 After your first issue is successfully merged...
 ------------------------------------------------
 
-Before getting started with your second (or third, or fourth, or nth)
-contribution, there are a couple of steps you need to take to clean up your
-local copy of the code::
+Before getting started with your second (or third, or fourth, or nth) contribution, there are a couple of steps you need to take to clean up your local copy of the code::
 
     git checkout master
     git pull dib master
     git branch -d fix/brief_issue_description     # delete the branch locally
     git push origin :fix/brief_issue_description  # delete the branch on your GitHub fork
 
-This will syncronize your local main (master) branch with the central khmer
-repository—including your newly integrated contribution—and delete the branch
-you used to make your submission.
+This will syncronize your local main (master) branch with the central khmer repository—including your newly integrated contribution—and delete the branch you used to make your submission.
 
-Now your local copy of the code is queued up for another contribution. If you
-find another issue that interests you, go back to the beginning of these
-instructions and repeat! You will also want to take a look at
-:doc:`guidelines-continued-dev`.
+Now your local copy of the code is teed up for another contribution.
+If you find another issue that interests you, go back to the beginning of these instructions and repeat!
+You will also want to take a look at :doc:`guidelines-continued-dev`.

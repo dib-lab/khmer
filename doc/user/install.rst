@@ -55,6 +55,7 @@ You'll need a 64-bit operating system, internet access, a C++11 compatible compi
     If you are running khmer in a HPC environment or for other reasons do not have administrative privileges, we strongly suggest installing khmer in a virtual environment.
     See the relevant instructions below.
 
+.. _user_install_prereqs:
 
 Prerequisites
 -------------
@@ -77,7 +78,7 @@ Linux
 
          sudo apt-get install python3-dev python3-venv build-essential
 
-   - For recent versions of Red Hat and Fedora you can invoke::
+   - For recent versions of Red Hat, Fedora, and CentOS you can invoke::
 
          sudo yum install -y python3-devel gcc-c++ make
 
