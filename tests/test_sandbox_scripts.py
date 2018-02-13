@@ -75,7 +75,7 @@ def _sandbox_scripts():
 
 
 @pytest.mark.parametrize("filename", _sandbox_scripts())
-def test_import_succeeds(filename, tmpdir):
+def test_import_succeeds(filename, tmpdir, capsys):
     try:
         mod = imp.load_source('__zzz', filename)
     except:
@@ -85,10 +85,6 @@ def test_import_succeeds(filename, tmpdir):
     with tmpdir.as_cwd():
         oldargs = sys.argv
         sys.argv = [filename]
-
-        oldout, olderr = sys.stdout, sys.stderr
-        sys.stdout = StringIO()
-        sys.stderr = StringIO()
 
         try:
             try:
@@ -104,8 +100,6 @@ def test_import_succeeds(filename, tmpdir):
                 pass                        # other failures are expected :)
         finally:
             sys.argv = oldargs
-            out, err = sys.stdout.getvalue(), sys.stderr.getvalue()
-            sys.stdout, sys.stderr = oldout, olderr
 
 
 @pytest.mark.skipif(not IN_REPOSITORY,
