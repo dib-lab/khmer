@@ -293,6 +293,7 @@ public:
         : Hashgraph(ksize, new BitStorage(sizes)) { } ;
 
     void update_from(const Nodegraph &other);
+    double similarity(const Nodegraph &other);
 };
 
 }

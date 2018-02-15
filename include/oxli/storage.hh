@@ -226,6 +226,7 @@ public:
     }
 
     void update_from(const BitStorage&);
+    double similarity(const BitStorage&);
 };
 
 

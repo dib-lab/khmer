@@ -216,6 +216,26 @@ def test_update_from_diff_num_tables():
         print(str(err))
 
 
+def test_similarity_1():
+    nodegraph = khmer.Nodegraph(5, 1000, 4)
+    other_nodegraph = khmer.Nodegraph(5, 1000, 4)
+
+    assert nodegraph.similarity(other_nodegraph) == 0
+
+    other_nodegraph.count('AAAAA')
+
+    assert nodegraph.similarity(other_nodegraph) == 0
+
+    nodegraph.count('GCGCG')
+
+    assert nodegraph.similarity(other_nodegraph) == 0
+
+    nodegraph.count('AAAAA')
+    other_nodegraph.count('GCGCG')
+
+    assert nodegraph.similarity(other_nodegraph) == 1
+
+
 def test_n_occupied_1():
     filename = utils.get_test_data('random-20-a.fa')
 

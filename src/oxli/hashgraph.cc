@@ -906,6 +906,23 @@ void Nodegraph::update_from(const Nodegraph &otherBASE)
     }
 }
 
+double Nodegraph::similarity(const Nodegraph &otherBASE)
+{
+    if (_ksize != otherBASE._ksize) {
+        throw oxli_exception("both nodegraphs must have same k size");
+    }
+    BitStorage * myself = dynamic_cast<BitStorage *>(this->store);
+    const BitStorage * other;
+    other = dynamic_cast<const BitStorage*>(otherBASE.store);
+
+    // if dynamic_cast worked, then the pointers will be not null.
+    if (myself && other) {
+        return myself->similarity(*other);
+    } else {
+        throw oxli_exception("similarity failed with incompatible objects");
+    }
+}
+
 template void Hashgraph::consume_seqfile_and_tag<read_parsers::FastxReader>(
     std::string const &filename,
     unsigned int &total_reads,
