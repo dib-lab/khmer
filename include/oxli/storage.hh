@@ -40,6 +40,7 @@ Contact: khmer-project@idyll.org
 
 #include <cassert>
 #include <array>
+#include <memory>
 #include <mutex>
 #include <unordered_map>
 using MuxGuard = std::lock_guard<std::mutex>;
