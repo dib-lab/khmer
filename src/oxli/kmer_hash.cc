@@ -210,7 +210,7 @@ HashIntoType _hash_murmur_forward(const std::string& kmer, const WordLength k)
 uint64_t _hash_murmur_uni(const std::string& sequence) {
     uint64_t out[2];
     uint64_t seed = 0;
-    MurmurHash_x64_128((void*)sequence.c_str(), sequence.length(), seed, &out);
+    MurmurHash3_x64_128((void*)sequence.c_str(), sequence.length(), seed, &out);
     return out[0];
 }
 
