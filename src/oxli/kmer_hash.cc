@@ -199,20 +199,23 @@ HashIntoType _hash_murmur(const std::string& kmer, const WordLength k,
 
 HashIntoType _hash_murmur_forward(const std::string& kmer, const WordLength k)
 {
-    HashIntoType h = 0;
-    HashIntoType r = 0;
-
-    oxli::_hash_murmur(kmer, k, h, r);
-
-    return h;
-}
-
-uint64_t _hash_murmur_uni(const std::string& sequence) {
     uint64_t out[2];
     uint64_t seed = 0;
-    MurmurHash3_x64_128((void*)sequence.c_str(), sequence.length(), seed, &out);
+    MurmurHash3_x64_128((void*)kmer.c_str(), k, seed, &out);
     return out[0];
+
 }
+
+
+HashIntoType _hash_murmur_forward(const std::string& kmer)
+{
+    uint64_t out[2];
+    uint64_t seed = 0;
+    MurmurHash3_x64_128((void*)kmer.c_str(), kmer.length(), seed, &out);
+    return out[0];
+
+}
+
 
 HashIntoType _hash_cyclic(const std::string& kmer, const WordLength k)
 {
@@ -258,11 +261,11 @@ HashIntoType _hash_cyclic(const std::string& kmer, const WordLength k,
 
 HashIntoType _hash_cyclic_forward(const std::string& kmer, const WordLength k)
 {
-    HashIntoType h = 0;
-    HashIntoType r = 0;
-
-    oxli::_hash_cyclic(kmer, k, h, r);
-    return h;
+    CyclicHash<uint64_t> hasher(k);
+    for (WordLength i = 0; i < k; ++i) {
+        hasher.eat(kmer[i]);
+    }
+    return hasher.hashvalue;
 }
 
 
