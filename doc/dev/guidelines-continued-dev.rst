@@ -200,38 +200,6 @@ After this you'll have to add and commit the merge just like any other set
 of changes. It's also recommended that you run tests.
 
 
-Virtual environments
---------------------
-
-The khmer package, like many software packages, relies on other third-party
-software. Some of this software has been bundled together with khmer and is
-compiled when you invoke ``make`` on the command line. But some of the software
-khmer depends on is distributed as Python packages separately from khmer.
-
-Python `virtual environments <https://pypi.python.org/pypi/virtualenv>`_ were
-designed to isolate a stable development environment for a particular project.
-This makes it possible to maintain different versions of a Python package for
-different projects on your computer.
-
-The installation instructions in the :doc:`Getting Started <getting-started>`
-docs install the ``virtualenv`` command on your computer. After completing those
-instructions, you can create a virtual environment with the command::
-
-    virtualenv -p python2 env/
-
-(You can substitute `python3` for `python2` if Python version 3 is installed on
-your system.) This command will create a new directory `env/` containing your
-new virtual environment. The command::
-
-    source env/bin/activate
-
-will activate the virtual environment. Now any Python packages that you install
-with ``pip`` or ``make install-dep`` will be installed into your isolated
-virtual environment.
-
-Note that any time you create a new terminal session, using the virtual
-environment requires that you re-activate it.
-
 Pull request cleanup (commit squashing)
 ---------------------------------------
 
@@ -261,36 +229,3 @@ See also `Code reviews: the lab meeting for code
 <http://fperez.org/py4science/code_reviews.html>`__ and
 `the PyCogent coding guidelines
 <http://pycogent.org/coding_guidelines.html>`__.
-
-CPython Checklist
------------------
-
-Here's a checklist for new CPython types with future-proofing for Python 3::
-
-   - [ ] the CPython object name is of the form `khmer_${OBJECTNAME}_Object`
-   - [ ] Named struct with `PyObject_HEAD` macro
-   - [ ] `static PyTypeObject khmer_${OBJECTNAME}_Type` with the following
-     entries
-      - [ ] `PyVarObject_HEAD_INIT(NULL, 0)` as the object init (this includes
-        the `ob_size` field).
-      - [ ] all fields should have their name in a comment for readability
-      - [ ] The `tp_name` filed is a dotted name with both the module name and
-        the name of the type within the module. Example: `khmer.ReadAligner`
-      - [ ] Deallocator defined and cast to `(destructor)` in tp_dealloc
-        - [ ] The object's deallocator must be
-          `Py_TYPE(obj)->tp_free((PyObject*)obj);`
-      - [ ] Do _not_ define a `tp_getattr`
-      - [ ] BONUS: write methods to present the state of the object via
-        `tp_str` & `tp_repr`
-      - [ ] _Do_ pass in the array of methods in `tp_methods`
-      - [ ] _Do_ define a new method in `tp_new`
-   - [ ] PyMethodDef arrays contain doc strings
-      - [ ] Methods are cast to `PyCFunctions`s
-   - [ ] Type methods use their type Object in the method signature.
-   - [ ] Type creation method decrements the reference to self
-     (`Py_DECREF(self);`) before each error-path exit (`return NULL;`)
-   - [ ] No factory methods. Example: `khmer_new_readaligner`
-   - [ ] Type object is passed to `PyType_Ready` and its return code is checked
-     in `MOD_INIT()`
-   - [ ] The reference count for the type object is incremented before adding
-     it to the module: `Py_INCREF(&khmer_${OBJECTNAME}_Type);`.
