@@ -26,7 +26,7 @@ cg.count('ATGGCA')
 cg.count('ATGGCA')
 cg.count('ACATGG')
 cg.count('AAAAAA')
-cg.count('TTTTTT') # this will be counted towards AAAAAA
+cg.count('TTTTTT')  # this will be counted towards AAAAAA
 
 # Show all >0 k-mer abundances from the table
 for i in range(nkmers):

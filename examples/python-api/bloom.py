@@ -11,7 +11,7 @@ target_table_size = 5e8
 num_tables = 4
 
 bloomfilter = khmer.Nodetable(ksize, target_table_size, num_tables)
-bloomfilter.consume('GCTGCACCGATGTACGCAAAGCTATTTAAAACCATAACTATTCTCACTTA');
+bloomfilter.consume('GCTGCACCGATGTACGCAAAGCTATTTAAAACCATAACTATTCTCACTTA')
 
 print('count for "GCTGCACCGATGTACGCAAAG" is',
       bloomfilter.get('GCTGCACCGATGTACGCAAAG'))
