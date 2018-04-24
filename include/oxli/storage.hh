@@ -422,8 +422,10 @@ public:
     // Final argument is the number of bits allocated for the value, which
     // we do not use.
     _supports_bigcount = true;
+    qf_init(&cf, (1ULL << size), size+8, 0,2,true,"",2038074761);
+    
 
-    qf_init(&cf, (1ULL << size), size+8, 0);
+
   }
 
   ~QFStorage() { qf_destroy(&cf); }
@@ -437,22 +439,22 @@ public:
   //
   bool add(HashIntoType khash) {
       bool is_new = get_count(khash) == 0;
-      qf_insert(&cf, khash % cf.range, 0, 1);
+      qf_insert(&cf, khash % cf.metadata->range, 1,false,false);
       return is_new;
   }
 
   // get the count for the given k-mer hash.
   const BoundedCounterType get_count(HashIntoType khash) const {
-    return qf_count_key_value(&cf, khash % cf.range, 0);
+    return qf_count_key(&cf, khash % cf.metadata->range);
   }
 
   // Accessors for protected/private table info members
   // xnslots is larger than nslots. It includes some extra slots to deal
   // with some details of how the counting is implemented
-  std::vector<uint64_t> get_tablesizes() const { return {cf.xnslots}; }
+  std::vector<uint64_t> get_tablesizes() const { return {cf.metadata->xnslots}; }
   const size_t n_tables() const { return 1; }
-  const uint64_t n_unique_kmers() const { return cf.ndistinct_elts; }
-  const uint64_t n_occupied() const { return cf.noccupied_slots; }
+  const uint64_t n_unique_kmers() const { return cf.metadata->ndistinct_elts; }
+  const uint64_t n_occupied() const { return cf.metadata->noccupied_slots; }
   void save(std::string outfilename, WordLength ksize);
   void load(std::string infilename, WordLength &ksize);
 
