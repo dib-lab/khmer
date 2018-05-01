@@ -84,7 +84,19 @@ extern "C" {
 
 	typedef quotient_filter_iterator QFi;
 
-	void qf_init(QF *qf, uint64_t nslots, uint64_t key_bits, uint64_t value_bits,uint64_t fixed_counter_size, bool mem, const char *path, uint32_t seed);
+	/*!
+	@breif initialize mqf .
+
+	@param Qf* qf : pointer to the Filter.
+	@param uint64_t nslots : Number of slots in the filter. Maximum number of items to be inserted depends on this number.
+	@param uint64_t key_bits: Number of bits in the hash values. This number should equal log2(nslots) +r. Accuracy depends on r.
+	@param uint64_t tag_bits: Number of bits in tag value.
+	@param uint64_t fixed_counter_size: Fixed counter size. must be > 0.
+	@param bool mem: Flag to create the filter on memeory. IF false, mmap is used.
+	@param const char * path: In case of mmap. Path of the file used to pack the filter.
+	@param uint32_t seed: useless value. To be removed
+		  */
+	void qf_init(QF *qf, uint64_t nslots, uint64_t key_bits, uint64_t tag_bits,uint64_t fixed_counter_size, bool mem, const char *path, uint32_t seed);
 
 	void qf_reset(QF *qf);
 

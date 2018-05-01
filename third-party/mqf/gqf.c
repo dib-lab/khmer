@@ -1254,7 +1254,7 @@ static inline void remove_replace_slots_and_shift_remainders_and_runends_and_off
 	modify_metadata(qf, &qf->metadata->noccupied_slots, -num_slots_freed);
 	/*qf->metadata->noccupied_slots -= (old_length - total_remainders);*/
 	if (!total_remainders) {
-		/*modify_metadata(qf, &qf->metadata->ndistinct_elts, -1);*/
+		modify_metadata(qf, &qf->metadata->ndistinct_elts, -1);
 		/*qf->metadata->ndistinct_elts--;*/
 	}
 }
@@ -1328,7 +1328,7 @@ static inline uint64_t decode_counter(const QF *qf, uint64_t index, uint64_t
 				index++;
 				no_digits++;
 				*count <<= qf->metadata->key_remainder_bits;
-				
+
 				fcount= get_fixed_counter(qf,index);
 		//		printf("quer slot =%lu  fixed count= %lu\n", get_slot(qf, index),fcount);
 				*count += get_slot(qf, index);
@@ -1627,7 +1627,7 @@ static inline bool insert(QF *qf, __uint128_t hash, uint64_t count, bool lock=fa
 		METADATA_WORD(qf, occupieds, hash_bucket_index) |= 1ULL <<
 			(hash_bucket_block_offset % 64);
 
-		/*modify_metadata(qf, &qf->metadata->ndistinct_elts, 1);*/
+		modify_metadata(qf, &qf->metadata->ndistinct_elts, 1);
 		modify_metadata(qf, &qf->metadata->noccupied_slots, 1);
 		/*modify_metadata(qf, &qf->metadata->nelts, 1);*/
 		/* This trick will, I hope, keep the fast case fast. */
@@ -1653,7 +1653,7 @@ static inline bool insert(QF *qf, __uint128_t hash, uint64_t count, bool lock=fa
 																																				&new_fcounters[67]-total_remainders,
 																																				&new_values[67] - p,
 																																				0);
-			/*modify_metadata(qf, &qf->metadata->ndistinct_elts, 1);*/
+			modify_metadata(qf, &qf->metadata->ndistinct_elts, 1);
 		} else { /* Non-empty bucket */
 
 			uint64_t current_remainder, current_count, current_end;
@@ -1680,7 +1680,7 @@ static inline bool insert(QF *qf, __uint128_t hash, uint64_t count, bool lock=fa
 																																					&new_fcounters[67]-total_remainders,
 																																					&new_values[67] - p,
 																																					0);
-				/*modify_metadata(qf, &qf->metadata->ndistinct_elts, 1);*/
+				modify_metadata(qf, &qf->metadata->ndistinct_elts, 1);
 				/* Found a counter for this remainder.  Add in the new count. */
 			} else if (current_remainder == hash_remainder) {
 				uint64_t *p = encode_counter(qf, hash_remainder, current_count + count, &new_values[67],&new_fcounters[67]);
@@ -1706,7 +1706,7 @@ static inline bool insert(QF *qf, __uint128_t hash, uint64_t count, bool lock=fa
 																																					&new_fcounters[67]-total_remainders,
 																																					&new_values[67] - p,
 																																					0);
-				/*modify_metadata(qf, &qf->metadata->ndistinct_elts, 1);*/
+				modify_metadata(qf, &qf->metadata->ndistinct_elts, 1);
 			}
 		}
 		METADATA_WORD(qf, occupieds, hash_bucket_index) |= 1ULL << (hash_bucket_block_offset % 64);
