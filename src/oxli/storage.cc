@@ -929,8 +929,8 @@ void QFStorage::save(std::string outfilename, WordLength ksize)
     outfile.write((const char *) &ht_type, 1);
     outfile.write((const char *) &ksize, sizeof(ksize));
 
-    outfile.write((const char *)cf.metadata,sizeof(qfmetadata));
-    outfile.write((const char *)cf.blocks,cf.metadata->size);
+    outfile.write((const char *)mf.metadata,sizeof(qfmetadata));
+    outfile.write((const char *)mf.blocks,mf.metadata->size);
     outfile.close();
 }
 
@@ -991,16 +991,18 @@ void QFStorage::load(std::string infilename, WordLength &ksize)
     infile.read((char *) &save_ksize, sizeof(save_ksize));
     ksize = save_ksize;
 
-    cf.mem = (qfmem *)calloc(sizeof(qfmem), 1);
-  	cf.metadata = (qfmetadata *)calloc(sizeof(qfmetadata), 1);
-    infile.read((char*)cf.metadata,sizeof(qfmetadata));
-    cf.blocks = (qfblock *)calloc(cf.metadata->size, 1);
-    infile.read((char*)cf.blocks, cf.metadata->size);
+    mf.mem = (qfmem *)calloc(sizeof(qfmem), 1);
+    mf.metadata = (qfmetadata *)calloc(sizeof(qfmetadata), 1);
+    infile.read((char*)mf.metadata,sizeof(qfmetadata));
+    mf.blocks = (qfblock *)calloc(mf.metadata->size, 1);
+    infile.read((char*)mf.blocks, mf.metadata->size);
 
-    cf.metadata->num_locks = 10;//should be changed to something realistic like function qf_deserialize
-  	cf.mem->metadata_lock = 0;
-  	/* initialize all the locks to 0 */
-  	cf.mem->locks = (volatile int *)calloc(cf.metadata->num_locks, sizeof(volatile int));
+    mf.metadata->num_locks =
+        10;//should be changed to something realistic like function qf_deserialize
+    mf.mem->metadata_lock = 0;
+    /* initialize all the locks to 0 */
+    mf.mem->locks = (volatile int *)calloc(mf.metadata->num_locks,
+                                           sizeof(volatile int));
 
 
 

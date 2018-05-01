@@ -131,7 +131,6 @@ clean: FORCE
 	cd src/oxli && $(MAKE) clean || true
 	cd tests && rm -rf khmertest_* || true
 	rm -f pytests.xml
-	cd third-party/cqf && make clean || true
 	cd third-party/mqf && make clean || true
 	rm -f $(EXTENSION_MODULE)
 	rm -f khmer/*.pyc scripts/*.pyc tests/*.pyc oxli/*.pyc \
