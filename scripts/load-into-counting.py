@@ -101,6 +101,8 @@ def get_parser():
                         help='Overwrite output file if it exists')
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
+    parser.add_argument('-c', '--use-CQF', dest='useCQF', default=False,
+                        action='store_true')
     return parser
 
 

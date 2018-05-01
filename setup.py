@@ -330,11 +330,19 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
         if sys.platform == 'darwin' and 'gcov' in self.libraries:
             self.libraries.remove('gcov')
 
-        cqfcmd = ['bash', '-c', 'cd third-party/cqf && make']
-        spawn(cmd=cqfcmd, dry_run=self.dry_run)
-        for ext in self.extensions:
-            ext.extra_objects.append(path_join("third-party", "cqf", "gqf.o"))
+        # cqfcmd = ['bash', '-c', 'cd third-party/cqf && make']
+        # spawn(cmd=cqfcmd, dry_run=self.dry_run)
+        # for ext in self.extensions:
+        #     ext.extra_objects.append(path_join("third-party", "cqf", "gqf.o"))
+        
 
+        mqfcmd = ['bash', '-c', 'cd third-party/mqf && make']
+        spawn(cmd=mqfcmd, dry_run=self.dry_run)
+        for ext in self.extensions:
+            ext.extra_objects.append(path_join("third-party", "mqf", "gqf.o"))
+
+
+            
         if "z" not in self.libraries:
             zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'
                     ' configure || bash ./configure --static ) && make -f '
