@@ -10,29 +10,22 @@ import random
 import pytest
 
 
-
 MAX_COUNT = 255
 MAX_BIGCOUNT = 65535
 
-sketchSize=1048576
+sketchSize = 1048576
 
 
 DNA = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC"
-
-
 
 
 def teardown():
     utils.cleanup()
 
 
-
-
-
 @pytest.fixture(params=[khmer.QFCounttable])
 def getSketch(request):
     return request.param
-
 
 
 def test_count_1(getSketch):
@@ -41,7 +34,6 @@ def test_count_1(getSketch):
 
     kmer = 'G' * 12
     hashval = hi.hash('G' * 12)
-
 
     assert hi.get(kmer) == 0
     assert hi.get(hashval) == 0
@@ -78,9 +70,6 @@ def test_count_2(getSketch):
     assert hi.get(hashval) == 2
 
 
-
-
-
 def test_read_write(getSketch):
     print("Start")
     fname = str.encode(utils.get_temp_filename('zzz'))
@@ -91,7 +80,6 @@ def test_read_write(getSketch):
              for n in range(400)]
     for kmer in kmers:
         ctm.add(kmer)
-
 
     ctm.save(fname)
 
@@ -104,7 +92,6 @@ def test_read_write(getSketch):
     #     assert ctm.get(kmer) == ctm2.get(kmer)
     #
     #
-
 
 
 def test_maxcount_with_bigcount(getSketch):
@@ -124,16 +111,9 @@ def test_maxcount_with_bigcount(getSketch):
     assert c == 10000, "should be able to count to 1000: %d" % c
 
 
-
-
-
-
-
-
 def test_get_ksize(getSketch):
     kh = getSketch(22, 16)
     assert kh.ksize() == 22
-
 
 
 #

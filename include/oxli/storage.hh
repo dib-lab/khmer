@@ -410,55 +410,78 @@ public:
  *
  * \brief A Quotient Filter storage
  */
- class QFStorage : public Storage {
+class QFStorage : public Storage
+{
 protected:
-  QF cf;
+    QF mf;
 
 public:
-  QFStorage(int size) {
-    // size is the power of two to specify the number of slots in
-    // the filter (2**size). Third argument sets the number of bits used
-    // in the key (current value of size+8 is copied from the CQF example)
-    // Final argument is the number of bits allocated for the value, which
-    // we do not use.
-    _supports_bigcount = true;
-    qf_init(&cf, (1ULL << size), size+8, 0,2,true,"",2038074761);
-    
+    QFStorage(int size)
+    {
+        // size is the power of two to specify the number of slots in
+        // the filter (2**size). Third argument sets the number of bits used
+        // in the key (current value of size+8 is copied from the CQF example)
+        // Final argument is the number of bits allocated for the value, which
+        // we do not use.
+        _supports_bigcount = true;
+        qf_init(&mf, (1ULL << size), size+8, 0,2,true,"",2038074761);
 
 
-  }
 
-  ~QFStorage() { qf_destroy(&cf); }
+    }
 
-  BoundedCounterType test_and_set_bits(HashIntoType khash) {
-    BoundedCounterType x = get_count(khash);
-    add(khash);
-    return !x;
-  }
+    ~QFStorage()
+    {
+        qf_destroy(&mf);
+    }
 
-  //
-  bool add(HashIntoType khash) {
-      bool is_new = get_count(khash) == 0;
-      qf_insert(&cf, khash % cf.metadata->range, 1,false,false);
-      return is_new;
-  }
+    BoundedCounterType test_and_set_bits(HashIntoType khash)
+    {
+        BoundedCounterType x = get_count(khash);
+        add(khash);
+        return !x;
+    }
 
-  // get the count for the given k-mer hash.
-  const BoundedCounterType get_count(HashIntoType khash) const {
-    return qf_count_key(&cf, khash % cf.metadata->range);
-  }
+    //
+    bool add(HashIntoType khash)
+    {
+        bool is_new = get_count(khash) == 0;
+        qf_insert(&mf, khash % mf.metadata->range, 1,false,false);
+        return is_new;
+    }
 
-  // Accessors for protected/private table info members
-  // xnslots is larger than nslots. It includes some extra slots to deal
-  // with some details of how the counting is implemented
-  std::vector<uint64_t> get_tablesizes() const { return {cf.metadata->xnslots}; }
-  const size_t n_tables() const { return 1; }
-  const uint64_t n_unique_kmers() const { return cf.metadata->ndistinct_elts; }
-  const uint64_t n_occupied() const { return cf.metadata->noccupied_slots; }
-  void save(std::string outfilename, WordLength ksize);
-  void load(std::string infilename, WordLength &ksize);
+    // get the count for the given k-mer hash.
+    const BoundedCounterType get_count(HashIntoType khash) const
+    {
+        return qf_count_key(&mf, khash % mf.metadata->range);
+    }
 
-  Byte **get_raw_tables() { return nullptr; }
+    // Accessors for protected/private table info members
+    // xnslots is larger than nslots. It includes some extra slots to deal
+    // with some details of how the counting is implemented
+    std::vector<uint64_t> get_tablesizes() const
+    {
+        return {mf.metadata->xnslots};
+    }
+    const size_t n_tables() const
+    {
+        return 1;
+    }
+    const uint64_t n_unique_kmers() const
+    {
+        return mf.metadata->ndistinct_elts;
+    }
+    const uint64_t n_occupied() const
+    {
+        return mf.metadata->noccupied_slots;
+    }
+    void save(std::string outfilename, WordLength ksize);
+    void load(std::string infilename, WordLength &ksize);
+
+    Byte **get_raw_tables()
+    {
+        return nullptr;
+    }
 };
 
 
