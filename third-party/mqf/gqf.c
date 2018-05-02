@@ -17,7 +17,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include "gqf.h"
-#include <iostream>
+//#include <iostream>
 
 /******************************************************************
  * Code for managing the metadata bits and slots w/o interpreting *
@@ -1865,11 +1865,11 @@ qf->mem = (qfmem *)calloc(sizeof(qfmem), 1);
 
 	} else {
 
-		qf->mem->fd = open(path, O_RDWR | O_CREAT | O_TRUNC, S_IRWXU);
-		if (qf->mem->fd < 0) {
-			perror("Couldn't open file:\n");
-			exit(EXIT_FAILURE);
-		}
+		// qf->mem->fd = open(path, O_RDWR | O_CREAT | O_TRUNC, S_IRWXU);
+		// if (qf->mem->fd < 0) {
+		// 	perror("Couldn't open file:\n");
+		// 	exit(EXIT_FAILURE);
+		// }
 
 		/* prashantpandey: Commenting out fallocate call to preallocate space for
 		 * the file on disk because fallocate is not supported on MAC OS. Revisit
@@ -2474,7 +2474,7 @@ void qf_intersect(QF *qfa, QF *qfb, QF *qfc)
 			qfi_get(&qfib, &keyb, &valueb, &countb);
 		}
 		else{
-				qf_insert(qfc, keya, std::min(counta,countb), true, true);
+				qf_insert(qfc, keya, std::min(counta,countb, true, true);
 				qfi_next(&qfia);
 				qfi_next(&qfib);
 				qfi_get(&qfia, &keya, &valuea, &counta);
