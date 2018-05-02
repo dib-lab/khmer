@@ -1041,10 +1041,10 @@ static inline void insert_replace_slots_and_shift_remainders_and_runends_and_off
 	uint64_t i;
 	int64_t ninserts = total_remainders - noverwrites;
 	uint64_t insert_index = overwrite_index + noverwrites;
-	// if(qf->metadata->noccupied_slots+ninserts > qf->metadata->maximum_occupied_slots )
-	// {
-	// 	throw std::overflow_error("QF is 95% full, cannot insert more items.");
-	// }
+	if(qf->metadata->noccupied_slots+ninserts > qf->metadata->maximum_occupied_slots )
+	{
+		throw std::overflow_error("QF is 95% full, cannot insert more items.");
+	}
 	//printf("remainder =%lu ,overwrite_index = %lu , insert_index=%lu , operation=%d, noverwites=%lu total_remainders=%lu nnserts=%lu \n", remainders[0],overwrite_index,insert_index,operation,noverwrites,total_remainders,ninserts);
 	if (ninserts > 0) {
 		/* First, shift things to create n empty spaces where we need them. */
@@ -1607,9 +1607,9 @@ static inline bool insert(QF *qf, __uint128_t hash, uint64_t count, bool lock=fa
 	uint64_t hash_bucket_block_offset = hash_bucket_index % SLOTS_PER_BLOCK;
 	/*uint64_t hash_bucket_lock_offset  = hash_bucket_index % NUM_SLOTS_TO_LOCK;*/
 	//printf("index= %lu remainder= %lu count=%lu\n",hash_bucket_index,hash_remainder,count);
-	// if(hash_bucket_index > qf->metadata->xnslots){
-	// 	throw std::out_of_range("Insert is called with hash index out of range");
-	// }
+	if(hash_bucket_index > qf->metadata->xnslots){
+		throw std::out_of_range("Insert is called with hash index out of range");
+	}
 	if (lock) {
 		if (!qf_lock(qf, hash_bucket_index, spin, false))
 			return false;
@@ -1729,9 +1729,9 @@ static inline bool insert(QF *qf, __uint128_t hash, uint64_t count, bool lock=fa
 	uint64_t new_values[67];
 	uint64_t new_fcounters[67];
 
-	// if(hash_bucket_index > qf->metadata->xnslots){
-	// 	throw std::out_of_range("Remove function is called with hash index out of range");
-	// }
+	if(hash_bucket_index > qf->metadata->xnslots){
+		throw std::out_of_range("Remove function is called with hash index out of range");
+	}
 
 
 	/* Empty bucket */
@@ -1806,10 +1806,10 @@ void qf_init(QF *qf, uint64_t nslots, uint64_t key_bits, uint64_t tag_bits,uint6
 	uint64_t size;
 
 
-	// if(popcnt(nslots) != 1){
-	// 	throw std::domain_error("nslots must be a power of 2");
-  //
-	// }
+	if(popcnt(nslots) != 1){
+		throw std::domain_error("nslots must be a power of 2");
+
+	}
 	num_slots = nslots;
 
 	xnslots = nslots + 10*sqrt((double)nslots);
@@ -1865,11 +1865,11 @@ qf->mem = (qfmem *)calloc(sizeof(qfmem), 1);
 
 	} else {
 
-		// qf->mem->fd = open(path, O_RDWR | O_CREAT | O_TRUNC, S_IRWXU);
-		// if (qf->mem->fd < 0) {
-		// 	perror("Couldn't open file:\n");
-		// 	exit(EXIT_FAILURE);
-		// }
+		qf->mem->fd = open(path, O_RDWR | O_CREAT | O_TRUNC, S_IRWXU);
+		if (qf->mem->fd < 0) {
+			perror("Couldn't open file:\n");
+			exit(EXIT_FAILURE);
+		}
 
 		/* prashantpandey: Commenting out fallocate call to preallocate space for
 		 * the file on disk because fallocate is not supported on MAC OS. Revisit
@@ -1882,10 +1882,10 @@ qf->mem = (qfmem *)calloc(sizeof(qfmem), 1);
 		// }
 
 		// allocate space for mmaped file
-		// std::ofstream outputFile(path);
-		// //outputFile.seekp(size+sizeof(qfmetadata));
-		// outputFile<<0;
-		// outputFile.close();
+		std::ofstream outputFile(path);
+		outputFile.seekp(size+sizeof(qfmetadata));
+		outputFile<<0;
+		outputFile.close();
 
 
 
@@ -2113,9 +2113,9 @@ uint64_t qf_remove_tag(const QF *qf, uint64_t key ,bool lock, bool spin)
 	__uint128_t hash = key;
 	uint64_t hash_remainder   = hash & BITMASK(qf->metadata->key_remainder_bits);
 	int64_t hash_bucket_index = hash >> qf->metadata->key_remainder_bits;
-	// if(hash_bucket_index > qf->metadata->xnslots){
-	// 		throw std::out_of_range("qf_remove_tag is called with hash index out of range");
-	// 	}
+	if(hash_bucket_index > qf->metadata->xnslots){
+			throw std::out_of_range("qf_remove_tag is called with hash index out of range");
+		}
 
 	if (!is_occupied(qf, hash_bucket_index)){
 		return 0;
@@ -2154,9 +2154,9 @@ uint64_t qf_get_tag(const QF *qf, uint64_t key)
 	__uint128_t hash = key;
 	uint64_t hash_remainder   = hash & BITMASK(qf->metadata->key_remainder_bits);
 	int64_t hash_bucket_index = hash >> qf->metadata->key_remainder_bits;
-	// if(hash_bucket_index > qf->metadata->xnslots){
-	// 		throw std::out_of_range("qf_get_tag is called with hash index out of range");
-	// 	}
+	if(hash_bucket_index > qf->metadata->xnslots){
+			throw std::out_of_range("qf_get_tag is called with hash index out of range");
+		}
 	if (!is_occupied(qf, hash_bucket_index))
 		return 0;
 
@@ -2234,9 +2234,9 @@ uint64_t qf_count_key(const QF *qf, uint64_t key)
  */
 bool qf_iterator(QF *qf, QFi *qfi, uint64_t position)
 {
-	// if(position > qf->metadata->xnslots){
-	// 	throw std::out_of_range("qf_iterator is called with position out of range");
-	// }
+	if(position > qf->metadata->xnslots){
+		throw std::out_of_range("qf_iterator is called with position out of range");
+	}
 	if (!is_occupied(qf, position)) {
 		uint64_t block_index = position;
 		uint64_t idx = bitselect(get_block(qf, block_index)->occupieds[0], 0);
@@ -2270,9 +2270,9 @@ bool qf_iterator(QF *qf, QFi *qfi, uint64_t position)
 int qfi_get(QFi *qfi, uint64_t *key, uint64_t *value, uint64_t *count)
 {
 
-	// if(qfi->current > qfi->qf->metadata->xnslots){
-	// 	throw std::out_of_range("qfi_get is called with hash index out of range");
-	// }
+	if(qfi->current > qfi->qf->metadata->xnslots){
+		throw std::out_of_range("qfi_get is called with hash index out of range");
+	}
 	uint64_t current_remainder, current_count;
 	decode_counter(qfi->qf, qfi->current, &current_remainder, &current_count);
 	*key = (qfi->run << qfi->qf->metadata->key_remainder_bits) | current_remainder;
@@ -2374,11 +2374,11 @@ inline int qfi_end(QFi *qfi)
 void qf_merge(QF *qfa, QF *qfb, QF *qfc)
 {
 	QFi qfia, qfib;
-	// if(qfa->metadata->range != qfb->metadata->range ||
-	// qfb->metadata->range != qfc->metadata->range )
-	// {
-	// 	throw std::logic_error("Merging non compatible filters");
-	// }
+	if(qfa->metadata->range != qfb->metadata->range ||
+	qfb->metadata->range != qfc->metadata->range )
+	{
+		throw std::logic_error("Merging non compatible filters");
+	}
 	qf_iterator(qfa, &qfia, 0);
 	qf_iterator(qfb, &qfib, 0);
 
@@ -2417,10 +2417,10 @@ void qf_merge(QF *qfa, QF *qfb, QF *qfc)
 bool qf_equals(QF *qfa, QF *qfb)
 {
 	QFi qfia, qfib;
-	// if(qfa->metadata->range != qfb->metadata->range  )
-	// {
-	// 	throw std::logic_error("comparing non compatible filters");
-	// }
+	if(qfa->metadata->range != qfb->metadata->range  )
+	{
+		throw std::logic_error("comparing non compatible filters");
+	}
 	qf_iterator(qfa, &qfia, 0);
 	qf_iterator(qfb, &qfib, 0);
 
@@ -2453,11 +2453,11 @@ bool qf_equals(QF *qfa, QF *qfb)
 void qf_intersect(QF *qfa, QF *qfb, QF *qfc)
 {
 	QFi qfia, qfib;
-	//if(qfa->metadata->range != qfb->metadata->range ||
-	// qfb->metadata->range != qfc->metadata->range )
-	// {
-	// 	throw std::logic_error("Calculate intersect for non compatible filters");
-	// }
+	if(qfa->metadata->range != qfb->metadata->range ||
+	qfb->metadata->range != qfc->metadata->range )
+	{
+		throw std::logic_error("Calculate intersect for non compatible filters");
+	}
 	qf_iterator(qfa, &qfia, 0);
 	qf_iterator(qfb, &qfib, 0);
 
@@ -2489,11 +2489,11 @@ void qf_intersect(QF *qfa, QF *qfb, QF *qfc)
 void qf_subtract(QF *qfa, QF *qfb, QF *qfc)
 {
 	QFi qfia, qfib;
-	// if(qfa->metadata->range != qfb->metadata->range ||
-	// qfb->metadata->range != qfc->metadata->range )
-	// {
-	// 	throw std::logic_error("Calculate subtracte for non compatible filters");
-	// }
+	if(qfa->metadata->range != qfb->metadata->range ||
+	qfb->metadata->range != qfc->metadata->range )
+	{
+		throw std::logic_error("Calculate subtracte for non compatible filters");
+	}
 	qf_iterator(qfa, &qfia, 0);
 	qf_iterator(qfb, &qfib, 0);
 
@@ -2536,10 +2536,10 @@ void qf_multi_merge(QF *qf_arr[], int nqf, QF *qfr)
 
 	uint64_t range=qf_arr[0]->metadata->range;
 	for (i=1; i<nqf; i++) {
-		// if(qf_arr[i]->metadata->range!=range)
-		// {
-		// 	throw std::logic_error("Merging non compatible filters");
-		// }
+		if(qf_arr[i]->metadata->range!=range)
+		{
+			throw std::logic_error("Merging non compatible filters");
+		}
 	}
 
 	for (i=0; i<nqf; i++) {
@@ -2588,10 +2588,10 @@ void qf_multi_merge(QF *qf_arr[], int nqf, QF *qfr)
 
 QF* qf_resize(QF* qf, int newQ, const char * originalFilename, const char * newFilename)
 {
-	// if((int)qf->metadata->key_bits-newQ <2)
-	// {
-	// 	throw std::logic_error("Resize cannot be done. Slot size cannot be less than 2");
-	// }
+	if((int)qf->metadata->key_bits-newQ <2)
+	{
+		throw std::logic_error("Resize cannot be done. Slot size cannot be less than 2");
+	}
 
 	if(originalFilename)
 	{
