@@ -2453,7 +2453,7 @@ bool qf_equals(QF *qfa, QF *qfb)
 void qf_intersect(QF *qfa, QF *qfb, QF *qfc)
 {
 	QFi qfia, qfib;
-	if(qfa->metadata->range != qfb->metadata->range ||
+	//if(qfa->metadata->range != qfb->metadata->range ||
 	// qfb->metadata->range != qfc->metadata->range )
 	// {
 	// 	throw std::logic_error("Calculate intersect for non compatible filters");
