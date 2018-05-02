@@ -70,7 +70,8 @@ PREFIX=/usr/local
 INCLUDES= -I ../../include/ -I ../../third-party/seqan/core/include/ \
 	      -I ../../third-party/smhasher/ \
 				-I ../../third-party/mqf/ \
-				-I ../../third-party/rollinghash
+				-I ../../third-party/rollinghash \
+
 
 ifeq ($(USE_SYSTEM_ZLIB), false)
 INCLUDES += -I ../../third-party/zlib/
@@ -102,6 +103,7 @@ CFLAGS   += -Wshadow -Wcast-align -Wstrict-prototypes
 CFLAGS   += $(INCLUDES) $(CPPFLAGS)
 
 LDFLAGS  ?=
+LDFLAGS  += -lstdc++
 ifneq ($(USE_SYSTEM_ZLIB), false)
 LDFLAGS  += -lz
 endif
