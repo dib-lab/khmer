@@ -2474,7 +2474,7 @@ void qf_intersect(QF *qfa, QF *qfb, QF *qfc)
 			qfi_get(&qfib, &keyb, &valueb, &countb);
 		}
 		else{
-				qf_insert(qfc, keya, std::min(counta,countb, true, true);
+				qf_insert(qfc, keya, std::min(counta,countb), true, true);
 				qfi_next(&qfia);
 				qfi_next(&qfib);
 				qfi_get(&qfia, &keya, &valuea, &counta);
