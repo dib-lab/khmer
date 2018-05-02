@@ -29,7 +29,7 @@ LD= g++ -std=c++11
 
 CXXFLAGS =  -Wall $(DEBUG) $(PROFILE) $(OPT)  -m64 -I. -Wno-unused-result -Wno-strict-aliasing -Wno-unused-function
 
-LDFLAGS = $(DEBUG) $(PROFILE) $(OPT)
+LDFLAGS = $(DEBUG) $(PROFILE) $(OPT)  -lpthread -lssl -lcrypto -lm
 
 #
 # declaration of dependencies
