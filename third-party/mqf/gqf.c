@@ -1882,10 +1882,10 @@ qf->mem = (qfmem *)calloc(sizeof(qfmem), 1);
 		// }
 
 		// allocate space for mmaped file
-		std::ofstream outputFile(path);
-		//outputFile.seekp(size+sizeof(qfmetadata));
-		outputFile<<0;
-		outputFile.close();
+		// std::ofstream outputFile(path);
+		// //outputFile.seekp(size+sizeof(qfmetadata));
+		// outputFile<<0;
+		// outputFile.close();
 
 
 
