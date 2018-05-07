@@ -227,6 +227,7 @@ public:
 
     void update_from(const BitStorage&);
     double similarity(const BitStorage&);
+    double containment(const BitStorage&);
 };
 
 

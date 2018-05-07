@@ -123,6 +123,34 @@ double BitStorage::similarity(const BitStorage& other)
     return double(intersection) / double(union_size);
 }
 
+double BitStorage::containment(const BitStorage& other)
+{
+    if (_tablesizes != other._tablesizes) {
+        throw oxli_exception("both nodegraphs must have same table sizes");
+    }
+
+    uint64_t intersection = 0;
+    uint64_t self_size = 0;
+    for (unsigned int table_num = 0; table_num < _n_tables; table_num++) {
+        Byte * me = _counts[table_num];
+        Byte * ot = other._counts[table_num];
+        uint64_t tablesize = _tablesizes[table_num];
+        uint64_t tablebytes = tablesize / 8 + 1;
+
+        for (uint64_t index = 0; index < tablebytes; index++) {
+            // First, get how many values in common we have
+            intersection += __builtin_popcountll(me[index] & ot[index]);
+            self_size += __builtin_popcountll(me[index]);
+        }
+    }
+
+    if (self_size == 0) {
+        self_size = 1;
+    }
+
+    return double(intersection) / double(self_size);
+}
+
 void BitStorage::save(std::string outfilename, WordLength ksize)
 {
     if (!_counts[0]) {

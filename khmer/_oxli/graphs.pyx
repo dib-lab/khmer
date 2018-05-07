@@ -901,3 +901,6 @@ cdef class Nodegraph(Hashgraph):
 
     def similarity(self, Nodegraph other):
         return deref(self._ng_this).similarity(deref(other._ng_this))
+
+    def containment(self, Nodegraph other):
+        return deref(self._ng_this).containment(deref(other._ng_this))

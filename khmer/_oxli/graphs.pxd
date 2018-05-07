@@ -205,6 +205,7 @@ cdef extern from "oxli/hashgraph.hh" namespace "oxli" nogil:
 
         void update_from(const CpNodegraph &) except +oxli_raise_py_error
         double similarity(const CpNodegraph &) except +oxli_raise_py_error
+        double containment(const CpNodegraph &) except +oxli_raise_py_error
 
 
 cdef extern from "oxli/labelhash.hh" namespace "oxli":
