@@ -51,10 +51,10 @@ gqf.o: gqf.c gqf.h
 #
 
 %.o: %.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDE) $< -c -o $@
+	$(CXX) $(CXXFLAGS) -I$(INCLUDE) $< -c -o $@
 
 %.o: %.c
-	$(CC) $(CXXFLAGS) $(INCLUDE) $< -c -o $@
+	$(CC) $(CXXFLAGS) -I$(INCLUDE) $< -c -o $@
 
 clean:
 	rm -f *.o $(TARGETS)
