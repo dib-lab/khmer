@@ -12,6 +12,7 @@ WORKDIR /home
 
 ARG branch
 ENV branch ${branch:-v2.1.2}
+ARG slug
 ENV slug ${slug:-dib-lab/khmer}
 
 RUN pip3 install git+https://github.com/${slug}.git@${branch}
