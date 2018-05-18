@@ -23,6 +23,10 @@ ifdef P
 	PROFILE=-pg -no-pie # for bug in gprof.
 endif
 
+ifneq ($(INCLUDE),)
+	INCLUDE := -I$(INCLUDE)
+endif
+
 CXX = g++ -std=c++11 -fPIC
 CC = g++ -std=c++11 -fPIC
 LD= g++ -std=c++11

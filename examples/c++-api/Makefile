@@ -7,6 +7,10 @@ CXXFLAGS=--std=c++11 \
 
 TESTS=exact-counting bloom consume
 
+ifneq ($(INCLUDE),)
+	INCLUDE := -I$(INCLUDE)
+endif
+
 %: %.cc ../../src/oxli/liboxli.a
 	$(CXX) $(CXXFLAGS) $< ../../src/oxli/liboxli.a -o $@
 
