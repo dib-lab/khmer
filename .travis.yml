@@ -87,7 +87,7 @@ script:
   - make py-demos
   - make cpp-demos
   - cd examples/stamps && ./do.sh
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cd ../.. && COMMIT=${TRAVIS_PULL_REQUEST_SHA:-$TRAVIS_COMMIT} SLUG=${TRAVIS_REPO_SLUG:-"dib-lab/khmer"} make docker-container; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cd ../.. && COMMIT=${TRAVIS_PULL_REQUEST_SHA:-$TRAVIS_COMMIT} SLUG=${TRAVIS_PULL_REQUEST_SLUG:-"dib-lab/khmer"} make docker-container; fi
 
 # generate all the diagnostic reports
 after_success:
