@@ -392,9 +392,9 @@ py-demos: sharedobj
 	python examples/python-api/mask.py
 
 COMMIT ?= $(shell git rev-parse HEAD)
-SLUG ?= $(if $(TRAVIS_REPO_SLUG),$(TRAVIS_REPO_SLUG),dib-lab/khmer)
+SLUG ?= $(TRAVIS_REPO_SLUG)
 docker-container:
-	cd docker && docker build --build-arg=branch=$(COMMIT) --build-arg=slug=$(SLUG) .
+	cd docker && docker build --build-arg branch=$(COMMIT) --build-arg slug=$(SLUG) .
 
 FORCE:
 
