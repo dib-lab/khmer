@@ -27,9 +27,9 @@ ifneq ($(INCLUDE),)
 	INCLUDE := -I$(INCLUDE)
 endif
 
-CXX = g++ -std=c++11 -fPIC
-CC = g++ -std=c++11 -fPIC
-LD= g++ -std=c++11
+CXX = c++ -std=c++11 -fPIC
+CC = c++ -std=c++11 -fPIC
+LD= c++ -std=c++11
 
 CXXFLAGS =  -Wall $(DEBUG) $(PROFILE) $(OPT)  -m64 -I. -Wno-unused-result -Wno-strict-aliasing -Wno-unused-function
 
