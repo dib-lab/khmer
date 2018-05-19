@@ -68,9 +68,9 @@ matrix:
       osx_image: xcode7.3
       env:
         - TESTATTR="'not linux and not known_failing and not huge'"
-        - CC=gcc
-        - CXX=g++
-        - c++=g++
+#        - CC=gcc
+#        - CXX=g++
+#        - c++=g++
       before_install:
         - source ci_scripts/install.sh
 
