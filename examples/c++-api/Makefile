@@ -1,3 +1,4 @@
+CXX=c++
 CXXFLAGS=--std=c++11 \
        -I ../../include/ \
 	   -I ../../third-party/smhasher \
@@ -11,6 +12,8 @@ ifneq ($(INCLUDE),)
 	INCLUDE := -I$(INCLUDE)
 endif
 
+all: $(TESTS)
+
 %: %.cc ../../src/oxli/liboxli.a
 	$(CXX) $(CXXFLAGS) $< ../../src/oxli/liboxli.a -o $@
 
@@ -21,8 +24,6 @@ run: all
 	./exact-counting
 	./bloom
 	./consume reads.fastq
-
-all: $(TESTS)
 
 clean:
 	-rm -f exact-counting bloom consume
