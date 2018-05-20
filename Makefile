@@ -392,8 +392,9 @@ py-demos: sharedobj
 	python examples/python-api/mask.py
 
 COMMIT ?= $(shell git rev-parse HEAD)
+SLUG ?= $(TRAVIS_PULL_REQUEST_SLUG)
 docker-container:
-	cd docker && docker build --build-arg=branch=$(COMMIT) .
+	cd docker && docker build --build-arg branch=$(COMMIT) --build-arg slug=$(SLUG) .
 
 FORCE:
 
