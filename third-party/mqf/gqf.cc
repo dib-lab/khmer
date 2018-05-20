@@ -16,10 +16,12 @@
 #include <fstream>
 #include <algorithm>
 #include <stdexcept>
-#include "gqf.h"
+#include "gqf.hh"
 #include <iostream>
 
-/******************************************************************
+extern "C" {
+
+    /******************************************************************
  * Code for managing the metadata bits and slots w/o interpreting *
  * the content of the slots.
  ******************************************************************/
@@ -2696,3 +2698,4 @@ int qf_space(QF *qf)
 #ifdef TEST
 	#include "tests/lowLevelTests.hpp"
 #endif
+}

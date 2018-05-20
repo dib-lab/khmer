@@ -44,7 +44,7 @@ Contact: khmer-project@idyll.org
 #include <unordered_map>
 using MuxGuard = std::lock_guard<std::mutex>;
 
-#include "gqf.h"
+#include "gqf.hh"
 
 namespace oxli {
 typedef std::unordered_map<HashIntoType, BoundedCounterType> KmerCountMap;

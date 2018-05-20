@@ -1,4 +1,3 @@
-CXX=c++
 CXXFLAGS=--std=c++11 \
        -I ../../include/ \
 	   -I ../../third-party/smhasher \

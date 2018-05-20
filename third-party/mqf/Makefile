@@ -13,10 +13,10 @@ endif
 # test for detecting whether or not the CPU supports it
 OS := $(shell uname)
 ifeq ($(OS), Darwin)
-	ARCH=-arch x86_64
+	ARCH=-m64
 else
 	#ARCH=-msse4.2 -D__SSE4_2_
-	ARCH=-m64
+	ARCH=
 endif
 
 ifdef P
@@ -27,13 +27,13 @@ ifneq ($(INCLUDE),)
 	INCLUDE := -I$(INCLUDE)
 endif
 
-CXX = c++ -std=c++11 -fPIC $(ARCH)
-CC = c++ -std=c++11 -fPIC $(ARCH)
-LD= c++ -std=c++11 $(ARCH)
+CXX = g++
+CC = g++
+LD= g++
 
-CXXFLAGS =  -Wall $(DEBUG) $(PROFILE) $(OPT)  -I. -Wno-unused-result -Wno-strict-aliasing -Wno-unused-function
+CXXFLAGS = -std=c++11 -fPIC $(ARCH) -Wall $(DEBUG) $(PROFILE) $(OPT)  -I. -Wno-unused-result -Wno-strict-aliasing -Wno-unused-function
 
-LDFLAGS = $(DEBUG) $(PROFILE) $(OPT)  -lstdc++
+LDFLAGS = $(DEBUG) $(PROFILE) $(OPT)
 
 #
 # declaration of dependencies
@@ -48,7 +48,7 @@ all: $(TARGETS)
 # dependencies between .o files and .cc (or .c) files
 
 %.o: %.cc
-gqf.o: gqf.c gqf.h
+gqf.o: gqf.cc gqf.hh
 
 #
 # generic build rules
@@ -56,9 +56,6 @@ gqf.o: gqf.c gqf.h
 
 %.o: %.cc
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $< -c -o $@
-
-%.o: %.c
-	$(CC) $(CXXFLAGS) $(INCLUDE) $< -c -o $@
 
 clean:
 	rm -f *.o $(TARGETS)
