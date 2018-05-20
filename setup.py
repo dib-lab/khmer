@@ -187,7 +187,7 @@ if sys.platform == 'darwin':
     # force 64bit only builds
     EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64', '-mmacosx-version-min=10.7',
                                '-stdlib=libc++'])
-    EXTRA_LINK_ARGS.append('-mmacosx-version-min=10.7')
+    EXTRA_LINK_ARGS.append('-mmacosx-version-min=10.7', '-lstdc++')
 
 if check_for_openmp():
     EXTRA_COMPILE_ARGS.extend(['-fopenmp'])
