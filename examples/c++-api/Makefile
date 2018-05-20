@@ -15,7 +15,7 @@ endif
 all: $(TESTS)
 
 %: %.cc ../../src/oxli/liboxli.a
-	$(CXX) -v $(CXXFLAGS) $< -o $@ -L ../../src/oxli -loxli -lstdc++
+	$(CXX) -v $(CXXFLAGS) ../../src/oxli/liboxli.a  $< -o $@ -lstdc++
 
 ../../src/oxli/liboxli.a:
 	cd ../../src/oxli && make
