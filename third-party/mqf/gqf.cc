@@ -19,7 +19,7 @@
 #include "gqf.hh"
 #include <iostream>
 
-extern "C" {
+// extern "C" {
 
     /******************************************************************
  * Code for managing the metadata bits and slots w/o interpreting *
@@ -2698,4 +2698,4 @@ int qf_space(QF *qf)
 #ifdef TEST
 	#include "tests/lowLevelTests.hpp"
 #endif
-}
+//}

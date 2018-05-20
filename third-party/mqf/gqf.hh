@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <pthread.h>
 
-extern "C" {
+// extern "C" {
 
 /* Can be
 	0 (choose size at run-time),
@@ -248,6 +248,6 @@ extern "C" {
 	bool qf_equals(QF *qfa, QF *qfb);
 
 
-}
+// }
 #endif /* QF_H */
 
