@@ -13,10 +13,10 @@ endif
 # test for detecting whether or not the CPU supports it
 OS := $(shell uname)
 ifeq ($(OS), Darwin)
-	ARCH=
+	ARCH=-arch x86_64
 else
 	#ARCH=-msse4.2 -D__SSE4_2_
-	ARCH=
+	ARCH=-m64
 endif
 
 ifdef P
@@ -27,11 +27,11 @@ ifneq ($(INCLUDE),)
 	INCLUDE := -I$(INCLUDE)
 endif
 
-CXX = c++ -std=c++11 -fPIC
-CC = c++ -std=c++11 -fPIC
-LD= c++ -std=c++11
+CXX = c++ -std=c++11 -fPIC $(ARCH)
+CC = c++ -std=c++11 -fPIC $(ARCH)
+LD= c++ -std=c++11 $(ARCH)
 
-CXXFLAGS =  -Wall $(DEBUG) $(PROFILE) $(OPT)  -m64 -I. -Wno-unused-result -Wno-strict-aliasing -Wno-unused-function
+CXXFLAGS =  -Wall $(DEBUG) $(PROFILE) $(OPT)  -I. -Wno-unused-result -Wno-strict-aliasing -Wno-unused-function
 
 LDFLAGS = $(DEBUG) $(PROFILE) $(OPT)  -lstdc++
 
