@@ -59,7 +59,7 @@ gqf.o: gqf.cc gqf.hh
 #
 
 %.o: %.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDE) $< -c -o $@
+	uname && $(CXX) $(CXXFLAGS) $(INCLUDE) $< -c -o $@
 
 clean:
 	rm -f *.o $(TARGETS)
