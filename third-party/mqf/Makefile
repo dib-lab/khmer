@@ -33,6 +33,10 @@ LD= g++
 
 CXXFLAGS = -std=c++11 -fPIC $(ARCH) -Wall $(DEBUG) $(PROFILE) $(OPT)  -I. -Wno-unused-result -Wno-strict-aliasing -Wno-unused-function
 
+ifeq ($(platform),Cygwin)
+CXXFLAGS += -lstdc++
+endif
+
 LDFLAGS = $(DEBUG) $(PROFILE) $(OPT)
 
 #
