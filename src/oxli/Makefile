@@ -330,7 +330,7 @@ murmur3.o: ../../third-party/smhasher/MurmurHash3.cc
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c -o $@ $<
 
 $(LIBOXLISO): $(LIBOXLI_OBJS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(SONAME_FLAGS) -shared -o $@ $^ -mmacosx-version-min=10.7 -lstdc++
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(SONAME_FLAGS)  -o $@ $^ -mmacosx-version-min=10.7 -lstdc++
 	ln -sf $(SONAME) liboxli.$(SHARED_EXT)
 
 liboxli.a: $(LIBOXLI_OBJS)
