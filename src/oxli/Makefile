@@ -167,7 +167,7 @@ SONAME       = liboxli.$(SHARED_EXT).$(LIB_VERSION)
 SONAME_FLAGS = -install_name $(PREFIX)/lib/$(SONAME) \
 	       -compatibility_version $(LIB_VERSION) \
 	       -current_version $(LIB_VERSION)
-LDFLAGS  +=  -undefined dynamic_lookup -arch x86_64 				 
+LDFLAGS  +=  -undefined dynamic_lookup -arch x86_64
 else
 SHARED_EXT   = so
 SONAME       = liboxli.$(SHARED_EXT).$(LIB_VERSION)
@@ -320,7 +320,7 @@ $(BZIP2_OBJS):
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so $(BZIP2_OBJS_BASE))
 
 $(MQF_OBJS):
-	(cd $(MQF_DIR) && make)
+	(cd $(MQF_DIR) && make clean all)
 
 # MurMur3
 murmur3.o: ../../third-party/smhasher/MurmurHash3.cc
