@@ -31,7 +31,7 @@ CXX = g++
 CC = g++
 LD= g++
 
-CXXFLAGS =  -std=c++11 -lstdc++ -undefined dynamic_lookup -arch x86_64  -fPIC $(ARCH) -Wall $(DEBUG) $(PROFILE) $(OPT)  -I. -Wno-unused-result -Wno-strict-aliasing -Wno-unused-function
+CXXFLAGS =  -std=c++11  -undefined dynamic_lookup -arch x86_64  -fPIC $(ARCH) -Wall $(DEBUG) $(PROFILE) $(OPT)  -I. -Wno-unused-result -Wno-strict-aliasing -Wno-unused-function
 
 
 LDFLAGS = $(DEBUG) $(PROFILE) $(OPT)
@@ -56,7 +56,7 @@ gqf.o: gqf.cc gqf.hh
 #
 
 %.o: %.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDE) $< -c -o $@
+	$(CXX) $(CXXFLAGS) $(INCLUDE) $< -c -o $@ -lstdc++
 
 clean:
 	rm -f *.o $(TARGETS)
