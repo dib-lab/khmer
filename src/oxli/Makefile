@@ -104,6 +104,7 @@ CFLAGS   += $(INCLUDES) $(CPPFLAGS)
 
 LDFLAGS  ?=
 LDFLAGS  += -lstdc++
+
 ifneq ($(USE_SYSTEM_ZLIB), false)
 LDFLAGS  += -lz
 endif
@@ -166,6 +167,7 @@ SONAME       = liboxli.$(SHARED_EXT).$(LIB_VERSION)
 SONAME_FLAGS = -install_name $(PREFIX)/lib/$(SONAME) \
 	       -compatibility_version $(LIB_VERSION) \
 	       -current_version $(LIB_VERSION)
+LDFLAGS  += -bundle -undefined dynamic_lookup -arch x86_64 				 
 else
 SHARED_EXT   = so
 SONAME       = liboxli.$(SHARED_EXT).$(LIB_VERSION)
