@@ -167,7 +167,8 @@ SONAME       = liboxli.$(SHARED_EXT).$(LIB_VERSION)
 SONAME_FLAGS = -install_name $(PREFIX)/lib/$(SONAME) \
 	       -compatibility_version $(LIB_VERSION) \
 	       -current_version $(LIB_VERSION)
-LDFLAGS  +=   -arch x86_64 				 
+LDFLAGS  +=  -stdlib=libstdc++ -std=c++11 -arch x86_64
+CXXFLAGS  +=  -stdlib=libstdc++ -std=c++11
 else
 SHARED_EXT   = so
 SONAME       = liboxli.$(SHARED_EXT).$(LIB_VERSION)
