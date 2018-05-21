@@ -329,7 +329,8 @@ murmur3.o: ../../third-party/smhasher/MurmurHash3.cc
 %.o: %.cc $(PRECOMILE_OBJS) $(OXLI_HEADERS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c -o $@ $<
 
-
+$(LIBOXLISO): $(LIBOXLI_OBJS)
+	echo "Dont build"
 
 liboxli.a: $(LIBOXLI_OBJS)
 	ar rcs $@ $^
