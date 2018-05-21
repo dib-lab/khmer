@@ -14,7 +14,7 @@ endif
 all: $(TESTS)
 
 %: %.cc ../../src/oxli/liboxli.a
-	$(CXX) -undefined dynamic_lookup -arch x86_64 -lstdc++ $(CXXFLAGS) $< ../../src/oxli/liboxli.a -o $@
+	$(CXX) -undefined dynamic_lookup -arch x86_64 -lstdc++ $(CXXFLAGS) $< ../../src/oxli/liboxli.dylib -o $@
 
 ../../src/oxli/liboxli.a:
 	cd ../../src/oxli && make
