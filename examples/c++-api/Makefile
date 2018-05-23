@@ -3,9 +3,11 @@ CXXFLAGS=--std=c++11 \
 	   -I ../../third-party/smhasher \
 	   -I ../../third-party/mqf \
 	   -I ../../third-party/seqan/core/include/ \
-	   -I ../../third-party/rollinghash
+	   -I ../../third-party/rollinghash\
+		 -Wl,-rpath=../../src/oxli/
 
 TESTS=exact-counting bloom consume
+
 
 ifneq ($(INCLUDE),)
 	INCLUDE := -I$(INCLUDE)
@@ -13,10 +15,10 @@ endif
 
 all: $(TESTS)
 
-%: %.cc ../../src/oxli/liboxli.a
-	$(CXX) -undefined dynamic_lookup -arch x86_64 -lstdc++ $(CXXFLAGS) $< ../../src/oxli/liboxli.a -o $@
+%: %.cc ../../src/oxli/liboxli.so
+	$(CXX) -L../../src/oxli/liboxli.so  -lstdc++ $(CXXFLAGS) $<  -o $@ -L../..//src/oxli liboxli.so.1 -lstdc++
 
-../../src/oxli/liboxli.a:
+../../src/oxli/liboxli.so:
 	cd ../../src/oxli && make
 
 run: all
