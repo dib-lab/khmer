@@ -168,6 +168,7 @@ SONAME_FLAGS = -install_name $(PREFIX)/lib/$(SONAME) \
 	       -compatibility_version $(LIB_VERSION) \
 	       -current_version $(LIB_VERSION)
 LDFLAGS  +=  -arch x86_64 -mmacosx-version-min=10.7
+$(CXXFLAGS) += -undefined dynamic_lookup -arch x86_64
 else
 SHARED_EXT   = so
 SONAME       = liboxli.$(SHARED_EXT).$(LIB_VERSION)
