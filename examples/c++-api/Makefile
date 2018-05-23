@@ -12,11 +12,14 @@ TESTS=exact-counting bloom consume
 ifneq ($(INCLUDE),)
 	INCLUDE := -I$(INCLUDE)
 endif
+ifeq ($(OS), Darwin)
+	$(CXXFLAGS) += -undefined dynamic_lookup -arch x86_64
+endif
 
 all: $(TESTS)
 
 %: %.cc ../../src/oxli/liboxli.so
-	$(CXX) -L../../src/oxli/liboxli.so  -lstdc++ $(CXXFLAGS) $<  -o $@ -L../..//src/oxli liboxli.so.1 -lstdc++
+	$(CXX)  -lstdc++ $(CXXFLAGS) $<  -o $@ -L../../src/oxli liboxli.so.1 -lstdc++
 
 ../../src/oxli/liboxli.so:
 	cd ../../src/oxli && make

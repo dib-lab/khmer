@@ -13,7 +13,7 @@ endif
 # test for detecting whether or not the CPU supports it
 OS := $(shell uname)
 ifeq ($(OS), Darwin)
-	ARCH=-m64
+	ARCH=-m64 -undefined dynamic_lookup -arch x86_64
 else
 	#ARCH=-msse4.2 -D__SSE4_2_
 	ARCH=
