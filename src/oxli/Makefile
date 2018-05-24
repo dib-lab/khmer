@@ -333,6 +333,7 @@ murmur3.o: ../../third-party/smhasher/MurmurHash3.cc
 $(LIBOXLISO): $(LIBOXLI_OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(SONAME_FLAGS) -dynamiclib -o $@ $^
 	ln -sf $(SONAME) liboxli.$(SHARED_EXT)
+	cp $(SONAME) liboxli.$(SHARED_EXT) /usr/local/lib/
 
 liboxli.a: $(LIBOXLI_OBJS)
 	ar rcs $@ $^
