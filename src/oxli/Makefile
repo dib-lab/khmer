@@ -331,7 +331,7 @@ murmur3.o: ../../third-party/smhasher/MurmurHash3.cc
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c -o $@ $<
 
 $(LIBOXLISO): $(LIBOXLI_OBJS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(SONAME_FLAGS) -shared -o $@ $^
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(SONAME_FLAGS) -dynamiclib -o $@ $^
 	ln -sf $(SONAME) liboxli.$(SHARED_EXT)
 
 liboxli.a: $(LIBOXLI_OBJS)

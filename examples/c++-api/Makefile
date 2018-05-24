@@ -3,8 +3,7 @@ CXXFLAGS=--std=c++11 \
 	   -I ../../third-party/smhasher \
 	   -I ../../third-party/mqf \
 	   -I ../../third-party/seqan/core/include/ \
-	   -I ../../third-party/rollinghash\
-		 -Wl,-rpath=../../src/oxli/
+	   -I ../../third-party/rollinghash
 
 TESTS=exact-counting bloom consume
 
