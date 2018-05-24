@@ -328,10 +328,10 @@ murmur3.o: ../../third-party/smhasher/MurmurHash3.cc
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 %.o: %.cc $(PRECOMILE_OBJS) $(OXLI_HEADERS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c -o $@ $< -arch x86_64 -mmacosx-version-min=10.7 -stdlib=libc++
 
 $(LIBOXLISO): $(LIBOXLI_OBJS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(SONAME_FLAGS) -dynamiclib -o $@ $^ -lstdc++
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(SONAME_FLAGS) -shared -o $@ $^ -lstdc++
 	ln -sf $(SONAME) liboxli.$(SHARED_EXT)
 	cp $(SONAME) liboxli.$(SHARED_EXT) /usr/local/lib/
 

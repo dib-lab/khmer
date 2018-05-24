@@ -69,7 +69,7 @@ matrix:
       env:
         - TESTATTR="'not linux and not known_failing and not huge'"
         - CC=cc
-        - CXX=c++
+        - CXX=clang++
 #        - c++=g++
       before_install:
         - source ci_scripts/install.sh
