@@ -155,7 +155,6 @@ def test_consume_with_mask_threshold():
                            |-----------|      <--- only these k-mers are
                             |-----------|          abundance <= 3 in the mask
     """
-    maskfile = utils.get_test_data('seq-a.fa')
     mask = khmer.Counttable(13, 1e3, 4)
     for _ in range(3):
         mask.consume('TAGATCTGCTTGAAACAAGTGGATTTGAGAAAAA')
@@ -172,3 +171,16 @@ def test_consume_with_mask_threshold():
     assert ct.get('ATTTGAGAAAAAA') == 1
     assert ct.get('TTTGAGAAAAAAG') == 1
     assert ct.get('TTGAGAAAAAAGT') == 1
+
+
+def test_consume_with_mask_complement():
+    mask = khmer.Nodetable(13, 1e3, 4)
+    mask.consume('TGCTTGAAACAAGTG')
+
+    infile = utils.get_test_data('seq-b.fa')
+    ct = khmer.Counttable(13, 1e3, 4)
+    nr, nk = ct.consume_seqfile_with_mask(infile, mask, threshold=1,
+                                          complement=True)
+
+    assert ct.get_kmer_counts('TGCTTGAAACAAGTG') == [1, 1, 1]
+    assert ct.get_kmer_counts('GAAACAAGTGGATTT') == [0, 0, 0]
