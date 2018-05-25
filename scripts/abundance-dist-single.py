@@ -87,15 +87,6 @@ def get_parser():
     parser.add_argument('-z', '--no-zero', dest='output_zero', default=True,
                         action='store_false',
                         help='Do not output zero-count bins')
-    parser.add_argument('-H', '--hash-function', choices=['2bit', 'murmur',
-                        'cyclic'], default='2bit', help='Indicate the hash '
-                        'function to be used; "2bit" is faster, is reversible,'
-                        ' and supports subsequent graph operations, but is '
-                        'limited to k <= 32; "murmur" supports arbitrarily '
-                        'large values of k and is compatible with k-mer '
-                        'banding, but is slower and does not support graph '
-                        'operations; "cyclic" is fast and supports banding, '
-                        'but does not support graph operations')
     parser.add_argument('-b', '--no-bigcount', dest='bigcount', default=True,
                         action='store_false',
                         help='Do not count k-mers past 255')
@@ -109,11 +100,6 @@ def get_parser():
                         help='Override sanity checks')
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
-    parser.add_argument('--filter', metavar='NT', help='only track abundance '
-                        'of k-mers in the given nodetable')
-    parser.add_argument('--max-fpr', metavar='FPR', type=float, default=0.2,
-                        help='terminate if expected false positive rate > '
-                        '`FPR`; default is 0.2')
     return parser
 
 
@@ -153,28 +139,17 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     log_info('k-mer countgraph sizes: {sizes}', sizes=countgraph.hashsizes())
     log_info('outputting to {output}', output=args.output_histogram_filename)
 
-    if args.filter:
-        filt = khmer.Nodetable.load(args.filter)
-
     # start loading
     rparser = khmer.ReadParser(args.input_sequence_filename)
     threads = []
     log_info('consuming input, round 1 -- {input}',
              input=args.input_sequence_filename)
     for _ in range(args.threads):
-        if args.filter:
-            thread = \
-                threading.Thread(
-                    target=countgraph.consume_seqfile_with_mask,
-                    args=(rparser, filt, ),
-                    kwargs={'threshold': 1, 'complement': True},
-                )
-        else:
-            thread = \
-                threading.Thread(
-                    target=countgraph.consume_seqfile,
-                    args=(rparser, )
-                )
+        thread = \
+            threading.Thread(
+                target=countgraph.consume_seqfile,
+                args=(rparser, )
+            )
         threads.append(thread)
         thread.start()
 
@@ -183,9 +158,6 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
 
     log_info('Total number of unique k-mers: {nk}',
              nk=countgraph.n_unique_kmers())
-    fpr = khmer.calc_expected_collisions(countgraph,
-                                         max_false_pos=args.max_fpr)
-    log_info('Expected FPR: {fpr:.3f}', fpr=fpr)
 
     abundance_lists = []
 
