@@ -94,12 +94,12 @@ void Hashtable::consume_seqfile_with_mask(
     unsigned int threshold,
     unsigned int &total_reads,
     unsigned long long &n_consumed,
-    bool complement
+    bool consume_masked
 )
 {
     ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
     consume_seqfile_with_mask<SeqIO>(
-        parser, mask, threshold, total_reads, n_consumed, complement
+        parser, mask, threshold, total_reads, n_consumed, consume_masked
     );
 }
 
@@ -112,13 +112,13 @@ void Hashtable::consume_seqfile_banding_with_mask(
     unsigned int threshold,
     unsigned int &total_reads,
     unsigned long long &n_consumed,
-    bool complement
+    bool consume_masked
 )
 {
     ReadParserPtr<SeqIO> parser = get_parser<SeqIO>(filename);
     consume_seqfile_banding_with_mask<SeqIO>(
         parser, num_bands, band, mask, threshold, total_reads, n_consumed,
-        complement
+        consume_masked
     );
 }
 
@@ -156,7 +156,7 @@ void Hashtable::consume_seqfile_with_mask(
     unsigned int threshold,
     unsigned int &total_reads,
     unsigned long long &n_consumed,
-    bool complement
+    bool consume_masked
 )
 {
     Read read;
@@ -175,7 +175,7 @@ void Hashtable::consume_seqfile_with_mask(
         while(!kmers->done()) {
             HashIntoType kmer = kmers->next();
             BoundedCounterType kcount = mask->get_count(kmer);
-            bool consume = complement ? kcount >= threshold : kcount <= threshold;
+            bool consume = consume_masked ? kcount >= threshold : kcount <= threshold;
             if (consume) {
                 count(kmer);
                 this_n_consumed++;
@@ -236,7 +236,7 @@ void Hashtable::consume_seqfile_banding_with_mask(
     unsigned int threshold,
     unsigned int &total_reads,
     unsigned long long &n_consumed,
-    bool complement
+    bool consume_masked
 )
 {
     Read read;
@@ -258,7 +258,7 @@ void Hashtable::consume_seqfile_banding_with_mask(
             HashIntoType kmer = kmers->next();
             if (kmer >= interval.first && kmer < interval.second) {
                 BoundedCounterType kcount = mask->get_count(kmer);
-                bool consume = complement ? kcount >= threshold : kcount <= threshold;
+                bool consume = consume_masked ? kcount >= threshold : kcount <= threshold;
                 if (consume) {
                     count(kmer);
                     this_n_consumed++;
@@ -648,7 +648,7 @@ template void Hashtable::consume_seqfile_with_mask<FastxReader>(
     unsigned int threshold,
     unsigned int &total_reads,
     unsigned long long &n_consumed,
-    bool complement
+    bool consume_masked
 );
 
 
@@ -658,7 +658,7 @@ template void Hashtable::consume_seqfile_with_mask<FastxReader>(
     unsigned int threshold,
     unsigned int &total_reads,
     unsigned long long &n_consumed,
-    bool complement
+    bool consume_masked
 );
 
 template void Hashtable::consume_seqfile_banding_with_mask<FastxReader>(
@@ -669,7 +669,7 @@ template void Hashtable::consume_seqfile_banding_with_mask<FastxReader>(
     unsigned int threshold,
     unsigned int &total_reads,
     unsigned long long &n_consumed,
-    bool complement
+    bool consume_masked
 );
 
 
@@ -681,7 +681,7 @@ template void Hashtable::consume_seqfile_banding_with_mask<FastxReader>(
     unsigned int threshold,
     unsigned int &total_reads,
     unsigned long long &n_consumed,
-    bool complement
+    bool consume_masked
 );
 
 

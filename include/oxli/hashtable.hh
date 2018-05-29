@@ -283,7 +283,7 @@ public:
         unsigned int threshold,
         unsigned int &total_reads,
         unsigned long long &n_consumed,
-        bool complement = false
+        bool consume_masked = false
     );
 
     template<typename SeqIO>
@@ -293,7 +293,7 @@ public:
         unsigned int threshold,
         unsigned int &total_reads,
         unsigned long long &n_consumed,
-        bool complement = false
+        bool consume_masked = false
     );
 
     // Consume sequences in k-mer banding mode.
@@ -325,7 +325,7 @@ public:
         unsigned int threshold,
         unsigned int &total_reads,
         unsigned long long &n_consumed,
-        bool complement = false
+        bool consume_masked = false
     );
 
     template<typename SeqIO>
@@ -337,7 +337,7 @@ public:
         unsigned int threshold,
         unsigned int &total_reads,
         unsigned long long &n_consumed,
-        bool complement = false
+        bool consume_masked = false
     );
 
     void set_use_bigcount(bool b)

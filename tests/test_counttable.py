@@ -180,7 +180,7 @@ def test_consume_with_mask_complement():
     infile = utils.get_test_data('seq-b.fa')
     ct = khmer.Counttable(13, 1e3, 4)
     nr, nk = ct.consume_seqfile_with_mask(infile, mask, threshold=1,
-                                          complement=True)
+                                          consume_masked=True)
 
     assert ct.get_kmer_counts('TGCTTGAAACAAGTG') == [1, 1, 1]
     assert ct.get_kmer_counts('GAAACAAGTGGATTT') == [0, 0, 0]
