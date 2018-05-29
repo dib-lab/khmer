@@ -282,7 +282,8 @@ public:
         Hashtable* mask,
         unsigned int threshold,
         unsigned int &total_reads,
-        unsigned long long &n_consumed
+        unsigned long long &n_consumed,
+        bool consume_masked = false
     );
 
     template<typename SeqIO>
@@ -291,7 +292,8 @@ public:
         Hashtable* mask,
         unsigned int threshold,
         unsigned int &total_reads,
-        unsigned long long &n_consumed
+        unsigned long long &n_consumed,
+        bool consume_masked = false
     );
 
     // Consume sequences in k-mer banding mode.
@@ -322,7 +324,8 @@ public:
         Hashtable* mask,
         unsigned int threshold,
         unsigned int &total_reads,
-        unsigned long long &n_consumed
+        unsigned long long &n_consumed,
+        bool consume_masked = false
     );
 
     template<typename SeqIO>
@@ -333,7 +336,8 @@ public:
         Hashtable* mask,
         unsigned int threshold,
         unsigned int &total_reads,
-        unsigned long long &n_consumed
+        unsigned long long &n_consumed,
+        bool consume_masked = false
     );
 
     void set_use_bigcount(bool b)
