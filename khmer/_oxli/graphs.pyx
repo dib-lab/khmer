@@ -391,31 +391,49 @@ cdef class QFCounttable(Hashtable):
 
 cdef class Counttable(Hashtable):
 
-    def __cinit__(self, int k, uint64_t starting_size, int n_tables):
-        cdef vector[uint64_t] primes
+    def __cinit__(self, int k, uint64_t starting_size, int n_tables,
+                  primes=None):
+        if primes is None:
+            primes = list()
+        cdef vector[uint64_t] _primes
         if type(self) is Counttable:
-            primes = get_n_primes_near_x(n_tables, starting_size)
-            self._ct_this = make_shared[CpCounttable](k, primes)
+            if primes:
+                _primes = primes
+            else:
+                _primes = get_n_primes_near_x(n_tables, starting_size)
+            self._ct_this = make_shared[CpCounttable](k, _primes)
             self._ht_this = <shared_ptr[CpHashtable]>self._ct_this
 
 
 cdef class CyclicCounttable(Hashtable):
 
-    def __cinit__(self, int k, uint64_t starting_size, int n_tables):
-        cdef vector[uint64_t] primes
+    def __cinit__(self, int k, uint64_t starting_size, int n_tables,
+                  primes=None):
+        if primes is None:
+            primes = list()
+        cdef vector[uint64_t] _primes
         if type(self) is CyclicCounttable:
-            primes = get_n_primes_near_x(n_tables, starting_size)
-            self._cct_this = make_shared[CpCyclicCounttable](k, primes)
+            if primes:
+                _primes = primes
+            else:
+                _primes = get_n_primes_near_x(n_tables, starting_size)
+            self._cct_this = make_shared[CpCyclicCounttable](k, _primes)
             self._ht_this = <shared_ptr[CpHashtable]>self._cct_this
 
 
 cdef class SmallCounttable(Hashtable):
 
-    def __cinit__(self, int k, uint64_t starting_size, int n_tables):
-        cdef vector[uint64_t] primes
+    def __cinit__(self, int k, uint64_t starting_size, int n_tables,
+                  primes=None):
+        if primes is None:
+            primes = list()
+        cdef vector[uint64_t] _primes
         if type(self) is SmallCounttable:
-            primes = get_n_primes_near_x(n_tables, starting_size)
-            self._st_this = make_shared[CpSmallCounttable](k, primes)
+            if primes:
+                _primes = primes
+            else:
+                _primes = get_n_primes_near_x(n_tables, starting_size)
+            self._st_this = make_shared[CpSmallCounttable](k, _primes)
             self._ht_this = <shared_ptr[CpHashtable]>self._st_this
 
     def get_raw_tables(self):
@@ -428,11 +446,17 @@ cdef class SmallCounttable(Hashtable):
 
 cdef class Nodetable(Hashtable):
 
-    def __cinit__(self, int k, uint64_t starting_size, int n_tables):
-        cdef vector[uint64_t] primes
+    def __cinit__(self, int k, uint64_t starting_size, int n_tables,
+                  primes=None):
+        if primes is None:
+            primes = list()
+        cdef vector[uint64_t] _primes
         if type(self) is Nodetable:
-            primes = get_n_primes_near_x(n_tables, starting_size)
-            self._nt_this = make_shared[CpNodetable](k, primes)
+            if primes:
+                _primes = primes
+            else:
+                _primes = get_n_primes_near_x(n_tables, starting_size)
+            self._nt_this = make_shared[CpNodetable](k, _primes)
             self._ht_this = <shared_ptr[CpHashtable]>self._nt_this
 
 
@@ -793,7 +817,9 @@ cdef class Hashgraph(Hashtable):
 cdef class Countgraph(Hashgraph):
 
     def __cinit__(self, int k, uint64_t starting_size, int n_tables,
-                  primes=[]):
+                  primes=None):
+        if primes is None:
+            primes = list()
         cdef vector[uint64_t] _primes
         if type(self) is Countgraph:
             if primes:
@@ -832,7 +858,9 @@ cdef class Countgraph(Hashgraph):
 cdef class SmallCountgraph(Hashgraph):
 
     def __cinit__(self, int k, uint64_t starting_size, int n_tables,
-                  primes=[]):
+                  primes=None):
+        if primes is None:
+            primes = list()
         cdef vector[uint64_t] _primes
         if type(self) is SmallCountgraph:
             if primes:
@@ -855,7 +883,9 @@ cdef class SmallCountgraph(Hashgraph):
 cdef class Nodegraph(Hashgraph):
 
     def __cinit__(self, int k, uint64_t starting_size, int n_tables,
-                  primes=[]):
+                  primes=None):
+        if primes is None:
+            primes = list()
         cdef vector[uint64_t] _primes
         if type(self) is Nodegraph:
             if primes:
