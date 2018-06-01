@@ -35,8 +35,8 @@
 
 
 import khmer
-
 import pytest
+import random
 from . import khmer_tst_utils as utils
 
 
@@ -184,3 +184,19 @@ def test_consume_with_mask_complement():
 
     assert ct.get_kmer_counts('TGCTTGAAACAAGTG') == [1, 1, 1]
     assert ct.get_kmer_counts('GAAACAAGTGGATTT') == [0, 0, 0]
+
+
+
+@pytest.mark.parametrize('sketchtype', [
+    (khmer.Nodegraph),
+    (khmer.Countgraph),
+    (khmer.SmallCountgraph),
+    (khmer.Nodetable),
+    (khmer.Counttable),
+    (khmer.SmallCounttable),
+    (khmer.CyclicCounttable),
+])
+def test_init_with_primes(sketchtype):
+    primes = khmer.get_n_primes_near_x(4, random.randint(1000, 2000))
+    sketch = sketchtype(31, 1, 1, primes=primes)
+    assert sketch.hashsizes() == primes
