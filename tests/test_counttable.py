@@ -186,7 +186,6 @@ def test_consume_with_mask_complement():
     assert ct.get_kmer_counts('GAAACAAGTGGATTT') == [0, 0, 0]
 
 
-
 @pytest.mark.parametrize('sketchtype', [
     (khmer.Nodegraph),
     (khmer.Countgraph),
