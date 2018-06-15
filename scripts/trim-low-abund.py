@@ -379,7 +379,7 @@ def main():
     pass2list = []
     for filename in args.input_filenames:
         # figure out temporary filename for 2nd pass
-        pass2filename = os.path.basename(filename) + '.pass2'
+        pass2filename = filename.replace(os.path.sep, '-') + '.pass2'
         pass2filename = os.path.join(tempdir, pass2filename)
         pass2fp = open(pass2filename, 'w')
 

@@ -35,6 +35,7 @@ under semantic versioning, but will be in future versions of khmer.
   or generators where appropriate.
 - All constructors have been removed from khmer/__init__.py.
 - GraphLabels does not inherit from Hashgraph.
+- `trim-low-abund.py` doesn't error out when given multiple files with identical basenames
 
 ## [2.1.1] - 2017-05-25
 ### Added
