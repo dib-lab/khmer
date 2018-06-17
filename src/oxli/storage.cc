@@ -923,34 +923,14 @@ void QFStorage::save(std::string outfilename, WordLength ksize)
     unsigned char version = SAVED_FORMAT_VERSION;
     unsigned char ht_type = SAVED_QFCOUNT;
 
+
     outfile.write(SAVED_SIGNATURE, 4);
     outfile.write((const char *) &version, 1);
     outfile.write((const char *) &ht_type, 1);
     outfile.write((const char *) &ksize, sizeof(ksize));
 
-    /* just a hack to handle __uint128_t value. Don't know a better to handle it
-     * right now */
-    uint64_t tmp_range;
-    tmp_range = cf.range;
-
-    outfile.write((const char *) &cf.nslots, sizeof(cf.nslots));
-    outfile.write((const char *) &cf.xnslots, sizeof(cf.xnslots));
-    outfile.write((const char *) &cf.key_bits, sizeof(cf.key_bits));
-    outfile.write((const char *) &cf.value_bits, sizeof(cf.value_bits));
-    outfile.write((const char *) &cf.key_remainder_bits, sizeof(cf.key_remainder_bits));
-    outfile.write((const char *) &cf.bits_per_slot, sizeof(cf.bits_per_slot));
-    outfile.write((const char *) &tmp_range, sizeof(tmp_range));
-    outfile.write((const char *) &cf.nblocks, sizeof(cf.nblocks));
-    outfile.write((const char *) &cf.nelts, sizeof(cf.nelts));
-    outfile.write((const char *) &cf.ndistinct_elts, sizeof(cf.ndistinct_elts));
-    outfile.write((const char *) &cf.noccupied_slots, sizeof(cf.noccupied_slots));
-
-    #if BITS_PER_SLOT == 8 || BITS_PER_SLOT == 16 || BITS_PER_SLOT == 32 || BITS_PER_SLOT == 64
-        outfile.write((const char *) cf.blocks, sizeof(qfblock) * cf.nblocks);
-    #else
-        outfile.write((const char *) cf.blocks,
-                      (sizeof(qfblock) + SLOTS_PER_BLOCK * cf.bits_per_slot / 8) * cf.nblocks);
-    #endif
+    outfile.write((const char *)mf.metadata,sizeof(qfmetadata));
+    outfile.write((const char *)mf.blocks,mf.metadata->size);
     outfile.close();
 }
 
@@ -1011,34 +991,22 @@ void QFStorage::load(std::string infilename, WordLength &ksize)
     infile.read((char *) &save_ksize, sizeof(save_ksize));
     ksize = save_ksize;
 
-    infile.read((char *) &cf.nslots, sizeof(cf.nslots));
-    infile.read((char *) &cf.xnslots, sizeof(cf.xnslots));
-    infile.read((char *) &cf.key_bits, sizeof(cf.key_bits));
-    infile.read((char *) &cf.value_bits, sizeof(cf.value_bits));
-    infile.read((char *) &cf.key_remainder_bits, sizeof(cf.key_remainder_bits));
-    infile.read((char *) &cf.bits_per_slot, sizeof(cf.bits_per_slot));
-    infile.read((char *) &tmp_range, sizeof(tmp_range));
+    mf.mem = (qfmem *)calloc(sizeof(qfmem), 1);
+    mf.metadata = (qfmetadata *)calloc(sizeof(qfmetadata), 1);
+    infile.read((char*)mf.metadata,sizeof(qfmetadata));
+    mf.blocks = (qfblock *)calloc(mf.metadata->size, 1);
+    infile.read((char*)mf.blocks, mf.metadata->size);
 
-    infile.read((char *) &cf.nblocks, sizeof(cf.nblocks));
-    infile.read((char *) &cf.nelts, sizeof(cf.nelts));
-    infile.read((char *) &cf.ndistinct_elts, sizeof(cf.ndistinct_elts));
-    infile.read((char *) &cf.noccupied_slots, sizeof(cf.noccupied_slots));
-    /* just a hack to handle __uint128_t value. Don't know a better to handle it
-     * right now */
-    cf.range = tmp_range;
-    // deallocate previously allocated blocks
-    free(cf.blocks);
-    /* allocate the space for the actual qf blocks */
-    #if BITS_PER_SLOT == 8 || BITS_PER_SLOT == 16 || BITS_PER_SLOT == 32 || BITS_PER_SLOT == 64
-        cf.blocks = (qfblock *)calloc(cf.nblocks, sizeof(qfblock));
-    #else
-        cf.blocks = (qfblock *)calloc(cf.nblocks, sizeof(qfblock) + SLOTS_PER_BLOCK * cf.bits_per_slot / 8);
-    #endif
-    #if BITS_PER_SLOT == 8 || BITS_PER_SLOT == 16 || BITS_PER_SLOT == 32 || BITS_PER_SLOT == 64
-        infile.read((char *) cf.blocks, sizeof(qfblock) * cf.nblocks);
-    #else
-        infile.read((char *) cf.blocks,
-                    (sizeof(qfblock) + SLOTS_PER_BLOCK * cf.bits_per_slot / 8) * cf.nblocks);
-    #endif
+    mf.metadata->num_locks =
+        10;//should be changed to something realistic like function qf_deserialize
+    mf.mem->metadata_lock = 0;
+    /* initialize all the locks to 0 */
+    mf.mem->locks = (volatile int *)calloc(mf.metadata->num_locks,
+                                           sizeof(volatile int));
+
+
+
+
+
     infile.close();
 }
