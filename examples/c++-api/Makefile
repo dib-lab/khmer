@@ -21,6 +21,8 @@ all: $(TESTS)
 	$(CXX) -o $@   $(CXXFLAGS) $<  -L../../src/oxli -loxli -lstdc++
 
 ../../src/oxli/liboxli.so:
+	g++ --version
+	clang++ --version
 	cd ../../src/oxli && make
 
 run: all
