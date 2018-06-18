@@ -18,6 +18,9 @@
 #include <stdexcept>
 #include "gqf.h"
 #include <iostream>
+#include <map>
+#include "utils.h"
+
 
 /******************************************************************
  * Code for managing the metadata bits and slots w/o interpreting *
@@ -1602,6 +1605,9 @@ static inline uint64_t next_slot(QF *qf, uint64_t current)
 static inline bool insert(QF *qf, __uint128_t hash, uint64_t count, bool lock=false,
 													bool spin=false)
 {
+	if(qf->metadata->maximum_count!=0){
+		count=std::min(count,qf->metadata->maximum_count);
+	}
 	uint64_t hash_remainder           = hash & BITMASK(qf->metadata->key_remainder_bits);
 	uint64_t hash_bucket_index        = hash >> qf->metadata->key_remainder_bits;
 	uint64_t hash_bucket_block_offset = hash_bucket_index % SLOTS_PER_BLOCK;
@@ -1611,6 +1617,8 @@ static inline bool insert(QF *qf, __uint128_t hash, uint64_t count, bool lock=fa
 		throw std::out_of_range("Insert is called with hash index out of range");
 	}
 	if (lock) {
+		if(qf->mem->general_lock)
+			return false;
 		if (!qf_lock(qf, hash_bucket_index, spin, false))
 			return false;
 	}
@@ -1683,7 +1691,11 @@ static inline bool insert(QF *qf, __uint128_t hash, uint64_t count, bool lock=fa
 				modify_metadata(qf, &qf->metadata->ndistinct_elts, 1);
 				/* Found a counter for this remainder.  Add in the new count. */
 			} else if (current_remainder == hash_remainder) {
-				uint64_t *p = encode_counter(qf, hash_remainder, current_count + count, &new_values[67],&new_fcounters[67]);
+				uint64_t tmp= current_count + count;
+				if(qf->metadata->maximum_count!=0){
+					tmp=std::min(tmp,qf->metadata->maximum_count);
+				}
+				uint64_t *p = encode_counter(qf, hash_remainder, tmp, &new_values[67],&new_fcounters[67]);
 				total_remainders=&new_values[67] - p;
 				insert_replace_slots_and_shift_remainders_and_runends_and_offsets(qf,
 																																					is_runend(qf, current_end) ? 1 : 2,
@@ -1769,6 +1781,8 @@ static inline bool insert(QF *qf, __uint128_t hash, uint64_t count, bool lock=fa
 	// 	p=&new_values[67];
 	// }
 	if (lock) {
+		if(qf->mem->general_lock)
+			return false;
 		if (!qf_lock(qf, hash_bucket_index, spin, false))
 		return false;
 	}
@@ -1859,7 +1873,8 @@ qf->mem = (qfmem *)calloc(sizeof(qfmem), 1);
 		qf->metadata->noccupied_slots = 0;
 		qf->metadata->maximum_occupied_slots=(uint64_t)((double)qf->metadata->xnslots *0.95);
 		qf->metadata->num_locks = (qf->metadata->xnslots/NUM_SLOTS_TO_LOCK)+2;
-
+		qf->metadata->maximum_count = 0;
+		qf->metadata->tags_map=NULL;
 		qf->blocks = (qfblock *)calloc(size, 1);
 
 
@@ -1912,12 +1927,14 @@ qf->mem = (qfmem *)calloc(sizeof(qfmem), 1);
 		qf->metadata->noccupied_slots = 0;
 		qf->metadata->maximum_occupied_slots=(uint64_t)((double)qf->metadata->xnslots *0.95);
 		qf->metadata->num_locks = (qf->metadata->xnslots/NUM_SLOTS_TO_LOCK)+2;
-
+		qf->metadata->maximum_count = 0;
+		qf->metadata->tags_map=NULL;
 		qf->blocks = (qfblock *)(qf->metadata + 1);
 	}
 
 	/* initialize all the locks to 0 */
 	qf->mem->metadata_lock = 0;
+	qf->mem->general_lock = 0;
 	qf->mem->locks = (volatile int *)calloc(qf->metadata->num_locks,
 																					sizeof(volatile int));
 
@@ -1935,6 +1952,11 @@ void qf_copy(QF *dest, QF *src)
 	memcpy(dest->mem, src->mem, sizeof(qfmem));
 	memcpy(dest->metadata, src->metadata, sizeof(qfmetadata));
 	memcpy(dest->blocks, src->blocks, src->metadata->size);
+
+	if(src->metadata->tags_map!=NULL){
+		dest->metadata->tags_map=
+		new std::map<uint64_t, std::vector<int> >(*src->metadata->tags_map);
+	}
 }
 
 /* free up the memory if the QF is in memory.
@@ -1945,6 +1967,10 @@ void qf_copy(QF *dest, QF *src)
 void qf_destroy(QF *qf)
 {
 	assert(qf->blocks != NULL);
+	if(qf->metadata->tags_map!=NULL){
+		delete qf->metadata->tags_map;
+		qf->metadata->tags_map=NULL;
+	}
 	if (qf->metadata->mem) {
 		free(qf->mem);
 		free(qf->metadata);
@@ -1954,6 +1980,7 @@ void qf_destroy(QF *qf)
 	munmap(qf->metadata, qf->metadata->size + sizeof(qfmetadata));
 	close(qf->mem->fd);
 	}
+
 	//qf->metadata->noccupied_slots=0;
 }
 
@@ -1969,37 +1996,43 @@ void qf_close(QF *qf)
  * Data won't be copied in memory.
  *
  */
-void qf_read(QF *qf, const char *path)
-{
-	struct stat sb;
-	int ret;
+ void qf_read(QF *qf, const char *path)
+ {
+	 struct stat sb;
+	 int ret;
 
-	qf->mem = (qfmem *)calloc(sizeof(qfmem), 1);
-	qf->mem->fd = open(path, O_RDWR, S_IRWXU);
-	if (qf->mem->fd < 0) {
-		perror("Couldn't open file:\n");
-		exit(EXIT_FAILURE);
+	 qf->mem = (qfmem *)calloc(sizeof(qfmem), 1);
+	 qf->mem->fd = open(path, O_RDWR, S_IRWXU);
+	 if (qf->mem->fd < 0) {
+		 perror("Couldn't open file:\n");
+		 exit(EXIT_FAILURE);
+	 }
+
+	 ret = fstat (qf->mem->fd, &sb);
+	 if ( ret < 0) {
+		 perror ("fstat");
+		 exit(EXIT_FAILURE);
+	 }
+
+	 if (!S_ISREG (sb.st_mode)) {
+		 fprintf (stderr, "%s is not a file\n", path);
+		 exit(EXIT_FAILURE);
+	 }
+
+	 qf->metadata = (qfmetadata *)mmap(NULL, sb.st_size, PROT_READ | PROT_WRITE, MAP_SHARED,
+	 qf->mem->fd, 0);
+	 qf->metadata->mem=false;
+		 qf->blocks = (qfblock *)(qf->metadata + 1);
+		 qf->metadata->num_locks = (qf->metadata->xnslots/NUM_SLOTS_TO_LOCK)+2;
+		 qf->mem->metadata_lock = 0;
+		 qf->mem->locks = (volatile int *)calloc(qf->metadata->num_locks,
+			 sizeof(volatile int));
+
+	string tagsMapOutName=string(path)+".tags_map";
+	if(file_exists(tagsMapOutName)){
+		qf->metadata->tags_map=load_tags_map(tagsMapOutName.c_str());
 	}
 
-	ret = fstat (qf->mem->fd, &sb);
-	if ( ret < 0) {
-		perror ("fstat");
-		exit(EXIT_FAILURE);
-	}
-
-	if (!S_ISREG (sb.st_mode)) {
-		fprintf (stderr, "%s is not a file\n", path);
-		exit(EXIT_FAILURE);
-	}
-
-	qf->metadata = (qfmetadata *)mmap(NULL, sb.st_size, PROT_READ | PROT_WRITE, MAP_SHARED,
-																qf->mem->fd, 0);
-	qf->metadata->mem=false;
-	qf->blocks = (qfblock *)(qf->metadata + 1);
-	qf->metadata->num_locks = (qf->metadata->xnslots/NUM_SLOTS_TO_LOCK)+2;
-	qf->mem->metadata_lock = 0;
-	qf->mem->locks = (volatile int *)calloc(qf->metadata->num_locks,
-																					sizeof(volatile int));
 }
 
 void qf_reset(QF *qf)
@@ -2009,7 +2042,8 @@ void qf_reset(QF *qf)
 	qf->metadata->nelts = 0;
 	qf->metadata->ndistinct_elts = 0;
 	qf->metadata->noccupied_slots = 0;
-
+	if(qf->metadata->tags_map!=NULL)
+		qf->metadata->tags_map->clear();
 #ifdef LOG_WAIT_TIME
 	memset(qf->wait_times, 0, (qf->metadata->num_locks+1)*sizeof(wait_time_data));
 #endif
@@ -2029,14 +2063,19 @@ void qf_serialize(const QF *qf, const char *filename)
 		perror("Error opening file for serializing\n");
 		exit(EXIT_FAILURE);
 	}
-
 	fwrite(qf->metadata, sizeof(qfmetadata), 1, fout);
-
 	/* we don't serialize the locks */
 	fwrite(qf->blocks, qf->metadata->size, 1, fout);
-
 	fclose(fout);
+
+	if(qf->metadata->tags_map!=NULL)
+	{
+		string tagsMapOutName=string(filename)+".tags_map";
+		save_tags_map(qf->metadata->tags_map,tagsMapOutName.c_str());
+	}
 }
+
+
 
 void qf_deserialize(QF *qf, const char *filename)
 {
@@ -2060,11 +2099,20 @@ void qf_deserialize(QF *qf, const char *filename)
 
 	qf->blocks = (qfblock *)calloc(qf->metadata->size, 1);
 	fread(qf->blocks, qf->metadata->size, 1, fin);
-
 	fclose(fin);
+
+	string tagsMapOutName=string(filename)+".tags_map";
+	if(file_exists(tagsMapOutName)){
+		qf->metadata->tags_map=load_tags_map(tagsMapOutName.c_str());
+	}
+
+
 }
 uint64_t qf_add_tag(const QF *qf, uint64_t key, uint64_t tag, bool lock, bool spin)
 {
+	if(qf->metadata->tag_bits==0){
+		return 0;
+	}
 	__uint128_t hash = key;
 	uint64_t hash_remainder   = hash & BITMASK(qf->metadata->key_remainder_bits);
 	int64_t hash_bucket_index = hash >> qf->metadata->key_remainder_bits;
@@ -2089,6 +2137,8 @@ uint64_t qf_add_tag(const QF *qf, uint64_t key, uint64_t tag, bool lock, bool sp
 																 &current_count);
 		if (current_remainder == hash_remainder){
 			if (lock) {
+				if(qf->mem->general_lock)
+					return false;
 				if (!qf_lock(qf, runstart_index, spin, false))
 				return 0;
 			}
@@ -2110,6 +2160,11 @@ uint64_t qf_add_tag(const QF *qf, uint64_t key, uint64_t tag, bool lock, bool sp
 
 uint64_t qf_remove_tag(const QF *qf, uint64_t key ,bool lock, bool spin)
 {
+
+	if(qf->metadata->tag_bits==0){
+		return 0;
+	}
+
 	__uint128_t hash = key;
 	uint64_t hash_remainder   = hash & BITMASK(qf->metadata->key_remainder_bits);
 	int64_t hash_bucket_index = hash >> qf->metadata->key_remainder_bits;
@@ -2134,6 +2189,8 @@ uint64_t qf_remove_tag(const QF *qf, uint64_t key ,bool lock, bool spin)
 																 &current_count);
 		if (current_remainder == hash_remainder){
 			if (lock) {
+				if(qf->mem->general_lock)
+					return false;
 				if (!qf_lock(qf, runstart_index, spin, false))
 					return false;
 				}
@@ -2151,6 +2208,9 @@ uint64_t qf_remove_tag(const QF *qf, uint64_t key ,bool lock, bool spin)
 
 uint64_t qf_get_tag(const QF *qf, uint64_t key)
 {
+	if(qf->metadata->tag_bits==0){
+		return 0;
+	}
 	__uint128_t hash = key;
 	uint64_t hash_remainder   = hash & BITMASK(qf->metadata->key_remainder_bits);
 	int64_t hash_bucket_index = hash >> qf->metadata->key_remainder_bits;
@@ -2360,6 +2420,61 @@ inline int qfi_end(QFi *qfi)
 		return 0;
 }
 
+
+void unionFn(uint64_t  key_a, uint64_t  tag_a,uint64_t  count_a,
+					   uint64_t  key_b, uint64_t  tag_b,uint64_t  count_b,
+					   uint64_t *key_c, uint64_t *tag_c,uint64_t *count_c)
+{
+		if(count_a==0){
+			*key_c=key_b;
+			*tag_c=tag_a;
+			*count_c=count_b;
+		}
+		else if(count_b==0){
+			*key_c=key_a;
+			*tag_c=tag_a;
+			*count_c=count_a;
+		}
+		else{
+			*key_c=key_a;
+			*tag_c=tag_a;
+			*count_c=count_a+count_b;
+		}
+
+}
+void intersectFn(uint64_t  key_a, uint64_t  tag_a,uint64_t  count_a,
+					   uint64_t  key_b, uint64_t  tag_b,uint64_t  count_b,
+					   uint64_t *key_c, uint64_t *tag_c,uint64_t *count_c)
+{
+	*key_c=0;
+	*tag_c=0;
+	*count_c=0;
+	if(count_a!=0 && count_b!=0){
+			*key_c=key_a;
+			*tag_c=tag_a;
+			*count_c=std::min(count_a,count_b);
+	}
+
+}
+
+void subtractFn(uint64_t  key_a, uint64_t  tag_a,uint64_t  count_a,
+					   uint64_t  key_b, uint64_t  tag_b,uint64_t  count_b,
+					   uint64_t *key_c, uint64_t *tag_c,uint64_t *count_c)
+{
+		if(count_b==0){
+			*key_c=key_a;
+			*tag_c=tag_a;
+			*count_c=count_a;
+		}
+		else{
+			*key_c=key_a;
+			*tag_c=tag_a;
+			*count_c=count_a<count_b ? 0:count_a-count_b;
+		}
+
+}
+
+
 /*
  * Merge qfa and qfb into qfc
  */
@@ -2371,7 +2486,11 @@ inline int qfi_end(QFi *qfi)
  * insert(min, ic)
  * increment either ia or ib, whichever is minimum.
  */
-void qf_merge(QF *qfa, QF *qfb, QF *qfc)
+void _qf_merge(QF *qfa, QF *qfb, QF *qfc,
+	void(*mergeFn)(uint64_t   keya, uint64_t  tag_a,uint64_t  count_a,
+						  	 uint64_t   keyb, uint64_t  tag_b,uint64_t  count_b,
+							   uint64_t*  keyc, uint64_t* tag_c,uint64_t* count_c
+							 ))
 {
 	QFi qfia, qfib;
 	if(qfa->metadata->range != qfb->metadata->range ||
@@ -2382,36 +2501,73 @@ void qf_merge(QF *qfa, QF *qfb, QF *qfc)
 	qf_iterator(qfa, &qfia, 0);
 	qf_iterator(qfb, &qfib, 0);
 
-	uint64_t keya, valuea, counta, keyb, valueb, countb;
-	qfi_get(&qfia, &keya, &valuea, &counta);
-	qfi_get(&qfib, &keyb, &valueb, &countb);
+	uint64_t keya, taga, counta, keyb, tagb, countb;
+	uint64_t keyc,tagc, countc;
+	qfi_get(&qfia, &keya, &taga, &counta);
+	qfi_get(&qfib, &keyb, &tagb, &countb);
+
 	do {
 		if (keya < keyb) {
-			qf_insert(qfc, keya, counta, true, true);
+			mergeFn(keya,taga,counta,0,0,0,&keyc,&tagc,&countc);
 			qfi_next(&qfia);
-			qfi_get(&qfia, &keya, &valuea, &counta);
+			qfi_get(&qfia, &keya, &taga, &counta);
 		}
-		else {
-			qf_insert(qfc, keyb, countb, true, true);
+		else if(keya > keyb) {
+			mergeFn(0,0,0,keyb,tagb,countb,&keyc,&tagc,&countc);
 			qfi_next(&qfib);
-			qfi_get(&qfib, &keyb, &valueb, &countb);
+			qfi_get(&qfib, &keyb, &tagb, &countb);
 		}
+		else{
+			mergeFn(keya,taga,counta,keyb,tagb,countb,&keyc,&tagc,&countc);
+			qfi_next(&qfia);
+			qfi_next(&qfib);
+			qfi_get(&qfia, &keya, &taga, &counta);
+			qfi_get(&qfib, &keyb, &tagb, &countb);
+		}
+		if(countc!=0){
+			qf_insert(qfc, keyc, countc, true, true);
+			qf_add_tag(qfc,keya,tagc);
+		}
+
 	} while(!qfi_end(&qfia) && !qfi_end(&qfib));
 
 	if (!qfi_end(&qfia)) {
+
 		do {
-			qfi_get(&qfia, &keya, &valuea, &counta);
-			qf_insert(qfc, keya, counta, true, true);
+			qfi_get(&qfia, &keya, &taga, &counta);
+			mergeFn(keya,taga,counta,0,0,0,&keyc,&tagc,&countc);
+			if(countc!=0){
+				qf_insert(qfc, keyc, countc, true, true);
+				qf_add_tag(qfc,keyc,tagc);
+			}
 		} while(!qfi_next(&qfia));
 	}
+
 	if (!qfi_end(&qfib)) {
 		do {
-			qfi_get(&qfib, &keyb, &valueb, &countb);
-			qf_insert(qfc, keyb, countb, true, true);
+			qfi_get(&qfib, &keyb, &tagb, &countb);
+			mergeFn(0,0,0,keyb,tagb,countb,&keyc,&tagc,&countc);
+			if(countc!=0){
+				qf_insert(qfc, keyc, countc, true, true);
+				qf_add_tag(qfc,keyc,tagc);
+			}
 		} while(!qfi_next(&qfib));
 	}
 
 	return;
+}
+void qf_merge(QF *qfa, QF *qfb, QF *qfc)
+{
+	_qf_merge(qfa,qfb,qfc,unionFn);
+}
+
+void qf_intersect(QF *qfa, QF *qfb, QF *qfc)
+{
+	_qf_merge(qfa,qfb,qfc,intersectFn);
+}
+void qf_subtract(QF *qfa, QF *qfb, QF *qfc)
+{
+	_qf_merge(qfa,qfb,qfc,subtractFn);
 }
 
 bool qf_equals(QF *qfa, QF *qfb)
@@ -2450,90 +2606,36 @@ bool qf_equals(QF *qfa, QF *qfb)
 	return true;
 }
 
-void qf_intersect(QF *qfa, QF *qfb, QF *qfc)
+
+
+std::map<std::string, uint64_t> Tags_map;
+uint64_t last_index=0;
+void union_multi_Fn(uint64_t   key_arr[], uint64_t  tag_arr[],uint64_t  count_arr[]
+	,std::map<uint64_t, std::vector<int> > ** inverted_indexes,int nqf,
+							 uint64_t*  key_c, uint64_t* tag_c,uint64_t* count_c)
 {
-	QFi qfia, qfib;
-	if(qfa->metadata->range != qfb->metadata->range ||
-	qfb->metadata->range != qfc->metadata->range )
+
+	*count_c=0;
+	for(int i=0;i<nqf;i++)
 	{
-		throw std::logic_error("Calculate intersect for non compatible filters");
+		//printf("key =%lu, count=%lu\n", key_arr[i],count_arr[i]);
+		if(count_arr[i]!=0)
+		{
+			*key_c=key_arr[i];
+			*tag_c=tag_arr[i];
+			*count_c+=count_arr[i];
+		}
 	}
-	qf_iterator(qfa, &qfia, 0);
-	qf_iterator(qfb, &qfib, 0);
 
-	uint64_t keya, valuea, counta, keyb, valueb, countb;
-	qfi_get(&qfia, &keya, &valuea, &counta);
-	qfi_get(&qfib, &keyb, &valueb, &countb);
-	do {
-		if (keya < keyb) {
-			qfi_next(&qfia);
-			qfi_get(&qfia, &keya, &valuea, &counta);
-		}
-		else if(keyb < keya) {
-			qfi_next(&qfib);
-			qfi_get(&qfib, &keyb, &valueb, &countb);
-		}
-		else{
-				qf_insert(qfc, keya, std::min(counta,countb), true, true);
-				qfi_next(&qfia);
-				qfi_next(&qfib);
-				qfi_get(&qfia, &keya, &valuea, &counta);
-				qfi_get(&qfib, &keyb, &valueb, &countb);
-		}
-	} while(!qfi_end(&qfia) && !qfi_end(&qfib));
-
-
-
-	return;
-}
-void qf_subtract(QF *qfa, QF *qfb, QF *qfc)
-{
-	QFi qfia, qfib;
-	if(qfa->metadata->range != qfb->metadata->range ||
-	qfb->metadata->range != qfc->metadata->range )
-	{
-		throw std::logic_error("Calculate subtracte for non compatible filters");
-	}
-	qf_iterator(qfa, &qfia, 0);
-	qf_iterator(qfb, &qfib, 0);
-
-	uint64_t keya, valuea, counta, keyb, valueb, countb;
-	qfi_get(&qfia, &keya, &valuea, &counta);
-	qfi_get(&qfib, &keyb, &valueb, &countb);
-	do {
-		if (keya < keyb) {
-			qfi_next(&qfia);
-			qfi_get(&qfia, &keya, &valuea, &counta);
-		}
-		else if(keyb < keya) {
-			qfi_next(&qfib);
-			qfi_get(&qfib, &keyb, &valueb, &countb);
-		}
-		else{
-				qf_insert(qfc, keya, counta>countb? counta-countb : 0, true, true);
-				qfi_next(&qfia);
-				qfi_next(&qfib);
-				qfi_get(&qfia, &keya, &valuea, &counta);
-				qfi_get(&qfib, &keyb, &valueb, &countb);
-		}
-	} while(!qfi_end(&qfia) && !qfi_end(&qfib));
-
-	return;
 }
 
-
-
-/*
- * Merge an array of qfs into the resultant QF
- */
-void qf_multi_merge(QF *qf_arr[], int nqf, QF *qfr)
+void _qf_multi_merge(QF *qf_arr[],int nqf, QF *qfr,
+	void(*mergeFn)(uint64_t   key_arr[], uint64_t  tag_arr[],uint64_t  count_arr[],
+								std::map<uint64_t, std::vector<int> > ** inverted_indexes,int nqf,
+							   uint64_t*  keyc, uint64_t* tag_c,uint64_t* count_c
+							 ))
 {
 	int i;
-	QFi qfi_arr[nqf];
-	int flag = 0;
-	int smallest_i = 0;
-	uint64_t smallest_key = UINT64_MAX;
-
 	uint64_t range=qf_arr[0]->metadata->range;
 	for (i=1; i<nqf; i++) {
 		if(qf_arr[i]->metadata->range!=range)
@@ -2542,48 +2644,262 @@ void qf_multi_merge(QF *qf_arr[], int nqf, QF *qfr)
 		}
 	}
 
+	QFi *qfi_arr[nqf];
+
+	uint64_t smallest_key=UINT64_MAX,second_smallest_key;
+	uint64_t keys[nqf];
+	uint64_t tags[nqf];
+	uint64_t counts[nqf];
+	std::map<uint64_t, std::vector<int> > ** inverted_indexes=new std::map<uint64_t, std::vector<int> >*[nqf];
+
 	for (i=0; i<nqf; i++) {
-		qf_iterator(qf_arr[i], &qfi_arr[i], 0);
+		qfi_arr[i]=new QFi();
+		qf_iterator(qf_arr[i], qfi_arr[i], 0);
+		qfi_get(qfi_arr[i], &keys[i], &tags[i], &counts[i]);
+		smallest_key=std::min(keys[i],smallest_key);
+		inverted_indexes[i]=qf_arr[i]->metadata->tags_map;
 	}
 
-	while (!flag) {
-		uint64_t keys[nqf];
-		uint64_t values[nqf];
-		uint64_t counts[nqf];
-		for (i=0; i<nqf; i++)
-			qfi_get(&qfi_arr[i], &keys[i], &values[i], &counts[i]);
+	uint64_t keys_m[nqf];
+	uint64_t tags_m[nqf];
+	uint64_t counts_m[nqf];
 
-		do {
-			smallest_key = UINT64_MAX;
-			for (i=0; i<nqf; i++) {
-				if (keys[i] < smallest_key) {
-					smallest_key = keys[i]; smallest_i = i;
+
+	bool finish=false;
+	while(!finish)
+	{
+		finish=true;
+		second_smallest_key=UINT64_MAX;
+		//printf("smallest_key = %llu\n",smallest_key );
+		for(i=0;i<nqf;i++)
+		{
+			keys_m[i]=0;
+			counts_m[i]=0;
+			tags_m[i]=0;
+
+			//printf(" key = %llu\n",keys[i]);
+			if(keys[i]==smallest_key){
+				keys_m[i]=keys[i];
+				counts_m[i]=counts[i];
+				tags_m[i]=tags[i];
+				qfi_next(qfi_arr[i]);
+				if(!qfi_end(qfi_arr[i]))
+				{
+					finish=false;
+					qfi_get(qfi_arr[i], &keys[i], &tags[i], &counts[i]);
+				}else{
+					keys[i]=UINT64_MAX;
 				}
 			}
-			qf_insert(qfr, keys[smallest_i], counts[smallest_i],
-								true, true);
-			qfi_next(&qfi_arr[smallest_i]);
-			qfi_get(&qfi_arr[smallest_i], &keys[smallest_i], &values[smallest_i],
-							&counts[smallest_i]);
-		} while(!qfi_end(&qfi_arr[smallest_i]));
+			second_smallest_key=std::min(second_smallest_key,keys[i]);
+		}
+		for (i = 0; i < nqf; i++) {
+			if(keys[i]!=UINT64_MAX)
+			{
+				finish=false;
+				break;
+			}
+		}
+		//printf("second_smallest_key=%llu finish=%d\n",second_smallest_key,finish);
+		uint64_t keyc,tagc, countc;
+		mergeFn(keys_m,tags_m,counts_m,inverted_indexes,nqf,&keyc,&tagc,&countc);
 
-		/* remove the qf that is exhausted from the array */
-		if (smallest_i < nqf-1)
-			memmove(&qfi_arr[smallest_i], &qfi_arr[smallest_i+1],
-							(nqf-smallest_i-1)*sizeof(qfi_arr[0]));
-		nqf--;
-		if (nqf == 1)
-			flag = 1;
+		if(countc!=0){
+			qf_insert(qfr, keyc, countc, true, true);
+			qf_add_tag(qfr,keyc,tagc);
+		}
+		smallest_key=second_smallest_key;
 	}
-	if (!qfi_end(&qfi_arr[0])) {
-		do {
-			uint64_t key, value, count;
-			qfi_get(&qfi_arr[0], &key, &value, &count);
-			qf_insert(qfr, key, count, true, true);
-		} while(!qfi_next(&qfi_arr[0]));
+	// cout<<"before delete"<<endl;
+	delete  inverted_indexes;
+	for(i=0;i<nqf;i++)
+	{
+		delete qfi_arr[i];
 	}
 
 	return;
+}
+
+/*
+ * Merge an array of qfs into the resultant QF
+ */
+void qf_multi_merge(QF *qf_arr[], int nqf, QF *qfr)
+{
+	_qf_multi_merge(qf_arr,nqf,qfr,union_multi_Fn);
+
+}
+
+void inverted_union_multi_Fn(uint64_t   key_arr[], uint64_t  tag_arr[],uint64_t  count_arr[],
+	std::map<uint64_t, std::vector<int> > ** inverted_indexes ,int nqf,
+							 uint64_t*  key_c, uint64_t* tag_c,uint64_t* count_c)
+{
+
+	std::string index_key="";
+	*count_c=0;
+	for(int i=0;i<nqf;i++)
+	{
+		if(count_arr[i]!=0)
+		{
+			*key_c=key_arr[i];
+			*count_c+=count_arr[i];
+			if(inverted_indexes==NULL){
+				index_key+=std::to_string(i);
+				index_key+=';';
+			}
+			else{
+				auto it=inverted_indexes[i]->find(tag_arr[i]);
+				for(auto k:it->second){
+					index_key+=std::to_string(k);
+					index_key+=';';
+				}
+			}
+
+		}
+	}
+	index_key.pop_back();
+	auto it=Tags_map.find(index_key);
+	if(it==Tags_map.end())
+	{
+
+		Tags_map.insert(std::make_pair(index_key,Tags_map.size()));
+		it=Tags_map.find(index_key);
+	}
+	*tag_c=it->second;
+
+}
+
+void inverted_union_multi_no_count_Fn(uint64_t   key_arr[], uint64_t  tag_arr[],uint64_t  count_arr[],
+									std::map<uint64_t, std::vector<int> > ** inverted_indexes, int nqf,
+							 uint64_t*  key_c, uint64_t* tag_c,uint64_t* count_c)
+{
+	std::string index_key="";
+	*count_c=0;
+	for(int i=0;i<nqf;i++)
+	{
+		//printf("key =%lu, count=%lu\n", key_arr[i],count_arr[i]);
+		if(count_arr[i]!=0)
+		{
+			*key_c=key_arr[i];
+			if(inverted_indexes==NULL){
+				index_key+=std::to_string(i);
+				index_key+=';';
+			}
+			else{
+				auto it=inverted_indexes[i]->find(tag_arr[i]);
+				for(auto k:it->second){
+					index_key+=std::to_string(k);
+					index_key+=';';
+				}
+			}
+
+		}
+	}
+	index_key.pop_back();
+	auto it=Tags_map.find(index_key);
+	if(it==Tags_map.end())
+	{
+
+		Tags_map.insert(std::make_pair(index_key,last_index));
+		last_index++;
+		it=Tags_map.find(index_key);
+	}
+	*count_c=it->second;
+
+}
+
+
+void qf_invertable_merge(QF *qf_arr[], int nqf, QF *qfr)
+{
+	int i;
+	int last_tag=0;
+	Tags_map.clear();
+	last_index=0;
+	for(i=0;i<nqf;i++){
+		if(qf_arr[i]->metadata->tags_map==NULL){
+			qf_arr[i]->metadata->tags_map=new std::map<uint64_t, std::vector<int> >();
+			vector<int> tmp(1);
+			tmp[0]=last_index;
+			Tags_map.insert(std::make_pair(std::to_string(i),last_index++));
+			qf_arr[i]->metadata->tags_map->insert(make_pair(0,tmp));
+		}
+		else{
+			auto it=qf_arr[i]->metadata->tags_map->begin();
+			int updated_tags=0;
+			while(it!=qf_arr[i]->metadata->tags_map->end()){
+				for(int j=0;j<it->second.size();j++){
+					it->second[j]+=last_tag;
+					auto it2=Tags_map.find(std::to_string(it->second[j]));
+					if(it2==Tags_map.end()){
+						Tags_map.insert(std::make_pair(std::to_string(it->second[j]),it->second[j]));
+						updated_tags++;
+					}
+				}
+				it++;
+			}
+		}
+		last_tag+=Tags_map.size();
+	}
+
+
+
+	_qf_multi_merge(qf_arr,nqf,qfr,inverted_union_multi_Fn);
+	qfr->metadata->tags_map=new std::map<uint64_t, std::vector<int> >();
+	auto it=Tags_map.begin();
+	while(it!=Tags_map.end()){
+		std::vector<int> tmp=key_to_vector_int(it->first);
+		qfr->metadata->tags_map->insert(std::make_pair(it->second,tmp));
+		it++;
+
+	}
+
+
+}
+
+void qf_invertable_merge_no_count(QF *qf_arr[], int nqf, QF *qfr)
+{
+
+	int i;
+	int last_tag=0;
+	Tags_map.clear();
+	last_index=0;
+	for(i=0;i<nqf;i++){
+		if(qf_arr[i]->metadata->tags_map==NULL){
+			qf_arr[i]->metadata->tags_map=new std::map<uint64_t, std::vector<int> >();
+			vector<int> tmp(1);
+			tmp[0]=last_index;
+			Tags_map.insert(std::make_pair(std::to_string(i),last_index++));
+			qf_arr[i]->metadata->tags_map->insert(make_pair(0,tmp));
+		}
+		else{
+			auto it=qf_arr[i]->metadata->tags_map->begin();
+			int updated_tags=0;
+			while(it!=qf_arr[i]->metadata->tags_map->end()){
+				for(int j=0;j<it->second.size();j++){
+					it->second[j]+=last_tag;
+					auto it2=Tags_map.find(std::to_string(it->second[j]));
+					if(it2==Tags_map.end()){
+						Tags_map.insert(std::make_pair(std::to_string(it->second[j]),it->second[j]));
+						updated_tags++;
+					}
+				}
+				it++;
+			}
+		}
+		last_tag+=Tags_map.size();
+	}
+
+
+	_qf_multi_merge(qf_arr,nqf,qfr,inverted_union_multi_no_count_Fn);
+
+	qfr->metadata->tags_map=new std::map<uint64_t, std::vector<int> >();
+	auto it=Tags_map.begin();
+	while(it!=Tags_map.end()){
+		std::vector<int> tmp=key_to_vector_int(it->first);
+		qfr->metadata->tags_map->insert(std::make_pair(it->second,tmp));
+		it++;
+	}
+
+
 }
 
 QF* qf_resize(QF* qf, int newQ, const char * originalFilename, const char * newFilename)
@@ -2691,6 +3007,27 @@ int qf_space(QF *qf)
 		return (int)(((double)qf->metadata->noccupied_slots/
 								 (double)qf->metadata->xnslots
 							 )* 100.0);
+}
+
+
+bool qf_general_lock(QF* qf, bool spin){
+	if (!qf_spin_lock(&qf->mem->general_lock, spin))
+		return false;
+	return true;
+}
+void qf_general_unlock(QF* qf){
+	qf_spin_unlock(&qf->mem->general_lock);
+}
+void qf_migrate(QF* source, QF* dest){
+	QFi source_i;
+	if (qf_iterator(source, &source_i, 0)) {
+		do {
+			uint64_t key = 0, value = 0, count = 0;
+			qfi_get(&source_i, &key, &value, &count);
+			qf_insert(dest, key, count, true, true);
+			qf_add_tag(dest,key,value);
+		} while (!qfi_next(&source_i));
+	}
 }
 
 #ifdef TEST

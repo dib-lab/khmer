@@ -224,7 +224,7 @@ BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 
 # Counting bloom filter
 MQF_DIR=../../third-party/mqf
-MQF_OBJS_BASE= gqf.o
+MQF_OBJS_BASE= gqf.o utils.o
 
 MQF_OBJS=$(addprefix $(MQF_DIR)/, $(MQF_OBJS_BASE))
 
@@ -328,7 +328,7 @@ murmur3.o: ../../third-party/smhasher/MurmurHash3.cc
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c -o $@ $<
 
 $(LIBOXLISO): $(LIBOXLI_OBJS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(SONAME_FLAGS) -shared -o $@ $^ -lstdc++ 
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(SONAME_FLAGS) -shared -o $@ $^ -lstdc++
 	ln -sf $(SONAME) liboxli.$(SHARED_EXT)
 
 liboxli.a: $(LIBOXLI_OBJS)
