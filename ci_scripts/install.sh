@@ -10,6 +10,9 @@ brew install astyle;
 brew install enchant;
 brew install cppcheck;
 
+brew tap homebrew/versions;
+brew install llvm37;
+
 pushd .
 cd
 mkdir -p download
