@@ -18,11 +18,9 @@ endif
 all: $(TESTS)
 
 %: %.cc ../../src/oxli/liboxli.so
-	$(CXX) -o $@   $(CXXFLAGS) $<  -L../../src/oxli -loxli -lstdc++
+	$(CXX) -undefined dynamic_lookup -arch x86_64 -lstdc++ $(CXXFLAGS) $< ../../src/oxli/liboxli.a -o $@-lstdc++
 
-../../src/oxli/liboxli.so:
-	g++ --version
-	clang++ --version
+../../src/oxli/liboxli.a:
 	cd ../../src/oxli && make
 
 run: all
