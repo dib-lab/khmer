@@ -69,8 +69,9 @@ PREFIX=/usr/local
 
 INCLUDES= -I ../../include/ -I ../../third-party/seqan/core/include/ \
 	      -I ../../third-party/smhasher/ \
-				-I ../../third-party/cqf/ \
-				-I ../../third-party/rollinghash
+				-I ../../third-party/mqf/ \
+				-I ../../third-party/rollinghash \
+
 
 ifeq ($(USE_SYSTEM_ZLIB), false)
 INCLUDES += -I ../../third-party/zlib/
@@ -102,6 +103,8 @@ CFLAGS   += -Wshadow -Wcast-align -Wstrict-prototypes
 CFLAGS   += $(INCLUDES) $(CPPFLAGS)
 
 LDFLAGS  ?=
+LDFLAGS  += -lstdc++
+
 ifneq ($(USE_SYSTEM_ZLIB), false)
 LDFLAGS  += -lz
 endif
@@ -164,6 +167,8 @@ SONAME       = liboxli.$(SHARED_EXT).$(LIB_VERSION)
 SONAME_FLAGS = -install_name $(PREFIX)/lib/$(SONAME) \
 	       -compatibility_version $(LIB_VERSION) \
 	       -current_version $(LIB_VERSION)
+LDFLAGS  +=  -stdlib=libstdc++ -std=c++11 -arch x86_64
+CXXFLAGS  +=  -stdlib=libstdc++ -std=c++11
 else
 SHARED_EXT   = so
 SONAME       = liboxli.$(SHARED_EXT).$(LIB_VERSION)
@@ -221,10 +226,10 @@ BZIP2_OBJS_BASE= \
 BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 
 # Counting bloom filter
-CQF_DIR=../../third-party/cqf
-CQF_OBJS_BASE= gqf.o
+MQF_DIR=../../third-party/mqf
+MQF_OBJS_BASE= gqf.o
 
-CQF_OBJS=$(addprefix $(CQF_DIR)/, $(CQF_OBJS_BASE))
+MQF_OBJS=$(addprefix $(MQF_DIR)/, $(MQF_OBJS_BASE))
 
 #### oxli proper below here ####
 
@@ -259,9 +264,9 @@ PRECOMILE_OBJS += $(BZIP2_OBJS)
 PRECLEAN_TARGS += libbz2clean
 endif
 
-LIBOXLI_OBJS  += $(CQF_OBJS)
-PRECOMILE_OBJS += $(CQF_OBJS)
-PRECLEAN_TARGS += libcqfclean
+LIBOXLI_OBJS  += $(MQF_OBJS)
+PRECOMILE_OBJS += $(MQF_OBJS)
+PRECLEAN_TARGS += libmqfclean
 
 HEADERS= \
 	hashtable.hh \
@@ -290,8 +295,8 @@ zlibclean:
 	(cd $(ZLIB_DIR) && make distclean)
 libbz2clean:
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
-libcqfclean:
-	(cd $(CQF_DIR) && make clean)
+libmqfclean:
+	(cd $(MQF_DIR) && make clean)
 
 clean: $(PRECLEAN_TARGS)
 	rm -f *.o *.a *.$(SHARED_EXT)* oxli.pc $(TEST_PROGS)
@@ -315,8 +320,8 @@ $(ZLIB_OBJS):
 $(BZIP2_OBJS):
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so $(BZIP2_OBJS_BASE))
 
-$(CQF_OBJS):
-	(cd $(CQF_DIR) && make)
+$(MQF_OBJS):
+	(cd $(MQF_DIR) && make)
 
 # MurMur3
 murmur3.o: ../../third-party/smhasher/MurmurHash3.cc
@@ -326,7 +331,7 @@ murmur3.o: ../../third-party/smhasher/MurmurHash3.cc
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c -o $@ $<
 
 $(LIBOXLISO): $(LIBOXLI_OBJS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(SONAME_FLAGS) -shared -o $@ $^
+	clang++ $(CXXFLAGS) $(LDFLAGS) $(SONAME_FLAGS) -shared -o $@ $^
 	ln -sf $(SONAME) liboxli.$(SHARED_EXT)
 
 liboxli.a: $(LIBOXLI_OBJS)
