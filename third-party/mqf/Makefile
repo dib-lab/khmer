@@ -26,10 +26,10 @@ endif
 ifneq ($(INCLUDE),)
 	INCLUDE := -I$(INCLUDE)
 endif
-
-CXX = g++
-CC = g++
-LD= g++
+#
+# CXX = g++
+# CC = g++
+# LD= g++
 
 CXXFLAGS =  -std=c++11   -fPIC $(ARCH) -Wall $(DEBUG) $(PROFILE) $(OPT)  -I. -Wno-unused-result -Wno-strict-aliasing -Wno-unused-function
 
