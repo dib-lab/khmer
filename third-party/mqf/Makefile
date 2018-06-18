@@ -23,13 +23,13 @@ ifdef P
 	PROFILE=-pg -no-pie # for bug in gprof.
 endif
 
-CXX = g++ -std=c++11 -fPIC
-CC = g++ -std=c++11 -fPIC
-LD= g++ -std=c++11
+#CXX = g++ -std=c++11 -fPIC
+#CC = g++ -std=c++11 -fPIC
+#LD= g++ -std=c++11
 
-CXXFLAGS =  -Wall $(DEBUG) $(PROFILE) $(OPT)  -m64 -I. -Wno-unused-result -Wno-strict-aliasing -Wno-unused-function
+CXXFLAGS :=  -std=c++11 -fPIC -Wall $(DEBUG) $(PROFILE) $(OPT)  -m64 -I. -Wno-unused-result -Wno-strict-aliasing -Wno-unused-function
 
-LDFLAGS = $(DEBUG) $(PROFILE) $(OPT)
+LDFLAGS := $(LDFLAGS) $(DEBUG) $(PROFILE) $(OPT)
 
 #
 # declaration of dependencies
@@ -44,7 +44,7 @@ all: $(TARGETS)
 # dependencies between .o files and .cc (or .c) files
 
 %.o: %.cc
-gqf.o: gqf.c gqf.h
+gqf.o: gqf.cc gqf.h
 
 #
 # generic build rules

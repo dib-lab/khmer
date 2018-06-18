@@ -70,6 +70,8 @@ matrix:
         - TESTATTR="'not linux and not known_failing and not huge'"
       before_install:
         - source ci_scripts/install.sh
+        - CXX="clang++ -stdlib=libc++"
+        - CXXFLAGS="$CXXFLAGS -nostdinc+"
 
 # command to install common dependencies
 install:
