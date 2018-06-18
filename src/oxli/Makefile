@@ -164,7 +164,7 @@ SONAME       = liboxli.$(SHARED_EXT).$(LIB_VERSION)
 SONAME_FLAGS = -install_name $(PREFIX)/lib/$(SONAME) \
 	       -compatibility_version $(LIB_VERSION) \
 	       -current_version $(LIB_VERSION)
-LDFLAGS  += -undefined dynamic_lookup -arch x86_64           
+LDFLAGS  += -undefined dynamic_lookup -arch x86_64
 
 else
 SHARED_EXT   = so
@@ -328,7 +328,7 @@ murmur3.o: ../../third-party/smhasher/MurmurHash3.cc
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c -o $@ $<
 
 $(LIBOXLISO): $(LIBOXLI_OBJS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(SONAME_FLAGS) -shared -o $@ $^
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(SONAME_FLAGS) -shared -o $@ $^ -lstdc++ 
 	ln -sf $(SONAME) liboxli.$(SHARED_EXT)
 
 liboxli.a: $(LIBOXLI_OBJS)

@@ -8,7 +8,7 @@ CXXFLAGS=--std=c++11 \
 TESTS=exact-counting bloom consume
 
 %: %.cc ../../src/oxli/liboxli.a
-	$(CXX) $(CXXFLAGS) $< ../../src/oxli/liboxli.a -o $@
+	$(CXX) $(CXXFLAGS) $< ../../src/oxli/liboxli.a -o $@ -lstdc++ 
 
 ../../src/oxli/liboxli.a:
 	cd ../../src/oxli && make
