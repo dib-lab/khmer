@@ -40,6 +40,16 @@ Contact: khmer-project@idyll.org
 #include <fstream>
 #include <iostream>
 
+#include <sys/mman.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <assert.h>
+#include <cstdlib>
+#include <ctime>
+#include <algorithm>
+
 #include "oxli/oxli_exception.hh"
 #include "oxli/hashtable.hh"
 #include "zlib.h"
@@ -742,6 +752,12 @@ ByteStorageGzFileWriter::ByteStorageGzFileWriter(
     gzclose(outfile);
 }
 
+size_t getFilesize(const char* filename) {
+    struct stat st;
+    stat(filename, &st);
+    return st.st_size;
+}
+
 void ByteStorageFile::load(
     const std::string   &infilename,
     WordLength &ksize,
@@ -767,6 +783,263 @@ void ByteStorage::load(std::string infilename, WordLength& ksize)
 {
     ByteStorageFile::load(infilename, ksize, *this);
 }
+
+
+ByteStorageMMap::ByteStorageMMap(vector<uint64_t>& tablesizes,string mapFile)
+{
+        unsigned int save_ksize = 0;
+        unsigned char save_n_tables = 0;
+        unsigned long long save_tablesize = 0;
+        unsigned long long save_occupied_bins = 0;
+        char* signature;
+        unsigned char version = 0, ht_type = 0, use_bigcount = 0;
+  // calculate needed space
+	size_t headerSize=7
+	  +sizeof(save_ksize)
+	  +sizeof(save_n_tables)
+	  +sizeof(save_occupied_bins);
+
+	
+	mmappedDataSize=headerSize;
+	_n_tables=tablesizes.size();
+	_tablesizes=tablesizes;
+	
+	
+	for (unsigned int i = 0; i < _n_tables; i++)
+	 {
+	   mmappedDataSize+=sizeof(tablesizes[i]);
+	   mmappedDataSize+=tablesizes[i];
+	 }
+
+  // create a file of the needed space
+	filePath=mapFile;
+	ofstream outputFile(filePath);
+	outputFile.seekp(mmappedDataSize-1);
+	outputFile<<0;
+	outputFile.close();
+  // mmap
+       int fd = open(filePath.c_str(), O_RDWR , 0);
+       assert(fd != -1);
+       mmappedData = (char*)mmap64(NULL, mmappedDataSize, PROT_WRITE|PROT_READ, MAP_SHARED , fd, 0);
+       assert(mmappedData != MAP_FAILED);
+
+  // make _count point to the mmaped data
+       char* dataPtr=mmappedData+headerSize;
+       _counts = new Byte*[_n_tables];
+       for (unsigned int i = 0; i < _n_tables; i++)
+	 {
+	   copy((const char *) &tablesizes[i],
+		(const char *) &tablesizes[i]+sizeof(tablesizes[i]),
+		dataPtr);
+	   dataPtr+=sizeof(tablesizes[i]);
+	   _counts[i]=(Byte*)dataPtr;
+	   dataPtr+=tablesizes[i];
+	 }
+}
+
+void ByteStorageMMap::save(std::string outfilename, WordLength ksize)
+{
+    if(outfilename!=filePath){
+      ByteStorage::save(outfilename,ksize);
+    }
+    if (!_counts[0]) {
+         throw oxli_exception();
+    }
+
+    char* dataPtr=mmappedData;
+    copy((const char *) &SAVED_SIGNATURE,
+	 (const char *) &SAVED_SIGNATURE+4,
+	 dataPtr);
+
+    dataPtr+=4;
+
+    *dataPtr=(char) SAVED_FORMAT_VERSION;
+    dataPtr++;
+    
+    *dataPtr=(char) SAVED_COUNTING_HT;
+    dataPtr++;
+    
+ 
+    unsigned int save_ksize = ksize;
+    unsigned char save_n_tables = _n_tables;
+    unsigned long long save_occupied_bins = _occupied_bins;
+ 
+
+    unsigned char use_bigcount = 0;
+    if (_use_bigcount) {
+        use_bigcount = 1;
+    }
+
+    *dataPtr=(const char )use_bigcount;
+    dataPtr++;
+    copy((const char *) &save_ksize,
+	 (const char *) &save_ksize+sizeof(save_ksize),
+	 dataPtr);
+
+    dataPtr+=sizeof(save_ksize);
+    
+    copy((const char *) &save_n_tables,
+	 (const char *) &save_n_tables+sizeof(save_n_tables),
+	 dataPtr);
+    dataPtr+=sizeof(save_n_tables);
+
+    copy((const char *) &save_occupied_bins,
+	 (const char *) &save_occupied_bins+sizeof(save_occupied_bins),
+	 dataPtr);
+    
+    dataPtr+=sizeof(save_occupied_bins);
+
+
+    
+    uint64_t n_counts = _bigcounts.size();
+
+    for (unsigned int i = 0; i < _n_tables; i++)
+      {
+	dataPtr+=sizeof(_tablesizes[i]);
+	dataPtr+=_tablesizes[i];
+      }
+    
+    int rc=msync(mmappedData,mmappedDataSize,MS_SYNC);
+    assert(rc==0);
+
+    if (n_counts) {
+        size_t offset=dataPtr-mmappedData;
+	ofstream outfile(filePath,ios_base::app);
+	outfile.seekp(offset);
+	outfile.write((const char *) &n_counts, sizeof(n_counts));
+        KmerCountMap::const_iterator it = _bigcounts.begin();
+        for (; it != _bigcounts.end() ; ++it) {
+            outfile.write((const char *) &it->first, sizeof(it->first));
+            outfile.write((const char *) &it->second, sizeof(it->second));
+        }
+	if (outfile.fail()) {
+	  throw oxli_file_exception(strerror(errno));
+	}
+	outfile.close();
+    }
+    
+
+}
+
+void ByteStorageMMap::load(std::string infilename, WordLength& ksize)
+{
+  char* dataPtr;
+  filePath=infilename;
+    try {
+      size_t filesize = getFilesize(infilename.c_str());
+      mmappedDataSize=filesize;
+       int fd = open(infilename.c_str(), O_RDWR , 0);
+       assert(fd != -1);
+       dataPtr = (char*)mmap64(NULL, filesize, PROT_WRITE|PROT_READ, MAP_SHARED , fd, 0);
+       mmappedData=dataPtr;
+       assert(dataPtr != MAP_FAILED);
+    } 
+     catch (const std::exception &e) {
+        std::string err = "Unknown error opening file: " + infilename + " "
+                          + strerror(errno);
+        throw oxli_file_exception(err);
+    }
+
+    if (_counts) {
+        for (unsigned int i = 0; i < _n_tables; i++) {
+            delete[] _counts[i];
+            _counts[i] = NULL;
+        }
+        delete[] _counts;
+        _counts = NULL;
+    }
+    _tablesizes.clear();
+
+    try {
+        unsigned int save_ksize = 0;
+        unsigned char save_n_tables = 0;
+        unsigned long long save_tablesize = 0;
+        unsigned long long save_occupied_bins = 0;
+        char* signature;
+        unsigned char version = 0, ht_type = 0, use_bigcount = 0;
+
+	signature=dataPtr;
+	dataPtr+=4;
+        
+	version=(unsigned char)*dataPtr++;
+	ht_type=(unsigned char)*dataPtr++;
+	
+
+        if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
+            std::ostringstream err;
+            err << "Does not start with signature for a oxli file: 0x";
+            for(size_t i=0; i < 4; ++i) {
+                err << std::hex << (int) signature[i];
+            }
+            err << " Should be: " << SAVED_SIGNATURE;
+            throw oxli_file_exception(err.str());
+        } else if (!(version == SAVED_FORMAT_VERSION)) {
+            std::ostringstream err;
+            err << "Incorrect file format version " << (int) version
+                << " while reading k-mer count file from " << infilename
+                << "; should be " << (int) SAVED_FORMAT_VERSION;
+            throw oxli_file_exception(err.str());
+        } else if (!(ht_type == SAVED_COUNTING_HT)) {
+            std::ostringstream err;
+            err << "Incorrect file format type " << (int) ht_type
+                << " while reading k-mer count file from " << infilename;
+            throw oxli_file_exception(err.str());
+        }
+	use_bigcount=(unsigned char)*dataPtr++;
+	save_ksize=*((unsigned int*)dataPtr);
+ 	dataPtr+=sizeof(save_ksize);
+	save_n_tables=*((unsigned long long*)dataPtr);
+	dataPtr+=sizeof(save_n_tables);
+        save_occupied_bins=*((unsigned long long*)dataPtr);  
+	dataPtr+=sizeof(save_occupied_bins);
+
+        ksize = (WordLength) save_ksize;
+        _n_tables = (unsigned int) save_n_tables;
+        _occupied_bins = save_occupied_bins;
+
+        _use_bigcount = use_bigcount;
+
+        _counts = new Byte*[_n_tables];
+
+        for (unsigned int i = 0; i < _n_tables; i++) {
+            uint64_t tablesize;
+
+	    save_tablesize=*((unsigned long long*)dataPtr);
+	    dataPtr+=sizeof(save_tablesize);
+            tablesize = save_tablesize;
+            _tablesizes.push_back(tablesize);
+
+            _counts[i] = (Byte*)dataPtr;
+	    dataPtr+=(save_tablesize);
+        }
+
+        uint64_t n_counts = *((uint64_t*)dataPtr);
+
+	dataPtr+=sizeof(n_counts);
+        if (n_counts) {
+            _bigcounts.clear();
+
+            HashIntoType kmer;
+            BoundedCounterType count;
+
+            for (uint64_t n = 0; n < n_counts; n++) {
+	      kmer=*((HashIntoType*)dataPtr);
+	      dataPtr+=sizeof(HashIntoType);
+	      count=*((BoundedCounterType*)dataPtr);
+	      dataPtr+=sizeof(BoundedCounterType);
+	      _bigcounts[kmer] = count;
+            }
+        }
+
+
+    } catch (const std::exception &e) {
+        std::string err = "Error reading from k-mer count file: " + infilename + " "
+                          + strerror(errno);
+        throw oxli_file_exception(err);
+    }
+  
+}
+
 
 
 void NibbleStorage::save(std::string outfilename, WordLength ksize)
@@ -923,34 +1196,14 @@ void QFStorage::save(std::string outfilename, WordLength ksize)
     unsigned char version = SAVED_FORMAT_VERSION;
     unsigned char ht_type = SAVED_QFCOUNT;
 
+
     outfile.write(SAVED_SIGNATURE, 4);
     outfile.write((const char *) &version, 1);
     outfile.write((const char *) &ht_type, 1);
     outfile.write((const char *) &ksize, sizeof(ksize));
 
-    /* just a hack to handle __uint128_t value. Don't know a better to handle it
-     * right now */
-    uint64_t tmp_range;
-    tmp_range = cf.range;
-
-    outfile.write((const char *) &cf.nslots, sizeof(cf.nslots));
-    outfile.write((const char *) &cf.xnslots, sizeof(cf.xnslots));
-    outfile.write((const char *) &cf.key_bits, sizeof(cf.key_bits));
-    outfile.write((const char *) &cf.value_bits, sizeof(cf.value_bits));
-    outfile.write((const char *) &cf.key_remainder_bits, sizeof(cf.key_remainder_bits));
-    outfile.write((const char *) &cf.bits_per_slot, sizeof(cf.bits_per_slot));
-    outfile.write((const char *) &tmp_range, sizeof(tmp_range));
-    outfile.write((const char *) &cf.nblocks, sizeof(cf.nblocks));
-    outfile.write((const char *) &cf.nelts, sizeof(cf.nelts));
-    outfile.write((const char *) &cf.ndistinct_elts, sizeof(cf.ndistinct_elts));
-    outfile.write((const char *) &cf.noccupied_slots, sizeof(cf.noccupied_slots));
-
-    #if BITS_PER_SLOT == 8 || BITS_PER_SLOT == 16 || BITS_PER_SLOT == 32 || BITS_PER_SLOT == 64
-        outfile.write((const char *) cf.blocks, sizeof(qfblock) * cf.nblocks);
-    #else
-        outfile.write((const char *) cf.blocks,
-                      (sizeof(qfblock) + SLOTS_PER_BLOCK * cf.bits_per_slot / 8) * cf.nblocks);
-    #endif
+    outfile.write((const char *)mf.metadata,sizeof(qfmetadata));
+    outfile.write((const char *)mf.blocks,mf.metadata->size);
     outfile.close();
 }
 
@@ -1011,34 +1264,22 @@ void QFStorage::load(std::string infilename, WordLength &ksize)
     infile.read((char *) &save_ksize, sizeof(save_ksize));
     ksize = save_ksize;
 
-    infile.read((char *) &cf.nslots, sizeof(cf.nslots));
-    infile.read((char *) &cf.xnslots, sizeof(cf.xnslots));
-    infile.read((char *) &cf.key_bits, sizeof(cf.key_bits));
-    infile.read((char *) &cf.value_bits, sizeof(cf.value_bits));
-    infile.read((char *) &cf.key_remainder_bits, sizeof(cf.key_remainder_bits));
-    infile.read((char *) &cf.bits_per_slot, sizeof(cf.bits_per_slot));
-    infile.read((char *) &tmp_range, sizeof(tmp_range));
+    mf.mem = (qfmem *)calloc(sizeof(qfmem), 1);
+    mf.metadata = (qfmetadata *)calloc(sizeof(qfmetadata), 1);
+    infile.read((char*)mf.metadata,sizeof(qfmetadata));
+    mf.blocks = (qfblock *)calloc(mf.metadata->size, 1);
+    infile.read((char*)mf.blocks, mf.metadata->size);
 
-    infile.read((char *) &cf.nblocks, sizeof(cf.nblocks));
-    infile.read((char *) &cf.nelts, sizeof(cf.nelts));
-    infile.read((char *) &cf.ndistinct_elts, sizeof(cf.ndistinct_elts));
-    infile.read((char *) &cf.noccupied_slots, sizeof(cf.noccupied_slots));
-    /* just a hack to handle __uint128_t value. Don't know a better to handle it
-     * right now */
-    cf.range = tmp_range;
-    // deallocate previously allocated blocks
-    free(cf.blocks);
-    /* allocate the space for the actual qf blocks */
-    #if BITS_PER_SLOT == 8 || BITS_PER_SLOT == 16 || BITS_PER_SLOT == 32 || BITS_PER_SLOT == 64
-        cf.blocks = (qfblock *)calloc(cf.nblocks, sizeof(qfblock));
-    #else
-        cf.blocks = (qfblock *)calloc(cf.nblocks, sizeof(qfblock) + SLOTS_PER_BLOCK * cf.bits_per_slot / 8);
-    #endif
-    #if BITS_PER_SLOT == 8 || BITS_PER_SLOT == 16 || BITS_PER_SLOT == 32 || BITS_PER_SLOT == 64
-        infile.read((char *) cf.blocks, sizeof(qfblock) * cf.nblocks);
-    #else
-        infile.read((char *) cf.blocks,
-                    (sizeof(qfblock) + SLOTS_PER_BLOCK * cf.bits_per_slot / 8) * cf.nblocks);
-    #endif
+    mf.metadata->num_locks =
+        10;//should be changed to something realistic like function qf_deserialize
+    mf.mem->metadata_lock = 0;
+    /* initialize all the locks to 0 */
+    mf.mem->locks = (volatile int *)calloc(mf.metadata->num_locks,
+                                           sizeof(volatile int));
+
+
+
+
+
     infile.close();
 }

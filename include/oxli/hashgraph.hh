@@ -277,6 +277,16 @@ public:
         : Hashgraph(ksize, new ByteStorage(sizes)) { } ;
 };
 
+// Hashgraph-derived class with ByteStorage.
+class CountgraphMMap : public oxli::Hashgraph
+{
+public:
+    explicit CountgraphMMap(WordLength ksize, std::vector<uint64_t> sizes)
+        : Hashgraph(ksize, new ByteStorageMMap(sizes)) { }  ;
+    explicit CountgraphMMap(WordLength ksize, std::vector<uint64_t> sizes,std::string filePath)
+      : Hashgraph(ksize, new ByteStorageMMap(sizes,filePath)) { }  ;
+};
+
 // Hashgraph-derived class with NibbleStorage.
 class SmallCountgraph : public oxli::Hashgraph
 {

@@ -855,6 +855,32 @@ cdef class Countgraph(Hashgraph):
         return subset
 
 
+cdef class CountgraphMMap(Hashgraph):
+
+    def __cinit__(self, int k, uint64_t starting_size, int n_tables,
+                  string filename=b"",primes=[]):
+        cdef vector[uint64_t] _primes
+        if type(self) is CountgraphMMap:
+            if primes:
+                _primes = primes
+            else:
+                _primes = get_n_primes_near_x(n_tables, starting_size)
+
+            if filename==b'':
+                self._cgM_this = make_shared[CpCountgraphMMap](k, _primes)	    
+            else:
+                self._cgM_this = make_shared[CpCountgraphMMap](k, _primes,filename)
+            self._hg_this = <shared_ptr[CpHashgraph]>self._cgM_this 
+            self._ht_this = <shared_ptr[CpHashtable]>self._hg_this
+
+    @classmethod
+    def load(cls, file_name):
+        """Load the graph from the specified file."""
+        cdef CountgraphMMap table = cls(1, 1, 1)
+        deref(table._cgM_this).load(_bstring(file_name))
+        return table
+
+
 cdef class SmallCountgraph(Hashgraph):
 
     def __cinit__(self, int k, uint64_t starting_size, int n_tables,

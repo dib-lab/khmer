@@ -42,6 +42,9 @@ Contact: khmer-project@idyll.org
 #include <array>
 #include <mutex>
 #include <unordered_map>
+#include <sys/mman.h>
+#include <sys/types.h>
+
 using MuxGuard = std::lock_guard<std::mutex>;
 
 #include "gqf.h"
@@ -410,51 +413,78 @@ public:
  *
  * \brief A Quotient Filter storage
  */
- class QFStorage : public Storage {
+class QFStorage : public Storage
+{
 protected:
-  QF cf;
+    QF mf;
 
 public:
-  QFStorage(int size) {
-    // size is the power of two to specify the number of slots in
-    // the filter (2**size). Third argument sets the number of bits used
-    // in the key (current value of size+8 is copied from the CQF example)
-    // Final argument is the number of bits allocated for the value, which
-    // we do not use.
-    qf_init(&cf, (1ULL << size), size+8, 0);
-  }
+    QFStorage(int size)
+    {
+        // size is the power of two to specify the number of slots in
+        // the filter (2**size). Third argument sets the number of bits used
+        // in the key (current value of size+8 is copied from the CQF example)
+        // Final argument is the number of bits allocated for the value, which
+        // we do not use.
+        _supports_bigcount = true;
+        qf_init(&mf, (1ULL << size), size+8, 0,2,true,"",2038074761);
 
-  ~QFStorage() { qf_destroy(&cf); }
 
-  BoundedCounterType test_and_set_bits(HashIntoType khash) {
-    BoundedCounterType x = get_count(khash);
-    add(khash);
-    return !x;
-  }
 
-  //
-  bool add(HashIntoType khash) {
-      bool is_new = get_count(khash) == 0;
-      qf_insert(&cf, khash % cf.range, 0, 1);
-      return is_new;
-  }
+    }
 
-  // get the count for the given k-mer hash.
-  const BoundedCounterType get_count(HashIntoType khash) const {
-    return qf_count_key_value(&cf, khash % cf.range, 0);
-  }
+    ~QFStorage()
+    {
+        qf_destroy(&mf);
+    }
 
-  // Accessors for protected/private table info members
-  // xnslots is larger than nslots. It includes some extra slots to deal
-  // with some details of how the counting is implemented
-  std::vector<uint64_t> get_tablesizes() const { return {cf.xnslots}; }
-  const size_t n_tables() const { return 1; }
-  const uint64_t n_unique_kmers() const { return cf.ndistinct_elts; }
-  const uint64_t n_occupied() const { return cf.noccupied_slots; }
-  void save(std::string outfilename, WordLength ksize);
-  void load(std::string infilename, WordLength &ksize);
+    BoundedCounterType test_and_set_bits(HashIntoType khash)
+    {
+        BoundedCounterType x = get_count(khash);
+        add(khash);
+        return !x;
+    }
 
-  Byte **get_raw_tables() { return nullptr; }
+    //
+    bool add(HashIntoType khash)
+    {
+        bool is_new = get_count(khash) == 0;
+        qf_insert(&mf, khash % mf.metadata->range, 1,false,false);
+        return is_new;
+    }
+
+    // get the count for the given k-mer hash.
+    const BoundedCounterType get_count(HashIntoType khash) const
+    {
+        return qf_count_key(&mf, khash % mf.metadata->range);
+    }
+
+    // Accessors for protected/private table info members
+    // xnslots is larger than nslots. It includes some extra slots to deal
+    // with some details of how the counting is implemented
+    std::vector<uint64_t> get_tablesizes() const
+    {
+        return {mf.metadata->xnslots};
+    }
+    const size_t n_tables() const
+    {
+        return 1;
+    }
+    const uint64_t n_unique_kmers() const
+    {
+        return mf.metadata->ndistinct_elts;
+    }
+    const uint64_t n_occupied() const
+    {
+        return mf.metadata->noccupied_slots;
+    }
+    void save(std::string outfilename, WordLength ksize);
+    void load(std::string infilename, WordLength &ksize);
+
+    Byte **get_raw_tables()
+    {
+        return nullptr;
+    }
 };
 
 
@@ -512,6 +542,10 @@ protected:
 public:
     KmerCountMap _bigcounts;
 
+  ByteStorage():_max_count(MAX_KCOUNT), _max_bigcount(MAX_BIGCOUNT),
+		_bigcount_spin_lock(false),_n_unique_kmers(0), _occupied_bins(0){
+    _supports_bigcount=true;
+  }
     // constructor: create an empty CountMin sketch.
     ByteStorage(std::vector<uint64_t>& tablesizes ) :
         _max_count(MAX_KCOUNT), _max_bigcount(MAX_BIGCOUNT),
@@ -659,6 +693,32 @@ public:
 
 };
 
+class ByteStorageMMap: public ByteStorage
+{
+private:
+  char* mmappedData;
+  size_t mmappedDataSize;
+  std::string filePath;
+public:
+  ByteStorageMMap(std::vector<uint64_t> tablesizes):ByteStorage(tablesizes)
+  {
+    filePath="";
+
+  }
+  ByteStorageMMap(std::vector<uint64_t>& tablesizes,std::string mapFile);
+  //  ByteStorageMMap(std::vector<uint64_t> )
+  void save(std::string, WordLength);
+  void load(std::string, WordLength&);
+  ~ByteStorageMMap()
+  {
+      int rc=msync(mmappedData,mmappedDataSize,MS_SYNC);
+      assert(rc==0);
+       rc = munmap(mmappedData, mmappedDataSize);
+      assert(rc == 0);
+      _counts=NULL;
+  }
+
+};
 // Helper classes for saving ByteStorage objs to disk & loading them.
 
 class ByteStorageFile

@@ -1,7 +1,7 @@
 CXXFLAGS=--std=c++11 \
        -I ../../include/ \
 	   -I ../../third-party/smhasher \
-	   -I ../../third-party/cqf \
+	   -I ../../third-party/mqf \
 	   -I ../../third-party/seqan/core/include/ \
 	   -I ../../third-party/rollinghash
 

@@ -197,6 +197,10 @@ cdef extern from "oxli/hashgraph.hh" namespace "oxli" nogil:
     cdef cppclass CpCountgraph "oxli::Countgraph" (CpHashgraph):
         CpCountgraph(WordLength, vector[uint64_t])
 
+    cdef cppclass CpCountgraphMMap "oxli::CountgraphMMap" (CpHashgraph):
+        CpCountgraphMMap(WordLength, vector[uint64_t],string)
+        CpCountgraphMMap(WordLength, vector[uint64_t])	
+
     cdef cppclass CpSmallCountgraph "oxli::SmallCountgraph" (CpHashgraph):
         CpSmallCountgraph(WordLength, vector[uint64_t])
 
@@ -267,6 +271,8 @@ cdef class SmallCounttable(Hashtable):
 cdef class Counttable(Hashtable):
     cdef shared_ptr[CpCounttable] _ct_this
 
+cdef class CounttableMMap(Hashtable):
+    cdef shared_ptr[CpCounttableMMap] _ctM_this
 
 cdef class CyclicCounttable(Hashtable):
     cdef shared_ptr[CpCyclicCounttable] _cct_this
@@ -290,6 +296,10 @@ cdef class Nodegraph(Hashgraph):
 
 cdef class Countgraph(Hashgraph):
     cdef shared_ptr[CpCountgraph] _cg_this
+
+cdef class CountgraphMMap(Hashgraph):
+    cdef shared_ptr[CpCountgraphMMap] _cgM_this
+
 
 
 cdef class SmallCountgraph(Hashgraph):
