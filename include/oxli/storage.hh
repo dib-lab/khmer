@@ -58,6 +58,7 @@ class Storage
 protected:
     bool _supports_bigcount;
     bool _use_bigcount;
+    Byte ** _counts;
 
 public:
     Storage() : _supports_bigcount(false), _use_bigcount(false) { } ;
@@ -75,6 +76,42 @@ public:
 
     void set_use_bigcount(bool b);
     bool get_use_bigcount();
+
+    inline void compose_init(Byte **othertable, BoundedCounterType max)
+    {
+        size_t _n_tables = n_tables();
+        std::vector<uint64_t> _tablesizes = get_tablesizes();
+
+        for (size_t row = 0; row < _n_tables; row++) {
+            for (size_t bin = 0; bin < _tablesizes[row]; bin++) {
+                BoundedCounterType count = othertable[row][bin];
+                if (count <= max) {
+                    unsigned char bit = bin % 8;
+                    _counts[row][bin] |= 1UL << bit;
+                }
+            }
+        }
+    }
+
+    inline void compose_update(Byte **othertable, BoundedCounterType max)
+    {
+        size_t _n_tables = n_tables();
+        std::vector<uint64_t> _tablesizes = get_tablesizes();
+
+        for (size_t row = 0; row < _n_tables; row++) {
+            for (size_t bin = 0; bin < _tablesizes[row]; bin++) {
+                BoundedCounterType count = othertable[row][bin];
+                unsigned char bit = bin % 8;
+                unsigned char isset = (_counts[row][bin] >> bit) & 1U;
+                if (count <= max && isset) {
+                    _counts[row][bin] |= 1UL << bit;
+                }
+                else {
+                    _counts[row][bin] &= ~(1UL << bit);
+                }
+            }
+        }
+    }
 };
 
 
@@ -99,7 +136,6 @@ protected:
     size_t _n_tables;
     uint64_t _occupied_bins;
     uint64_t _n_unique_kmers;
-    Byte ** _counts;
 
 public:
     BitStorage(std::vector<uint64_t>& tablesizes) :
@@ -252,7 +288,6 @@ protected:
     uint64_t _n_unique_kmers;
     std::array<std::mutex, 32> mutexes;
     static constexpr uint8_t _max_count{15};
-    Byte ** _counts;
 
     // Compute index into the table, this retrieves the correct byte
     // which you then need to select the correct nibble from
@@ -495,8 +530,6 @@ protected:
     size_t _n_tables;
     uint64_t _n_unique_kmers;
     uint64_t _occupied_bins;
-
-    Byte ** _counts;
 
     // initialize counts with empty hashtables.
     void _allocate_counters()

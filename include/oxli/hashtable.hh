@@ -624,6 +624,24 @@ class Nodetable : public oxli::MurmurHashtable
 public:
     explicit Nodetable(WordLength ksize, std::vector<uint64_t> sizes)
         : MurmurHashtable(ksize, new BitStorage(sizes)) { } ;
+
+    void compose_init(Counttable& other, BoundedCounterType max)
+    {
+        if (get_tablesizes() != other.get_tablesizes()) {
+            std::cerr << "Table size mismatch\n";
+            return;
+        }
+        store->compose_init(other.get_raw_tables(), max);
+    }
+
+    void compose_update(Counttable& other, BoundedCounterType max)
+    {
+        if (get_tablesizes() != other.get_tablesizes()) {
+            std::cerr << "Table size mismatch\n";
+            return;
+        }
+        store->compose_update(other.get_raw_tables(), max);
+    }
 };
 
 }

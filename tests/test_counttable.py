@@ -199,3 +199,33 @@ def test_init_with_primes(sketchtype):
     primes = khmer.get_n_primes_near_x(4, random.randint(1000, 2000))
     sketch = sketchtype(31, 1, 1, primes=primes)
     assert sketch.hashsizes() == primes
+
+
+def test_compose():
+    counts1 = khmer.Counttable(21, 1e4, 4)
+    counts2 = khmer.Counttable(21, 1e4, 4)
+
+    counts1.add('GATTACAGATTACAGATTACA')
+    counts2.add('GATTACAGATTACAGATTACA')
+
+    counts1.add('TAGATCTGCTTGAAACAAGTG')
+    for _ in range(5):
+        counts2.add('TAGATCTGCTTGAAACAAGTG')
+
+    for _ in range(5):
+        counts1.add('AAGTGGATTTGAGAAAAAAGT')
+    counts2.add('AAGTGGATTTGAGAAAAAAGT')
+
+    for _ in range(5):
+        counts1.add('GGGGGGGGGGGGGGGGGGGGG')
+        counts2.add('GGGGGGGGGGGGGGGGGGGGG')
+
+    kmers = khmer.Nodetable(21, 1e4, 4)
+    kmers.compose_init(counts1, 3)
+    kmers.compose_update(counts2, 3)
+
+    assert kmers.get('GATTACAGATTACAGATTACA') == 1
+    assert kmers.get('TAGATCTGCTTGAAACAAGTG') == 0
+    assert kmers.get('AAGTGGATTTGAGAAAAAAGT') == 0
+    assert kmers.get('GGGGGGGGGGGGGGGGGGGGG') == 0
+    assert kmers.get('AAAAAAAAAAAAAAAAAAAAA') == 1
