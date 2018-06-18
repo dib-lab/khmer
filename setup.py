@@ -187,7 +187,7 @@ if sys.platform == 'darwin':
     # force 64bit only builds
     EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64', '-mmacosx-version-min=10.7',
                                '-stdlib=libc++'])
-    EXTRA_LINK_ARGS.append('-mmacosx-version-min=10.7')
+    EXTRA_LINK_ARGS.extend(['-mmacosx-version-min=10.7', '-lstdc++'])
 
 if check_for_openmp():
     EXTRA_COMPILE_ARGS.extend(['-fopenmp'])
@@ -330,10 +330,10 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
         if sys.platform == 'darwin' and 'gcov' in self.libraries:
             self.libraries.remove('gcov')
 
-        cqfcmd = ['bash', '-c', 'cd third-party/cqf && make']
-        spawn(cmd=cqfcmd, dry_run=self.dry_run)
+        mqfcmd = ['bash', '-c', 'cd third-party/mqf && make']
+        spawn(cmd=mqfcmd, dry_run=self.dry_run)
         for ext in self.extensions:
-            ext.extra_objects.append(path_join("third-party", "cqf", "gqf.o"))
+            ext.extra_objects.append(path_join("third-party", "mqf", "gqf.o"))
 
         if "z" not in self.libraries:
             zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'

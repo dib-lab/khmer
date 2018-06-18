@@ -21,53 +21,58 @@ matrix:
   fast_finish: true
   include:
 
-    - os: linux
-      python: "3.4"
-      # Tell travis we want debian trusty
-      sudo: required
-      dist: trusty
-      env:
-        - TESTATTR="'not huge and not known_failing'"
-      addons:
-        apt:
-          packages:
-            - astyle
-            - cppcheck
-            - enchant
-
-    - os: linux
-      python: "3.5"
-      # Tell travis we want debian trusty
-      sudo: required
-      dist: trusty
-      env:
-        - TESTATTR="'not huge and not known_failing'"
-      addons:
-        apt:
-          packages:
-            - astyle
-            - cppcheck
-            - enchant
-
-    - os: linux
-      python: "3.6"
-      # Tell travis we want debian trusty
-      sudo: required
-      dist: trusty
-      env:
-        - TESTATTR="'not huge and not known_failing'"
-      addons:
-        apt:
-          packages:
-            - astyle
-            - cppcheck
-            - enchant
+    # - os: linux
+    #   python: "3.4"
+    #   # Tell travis we want debian trusty
+    #   sudo: required
+    #   dist: trusty
+    #   env:
+    #     - TESTATTR="'not huge and not known_failing'"
+    #   addons:
+    #     apt:
+    #       packages:
+    #         - astyle
+    #         - cppcheck
+    #         - enchant
+    #
+    # - os: linux
+    #   python: "3.5"
+    #   # Tell travis we want debian trusty
+    #   sudo: required
+    #   dist: trusty
+    #   env:
+    #     - TESTATTR="'not huge and not known_failing'"
+    #   addons:
+    #     apt:
+    #       packages:
+    #         - astyle
+    #         - cppcheck
+    #         - enchant
+    #
+    # - os: linux
+    #   python: "3.6"
+    #   # Tell travis we want debian trusty
+    #   sudo: required
+    #   dist: trusty
+    #   env:
+    #     - TESTATTR="'not huge and not known_failing'"
+    #   addons:
+    #     apt:
+    #       packages:
+    #         - astyle
+    #         - cppcheck
+    #         - enchant
 
     - os: osx
       language: generic
-      osx_image: xcode7.3
+      osx_image: xcode9.4
       env:
         - TESTATTR="'not linux and not known_failing and not huge'"
+        - CC=cc
+        - CXX="clang++-3.7 -stdlib=libc++"
+        - CXXFLAGS="$CXXFLAGS -nostdinc++ -I/usr/local/opt/llvm@3.7/lib/llvm-3.7/include/c++/v1"
+        - LDFLAGS="$LDFLAGS -L/usr/local/opt/llvm@3.7/lib/llvm-3.7/lib"
+#        - c++=g++
       before_install:
         - source ci_scripts/install.sh
 

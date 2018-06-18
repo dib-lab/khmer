@@ -77,12 +77,14 @@ def test_n_occupied(AnyTabletype):
     assert tt.n_unique_kmers() == 1
 
     tt.add(kmer)
+    assert tt.n_occupied() == 1
     # the CQF implementation we use can use more than one slot to represent
     # counts for a single kmer
-    if not tt.__class__.__name__.startswith("QF"):
-        assert tt.n_occupied() == 1
-    else:
-        assert tt.n_occupied() == 2
+    # if not tt.__class__.__name__.startswith("QF"):
+    #     assert tt.n_occupied() == 1
+    # else:
+    #     assert tt.n_occupied() == 2
+
     assert tt.n_unique_kmers() == 1
 
 
