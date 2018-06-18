@@ -68,10 +68,11 @@ matrix:
       osx_image: xcode7.3
       env:
         - TESTATTR="'not linux and not known_failing and not huge'"
+        - CXXFLAGS="$CXXFLAGS -nostdinc+"
+        - CXX="clang++ -stdlib=libc++"
       before_install:
         - source ci_scripts/install.sh
-        - CXX="clang++ -stdlib=libc++"
-        - CXXFLAGS="$CXXFLAGS -nostdinc+"
+
 
 # command to install common dependencies
 install:
