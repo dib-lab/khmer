@@ -69,7 +69,9 @@ matrix:
       env:
         - TESTATTR="'not linux and not known_failing and not huge'"
         - CC=cc
-        - CXX=clang++
+        - CXX="clang++-3.7 -stdlib=libc++"
+        - CXXFLAGS="$CXXFLAGS -nostdinc++ -I/usr/local/opt/llvm@3.7/lib/llvm-3.7/include/c++/v1"
+        - LDFLAGS="$LDFLAGS -L/usr/local/opt/llvm@3.7/lib/llvm-3.7/lib"
 #        - c++=g++
       before_install:
         - source ci_scripts/install.sh
