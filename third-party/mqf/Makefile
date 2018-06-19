@@ -9,23 +9,27 @@ else
 	OPT=-Ofast
 endif
 
-ifdef NH
+OS := $(shell uname)
+ifeq ($(OS), Darwin)
 	ARCH=
 else
-	ARCH=-msse4.2 -D__SSE4_2_
+	#ARCH=-msse4.2 -D__SSE4_2_
+	ARCH=
 endif
 
 ifdef P
 	PROFILE=-pg -no-pie # for bug in gprof.
 endif
 
-CXX = g++ -std=c++11
-CC = g++ -std=c++11
-LD= g++ -std=c++11
+#
+# CXX = g++ -std=c++11
+# CC = g++ -std=c++11
+# LD= g++ -std=c++11
 
-CXXFLAGS =  -fPIC -Wall $(DEBUG) $(PROFILE) $(OPT) $(ARCH) -m64 -I. -Wno-unused-result -Wno-strict-aliasing -Wno-unused-function
+CXXFLAGS :=  -std=c++11 -fPIC -Wall $(DEBUG) $(PROFILE) $(OPT)  -m64 -I. -Wno-unused-result -Wno-strict-aliasing -Wno-unused-function
 
-LDFLAGS = $(DEBUG) $(PROFILE) $(OPT)
+LDFLAGS := $(LDFLAGS) $(DEBUG) $(PROFILE) $(OPT)
+
 
 #
 # declaration of dependencies
