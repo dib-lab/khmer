@@ -61,6 +61,18 @@ bool apply_kmer_filters(const Kmer& node, const std::list<KmerFilter>& filters)
 }
 
 
+void apply_kmer_helpers(const Kmer& node, const KmerHelperList& helpers)
+{
+    if (!helpers.size()) {
+        return;
+    }
+
+    for (auto helper: helpers) {
+        helper(node);
+    }
+}
+
+
 KmerFilter get_label_filter(const Label label, const LabelHash * lh)
 {
     KmerFilter filter = [=] (const Kmer& node) {
@@ -118,6 +130,17 @@ KmerFilter get_simple_label_intersect_filter(const LabelSet& src_labels,
     return filter;
 }
 
+/*
+KmerFilter get_link_filter(const Kmer& src_node,
+                           std::shared_ptr<LinkList> links,
+                           std::shared_ptr< std::list<uint64_t> > ages,
+                           const unsigned int min_count)
+{
+    KmerFilter filter = [=] (const Kmer& node) {
+        
+    }
+}
+*/
 
 KmerFilter get_junction_count_filter(const Kmer& src_node,
                                      Countgraph * junctions,

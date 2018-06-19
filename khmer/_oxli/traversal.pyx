@@ -26,7 +26,7 @@ cdef class Traverser:
             cpkmer = deref(kmers).front()
             kmer = Kmer.wrap(new CpKmer(cpkmer), deref(self._graph_ptr).ksize())
             result.append(kmer)
-            deref(kmers).pop()
+            deref(kmers).pop_back()
         return result
 
     cdef list _kmerqueue_to_hash_list(self, KmerQueue * kmers):
@@ -35,7 +35,7 @@ cdef class Traverser:
         while(deref(kmers).empty() == 0):
             cpkmer = deref(kmers).front()
             result.append(cpkmer.kmer_u)
-            deref(kmers).pop()
+            deref(kmers).pop_back()
         return result
 
     cdef list _neighbors(self, CpKmer start, int direction=0):

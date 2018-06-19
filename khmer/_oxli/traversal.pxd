@@ -1,3 +1,4 @@
+from libcpp.memory cimport unique_ptr
 from libc.stdint cimport uint32_t
 from libcpp.memory cimport shared_ptr
 from libcpp cimport bool

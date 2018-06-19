@@ -1,6 +1,6 @@
 from libcpp cimport bool
 from libcpp.memory cimport shared_ptr
-from libcpp.queue cimport queue
+from libcpp.deque cimport deque
 from libcpp.set cimport set
 from libcpp.string cimport string
 
@@ -50,11 +50,12 @@ cdef extern from "oxli/kmer_hash.hh" namespace "oxli":
     HashIntoType _hash_murmur(const string&, const WordLength)
     HashIntoType _hash_murmur(const string&,
                               HashIntoType&, HashIntoType&)
-    HashIntoType _hash_murmur_forward(const string&)
+    HashIntoType _hash_murmur_forward(const string&,
+                                      const WordLength)
 
 
 cdef extern from "oxli/oxli.hh" namespace "oxli":
-    ctypedef queue[CpKmer] KmerQueue
+    ctypedef deque[CpKmer] KmerQueue
     ctypedef set[CpKmer] KmerSet
     ctypedef bool (*KmerFilter) (CpKmer kmer)
 
@@ -65,3 +66,23 @@ cdef class Kmer:
 
     @staticmethod
     cdef Kmer wrap(CpKmer * cpkmer, WordLength K)
+    @staticmethod
+    cdef Kmer wrap_partial(CpKmer *cpkmer)
+
+
+cpdef HashIntoType forward_hash(object kmer, unsigned int K)
+
+
+cpdef HashIntoType forward_hash_no_rc(object kmer, WordLength K)
+
+
+cpdef str reverse_hash(object h, int K)
+
+
+cpdef str reverse_complement(object sequence)
+
+
+cpdef hash_murmur3(object s)
+
+
+cpdef hash_no_rc_murmur3(object s)

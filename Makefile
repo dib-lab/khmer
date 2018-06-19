@@ -106,9 +106,12 @@ install-dependencies:
 	pip install --requirement doc/requirements.txt
 
 ## sharedobj   : build khmer shared object file
-sharedobj: $(EXTENSION_MODULE)
+sharedobj: $(EXTENSION_MODULE) $(CYTHON_MODULE)
 
 $(EXTENSION_MODULE): $(CPPSOURCES) $(CYSOURCES)
+	./setup.py build_ext --inplace
+
+$(CYTHON_MODULE): $(CPPSOURCES) $(CYSOURCES)
 	./setup.py build_ext --inplace
 
 coverage-debug: $(CPPSOURCES)
@@ -144,6 +147,7 @@ clean: FORCE
 	rm -rf __pycache__/ khmer.egg-info/
 	@find ./ -type d -name __pycache__ -exec rm -rf {} +
 	@find ./khmer/ -type f -name *$(MODEXT) -exec rm -f {} +
+	@find ./khmer/_oxli/ -type f -name *.so -exec rm -f {} +
 	-rm -f *.gcov
 
 debug: FORCE
@@ -285,6 +289,8 @@ install-liboxli: liboxli
 	cd src/oxli && $(MAKE) install PREFIX=$(PREFIX)
 	mkdir -p $(PREFIX)/include/khmer
 	cp -r include/khmer/_cpy_*.hh $(PREFIX)/include/khmer/
+	cp include/oxli/oxli_exception_convert.hh $(PREFIX)/include/oxli/
+	cp third-party/rollinghash/*.h $(PREFIX)/include/oxli/
 
 # Runs a test of liboxli
 libtest: FORCE

@@ -134,10 +134,11 @@ public:
      * @param node The Kmer to start at.
      * @param node_q To collect the results.
      *
-     * @return Number of neighbors found.
+     * @return Number of neighbors total (could be more than those found).
      */
+    template <class Container=KmerQueue>
     unsigned int neighbors(const Kmer& node,
-                           KmerQueue &node_q) const;
+                           Container &found) const;
 
     /**
      * @brief Get the degree of the given Kmer in the templated direction.
@@ -164,6 +165,7 @@ public:
     // The current position.
     Kmer cursor;
     using NodeGatherer<direction>::push_filter;
+    using NodeGatherer<direction>::neighbors;
 
     explicit NodeCursor(const Hashgraph * ht,
                         Kmer start_kmer,
@@ -184,15 +186,19 @@ public:
      *
      * @return Number of neighbors found.
      */
-    unsigned int neighbors(KmerQueue& node_q) const
+    template <class Container=KmerQueue>
+    unsigned int neighbors(Container& found) const
     {
-        return NodeGatherer<direction>::neighbors(cursor, node_q);
+        return NodeGatherer<direction>::neighbors(cursor, found);
     }
+
 
     /**
      * @return Degree of the current cursor position and direction.
      */
     unsigned int cursor_degree() const;
+    unsigned int in_degree() const;
+    unsigned int out_degree() const;
 
 };
 
@@ -246,12 +252,20 @@ public:
 template <bool direction>
 class AssemblerTraverser: public NodeCursor<direction>
 {
-
 protected:
     std::shared_ptr<SeenSet> visited;
+    KmerHelperList helpers;
 
 public:
-    using NodeCursor<direction>::NodeCursor;
+
+    using NodeCursor<direction>::push_filter;
+
+    explicit AssemblerTraverser(const Hashgraph * ht,
+                                Kmer start_kmer);
+
+    explicit AssemblerTraverser(const Hashgraph* ht,
+                                Kmer start_kmer,
+                                KmerFilter filter);
     
     explicit AssemblerTraverser(const Hashgraph * ht,
                                 Kmer start_kmer,
@@ -263,6 +277,11 @@ public:
                                 std::shared_ptr<SeenSet> visited);
 
     AssemblerTraverser(const AssemblerTraverser& other);
+
+    void _init_visited() {
+        visited = std::make_shared<SeenSet>();
+        push_filter(get_visited_filter(visited));
+    }
 
 
     /**
@@ -290,8 +309,55 @@ public:
     std::string join_contigs(std::string& contig_a,
                              std::string& contig_b,
                              WordLength offset = 0) const;
+
+    void push_helper(KmerHelper helper)
+    {
+        helpers.push_back(helper);
+    }
+
+    KmerHelper pop_helper()
+    {
+        KmerHelper back = this->helpers.back();
+        this->helpers.pop_back();
+        return back;
+    }
+
+    unsigned int n_helpers()
+    {
+        return helpers.size();
+    }
 };
 
 
-}
+template<bool direction>
+class CompactingAT: public AssemblerTraverser<direction>
+{
+protected:
+
+    Traverser traverser;
+
+public:
+
+    explicit CompactingAT(const Hashgraph * ht,
+                          Kmer start_kmer);
+
+    explicit CompactingAT(const Hashgraph * ht,
+                          Kmer start_kmer,
+                          KmerFilter filter);
+
+    explicit CompactingAT(const Hashgraph * ht,
+                          Kmer start_kmer,
+                          KmerFilterList filters);
+
+    explicit CompactingAT(const Hashgraph * ht,
+                          Kmer start_kmer,
+                          KmerFilterList filters,
+                          std::shared_ptr<SeenSet> visited);
+
+    virtual char next_symbol();
+
+};
+
+} //namespace khmer
+
 #endif

@@ -49,10 +49,11 @@ namespace oxli
  * Simple Linear Assembly
  ********************************/
 
-LinearAssembler::LinearAssembler(const Hashgraph * ht) :
+LinearAssembler::LinearAssembler(const Hashgraph * ht,
+                                 std::shared_ptr<SeenSet> global_visited) :
     graph(ht), _ksize(ht->ksize())
 {
-
+    global_visited = global_visited;
 }
 
 // Starting from the given seed k-mer, assemble the maximal linear path in
@@ -72,7 +73,13 @@ const
         node_filters.push_back(get_stop_bf_filter(stop_bf));
     }
 
-    std::shared_ptr<SeenSet> visited = std::make_shared<SeenSet>();
+    std::shared_ptr<SeenSet> visited;
+    if (global_visited != nullptr) {
+        visited = global_visited;
+    } else {
+        visited = std::make_shared<SeenSet>();
+    }
+
     AssemblerTraverser<TRAVERSAL_RIGHT> rcursor(graph, seed_kmer, node_filters, visited);
     AssemblerTraverser<TRAVERSAL_LEFT> lcursor(graph, seed_kmer, node_filters, visited);
 
@@ -98,7 +105,17 @@ const
         node_filters.push_back(get_stop_bf_filter(stop_bf));
     }
 
-    AssemblerTraverser<TRAVERSAL_RIGHT> cursor(graph, seed_kmer, node_filters);
+    std::shared_ptr<SeenSet> visited;
+    if (global_visited != nullptr) {
+        visited = global_visited;
+    } else {
+        visited = std::make_shared<SeenSet>();
+    }
+
+    AssemblerTraverser<TRAVERSAL_RIGHT> cursor(graph, 
+                                               seed_kmer, 
+                                               node_filters,
+                                               visited);
     return _assemble_directed<TRAVERSAL_RIGHT>(cursor);
 }
 
@@ -112,7 +129,17 @@ const
         node_filters.push_back(get_stop_bf_filter(stop_bf));
     }
 
-    AssemblerTraverser<TRAVERSAL_LEFT> cursor(graph, seed_kmer, node_filters);
+    std::shared_ptr<SeenSet> visited;
+    if (global_visited != nullptr) {
+        visited = global_visited;
+    } else {
+        visited = std::make_shared<SeenSet>();
+    }
+
+    AssemblerTraverser<TRAVERSAL_LEFT> cursor(graph, 
+                                              seed_kmer, 
+                                              node_filters,
+                                              visited);
     return _assemble_directed<TRAVERSAL_LEFT>(cursor);
 }
 
@@ -171,6 +198,81 @@ const
     std::cout << "## assemble_linear_right[end] found " << found << std::endl;
 #endif
     return contig;
+}
+
+/********************************
+ * Compacting Assembler
+ ********************************/
+
+std::string CompactingAssembler::assemble(const Kmer seed_kmer,
+                                          const Hashgraph * stop_bf)
+const
+{
+    if (graph->get_count(seed_kmer) == 0) {
+        return "";
+    }
+
+    std::list<KmerFilter> node_filters;
+    if (stop_bf) {
+        node_filters.push_back(get_stop_bf_filter(stop_bf));
+    }
+
+    std::shared_ptr<SeenSet> visited;
+    if (global_visited != nullptr) {
+        visited = global_visited;
+    } else {
+        visited = std::make_shared<SeenSet>();
+    }
+
+    CompactingAT<TRAVERSAL_RIGHT> rcursor(graph, seed_kmer, node_filters, visited);
+    CompactingAT<TRAVERSAL_LEFT> lcursor(graph, seed_kmer, node_filters, visited);
+
+    std::string right_contig = _assemble_directed<TRAVERSAL_RIGHT>(rcursor);
+    std::string left_contig = _assemble_directed<TRAVERSAL_LEFT>(lcursor);
+
+    right_contig = right_contig.substr(_ksize);
+    return left_contig + right_contig;
+}
+
+std::string CompactingAssembler::assemble_right(const Kmer seed_kmer,
+                                                const Hashgraph * stop_bf)
+const
+{
+    std::list<KmerFilter> node_filters;
+    if (stop_bf) {
+        node_filters.push_back(get_stop_bf_filter(stop_bf));
+    }
+
+    std::shared_ptr<SeenSet> visited;
+    if (global_visited != nullptr) {
+        visited = global_visited;
+    } else {
+        visited = std::make_shared<SeenSet>();
+    }
+
+    CompactingAT<TRAVERSAL_RIGHT> cursor(graph, seed_kmer, node_filters, visited);
+    return LinearAssembler::_assemble_directed<TRAVERSAL_RIGHT>(cursor);
+}
+
+
+std::string CompactingAssembler::assemble_left(const Kmer seed_kmer,
+                                               const Hashgraph * stop_bf)
+const
+{
+    std::list<KmerFilter> node_filters;
+    if (stop_bf) {
+        node_filters.push_back(get_stop_bf_filter(stop_bf));
+    }
+
+    std::shared_ptr<SeenSet> visited;
+    if (global_visited != nullptr) {
+        visited = global_visited;
+    } else {
+        visited = std::make_shared<SeenSet>();
+    }
+
+    CompactingAT<TRAVERSAL_LEFT> cursor(graph, seed_kmer, node_filters, visited);
+    return LinearAssembler::_assemble_directed<TRAVERSAL_LEFT>(cursor);
 }
 
 
@@ -309,7 +411,7 @@ const
                     // spin off a cursor for the new branch
                     AssemblerTraverser<direction> branch_cursor(cursor);
                     branch_cursor.cursor = branch_starts.front();
-                    branch_starts.pop();
+                    branch_starts.pop_front();
 
 #if DEBUG_ASSEMBLY
                     std::cout << "Branch cursor: " << branch_cursor.cursor.repr(
@@ -512,7 +614,7 @@ const
                 AssemblerTraverser<direction> branch_cursor(cursor);
 
                 branch_cursor.cursor = branch_starts.front();
-                branch_starts.pop();
+                branch_starts.pop_front();
 
                 // assemble linearly as far as possible
                 std::string branch = linear_asm._assemble_directed<direction>(branch_cursor);

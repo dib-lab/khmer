@@ -54,6 +54,17 @@ cdef class LinearAssembler:
         return self._assemble_right(_seed)
 
 
+cdef class CompactingAssembler(LinearAssembler):
+
+    def __cinit__(self, Hashgraph graph not None, Hashgraph stop_filter=None):
+        self.graph = graph
+        self._graph_ptr = graph._hg_this
+        self.set_stop_filter(stop_filter=stop_filter)
+        
+        if type(self) is CompactingAssembler:
+            self._this = <shared_ptr[CpLinearAssembler]>make_shared[CpCompactingAssembler](self._graph_ptr.get())
+
+
 cdef class SimpleLabeledAssembler:
 
     def __cinit__(self, GraphLabels labels not None, Hashgraph stop_filter=None):

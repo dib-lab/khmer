@@ -44,7 +44,6 @@ Contact: khmer-project@idyll.org
 
 #include <Python.h>
 
-#include <iostream>
 
 #include "_cpy_utils.hh"
 
@@ -76,20 +75,6 @@ Contact: khmer-project@idyll.org
 
 
 namespace khmer {
-
-PyObject * forward_hash(PyObject * self, PyObject * args);
-
-PyObject * forward_hash_no_rc(PyObject * self, PyObject * args);
-
-PyObject * reverse_hash(PyObject * self, PyObject * args);
-
-PyObject * murmur3_forward_hash(PyObject * self, PyObject * args);
-
-PyObject * murmur3_forward_hash_no_rc(PyObject * self, PyObject * args);
-
-PyObject * reverse_complement(PyObject * self, PyObject * args);
-
-PyObject * get_version_cpp( PyObject * self, PyObject * args );
 
 extern PyMethodDef KhmerMethods[];
 

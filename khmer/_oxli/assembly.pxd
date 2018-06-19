@@ -21,6 +21,9 @@ cdef extern from "oxli/assembler.hh" namespace "oxli":
         string assemble_left(const CpKmer) const     
         string assemble_right(const CpKmer) const
 
+    cdef cppclass CpCompactingAssembler(CpLinearAssembler):
+        CpCompactingAssembler(CpHashgraph *)
+
     cdef cppclass CpSimpleLabeledAssembler "oxli::SimpleLabeledAssembler":
         CpSimpleLabeledAssembler(const CpLabelHash *)
 
@@ -49,6 +52,10 @@ cdef class LinearAssembler:
     cdef str _assemble(self, CpKmer start)
     cdef str _assemble_left(self, CpKmer start)
     cdef str _assemble_right(self, CpKmer start)
+
+
+cdef class CompactingAssembler(LinearAssembler):
+    pass
 
 
 cdef class SimpleLabeledAssembler:

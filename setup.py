@@ -158,29 +158,31 @@ def build_dir():
 ZLIBDIR = 'third-party/zlib'
 BZIP2DIR = 'third-party/bzip2'
 
+
 BUILD_DEPENDS = [path_join("include", "khmer", bn + ".hh") for bn in [
     "_cpy_khmer", "_cpy_utils", "_cpy_readparsers"
 ]]
 BUILD_DEPENDS.extend(path_join("include", "oxli", bn + ".hh") for bn in [
     "khmer", "kmer_hash", "hashtable", "labelhash", "hashgraph",
     "hllcounter", "oxli_exception", "read_aligner", "subset", "read_parsers",
-    "kmer_filters", "traversal", "assembler", "alphabets", "storage"])
+    "kmer_filters", "traversal", "assembler", "alphabets", "storage",
+    "partitioning", "gmap", "hist", "cdbg"])
 
 SOURCES = [path_join("src", "khmer", bn + ".cc") for bn in [
     "_cpy_khmer", "_cpy_utils", "_cpy_readparsers"
 ]]
 SOURCES.extend(path_join("src", "oxli", bn + ".cc") for bn in [
     "read_parsers", "kmer_hash", "hashtable", "hashgraph",
-    "labelhash", "subset", "read_aligner",
+    "labelhash", "subset", "read_aligner", "oxli",
     "hllcounter", "traversal", "kmer_filters", "assembler", "alphabets",
-    "storage"])
+    "storage", "partitioning", "cdbg"])
 
 SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
 
 # Don't forget to update lib/Makefile with these flags!
 EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11', '-pedantic',
-                      '-fno-omit-frame-pointer']
+                      '-fno-omit-frame-pointer', '-fdiagnostics-color']
 EXTRA_LINK_ARGS = ['-fno-omit-frame-pointer']
 
 if sys.platform == 'darwin':
@@ -218,7 +220,7 @@ for cython_ext in glob.glob(os.path.join("khmer", "_oxli",
 
     CY_EXTENSION_MOD_DICT = \
         {
-            "sources": [cython_ext, "khmer/_oxli/oxli_exception_convert.cc"],
+            "sources": [cython_ext, "src/oxli/oxli_exception_convert.cc"],
             "extra_compile_args": EXTRA_COMPILE_ARGS,
             "extra_link_args": EXTRA_LINK_ARGS,
             "extra_objects": [path_join(build_dir(), splitext(p)[0] + '.o')
@@ -287,7 +289,7 @@ SETUP_METADATA = \
         # additional-meta-data note #3
         "url": 'https://khmer.readthedocs.io/',
         "packages": ['khmer', 'khmer.tests', 'oxli', 'khmer._oxli'],
-        "package_data": {'khmer/_oxli': ['*.pxd']},
+        "package_data": {'khmer/_oxli': ['*.pxd', 'oxli_exception_convert.hh']},
         "package_dir": {'khmer.tests': 'tests'},
         "install_requires": ['screed >= 1.0', 'bz2file', 'Cython>=0.25.2'],
         "setup_requires": ["pytest-runner>=2.0,<3dev", "setuptools>=18.0",

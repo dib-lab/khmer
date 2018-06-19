@@ -6,6 +6,8 @@ from libc.stdint cimport uint64_t
 from cython.operator cimport dereference as deref
 
 from khmer._oxli.oxli_types cimport *
+from khmer._oxli.utils cimport _bstring, _ustring
+
 
 cdef class Kmer:
 
@@ -58,8 +60,61 @@ cdef class Kmer:
         return kmer
 
     @staticmethod
+    cdef Kmer wrap_partial(CpKmer* cpkmer):
+        cdef Kmer kmer = Kmer()
+        kmer._this.reset(cpkmer)
+        kmer.kmer = ""
+        return kmer
+
+    @staticmethod
     def create(HashIntoType tag, WordLength K):
         cdef Kmer kmer = Kmer()
         deref(kmer._this).set_from_unique_hash(tag, K)
         kmer.kmer = _revhash(kmer.kmer_u, K)
         return kmer
+
+
+cpdef HashIntoType forward_hash(object kmer, unsigned int K):
+    '''Run the 2-bit hash algorithm on the given K-mer.'''
+
+    if K > 32:
+        raise ValueError("k-mer size must be <= 32")
+    if len(kmer) != K:
+        raise ValueError("k-mer length must equal K")
+
+    return _hash(_bstring(kmer), K)
+
+
+cpdef HashIntoType forward_hash_no_rc(object kmer, WordLength K):
+    '''Run the 2-bit hash function in only the given
+    sequence orientation.'''
+
+    if K > 32:
+        raise ValueError("k-mer size must be <= 32")
+    if len(kmer) != K:
+        raise ValueError("k-mer length must equal K")
+
+    return _hash_forward(_bstring(kmer), K)
+
+
+cpdef str reverse_hash(object h, int K):
+    if K > 32:
+        raise ValueError("k-mer size must be <= 32")
+    
+    cdef HashIntoType _h = <HashIntoType>h
+    return _revhash(_h, K)
+
+
+cpdef str reverse_complement(object sequence):
+    cdef string s = _revcomp(_bstring(sequence))
+    return s
+
+
+cpdef hash_murmur3(object s):
+    cdef HashIntoType h = _hash_murmur(_bstring(s), len(s))
+    return h
+
+
+cpdef hash_no_rc_murmur3(object s):
+    cdef HashIntoType h = _hash_murmur_forward(_bstring(s), len(s))
+    return h

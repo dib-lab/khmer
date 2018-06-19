@@ -52,6 +52,7 @@ class LabelHash;
 
 
 bool apply_kmer_filters(const Kmer& node, const KmerFilterList& filters);
+void apply_kmer_helpers(const Kmer& node, const KmerHelperList& helpers);
 
 KmerFilter get_label_filter(const Label label, const LabelHash * lh);
 

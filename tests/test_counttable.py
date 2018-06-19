@@ -38,6 +38,7 @@ import khmer
 import pytest
 import random
 from . import khmer_tst_utils as utils
+from .graph_structure_fixtures import using_ksize
 
 
 def test_get_kmer_hashes():
@@ -61,13 +62,14 @@ def test_kmer_revcom_hash(kmer):
     assert a.hash(kmer) == a.hash(khmer.reverse_complement(kmer))
 
 
-@pytest.mark.parametrize('ksize,sketch_allocator', [
-    (21, khmer.Nodetable),
-    (21, khmer.Counttable),
-    (21, khmer.SmallCounttable),
-    (49, khmer.Nodetable),
-    (49, khmer.Counttable),
-    (49, khmer.SmallCounttable),
+@using_ksize([21,49])
+@pytest.mark.parametrize('sketch_allocator', [
+    (khmer.Nodetable),
+    (khmer.Counttable),
+    (khmer.SmallCounttable),
+    (khmer.Nodetable),
+    (khmer.Counttable),
+    (khmer.SmallCounttable),
 ])
 def test_reverse_hash(ksize, sketch_allocator):
     multiplier = int(ksize / len('GATTACA'))

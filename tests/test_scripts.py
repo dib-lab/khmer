@@ -973,6 +973,7 @@ def test_partition_graph_no_big_traverse():
     assert x[0] == 4, x       # should be four partitions, broken at knot.
 
 
+@pytest.mark.xfail(reason='Deprecated legacy partitioning.')
 def test_partition_find_knots_execute():
     graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
 
@@ -989,6 +990,7 @@ def test_partition_find_knots_execute():
     assert os.path.exists(stoptags_file)
 
 
+@pytest.mark.xfail(reason='Deprecated legacy partitioning.')
 def test_partition_find_knots_existing_stoptags():
     graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
 
@@ -1688,13 +1690,14 @@ def test_sample_reads_randomly():
     assert seqs == answer
 
 
-def test_sample_reads_randomly_force_single():
+def test_sample_reads_randomly_single_mode():
     infile = utils.copy_test_data('test-reads.fa')
     in_dir = os.path.dirname(infile)
 
     script = 'sample-reads-randomly.py'
     # fix random number seed for reproducibility
-    args = ['-N', '10', '-M', '12000', '-R', '1', '--force_single']
+    args = ['-N', '10', '-M', '12000', '-R', '1', 
+            '--pairing-mode', 'single']
     args.append(infile)
     utils.runscript(script, args, in_dir)
 
@@ -1730,13 +1733,14 @@ def test_sample_reads_randomly_force_single():
     assert seqs == answer
 
 
-def test_sample_reads_randomly_force_single_outfile():
+def test_sample_reads_randomly_single_mode_outfile():
     infile = utils.copy_test_data('test-reads.fa')
     in_dir = os.path.dirname(infile)
 
     script = 'sample-reads-randomly.py'
     # fix random number seed for reproducibility
-    args = ['-N', '10', '-M', '12000', '-R', '1', '--force_single', '-o',
+    args = ['-N', '10', '-M', '12000', '-R', '1', 
+            '--pairing-mode', 'single', '-o',
             in_dir + '/randreads.out']
 
     args.append(infile)
@@ -2098,32 +2102,22 @@ def execute_streaming_diginorm(ifilename):
     This is not directly executed but is run by the tests themselves
     '''
     # Get temp filenames, etc.
-    fifo = utils.get_temp_filename('fifo')
-    in_dir = os.path.dirname(fifo)
-    script = 'normalize-by-median.py'
-    args = ['-C', '1', '-k', '17', '-o', 'outfile', fifo]
+    script = os.path.join(utils.scriptpath(), 
+                          'normalize-by-median.py')
+    infile = utils.copy_test_data(ifilename)
+    in_dir = os.path.dirname(infile)
+    args = '-C 1 -k 17 -o outfile -'
+    cmd = 'cat {infile} | {script} {args}'.format(infile=infile,
+                                                  script=script,
+                                                  args=args)
+    (status, out, err) = utils.run_shell_cmd(cmd, in_directory=in_dir)
 
-    # make a fifo to simulate streaming
-    os.mkfifo(fifo)
+    if status != 0:
+        print(out)
+        print(err)
+        assert status == 0, status
 
-    # FIFOs MUST BE OPENED FOR READING BEFORE THEY ARE WRITTEN TO
-    # If this isn't done, they will BLOCK and things will hang.
-    thread = threading.Thread(target=utils.runscript,
-                              args=(script, args, in_dir))
-    thread.start()
-    ifile = io.open(ifilename, 'rb')
-    fifofile = io.open(fifo, 'wb')
-    # read binary to handle compressed files
-    chunk = ifile.read(8192)
-    while len(chunk) > 0:
-        fifofile.write(chunk)
-        chunk = ifile.read(8192)
-
-    fifofile.close()
-
-    thread.join()
-
-    return in_dir + '/outfile'
+    return os.path.join(in_dir, 'outfile')
 
 
 def _execute_load_graph_streaming(filename):
@@ -2186,6 +2180,7 @@ def test_screed_streaming_ufq():
     assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
 
 
+@pytest.mark.known_failing
 def test_screed_streaming_bzipfq():
     # bzip compressed fq
     o = execute_streaming_diginorm(utils.get_test_data('100-reads.fq.bz2'))
@@ -2194,6 +2189,7 @@ def test_screed_streaming_bzipfq():
     assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT'), seqs
 
 
+@pytest.mark.known_failing
 def test_screed_streaming_bzipfa():
     # bzip compressed fa
     o = execute_streaming_diginorm(
@@ -2204,7 +2200,6 @@ def test_screed_streaming_bzipfa():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG')
 
 
-@pytest.mark.known_failing
 def test_screed_streaming_gzipfq():
     # gzip compressed fq
     o = execute_streaming_diginorm(utils.get_test_data('100-reads.fq.gz'))
@@ -2213,7 +2208,6 @@ def test_screed_streaming_gzipfq():
     assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTG')
 
 
-@pytest.mark.known_failing
 def test_screed_streaming_gzipfa():
     o = execute_streaming_diginorm(
         utils.get_test_data('test-abund-read-2.fa.gz'))
@@ -2874,9 +2868,10 @@ def test_unique_kmers_multiple_inputs():
                           if entry.endswith('.py')])
 def test_version_and_basic_citation(scriptname):
     with open(os.path.join(utils.scriptpath(), scriptname)) as script:
+        print(script)
         line = script.readline()
         line = script.readline()
-        if 'khmer' in line:
+        if 'khmer' in line and '_oxli.app' not in line:
             # check citation information appears when using --info
             status, out, err = utils.runscript(scriptname, ["--info"])
             assert status == 0, status

@@ -36,14 +36,16 @@
 import screed
 import khmer
 from . import khmer_tst_utils as utils
+from .graph_structure_fixtures import using_ksize
 import pytest
 
 
-@pytest.mark.parametrize('ksize,memory,epsilon,numbands', [
-    (21, 5e6, 1, 2),
-    (21, 5e6, 1, 4),
-    (21, 5e6, 1, 8),
-    (21, 5e6, 1, 16),
+@using_ksize(21)
+@pytest.mark.parametrize('memory,epsilon,numbands', [
+    (5e6, 1, 2),
+    (5e6, 1, 4),
+    (5e6, 1, 8),
+    (5e6, 1, 16),
 ])
 def test_banding_in_memory(ksize, memory, epsilon, numbands):
     """
@@ -82,11 +84,12 @@ def test_banding_in_memory(ksize, memory, epsilon, numbands):
                 assert min(nonzeros) == 1
 
 
-@pytest.mark.parametrize('ksize,memory,numbands', [
-    (21, 5e6, 3),
-    (21, 5e6, 11),
-    (21, 5e6, 23),
-    (21, 5e6, 29),
+@using_ksize(21)
+@pytest.mark.parametrize('memory,numbands', [
+    (5e6, 3),
+    (5e6, 11),
+    (5e6, 23),
+    (5e6, 29),
 ])
 def test_banding_to_disk(ksize, memory, numbands):
     """

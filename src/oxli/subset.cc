@@ -234,7 +234,7 @@ void SubsetPartition::find_all_tags(
     };
     Traverser traverser(_ht, filter);
 
-    node_q.push(start_kmer);
+    node_q.push_front(start_kmer);
     breadth_q.push(0);
 
     while(!node_q.empty()) {
@@ -245,7 +245,7 @@ void SubsetPartition::find_all_tags(
         }
 
         Kmer node = node_q.front();
-        node_q.pop();
+        node_q.pop_front();
 
         unsigned int breadth = breadth_q.front();
         breadth_q.pop();
@@ -331,7 +331,7 @@ unsigned int SubsetPartition::sweep_for_tags(
         Kmer node = kmers.next();
         traversed_nodes.insert(node);
 
-        node_q.push(node);
+        node_q.push_front(node);
         breadth_q.push(0);
     }
 
@@ -347,7 +347,7 @@ unsigned int SubsetPartition::sweep_for_tags(
         }
 
         Kmer node = node_q.front();
-        node_q.pop();
+        node_q.pop_front();
 
         unsigned int breadth = breadth_q.front();
         breadth_q.pop();
@@ -423,7 +423,7 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(
 
     Traverser traverser(_ht, filter);
 
-    node_q.push(start_kmer);
+    node_q.push_front(start_kmer);
     breadth_q.push(0);
 
     while(!node_q.empty()) {
@@ -433,7 +433,7 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(
         }
 
         Kmer node = node_q.front();
-        node_q.pop();
+        node_q.pop_front();
 
         unsigned int breadth = breadth_q.front();
         breadth_q.pop();

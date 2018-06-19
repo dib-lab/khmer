@@ -199,9 +199,13 @@ void Hashgraph::load_tagset(std::string infilename, bool clear_tags)
 
 void Hashgraph::consume_sequence_and_tag(const std::string& seq,
         unsigned long long& n_consumed,
-        SeenSet * found_tags)
+        SeenSet * found_tags,
+        SeenSet * tag_set)
 {
     bool kmer_tagged;
+    if (tag_set == nullptr) {
+        tag_set = &all_tags;
+    }
 
     KmerIterator kmers(seq.c_str(), _ksize);
     HashIntoType kmer;
@@ -226,11 +230,11 @@ void Hashgraph::consume_sequence_and_tag(const std::string& seq,
             ++since;
         } else {
             ACQUIRE_ALL_TAGS_SPIN_LOCK
-            kmer_tagged = set_contains(all_tags, kmer);
+            kmer_tagged = set_contains(*tag_set, kmer);
             RELEASE_ALL_TAGS_SPIN_LOCK
             if (kmer_tagged) {
                 since = 1;
-                if (found_tags) {
+                if (found_tags != nullptr) {
                     found_tags->insert(kmer);
                 }
             } else {
@@ -238,9 +242,9 @@ void Hashgraph::consume_sequence_and_tag(const std::string& seq,
             }
         }
 #else
-        if (!is_new_kmer && set_contains(all_tags, kmer)) {
+        if (!is_new_kmer && set_contains(*tag_set, kmer)) {
             since = 1;
-            if (found_tags) {
+            if (found_tags != nullptr) {
                 found_tags->insert(kmer);
             }
         } else {
@@ -250,9 +254,9 @@ void Hashgraph::consume_sequence_and_tag(const std::string& seq,
 
         if (since >= _tag_density) {
             ACQUIRE_ALL_TAGS_SPIN_LOCK
-            all_tags.insert(kmer);
+            tag_set->insert(kmer);
             RELEASE_ALL_TAGS_SPIN_LOCK
-            if (found_tags) {
+            if (found_tags != nullptr) {
                 found_tags->insert(kmer);
             }
             since = 1;
@@ -262,9 +266,9 @@ void Hashgraph::consume_sequence_and_tag(const std::string& seq,
 
     if (since >= _tag_density/2 - 1) {
         ACQUIRE_ALL_TAGS_SPIN_LOCK
-        all_tags.insert(kmer);	// insert the last k-mer, too.
+        tag_set->insert(kmer);	// insert the last k-mer, too.
         RELEASE_ALL_TAGS_SPIN_LOCK
-        if (found_tags) {
+        if (found_tags != nullptr) {
             found_tags->insert(kmer);
         }
     }
@@ -431,7 +435,7 @@ const
     }
 
     KmerQueue node_q;
-    node_q.push(start);
+    node_q.push_front(start);
 
     // Avoid high-circumference k-mers
     Traverser traverser(this);
@@ -443,7 +447,7 @@ const
 
     while(!node_q.empty()) {
         Kmer node = node_q.front();
-        node_q.pop();
+        node_q.pop_front();
 
         // have we already seen me? don't count; exit.
         if (set_contains(keeper, node)) {
@@ -484,6 +488,11 @@ unsigned int Hashgraph::kmer_degree(const char * kmer_s)
     return traverser.degree(node);
 }
 
+unsigned int Hashgraph::kmer_degree(Kmer kmer)
+{
+    return kmer_degree(kmer.kmer_r, kmer.kmer_f);
+}
+
 size_t Hashgraph::trim_on_stoptags(std::string seq) const
 {
     KmerIterator kmers(seq.c_str(), _ksize);
@@ -518,12 +527,12 @@ const
     };
     Traverser traverser(this, filter);
 
-    node_q.push(start);
+    node_q.push_front(start);
     breadth_q.push(0);
 
     while(!node_q.empty()) {
         Kmer node = node_q.front();
-        node_q.pop();
+        node_q.pop_front();
 
         unsigned int breadth = breadth_q.front();
         breadth_q.pop();
@@ -871,7 +880,7 @@ const
 
         while (node_q.size()) {
             Kmer node = node_q.front();
-            node_q.pop();
+            node_q.pop_front();
 
             if (set_contains(high_degree_nodes, node)) {
                 // if there are any adjacent high degree nodes, record;

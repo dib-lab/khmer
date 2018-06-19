@@ -53,6 +53,7 @@ namespace oxli
 class Hashgraph;
 class LabelHash;
 
+
 /**
  * \class LinearAssembler
  *
@@ -78,8 +79,10 @@ public:
 
     WordLength _ksize;
     const Hashgraph * graph;
+    std::shared_ptr<SeenSet> global_visited;
 
-    explicit LinearAssembler(const Hashgraph * ht);
+    explicit LinearAssembler(const Hashgraph * ht,
+                             std::shared_ptr<SeenSet> global_visited = nullptr);
 
     virtual std::string assemble(const Kmer seed_kmer,
                                  const Hashgraph * stop_bf = 0) const;
@@ -97,12 +100,36 @@ public:
 // The explicit specializations need to be declared in the same translation unit
 // as their unspecialized declaration.
 template<>
-std::string LinearAssembler::_assemble_directed<TRAVERSAL_LEFT>(AssemblerTraverser<TRAVERSAL_LEFT>
-        &cursor) const;
+std::string LinearAssembler::_assemble_directed<TRAVERSAL_LEFT>(AssemblerTraverser<TRAVERSAL_LEFT> &cursor) const;
 
 template<>
-std::string LinearAssembler::_assemble_directed<TRAVERSAL_RIGHT>(AssemblerTraverser<TRAVERSAL_RIGHT>
-        &cursor) const;
+std::string LinearAssembler::_assemble_directed<TRAVERSAL_RIGHT>(AssemblerTraverser<TRAVERSAL_RIGHT> &cursor) const;
+
+
+class CompactingAssembler: public LinearAssembler
+{
+public:
+
+    explicit CompactingAssembler(const Hashgraph* ht,
+                                 std::shared_ptr<SeenSet> global_visited=nullptr) 
+        : LinearAssembler(ht, global_visited) {}
+
+    virtual std::string assemble(const Kmer seed_kmer,
+                                          const Hashgraph * stop_bf) const;
+
+    virtual std::string assemble_right(const Kmer seed_kmer,
+                               const Hashgraph * stop_bf = 0) const;
+
+    virtual std::string assemble_left(const Kmer seed_kmer,
+                              const Hashgraph * stop_bf = 0) const;
+
+    template<bool direction>
+    std::string _assemble_directed(CompactingAT<direction>& cursor) const 
+    {
+        return LinearAssembler::_assemble_directed<direction>(cursor);
+    }
+};
+typedef CompactingAssembler CpCompactingAssembler;
 
 
 /**
@@ -159,7 +186,6 @@ public:
 
     explicit JunctionCountAssembler(Hashgraph * ht);
     ~JunctionCountAssembler();
-
 
     StringVector assemble(const Kmer seed_kmer,
                           const Hashtable * stop_bf=0) const;

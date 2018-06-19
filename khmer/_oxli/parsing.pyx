@@ -1,144 +1,16 @@
 # -*- coding: UTF-8 -*-
-
-
-from cython.operator cimport dereference as deref
 cimport cython
+from cython.operator cimport dereference as deref
 from libcpp cimport bool
 from libcpp.string cimport string
 
 import sys
 
 from khmer._oxli.utils cimport _bstring, _ustring
+from khmer._oxli.sequence cimport (Alphabets, Sequence, CpSequence,
+                                   CpSequencePair, ReadBundle, is_valid,
+                                   sanitize_sequence)
 
-
-cdef class Alphabets:
-    
-    @staticmethod
-    def get(name):
-        cdef unicode alphabet = _ustring(Alphabets._get(_bstring(name)))
-        if not alphabet:
-            raise ValueError('No alphabet with name {0}'.format(name))
-        return alphabet
-
-    @staticmethod
-    cdef string _get(string name):
-        if name == b'DNA_SIMPLE':
-            return DNA_SIMPLE
-        elif name == b'DNAN_SIMPLE':
-            return DNAN_SIMPLE
-        elif name == b'RNA_SIMPLE':
-            return RNA_SIMPLE
-        elif name == b'RNAN_SIMPLE':
-            return RNAN_SIMPLE
-        elif name == b'IUPAC_NUCL':
-            return IUPAC_NUCL
-        elif name == b'IUPAC_AA':
-            return IUPAC_AA
-        else:
-            return string()
-
-
-@cython.freelist(100)
-cdef class Sequence:
-
-    def __cinit__(self, name=None, sequence=None,
-                        quality=None, description=None,
-                        cleaned_seq=None):
-
-        if name is not None and sequence is not None:
-            self._obj.sequence = _bstring(sequence)
-            self._obj.name = _bstring(name)
-            if description is not None:
-                self._obj.description = _bstring(description)
-            if quality is not None:
-                self._obj.quality = _bstring(quality)
-            if cleaned_seq is not None:
-                self._obj.cleaned_seq = _bstring(cleaned_seq)
-            else:
-                self._obj.cleaned_seq = self._obj.sequence
-
-    def __str__(self):
-        return repr(self)
-
-    def __repr__(self):
-        return 'Sequence(name="{0}", sequence="{1}")'.format(self.name, self.sequence)
-
-    def __len__(self):
-        return self._obj.sequence.length()
-
-    def __richcmp__(x, y, op):
-        if op == 2:
-            return x.name == y.name and x.sequence == y.sequence
-        else:
-            raise NotImplementedError('Operator not available')
-
-    def kmers(self, int K):
-        cdef int i = 0
-        cdef unicode sequence = self.sequence
-        for i in range(0, len(self)-K+1):
-            yield sequence[i:i+K]
-
-    def __getitem__(self, x):
-        # Definitely optimize this.
-        return self.sequence[x]
-
-    @property
-    def name(self):
-        cdef unicode name = self._obj.name
-        return self._obj.name if name else None
-
-    @property
-    def sequence(self):
-        cdef unicode sequence = self._obj.sequence
-        return self._obj.sequence if sequence else None
-
-    @property
-    def description(self):
-        cdef unicode description = self._obj.description
-        return description if description else None
-
-    @property
-    def quality(self):
-        cdef unicode quality = self._obj.quality
-        return quality if quality else None
-
-    @property
-    def cleaned_seq(self):
-        cdef unicode cleaned_seq = self._obj.cleaned_seq
-        return cleaned_seq if cleaned_seq else None
-
-    @staticmethod
-    def from_screed_record(record):
-        cdef Sequence seq = Sequence(name=record.name,
-                                     sequence=record.sequence)
-        if hasattr(record, 'quality'):
-            seq._obj.quality = _bstring(record.quality)
-
-        for attr in ('annotations', 'description'):
-            if hasattr(record, attr):
-                seq._obj.description = _bstring(getattr(record, attr))
-
-        return seq
-
-    @staticmethod
-    cdef Sequence _wrap(CpSequence cseq):
-        cdef Sequence seq = Sequence()
-        seq._obj = cseq
-        return seq
-
-
-cdef class ReadBundle:
-
-    def __cinit__(self, *raw_records):
-        self.reads = [r for r in raw_records if r]
-
-    @property
-    def num_reads(self):
-        return len(self.reads)
-
-    @property
-    def total_length(self):
-        return sum([len(r.sequence) for r in self.reads])
 
 
 def print_error(msg):
@@ -164,35 +36,18 @@ class UnpairedReadsError(ValueError):
         self.read2 = r2
 
 
-cdef inline bool is_valid(const char base, string& alphabet):
-    cdef char b
-    for b in alphabet:
-        if b == base:
-            return True
-    return False
-
-
-cdef inline bool sanitize_sequence(string& sequence,
-                                   string& alphabet,
-                                   bool convert_n):
-    cdef int i = 0
-    for i in range(sequence.length()):
-        sequence[i] &= 0xdf
-        if not is_valid(sequence[i], alphabet):
-            return False
-        if convert_n and sequence[i] == b'N':
-            sequence[i] = b'A'
-    return True
-
-
 cdef class FastxParser:
 
     def __cinit__(self, filename, *args, **kwargs):
         self._this = get_parser[CpFastxReader](_bstring(filename))
+        if self.is_complete():
+            raise RuntimeError('{0} has no sequences!'.format(filename))
 
     cdef Sequence _next(self):
         if not self.is_complete():
-            return Sequence._wrap(deref(self._this).get_next_read())
+            seq = Sequence._wrap(deref(self._this).get_next_read())
+            seq.clean()
+            return seq
         else:
             return None
 
@@ -205,6 +60,10 @@ cdef class FastxParser:
             seq = self._next()
             yield seq
 
+    @property
+    def num_reads(self):
+        return deref(self._this).get_num_reads()
+
 
 cdef class SanitizedFastxParser(FastxParser):
 
@@ -212,7 +71,7 @@ cdef class SanitizedFastxParser(FastxParser):
                         bool convert_n=True):
         self.n_bad = 0
         self.convert_n = convert_n
-        self._alphabet = Alphabets._get(_bstring(alphabet))
+        self._alphabet = Alphabets._get(alphabet)
 
     cdef Sequence _next(self):
         cdef Sequence seq
@@ -227,6 +86,7 @@ cdef class SanitizedFastxParser(FastxParser):
                 self.n_bad += 1
                 return None
             else:
+                seq._obj.cleaned_seq = seq._obj.sequence
                 return seq
         else:
             return None

@@ -242,7 +242,9 @@ LIBOXLI_OBJS= \
 	assembler.o \
 	alphabets.o \
 	murmur3.o \
-	storage.o
+	storage.o \
+	partitioning.o \
+	cdbg.o
 
 PRECOMILE_OBJS ?=
 PRECLEAN_TARGS ?=
@@ -278,7 +280,12 @@ HEADERS= \
 	kmer_filters.hh \
 	assembler.hh \
 	alphabets.hh \
-	storage.hh
+	storage.hh \
+	partitioning.hh \
+	gmap.hh \
+	hist.hh \
+	cdbg.hh
+
 OXLI_HEADERS = $(addprefix ../../include/oxli/,$(HEADERS))
 
 # START OF RULES #
@@ -324,6 +331,9 @@ murmur3.o: ../../third-party/smhasher/MurmurHash3.cc
 
 %.o: %.cc $(PRECOMILE_OBJS) $(OXLI_HEADERS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c -o $@ $<
+
+map_type_test: map_type_test.cc 
+	$(CXX) -o $@ $< $(CXXFLAGS) -loxli -L.
 
 $(LIBOXLISO): $(LIBOXLI_OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(SONAME_FLAGS) -shared -o $@ $^

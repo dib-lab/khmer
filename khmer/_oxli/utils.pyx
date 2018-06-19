@@ -5,6 +5,18 @@ from cpython.version cimport PY_MAJOR_VERSION
 from cython import short, int, long
 
 
+FILETYPES = \
+{
+    "COUNTING_HT": SAVED_COUNTING_HT,
+    "HASHBITS": SAVED_HASHBITS,
+    "TAGS": SAVED_TAGS,
+    "STOPTAGS": SAVED_STOPTAGS,
+    "SUBSET": SAVED_SUBSET,
+    "LABELSET": SAVED_LABELSET,
+    "SMALLCOUNT": SAVED_SMALLCOUNT
+}
+
+
 def is_prime(n):
     return _is_prime(n)
 
@@ -43,8 +55,10 @@ cdef unicode _ustring(s):
 cpdef bool is_str(object s):
     return isinstance(s, (basestring, bytes))
 
+
 cpdef bool is_num(object n):
     return isinstance(n, (int, long))
+
 
 cdef void _flatten_fill(double * fill_to, object fill_from):
     '''UNSAFE fill from multilevel python iterable to C array.'''
@@ -52,7 +66,13 @@ cdef void _flatten_fill(double * fill_to, object fill_from):
     for idx, item in enumerate(flattened):
         fill_to[idx] = <double>item
 
+
 cdef void _fill(double * fill_to, object fill_from):
     '''UNSAFE fill from flat python iterable to C array.'''
     for idx, item in enumerate(fill_from):
         fill_to[idx] = <double>item
+
+
+cpdef str get_version_cpp():
+    return _get_version_cpp()
+

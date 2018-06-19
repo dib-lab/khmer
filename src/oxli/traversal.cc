@@ -71,7 +71,7 @@ NodeGatherer<direction>::NodeGatherer(const Hashgraph * ht) :
 
 template <bool direction>
 NodeGatherer<direction>::NodeGatherer(const Hashgraph * ht,
-                                      KmerFilter filter) :
+                                                 KmerFilter filter) :
     NodeGatherer(ht, KmerFilterList())
 {
     filters.push_back(filter);
@@ -113,24 +113,27 @@ const
 
 
 template<bool direction>
+template<class Container>
 unsigned int NodeGatherer<direction>::neighbors(const Kmer& node,
-        KmerQueue & node_q)
+                                                Container& found)
 const
 {
-    unsigned int found = 0;
+    unsigned int n_found = 0;
 
     for (auto base : alphabets::DNA_SIMPLE) {
         // Get the putative neighboring Kmer
         Kmer neighbor = get_neighbor(node, base);
         // Now check if it's in the graph and passes the filters
-        if (graph->get_count(neighbor) && !(apply_kmer_filters(neighbor, filters))) {
-            node_q.push(neighbor);
-            ++found;
+        if (graph->get_count(neighbor)) {
+            ++n_found;
+            if (!apply_kmer_filters(neighbor, filters)) {
+                found.insert(found.end(), neighbor);
+            }
         }
         ++base;
     }
 
-    return found;
+    return n_found;
 }
 
 
@@ -276,32 +279,50 @@ unsigned int Traverser::degree_right(const Kmer& node) const
 
 template<bool direction>
 AssemblerTraverser<direction>::AssemblerTraverser(const Hashgraph * ht,
-                                                  Kmer start_kmer,
-                                                  KmerFilterList filters) :
-        NodeCursor<direction>(ht, start_kmer, filters)
+                                                  Kmer start_kmer) :
+    NodeCursor<direction>(ht, start_kmer)
 {
-    visited = std::make_shared<SeenSet>();
-    AssemblerTraverser<direction>::push_filter(get_visited_filter(visited));
+    _init_visited();
 }
 
 template<bool direction>
 AssemblerTraverser<direction>::AssemblerTraverser(const Hashgraph * ht,
-                                                  Kmer start_kmer,
-                                                  KmerFilterList filters,
-                                                  std::shared_ptr<SeenSet> visited) :
-        NodeCursor<direction>(ht, start_kmer, filters), visited(visited)
+                                      Kmer start_kmer,
+                                      KmerFilterList filters) :
+    NodeCursor<direction>(ht, start_kmer, filters)
+
+{
+    _init_visited();
+}
+
+template<bool direction>
+AssemblerTraverser<direction>::AssemblerTraverser(const Hashgraph * ht,
+                                      Kmer start_kmer,
+                                      KmerFilterList filters,
+                                      std::shared_ptr<SeenSet> visited) :
+    NodeCursor<direction>(ht, start_kmer, filters), visited(visited)
 {
     AssemblerTraverser<direction>::push_filter(get_visited_filter(visited));
 }
 
-template<bool direction>
-AssemblerTraverser<direction>::AssemblerTraverser(const AssemblerTraverser<direction>& other) : 
-    AssemblerTraverser<direction>(other.graph,
-                                  other.cursor,
-                                  other.filters,
-                                  other.visited)
+
+template <bool direction>
+AssemblerTraverser<direction>::AssemblerTraverser(const Hashgraph * ht,
+                                                  Kmer start_kmer,
+                                                  KmerFilter filter) :
+    NodeCursor<direction>(ht, start_kmer, filter)
 {
+    _init_visited();
 }
+
+
+template<bool direction>
+AssemblerTraverser<direction>::AssemblerTraverser(const AssemblerTraverser<direction>& other) :
+    AssemblerTraverser<direction>(other.graph, other.cursor, other.filters, other.visited)
+{
+    
+}
+
 
 template <>
 std::string AssemblerTraverser<TRAVERSAL_RIGHT>::join_contigs(std::string& contig_a,
@@ -328,6 +349,7 @@ char AssemblerTraverser<direction>::next_symbol()
     Kmer cursor_next;
 
     visited->insert(this->cursor);
+    apply_kmer_helpers(this->cursor, this->helpers);
     for (auto base : alphabets::DNA_SIMPLE) {
         // Get the putative neighbor for this base at the cursor position
         neighbor = NodeCursor<direction>::get_neighbor(this->cursor, base);
@@ -355,12 +377,71 @@ char AssemblerTraverser<direction>::next_symbol()
 }
 
 
+/******************************************
+ * CompactingAT
+ ******************************************/
+
+template <bool direction>
+CompactingAT<direction>::CompactingAT(const Hashgraph * ht,
+                                      Kmer start_kmer) :
+    AssemblerTraverser<direction>(ht, start_kmer), traverser(ht)
+{
+}
+
+template<bool direction>
+CompactingAT<direction>::CompactingAT(const Hashgraph * ht,
+                                      Kmer start_kmer,
+                                      KmerFilterList filters,
+                                      std::shared_ptr<SeenSet> visited) :
+    AssemblerTraverser<direction>(ht, start_kmer, filters, visited), traverser(ht)
+{
+}
+
+
+template<bool direction>
+CompactingAT<direction>::CompactingAT(const Hashgraph * ht,
+                                      Kmer start_kmer,
+                                      KmerFilterList filters) :
+    AssemblerTraverser<direction>(ht, start_kmer, filters), traverser(ht)
+{
+}
+
+template <bool direction>
+CompactingAT<direction>::CompactingAT(const Hashgraph * ht,
+                                      Kmer start_kmer,
+                                      KmerFilter filter) :
+    AssemblerTraverser<direction>(ht, start_kmer, filter), traverser(ht)
+{
+}
+
+template<>
+char CompactingAT<TRAVERSAL_RIGHT>::next_symbol()
+{
+    if (traverser.degree_left(this->cursor) > 1) {
+        return '\0';
+    }
+    return AssemblerTraverser<TRAVERSAL_RIGHT>::next_symbol();
+}
+
+
+template<>
+char CompactingAT<TRAVERSAL_LEFT>::next_symbol()
+{
+    if (traverser.degree_right(this->cursor) > 1) {
+        return '\0';
+    }
+    return AssemblerTraverser<TRAVERSAL_LEFT>::next_symbol();
+}
+
+
 template class NodeGatherer<TRAVERSAL_LEFT>;
 template class NodeGatherer<TRAVERSAL_RIGHT>;
 template class NodeCursor<TRAVERSAL_LEFT>;
 template class NodeCursor<TRAVERSAL_RIGHT>;
 template class AssemblerTraverser<TRAVERSAL_RIGHT>;
 template class AssemblerTraverser<TRAVERSAL_LEFT>;
+template class CompactingAT<TRAVERSAL_RIGHT>;
+template class CompactingAT<TRAVERSAL_LEFT>;
 
 
 } // namespace oxli

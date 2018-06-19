@@ -56,16 +56,18 @@ import textwrap
 from khmer import khmer_args
 from khmer import Countgraph, SmallCountgraph, ReadParser
 
+from khmer._oxli.parsing import BrokenPairedReader, FastxParser
+from khmer._oxli.sequence import trim_sequence
+
 from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
                               report_on_config, calculate_graphsize,
-                              sanitize_help)
+                              sanitize_help, add_pairing_args)
 from khmer.khmer_args import FileType as khFileType
-from khmer.utils import write_record, broken_paired_reader, ReadBundle
+from khmer.utils import write_record, paired_fastx_handler, ReadBundle
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
                          get_file_writer)
 from khmer.khmer_logger import configure_logging, log_info, log_error
-from khmer.trimming import trim_record
 
 DEFAULT_TRIM_AT_COVERAGE = 20
 DEFAULT_CUTOFF = 2
@@ -139,8 +141,6 @@ def get_parser():
 
     # expert options
     parser.add_argument('--force', default=False, action='store_true')
-    parser.add_argument('--ignore-pairs', default=False, action='store_true',
-                        help='treat all reads as if they were singletons')
     parser.add_argument('-T', '--tempdir', type=str, default='./',
                         help="Set location of temporary directory for "
                         "second pass")
@@ -155,7 +155,7 @@ def get_parser():
     parser.add_argument('--single-pass', default=False, action='store_true',
                         help="Do not do a second pass across the low coverage "
                         "data")
-
+    add_pairing_args(parser)
     return parser
 
 
@@ -225,7 +225,7 @@ class Trimmer(object):
             # trim?
             if min_coverage >= TRIM_AT_COVERAGE:
                 for read in bundle.reads:
-                    record, did_trim = trim_record(graph, read, CUTOFF)
+                    record, did_trim = trim_sequence(graph, read, CUTOFF)
                     if did_trim:
                         self.trimmed_reads += 1
                     if record:
@@ -262,7 +262,7 @@ class Trimmer(object):
                bundle.coverages_at_least(graph, TRIM_AT_COVERAGE):
 
                 for read in bundle.reads:
-                    trimmed_record, did_trim = trim_record(graph, read, CUTOFF)
+                    trimmed_record, did_trim = trim_sequence(graph, read, CUTOFF)
 
                     if did_trim:
                         self.trimmed_reads += 1
@@ -377,7 +377,10 @@ def main():
         trimfp = get_file_writer(args.output, args.gzip, args.bzip)
 
     pass2list = []
-    for filename in args.input_filenames:
+    for filename, reader in paired_fastx_handler(args.input_filenames,
+                                                 args.pairing_mode,
+                                                 min_length=K,
+                                                 yield_filenames=True):
         # figure out temporary filename for 2nd pass
         pass2filename = filename.replace(os.path.sep, '-') + '.pass2'
         pass2filename = os.path.join(tempdir, pass2filename)
@@ -394,16 +397,12 @@ def main():
         # record all this info
         pass2list.append((filename, pass2filename, trimfp))
 
-        # input file stuff: get a broken_paired reader.
-        paired_iter = broken_paired_reader(ReadParser(filename), min_length=K,
-                                           force_single=args.ignore_pairs)
-
         # main loop through the file.
         n_start = trimmer.n_reads
         save_start = trimmer.n_saved
 
         watermark = REPORT_EVERY_N_READS
-        for read in trimmer.pass1(paired_iter, pass2fp):
+        for read in trimmer.pass1(reader, pass2fp):
             if (trimmer.n_reads - n_start) > watermark:
                 log_info("... {filename} {n_saved} {n_reads} {n_bp} "
                          "{w_reads} {w_bp}", filename=filename,
@@ -449,10 +448,9 @@ def main():
         # so pairs will stay together if not orphaned.  This is in contrast
         # to the first loop.  Hence, force_single=True below.
 
-        read_parser = ReadParser(pass2filename)
-        paired_iter = broken_paired_reader(read_parser,
-                                           min_length=K,
-                                           force_single=True)
+        paired_iter = BrokenPairedReader(FastxParser(pass2filename),
+                                         force_single=True,
+                                         min_length=K)
 
         watermark = REPORT_EVERY_N_READS
         for read in trimmer.pass2(paired_iter):
@@ -467,8 +465,6 @@ def main():
             write_record(read, trimfp)
             written_reads += 1
             written_bp += len(read)
-
-        read_parser.close()
 
         log_info('removing {pass2}', pass2=pass2filename)
         os.unlink(pass2filename)

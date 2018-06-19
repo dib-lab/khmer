@@ -116,6 +116,7 @@ HashIntoType _hash_murmur(const std::string& kmer, const WordLength k,
                           HashIntoType& h, HashIntoType& r);
 HashIntoType _hash_murmur_forward(const std::string& kmer,
                                   const WordLength k);
+uint64_t _hash_murmur_uni(const std::string& sequence);
 
 // Cyclic hash, a rolling hash that is irreversible
 HashIntoType _hash_cyclic(const std::string& kmer, const WordLength k);
@@ -197,6 +198,11 @@ public:
         return kmer_u < other.kmer_u;
     }
 
+    bool operator== (const Kmer &other) const
+    {
+        return kmer_u == other.kmer_u;
+    }
+
     std::string get_string_rep(WordLength K) const
     {
         return _revhash(kmer_u, K);
@@ -219,6 +225,14 @@ public:
     bool is_forward() const
     {
         return kmer_f == kmer_u;
+    }
+
+    void set_forward()
+    {
+        if (!is_forward()) {
+            kmer_r = kmer_f;
+            kmer_f = kmer_u;
+        }
     }
 };
 
@@ -301,6 +315,10 @@ public:
         HashIntoType kmer_f, kmer_r, kmer_u;
         kmer_u = _hash(kmer_c, _ksize, kmer_f, kmer_r);
         return Kmer(kmer_f, kmer_r, kmer_u);
+    }
+
+    WordLength K() const {
+        return _ksize;
     }
 };
 

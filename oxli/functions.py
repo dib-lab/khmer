@@ -37,6 +37,7 @@
 
 import threading
 import khmer.utils
+from khmer._oxli.parsing import FastxParser
 
 
 def build_graph(ifilenames, graph, num_threads=1, tags=False):
@@ -54,7 +55,7 @@ def build_graph(ifilenames, graph, num_threads=1, tags=False):
         eat = graph.consume_seqfile
 
     for _, ifile in enumerate(ifilenames):
-        rparser = khmer.ReadParser(ifile)
+        rparser = FastxParser(ifile)
         threads = []
 
         for _ in range(num_threads):

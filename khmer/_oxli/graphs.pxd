@@ -10,6 +10,7 @@ from khmer._oxli.hashing cimport Kmer, CpKmer, KmerSet, CpKmerFactory, CpKmerIte
 from khmer._oxli.parsing cimport CpReadParser, CpSequence, FastxParserPtr
 from khmer._oxli.legacy_partitioning cimport (CpSubsetPartition, cp_pre_partition_info,
                                    SubsetPartition)
+from khmer._oxli.sequence cimport Sequence
 from khmer._oxli.utils cimport oxli_raise_py_error
 
 
@@ -35,6 +36,7 @@ cdef extern from "oxli/storage.hh":
 
         void set_use_bigcount(bool)
         bool get_use_bigcount()
+        void reset()
 
 
 cdef extern from "oxli/hashtable.hh" namespace "oxli" nogil:
@@ -102,6 +104,7 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli" nogil:
         uint64_t trim_below_abundance(string, BoundedCounterType) const
         vector[uint32_t] find_spectral_error_positions(string,
                                                        BoundedCounterType)
+        void reset()
 
     cdef cppclass CpMurmurHashtable "oxli::MurmurHashtable" (CpHashtable):
         CpMurmurHashtable(WordLength, CpStorage *)
@@ -254,6 +257,8 @@ cdef class Hashtable:
     cdef CpKmer _build_kmer(self, object kmer) except *
     cdef FastxParserPtr _get_parser(self, object parser_or_filename) except *
     cdef list _get_raw_tables(self, uint8_t **, vector[uint64_t])
+
+    cdef int _trim_on_abundance(self, Sequence sequence, int abundance)
 
 
 cdef class QFCounttable(Hashtable):

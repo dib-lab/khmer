@@ -40,11 +40,13 @@ Contact: khmer-project@idyll.org
 
 #include <cassert>
 #include <array>
+#include <memory>
 #include <mutex>
 #include <unordered_map>
 using MuxGuard = std::lock_guard<std::mutex>;
 
-#include "gqf.h"
+typedef struct quotient_filter;
+typedef quotient_filter QF;
 
 namespace oxli {
 typedef std::unordered_map<HashIntoType, BoundedCounterType> KmerCountMap;
@@ -72,6 +74,7 @@ public:
     virtual bool add(HashIntoType khash) = 0;
     virtual const BoundedCounterType get_count(HashIntoType khash) const = 0;
     virtual Byte ** get_raw_tables() = 0;
+    virtual void reset() = 0;
 
     void set_use_bigcount(bool b);
     bool get_use_bigcount();
@@ -225,6 +228,8 @@ public:
         return _counts;
     }
 
+    void reset();
+
     void update_from(const BitStorage&);
 };
 
@@ -308,7 +313,15 @@ public:
             memset(_counts[i], 0, tablebytes);
         }
     }
-
+    
+    void reset()
+    {
+        for (unsigned int table_num = 0; table_num < _n_tables; table_num++) {
+            uint64_t tablesize = _tablesizes[table_num];
+            uint64_t tablebytes = tablesize / 2 + 1;
+            memset(_counts[table_num], 0, tablebytes);
+        }
+    }
 
     BoundedCounterType test_and_set_bits(HashIntoType khash)
     {
@@ -412,19 +425,12 @@ public:
  */
  class QFStorage : public Storage {
 protected:
-  QF cf;
+    std::shared_ptr<QF> cf;
 
 public:
-  QFStorage(int size) {
-    // size is the power of two to specify the number of slots in
-    // the filter (2**size). Third argument sets the number of bits used
-    // in the key (current value of size+8 is copied from the CQF example)
-    // Final argument is the number of bits allocated for the value, which
-    // we do not use.
-    qf_init(&cf, (1ULL << size), size+8, 0);
-  }
+  QFStorage(int size);
 
-  ~QFStorage() { qf_destroy(&cf); }
+  ~QFStorage();
 
   BoundedCounterType test_and_set_bits(HashIntoType khash) {
     BoundedCounterType x = get_count(khash);
@@ -433,28 +439,23 @@ public:
   }
 
   //
-  bool add(HashIntoType khash) {
-      bool is_new = get_count(khash) == 0;
-      qf_insert(&cf, khash % cf.range, 0, 1);
-      return is_new;
-  }
+  bool add(HashIntoType khash);
 
   // get the count for the given k-mer hash.
-  const BoundedCounterType get_count(HashIntoType khash) const {
-    return qf_count_key_value(&cf, khash % cf.range, 0);
-  }
+  const BoundedCounterType get_count(HashIntoType khash) const;
 
   // Accessors for protected/private table info members
   // xnslots is larger than nslots. It includes some extra slots to deal
   // with some details of how the counting is implemented
-  std::vector<uint64_t> get_tablesizes() const { return {cf.xnslots}; }
+  std::vector<uint64_t> get_tablesizes() const;
   const size_t n_tables() const { return 1; }
-  const uint64_t n_unique_kmers() const { return cf.ndistinct_elts; }
-  const uint64_t n_occupied() const { return cf.noccupied_slots; }
+  const uint64_t n_unique_kmers() const;
+  const uint64_t n_occupied() const;
   void save(std::string outfilename, WordLength ksize);
   void load(std::string infilename, WordLength &ksize);
 
   Byte **get_raw_tables() { return nullptr; }
+  void reset() {}; //nop
 };
 
 
@@ -537,6 +538,14 @@ public:
             _counts = NULL;
 
             _n_tables = 0;
+        }
+    }
+
+    void reset()
+    {
+        for (unsigned int table_num = 0; table_num < _n_tables; table_num++) {
+            uint64_t tablesize = _tablesizes[table_num];
+            memset(_counts[table_num], 0, tablesize);
         }
     }
 

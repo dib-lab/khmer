@@ -72,6 +72,7 @@ private:\
 #include <set>
 #include <map>
 #include <unordered_map>
+#include <unordered_set>
 #include <queue>
 #include <list>
 #include <functional>
@@ -107,6 +108,8 @@ private:\
 
 namespace oxli
 {
+
+extern std::string get_version_cpp();
 
 // largest number we can count up to, exactly. (8 bytes)
 typedef unsigned long long int ExactCounterType;
@@ -161,13 +164,16 @@ void deallocate_ptr_set(T& s)
 }
 
 class Kmer;
-typedef std::queue<Kmer> KmerQueue;
+typedef std::deque<Kmer> KmerQueue;
 typedef std::set<Kmer> KmerSet;
+
 
 // A function which takes a Kmer and returns true if it
 // is to be filtered / ignored
 typedef std::function<bool (const Kmer&)> KmerFilter;
+typedef std::function<void (const Kmer&)> KmerHelper;
 typedef std::list<KmerFilter> KmerFilterList;
+typedef std::list<KmerHelper> KmerHelperList;
 typedef std::vector<std::string> StringVector;
 }
 

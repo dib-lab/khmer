@@ -34,7 +34,6 @@
 # Contact: khmer-project@idyll.org
 """File handling/checking utilities for command-line scripts."""
 
-
 import os
 import sys
 import errno

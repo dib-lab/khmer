@@ -2,7 +2,7 @@
 #include <exception>
 #include <string>
 #include "oxli/oxli_exception.hh"
-#include "oxli_exception_convert.hh"
+#include "oxli/oxli_exception_convert.hh"
 
 
 void oxli_raise_py_error()
@@ -18,6 +18,9 @@ void oxli_raise_py_error()
   }
   catch (oxli::InvalidStream& e) {
     PyErr_SetString(PyExc_OSError, e.what());
+  }
+  catch (oxli::EmptyStream& e) {
+    PyErr_SetString(PyExc_RuntimeError, e.what());
   }
   catch (oxli::oxli_value_exception& e) {
     PyErr_SetString(PyExc_ValueError, e.what());

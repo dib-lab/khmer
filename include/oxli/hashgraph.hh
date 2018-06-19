@@ -196,7 +196,8 @@ public:
     // consume a string & add sparse graph nodes.
     void consume_sequence_and_tag(const std::string& seq,
                                   unsigned long long& n_consumed,
-                                  SeenSet * new_tags = 0);
+                                  SeenSet * new_tags = nullptr,
+                                  SeenSet * tag_set = nullptr);
 
     // get the tags present in this sequence.
     void get_tags_for_sequence(const std::string& seq,
@@ -244,6 +245,7 @@ public:
     // Calculate the graph degree of the given k-mer.
     unsigned int kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r);
     unsigned int kmer_degree(const char * kmer_s);
+    unsigned int kmer_degree(Kmer kmer);
 
     // Find all nodes with a degree > 2.
     void find_high_degree_nodes(const char * sequence,
