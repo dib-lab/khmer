@@ -42,6 +42,8 @@ Contact: khmer-project@idyll.org
 #include <array>
 #include <mutex>
 #include <unordered_map>
+#include <sstream>
+#include <istream>
 using MuxGuard = std::lock_guard<std::mutex>;
 
 #include "gqf.h"
@@ -66,6 +68,7 @@ public:
     virtual const size_t n_tables() const = 0;
     virtual void save(std::string, WordLength) = 0;
     virtual void load(std::string, WordLength&) = 0;
+    virtual void load(std::istringstream &buf, WordLength &ksize) = 0;
     virtual const uint64_t n_occupied() const = 0;
     virtual const uint64_t n_unique_kmers() const = 0;
     virtual BoundedCounterType test_and_set_bits( HashIntoType khash ) = 0;
@@ -94,6 +97,8 @@ public:
 
 class BitStorage : public Storage
 {
+private:
+    void _load(std::istream& infile, WordLength& ksize);
 protected:
     std::vector<uint64_t> _tablesizes;
     size_t _n_tables;
@@ -152,6 +157,7 @@ public:
 
     void save(std::string, WordLength ksize);
     void load(std::string, WordLength& ksize);
+    void load(std::istringstream &buf, WordLength &ksize);
 
     // count number of occupied bins
     const uint64_t n_occupied() const
@@ -397,6 +403,7 @@ public:
     }
     void save(std::string outfilename, WordLength ksize);
     void load(std::string infilename, WordLength& ksize);
+    void load(std::istringstream &buf, WordLength &ksize) {}
 
     Byte ** get_raw_tables()
     {
@@ -453,6 +460,7 @@ public:
   const uint64_t n_occupied() const { return cf.noccupied_slots; }
   void save(std::string outfilename, WordLength ksize);
   void load(std::string infilename, WordLength &ksize);
+  void load(std::istringstream &buf, WordLength &ksize) {}
 
   Byte **get_raw_tables() { return nullptr; }
 };
@@ -560,6 +568,7 @@ public:
 
     void save(std::string, WordLength);
     void load(std::string, WordLength&);
+    void load(std::istringstream &buf, WordLength &ksize) {}
 
     inline BoundedCounterType test_and_set_bits(HashIntoType khash)
     {

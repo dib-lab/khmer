@@ -41,10 +41,12 @@ Contact: khmer-project@idyll.org
 #include <stdint.h>
 #include <string.h>
 #include <fstream>
+#include <istream>
 #include <iostream>
 #include <list>
 #include <queue>
 #include <set>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <memory>
@@ -293,6 +295,12 @@ public:
         : Hashgraph(ksize, new BitStorage(sizes)) { } ;
 
     void update_from(const Nodegraph &other);
+
+    void load(std::istringstream &buf)
+    {
+        store->load(buf, _ksize);
+        _init_bitstuff();
+    }
 };
 
 }

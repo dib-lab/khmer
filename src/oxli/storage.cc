@@ -141,6 +141,7 @@ void BitStorage::save(std::string outfilename, WordLength ksize)
  */
 void BitStorage::load(std::string infilename, WordLength &ksize)
 {
+    cout << "DEBUG: inside wrong load in storage.cc" << endl;
     ifstream infile;
 
     // configure ifstream to raise exceptions for everything.
@@ -165,75 +166,9 @@ void BitStorage::load(std::string infilename, WordLength &ksize)
         throw oxli_file_exception(err);
     }
 
-    if (_counts) {
-        for (unsigned int i = 0; i < _n_tables; i++) {
-            delete[] _counts[i];
-            _counts[i] = NULL;
-        }
-        delete[] _counts;
-        _counts = NULL;
-    }
-    _tablesizes.clear();
 
     try {
-        unsigned int save_ksize = 0;
-        unsigned char save_n_tables = 0;
-        unsigned long long save_tablesize = 0;
-        unsigned long long save_occupied_bins = 0;
-        char signature[4];
-        unsigned char version, ht_type;
-
-        infile.read(signature, 4);
-        infile.read((char *) &version, 1);
-        infile.read((char *) &ht_type, 1);
-        if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
-            std::ostringstream err;
-            err << "Does not start with signature for a oxli file: 0x";
-            for(size_t i=0; i < 4; ++i) {
-                err << std::hex << (int) signature[i];
-            }
-            err << " Should be: " << SAVED_SIGNATURE;
-            throw oxli_file_exception(err.str());
-        } else if (!(version == SAVED_FORMAT_VERSION)) {
-            std::ostringstream err;
-            err << "Incorrect file format version " << (int) version
-                << " while reading k-mer graph from " << infilename
-                << "; should be " << (int) SAVED_FORMAT_VERSION;
-            throw oxli_file_exception(err.str());
-        } else if (!(ht_type == SAVED_HASHBITS)) {
-            std::ostringstream err;
-            err << "Incorrect file format type " << (int) ht_type
-                << " while reading k-mer graph from " << infilename;
-            throw oxli_file_exception(err.str());
-        }
-
-        infile.read((char *) &save_ksize, sizeof(save_ksize));
-        infile.read((char *) &save_n_tables, sizeof(save_n_tables));
-        infile.read((char *) &save_occupied_bins, sizeof(save_occupied_bins));
-
-        ksize = (WordLength) save_ksize;
-        _n_tables = (unsigned int) save_n_tables;
-        _occupied_bins = save_occupied_bins;
-
-        _counts = new Byte*[_n_tables];
-        for (unsigned int i = 0; i < _n_tables; i++) {
-            uint64_t tablesize;
-            unsigned long long tablebytes;
-
-            infile.read((char *) &save_tablesize, sizeof(save_tablesize));
-
-            tablesize = save_tablesize;
-            _tablesizes.push_back(tablesize);
-
-            tablebytes = tablesize / 8 + 1;
-            _counts[i] = new Byte[tablebytes];
-
-            unsigned long long loaded = 0;
-            while (loaded != tablebytes) {
-                infile.read((char *) _counts[i], tablebytes - loaded);
-                loaded += infile.gcount();
-            }
-        }
+        _load(infile, ksize);
         infile.close();
     } catch (std::ifstream::failure &e) {
         std::string err;
@@ -249,6 +184,98 @@ void BitStorage::load(std::string infilename, WordLength &ksize)
         std::string err = "Unknown error opening file: " + infilename + " "
                           + strerror(errno);
         throw oxli_file_exception(err);
+    }
+}
+
+void BitStorage::load(std::istringstream &buf, WordLength &ksize) {
+    cout << "DEBUG: inside load in storage.cc" << endl;
+    try {
+        _load(buf, ksize);
+    } catch (std::ifstream::failure &e) {
+        std::string err;
+        if (buf.eof()) {
+            err = "Unexpected end of k-mer graph buffer";
+        } else {
+            err = "Error reading from k-mer graph buffer";
+        }
+        throw oxli_file_exception(err);
+    } catch (const std::exception &e) {
+        // Catching std::exception is a stopgap for
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145
+        throw oxli_file_exception("Unknown error opening from buffer");
+    }
+}
+
+void BitStorage::_load(istream &infile, WordLength &ksize)
+{
+    cout << "DEBUG: inside _load in storage.cc" << endl;
+    if (_counts) {
+        for (unsigned int i = 0; i < _n_tables; i++) {
+            delete[] _counts[i];
+            _counts[i] = NULL;
+        }
+        delete[] _counts;
+        _counts = NULL;
+    }
+    _tablesizes.clear();
+
+    unsigned int save_ksize = 0;
+    unsigned char save_n_tables = 0;
+    unsigned long long save_tablesize = 0;
+    unsigned long long save_occupied_bins = 0;
+    char signature[4];
+    unsigned char version, ht_type;
+
+    infile.read(signature, 4);
+    infile.read((char *) &version, 1);
+    infile.read((char *) &ht_type, 1);
+    if (!(std::string(signature, 4) == SAVED_SIGNATURE)) {
+        std::ostringstream err;
+        err << "Does not start with signature for a oxli file: 0x";
+        for(size_t i=0; i < 4; ++i) {
+            err << std::hex << (int) signature[i];
+        }
+        err << " Should be: " << SAVED_SIGNATURE;
+        throw oxli_file_exception(err.str());
+    } else if (!(version == SAVED_FORMAT_VERSION)) {
+        std::ostringstream err;
+        err << "Incorrect file format version " << (int) version
+            << " while reading k-mer graph from file "
+            << "; should be " << (int) SAVED_FORMAT_VERSION;
+        throw oxli_file_exception(err.str());
+    } else if (!(ht_type == SAVED_HASHBITS)) {
+        std::ostringstream err;
+        err << "Incorrect file format type " << (int) ht_type
+            << " while reading k-mer graph from file";
+        throw oxli_file_exception(err.str());
+    }
+
+    infile.read((char *) &save_ksize, sizeof(save_ksize));
+    infile.read((char *) &save_n_tables, sizeof(save_n_tables));
+    infile.read((char *) &save_occupied_bins, sizeof(save_occupied_bins));
+
+    ksize = (WordLength) save_ksize;
+    _n_tables = (unsigned int) save_n_tables;
+    _occupied_bins = save_occupied_bins;
+
+    _counts = new Byte*[_n_tables];
+    for (unsigned int i = 0; i < _n_tables; i++) {
+        uint64_t tablesize;
+        unsigned long long tablebytes;
+
+        infile.read((char *) &save_tablesize, sizeof(save_tablesize));
+
+        tablesize = save_tablesize;
+        _tablesizes.push_back(tablesize);
+
+        tablebytes = tablesize / 8 + 1;
+        _counts[i] = new Byte[tablebytes];
+
+        unsigned long long loaded = 0;
+        while (loaded != tablebytes) {
+            infile.read((char *) _counts[i], tablebytes - loaded);
+            loaded += infile.gcount();
+        }
     }
 }
 

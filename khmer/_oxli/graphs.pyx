@@ -298,10 +298,10 @@ cdef class Hashtable:
         deref(self._ht_this).save(_bstring(file_name))
 
     @classmethod
-    def load(cls, file_name):
+    def load(cls, data):
         """Load the graph from the specified file."""
         cdef Hashtable table = cls(1, 1, 1)
-        deref(table._ht_this).load(_bstring(file_name))
+        deref(table._ht_this).load(_bstring(data))
         return table
 
     def n_unique_kmers(self):
@@ -866,3 +866,21 @@ cdef class Nodegraph(Hashgraph):
 
     def update(self, Nodegraph other):
         deref(self._ng_this).update_from(deref(other._ng_this))
+
+    @classmethod
+    def from_buffer(cls, data):
+
+    @classmethod
+    def load(cls, data):
+        """Load the graph from the specified file."""
+        cdef Nodegraph table = cls(1, 1, 1)
+        cdef istringstream *buf
+
+        if isinstance(data, memoryview):
+            buf = new istringstream(data.tobytes())
+            print("DEBUG: passed here")
+            deref(table._ng_this).load(deref(buf))
+            return table
+        else:
+            deref(table._ht_this).load(_bstring(data))
+            return table

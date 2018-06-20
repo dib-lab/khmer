@@ -813,6 +813,27 @@ def test_nodegraph_file_type_check():
         print(str(e))
 
 
+def test_nodegraph_load_from_buffer():
+    filename = utils.get_test_data('random-20-a.fa')
+
+    nodegraph = khmer.Nodegraph(20, 100000, 3)
+
+    for _, record in enumerate(screed.open(filename)):
+        nodegraph.consume(record.sequence)
+
+    assert nodegraph.n_occupied() == 3884
+    assert nodegraph.n_unique_kmers() == 3960
+
+    savefile = utils.get_temp_filename('out')
+    nodegraph.save(savefile)
+
+    with open(savefile, 'rb') as data:
+        buf = data.read()
+        ng2 = Nodegraph.from_buffer(memoryview(buf))
+
+        assert ng2.n_occupied() == 3884, ng2.n_occupied()
+
+
 def test_stoptags_file_version_check():
     nodegraph = khmer.Nodegraph(32, 1, 1,)
 

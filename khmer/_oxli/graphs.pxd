@@ -18,6 +18,13 @@ cdef extern from "Python.h":
     object PyMemoryView_FromBuffer(Py_buffer *view)
 
 
+cdef extern from "<iostream>" namespace "std":
+    cdef cppclass istream:
+        pass
+    cdef cppclass istringstream(istream):
+        istringstream(char*)
+
+
 cdef extern from "oxli/storage.hh":
     cdef cppclass CpStorage "oxli::Storage":
         CpStorage()
@@ -204,6 +211,8 @@ cdef extern from "oxli/hashgraph.hh" namespace "oxli" nogil:
         CpNodegraph(WordLength, vector[uint64_t])
 
         void update_from(const CpNodegraph &) except +oxli_raise_py_error
+
+        void load(istringstream &)
 
 
 cdef extern from "oxli/labelhash.hh" namespace "oxli":
