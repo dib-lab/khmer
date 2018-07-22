@@ -50,7 +50,7 @@ namespace oxli
  ********************************/
 
 LinearAssembler::LinearAssembler(const Hashgraph * ht) :
-    graph(ht), _ksize(ht->ksize())
+    _ksize(ht->ksize()), graph(ht)
 {
 
 }
@@ -344,7 +344,7 @@ const
  ***************************************/
 
 JunctionCountAssembler::JunctionCountAssembler(Hashgraph * ht) :
-    graph(ht), _ksize(ht->ksize()), traverser(ht), linear_asm(ht)
+    linear_asm(ht), traverser(ht), graph(ht), _ksize(ht->ksize())
 {
     std::vector<uint64_t> table_sizes = graph->get_tablesizes();
     junctions = new Countgraph(_ksize, table_sizes);

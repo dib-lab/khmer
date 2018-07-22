@@ -52,7 +52,7 @@ namespace oxli
 template <bool direction>
 NodeGatherer<direction>::NodeGatherer(const Hashgraph * ht,
                                       KmerFilterList filters) :
-    KmerFactory(ht->ksize()), graph(ht), filters(filters)
+    KmerFactory(ht->ksize()), filters(filters), graph(ht)
 {
     bitmask = 0;
     for (unsigned int i = 0; i < _ksize; i++) {
