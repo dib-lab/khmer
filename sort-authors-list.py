@@ -70,7 +70,7 @@ print(
      year = "2015",
      month = "08",
      publisher = "F1000",
-     url = "http://dx.doi.org/10.12688/f1000research.6924.1"
+     url = "https://doi.org/10.12688/f1000research.6924.1"
   }''')
 
 doclist = u':Authors: '

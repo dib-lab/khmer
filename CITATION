@@ -49,7 +49,7 @@ Software Citation
 If you use the khmer software, you must cite:
 
    Crusoe et al., The khmer software package: enabling efficient nucleotide
-   sequence analysis. 2015. http://dx.doi.org/10.12688/f1000research.6924.1
+   sequence analysis. 2015. https://doi.org/10.12688/f1000research.6924.1
 
 .. code-block:: tex
 
@@ -76,7 +76,7 @@ If you use the khmer software, you must cite:
      year = "2015",
      month = "08",
      publisher = "F1000",
-     url = "http://dx.doi.org/10.12688/f1000research.6924.1"
+     url = "https://doi.org/10.12688/f1000research.6924.1"
   }
 
 If you use any of our published scientific methods you should *also*
@@ -97,7 +97,7 @@ representation and partitioning algorithms described in:
    Pell J, Hintze A, Canino-Koning R, Howe A, Tiedje JM, Brown CT.
    Scaling metagenome sequence assembly with probabilistic de Bruijn graphs
    Proc Natl Acad Sci U S A. 2012 Aug 14;109(33):13272-7.
-   http://dx.doi.org/10.1073/pnas.1121464109.
+   https://doi.org/10.1073/pnas.1121464109.
    PMID: 22847406
 
 .. code-block:: tex
@@ -165,7 +165,7 @@ The :program:`script trim-low-abund.py` is described in:
    Crossing the streams: a framework for streaming analysis of short DNA
    sequencing reads
    Zhang Q, Awad S, Brown CT
-   https://dx.doi.org/10.7287/peerj.preprints.890v1
+   https://doi.org/10.7287/peerj.preprints.890v1
 
 .. code-block:: tex
 
@@ -175,7 +175,7 @@ The :program:`script trim-low-abund.py` is described in:
           short DNA sequencing reads",
       year = "2015",
       eprint = "PeerJ Preprints 3:e1100",
-      url = "https://dx.doi.org/10.7287/peerj.preprints.890v1"
+      url = "https://doi.org/10.7287/peerj.preprints.890v1"
   }
 
 K-mer counting
@@ -188,7 +188,7 @@ counting described in:
    These Are Not the K-mers You Are Looking For: Efficient Online K-mer
    Counting Using a Probabilistic Data Structure
    Zhang Q, Pell J, Canino-Koning R, Howe AC, Brown CT.
-   http://dx.doi.org/10.1371/journal.pone.0101271
+   https://doi.org/10.1371/journal.pone.0101271
 
 .. code-block:: tex
 
@@ -202,7 +202,7 @@ counting described in:
       year = "2014",
       month = "07",
       volume = "9",
-      url = "http://dx.doi.org/10.1371/journal.pone.0101271",
+      url = "https://doi.org/10.1371/journal.pone.0101271",
       pages = "e101271",
       abstract = "<p>K-mer abundance analysis is widely used for many purposes in
   nucleotide sequence analysis, including data preprocessing for de novo
@@ -238,7 +238,7 @@ in:
 
    SeqAn An efficient, generic C++ library for sequence analysis
    Döring A, Weese D, Rausch T, Reinert K.
-   http://dx.doi.org/10.1186/1471-2105-9-11
+   https://doi.org/10.1186/1471-2105-9-11
 
 .. code-block:: tex
 
