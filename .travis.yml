@@ -77,6 +77,8 @@ install:
   - which python
   - gcc --version
   - which gcc
+  - pip install --upgrade pip
+  - pip install Cython
   - make install-dependencies
 
 # command to run tests
