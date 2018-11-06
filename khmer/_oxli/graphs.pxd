@@ -122,7 +122,7 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli" nogil:
         CpNodetable(WordLength, vector[uint64_t])
 
     cdef cppclass CpQFCounttable "oxli::QFCounttable" (CpHashtable):
-        CpQFCounttable(WordLength, uint64_t) except +oxli_raise_py_error
+        CpQFCounttable(WordLength, uint64_t,uint64_t) except +oxli_raise_py_error
 
 
 cdef extern from "oxli/hashgraph.hh" namespace "oxli" nogil:
@@ -215,7 +215,7 @@ cdef extern from "oxli/labelhash.hh" namespace "oxli":
                                                uint64_t &,
                                                CallbackFn,
                                                void *)
-        void consume_seqfile_and_tag_with_labels[SeqIO](const string &,
+        void _seqfile_and_tag_with_labels[SeqIO](const string &,
                                                uint32_t &,
                                                uint64_t &)
         void consume_seqfile_and_tag_with_labels[SeqIO](

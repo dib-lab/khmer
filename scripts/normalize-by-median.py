@@ -51,7 +51,7 @@ import screed
 import os
 import khmer
 import textwrap
-from khmer import khmer_args, Countgraph
+from khmer import khmer_args, Countgraph, QFCounttable
 from contextlib import contextmanager
 from khmer.khmer_args import (build_counting_args, add_loadgraph_args,
                               report_on_config, calculate_graphsize,
@@ -295,6 +295,8 @@ def get_parser():
                         help='Input FAST[AQ] sequence filename.', nargs='+')
     add_loadgraph_args(parser)
     add_output_compression_type(parser)
+    parser.add_argument('--mqf', dest='mqf', default=False,
+                        action='store_true')
     return parser
 
 
@@ -338,9 +340,13 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         log_info('loading k-mer countgraph from {graph}',
                  graph=args.loadgraph)
         countgraph = Countgraph.load(args.loadgraph)
+    elif args.mqf:
+        countgraph = khmer_args.create_MQFGraph(args)
     else:
         log_info('making countgraph')
         countgraph = khmer_args.create_countgraph(args)
+
+
 
     # create an object to handle diginorm of all files
     norm = Normalizer(args.cutoff, countgraph)

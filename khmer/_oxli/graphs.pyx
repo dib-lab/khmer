@@ -368,9 +368,10 @@ cdef class QFCounttable(Hashtable):
         Set the number of slots used by the counting quotient filter. This
         determines the amount of memory used and how many k-mers can be entered
         into the datastructure. Each slot uses roughly 1.3 bytes.
+    slot size: integer
     """
 
-    def __cinit__(self, int k, uint64_t size):
+    def __cinit__(self, int k, uint64_t size,uint64_t slotsize):
         # size has to be a power of two
         power_of_two = ((size & (size - 1) == 0) and
                         (size != 0))
@@ -378,7 +379,7 @@ cdef class QFCounttable(Hashtable):
             raise ValueError("size has to be a power of two, not"
                              " {}.".format(size))
         if type(self) is QFCounttable:
-            self._qf_this = make_shared[CpQFCounttable](k, <uint64_t>log(size, 2))
+            self._qf_this = make_shared[CpQFCounttable](k, <uint64_t>log(size, 2),slotsize)
             self._ht_this = <shared_ptr[CpHashtable]>self._qf_this
 
 

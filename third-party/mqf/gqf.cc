@@ -1848,6 +1848,7 @@ void qf_init(QF *qf, uint64_t nslots, uint64_t key_bits, uint64_t tag_bits,uint6
 //bits_per_slot,key_remainder_bits,fixed_counter_size,tag_bits );
 size = nblocks * (sizeof(qfblock) + (8 * bits_per_slot )) ;
 
+
 qf->mem = (qfmem *)calloc(sizeof(qfmem), 1);
 
 	if (mem) {

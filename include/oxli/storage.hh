@@ -416,7 +416,7 @@ protected:
     QF mf;
 
 public:
-    QFStorage(int size)
+    QFStorage(int size,int slotSize)
     {
         // size is the power of two to specify the number of slots in
         // the filter (2**size). Third argument sets the number of bits used
@@ -424,7 +424,7 @@ public:
         // Final argument is the number of bits allocated for the value, which
         // we do not use.
         _supports_bigcount = true;
-        qf_init(&mf, (1ULL << size), size+8, 0,2,true,"",2038074761);
+        qf_init(&mf, (1ULL << size), size+slotSize, 0,2,true,"",2038074761);
 
 
 
