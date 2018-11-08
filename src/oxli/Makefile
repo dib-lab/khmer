@@ -223,8 +223,8 @@ BZIP2_OBJS_BASE= \
 BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 
 # Counting bloom filter
-MQF_DIR=../../third-party/mqf
-MQF_OBJS_BASE= gqf.o utils.o
+MQF_DIR=../../third-party/MQF
+MQF_OBJS_BASE= libMQF.a
 
 MQF_OBJS=$(addprefix $(MQF_DIR)/, $(MQF_OBJS_BASE))
 

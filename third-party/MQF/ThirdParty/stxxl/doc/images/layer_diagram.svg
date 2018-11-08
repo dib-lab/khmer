@@ -1,0 +1,576 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Creator: fig2dev Version 3.2 Patchlevel 5 -->
+
+<!-- CreationDate: Mon Aug 30 17:25:01 2010 -->
+
+<!-- Magnification: 1.050 -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="646.51501"
+   height="465.49869"
+   viewBox="1441 1382 8577.2987 6161.3924"
+   id="svg2837"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="layer_diagram.svg"
+   inkscape:export-filename="layer_diagram.png"
+   inkscape:export-xdpi="82.480003"
+   inkscape:export-ydpi="82.480003">
+  <metadata
+     id="metadata3059">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs3057">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 252 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="648 : 252 : 1"
+       inkscape:persp3d-origin="324 : 168 : 1"
+       id="perspective3061" />
+    <defs
+       id="defs2845">
+      <pattern
+         id="tile1"
+         x="0"
+         y="0"
+         width="200"
+         height="200"
+         patternUnits="userSpaceOnUse">
+        <path
+           d="M 0 -100 200 20"
+           id="path2848" />
+        <path
+           d="M 0  -60 200 60"
+           id="path2850" />
+        <path
+           d="M 0  -20 200 100"
+           id="path2852" />
+        <path
+           d="M 0   20 200 140"
+           id="path2854" />
+        <path
+           d="M 0   60 200 180"
+           id="path2856" />
+        <path
+           d="M 0  100 200 220"
+           id="path2858" />
+        <path
+           d="M 0  140 200 260"
+           id="path2860" />
+        <path
+           d="M 0  180 200 300"
+           id="path2862" />
+      </pattern>
+    </defs>
+    <defs
+       id="defs2870">
+      <pattern
+         id="tile2"
+         x="0"
+         y="0"
+         width="200"
+         height="200"
+         patternUnits="userSpaceOnUse">
+        <path
+           d="M 0 -100 200 20"
+           id="path2873" />
+        <path
+           d="M 0  -60 200 60"
+           id="path2875" />
+        <path
+           d="M 0  -20 200 100"
+           id="path2877" />
+        <path
+           d="M 0   20 200 140"
+           id="path2879" />
+        <path
+           d="M 0   60 200 180"
+           id="path2881" />
+        <path
+           d="M 0  100 200 220"
+           id="path2883" />
+        <path
+           d="M 0  140 200 260"
+           id="path2885" />
+        <path
+           d="M 0  180 200 300"
+           id="path2887" />
+      </pattern>
+    </defs>
+    <defs
+       id="defs2895">
+      <pattern
+         id="tile3"
+         x="0"
+         y="0"
+         width="200"
+         height="200"
+         patternUnits="userSpaceOnUse">
+        <path
+           d="M 0 -100 200 20"
+           id="path2898" />
+        <path
+           d="M 0  -60 200 60"
+           id="path2900" />
+        <path
+           d="M 0  -20 200 100"
+           id="path2902" />
+        <path
+           d="M 0   20 200 140"
+           id="path2904" />
+        <path
+           d="M 0   60 200 180"
+           id="path2906" />
+        <path
+           d="M 0  100 200 220"
+           id="path2908" />
+        <path
+           d="M 0  140 200 260"
+           id="path2910" />
+        <path
+           d="M 0  180 200 300"
+           id="path2912" />
+      </pattern>
+    </defs>
+    <defs
+       id="defs2920">
+      <pattern
+         id="tile4"
+         x="0"
+         y="0"
+         width="200"
+         height="200"
+         patternUnits="userSpaceOnUse">
+        <path
+           d="M 0 -100 200 20"
+           id="path2923" />
+        <path
+           d="M 0  -60 200 60"
+           id="path2925" />
+        <path
+           d="M 0  -20 200 100"
+           id="path2927" />
+        <path
+           d="M 0   20 200 140"
+           id="path2929" />
+        <path
+           d="M 0   60 200 180"
+           id="path2931" />
+        <path
+           d="M 0  100 200 220"
+           id="path2933" />
+        <path
+           d="M 0  140 200 260"
+           id="path2935" />
+        <path
+           d="M 0  180 200 300"
+           id="path2937" />
+      </pattern>
+    </defs>
+    <defs
+       id="defs2945">
+      <pattern
+         id="tile5"
+         x="0"
+         y="0"
+         width="200"
+         height="200"
+         patternUnits="userSpaceOnUse">
+        <path
+           d="M 0 -100 200 20"
+           id="path2948" />
+        <path
+           d="M 0  -60 200 60"
+           id="path2950" />
+        <path
+           d="M 0  -20 200 100"
+           id="path2952" />
+        <path
+           d="M 0   20 200 140"
+           id="path2954" />
+        <path
+           d="M 0   60 200 180"
+           id="path2956" />
+        <path
+           d="M 0  100 200 220"
+           id="path2958" />
+        <path
+           d="M 0  140 200 260"
+           id="path2960" />
+        <path
+           d="M 0  180 200 300"
+           id="path2962" />
+      </pattern>
+    </defs>
+    <defs
+       id="defs2970">
+      <pattern
+         id="tile6"
+         x="0"
+         y="0"
+         width="200"
+         height="200"
+         patternUnits="userSpaceOnUse">
+        <path
+           d="M 0 -100 200 20"
+           id="path2973" />
+        <path
+           d="M 0  -60 200 60"
+           id="path2975" />
+        <path
+           d="M 0  -20 200 100"
+           id="path2977" />
+        <path
+           d="M 0   20 200 140"
+           id="path2979" />
+        <path
+           d="M 0   60 200 180"
+           id="path2981" />
+        <path
+           d="M 0  100 200 220"
+           id="path2983" />
+        <path
+           d="M 0  140 200 260"
+           id="path2985" />
+        <path
+           d="M 0  180 200 300"
+           id="path2987" />
+      </pattern>
+    </defs>
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1918"
+     inkscape:window-height="1180"
+     id="namedview3055"
+     showgrid="false"
+     inkscape:zoom="1.6546299"
+     inkscape:cx="272.96192"
+     inkscape:cy="232.69444"
+     inkscape:window-x="1920"
+     inkscape:window-y="18"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg2837"
+     units="mm"
+     fit-margin-top="2"
+     fit-margin-left="3"
+     fit-margin-right="3"
+     fit-margin-bottom="3" />
+  <g
+     id="g3088"
+     transform="translate(0,-391.09186)">
+    <text
+       transform="matrix(-3.6732199e-6,-1,1,-3.6732199e-6,0,0)"
+       style="font-size:441px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:none;font-family:Helvetica"
+       id="text2993"
+       font-size="441"
+       font-weight="bold"
+       font-style="normal"
+       y="2153.5166"
+       x="-4696.7891"
+       xml:space="preserve">TXXL</text>
+    <text
+       transform="matrix(-1.101966e-5,-1,1,-1.101966e-5,0,0)"
+       style="font-size:567px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:none;font-family:Helvetica"
+       id="text2997"
+       font-size="567"
+       font-weight="bold"
+       font-style="normal"
+       y="2173.2498"
+       x="-5454.3784"
+       xml:space="preserve">S</text>
+  </g>
+  <rect
+     id="rect2999"
+     style="color:#000000;fill:#9eb0d5;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:32.00000043;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+     rx="251"
+     height="1464"
+     width="7370"
+     y="3903.1101"
+     x="2389.5339"
+     ry="251" />
+  <rect
+     id="rect3001"
+     style="color:#000000;fill:#9eb0d5;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:32.00000043;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+     rx="173"
+     height="1472"
+     width="3023"
+     y="2326.7798"
+     x="6736.5342"
+     ry="173" />
+  <rect
+     id="rect3003"
+     style="fill:#9eb0d5;fill-opacity:1;stroke:#000000;stroke-width:32.00000043000000005;stroke-linecap:butt;stroke-linejoin:miter;color:#000000;fill-rule:nonzero;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+     rx="188"
+     height="1472"
+     width="4155"
+     y="2334.7798"
+     x="2389.5339"
+     ry="188" />
+  <rect
+     id="rect3005"
+     style="fill:#4d6eb1;fill-opacity:1;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     rx="251.00002"
+     height="519"
+     width="7370.0039"
+     y="1484.7797"
+     x="2389.5339"
+     ry="251" />
+  <rect
+     id="rect3007"
+     style="color:#000000;fill:#4d6eb1;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:32.00000043;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+     rx="251"
+     height="519"
+     width="7370.0039"
+     y="6874.4941"
+     x="2437.5339"
+     ry="251" />
+  <rect
+     id="rect3009"
+     style="color:#000000;fill:#9eb0d5;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:32.00000043;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+     rx="251"
+     height="1124.3066"
+     width="7370.0039"
+     y="5471.4375"
+     x="2389.5339"
+     ry="251" />
+  <rect
+     id="rect3011"
+     style="fill:none;stroke:#000000;stroke-width:16;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:62, 62"
+     rx="0"
+     height="4459.9976"
+     width="8279.2451"
+     y="2226.7505"
+     x="1590.0269" />
+  <polyline
+     id="polyline3013"
+     style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     points="2456,4535 9826,4535 9118,4535 "
+     transform="translate(-66.465922,-64.889013)" />
+  <polyline
+     id="polyline3015"
+     style="fill:none;stroke:#000000;stroke-width:31.93028641;stroke-linecap:butt;stroke-linejoin:miter"
+     points="2457,6188 9778,6188 9293,6188 "
+     transform="matrix(1.0043713,0,0,1,-77.206305,-197.55876)" />
+  <polyline
+     id="polyline3017"
+     style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     points="2456,2881 5905,2881 6614,2881 "
+     transform="translate(-66.465922,67.780745)" />
+  <polyline
+     id="polyline3019"
+     style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     points="6803,2881 9307,2881 9826,2881 "
+     transform="translate(-66.465922,67.780745)" />
+  <text
+     style="font-size:215px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-anchor:middle;fill:#000000;stroke:none;font-family:TeX Gyre Adventor;-inkscape-font-specification:TeX Gyre Adventor"
+     id="text3021"
+     font-size="215"
+     font-weight="normal"
+     font-style="normal"
+     y="6368.4375"
+     x="6076.0845"
+     xml:space="preserve"><tspan
+       style="font-size:265.33950806px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;stroke:none;font-family:TeX Gyre Adventor;-inkscape-font-specification:TeX Gyre Adventor"
+       id="tspan3245">files, I/O requests, disk queues, completion handlers</tspan></text>
+  <text
+     style="font-size:215px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-anchor:middle;fill:#000000;stroke:none;font-family:TeX Gyre Adventor;-inkscape-font-specification:TeX Gyre Adventor"
+     id="text3023"
+     font-size="215"
+     font-weight="normal"
+     font-style="normal"
+     y="5136.7778"
+     x="6067.3408"
+     xml:space="preserve"><tspan
+       style="font-size:265.33950806px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;stroke:none;font-family:TeX Gyre Adventor;-inkscape-font-specification:TeX Gyre Adventor"
+       id="tspan3243">block prefetcher, buffered block writer</tspan></text>
+  <text
+     style="font-size:215px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
+     id="text3025"
+     font-size="215"
+     font-weight="normal"
+     font-style="normal"
+     y="6964.7793"
+     x="6074.5342"
+     xml:space="preserve" />
+  <text
+     style="font-size:265px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:none;font-family:Helvetica"
+     id="text3027"
+     font-size="265"
+     font-weight="bold"
+     font-style="normal"
+     y="5860.7769"
+     x="6082.5166"
+     xml:space="preserve"><tspan
+       style="font-size:371.47531128px;stroke:none"
+       id="tspan3223">Asynchronous I/O Primitives</tspan></text>
+  <text
+     style="font-size:265px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:none;font-family:Helvetica"
+     id="text3029"
+     font-size="265"
+     font-weight="bold"
+     font-style="normal"
+     y="4328.1084"
+     x="6061.8369"
+     xml:space="preserve"><tspan
+       style="font-size:371.47531128px;stroke:none"
+       id="tspan3219">Block Management</tspan></text>
+  <text
+     style="font-size:215px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-anchor:middle;fill:#000000;stroke:none;font-family:TeX Gyre Adventor;-inkscape-font-specification:TeX Gyre Adventor"
+     id="text3031"
+     font-size="215"
+     font-weight="normal"
+     font-style="normal"
+     y="4840.7959"
+     x="6076.1714"
+     xml:space="preserve"><tspan
+       style="font-size:265.33950806px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;stroke:none;font-family:TeX Gyre Adventor;-inkscape-font-specification:TeX Gyre Adventor"
+       id="tspan3241">typed block, block manager, buffered streams,</tspan></text>
+  <text
+     style="font-size:215px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;stroke:none;font-family:AvantGarde"
+     id="text3033"
+     font-size="215"
+     font-weight="normal"
+     font-style="normal"
+     y="3279.7798"
+     x="2545.4448"
+     xml:space="preserve"><tspan
+       style="font-size:265.33950806px;stroke:none"
+       id="tspan3227">Containers:</tspan></text>
+  <text
+     style="font-size:265px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:none;font-family:Helvetica"
+     id="text3035"
+     font-size="265"
+     font-weight="bold"
+     font-style="normal"
+     y="2787.843"
+     x="4462.5898"
+     xml:space="preserve"><tspan
+       style="font-size:371.47531128px;stroke:none"
+       id="tspan3215">STL Interface</tspan></text>
+  <text
+     style="font-size:164px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;stroke:none;font-family:AvantGarde"
+     id="text3037"
+     font-size="164"
+     font-weight="normal"
+     font-style="normal"
+     y="3179.291"
+     x="4228.4468"
+     xml:space="preserve"><tspan
+       style="font-size:199.00462341px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;stroke:none;font-family:TeX Gyre Adventor;-inkscape-font-specification:TeX Gyre Adventor"
+       id="tspan3231">vector, stack, set, map</tspan><tspan
+       style="font-size:199.00462341px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;stroke:none;font-family:TeX Gyre Adventor;-inkscape-font-specification:TeX Gyre Adventor"
+       id="tspan3257" /></text>
+  <text
+     style="font-size:164px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-anchor:start;fill:#000000;stroke:none;font-family:TeX Gyre Adventor;-inkscape-font-specification:TeX Gyre Adventor"
+     id="text3039"
+     font-size="164"
+     font-weight="normal"
+     font-style="normal"
+     y="3394.825"
+     x="4264.5664"
+     xml:space="preserve"><tspan
+       style="font-size:199.00462341px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;stroke:none;font-family:TeX Gyre Adventor;-inkscape-font-specification:TeX Gyre Adventor"
+       id="tspan3233">priority_queue, matrix</tspan></text>
+  <text
+     style="font-size:164px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-anchor:start;fill:#000000;stroke:none;font-family:TeX Gyre Adventor;-inkscape-font-specification:TeX Gyre Adventor"
+     id="text3041"
+     font-size="164"
+     font-weight="normal"
+     font-style="normal"
+     y="3651.8206"
+     x="4278.5337"
+     xml:space="preserve"><tspan
+       style="font-size:199.00462341px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;stroke:none;font-family:TeX Gyre Adventor;-inkscape-font-specification:TeX Gyre Adventor"
+       id="tspan3235">sort, for_each, merge</tspan></text>
+  <text
+     style="font-size:215px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-anchor:start;fill:#000000;stroke:none;font-family:TeX Gyre Adventor;-inkscape-font-specification:TeX Gyre Adventor"
+     id="text3043"
+     font-size="215"
+     font-weight="normal"
+     font-style="normal"
+     y="3304.3862"
+     x="7151.0605"
+     xml:space="preserve"><tspan
+       style="font-size:265.33950806px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;stroke:none;font-family:TeX Gyre Adventor;-inkscape-font-specification:TeX Gyre Adventor"
+       id="tspan3237">Pipelined sorting,</tspan></text>
+  <text
+     style="font-size:215px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-anchor:start;fill:#000000;stroke:none;font-family:TeX Gyre Adventor;-inkscape-font-specification:TeX Gyre Adventor"
+     id="text3045"
+     font-size="215"
+     font-weight="normal"
+     font-style="normal"
+     y="3592.3953"
+     x="7118.9316"
+     xml:space="preserve"><tspan
+       style="font-size:265.33950806px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;stroke:none;font-family:TeX Gyre Adventor;-inkscape-font-specification:TeX Gyre Adventor"
+       id="tspan3239">zero-I/O scanning</tspan></text>
+  <text
+     style="font-size:265px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:none;font-family:Helvetica"
+     id="text3047"
+     font-size="265"
+     font-weight="bold"
+     font-style="normal"
+     y="2775.8159"
+     x="8246.7646"
+     xml:space="preserve"><tspan
+       style="font-size:371.47531128px;stroke:none"
+       id="tspan3217">Pipelining</tspan></text>
+  <text
+     style="font-size:215px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;stroke:none;font-family:AvantGarde"
+     id="text3049"
+     font-size="215"
+     font-weight="normal"
+     font-style="normal"
+     y="3663.8477"
+     x="2599.8601"
+     xml:space="preserve"><tspan
+       style="font-size:265.33950806px;stroke:none"
+       id="tspan3229">Algorithms:</tspan></text>
+  <text
+     style="font-size:265px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:none;font-family:Helvetica"
+     id="text3051"
+     font-size="265"
+     font-weight="bold"
+     font-style="normal"
+     y="7252.4941"
+     x="6128.1587"
+     xml:space="preserve"><tspan
+       style="font-size:371.47531128px;stroke:none"
+       id="tspan3225">Operating System</tspan></text>
+  <text
+     style="font-size:265px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:none;font-family:Helvetica"
+     id="text3053"
+     font-size="265"
+     font-weight="bold"
+     font-style="normal"
+     y="1861.7599"
+     x="6054.0684"
+     xml:space="preserve"><tspan
+       style="font-size:371.47531128px;stroke:none"
+       id="tspan3221">Applications</tspan></text>
+</svg>

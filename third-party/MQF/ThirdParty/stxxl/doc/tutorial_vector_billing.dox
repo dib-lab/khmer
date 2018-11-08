@@ -1,0 +1,114 @@
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/tutorial_vector_billing.dox
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2006 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+namespace stxxl {
+
+/** \page tutorial_vector_billing A Billing System for Phone Calls (stxxl::vector and stxxl::sort)
+
+\author Roman Dementiev (2006)
+
+The intended audience of this tutorial are developers or researchers who develop applications or implement algorithms processing large data sets which do not fit into the main memory of a computer. They must have basic knowledge in the theory of external memory computing and have working knowledge of C++ and an experience with programming using STL. Familiarity with key concepts of generic programming and C++ template mechanism is assumed.
+
+Let us start with a toy but pretty relevant problem: the phone call billing problem. You are given a sequence of event records. Each record has a time stamp (time when the event had happened), type of event ('call begin' or 'call end'), the callers number, and the destination number. The event sequence is time-ordered. Your task is to generate a bill for each subscriber that includes cost of all her calls. The solution is uncomplicated: sort the records by the callers number. Since the sort brings all records of a subscriber together, we \a scan the sorted result computing and summing up the costs of all calls of a particular subscriber.  The phone companies record up to 300 million transactions per day. AT&T billing system Gecko \cite BillingLarge has to process databases with about 60 billion records, occupying 2.6 terabytes. Certainly this volume can not be sorted in the main memory of a single computer (Except may be in the main memory of an expensive <i>super</i>computer.)  Therefore we need to sort those huge data sets out-of-memory. Now we show how STXXL can be useful here, since it can handle large volumes I/O efficiently.
+
+# STL Code
+
+If you are familiar with STL your the <tt>main</tt> function of bill
+generation program will probably look like this:
+
+\code
+int main(int argc, char * argv[])
+{
+    if(argc < 4) // check if all parameters are given
+    {            // in the command line
+        print_usage(argv[0]);
+        return 0;
+    }
+    // open file with the event log
+    std::fstream in(argv[1], std::ios::in);
+    // create a vector of log entries to read in
+    std::vector<LogEntry> v;
+    // read the input file and push the records
+    // into the vector
+    std::copy(std::istream_iterator<LogEntry>(in),
+              std::istream_iterator<LogEntry>(),
+              std::back_inserter(v));
+    // sort records by callers number
+    std::sort(v.begin(), v.end(), SortByCaller());
+    // open bill file for output
+    std::fstream out(argv[3], std::ios::out);
+    // scan the vector and output bills
+    std::for_each(v.begin(), v.end(), ProduceBill(out));
+    return 0;
+}
+\endcode
+
+To complete the code we need to define the log entry data type \c LogEntry, input operator \c >> for \c LogEntry, comparison functor \c SortByCaller, unary functor \c ProduceBills used for computing bills, and the \c print_usage function.
+
+\snippet examples/algo/phonebills.cpp prolog
+
+# Going Large -- Use STXXL
+
+In order to make the program I/O efficient we will replace the STL internal memory data structures and algorithms by their STXXL counterparts. The changes are marked with \c //!
+
+\code
+#include <stxxl.h> //! include STXXL headers
+// the rest of the code remains the same
+int main(int argc, char * argv[])
+{
+    if(argc < 4) // check if all parameters are given
+    {            // in the command line
+        print_usage(argv[0]);
+        return 0;
+    }
+    // open file with the event log
+    std::fstream in(argv[1], std::ios::in);
+    // create a vector of log entries to read in
+    stxxl::vector<LogEntry> v;                                  //! use stxxl::vector instead of std::vector
+    // read the input file and push the records
+    // into the vector
+    std::copy(std::istream_iterator<LogEntry>(in),
+              std::istream_iterator<LogEntry>(),
+              std::back_inserter(v));
+    // bound the main memory consumption by M
+    // during sorting
+    const unsigned M = atol(argv[2])*1024*1024;                 //! calculated memory limit M
+    // sort records by callers number
+    stxxl::sort(v.begin(), v.end(), SortByCaller(), M);         //! use stxxl::sort instead of std::sort
+    // open bill file for output
+    std::fstream out(argv[3], std::ios::out);
+    // scan the vector and output bills
+    // the last parameter tells how many buffers
+    // to use for overlapping I/O and computation
+    stxxl::for_each(v.begin(), v.end(), ProduceBill(out), 2);   //! use stxxl::for_each instead of std::for_each
+    return 0;
+}
+\endcode
+
+As you note the changes are minimal. Only the namespaces and some memory specific parameters had to be changed.
+
+See \ref examples/algo/phonebills.cpp for the full source code. The example program is automatically compiled when building STXXL, refer to \ref install on how to build programs with STXXL.
+
+The program \ref examples/algo/phonebills_genlog.cpp can be used to generate logs for processing with the phonebills example.
+
+Do not forget to configure you external memory space in file <tt>.stxxl</tt>. See \ref config.
+
+\example examples/algo/phonebills.cpp
+This example code is explain in \ref tutorial_vector_billing
+
+\example examples/algo/phonebills_genlog.cpp
+This example code is explain in \ref tutorial_vector_billing
+
+*/
+
+} // namespace stxxl

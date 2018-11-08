@@ -1,0 +1,171 @@
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/tutorial_map.dox
+ *
+ *  Usage Tutorial for STXXL
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *  Copyright (C) 2013 Daniel Feist <daniel.feist@student.kit.edu>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+namespace stxxl {
+
+/** \page tutorial_map STXXL Map (B+-tree)
+
+This page introduces into the stxxl::map (for further information on the structure you may have a look at \ref design_map).
+
+stxxl::map is an external associative container that stores elements formed by a combination of a unique key value and a data value, following a specific order.
+The map's key values are generally used to sort and uniquely identify the data values, while the data values store the content associated to this key.
+
+### Creating a STXXL Map
+
+To create a stxxl::map object, several template parameters are required. The first two parameters KeyType and DataType which is an std::pair<int, char> in this example are self-explanatory, the third parameter has to be a comparator class which is used to determine whether a key is smaller than another one, the fourth and fifth parameter define the node- and leaf block size.
+\code
+#define DATA_NODE_BLOCK_SIZE (4096)
+#define DATA_LEAF_BLOCK_SIZE (4096)
+...
+// template parameter <KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy (optional)>
+typedef stxxl::map<int, char, CompareGreater, DATA_NODE_BLOCK_SIZE, DATA_LEAF_BLOCK_SIZE> map_type;
+
+// constructor map(node_cache_size_in_bytes, leaf_cache_size_in_bytes) to create map object named my_map
+map_type my_map((map_type::node_block_type::raw_size) * 3, (map_type::leaf_block_type::raw_size) * 3);
+\endcode
+
+The comparator class has to be defined by hand (and before the map definition above) and looks like:
+\code
+struct ComparatorGreater
+{
+    bool operator () (const int & a, const int & b) const
+    { return a > b; }
+
+    static int max_value()
+    { return std::numeric_limits<int>::min(); }
+};
+\endcode
+
+If CompareGreater()(a,b) is true, then a is greater than b. CompareType must also provide a static max_value method, that returns a value of type KeyType that is larger than any key stored in map, i.e. for all x in map holds CompareType()(x,CompareType::max_value())
+
+Naturally, we can define a comparator class which returns true if a is smaller than b as follows:
+
+\code
+struct CompareLess
+{
+    bool operator () (const int & a, const int & b) const
+    { return a < b; }
+
+    static int max_value() const
+    { return std::numeric_limits<int>::max(); }
+};
+\endcode
+
+Note that CompareType must define a strict weak ordering.
+
+### Insert elements
+
+Insertion of elements is possible in three different ways:
+
+1. simple insertion
+\code
+my_map.insert(std::pair<int, char>(1, 'a'));
+my_map.insert(std::pair<int, char>(2, 'b'));
+my_map.insert(std::pair<int, char>(3, 'c'));
+my_map.insert(std::pair<int, char>(4, 'd'));
+\endcode
+
+2. insertion with hint
+\code
+map_type::iterator iter = my_map.begin();
+my_map.insert(iter, std::pair<int, char>(5, 'w'));
+my_map.insert(iter, std::pair<int, char>(6, 'x'));
+my_map.insert(iter, std::pair<int, char>(7, 'y'));
+my_map.insert(iter, std::pair<int, char>(8, 'z'));
+\endcode
+
+3. range insertion
+\code
+map_type anothermap((map_type::node_block_type::raw_size) * 3, (map_type::leaf_block_type::raw_size) * 3);
+anothermap.insert(my_map.begin(),my_map.find('c'));   // stores (1, 'a'), (2, 'b'), (3, 'c')
+\endcode
+
+### Access elements
+
+Random access is possible by using the []-operator:
+\code
+std::cout << "my_map[4] is " << my_map[4] << std::endl;  // prints 'd'
+\endcode
+
+Scanning a stxxl::map by an iterator works like
+\code
+// echo every element my_map contains
+for (iter = my_map.begin(); iter != my_map.end(); ++iter)
+{
+    std::cout << iter->first << " => " << iter->second << std::endl;
+}
+\endcode
+
+Hint: To enable leaf prefetching during scanning, call my_map.enable_prefetching() before.
+
+In addition, the operations lower_bound() and upper_bound() are available. The function lower_bound(key) returns an iterator which initially points to the first element in the container whose key <b> is not considered </b> to go before key. upper_bound(key) works similar as it returns an iterator which initially points to the first element in the container whose key <b> is considered </b> to go after key.
+\code
+map_type::iterator iter_low, iter_up;
+
+iter_low = my_map.lower_bound(2);  // iter_low points to 2 in this case
+iter_up = my_map.upper_bound(6);  // iter_up points to 5 in this case
+
+std::cout << "lower bound " << iter_low->second << " upper bound " << iter_up->second << std::endl;
+\endcode
+
+Note: lower_bound() works nearly equal to upper_bound(), except in the case that the map contains an element with a key equivalent lower_bound(x): In this case lower_bound(x) returns an iterator pointing to that element, whereas upper_bound(x) returns an iterator pointing to the next element.
+
+
+### Delete elements
+
+Removing elements out of the map is possible in three different ways:
+
+1. Erasing by iterator
+\code
+map_type::iter iter = my_map.find(7);
+my_map.erase(iter);
+\endcode
+
+2. Erasing by key
+\code
+my_map.erase(8);
+\endcode
+
+3. Erasing by range
+\code
+iter = my_map.find(3);
+my_map.erase(iter, my_map.end());
+\endcode
+
+### Determine size / Check whether the map is empty
+
+To determine the size (i.e. the number of elements) of an instance, call size():
+\code
+std::cout << "number of elements in my_map: " << my_map.size() << std::endl;
+\endcode
+
+To check if the priority queue is empty, call empty() which returns true in case:
+\code
+std::cout << "is my_map empty? " << my_map.empty() << std::endl;
+\endcode
+
+### A minimal working example on STXXL Map
+
+(See \ref examples/containers/map1.cpp for the sourcecode of the following example).
+
+\snippet examples/containers/map1.cpp example
+
+\example examples/containers/map1.cpp
+This example code is explained in the \ref tutorial_map section
+
+*/
+
+} // namespace stxxl

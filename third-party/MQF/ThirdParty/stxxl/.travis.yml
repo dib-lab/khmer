@@ -1,0 +1,37 @@
+language: cpp
+
+env:
+  global:
+    # limit parallel threads (default is 32!)
+    - OMP_NUM_THREADS=4
+  matrix:
+    # gcc-4.8 builds
+    - CMAKE_CC="gcc-4.8" CMAKE_CXX="g++-4.8" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Debug   -DUSE_OPENMP=OFF  -DNO_CXX11=ON"
+    - CMAKE_CC="gcc-4.8" CMAKE_CXX="g++-4.8" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Debug   -DUSE_OPENMP=ON   -DUSE_GNU_PARALLEL=OFF"
+    - CMAKE_CC="gcc-4.8" CMAKE_CXX="g++-4.8" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Debug   -DUSE_OPENMP=ON   -DUSE_GNU_PARALLEL=ON"
+    - CMAKE_CC="gcc-4.8" CMAKE_CXX="g++-4.8" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release -DUSE_OPENMP=ON   -DUSE_GNU_PARALLEL=OFF"
+    - CMAKE_CC="gcc-4.8" CMAKE_CXX="g++-4.8" CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release -DUSE_OPENMP=ON   -DUSE_GNU_PARALLEL=ON"
+    # one boost build
+    - CMAKE_CC="gcc"     CMAKE_CXX="g++"     CMAKE_FLAGS=""     CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Debug   -DUSE_GNU_PARALLEL=OFF" USE_BOOST=ON
+    # one 32-bit build
+    - CMAKE_CC="gcc"     CMAKE_CXX="g++"     CMAKE_FLAGS="-m32" CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Debug   -DUSE_GNU_PARALLEL=OFF" USE_BOOST=OFF
+    # clang build
+    - CMAKE_CC="clang"   CMAKE_CXX="clang++" CMAKE_FLAGS="-Wno-sign-conversion" CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release"
+
+install:
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  - sudo apt-get -qq update
+  - if [ "$CMAKE_CXX" == "g++-4.8" ]; then sudo apt-get install g++-4.8; fi
+  - if [ "$CMAKE_FLAGS" == "-m32" ]; then sudo apt-get install g++-multilib; fi
+  - if [ "$USE_BOOST" == "ON" ]; then sudo apt-get install libboost-all-dev; fi
+
+before_script:
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_C_COMPILER=$CMAKE_CC -DCMAKE_CXX_COMPILER=$CMAKE_CXX
+    -DBUILD_TESTS=ON -DTRY_COMPILE_HEADERS=ON
+    -DUSE_BOOST=$USE_BOOST $CMAKE_ARGS ../
+    #-DCMAKE_C_FLAGS="-Wconversion $CMAKE_FLAGS" -DCMAKE_CXX_FLAGS="-Wconversion $CMAKE_FLAGS"
+
+script:
+  - make -j4 && ./tools/stxxl_tool info && ctest -V

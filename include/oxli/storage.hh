@@ -424,7 +424,7 @@ public:
         // Final argument is the number of bits allocated for the value, which
         // we do not use.
         _supports_bigcount = true;
-        qf_init(&mf, (1ULL << size), size+slotSize, 0,2,true,"",2038074761);
+        qf_init(&mf, (1ULL << size), size+slotSize, 0,2,0,true,"",2038074761);
 
 
 

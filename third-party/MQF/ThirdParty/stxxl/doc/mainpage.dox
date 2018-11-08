@@ -1,0 +1,153 @@
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/mainpage.dox
+ *
+ *  Main page of STXXL doxygen tree. All doc pages should be linked here.
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+/** \mainpage Welcome to STXXL
+
+The core of STXXL is an implementation of the C++ standard template library STL for <b>external memory</b> (out-of-core) computations, i.e., STXXL implements containers and algorithms that can process huge volumes of data that only fit on disks. While the compatibility to the STL supports ease of use and compatibility with existing applications, another design priority is high performance. Here is a selection of STXXL performance features:
+
+- transparent support of multiple disks
+- variable block lengths
+- overlapping of I/O and computation
+- prevention of OS file buffering overhead
+- algorithm pipelining
+- utilization of multiple processor cores for internal computation
+
+See the \subpage introduction "introduction to external memory" for a longer description and our vision.
+
+# Getting Started: Building and Tutorial
+
+This section will help you if you are using the STXXL for the first time.
+
+First you must compile the library. Pick one of the following \subpage install "build instructions", depending on your host system:
+
+- \ref install_unix
+- \ref install_windows
+
+Once compiled, you can read the following simple tutorials on how to use STXXL containers and algorithms:
+
+- \ref tutorial_vector
+- \ref tutorial_stack
+- \ref tutorial_pqueue
+
+See the corresponding page for a \subpage tutorial "complete list of all Tutorials and Examples".
+
+# Design and More Information
+
+We have collected much documentation about the design of STXXL. Even more information is available as academic research papers, technical reports and theses.
+
+- \subpage design "Design of STXXL concepts, containers and algorithms"
+
+If you plan to contribute code to STXXL, please read the \subpage coding_style and use the \subpage common.
+
+# FAQ, Troubleshooting, Bugs and More
+
+- \subpage faq
+
+- Questions concerning use and development of the STXXL library should be posted to the <a href="http://sourceforge.net/projects/stxxl/forums"><b>FORUMS</b></a>. Please search the forum before posting, your question may have been answered before.
+
+- See \ref faq_compilers when compilation fails.
+
+- Bugs and pull requests can be reported via <a href="http://github.com/stxxl/stxxl"><b>Github</b></a>: http://github.com/stxxl/stxxl.
+
+- Check the \ref changelog for recent changes when switching version.
+
+- The STXXL source also contains \subpage stxxl_tool "stxxl_tool", a collection of simple tools and benchmarks.
+
+# License and Authors
+
+\c STXXL is distributed under the Boost Software License, Version 1.0. \n
+You can find a copy of the license in the accompanying file \ref license or at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>. \n
+Many people have contributed to STXXL, see all \ref authors.
+\subpage textfiles "&nbsp;"
+
+*/
+
+/** \page textfiles Additional Text Files
+
+- \subpage readme
+- \subpage changelog
+- \subpage authors
+- \subpage textfiles_install
+- \subpage license
+- \subpage textfiles_todo
+
+\page readme README
+
+\verbinclude README
+
+\page changelog ChangeLog
+
+\verbinclude CHANGELOG
+
+\page authors AUTHORS
+
+The following list of authors have contributed to STXXL:
+
+\verbinclude AUTHORS
+
+\page textfiles_install INSTALL
+
+\verbinclude INSTALL
+
+\page license LICENSE_1_0.txt
+
+\verbinclude LICENSE_1_0.txt
+
+\page textfiles_todo TODO
+
+\verbinclude TODO
+
+ */
+
+// Module Groups are defined here to fix their order:
+
+/*! \defgroup stllayer STL-User Layer
+  Layer which groups STL compatible algorithms and containers
+*/
+
+/*! \defgroup streampack Stream Package
+
+  Package that enables pipelining of consequent sorts and scans of the external data avoiding the saving the intermediate results on the disk, e.g. the output of a sort can be directly fed into a scan procedure without the need to save it on a disk.  All components of the package are contained in the \c stxxl::stream namespace.
+
+   STREAM ALGORITHM CONCEPT (Do not confuse with C++ input/output streams)
+
+\verbatim
+
+   struct stream_algorithm // stream, pipe, whatever
+   {
+     typedef some_type value_type;
+
+     const value_type & operator * () const; // return current element of the stream
+     stream_algorithm & operator ++ ();      // go to next element. precondition: empty() == false
+     bool empty() const;                     // return true if end of stream is reached
+
+   };
+\endverbatim
+*/
+
+/*! \defgroup mnglayer Block Management Layer
+
+  Group of classes which help controlling external memory space, managing disks, and allocating and deallocating blocks of external storage.
+*/
+
+/*! \defgroup iolayer I/O Primitives Layer
+
+  Group of classes which enable abstraction from operating system calls and support system-independent interfaces for asynchronous I/O.
+*/
+
+/*! \defgroup support Common Utilities and Support Classes
+
+Supporting classes also useful for applications, see also \ref common .
+*/

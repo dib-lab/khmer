@@ -1,0 +1,19 @@
+This directory contains some benchmarks referenced in past papers on
+STXXL. These mostly compare to versions of TPIE, LEDA-SM and BerkeleyDB.
+
+The code works only with old versions of TPIE: 091905 (which is the youngest
+version at duke.edu). To enable compilation with TPIE, download
+tpie_091905.tgz, unpack and compile it in the tools/benchmarks directory of the
+source tree. The cmake file will detect
+tools/benchmarks/tpie_*/lib/libtpie.a and compile the TPIE tests with it.
+
+LEDA-SM test were removed as the library is no longer available.
+
+Comparisons against BerkeleyDB are easier, because this library has a very
+stable interface. If TPIE was detected, the cmake script will search for
+BerkeleyDB on the system and attempt to compile with it.
+
+All benchmarks not depending on external libraries are build with
+-DBUILD_TESTS=ON.
+
+2013-10-07 Timo Bingmann

@@ -1,0 +1,94 @@
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/tutorial_stack.dox
+ *
+ *  Usage Tutorial for STXXL
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *  Copyright (C) 2013 Daniel Feist <daniel.feist@student.kit.edu>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+namespace stxxl {
+
+/** \page tutorial_stack STXXL Stack
+
+This section introduces into the STXXL stack container (to learn more about the structure of stxxl::stack, see section \ref design_stack).
+
+STXXL stacks are last in first out (LIFO), i.e. inserting and extracting elements are only allowed from one end of the container and the element on top is the element added most recently.
+
+### Creating a STXXL stack
+
+Before using a STXXL stack, we initially have to define and then to instantiate a stack object. To manage the configuration of the stack type we used the generator template. A minimal configuration is shown below - as one can see the value_type (integer in our case) is the only stricly neccessary parameter. See \ref design_stack_generator for additional configuration parameters and information.
+
+\code
+typedef stxxl::STACK_GENERATOR<int>::result stack;
+stack my_stack;  // create empty stack object
+\endcode
+
+Hint: STXXL stack provides specialized implementations for a certain access pattern. If the access pattern is known before, such a customization might gain a significant speedup.
+The default stack is stxxl::normal_stack which is the best for a random sequence of push'es and pop's. See \ref design_stack section for more details.
+
+### Insert / Access / Delete elements
+
+To insert an element on top of the stack call push():
+
+\code
+my_stack.push(7);
+my_stack.push(2);
+my_stack.push(5);
+// stack from bottom to top: |7|2|5|
+\endcode
+
+To access the top element call top():
+
+\code
+std::cout << "element on top of stack is: " << my_stack.top << std::endl;  // prints out 5
+\endcode
+
+To remove the top element call pop().
+
+\code
+my_stack.pop();  // removes element 5
+\endcode
+
+### Determine size  / Check whether stack is empty
+
+To determine the size (i.e. the number of elements) of stack instance, call size():
+
+\code
+std::cout << "size of stack: " << my_stack.size() << std::endl;
+\endcode
+
+To check if the stack is empty, call empty() which returns true in case of emptyness:
+
+\code
+// loop till stack is empty
+while (!my_stack.empty())
+{
+  // do something
+}
+\endcode
+
+### A minimal working example of STXXL's stack
+
+(See \ref examples/containers/stack1.cpp for the sourcecode of the following example).
+
+\snippet examples/containers/stack1.cpp example
+
+See \ref examples/containers/stack2.cpp for the sourcecode of a more comprehensive example.
+
+\example examples/containers/stack1.cpp
+This example code is explained in the \ref tutorial_stack section
+
+\example examples/containers/stack2.cpp
+This example code is explained in the \ref tutorial_stack section
+
+*/
+
+} // namespace

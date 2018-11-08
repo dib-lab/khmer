@@ -1,0 +1,76 @@
+#!/bin/sh
+
+############################################################################
+#  misc/record-load-iostat
+#
+#  Part of the STXXL. See http://stxxl.sourceforge.net
+#
+#  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+#
+#  Distributed under the Boost Software License, Version 1.0.
+#  (See accompanying file LICENSE_1_0.txt or copy at
+#  http://www.boost.org/LICENSE_1_0.txt)
+############################################################################
+
+# Usage: $0 [ -p outfileprefix ] command
+
+PID_IOSTAT=""
+PID_LOAD=""
+RETVAL="1"
+
+cleanup()
+{
+	if [ -n "$PID_IOSTAT" ] || [ -n "$PID_LOAD" ]; then
+		kill $PID_IOSTAT $PID_LOAD
+	fi
+	exit $RETVAL
+}
+
+loadavg()
+{
+	while true
+	do
+		cat /proc/loadavg
+		sleep 1
+	done
+}
+
+trap cleanup 1 2 3 15
+
+OUTFILEPREFIX=iostat_`hostname`_`date +%F--%H-%M`
+
+if [ "$1" = "-p" ]; then
+	OUTFILEPREFIX="$2"
+	shift
+	shift
+fi
+
+if [ -z "$DONT_WAIT_FOR_LOW_LOAD" ]; then
+# wait at most 120 seconds for load to drop below 1.00
+loop=""
+load=`cut -d. -f1 /proc/loadavg`
+echo -n "Waiting for load to drop below 1.00 " >/dev/tty
+while [ "$load" != "0" ] && [ "$loop" != "........................" ]
+do
+	echo -n "." >/dev/tty
+	sleep 5
+	loop="$loop."
+	load=`cut -d. -f1 /proc/loadavg`
+done
+echo " ==> `cut -d' ' -f1 /proc/loadavg`" >/dev/tty
+fi
+
+#run command passed as the argument concurrently to iostat
+#dump I/O stat every second
+iostat -x -m -t $IOSTAT_FLAGS 1 >$OUTFILEPREFIX.iostat &
+PID_IOSTAT=$!
+
+loadavg >$OUTFILEPREFIX.loadavg &
+PID_LOAD=$!
+
+"$@"
+RETVAL=$?
+
+cleanup
+
+exit $RETVAL

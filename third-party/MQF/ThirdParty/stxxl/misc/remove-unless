@@ -1,0 +1,12 @@
+#!/bin/sh
+
+test $# = 3 || exit 1
+
+file="$1"
+bn=`dirname "$file"`/`basename "$1" "$2"`
+predep="$bn$3"
+
+if [ ! -e "$predep" ]; then
+	echo "rm -f $file"
+	rm -f "$file"
+fi

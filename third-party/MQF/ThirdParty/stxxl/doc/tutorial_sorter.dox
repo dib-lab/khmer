@@ -1,0 +1,116 @@
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/tutorial_sorter.dox
+ *
+ *  Usage Tutorial for STXXL
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+namespace stxxl {
+/** \page tutorial_sorter STXXL Sorter
+
+This section introduces into the STXXL sorter container (to learn more about the structure of stxxl::sorter, see section \ref stxxl::sorter).
+
+The STXXL sorter container combines the two functions of runs_creator and runs_merger from the stream packages into a two-phase container. As a result, the STXXL sorter implements a external memory k-way merge sort to sort large amounts of data.
+
+### Create a STXXL sorter
+
+Before using a STXXL sorter, we initially have to define and then to instantiate a sorter object. Two template parameters are required to define a stxxl::sorter. ValueType defines the type of the contained objects (must be a POD with no references to internal memory) and CompareType is the type of comparison object used for sorting the runs (see example below).
+BlockSize and AllocStr are optional (see \ref stxxl::sorter for additional information). The more straightforward of the two sorter constructors expects the comparator object and memory_to_use (bytes) in ram for sorted runs as parameters.
+
+\code
+// template parameter <ValueType, CompareType, BlockSize(optional), AllocStr(optional)>
+typedef stxxl::sorter<int, my_comparator, 1*1024*1024> sorter_type;
+
+// create sorter object (CompareType(), MemoryToUse)
+sorter_type int_sorter(my_comparator(), 64*1024*1024);
+\endcode
+
+
+The comparator class may look as follows. The operator() is needed to compare two given elements a and b. CompareType must also provide a min_value() method, that returns the value of type ValueType that is smaller than any element of the queue x, i.e. CompareType(CompareType.min_value(),x) is always true as well as a max_value() method that works equivalent:
+\code
+// achieve an ascending order of sorting
+struct my_comparator
+{
+  bool operator()(const int &a, const int &b) const
+  {
+    return a < b;
+  }
+
+  int min_value() const {
+    return std::numeric_limits<int>::min();
+  }
+
+  int max_value() const {
+    return std::numeric_limits<int>::max();
+  }
+};
+\endcode
+
+Note that CompareType must define strict weak ordering. \n
+\n
+The sorter container know two different kind of states - the input state and a output state. Insertion of elements are only allowed when the sorter is in the input state. After sorting is called, the container enters the output state and inserting elements is disallowed.
+
+### Insert elements
+
+Inserting elements is possible into the sorter container by calling the push() function:
+\code
+int_sorter.push(5);
+int_sorter.push(10);
+int_sorter.push(3);
+\endcode
+
+### Sorting all elements
+
+Sorting all elements a sorter container is holding, call sort():
+\code
+int_sorter.sort();
+\endcode
+
+
+### Access sorted elements
+
+After calling sort, the items ca be read in sorted order using the operator*(), using operator++() to advance to the next item and empty() to check for the end:
+\code
+while (!int_sorter.empty())
+{
+  std::cout << *int_sorter << " ";
+  ++int_sorter;
+}
+\endcode
+
+
+### Determine size / Check whether the map is empty
+
+To determine the size (i.e. the number of elements) of a sorter container, call size():
+\code
+std::cout << "number of elements in int_sorter: " << int_sorter.size() << std::endl;
+\endcode
+
+To check if the sorter is empty, call empty() which returns true in case:
+\code
+std::cout << "is int_sorter empty? " << int_sorter.empty() << std::endl;
+\endcode
+
+### A minimal working example of STXXL's sorter
+
+(See \ref examples/containers/sorter1.cpp for the sourcecode of the following example).
+
+\snippet examples/containers/sorter1.cpp example
+
+See \ref examples/containers/sorter2.cpp for the sourcecode of a more comprehensive example.
+
+\example examples/containers/sorter1.cpp
+This example code is explained in the \ref tutorial_sorter section.
+
+\example examples/containers/sorter2.cpp
+This example code is explained in the \ref tutorial_sorter section.
+*/
+} // namespace stxxl

@@ -1,0 +1,530 @@
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/common.dox
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+namespace stxxl {
+
+////////////////////////////////////////////////////////////////////////////////
+/** \page common Common Utilities and Helpers
+
+\author Timo Bingmann (2013)
+
+A lots of basic utility classes and helper functions have accumulated in STXXL. Try are usually fundamental enough to be also used in an application program.  Before implementing a common software utility, please check the list below; it might already exist in STXXL:
+
+- \subpage common_io_counter "I/O statistics and performance counter"
+- \subpage common_random "random number generators"
+- \subpage common_timer "timestamp and timer function"
+- \subpage common_simple_vector "a non-growing, non-initializing simple_vector"
+- \subpage common_counting_ptr "reference counted (shared) objects via counting_ptr"
+- \subpage common_cmdline "command line parser"
+- \subpage common_binary_buffer "serialization of variable data structures into blobs"
+- \subpage common_thread_sync "synchronization primitives for multi-threading"
+- \subpage common_logging "logging macros"
+- \subpage common_assert "macros for checking assertions"
+- \subpage common_throw "macros for throwing exceptions"
+- \subpage common_types "signed and unsigned integer types"
+- \subpage common_log2 "calculating log_2(x)"
+- \subpage common_misc_macros "miscellaneous macros"
+- \subpage common_misc_funcs "miscellaneous functions"
+
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+
+/** \page common_random Random Number Generators
+
+See also file common/rand.h
+
+Measuring the time consumption of program sections are often of great interest. The Stxxl comes with several build-in pseudo random number generators as shown below:
+
+\code
+
+stxxl::random_number32 rand32;  // integer values in [0, 2^32)
+stxxl::random_number64 rand64;  // integer values in [0, 2^64)
+stxxl::random_uniform_slow urand_slow;  // uniform values in [0.0, 1.0)
+stxxl::random_uniform_fast urand_fast;  // uniform values in [0.0, 1.0)
+stxxl::random_number<> n_rand;  // integer values in [0,N)
+
+unsigned int random32 = rand32();
+stxxl::uint64 random64 = rand64();
+double urandom_slow = urand_slow();
+double urandom_fast = urand_fast();
+unsigned int n_random = n_rand(123456789);
+
+STXXL_MSG("random 32 bit number: " << random32);
+STXXL_MSG("random 64 bit number: " << random64);
+STXXL_MSG("random number between [0.0, 1.0) (slow): " << urandom_slow);
+STXXL_MSG("random number between [0.0, 1.0) (fast): " << urandom_fast);
+STXXL_MSG("random number between [0,123456789): " << n_random);
+
+\endcode
+
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+
+/** \page common_timer Timestamp and Timer Classes
+
+See also file common/timer.h
+
+Measuring the time certain parts of an algorithm or the entire algorithm consume will often be of great interest. The STXXL provides build-in time measurement class stxxl::timer which can be used as follows:
+
+\code
+#include <stxxl/timer>  // make timer class available
+
+stxxl::timer Timer;  // create Timer object
+
+Timer.start();
+
+// code section which shall be measured
+
+Timer.stop();
+
+// get results:
+STXXL_MSG(",easured time: " << (Timer.seconds()) << " (seconds), " << (Timer.mseconds()) << " (milliseconds), " << (Timer.useconds()) << " (microseconds))
+
+Timer.reset();  // reset clock to zero which allows to run start() again
+
+\endcode
+
+As an alternative, one can also work on the timestamp itself:
+
+\code
+double start = stxxl::timestamp();
+
+// code section to be measured
+
+double stop = stxxl::timestamp();
+
+STXXL_MSG("measured time: " << (stop - start) << " seconds.");
+\endcode
+
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+
+/** \page common_simple_vector A Non-growing, Non-initializing Simpler Vector
+
+For applications where a std::vector is overkill, or one wishes to allocate an uninitialied POD array, the \ref simple_vector is a good method.
+
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+
+/** \page common_counting_ptr Reference Counted (Shared) Objects
+
+Some objects in STXXL are reference counted. This is usually done for large objects, which should not be copied deeply in assignments. Instead, a reference counting pointer is used, which holds a handle while the pointer exists and deletes the object once all pointers go out of scope. Examples are matrices and \ref stream::sorted_runs.
+
+The method used is called \ref counting_ptr or intrusive reference counting.  This is similar, but not identical to boost or TR1's \c shared_ptr.
+
+The \ref counting_ptr is accompanied by \ref counted_object, which contains the actual reference counter (a single integer). A reference counted object must derive from \ref counted_object :
+
+\code
+struct something : public stxxl::counted_object
+{
+};
+\endcode
+
+Code that now wishes to use pointers referencing this object, will typedef an \ref counting_ptr, which is used to increment and decrement the included reference counter automatically.
+
+\code
+typedef stxxl::counting_ptr<something> something_ptr
+{
+    // create new instance of something
+    something_ptr p1 = new something;
+    {
+        // create a new reference to the same instance (no deep copy!)
+        something_ptr p2 = p1;
+        // this block end will decrement the reference count, but not delete the object
+    }
+    // this block end will delete the object
+}
+\endcode
+
+The \ref counting_ptr can generally be used like a usual pointer or \c shared_ptr (see the docs for more).
+
+There is also \ref const_counting_ptr to return const objects (note that a const \ref counting_ptr will only render the pointer const, not the enclosed object).
+
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+
+/** \page common_cmdline Command Line Parser
+
+STXXL now contains a rather sophisticated command line parser for C++, \ref cmdline_parser, which enables rapid creation of complex command line constructions. Maybe most importantly for application with external memory: the parser will recognize byte sizes with SI/IEC suffixes like '2 GiB' and transform it appropriately.
+
+\snippet examples/common/cmdline.cpp example
+
+When running the program above without arguments, it will print:
+\verbatim
+$ ./cmdline
+Missing required argument for parameter 'filename'
+
+Usage: ./cmdline [options] <filename>
+
+This may some day be a useful program, which solves many serious problems of
+the real world and achives global peace.
+
+Author: Timo Bingmann <tb@panthema.net>
+
+Parameters:
+  filename  A filename to process
+Options:
+  -r, --rounds N  Run N rounds of the experiment.
+  -s, --size      Number of bytes to process.
+\endverbatim
+
+Nice output, notice the line wrapping of the description and formatting of parameters and arguments. These too are wrapped if the description is too long.
+
+We now try to give the program some arguments:
+\verbatim
+$ ./cmdline -s 2GiB -r 42 /dev/null
+Option -s, --size set to 2147483648.
+Option -r, --rounds N set to 42.
+Parameter filename set to "/dev/null".
+Command line parsed okay.
+Parameters:
+  filename        (string)            "/dev/null"
+Options:
+  -r, --rounds N  (unsigned integer)  42
+  -s, --size      (bytes)             2147483648
+\endverbatim
+The output shows pretty much what happens. The command line parser is by default in a verbose mode outputting all arguments and values parsed. The debug summary shows to have values the corresponding variables were set.
+
+One feature worth naming is that the parser also supports lists of strings, i.e. \c std::vector<std::string> via \ref cmdline_parser::add_param_stringlist() and similar.
+
+\example examples/common/cmdline.cpp
+This example is documented in \ref common_cmdline tutorial.
+
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+
+/** \page common_binary_buffer Serializing Variable Data Structures with binary_buffer
+
+Some applications of STXXL will require variable data structures. Currently there is not much support for this in STXXL.
+
+For serializing information into in-memory data blocks, the STXXL provides the helper classes \ref binary_buffer and \ref binary_reader. These provide functions \ref binary_buffer::put<>() to append arbitrary integral data types and \ref binary_reader::get<>() to read these again. Serialization and deserialization of variable data structures are then composed of identical sequences of put()/get().
+
+Additionally, the classes already provide methods to serialize variable length strings (together with their lengths), and thereby also sub-block serialization. These functions are called \ref binary_buffer::put_string() and \ref binary_reader::get_string().
+
+Furthermore, to squeeze small integers into fewer bytes, they classes also contain "varint" encoding, where each byte contains 7 data bits and one continuation bit. These functions are called \ref binary_buffer::put_varint() and \ref binary_reader::get_varint().
+
+The following example fills a binary_buffer with some data elements:
+\snippet tests/common/test_binary_buffer.cpp serialize
+
+And the following binary_reader example deserializes the data elements and check's their content.
+\snippet tests/common/test_binary_buffer.cpp deserialize
+
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+
+/** \page common_thread_sync Synchronization Primitives for Multi-Threading
+
+To support multi-threading, some parts of STXXL use synchronization primitives to ensure correct results. The primitives are based either on pthreads or on Boost classes.
+
+\section mutex Mutexes
+
+For simple mutual exclusion contexts, stxxl::mutex objects should be used together with scoped locks:
+
+\code
+class Something
+{
+    stxxl::mutex m_mtx;
+    void critical_function()
+    {
+        stxxl::scoped_mutex_lock lock(m_mtx);
+        // do something requiring locking
+    }
+};
+\endcode
+
+\section semaphore Semaphores
+
+Additionally stxxl::semaphore is available if counting is required.
+
+\section further Further Primitives: State and OnOff-Switch
+
+stxxl::state is a synchronized state switching mechanism?
+
+stxxl::onoff_switch is a two state semaphore thing?
+
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+
+/** \page common_logging Logging Macros STXXL_MSG
+
+All STXXL components should output log or trace messages using the following macros. There are two basic methods for logging using ostream syntax:
+
+\code
+// for plain messages
+STXXL_MSG("text " << var)
+// for error messages
+STXXL_ERRMSG("error message " << reason)
+\endcode
+
+For debugging and tracing the following macros can be used for increasing
+levels of verbosity:
+
+\code
+// level 0 (for current debugging)
+STXXL_VERBOSE0("text " << var)
+// level 1,2 and 3 for more verbose debugging level
+STXXL_VERBOSE1("text " << var)
+STXXL_VERBOSE2("text " << var)
+STXXL_VERBOSE3("text " << var)
+\endcode
+
+A method used by some submodule authors to create their own levels of verbosity is to make their own debugging macros:
+
+\code
+#define STXXL_VERBOSE_VECTOR(msg) STXXL_VERBOSE1("vector[" << static_cast<const void *>(this) << "]::" << msg)
+\endcode
+
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+
+/** \page common_assert Macros for Checking Assertions
+
+There are quite a bunch of macros for testing assertions. You must be careful to pick the right one depending on when and what you want to assert on.
+
+# Compile-time Assertions: STXXL_STATIC_ASSERT
+
+To check specific conditions at compile time use \ref STXXL_STATIC_ASSERT.
+
+\code
+struct item { int a,b,c,d; }
+STXXL_STATIC_ASSERT(sizeof(item) == 4 * sizeof(int));
+\endcode
+
+# Assertions in Unit Tests: STXXL_CHECK
+
+Assertions in unit tests must use the following macros to ensure that the condition is also checked in release builds (where a plain \c "assert()" is void). These \c CHECK function should NOT be used to test return values, since we try to throw exceptions instead of aborting the program.
+
+\code
+// test a condition
+STXXL_CHECK( 2+2 == 4 );
+// test a condition and output a more verbose reason on failure
+STXXL_CHECK2( 2+2 == 4, "We cannot count!");
+\endcode
+
+Sometimes one also wants to check that a specific expression \b throws an exception. This checking can be done automatically using a <tt>try { } catch {}</tt> by using \ref STXXL_CHECK_THROW.
+
+# Plain Assertions: assert
+
+For the usual assertions, that should be removed in production code for performance, we use the standard \c "assert()" function.
+
+However, there is also \ref STXXL_ASSERT(), which can be used as a replacement for \c assert(), when compiler warnings about unused variables or typedefs occur. The issue is that assert() completely removes the code, whereas \ref STXXL_ASSERT() keeps the code encloses it inside \c if(0).
+
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+
+/** \page common_throw Macros for Throwing Exception
+
+The STXXL provides several pre-defined exception macros to detect run-time errors. The basic ones are:
+
+- STXXL_THROW(exception_type, error_message)
+- STXXL_THROW2(exception_type, location, error_message)
+- STXXL_THROW_ERRNO(exception_type, error_message)
+- STXXL_THROW_INVALID_ARGUMENT(error_message)
+- STXXL_THROW_UNREACHABLE(error_message)
+
+In addition, we also defined \b conditional throw macros, which check the outcome of a function call:
+
+- STXXL_THROW_IF(expr, exception_type, error_message)
+- STXXL_THROW_NE_0(expr, exception_type, error_message)
+- STXXL_THROW_EQ_0(expr, exception_type, error_message)
+- STXXL_THROW_LT_0(expr, exception_type, error_message)
+
+For checking system calls which set errno, the following macros are used to also provide strerror information for the user:
+
+- STXXL_THROW_ERRNO_IF(expr, exception_type, error_message)
+- STXXL_THROW_ERRNO_NE_0(expr, exception_type, error_message)
+- STXXL_THROW_ERRNO_EQ_0(expr, exception_type, error_message)
+- STXXL_THROW_ERRNO_LT_0(expr, exception_type, error_message)
+
+For checking pthread system calls, a special macro is needed, because these do not set errno. Instead they return the errno value:
+
+- STXXL_CHECK_PTHREAD_CALL(pthread call)
+
+And for WINAPI calls there is a special macro to call GetLastError and format it in a nice way:
+
+- STXXL_THROW_WIN_LASTERROR(exception_type, error_message)
+
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+
+/** \page common_log2 Calculating log2(x) for Integers and at Compile-Time
+
+STXXL provides three methods to calculate log2(x), which is often needed for binary trees, etc.
+
+The first is during \b compile-time using template meta-programming magic:
+
+\code
+#include <stxxl/bits/common/tmeta.h>
+
+std::cout << stxxl::LOG2<10000>::floor << std::endl;
+std::cout << stxxl::LOG2<10000>::ceil << std::endl;
+\endcode
+
+The second is for calculating log2(x) for \b integer arguments using simple bit shift arithmetic:
+
+\code
+#include <stxxl/bits/common/utils.h>
+
+std::cout << stxxl::ilog2_floor(10000) << std::endl;
+std::cout << stxxl::ilog2_ceil(10000) << std::endl;
+\endcode
+
+The third and probably least useful is to use conversion to \b double and \c math.h's facilities:
+
+\code
+#include <stxxl/bits/common/utils.h>
+
+std::cout << stxxl::log2_floor(10000) << std::endl;
+std::cout << stxxl::log2_ceil(10000) << std::endl;
+\endcode
+
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+
+/** \page common_types Signed and Unsigned Integer Types
+
+STXXL provides two very important types: \ref stxxl::int_type and \ref stxxl::unsigned_type. These should be used for general counting and indexing types, as they are defined to be the size of a register on the machines: on 32-bit machines the two types are 4 bytes size, while on a 64-bit machine the two types are 8 bytes in size!
+
+The previous types are for general purpose counting. For real 64-bit integers, also on 32-bit machines, STXXL also provides a stxx::uint64 type (independent of other headers).
+
+See the file common/types.h
+
+\section common_types_uint uint40 and uint48 Unsigned Integer Types
+
+When storing file offsets in external memory, one often does not require full 64-bit indexes. Mostly, 40-bit or 48-bit are sufficient, if only < 1 TiB or < 16 TiB of data are processed. If one stores theses integers in five or six bytes, the total I/O volume can be reduced significantly.
+
+Since this issue occurs commonly in EM algorithms, STXXL provides two types: stxxl::uint40 and stxxl::uint48.
+
+See the file common/uint_types.h
+
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+
+/** \page common_misc_macros Miscellaneous Macros
+
+\section namespaces STXXL_BEGIN_NAMESPACE
+
+A long, long time ago, not all compilers supported C++ namespaces, thus STXXL uses the macros \ref STXXL_BEGIN_NAMESPACE and \ref STXXL_END_NAMESPACE, which open and close the \c "namespace stxxl".
+
+\section unused STXXL_UNUSED
+
+\ref STXXL_UNUSED is not actually a macro. It is a remedy against "unused variable" warnings, for whatever reason. Usage:
+
+\code
+void function(int x)
+{
+    STXXL_UNUSED(x);
+}
+\endcode
+
+\section likely LIKELY and UNLIKEY
+
+Some compilers have facilities to specify whether a condition is likely or unlikely to be true. This may have consequences on how to layout the assembler code better.
+
+\code
+if (LIKELY(x > 1)) { ... }
+if (UNLIKELY(x > 8)) { ... }
+\endcode
+
+\section deprecated Deprecated Functions
+
+Some compilers can warn the user about deprecated function by tagging them in the source. In STXXL we use the macro \ref STXXL_DEPRECATED(...) to enclose deprecated functions.
+
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+
+/** \page common_misc_funcs Miscellaneous Functions
+
+\section parse_filesize Parsing Filesizes with K, M, G suffixes
+
+Since with STXXL one often has to parse large file or disk sizes, there is a function called \ref parse_SI_IEC_size(), which accepts strings like "1 GiB" or "20 TB" as input.
+
+See the \ref install_config documentation page on the format of accepted file size strings.
+
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+
+/** \page common_io_counter I/O Performance Counter
+
+The STXXL library provides various I/O performance counters (stxxl::stats class) which can be used to get an extensive set of I/O statistics. They can be accessed as follows:
+
+\code
+  // generate stats instance
+  stxxl::stats * Stats = stxxl::stats::get_instance();
+
+  // start measurement here
+  stxxl::stats_data stats_begin(*Stats);
+
+  // some computation ...
+
+  // substract current stats from stats at the beginning of the measurement
+  std::cout << (stxxl::stats_data(*Stats) - stats_begin);
+\endcode
+
+The Stats ostream holds various measured I/O data:
+
+\verbatim
+STXXL I/O statistics
+ total number of reads                      : 2
+ average block size (read)                  : 2097152 (2.000 MiB)
+ number of bytes read from disks            : 4194304 (4.000 MiB)
+ time spent in serving all read requests    : 0.062768 s @ 63.7268 MiB/s
+ time spent in reading (parallel read time) : 0.062768 s @ 63.7268 MiB/s
+ total number of writes                     : 2
+ average block size (write)                 : 2097152 (2.000 MiB)
+ number of bytes written to disks           : 4194304 (4.000 MiB)
+ time spent in serving all write requests   : 0.0495751 s @ 80.6857 MiB/s
+ time spent in writing (parallel write time): 0.0495751 s @ 80.6857 MiB/s
+ time spent in I/O (parallel I/O time)      : 0.112343 s @ 71.2104 MiB/s
+ I/O wait time                              : 0.104572 s
+ I/O wait4read time                         : 0.054934 s
+ I/O wait4write time                        : 0.049638 s
+ Time since the last reset                  : 0.605008 s
+\endverbatim
+
+We can access individual I/O data in contrast to the whole content of Stats ostream by:
+
+\code
+std::cout << Stats->get_written_volume() << std::endl;  // print number of bytes written to the disks
+\endcode
+
+\b Hint: There's another statistical parameter which may be in developer's interest: the maximum number of bytes (the peak) allocated in external memory during program run. This parameter can be accessed by:
+
+\code
+stxxl::block_manager * bm = stxxl::block_manager::get_instance();
+// lots of external work here...
+std::cout << "max: " << bm->get_maximum_allocation() << std::endl;  // max. number of bytes allocated until now
+\endcode
+
+See \ref stxxl::stats and \ref stxxl::stats_data class reference for all provided individual functions.
+
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+
+} // namespace stxxl

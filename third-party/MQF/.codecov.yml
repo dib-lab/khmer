@@ -1,0 +1,4 @@
+ignore:
+  - main.c
+  - catch.hpp
+  - test.h

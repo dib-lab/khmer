@@ -1,0 +1,120 @@
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/tutorial_deque.dox
+ *
+ *  Usage Tutorial for STXXL
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *  Copyright (C) 2013 Daniel Feist <daniel.feist@student.kit.edu>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+namespace stxxl {
+
+/** \page tutorial_deque STXXL Deque
+
+This page introduces into the stxxl::deque container (to learn more about the structure of stxxl::deque, see section \ref design_deque).
+
+The acronym Deque stands for "double-ended-queue", that means elements can be accessed, inserted and deleted on both ends of the data structure - in contrast to the stxxl::queue (see \ref tutorial_queue),
+where that's only possible on one of the two endings.
+
+
+### Creating a STXXL deque
+
+To create a stxxl::deque object, only the data value type must be specified:
+
+\code
+typedef stxxl::deque<int> deque;
+deque my_deque;
+\endcode
+
+See \ref stxxl::deque for additional template parameter details.
+
+### Insert elements
+
+Inserting elements is possible at the start (by calling the push_front() function) as well as the end (by calling the push_back() function) of the deque.
+
+\code
+my_deque.push_front(2);
+my_deque.push_front(11);
+
+my_deque.push_back(5);
+my_deque.push_back(8);
+
+// deque now stores: |11|2|5|8|
+\endcode
+
+
+### Access elements
+
+To return a reference to the element at the start of the deque, call front(), to return a reference to the elemtent at the end of the deque, call back() on a deque instance.
+
+\code
+std::cout << "return 'first' element: " << my_deque.front() << std::endl;  // prints 11
+std::cout << "return 'last' element: " << my_deque.back() << std::endl;  // prints 8
+\endcode
+
+Accessing elements at random is supported by the STXXL deque with the []-operator like the following.
+
+\code
+std::cout << "random access: " << my_deque[2] << std::endl;  // prints 5
+\endcode
+
+The operations described in this sections are not I/O-efficient as they come with \f$\mathcal{O}(1)\f$ time per I/O-access. To achieve I/O-efficient scanning, the STXXL deque provides different iterators.
+The simplest iterator can be used as follows:
+
+\code
+// create forward-iterator (which advances from start to end)
+stxxl::deque_iterator<deque> deque_iterator = my_deque.begin();
+// access item at current iterator position
+std::cout << *deque_iterator << std::endl;
+// move up one step by preincrement
+++deque_iterator;
+\endcode
+
+### Delete elements
+
+Deleting elements is possible at both endings of the deque by using pop_front() and pop_back():
+
+\code
+my_deque.pop_front();  // deque now stores: |2|5|8|
+my_deque.pop_back();  // deque now stores: |2|5|
+\endcode
+
+
+### Determine size / Check whether the deque is empty
+
+To determine the size (i.e. the number of elements) of an instance, call size():
+
+\code
+std::cout << "deque stores: " << my_deque.size() << " elements" << std::endl;
+\endcode
+
+To check if the deque is empty, call empty() which returns true if the deque is empty:
+
+\code
+std::cout << "empty deque? " << my_deque.empty() << std::endl;
+\endcode
+
+### A minimal example on STXXL's deque
+
+(See \ref examples/containers/deque1.cpp for the sourcecode of the following example).
+
+\snippet examples/containers/deque1.cpp example
+
+See \ref examples/containers/deque2.cpp for the sourcecode of a more comprehensive example.
+
+\example examples/containers/deque1.cpp
+This example code is explained in the \ref tutorial_deque section.
+
+\example examples/containers/deque2.cpp
+This example code is explained in the \ref tutorial_deque section.
+
+*/
+
+} // namespace stxxl

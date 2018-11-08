@@ -1,0 +1,88 @@
+-*- mode: org -*-
+############################################################################
+#  misc/do-release.txt
+#
+#  Notes about the procedure of publishing a release.
+#
+#  Part of the STXXL. See http://stxxl.sourceforge.net
+#
+#  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+#
+#  Distributed under the Boost Software License, Version 1.0.
+#  (See accompanying file LICENSE_1_0.txt or copy at
+#  http://www.boost.org/LICENSE_1_0.txt)
+############################################################################
+
+#+STARTUP: showall
+
+* Prerelease Checks
+
+** Run misc/analyze-source.pl (-w) to uncrustify everything.
+
+** Check that the library passes all build tests on all supported systems.
+
+** Check that the CHANGELOG and TODO is up to date.
+
+* Release Procedure
+
+** Update CHANGELOG -> change from (unreleased) to (release date)
+   [file:../CHANGELOG]
+
+** Update the following files with the correct version number:
+   [file:../CMakeLists.txt] -> STXXL_VERSION_*
+   [file:../Doxyfile] -> PROJECT_NUMBER
+
+** Git commit and add signed tag
+   git commit -am "stxxl-1.4.x"
+   git tag -s -a 1.4.x -m "Final release 1.4.x"
+   git push
+   git push --tags
+
+** Package final source tarball and zip
+   git reset --hard master
+   git clean -d -f -x
+   mkdir build; cd build
+   cmake ..
+   make package_source
+   # check tarball
+   tar tvvzf stxxl-1.4.x.tar.gz
+   # move stxxl-1.4.x.tar.gz out of build
+
+** Generate stand-alone doxygen tarball:
+   # check doxygen version! -> 1.8.5
+   doxygen --version
+   git reset --hard master
+   git clean -d -f -x
+   mv include/stxxl/bits/config.h.in include/stxxl/bits/config.h
+   doxygen
+   # optimize pngs
+   optipng -o7 doxygen-html/*.png doxygen-html/*/*.png
+   # remove hashstamp files
+   rm doxygen-html/*.md5
+   # tag HTML with version and link
+   sed -i "s@<li class=\"footer\">Generated@<li class=\"footer\"><a href=\"http://stxxl.sourceforge.net\">STXXL 1.4.x</a> - Generated@" doxygen-html/*.html
+   tar czf stxxl-1.4.x-doxygen.tar.gz doxygen-html
+   # check tarball
+   tar tvvzf stxxl-1.4.x-doxygen.tar.gz
+   # move stxxl-1.4.x-doxygen.tar.gz out of build
+
+** Upload both tarballs to sourceforge
+
+** Update website with new versions
+   - copy contents of doxygen tarball into git website repository
+
+* Post-Release Procedure
+
+** Update CHANGELOG -> change to next version 1.4.99 (unreleased)
+   [file:../CHANGELOG]
+
+** Update the following files with the new prerelease version number:
+   [file:../CMakeLists.txt] -> STXXL_VERSION_*
+   [file:../Doxyfile] -> PROJECT_NUMBER
+
+** Git commit and add signed tag
+   git commit -am "Tagging trunk with unreleased 1.4-dev"
+
+* Announcements
+
+** Post announcement messages on sourceforge "forum" and "news" sections

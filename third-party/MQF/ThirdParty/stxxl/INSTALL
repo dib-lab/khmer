@@ -1,0 +1,23 @@
+BASIC INFORMATION
+
+For detailed installation instructions, including instruction for installation
+in a Linux or Windows based environment and application compilation hints
+(including an example Makefile) please read the doxygen manual:
+http://stxxl.sourceforge.net/
+
+
+QUICK INSTALLATION INSTRUCTIONS FOR POSIX COMPATIBLE SYSTEMS
+
+* Extract the tarball and change into the stxxl root directory.
+
+* Create a separate build directory (in-source building is prohibited):
+  - mkdir build
+  - cd build
+
+* Run cmake to detect the build platform (where ".." is the STXXL tree):
+  - cmake ..
+
+* Check cmake's output for errors, then run build the library:
+  - make
+
+* See http://stxxl.sourceforge.net/ for more details.
