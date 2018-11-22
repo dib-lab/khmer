@@ -43,6 +43,7 @@ Contact: khmer-project@idyll.org
 #include <mutex>
 #include <unordered_map>
 using MuxGuard = std::lock_guard<std::mutex>;
+#include <iostream>
 
 #include "gqf.h"
 
@@ -137,6 +138,7 @@ public:
             _counts[i] = new Byte[tablebytes];
             memset(_counts[i], 0, tablebytes);
         }
+        std::cout << "DEBUG: " << _counts[0] << std::endl << std::flush;
     }
 
     // Accessors for protected/private table info members
