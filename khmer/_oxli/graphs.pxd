@@ -125,6 +125,10 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli" nogil:
         CpQFCounttable(WordLength, uint64_t,uint64_t) except +oxli_raise_py_error
 
 
+    cdef cppclass CpBufferedQFCounttable "oxli::BufferedQFCounttable" (CpHashtable):
+        CpBufferedQFCounttable(WordLength, uint64_t,uint64_t) except +oxli_raise_py_error
+
+
 cdef extern from "oxli/hashgraph.hh" namespace "oxli" nogil:
     cdef cppclass CpHashgraph "oxli::Hashgraph" (CpHashtable):
         set[HashIntoType] all_tags
@@ -259,6 +263,8 @@ cdef class Hashtable:
 cdef class QFCounttable(Hashtable):
     cdef shared_ptr[CpQFCounttable] _qf_this
 
+cdef class BufferedQFCounttable(Hashtable):
+    cdef shared_ptr[CpBufferedQFCounttable] _qf_this
 
 cdef class SmallCounttable(Hashtable):
     cdef shared_ptr[CpSmallCounttable] _st_this

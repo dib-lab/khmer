@@ -334,6 +334,7 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
         spawn(cmd=mqfcmd, dry_run=self.dry_run)
         for ext in self.extensions:
             ext.extra_objects.append(path_join("third-party", "MQF", "libMQF.a"))
+        #    ext.extra_objects.append(path_join("third-party", "MQF","ThirdParty","stxxl","build","lib", "libstxxl.a"))
 
         if "z" not in self.libraries:
             zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'

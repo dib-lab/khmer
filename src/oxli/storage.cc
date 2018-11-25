@@ -1010,3 +1010,13 @@ void QFStorage::load(std::string infilename, WordLength &ksize)
 
     infile.close();
 }
+
+void BufferedMQFStorage::save(std::string outfilename, WordLength ksize)
+{
+}
+
+
+void BufferedMQFStorage::load(std::string infilename, WordLength &ksize)
+{
+
+}

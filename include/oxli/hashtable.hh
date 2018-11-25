@@ -618,6 +618,14 @@ public:
         : MurmurHashtable(ksize, new QFStorage(size,slotsize)) { } ;
 };
 
+class BufferedQFCounttable : public oxli::MurmurHashtable
+{
+public:
+    explicit BufferedQFCounttable(WordLength ksize, int size,int slotsize)
+        : MurmurHashtable(ksize, new BufferedMQFStorage(size,slotsize)) { } ;
+};
+
+
 // Hashtable-derived class with BitStorage.
 class Nodetable : public oxli::MurmurHashtable
 {

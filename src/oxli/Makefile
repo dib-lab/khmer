@@ -69,7 +69,7 @@ PREFIX=/usr/local
 
 INCLUDES= -I ../../include/ -I ../../third-party/seqan/core/include/ \
 	      -I ../../third-party/smhasher/ \
-				-I ../../third-party/mqf/ \
+				-I ../../third-party/MQF/ \
 				-I ../../third-party/rollinghash
 
 ifeq ($(USE_SYSTEM_ZLIB), false)
@@ -300,10 +300,10 @@ clean: $(PRECLEAN_TARGS)
 
 install: $(LIBOXLISO) liboxli.a oxli.pc $(OXLI_HEADERS)
 	rm -rf $(PREFIX)/include/oxli $(PREFIX)/include/khmer
-	mkdir -p $(PREFIX)/lib $(PREFIX)/lib/pkgconfig $(PREFIX)/include/oxli
+	mkdir -p $(PREFIX)/lib $(PREFIX)/lib/pkgconfig $(PREFIX)/BufferedQFCounttable/oxli
 	cp -r $(OXLI_HEADERS) 				\
 		../../third-party/smhasher/MurmurHash3.h 	\
-		$(PREFIX)/include/oxli/
+		$(PREFIX)/BufferedQFCounttable/oxli/
 	cp oxli.pc $(PREFIX)/lib/pkgconfig/
 	cp $(LIBOXLISO) liboxli.a $(PREFIX)/lib/
 	ln -sf $(PREFIX)/lib/$(LIBOXLISO) $(PREFIX)/lib/liboxli.$(SHARED_EXT)
