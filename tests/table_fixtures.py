@@ -58,7 +58,7 @@ def tablewrapper(tabletype):
 
         if tabletype is QFCounttable:
             qf_size = 2**math.ceil(math.log(starting_size, 2))
-            return tabletype(k, qf_size)
+            return tabletype(k, qf_size,8)
         else:
             return tabletype(k, starting_size, n_tables)
 

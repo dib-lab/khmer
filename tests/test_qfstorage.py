@@ -30,7 +30,7 @@ def getSketch(request):
 
 def test_count_1(getSketch):
     print("start")
-    hi = getSketch(12, sketchSize)
+    hi = getSketch(12, sketchSize,8)
 
     kmer = 'G' * 12
     hashval = hi.hash('G' * 12)
@@ -53,7 +53,7 @@ def test_count_1(getSketch):
 
 
 def test_count_2(getSketch):
-    hi = getSketch(12, sketchSize)
+    hi = getSketch(12, sketchSize,8)
     print("done")
     kmer = 'G' * 12
     hashval = hi.hash('G' * 12)
@@ -74,7 +74,7 @@ def test_read_write(getSketch):
     print("Start")
     fname = str.encode(utils.get_temp_filename('zzz'))
     rng = random.Random(1)
-    ctm = getSketch(20, sketchSize)
+    ctm = getSketch(20, sketchSize,8)
 
     kmers = ["".join(rng.choice("ACGT") for _ in range(20))
              for n in range(400)]
@@ -96,7 +96,7 @@ def test_read_write(getSketch):
 
 def test_maxcount_with_bigcount(getSketch):
     # hashtable should not saturate, if use_bigcount is set.
-    kh = getSketch(4, 128)
+    kh = getSketch(4, 128,8)
 
     last_count = None
     for _ in range(0, 10000):
@@ -112,7 +112,7 @@ def test_maxcount_with_bigcount(getSketch):
 
 
 def test_get_ksize(getSketch):
-    kh = getSketch(22, 16)
+    kh = getSketch(22, 16,8)
     assert kh.ksize() == 22
 
 

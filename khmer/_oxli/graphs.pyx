@@ -386,7 +386,7 @@ cdef class QFCounttable(Hashtable):
     @classmethod
     def load(cls, file_name):
         """Load the graph from the specified file."""
-        cdef QFCounttable table = cls(1, 1)
+        cdef QFCounttable table = cls(1, 1,1)
         deref(table._qf_this).load(_bstring(file_name))
         return table
 
