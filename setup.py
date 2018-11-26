@@ -180,7 +180,7 @@ SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
 
 # Don't forget to update lib/Makefile with these flags!
 EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11', '-pedantic',
-                      '-fno-omit-frame-pointer']
+                      '-fno-omit-frame-pointer','-fPIC']
 EXTRA_LINK_ARGS = ['-fno-omit-frame-pointer']
 
 if sys.platform == 'darwin':
@@ -334,7 +334,7 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
         spawn(cmd=mqfcmd, dry_run=self.dry_run)
         for ext in self.extensions:
             ext.extra_objects.append(path_join("third-party", "MQF", "libMQF.a"))
-        #    ext.extra_objects.append(path_join("third-party", "MQF","ThirdParty","stxxl","build","lib", "libstxxl.a"))
+            ext.extra_objects.append(path_join("third-party", "MQF","ThirdParty","stxxl","build","lib", "libstxxl.a"))
 
         if "z" not in self.libraries:
             zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'

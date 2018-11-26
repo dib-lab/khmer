@@ -43,8 +43,8 @@ OBJS= gqf.o	utils.o bufferedMQF.o  onDiskMQF.o
 
 # dependencies between programs and .o files
 
-main:	main.o $(STXXL) $(OBJS)
-	$(LD) $^ $(LDFLAGS) -o $@ $(STXXL)
+main:	main.o libMQF.a
+	$(LD)  main.o $(LDFLAGS) -o $@  libMQF.a
 # dependencies between .o files and .h files
 
 libgqf.so: $(OBJS)
@@ -57,11 +57,12 @@ main.o: gqf.h
 
 libMQF.a: $(STXXL) $(OBJS)
 	ar rcs libMQF.a  $(OBJS) $(STXXL)
+	ranlib libMQF.a
 # dependencies between .o files and .cc (or .c) files
 
 $(STXXL):
 	mkdir -p ThirdParty/stxxl/build
-	cd ThirdParty/stxxl/build && cmake DBUILD_STATIC_LIBS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./ ..
+	cd ThirdParty/stxxl/build && cmake DBUILD_STATIC_LIBS=ON   -DCMAKE_BUILD_TYPE=Release -DCCMAKE_CXX_FLAGS="-fPIC" -DCMAKE_INSTALL_PREFIX=./ ..
 	cd ThirdParty/stxxl/build && make all install
 
 

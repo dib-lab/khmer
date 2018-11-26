@@ -256,7 +256,9 @@ elseif(NOT NO_CXX11)
     endif()
   endif(APPLE)
 endif()
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fPIC")
 # check C++ compiler for C++11 features
 
 include(CheckCXXSourceCompiles)
