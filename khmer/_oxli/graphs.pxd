@@ -127,6 +127,9 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli" nogil:
 
     cdef cppclass CpBufferedQFCounttable "oxli::BufferedQFCounttable" (CpHashtable):
         CpBufferedQFCounttable(WordLength, uint64_t,uint64_t) except +oxli_raise_py_error
+        bool addToBufferQuery(const string &)
+        bool queryBuffer()
+        bool clearQueryBuffer()
 
 
 cdef extern from "oxli/hashgraph.hh" namespace "oxli" nogil:

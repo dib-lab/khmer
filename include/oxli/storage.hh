@@ -500,7 +500,7 @@ public:
         // Final argument is the number of bits allocated for the value, which
         // we do not use.
         _supports_bigcount = true;
-        qf_init(&buffer, (1ULL << 15), 15+slotSize, 0,2,0,true,"",2038074761);
+        qf_init(&buffer, (1ULL << 18), size+slotSize, 0,2,0,true,"",2038074761);
         bufferedMQF_init(&main, (1ULL<< (size-2)) ,(1ULL << size), size+slotSize
         ,0,2,"");
 
@@ -524,6 +524,11 @@ public:
     bool add(HashIntoType khash)
     {
         bool is_new = get_count(khash) == 0;
+
+      //  if(!is_new)
+        {
+            qf_insert(&buffer, khash % buffer.metadata->range, 1,false,false);
+        }
         bufferedMQF_insert(&main, khash % main.disk->metadata->range, 1,false,false);
         return is_new;
     }
@@ -531,9 +536,48 @@ public:
     // get the count for the given k-mer hash.
     const BoundedCounterType get_count(HashIntoType khash) const
     {
-        return bufferedMQF_count_key(&main, khash % main.disk->metadata->range);
+    //    cout<<"query "<<qf_count_key(&buffer, khash % buffer.metadata->range)<<endl;
+    //    cout<<khash<<" query"<<endl;
+        return qf_count_key(&buffer, khash % buffer.metadata->range);
     }
 
+    bool addToQueryBuffer(HashIntoType khash)
+    {
+      if(qf_space(&buffer)>90){
+        cout<<"Here"<<endl;
+        return false;
+      }
+    //  cout<<(uint64_t)(khash% buffer.metadata->range)<<"-addBufferQuery"<<endl;
+      qf_insert(&buffer, khash % buffer.metadata->range, 1,false,false);
+      return true;
+    }
+    bool queryBuffer(){
+      // QFi it;
+      // qf_iterator(&buffer,&it,0);
+      // while(!qfi_end(&it))
+      // {
+      //   uint64_t key,value,count;
+      //   qfi_get(&it,&key,&value,&count);
+      //   cout<<key<<"->"<<count<<endl;
+      //   qfi_next(&it);
+      // }
+      bufferedMQF_BatchQuery(&main,&buffer);
+  //    qf_iterator(&buffer,&it,0);
+      // while(!qfi_end(&it))
+      // {
+      //   uint64_t key,value,count;
+      //   qfi_get(&it,&key,&value,&count);
+      //   cout<<key<<"->"<<count<<endl;
+      //   qfi_next(&it);
+      // }
+    //  cout<<"Batch query is called"<<endl;
+      return true;
+    }
+    bool clearQueryBuffer(){
+      //cout<<"Buffer is reseted"<<endl;
+      qf_reset(&buffer);
+      return true;
+    }
     // Accessors for protected/private table info members
     // xnslots is larger than nslots. It includes some extra slots to deal
     // with some details of how the counting is implemented

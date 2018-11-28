@@ -2410,7 +2410,7 @@ bool qfi_firstInBlock(QF* qf,QFi *it, QFi * res){
 		qf_iterator(qf,res,it->current-tmp);
 	}
 	while(res->current < current)
-		qfi_next(res);	
+		qfi_next(res);
 }
 
 bool qfi_find(QF *qf,QFi *qfi, uint64_t key)
@@ -2557,7 +2557,7 @@ double slotsUsedInCounting(QF* qf){
 	return (double)res;
 }
 
-inline int qfi_end(QFi *qfi)
+int qfi_end(QFi *qfi)
 {
 	if (qfi->current >= qfi->qf->metadata->xnslots /*&& is_runend(qfi->qf, qfi->current)*/)
 		return 1;

@@ -561,7 +561,7 @@ def create_MQFGraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
 
     p=int(math.ceil(math.log2(float(args.unique_kmers)/float(fp_rate))))
     slotSize=p-size
-
+    size+=4
     if slotSize<2 :
         print_error("\n** ERROR: too small slot size.\n")
         sys.exit(1)
@@ -573,11 +573,20 @@ def create_MQFGraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
     bitsPerSlot=slotSize+2
     totalSize=nblocks*(blockSize+bitsPerSlot*8)
     totalSize/=(1000.0 ** 3);
-    log_info("*** INFO: creating MQF of size {size} and slot {slotsize}. Total Size ={totalSize}G"
-             , size=size, slotsize=slotSize,totalSize=totalSize)
 
-    return khmer.QFCounttable(ksize,2**size,slotSize)
 
+
+    if args.mqf:
+        log_info("*** INFO: creating MQF of size {size} and slot {slotsize}. Total Size ={totalSize}G"
+                 , size=size, slotsize=slotSize,totalSize=totalSize)
+        return khmer.QFCounttable(ksize,2**size,slotSize)
+    elif args.bmqf:
+        log_info("*** INFO: creating Buffered MQF of size {size} and slot {slotsize}. Total Size ={totalSize}G"
+                 , size=size, slotsize=slotSize,totalSize=totalSize)
+        return khmer.BufferedQFCounttable(ksize,2**size,slotSize)
+    else:
+        print_error("\n** ERROR: Unknown mqf type.\n")
+        sys.exit(1)
 
 def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
     """Create and return a countgraph."""

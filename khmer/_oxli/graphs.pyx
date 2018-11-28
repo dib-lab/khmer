@@ -434,6 +434,17 @@ cdef class BufferedQFCounttable(Hashtable):
         deref(table._qf_this).load(_bstring(file_name))
         return table
 
+    def addToBufferQuery(self, str sequence):
+        '''add the kmers on seq to query buffer.'''
+        cdef bytes data = self._valid_sequence(sequence)
+        return <bool>deref(self._qf_this).addToBufferQuery(data)
+
+    def queryBuffer(self):
+        return <bool>deref(self._qf_this).queryBuffer()
+
+    def clearQueryBuffer(self):
+        return <bool>deref(self._qf_this).clearQueryBuffer()
+
 
 cdef class Counttable(Hashtable):
 

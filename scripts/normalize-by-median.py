@@ -152,6 +152,26 @@ class WithDiagnostics(object):
             report_fp.flush()
 
 
+def BufferedReader(reader,bufferedCountTable,numReads):
+    reads=[]
+    for i, is_paired, read0, read1 in reader:
+        bufferedCountTable.addToBufferQuery(read0.cleaned_seq)
+        if is_paired:
+            bufferedCountTable.addToBufferQuery(read1.cleaned_seq)
+        reads.append([i,is_paired, read0, read1])
+        if len(reads)==numReads:
+            bufferedCountTable.queryBuffer()
+            for r in reads:
+                yield r[0],r[1],r[2],r[3]
+            bufferedCountTable.clearQueryBuffer()
+            reads=[]
+    if len(reads)==0:
+        bufferedCountTable.queryBuffer()
+        for r in reads:
+            yield r[0],r[1],r[2],r[3]
+        bufferedCountTable.clearQueryBuffer()
+
+
 class Normalizer(object):
     """Digital normalization algorithm."""
 
@@ -297,6 +317,8 @@ def get_parser():
     add_output_compression_type(parser)
     parser.add_argument('--mqf', dest='mqf', default=False,
                         action='store_true')
+    parser.add_argument('--bmqf', dest='bmqf', default=False,
+                                    action='store_true')
     return parser
 
 
@@ -340,7 +362,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         log_info('loading k-mer countgraph from {graph}',
                  graph=args.loadgraph)
         countgraph = Countgraph.load(args.loadgraph)
-    elif args.mqf:
+    elif args.mqf or args.bmqf:
         countgraph = khmer_args.create_MQFGraph(args)
     else:
         log_info('making countgraph')
@@ -390,7 +412,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
             reader = broken_paired_reader(screed_iter, min_length=args.ksize,
                                           force_single=force_single,
                                           require_paired=require_paired)
-
+            if args.bmqf:
+                reader= BufferedReader(reader,countgraph,1000)
             # actually do diginorm
             for record in with_diagnostics(reader, filename):
                 if record is not None:

@@ -623,6 +623,26 @@ class BufferedQFCounttable : public oxli::MurmurHashtable
 public:
     explicit BufferedQFCounttable(WordLength ksize, int size,int slotsize)
         : MurmurHashtable(ksize, new BufferedMQFStorage(size,slotsize)) { } ;
+    bool addToBufferQuery(const std::string &s) const
+        {
+          KmerHashIteratorPtr kmers = ((Hashtable*)this)->new_kmer_iterator(s);
+          while(!kmers->done()) {
+            HashIntoType kmer = kmers->next();
+            bool res=((BufferedMQFStorage*)store)->addToQueryBuffer(kmer);
+            if(!res)
+              return false;
+          }
+          return true;
+        }
+    bool queryBuffer(){
+          return ((BufferedMQFStorage*)store)->queryBuffer();
+        }
+    bool clearQueryBuffer()
+    {
+      return ((BufferedMQFStorage*)store)->clearQueryBuffer();
+    }
+
+
 };
 
 

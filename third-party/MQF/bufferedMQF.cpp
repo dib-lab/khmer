@@ -82,15 +82,23 @@ void bufferedMQF_syncBuffer(bufferedMQF *qf){
 
 void bufferedMQF_BatchQuery( bufferedMQF* qf,QF* Batch){
 	QFi source_i;
+	QF* result=new QF();
+	qf_init(result, Batch->metadata->nslots,Batch->metadata->key_bits , 0,Batch->metadata->fixed_counter_size,0,true,"",2038074761);
 	if (qf_iterator(Batch, &source_i, 0)) {
 		do {
 			uint64_t key = 0, value = 0, count = 0;
 			qfi_get(&source_i, &key, &value, &count);
 			uint64_t diskCount=qf->disk->count_key(key);
 			uint64_t memCount=qf_count_key(qf->memoryBuffer,key);
-			qf_setCounter(Batch,key,diskCount+memCount);
+			//cout<<key<<"-bufferedQuery-"<<memCount+diskCount<<endl;
+			qf_insert(result,key,count,false,false);
+		//	qf_setCounter(Batch,key,diskCount+memCount);
 		} while (!qfi_next(&source_i));
 	}
+	qf_reset(Batch);
+	qf_copy(Batch,result);
+	qf_destroy(result);
+	delete result;
 }
 
 
