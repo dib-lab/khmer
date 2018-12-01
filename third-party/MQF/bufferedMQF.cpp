@@ -91,7 +91,7 @@ void bufferedMQF_BatchQuery( bufferedMQF* qf,QF* Batch){
 			uint64_t diskCount=qf->disk->count_key(key);
 			uint64_t memCount=qf_count_key(qf->memoryBuffer,key);
 			//cout<<key<<"-bufferedQuery-"<<memCount+diskCount<<endl;
-			qf_insert(result,key,count,false,false);
+			qf_insert(result,key,memCount+diskCount,false,false);
 		//	qf_setCounter(Batch,key,diskCount+memCount);
 		} while (!qfi_next(&source_i));
 	}

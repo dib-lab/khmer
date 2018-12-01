@@ -275,6 +275,18 @@ std::pair<uint64_t, uint64_t> compute_band_interval(unsigned int num_bands,
     return interval;
 }
 
+uint64_t ihash(uint64_t key,uint64_t mask)
+	{    
+		key = (~key + (key << 21)) & mask; // key = (key << 21) - key - 1;
+		key = key ^ key >> 24;
+		key = ((key + (key << 3)) + (key << 8)) & mask; // key * 265
+		key = key ^ key >> 14;
+		key = ((key + (key << 2)) + (key << 4)) & mask; // key * 21
+		key = key ^ key >> 28;
+		key = (key + (key << 31)) & mask;
+		return key;
+	}
+
 KmerIterator::KmerIterator(const char * seq,
                            unsigned char k) :
     KmerFactory(k), _seq(seq)

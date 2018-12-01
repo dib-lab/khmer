@@ -446,9 +446,9 @@ public:
     //
     bool add(HashIntoType khash)
     {
-        bool is_new = get_count(khash) == 0;
+      //  bool is_new = get_count(khash) == 0;
         qf_insert(&mf, khash % mf.metadata->range, 1,false,false);
-        return is_new;
+        return true;
     }
 
     // get the count for the given k-mer hash.

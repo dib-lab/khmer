@@ -611,18 +611,18 @@ public:
 };
 
 // Hashtable-derived class with QFStorage.
-class QFCounttable : public oxli::MurmurHashtable
+class QFCounttable : public oxli::Hashtable
 {
 public:
     explicit QFCounttable(WordLength ksize, int size,int slotsize)
-        : MurmurHashtable(ksize, new QFStorage(size,slotsize)) { } ;
+        : Hashtable(ksize, new QFStorage(size,slotsize)) { } ;
 };
 
-class BufferedQFCounttable : public oxli::MurmurHashtable
+class BufferedQFCounttable : public oxli::Hashtable
 {
 public:
     explicit BufferedQFCounttable(WordLength ksize, int size,int slotsize)
-        : MurmurHashtable(ksize, new BufferedMQFStorage(size,slotsize)) { } ;
+        : Hashtable(ksize, new BufferedMQFStorage(size,slotsize)) { } ;
     bool addToBufferQuery(const std::string &s) const
         {
           KmerHashIteratorPtr kmers = ((Hashtable*)this)->new_kmer_iterator(s);

@@ -330,12 +330,12 @@ protected:
     const char * _seq;
 
     HashIntoType _kmer_f, _kmer_r;
-    HashIntoType bitmask;
     unsigned int _nbits_sub_1;
     unsigned int index;
     size_t length;
     bool initialized;
 public:
+		HashIntoType bitmask;
     KmerIterator(const char * seq, unsigned char k);
 
     /** @param[in]  f The forward hash value.
@@ -395,6 +395,9 @@ public:
 
 // TwoBitKmerHashIterator -- just wrap KmerIterator.
 
+uint64_t ihash(uint64_t key,uint64_t mask);
+
+
 class TwoBitKmerHashIterator : public KmerHashIterator {
 protected:
     KmerIterator iter;
@@ -402,9 +405,9 @@ public:
     TwoBitKmerHashIterator(const char * seq, WordLength k) :
         iter(seq, k) { } ;
 
-    HashIntoType first() { return iter.first(); }
+    HashIntoType first() { return ihash(iter.first(),iter.bitmask); }
 
-    HashIntoType next() { return iter.next(); }
+    HashIntoType next() { return ihash(iter.next(),iter.bitmask); }
 
     bool done() const { return iter.done(); }
 

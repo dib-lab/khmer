@@ -560,8 +560,9 @@ def create_MQFGraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
         fp_rate = args.fp_rate
 
     p=int(math.ceil(math.log2(float(args.unique_kmers)/float(fp_rate))))
+    p=min(p,ksize*2);
     slotSize=p-size
-    size+=4
+
     if slotSize<2 :
         print_error("\n** ERROR: too small slot size.\n")
         sys.exit(1)
