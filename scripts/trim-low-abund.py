@@ -155,6 +155,8 @@ def get_parser():
     parser.add_argument('--single-pass', default=False, action='store_true',
                         help="Do not do a second pass across the low coverage "
                         "data")
+    parser.add_argument('--mqf', dest='mqf', default=False,
+                        action='store_true')
 
     return parser
 
@@ -350,6 +352,9 @@ def main():
             ct = SmallCountgraph.load(args.loadgraph)
         else:
             ct = Countgraph.load(args.loadgraph)
+    elif args.mqf:
+        log_info('making MQF')
+        ct = khmer_args.create_MQFGraph(args)
     else:
         log_info('making countgraph')
         ct = khmer_args.create_countgraph(args)
