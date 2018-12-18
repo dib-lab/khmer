@@ -93,13 +93,16 @@ def get_parser():
                               consistency')
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
+    parser.add_argument('-q', '--quiet', dest='quiet', default=False,
+            action='store_true')
     add_output_compression_type(parser)
     return parser
 
 
 def main():
     args = sanitize_help(get_parser()).parse_args()
-
+    configure_logging(args.quiet)
+    
     check_input_files(args.left, args.force)
     check_input_files(args.right, args.force)
     check_space([args.left, args.right], args.force)
