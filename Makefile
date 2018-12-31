@@ -135,7 +135,7 @@ clean: FORCE
 	rm -f $(EXTENSION_MODULE)
 	rm -f khmer/*.pyc scripts/*.pyc tests/*.pyc oxli/*.pyc \
 		sandbox/*.pyc khmer/__pycache__/* sandbox/__pycache__/* \
-		khmer/_oxli/*.cpp khmer/_oxli/*.so
+		khmer/_oxli/*.so
 	./setup.py clean --all || true
 	rm -f coverage-debug
 	rm -Rf .coverage coverage-gcovr.xml coverage.xml

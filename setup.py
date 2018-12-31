@@ -64,20 +64,9 @@ ez_setup.use_setuptools(version="3.4.1")
 
 CMDCLASS = versioneer.get_cmdclass()
 
-try:
-    import Cython
-    from Cython.Distutils import Extension as CyExtension
-    HAS_CYTHON = True
-    cy_ext = 'pyx'
-    print('*** NOTE: Found Cython, extension files will be '
-          'transpiled if this is an install invocation.',
-          file=sys.stderr)
-except ImportError:
-    from setuptools import Extension as CyExtension
-    HAS_CYTHON = False
-    cy_ext = 'cpp'
-    print('*** WARNING: Cython not found, assuming cythonized '
-          'files available for compilation.', file=sys.stderr)
+from setuptools import Extension as CyExtension
+HAS_CYTHON = False
+cy_ext = 'cpp'
 
 # strip out -Wstrict-prototypes; a hack suggested by
 # http://stackoverflow.com/a/9740721
