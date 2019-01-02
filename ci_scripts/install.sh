@@ -6,9 +6,8 @@ if [ "${TRAVIS_OS_NAME}" != "osx" ]; then
 fi
 
 brew update;
-brew install --verbose astyle;
-brew install --verbose enchant;
-brew install --verbose cppcheck;
+brew install astyle;
+brew install cppcheck;
 
 pushd .
 cd
