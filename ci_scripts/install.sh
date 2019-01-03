@@ -13,7 +13,7 @@ pushd .
 cd
 mkdir -p download
 cd download
-wget https://repo.continuum.io/miniconda/Miniconda2-4.5.11-MacOSX-x86_64.sh \
+wget https://repo.continuum.io/miniconda/Miniconda3-4.5.11-MacOSX-x86_64.sh \
   -O miniconda.sh
 chmod +x miniconda.sh && ./miniconda.sh -b
 cd ..
