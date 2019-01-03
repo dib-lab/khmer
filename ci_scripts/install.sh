@@ -7,7 +7,6 @@ fi
 
 brew update;
 brew install astyle;
-brew install enchant;
 brew install cppcheck;
 
 pushd .
