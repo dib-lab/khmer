@@ -100,6 +100,7 @@ after_success:
   - make format
   - make diff_pylint_report
   - make cppcheck
+  - make pydocstyle
   # only upload one coverage report to codecov as it merges all reports
   # from all builds into one.
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pip install codecov; fi
