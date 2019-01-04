@@ -904,17 +904,3 @@ cdef class Nodegraph(Hashgraph):
 
     def containment(self, Nodegraph other):
         return deref(self._ng_this).containment(deref(other._ng_this))
-
-    def get_raw_tables(self):
-        cdef uint8_t ** table_ptrs = deref(self._ng_this).get_raw_tables()
-        cdef vector[uint64_t] sizes = deref(self._ng_this).get_tablesizes()
-
-        new_raw_tables = []
-        for table_idx, table_size in enumerate(sizes):
-            table = table_ptrs[table_idx]
-            counter = table[0]
-            new_table = []
-            for i in range(table_size):
-                new_table.append(counter >> i)
-                new_raw_tables.append(new_table)
-        return new_raw_tables
