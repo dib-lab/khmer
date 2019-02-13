@@ -48,7 +48,7 @@ shotgun sequencing data from genomes, transcriptomes, metagenomes, and
 single cells.  khmer can make *de novo* assemblies faster, and
 sometimes better. khmer can also identify (and fix) problems with
 shotgun data.  You can read more about khmer in `our software paper
-<https://dx.doi.org/10.12688/f1000research.6924.1>`__.
+<https://doi.org/10.12688/f1000research.6924.1>`__.
 
 khmer is free and open source software.
 
