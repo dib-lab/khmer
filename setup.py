@@ -64,20 +64,9 @@ ez_setup.use_setuptools(version="3.4.1")
 
 CMDCLASS = versioneer.get_cmdclass()
 
-try:
-    import Cython
-    from Cython.Distutils import Extension as CyExtension
-    HAS_CYTHON = True
-    cy_ext = 'pyx'
-    print('*** NOTE: Found Cython, extension files will be '
-          'transpiled if this is an install invocation.',
-          file=sys.stderr)
-except ImportError:
-    from setuptools import Extension as CyExtension
-    HAS_CYTHON = False
-    cy_ext = 'cpp'
-    print('*** WARNING: Cython not found, assuming cythonized '
-          'files available for compilation.', file=sys.stderr)
+from setuptools import Extension as CyExtension
+HAS_CYTHON = False
+cy_ext = 'cpp'
 
 # strip out -Wstrict-prototypes; a hack suggested by
 # http://stackoverflow.com/a/9740721
@@ -289,9 +278,8 @@ SETUP_METADATA = \
         "packages": ['khmer', 'khmer.tests', 'oxli', 'khmer._oxli'],
         "package_data": {'khmer/_oxli': ['*.pxd']},
         "package_dir": {'khmer.tests': 'tests'},
-        "install_requires": ['screed >= 1.0', 'bz2file', 'Cython>=0.25.2'],
-        "setup_requires": ["pytest-runner>=2.0,<3dev", "setuptools>=18.0",
-                           "Cython>=0.25.2"],
+        "install_requires": ['screed>=1.0', 'bz2file'],
+        "setup_requires": ['setuptools>=18.0'],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
                            'tests': ['pytest>=2.9'],
