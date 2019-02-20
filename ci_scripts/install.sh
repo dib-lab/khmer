@@ -7,14 +7,13 @@ fi
 
 brew update;
 brew install astyle;
-brew install enchant;
 brew install cppcheck;
 
 pushd .
 cd
 mkdir -p download
 cd download
-wget http://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh \
+wget https://repo.continuum.io/miniconda/Miniconda3-4.5.11-MacOSX-x86_64.sh \
   -O miniconda.sh
 chmod +x miniconda.sh && ./miniconda.sh -b
 cd ..

@@ -45,8 +45,7 @@ PYSOURCES=$(filter-out khmer/_version.py, \
 	  $(wildcard khmer/*.py scripts/*.py oxli/*.py) )
 SOURCES=$(PYSOURCES) $(CPPSOURCES) $(CYSOURCES) setup.py
 
-DEVPKGS=pep8==1.6.2 diff_cover autopep8 pylint coverage gcovr pytest \
-	'pytest-runner>=2.0,<3dev' pydocstyle pyenchant
+DEVPKGS=pep8==1.6.2 diff_cover autopep8 pylint coverage gcovr pytest pydocstyle
 
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 
@@ -135,7 +134,7 @@ clean: FORCE
 	rm -f $(EXTENSION_MODULE)
 	rm -f khmer/*.pyc scripts/*.pyc tests/*.pyc oxli/*.pyc \
 		sandbox/*.pyc khmer/__pycache__/* sandbox/__pycache__/* \
-		khmer/_oxli/*.cpp khmer/_oxli/*.so
+		khmer/_oxli/*.so
 	./setup.py clean --all || true
 	rm -f coverage-debug
 	rm -Rf .coverage coverage-gcovr.xml coverage.xml
@@ -392,8 +391,9 @@ py-demos: sharedobj
 	python examples/python-api/mask.py
 
 COMMIT ?= $(shell git rev-parse HEAD)
+SLUG ?= $(TRAVIS_PULL_REQUEST_SLUG)
 docker-container:
-	cd docker && docker build --build-arg=branch=$(COMMIT) .
+	cd docker && docker build --build-arg branch=$(COMMIT) --build-arg slug=$(SLUG) .
 
 FORCE:
 
