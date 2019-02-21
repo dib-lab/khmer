@@ -278,6 +278,8 @@ CMDCLASS.update({'build_ext': KhmerBuildExt})
 
 
 _DISTUTILS_REINIT = Distribution.reinitialize_command
+
+
 def reinitialize_command(self, command, reinit_subcommands):
     """Monkeypatch the original version from distutils.
 
@@ -291,6 +293,8 @@ def reinitialize_command(self, command, reinit_subcommands):
     if options:
         self._set_command_options(cmd_obj, options)
     return cmd_obj
+
+
 Distribution.reinitialize_command = reinitialize_command
 
 

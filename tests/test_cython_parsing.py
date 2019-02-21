@@ -223,9 +223,9 @@ class Test_BrokenPairedReader(object):
 
         assert len(result) == 1
         assert n == 0
-        l, r = result[0]
-        assert l == reads[0]
-        assert r == reads[1]
+        left, right = result[0]
+        assert left == reads[0]
+        assert right == reads[1]
 
     @pytest.mark.parametrize("parser", [FastxParser, SanitizedFastxParser])
     def testRequirePairedAndMinLength_SwappedHalfPass(self, parser,
@@ -244,9 +244,9 @@ class Test_BrokenPairedReader(object):
 
         assert n == 0
         assert len(result) == 1
-        l, r = result[0]
-        assert l == reads[0]
-        assert r == reads[1]
+        left, right = result[0]
+        assert left == reads[0]
+        assert right == reads[1]
 
     @pytest.mark.parametrize("parser", [FastxParser, SanitizedFastxParser])
     def testRequirePairedAndMinLength_NeitherPass(self, parser, create_fastx):
@@ -264,9 +264,9 @@ class Test_BrokenPairedReader(object):
 
         assert n == 0
         assert len(result) == 1
-        l, r = result[0]
-        assert l == reads[0]
-        assert r == reads[1]
+        left, right = result[0]
+        assert left == reads[0]
+        assert right == reads[1]
 
     @pytest.mark.parametrize("parser", [FastxParser, SanitizedFastxParser])
     def testRequirePairedAndMinLength_SwappedNeitherPass(self, parser,
@@ -285,9 +285,9 @@ class Test_BrokenPairedReader(object):
 
         assert n == 0
         assert len(result) == 1
-        l, r = result[0]
-        assert l == reads[2]
-        assert r == reads[3]
+        left, right = result[0]
+        assert left == reads[2]
+        assert right == reads[3]
 
 
 def test_check_is_pair_1():
