@@ -34,13 +34,10 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Contact: khmer-project@idyll.org
-"""Setup for khmer project."""
 
-import ez_setup
-
-import glob
+import codecs
+from glob import glob
 import os
-import sys
 from os import listdir as os_listdir
 from os.path import join as path_join
 from os.path import splitext
@@ -49,7 +46,6 @@ import subprocess
 import sys
 import sysconfig
 import tempfile
-import codecs
 
 from setuptools import setup
 from setuptools import Extension
@@ -60,7 +56,6 @@ from distutils.dist import Distribution
 from distutils.errors import DistutilsPlatformError
 
 import versioneer
-ez_setup.use_setuptools(version="3.4.1")
 
 CMDCLASS = versioneer.get_cmdclass()
 
@@ -68,25 +63,11 @@ from setuptools import Extension as CyExtension
 HAS_CYTHON = False
 cy_ext = 'cpp'
 
-# strip out -Wstrict-prototypes; a hack suggested by
-# http://stackoverflow.com/a/9740721
-# proper fix coming in http://bugs.python.org/issue1222585
-# numpy has a "nicer" fix:
-# https://github.com/numpy/numpy/blob/master/numpy/distutils/ccompiler.py
-OPT = get_config_vars('OPT')[0]
-os.environ['OPT'] = " ".join(
-    flag for flag in OPT.split() if flag != '-Wstrict-prototypes'
-)
 
-# Checking for OpenMP support. Currently clang doesn't work with OpenMP,
-# so it needs to be disabled for now.
-# This function comes from the yt project:
-# https://bitbucket.org/yt_analysis/yt/src/f7c75759e0395861b52d16921d8ce3ad6e36f89f/yt/utilities/lib/setup.py?at=yt
-
-
+# Checking for OpenMP support. Currently clang doesn't work with OpenMP, so it
+# needs to be disabled for now. This function comes from the yt project:
+# https://bitbucket.org/yt_analysis/yt/src/f7c75759/yt/utilities/lib/setup.py
 def check_for_openmp():
-    """Check for OpenMP support."""
-    # Create a temporary directory
     tmpdir = tempfile.mkdtemp()
     curdir = os.getcwd()
     exit_code = 1
@@ -96,12 +77,7 @@ def check_for_openmp():
 
     try:
         os.chdir(tmpdir)
-
-        # Get compiler invocation
         compiler = os.getenv('CC', 'cc')
-
-        # Attempt to compile a test script.
-        # See http://openmp.org/wp/openmp-compilers/
         filename = r'test.c'
         source = open(filename, 'wt', 1)
         source.write(
@@ -116,10 +92,9 @@ def check_for_openmp():
             """
         )
         with open(os.devnull, 'w') as fnull:
-            exit_code = subprocess.call([compiler, '-fopenmp', filename],
-                                        stdout=fnull, stderr=fnull)
-
-        # Clean up
+            exit_code = subprocess.call(
+                [compiler, '-fopenmp', filename], stdout=fnull, stderr=fnull
+            )
         source.close()
     finally:
         os.chdir(curdir)
@@ -139,13 +114,6 @@ def distutils_dir_name(dname):
 def build_dir():
     return path_join("build", distutils_dir_name("temp"))
 
-# We bundle tested versions of zlib & bzip2. To use the system zlib and bzip2
-# change setup.cfg or use the `--libraries z,bz2` parameter which will make our
-# custom build_ext command strip out the bundled versions.
-
-
-ZLIBDIR = 'third-party/zlib'
-BZIP2DIR = 'third-party/bzip2'
 
 BUILD_DEPENDS = [path_join("include", "khmer", bn + ".hh") for bn in [
     "_cpy_khmer", "_cpy_utils", "_cpy_readparsers"
@@ -168,15 +136,13 @@ SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
 
 # Don't forget to update lib/Makefile with these flags!
-EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11', '-pedantic',
-                      '-fno-omit-frame-pointer']
-EXTRA_LINK_ARGS = ['-fno-omit-frame-pointer']
+EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11']
+EXTRA_LINK_ARGS = []
 
 if sys.platform == 'darwin':
     # force 64bit only builds
-    EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64', '-mmacosx-version-min=10.7',
-                               '-stdlib=libc++'])
-    EXTRA_LINK_ARGS.append('-mmacosx-version-min=10.7')
+    EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64', '-mmacosx-version-min=10.9'])
+    EXTRA_LINK_ARGS.append('-mmacosx-version-min=10.9')
 
 if check_for_openmp():
     EXTRA_COMPILE_ARGS.extend(['-fopenmp'])
@@ -202,9 +168,7 @@ CY_OPTS = {
     'c_string_encoding': 'utf8'
 }
 
-for cython_ext in glob.glob(os.path.join("khmer", "_oxli",
-                                         "*.{0}".format(cy_ext))):
-
+for cython_ext in glob(os.path.join("khmer", "_oxli", "*.{0}".format(cy_ext))):
     CY_EXTENSION_MOD_DICT = \
         {
             "sources": [cython_ext, "khmer/_oxli/oxli_exception_convert.cc"],
@@ -300,54 +264,18 @@ SETUP_METADATA = \
     }
 
 
-class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
-    """Specialized Python extension builder for khmer project.
-
-    Only run the library setup when needed, not on every invocation.
-
-    Also strips out the bundled zlib and bzip2 libraries if
-    `--libraries z,bz2` is specified or the equivalent is in setup.cfg
-    """
-
+class KhmerBuildExt(_build_ext):
+    """Specialized Python extension builder for khmer project."""
     def run(self):
-        """Run extension builder."""
-        if "%x" % sys.maxsize != '7fffffffffffffff':
-            raise DistutilsPlatformError("%s require 64-bit operating system" %
-                                         SETUP_METADATA["packages"])
-
-        if sys.platform == 'darwin' and 'gcov' in self.libraries:
-            self.libraries.remove('gcov')
-
         cqfcmd = ['bash', '-c', 'cd third-party/cqf && make']
         spawn(cmd=cqfcmd, dry_run=self.dry_run)
         for ext in self.extensions:
             ext.extra_objects.append(path_join("third-party", "cqf", "gqf.o"))
-
-        if "z" not in self.libraries:
-            zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'
-                    ' configure || bash ./configure --static ) && make -f '
-                    'Makefile.pic PIC']
-            spawn(cmd=zcmd, dry_run=self.dry_run)
-            for ext in self.extensions:
-                ext.extra_objects.extend(
-                    path_join("third-party", "zlib", bn + ".lo") for bn in [
-                        "adler32", "compress", "crc32", "deflate", "gzclose",
-                        "gzlib", "gzread", "gzwrite", "infback", "inffast",
-                        "inflate", "inftrees", "trees", "uncompr", "zutil"])
-
-        if "bz2" not in self.libraries:
-            bz2cmd = ['bash', '-c', 'cd ' + BZIP2DIR + ' && make -f '
-                      'Makefile-libbz2_so all']
-            spawn(cmd=bz2cmd, dry_run=self.dry_run)
-            for ext in self.extensions:
-                ext.extra_objects.extend(
-                    path_join("third-party", "bzip2", bn + ".o") for bn in [
-                        "blocksort", "huffman", "crctable", "randtable",
-                        "compress", "decompress", "bzlib"])
         _build_ext.run(self)
 
 
 CMDCLASS.update({'build_ext': KhmerBuildExt})
+
 
 _DISTUTILS_REINIT = Distribution.reinitialize_command
 
@@ -363,8 +291,7 @@ def reinitialize_command(self, command, reinit_subcommands):
     cmd_obj = _DISTUTILS_REINIT(self, command, reinit_subcommands)
     options = self.command_options.get(command)
     if options:
-        self._set_command_options(  # pylint: disable=protected-access
-            cmd_obj, options)
+        self._set_command_options(cmd_obj, options)
     return cmd_obj
 
 
