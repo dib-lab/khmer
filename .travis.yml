@@ -82,7 +82,7 @@ install:
 # command to run tests
 script:
   - make test
-  - make pep8
+  - make style
   - make doc
   - make py-demos
   - make cpp-demos
