@@ -120,6 +120,8 @@ cdef extern from "oxli/hashtable.hh" namespace "oxli" nogil:
 
     cdef cppclass CpNodetable "oxli::Nodetable" (CpMurmurHashtable):
         CpNodetable(WordLength, vector[uint64_t])
+        void compose_init(CpCounttable&, BoundedCounterType)
+        void compose_update(CpCounttable&, BoundedCounterType)
 
     cdef cppclass CpQFCounttable "oxli::QFCounttable" (CpHashtable):
         CpQFCounttable(WordLength, uint64_t) except +oxli_raise_py_error

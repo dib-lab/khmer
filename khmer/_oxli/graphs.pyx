@@ -459,6 +459,12 @@ cdef class Nodetable(Hashtable):
             self._nt_this = make_shared[CpNodetable](k, _primes)
             self._ht_this = <shared_ptr[CpHashtable]>self._nt_this
 
+    def compose_init(self, Counttable ct, int max):
+        deref(self._nt_this).compose_init(deref(ct._ct_this), max)
+
+    def compose_update(self, Counttable ct, int max):
+        deref(self._nt_this).compose_update(deref(ct._ct_this), max)
+
 
 cdef class Hashgraph(Hashtable):
 
