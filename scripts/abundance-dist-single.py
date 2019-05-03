@@ -84,6 +84,15 @@ def get_parser():
                         'output histogram file. The columns are: (1) k-mer '
                         'abundance, (2) k-mer count, (3) cumulative count, '
                         '(4) fraction of total distinct k-mers.')
+    parser.add_argument('-H', '--hash-function', choices=['2bit', 'murmur',
+                        'cyclic'], default='2bit', help='Indicate the hash '
+                        'function to be used; "2bit" is faster, is reversible,'
+                        ' and supports subsequent graph operations, but is '
+                        'limited to k <= 32; "murmur" supports arbitrarily '
+                        'large values of k and is compatible with k-mer '
+                        'banding, but is slower and does not support graph '
+                        'operations; "cyclic" is fast and supports banding, '
+                        'but does not support graph operations')
     parser.add_argument('-z', '--no-zero', dest='output_zero', default=True,
                         action='store_false',
                         help='Do not output zero-count bins')
@@ -98,6 +107,15 @@ def get_parser():
                         "filename.")
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Override sanity checks')
+    parser.add_argument('--banding', type=int, nargs=2, default=False,
+                        metavar=('N', 'B'), help='process k-mers in "banding" '
+                        'mode; specify two integers: a number of bands "N", '
+                        'and a band index "B" such that B is between 1 and N '
+                        'inclusive; as a result, only 1/N k-mers will be '
+                        'processed, resulting in a roughly N-fold reduction '
+                        'in memory consumption; for example, "--banding 50 9" '
+                        'will split the k-mer space into 50 bands and only '
+                        'process k-mers in band 9')
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
     return parser
@@ -106,6 +124,9 @@ def get_parser():
 def main():  # pylint: disable=too-many-locals,too-many-branches
     args = sanitize_help(get_parser()).parse_args()
     graph_type = 'smallcountgraph' if args.small_count else 'countgraph'
+    if args.banding and args.hash_function == '2bit':
+        message = 'can only process in "banding" mode with "murmur" hash'
+        raise ValueError(message)
 
     configure_logging(args.quiet)
     report_on_config(args, graph_type)
@@ -145,8 +166,15 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     log_info('consuming input, round 1 -- {input}',
              input=args.input_sequence_filename)
     for _ in range(args.threads):
-        thread = \
-            threading.Thread(
+        if args.banding:
+            numbands = args.banding[0]
+            bandindex = args.banding[1] - 1  # CLI is 1-based, API is 0-based
+            thread = threading.Thread(
+                target=countgraph.consume_seqfile_banding,
+                args=(rparser, numbands, bandindex, )
+            )
+        else:
+            thread = threading.Thread(
                 target=countgraph.consume_seqfile,
                 args=(rparser, )
             )
