@@ -1,0 +1,80 @@
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/tutorial_queue.dox
+ *
+ *  Usage Tutorial for STXXL
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *  Copyright (C) 2013 Daniel Feist <daniel.feist@student.kit.edu>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+namespace stxxl {
+
+/** \page tutorial_queue STXXL Queue
+
+This page introduces into the stxxl::queue Container (to learn more about the structure of stxxl::stack, see section \ref design_queue).
+
+### Creating a STXXL queue
+
+Before using a STXXL queue, we initially have to define and then to instantiate a queue object. The implementation holds the head and the tail blocks in the main memory. Prefetch and write block pools might be used to overlap I/O and computation during queue operations. A minimal configuration is shown below - the value_type (integer in our example case) is the only stricly neccessary parameter.
+The default configuration initializes a write_pool and a prefetch_pool of size 1.
+
+\code
+typedef stxxl::queue<int> queue;
+// create queue object with default parameters:
+// write_pool size = ?, prefetch_pool size = 1, blocks2prefetch = number of blocks in the prefetch pool (i.e. 1)
+queue my_queue;
+\endcode
+
+The STXXL queue implementation provides three different types of constructors to customize your individual caching. See \ref stxxl::queue more details. Additional optional template parameters are block_size, allocation_strategy, size_type, see \ref stxxl::queue for further details.
+
+### Insert / Access / Delete elements
+
+To insert a new value at the beginning of the queue, call push().
+Accessing elements are possible on both endings of the queue, back() returns the value at the beginning, front() returns the value at the end. Deleting a value by pop() erases the first inserted element.
+
+\code
+my_queue.push(5);  // queue now stores: |5|
+my_queue.push(9);  // queue now stores: |9|5|
+my_queue.push(1);  // queue now stores: |1|9|5|
+x = my_queue.back();  // x = 1
+y = my_queue.front();  // y = 5
+my_queue.pop();  // queue now stores: |1|9|
+\endcode
+
+### Determine size / Check whether queue is empty
+
+To determine the number of elements a queue currently stores, call size():
+
+\code
+std::cout << "size of queue: " << my_queue.size() << std::endl;
+\endcode
+
+To check if the queue is empty, call empty() which returns true in that case:
+
+\code
+std::cout << "queue empty? " << my_queue.empty() << std::endl;
+\endcode
+
+### A minimal working example of STXXL's queue
+
+(See \ref examples/containers/queue1.cpp for the sourcecode of the following example).
+
+\snippet examples/containers/queue1.cpp example
+
+See \ref examples/containers/queue2.cpp for the sourcecode of a more comprehensive example.
+
+\example examples/containers/queue1.cpp
+This example code is explained in the \ref tutorial_queue section.
+
+\example examples/containers/queue2.cpp
+This example code is explained in the \ref tutorial_queue section.
+
+*/
+
+} // namespace stxxl

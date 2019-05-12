@@ -1,0 +1,121 @@
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/stxxl_tool.dox
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+namespace stxxl {
+
+/** \page stxxl_tool stxxl_tool Collection
+
+\authors Timo Bingmann (2013)
+
+The \c stxxl_tool accompanies the source code and also binary distributions of STXXL. It contains multiple subprograms that can be used for benchmarking basic functionality of the library. We describe only some of the benchmarks and functions in this document. 
+
+\c stxxl_tool has a verbose command line help and descriptions of all subtools are available there. Try
+\verbatim
+$ stxxl_tool
+(prints all available subtools)
+$ stxxl_tool <subtool> --help
+\endverbatim
+
+
+\section create_files
+
+To pre-create files one can issue a command similar to:
+\verbatim
+$ stxxl_tool create_files 10gib /data01/stxxl.tmp
+\endverbatim
+
+
+\section benchmark_disks Benchmark Disk Bandwidth
+
+Maybe the most important tool for testing the I/O performance of an experimental platform is <b><tt>stxxl_tool benchmark_disks</tt></b>.
+
+This subtool will read the disk configuration file (.stxxl) and open all parallel disk files. Then the specified amount of data is written and read on the configured disks using the block manager and file I/O layers. The transfer speed is outputted for every batch for processed blocks.
+
+An example run looks as follows:
+\verbatim
+$ stxxl_tool benchmark_disks 10gib -b 4
+Parameter size set to 10737418240.
+Option -b, --batch set to 4.
+[STXXL-MSG] STXXL v1.4.0 (prerelease)
+[STXXL-MSG] Disk '/data01/stxxl' is allocated, space: 228881 MiB, I/O implementation: syscall
+[STXXL-MSG] Disk '/data02/stxxl' is allocated, space: 228881 MiB, I/O implementation: syscall
+[STXXL-MSG] In total 2 disks are allocated, space: 457763 MiB
+# Batch size: 33554432 (32.000 MiB)  (4 blocks of 8388608 (8.000 MiB) ) using randomized cycling striping
+Offset          0 MiB: 170.6 MiB/s write, 108.9 MiB/s read
+Offset         32 MiB: 164.6 MiB/s write, 108.4 MiB/s read
+Offset         64 MiB: 158.6 MiB/s write, 102.0 MiB/s read
+Offset         96 MiB: 143.8 MiB/s write, 116.3 MiB/s read
+Offset        128 MiB: 156.3 MiB/s write, 130.7 MiB/s read
+Offset        160 MiB: 168.3 MiB/s write,  99.3 MiB/s read
+Offset        192 MiB: 156.6 MiB/s write, 109.2 MiB/s read
+Offset        224 MiB: 159.9 MiB/s write, 107.7 MiB/s read
+Offset        256 MiB: 156.0 MiB/s write,  88.7 MiB/s read
+Offset        288 MiB: 149.6 MiB/s write, 109.7 MiB/s read
+Offset        320 MiB: 138.3 MiB/s write, 113.2 MiB/s read
+[...]
+\endverbatim
+
+
+\section benchmark_sort Benchmark Sorting Methods
+
+The second performance metric of an experimental platform is how fast STXXL can sort on it. This is measured by the <tt>stxxl_tool benchmark_sort</tt> subtool.
+
+This subtool performs stxxl::sort, stxxl::ksort and stream::sort on uint32 pairs, uint64 pairs and a larger struct of 64 bytes.
+
+An example run looks as follows:
+\verbatim
+$ stxxl_tool benchmark_sort 20gib -M 1gib
+Parameter size set to 21474836480.
+Option -M, --ram set to 1073741824.
+[STXXL-MSG] STXXL v1.4.0 (prerelease) + gnu parallel(20120301)
+[STXXL-MSG] Disk '/dev/sdb1' is allocated, space: 915527 MiB, I/O implementation: syscall
+[STXXL-MSG] Disk '/dev/sdc1' is allocated, space: 915527 MiB, I/O implementation: syscall
+[STXXL-MSG] Disk '/dev/sdd1' is allocated, space: 915527 MiB, I/O implementation: syscall
+[STXXL-MSG] Disk '/dev/sde1' is allocated, space: 915527 MiB, I/O implementation: syscall
+[STXXL-MSG] In total 4 disks are allocated, space: 3662109 MiB
+#!!! running sorting test with pair of uint32 = 8 bytes.
+# materialize random_stream into vector of size 2684354560
+finished in 46.9271 seconds @ 436.421 MiB/s
+# stxxl::sort vector of size 2684354560
+finished in 256.048 seconds @ 79.9849 MiB/s
+# stxxl::ksort vector of size 2684354560
+finished in 356.964 seconds @ 57.3727 MiB/s
+# stxxl::stream::sort of size 2684354560
+finished in 213.102 seconds @ 96.1041 MiB/s
+
+#!!! running sorting test with pair of uint64 = 16 bytes.
+# materialize random_stream into vector of size 1342177280
+finished in 95.5571 seconds @ 214.322 MiB/s
+# stxxl::sort vector of size 1342177280
+finished in 222.727 seconds @ 91.9513 MiB/s
+# stxxl::ksort vector of size 1342177280
+finished in 265.456 seconds @ 77.1502 MiB/s
+# stxxl::stream::sort of size 1342177280
+finished in 200.357 seconds @ 102.218 MiB/s
+
+#!!! running sorting test with struct of 64 bytes = 64 bytes.
+# materialize random_stream into vector of size 335544320
+finished in 46.9293 seconds @ 436.401 MiB/s
+# stxxl::sort vector of size 335544320
+finished in 215.798 seconds @ 94.9035 MiB/s
+# stxxl::ksort vector of size 335544320
+finished in 222.5 seconds @ 92.0451 MiB/s
+# stxxl::stream::sort of size 335544320
+finished in 112.607 seconds @ 181.871 MiB/s
+\endverbatim
+
+As stxxl::sort and stxxl::ksort perform about 4 read/write steps on the data, the sorting speed is about 1/4 of the scanning speed. On the other hand, stream::sort performs only 2 read/write steps to create a sorted stream from an unsorted one. Thus the stream sorting speed is about 1/2 of scanning speed.
+
+*/
+
+} // namespace stxxl

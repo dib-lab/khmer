@@ -1,0 +1,102 @@
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/tutorial_vector_buf.dox
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+namespace stxxl {
+
+/** \page tutorial_vector_buf Efficient Sequential Reading and Writing to Vectors
+
+\author Timo Bingmann (2013)
+
+The stxxl::vector is a very versatile container and it allows sequential access loops like the following:
+
+\snippet examples/containers/vector_buf.cpp element
+
+However, these sequential loops using element access are <b>not very efficient</b> (see the experimental results below). Each \c operator[] is processed by the vector paging mechanism, and returns a writeable reference to the element. Because the reference might be modified, the vector must assume that the accessed page is dirty. Thus the read loop will actually rewrite the whole vector.
+
+This effect can be avoided using a <tt>const vector&</tt> or vector::const_iterator as shown in the following:
+
+\snippet examples/containers/vector_buf.cpp iterator
+
+This method is already pretty good, but one can achieve even better performance. The problem with iterators is that all accesses still go through the vector's paging algorithms, possibly updating the internal paging algorithm's state. More importantly, the access operators do not use prefetching. For this purpose STXXL provides buffered reading and writing to vector ranges. These utilized asynchronous I/O and will thus <b>will overlap I/O with computation</b>.
+
+The two basic classes to efficiently read and write vector are vector_bufreader and vector_bufwriter. Their interface is a combination of the \c stream interface and iostreams. The two classes are more conveniently accessible via vector::bufreader_type and vector::bufwriter_type.
+
+\snippet examples/containers/vector_buf.cpp buffered
+
+When using vector_bufwriter the vector's size \a should be allocated in advance. However, this is not required: when reaching the end of the vector, the buffered writer will automatically double the vector's size. Thus writing will not produce segfaults; however, doubling may go wrong for huge vectors.
+
+Note that the same efficiency can be achieved using stream functions: stream::vector_iterator2stream and stream::materialize also use overlapping I/O.
+
+As last method, which is currently supported by STXXL, one can iterate over the vector using C++11's \c auto \c for loop construct:
+
+\snippet examples/containers/vector_buf.cpp cxx11
+
+Note that we must construct a buffered reader explicitly, because just stating <tt>"vec"</tt> would amount to using the usual iterators (with pager). Support for C++11 is still experimental.
+
+All source code from this example is available in \ref examples/containers/vector_buf.cpp. The program also check the sum results and measures the time.
+
+The following experimental results are from a machine with four disks:
+\verbatim
+$ vector_buf 64
+[STXXL-MSG] STXXL v1.4.0 (prerelease)
+[STXXL-MSG] Disk '/data01/stxxl' is allocated, space: 162124 MiB, I/O implementation: syscall_unlink
+[STXXL-MSG] Disk '/data02/stxxl' is allocated, space: 228881 MiB, I/O implementation: syscall_unlink
+[STXXL-MSG] Disk '/data03/stxxl' is allocated, space: 228881 MiB, I/O implementation: syscall_unlink
+[STXXL-MSG] Disk '/data04/stxxl' is allocated, space: 228881 MiB, I/O implementation: syscall_unlink
+[STXXL-MSG] In total 4 disks are allocated, space: 848770 MiB
+[STXXL-MSG] Starting vector element access
+sum: 4393751543808
+[STXXL-MSG] Finished vector element access after 848.695 seconds. Processed 128.000 GiB @ 154.439 MiB/s
+[STXXL-MSG] Starting vector iterator access
+sum: 4393751543808
+[STXXL-MSG] Finished vector iterator access after 540.938 seconds. Processed 128.000 GiB @ 242.305 MiB/s
+[STXXL-MSG] Starting vector buffered access
+sum: 4393751543808
+[STXXL-MSG] Finished vector buffered access after 441.26 seconds. Processed 128.000 GiB @ 297.040 MiB/s
+[STXXL-MSG] Starting vector C++11 loop access
+sum: 4393751543808
+[STXXL-MSG] Finished vector C++11 loop access after 440.977 seconds. Processed 128.000 GiB @ 297.231 MiB/s
+\endverbatim
+
+Obviously, buffered access to stxxl::vector most efficient, where using const_iterators is only 18\% slower. Just using element access via operator[] is not a good idea.
+
+The difference between the methods grows smaller then using only one disk, because the I/O bandwidth decreases:
+\verbatim
+$ vector_buf 64
+[STXXL-MSG] STXXL v1.4.0 (prerelease)
+[STXXL-MSG] Disk '/data01/stxxl' is allocated, space: 162124 MiB, I/O implementation: syscall_unlink
+[STXXL-MSG] Starting vector element access
+sum: 4393751543808
+[STXXL-MSG] Finished vector element access after 2793.85 seconds. Processed 128.000 GiB @ 46.915 MiB/s
+[STXXL-MSG] Starting vector iterator access
+sum: 4393751543808
+[STXXL-MSG] Finished vector iterator access after 1770.75 seconds. Processed 128.000 GiB @ 74.020 MiB/s
+[STXXL-MSG] Starting vector buffered access
+sum: 4393751543808
+[STXXL-MSG] Finished vector buffered access after 1670.13 seconds. Processed 128.000 GiB @ 78.480 MiB/s
+[STXXL-MSG] Starting vector C++11 loop access
+sum: 4393751543808
+[STXXL-MSG] Finished vector C++11 loop access after 1671.53 seconds. Processed 128.000 GiB @ 78.415 MiB/s
+\endverbatim
+
+As a last note: there is also vector_bufreader_reverse and vector::bufreader_reverse_type for buffered reading in reverse.
+
+\example examples/containers/vector_buf.cpp
+This example code is explained in the \ref tutorial_vector_buf section.
+
+\example examples/containers/copy_file.cpp
+This is an example of how to copy a file to another using STXXL's asynchronous I/O features.
+
+*/
+
+} // namespace stxxl

@@ -1,0 +1,536 @@
+Version 1.4-dev (unreleased)
+
+Version 1.4.1 (29 October 2014)
+
+* support kernel based asynchronous I/O on Linux (new file type "linuxaio"),
+  which exploits Native Command Queuing (NCQ) if available.
+  disable/enable with the define STXXL_FILE_LINUXAIO 0/1 via cmake
+
+* adding new disk_config entry device_id, which specifies the physical device
+  id of the "disk" used during prefetching sequence calculations. This used to
+  be identical with the queue id, however, for linuxaio there is only one
+  queue; thus the distinction had to be made. In a default config, no changes
+  are necessary, as the device_id parameter is automatically enumerated.
+
+* adding stxxl::binary_buffer which can be used for compact serialization and
+  reading via a stxxl::binary_reader cursor interface.
+
+* stxxl::unordered_map is a hash map, backed by external memory. It probably
+  only works well when lots of internal memory is used to buffer access to a
+  relatively small working set. Then, however, fast direct in-memory item
+  access can be used.
+
+* stxxl::external_shared_ptr is a proxy class to allow use of shared_ptr
+  classes inside stxxl containers. Reference counts are kept in memory, while
+  data may be swapped out to disk.
+
+* removing struct default_completion_handler, using a NULL pointer in default
+  complete handler instead, since otherwise a default_completion_handler
+  objects is cloned for _each_io_request_! Using a NULL pointer avoids
+  superfluous new/delete work on the heap.
+
+* minor changes:
+  - disable TPIE benchmarks by default, removing a warning.
+  - compilation and tests work under MinGW 64-bit with special threads.
+  - fixed compilation on 32-bit systems, everything is -Wconversion safe.
+  - adding 32-bit and 64-bit cmdline_parser::add_bytes() variants.
+  - removing all double underscores.
+  - use atomic_counted_object in class file for request reference counting.
+  - adding local/test2.cpp containing a stxxl::sorter example.
+
+Version 1.4.0 (12 December 2013)
+
+* Reorganized Directory Hierarchy
+  - separating old component based directories into lib/ (libstxxl source
+    files), tests/ (for tests cases), examples/ (for tutorial and example code)
+    and tools/ (for stxxl_tool and more benchmarks).
+
+* CMake build system for cross-platform compilation
+  - replaced adhoc Makefiles with CMake build system
+  - CMake scripts can also output MSVC project files and more.
+  - all component tests must register with CMake's test system -> run make test
+  - generates pkg-config and CMake's project config files
+
+* Greatly Improved Doxygen Documentation
+  - integrated old LaTeX tutorial
+  - newly written tutorials for almost all STXXL containers and algorithms
+  - embedded design documentation from Roman Dementiev's PhD thesis
+  - new compilation instructions for CMake build system
+
+* Improved .stxxl Config Options for File I/O Implementations
+  - looking for .stxxl in more places than just the current directory (see the
+    docs for which places exactly).
+  - parse file size with SI and IEC units, like "10GiB" in disk= config lines.
+  - parse additional file I/O implementation options.
+  - support for "unlink_on_open" (keep file descriptor but unlink file) and
+    "delete_at_exit" options.
+  - support for "direct=off/try/on" to turn off O_DIRECT for tmpfs and similar.
+  - the default open mode is now direct=try -> prints a warning if O_DIRECT is
+    unavailable on the system.
+
+* .stxxl Config Options Represented as disk_config Class
+  - all disk= config lines are parsed into disk_config objects.
+  - allow API calls to configure disks via stxxl::config::add_disk()
+  - delay config file load till config::initialize() is called by block_manager
+
+* Command line parser stxxl::cmdline_parser
+  - stand-alone command line parser with ability to parse SI and IEC units for
+    "bytes sizes".
+  - automatically output nicely formatted help for all options and flags.
+  - using the cmdline_parser for all stxxl_tool subtools.
+
+* Created stxxl_tool from multiple small tools and benchmarks
+  - stxxl_tool is a collection of subtools, previous scattered around in the
+    directory hierarchy.
+  - goal is to have one tool installed in binary distribution together with
+    libstxxl library and includes.
+  - primary tool for standardized platform speed tests.
+  - provide good command line help on these subtools via cmdline_parser.
+
+* Adding skew3 as "real-world" STXXL application to examples subdirectory.
+  - enhanced integrated stxxl::tuple construction for this application.
+
+* Enable use of raw block devices on Linux
+  - these do provide more stable I/O throughput than even XFS.
+  - disable growing of these devices
+
+* Most platform configuration is now done by CMake and saved into the
+  <stxxl/bits/config.h> header file
+
+* Enhanced stxxl::block_manager to count maximum, current and total number of
+  bytes allocated in external memory.
+
+* Support Visual Studio 2012 and 2013 _without_ Boost by using std::thread
+  - VS 2012 and 2013 support STL threads, mutexes, condition_variables and
+    more, which are basically modeled after the Boost libraries. Thus we can
+    simply uses these included libraries instead of Boost.
+  - Fixed bad runtime deadlock bug occurring when joining std::threads after
+    main() exits. The bug persists in VS 2012 and 2013.
+
+* Implementing counting_ptr reference counted objects
+  - used like boost::intrusive_ptr with a base class.
+  - reimplementing request_ptr using just counting_ptr<request>.
+  - (optionally) use atomic operations for thread-safe reference counting
+  - applying counting_ptr to stream::sorted_runs to avoid extra copying
+
+* New STXXL container "stxxl::sequence"
+  - basically a deque container without random access to blocks.
+  - efficient {push/pop}_{front/back} at both ends.
+  - access to block sequence via stream and reverse_stream constructions
+
+* New STXXL container "stxxl::sorter"
+  - combination of stream::runs_creator and stream::runs_merger into a
+    convenient sorting container.
+
+* Added vector_bufreader and vector_bufwriter to overlapping I/O and
+  computation when accessing a stxxl::vector in scanning mode.
+  - documented problems of scanning in a vector
+  - C++11 range loop access support to stxxl::vector via vector_bufreader.
+
+* Added uint40 and uint48 types for integers with five and six bytes.
+
+* Adding STXXL_CHECK macros to always check outcomes in tests.
+
+* Renaming mng/mng.{h,cpp} -> mng/block_manager.{h,cpp}.
+
+* Reworking version.h
+  - add integer version like 10400 for 1.4.0
+  - add get_version_string() for longer version string with features
+  - check_library_version() for mismatch between headers and libraries
+
+* Reworking error_handling.h to throw much more useful exceptions with
+  errno information and more.
+
+* Various file renames (which are only possible at major version changes).
+
+* Fixing bug in shrinking vector with vector::resize(n,true).
+
+------------------------------------------
+Version 1.3.2 (unreleased)
+
+* New Features
+  - Add defines STXXL_VERSION_{MAJOR,MINOR,PATCHLEVEL} and library routines
+    stxxl::version_{major,minor,patchlevel}() for getting STXXL version
+    information and an inline function check_library_version() to check at
+    runtime for mismatching header and library versions.  (Bz:#6)
+    Available via <stxxl/version.h>
+* Merged matrix branch which allows external memory matrix operations.
+  - merged dsr::argument_helper for command line processing
+  - also required an internal memory addressable_priority_queue, a
+    shared_object_pointer (instrusive pointer)
+  - adds block_scheduler as submodule to prefetch matrix blocks in a
+    pre-recorded order
+  - contains a test and benchmark.
+* Fixed bug in stxxl::priority_queue
+  - added dump_sizes()
+  - The priority queue may become fragmented after a significant number of
+    insertions and deletes so that all slots in all groups are being used, but
+    the last external group is nearly empty (counting elements).  In that case
+    we merge the whole last external group into a temporary ext_merger and swap
+    this overflow merger and the (now empty) last external merger
+    afterwards. Increasing the number of groups beyond 4 is not possible
+    without significant changes elsewhere.
+* Fixed bug in stxxl::queue
+  - added special case when first block has space at the beginning
+  - added another test N * (push,pop,push), N * (pop, push, pop)
+* Using LIKELY and UNLIKEY to prioritize branchs in gcc.
+* Platform Support
+  - add GCC 4.6
+  - add clang++ 2.9
+  - update ICPC 12.0 (Intel C++ Composer XE 2011 Update 4): drop workarounds
+    for bugs fixed in Update 4
+  - Boost 1.46: Boost Filesystem Version 3
+
+------------------------------------------
+Version 1.3.1 (10 March 2011)
+
+* Possibly breaking changes
+  - No longer open syscall files with O_SYNC|O_DSYNC|O_RSYNC by default when
+    doing direct I/O, to avoid a write performance decrease starting with Linux
+    kernel version 2.6.32.
+    A stxxl::file::SYNC flag has been added to allow forcing the O_*SYNC flags
+    when opening files.
+  - Lock files by default (if implemented for this file type), can by disabled
+    via stxxl::file::NO_LOCK.
+  - block_prefetcher now takes a completion_handler instead of a raw function
+    pointer.  Furthermore, the completion_handler is already executed after the
+    read operation completes, not only when the issuer waits for it to
+    complete.  The I/O thread issues the call to the completion_handler, so for
+    multiple disks, this may happen concurrently.
+* Internal changes, not user-visible
+  - Change handling of (empty) filler elements in typed_block to fix
+    mismatching struct size in nested blocks.
+  - Removed debugmon which was very limited and disabled for a long time.
+* Bugfixes
+  - Allow prefetch schedule computation of vectors that are bound to a file.
+  - Fix race growing files during concurrent block allocation.
+  - Allow reading a block that spans over end-of-file, fill remainder with
+    zeroes.
+  - Crash at program termination when using global stxxl containers.
+  - Enable syscall_file to read/write >=2GiB of data in a single I/O operation.
+* New public headers: stxxl/stats, stxxl/request
+* Parallel mode can be switched on for internal STXXL computation selectively
+  (i.e. without enabling it for the non-stxxl part of an application), by
+  setting USE_PARALLEL_MODE=yes in make.settings.local.
+* Platform Support
+  - add ICPC 12.0, works with both MCSTL (needs libstdc++ from GCC 4.2) and
+    parallel mode (needs libstdc++ from GCC 4.3 (not 4.4/4.5))
+  - add CLANG++ 2.8
+  - add MSVC 2010/Windows 7
+  - allow the library name generated by MSVC to be changed by setting LIBNAME
+    and redefining STXXL_LIBNAME (defaults to "stxxl")
+* Under-the-hood improvements
+  - code cleanup
+  - I/O-layer: renaming and reorganization of the request implementation
+* Documentation updates
+* Several new test programs
+* Several test programs improved
+
+------------------------------------------
+Version 1.3.0 (12 August 2010)
+
+* New file types
+  - fileperblock_syscall/fileperblock_mmap/fileperblock_boostfd/fileperblock_wincall:
+    Use a separate file for each block, which is accessed by means of the
+    underlying file type.  The "filename" given is used as a prefix of the
+    block file names.  The advantage of these file types is that unused
+    disk space is freed earlier on the file system level.
+  - wbtl_file:  Do library-based write-combining (good for writing small blocks onto SSDs)
+* I/O subsystem
+  - separate the disk number of a file (which queue to put requests in)
+    from the fact that blocks for this file are allocated via the block
+    manager (disk number -1 otherwise).
+  - separate wait time counting for read and write I/Os
+  - wait times can be logged to a separate log file
+    (compile with -DSTXXL_WAIT_LOG_ENABLED and set STXXLWAITLOGFILE in the environment)
+* Parallel PQ
+  - priority_queue now supports parallelized operations utilizing the libstdc++ parallel mode
+* Other new functionality
+  - file requests can now be canceled (success not guaranteed), completion handlers are called anyway.
+  - log file locations are now configurable by the environment variables
+    STXXLLOGFILE and STXXLERRLOGFILE
+  - single queue I/O scheduling
+  - reverse_iterator added to containers types vector, deque and map
+  - autogrow files (specified in .stxxl by a size of 0), will be deleted on normal program termination
+  - add infrastructure to build multiple binaries with different CXXFLAGS from a single source
+  - overwriting deleted memfile regions with uninitialized data is now optional
+    (STXXL_CLEAR_FREE_MEMFILE_MEM)
+  - read_write_pool that combines prefetch_pool with write_pool and ensures cache coherency
+  - add a replaceable exit handler implementation, can be overwritten e.g. for library inclusion
+* Many, many bug fixes, in particular concerning
+  - priority queue
+  - optimal prefetch schedule
+  - possible race condition while creating singleton instances
+  - random_shuffle()
+* Platform Support
+  - add GCC 4.4 (parallel mode features not working in GCC 4.3 can now be used)
+  - add GCC 4.5
+  - initial support for GCC 4.6
+  - add ICPC 11.x
+  - add Boost 1.42
+  - add FreeBSD
+  - drop Solaris
+* New benchmarks
+  - io/benchmark_disks: more command line paramaters for finer testing granularity
+  - measure hard-disk and flash-disk combined performance and
+    determine best block size pairs (io/benchmark_disk_and_flash)
+  - benchmark using regular STXXL configuration (benchmark_configured_disks)
+* Possibly breaking changes
+  - API name changes
+    vector::touch -> vector::block_externally_updated
+  - Template parameter changes
+    stream::sorted_runs, trigger_entry, trigger_entry_cmp, trigger_entry_iterator
+  - Priority of write changes
+  - Other name changes (considered internal)
+    typed_block<>::has_filler -> !typed_block<>::has_only_data
+    file::delete_region -> file::discard
+    vector::alloc_strategy -> vector::alloc_strategy_type
+  - stxxl::sort(..., M) and stxxl::stream::sort(..., M) now adhere to to the memory limit M
+    more strictly and throw errors instead of overallocating
+  - Execute completion handler before notifying waiters, so far after.
+* Deprecated methods:
+  - stxxl::stats::reset(), stxxl::stats::_reset_io_wait_time():
+    use stxxl::stats_data instead to store snapshots of the counters and compute differences
+* Under-the-hood improvements
+  - I/O layer cleanup
+  - aligned_alloc
+* Doxy now also lists undocumented members
+* stop requiring STXXL_ROOT to be a hard coded absolute path set in make.settings.local,
+  a default of CURDIR works fine
+* document #defines in defines.h
+  - switch on/off file types with STXXL_HAVE_xxx_FILE (to avoid platform compatibility problems)
+
+------------------------------------------
+Version 1.2.1 (14 August 2008)
+
+* add support for the libstdc++ parallel_mode (successor of MCSTL),
+  new make targets: library_g++_pmode, tests_g++_pmode, clean_g++_pmode
+  (requires g++ 4.3.2 or later)
+* new stxxl file type stxxl::mem_file (for debugging purposes only),
+  helps debugging with valgrind because no memory cell ever
+  leaves valgrind's control
+* properly destroy the singleton objects (block manager, disk queue threads,
+  logger, stats, config, ...) at program exit
+* fixed a bug (recursive locking) in recursive block allocation
+* added a test program for recursive block allocation
+* sensible dependencies for nmake (MSVC): only rebuild files as necessary
+* improve performance of createdisks
+* human-readable output for I/O stats
+* replace hard coded min/max values by std::numeric_limits<>::min/max in
+  examples
+* fix a case where only half of the available memory was used during
+  recursive merging
+* verify stxxl::set_seed() functionality in tests
+* remove stxxl disk files created from default configuration (no .stxxl
+  file found) and other temporary files at program end
+* stop using deprecated functions, switch to the replacements instead
+* unify the mutex lock handling by introducing stxxl::scoped_mutex_lock
+* unify the I/O wait time counting to work like read/write time counting
+* simplify I/O time counting with scoped_{read,write,wait}_timer
+* add some more tests
+* more code cleanup + reformatting
+* move some more code to the library
+* reduce some include dependencies
+* build system tuning
+* propagate region deletion (when blocks are freed) to the file level
+* fix problem in sorters where blocks were released too early
+* specialize is_sorted() to use const_vector_iterators, no extra writes
+* add c++0x style const_iterator cbegin()/cend() to all containers
+
+------------------------------------------
+Version 1.2.0 (05 July 2008)
+
+* made the block management layer thread-safe
+* made all size_types unsigned
+* stxxl::priority_queue
+  - fixed a rare assertion
+  - fixed a race condition by using proper block hinting
+  - insert_queue: replaced std::priority_queue with a special
+    implementation internal_priority_queue that allows for
+    fast exporting of all elements
+  - even more bugs and inefficiencies fixed
+  - significant speed improvements
+* random number generators are now all seedable,
+  should allow redoing identical program runs for debugging purposes
+* stxxl::noncopyable, inspired by boost::noncopyable: inheriting from this
+  class forbids copying of objects when this is undesirable
+  - used in all classes that had implemented their own variants previously
+* stxxl::vector, all sorting functions: replaced two2one_dim_array_row_adapter
+  with array_of_sequences_iterator which is much faster, especially
+  if blocks have padding
+* if required, verify that the sentinels satisfy a strict weak ordering
+* stxxl::vector: several operations sped up, several more implemented
+* fix existing allocation strategies and add experimental support for
+  distinguishing between regular disks and flash devices
+* stxxl::stable_ksort
+  - add experimental warning, some parts are not yet implemented
+  - fixed an off-by-one error in memory allocation vs. usage
+* btree: fuse last two nodes/leaves if possible, rebalancing can fail
+* btree tests: ensure uniqueness of test data if required
+* reduce function call overhead of stxxl::debugmon if it's not activated
+* add public interface headers: stxxl/types, stxxl/aligned_alloc
+* add compatibility wrappers for standard extensions
+  hash_map, hash_set, auto_ptr
+* MCSTL is only supported with g++ 4.2 and icpc 10.x
+* lots of small bugfixes
+* made the TPIE, BDB and LEDA_SM tests compile again
+* general code cleanup
+  - fixed most compiler warnings
+  - elimination of duplicate and unused code
+  - cleaned up and sanitized debugging macros
+  - no more 'using namespace std' and 'using namespace stxxl'
+  - fixed ambiguities noted by g++ 4.3
+  - unify the #include directives
+  - add/unify/cleanup copyright headers
+* general code reformatting (uncrustify)
+* add support for new compiler releases
+* portability fixes for different platforms
+* implemented file truncation on windows platforms
+* build system
+  - lots of small modifications
+  - now only requires GNU make 3.78 or later
+  - check whether STXXL_ROOT has been set correctly and if unset, try
+    autoconfiguration by creating make.settings.local with defaults
+  - improved and simplified boost support for posix systems
+  - Mac OS X support
+* changed all tests so that they behave well in their default parameters,
+  system assumptions and return values and can be run from a script
+  - use aligned_alloc/aligned_dealloc appropriately
+* added some more test programs
+* add misc/run_all_tests that runs all tests with sensible parameters,
+  optionally via valgrind
+* checked all tests with valgrind
+  - fixed use of uninitialized memory when writing to normal files
+  - (optionally) initialize typed_blocks and payload data in test structs
+    to suppress (most) uninitialized write errors when writing to disk files
+  - fix mismatched new/delete in mcstl
+* update install and usage instructions
+* spell checked sources and documentation
+
+------------------------------------------
+Version 1.1.0 (31 July 2007)
+
+* stxxl is now hosted on SourceForge: http://stxxl.sourceforge.net/
+* Restructured the source layout:
+  - includes moves to include/
+  - introduced some public headers:
+    stxxl.h, stxxl/algorithm, stxxl/bits, stxxl/deque, stxxl/io, stxxl/ksort, stxxl/mallocstats, stxxl/map, stxxl/mng, stxxl/priority_queue, stxxl/queue, stxxl/random, stxxl/scan, stxxl/sort, stxxl/stable_ksort, stxxl/stack, stxxl/stream, stxxl/timer, stxxl/vector
+  - the header "stxxl" is no longer available, please use "stxxl.h" instead
+  - the use of any other (internal) header is discouraged, additional public headers can be added as the need arises
+* Overhauled the build system:
+  - merged configuration files, simplified option tuning
+  - support object files and binaries with and without mcstl support existing in parallel
+  - the library build creates stxxl.mk which can be included in an applications Makefile to set the correct compiler/linker switches for stxxl
+  - similarly mcstxxl.mk is created for a stxxl compiled with mcstl support
+  - add dependency tracking and improve parallelism during build
+* compiler support matrix: (for an up-to-date list, please see the doxygen documentation)
+  compiler      |  stxxl    stxxl + mcstl
+  --------------+------------------------
+  GCC 4.3       |    x            x
+  GCC 4.2       |    x            x
+  GCC 4.1       |    x           n/a
+  GCC 4.0       |    x           n/a
+  GCC 3.4       |    x           n/a
+  GCC 3.3       |    o           n/a
+  GCC 2.95      |    -           n/a
+  ICPC 9.1.051  |    x            x¹
+  ICPC 10.0.025 |    x            x¹
+  MSVC 2005 8.0 |    x           n/a
+    x = full support   o = partial support   - = unsupported
+    n/a = compiler does not support OpenMP which is needed by MCSTL
+      ¹ = does not work with STL GCC 4.2.0 (ICPC bug), workaround:
+          the first include in the program must be
+          "stxxl/bits/common/intel_compatibility.h"
+* pipelined stream::sort, stream::runs_creator and stream::runs_merger are parallelized using MCSTL
+* obsolete files removed
+* fixed include dependencies
+* fixed lots of warnings
+* fixed lots of small bugs
+* add header compilation tests
+* stxxl::vector: implemented some more functions
+* const char* stxxl::get_version_string(): new function
+* comparators inherit from std::binary_function<>
+* cleanup, reformat the code to a consistent format (Thanks, uncrustify!)
+
+------------------------------------------
+Version 1.0e (4 June 2007)
+
+* Bugfix: for objects with the destructors, memory block were allocated in a non-aligned fashion
+* Internal CPU efficiency of Stxxl priority queue is improved (loser trees in external mergers are integrated)
+* Fixed bug with conversion of const/non-const iterators, implemented comparison and difference operations on const/non-const iterators (for vector, map, and deque)
+* Added operator[] to vector and deque iterators
+* stxxl::random_shuffle added
+* improved Makefile structure (thanx to Andreas Beckmann)
+* Allow parallel build for g++
+
+------------------------------------------
+Version 1.0d (16 January 2007)
+
+* Support of Visual Studio 2005 Express (VC++ 8.0)
+
+* Algorithms and data structures of Stxxl can now use more than 4GB of main memory on 64-bit processors/compilers
+
+* Support of error reporting using the C++ exception mechanism
+
+-------------------------------------------
+Version 1.0c (21 September 2006)
+
+* An implementation of an I/O-efficient deque
+
+* STXXL uses MCSTL library (optional) to improve the performance of stxxl::sort and pipelined sort on SMP and multicore processors.
+
+-------------------------------------------
+Version 0.99 (22 March 2006)
+
+* Better compiler support: g++ (versions 3.3.x-4.0.x) and Microsoft Visual C++ 7.1 (.NET)
+
+* New B+Tree-based implementation of map (compatible with all listed above compilers): I/O-efficient map
+
+------------------------------------------
+Version 0.9 (9 August 2005)
+
+* STXXL has been ported to Windows. It now can be run under Windows XP and Windows 2000
+
+* STXXL can be compiled now by g++ (versions 3.0.x-3.4.x, 4.0.x) and Microsoft Visual C++ 7.1 (.NET)
+
+* New data structure: I/O efficient FIFO queue
+
+------------------------------------------
+Version 0.77 (24 March 2005)
+
+* An implementation of queue is available
+
+------------------------------------------
+Version 0.75 (23 March 2005)
+
+* An implementation of map based on B+tree is available
+
+------------------------------------------
+Version 0.7 (25 January 2005)
+
+* The implementation of pipelining is extended and improved
+
+------------------------------------------
+Version 0.6 (5 September 2004)
+
+* Tested implementation of the stream package (aka pipelining) is available
+
+------------------------------------------
+Version 0.5 (21 November 2003)
+
+* The first implementation of the stream package (aka pipelining) is available
+
+* Priority queue is available
+
+------------------------------------------
+Version 0.2 (Summer 2003)
+
+* The first public release
+
+* Vectors, stacks, sorting, scanning are available
+
+------------------------------------------
+# Local Variables:
+# mode: text
+# mode: flyspell
+# End:

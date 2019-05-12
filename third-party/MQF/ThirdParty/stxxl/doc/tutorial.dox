@@ -1,0 +1,74 @@
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/tutorial.dox
+ *
+ *  Usage Tutorial for STXXL
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+namespace stxxl {
+
+/** \page tutorial Tutorials and Examples
+
+\authors Timo Bingmann, Daniel Feist (2013)
+
+This tutorial on the Standard Templete Library for Very Large Datasets (STXXL) is meant as an introduction to all those who use the STXXL for the first time - just basic knowledge in C++ is required. Note that the focus of this tutorial is on the most importatant features and is by no means exhaustive. If necessary, we refer to more advanced functionality which would go however beyond the scope of this introduction.
+
+Why do i need the STXXL? Imagine a situation where you want to work with a std::vector which does not fit into the internal memory completely. That is precisely the situation where the STXXL container
+stxxl::vector solves the issue. The practical part about it: Stxxl containers work in a similar way as their internal counterparts from the Standard Template Library (STL) so that parts of this tutorial may
+sound familiar to you. Naturally, the vector container is just an example - the same applies to other data structures.
+
+Before running the STXXL for the first time you may check \ref install_unix.
+
+# Available tutorials on STXXL Containers
+
+This section introduces in all currently available STXXL containers.
+The practical part about it: STXXL containers which have an internal counterparts in the Standard Template Library (STL) work similar so that parts of this tutorial may sound familiar to you:
+
+- \subpage tutorial_vector "stxxl::vector tutorial"
+  - \subpage tutorial_vector_billing
+  - \subpage tutorial_vector_buf
+- \subpage tutorial_stack "stxxl::stack tutorial"
+- \subpage tutorial_queue "stxxl::queue tutorial"
+- \subpage tutorial_deque "stxxl::deque tutorial"
+- \subpage tutorial_map "stxxl::map tutorial"
+- \subpage tutorial_unordered_map "stxxl::unordered_map tutorial"
+
+Beyond these, STXXL also provides a set of containers that are not part of the STL:
+
+- \subpage tutorial_pqueue "stxxl::priority_queue tutorial"
+- \subpage tutorial_matrix "stxxl::matrix tutorial"
+- \subpage tutorial_sorter "stxxl::sorter tutorial"
+- \subpage tutorial_sequence "stxxl::sequence tutorial"
+
+Furthermore, the stream pipeline component of STXXL is described in the following tutorials:
+
+- \subpage tutorial_stream
+- \subpage tutorial_stream_edgesort
+
+For more information on the structure, the internal design and time / space complexity of the provided operations, see \ref design_stl.
+
+# More Examples and Real Applications
+
+The \c examples subdirectory of the STXXL tarballs contains more example code than those of the tutorials above. These are less documented but still contain useful code snippets and usage information.
+
+- The \c examples/applications directory is a collection of real external memory algorithms computing non-trivial output. We welcome contributions of interesting applications to this collection, currently included are:
+
+  - the DC3/skew3 suffix sorting algorithm \ref examples/applications/skew3.cpp
+
+- There is a collection of simple tools which copy and sort files containing integers or structs: \ref examples/containers/copy_file.cpp "copy_file.cpp", \ref examples/algo/sort_file.cpp "sort_file.cpp" and \ref examples/algo/copy_and_sort_file.cpp "copy_and_sort_file.cpp".
+
+\example examples/applications/skew3.cpp
+\example examples/algo/sort_file.cpp
+\example examples/algo/copy_and_sort_file.cpp
+
+*/
+
+} // namespace stxxl

@@ -1,0 +1,161 @@
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/faq.dox
+ *
+ *  Frequently asked and answered questions
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2007 Andreas Beckmann <beckmann@mpi-inf.mpg.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+/** \page faq FAQ - Frequently Asked Questions
+
+\section faq_latest Latest version of this FAQ
+
+The most recent version of this FAQ can always be found <a href="http://stxxl.sourceforge.net">here</a>.
+
+\section faq_compilers Supported Compilers and Platforms
+
+The following compilers have been tested in different \c STXXL configurations.  Other compilers might work, too, but we don't have the resources (systems, compilers or time) to test them. Feedback is welcome.
+
+Please note that from STXXL 1.4.0 on, only 64-bit systems are fully supported. Compilation on 32-bit seems to work, but we cannot support it anymore.
+
+The compilers marked with '*' are the maintainers' favorite choices and are most thoroughly tested.
+
+compiler                | supported options
+----------------------- | --------------------------
+gcc 4.9.1               | stxxl parallel (boost) (c++11)
+gcc 4.8.3 *             | stxxl parallel (boost) (c++11)
+gcc 4.7.3               | stxxl parallel (boost) (c++0x)
+gcc 4.6.4               | stxxl parallel (boost) (c++0x)
+gcc 4.5.4               | stxxl parallel (boost) (c++0x)
+gcc 4.4.7               | stxxl parallel (boost) (c++0x)
+gcc 4.3.6               | stxxl (boost)
+gcc 4.1.2               | stxxl (boost)
+gcc 3.4.6               | stxxl (boost)
+gcc 3.3                 | unsupported
+icpc 2015.0.090 *       | stxxl (boost) (c++0x)
+icpc 2013.5.192 *       | stxxl (boost) (c++0x)
+icpc 2011.13.367        | stxxl (boost) (c++0x)
+clang++ 3.2, 3.3, 3.4.2 | stxxl (boost) (c++0x)
+mingw-w64 gcc 4.8.3     | stxxl parallel (boost) (c++11)
+cygwin gcc 4.8.3        | stxxl parallel (boost) (c++11)
+msvc 2013 12.0 *        | stxxl (boost) (c++11)
+msvc 2012 11.0          | stxxl (boost) (c++0x)
+msvc 2010 10.0          | stxxl boost required
+
+- The option "parallel" uses the __gnu_parallel extensions in some parts of STXXL. For all \c gcc versions >= 4.4 the __gnu_parallel extensions are ON by default. Support for MCSTL (predecessor of __gnu_parallel) was removed in STXXL 1.4.0.
+
+- Boost is optional and not recommended on all systems, except MSVC 2010. It provides no advantages on other platforms. \n
+  STXXL has been tested with Boost 1.40.0, 1.42.0 and 1.46.1. Other versions may work, too, but older versions will not get support.
+
+- Support for C++0x and C++11 is integrated and automatically detected. No core parts of STXXL require C++11.
+
+- All options are automatically detected by CMake.
+
+
+\section faq_credit How can I credit STXXL, and thus foster its development?
+
+- For all users:
+  - Sign up at Ohloh and add yourself as an STXXL user / rate STXXL: http://www.ohloh.net/p/stxxl
+  - Rate STXXL at heise Software-Verzeichnis (German): http://www.heise.de/software/download/stxxl/76072
+  - Rate STXXL at SourceForge: https://sourceforge.net/projects/stxxl/
+
+- For scientific work:  Cite the papers mentioned here: http://stxxl.sourceforge.net/
+
+- For industrial users:  Tell us the name of your company, so we can use it as a reference.
+
+
+\section faq_nonPODs References to Elements in External Memory Data Structures
+
+You should not pass or store references to elements in an external memory data structure. When the reference is used, the block that contains the element may be no longer in internal memory.<br> Use/pass an iterator (reference) instead.<br> For an \c stxxl::vector with \c n pages and LRU replacement strategy, it can be guaranteed that the last \c n references obtained using \c stxxl::vector::operator[] or dereferencing an iterator are valid.
+
+However, if \c n is 1, even a single innocent-looking line like
+\verbatim
+std::cout << v[0] << " " << v[1000000] << std::endl;
+\endverbatim
+can lead to inconsistent results.
+
+
+\section faq_templateparam Parameterizing STXXL Containers
+
+STXXL container types like stxxl::vector can be parameterized only with a value type that is a
+<a href="http://en.wikipedia.org/wiki/Plain_old_data_structures">POD</a>
+(i. e. no virtual functions, no user-defined copy assignment/destructor, etc.)
+and does not contain references (including pointers) to internal memory.
+Usually, "complex" data types do not satisfy this requirements.
+
+This is why stxxl::vector<std::vector<T> > and stxxl::vector<stxxl::vector<T> > are invalid.
+If appropriate, use std::vector<stxxl::vector<T> >, or emulate a two-dimensional array by
+doing index calculation.
+
+
+\section faq_threadsafe Thread-Safety
+
+The I/O and block management layers are thread-safe (since release 1.1.1).
+The user layer data structures are not thread-safe.<br>
+I.e. you may access <b>different</b> \c STXXL data structures from concurrent threads without problems,
+but you should not share a data structure between threads (without implementing proper locking yourself).<br>
+This is a design choice, having the data structures thread-safe would mean a significant performance loss.
+
+
+\section faq_diskalloc Disk Allocation on Multiple Disks
+
+Q: I have configured several disks to use with STXXL. Why does STXXL fail complaining about the <b>lack of space</b>? According to my calclulations, the space on the disks should be sufficient.
+
+A: This may happen if the disks have <b>different size</b>. With the default parameters \c STXXL containers use randomized block-to-disk allocation strategies
+that distribute data evenly between the disks but ignore the availability of free space on them. Thus when the smallest disk is full, the program will abort because it cannot grow the file on that disk.
+
+A2: This round-robin disk allocation is due to the history of STXXL's support for parallel disk algorithms. It would be great if someone would contribute a patch for this issue. This would require adapting stxxl::disk_allocator and stxxl::block_manager to skip full disks when allocating new blocks.
+
+\section faq_msclr STXXL in a Microsoft CLR Library
+
+From STXXL user Christian, posted in the <a href="https://sourceforge.net/projects/stxxl/forums/forum/446474/topic/3407329">forum</a>:
+
+Precondition: I use STXXL in a Microsoft CLR Library (a special DLL). That means that managed code and native code (e.g. STXXL) have to co-exist in your library.
+
+Symptom: Application crashes at process exit, when the DLL is unloaded.
+
+Cause: STXXL's singleton classes use the \c atexit() function to destruct themselves at process exit. The exit handling will cause the process to crash at exit (still unclear if it's a bug or a feature of the MS runtime).
+
+Solution:
+
+1.) Compiled STXXL static library with \c STXXL_NON_DEFAULT_EXIT_HANDLER defined.
+
+2.) For cleanup, \c stxxl::run_exit_handlers() has now to be called manually. To get this done automatically:
+
+Defined a CLI singleton class "Controller":
+
+\verbatim
+public ref class Controller {
+private: 
+    static Controller^ instance = gcnew Controller;
+    Controller();
+};
+\endverbatim
+
+Registered my own cleanup function in Controller's constructor which will manage to call \c stxxl::run_exit_handlers():
+
+\verbatim
+#pragma managed(push, off)
+static int myexitfn()
+{
+    stxxl::run_exit_handlers();
+    return 0;
+}
+#pragma managed(pop)
+
+Controller::Controller()
+{
+    onexit(myexitfn);
+}
+\endverbatim
+
+
+*/

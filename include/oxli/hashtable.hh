@@ -614,9 +614,17 @@ public:
 class QFCounttable : public oxli::MurmurHashtable
 {
 public:
-    explicit QFCounttable(WordLength ksize, int size)
-        : MurmurHashtable(ksize, new QFStorage(size)) { } ;
+    explicit QFCounttable(WordLength ksize, int size,int slotsize)
+        : MurmurHashtable(ksize, new QFStorage(size,slotsize)) { } ;
 };
+
+class BufferedQFCounttable : public oxli::MurmurHashtable
+{
+public:
+    explicit BufferedQFCounttable(WordLength ksize, int size,int slotsize)
+        : MurmurHashtable(ksize, new BufferedMQFStorage(size,slotsize)) { } ;
+};
+
 
 // Hashtable-derived class with BitStorage.
 class Nodetable : public oxli::MurmurHashtable

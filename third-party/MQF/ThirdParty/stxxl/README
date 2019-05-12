@@ -1,0 +1,27 @@
+DESCRIPTION
+
+STXXL is an implementation of the C++ standard template library STL for
+external memory (out-of-core) computations, i. e. STXXL implements containers
+and algorithms that can process huge volumes of data that only fit on disks.
+While the closeness to the STL supports ease of use and compatibility with
+existing applications, another design priority is high performance.
+
+
+DOCUMENTATION
+
+See the Doxygen documentation for installation manual and programmer
+documentation: http://stxxl.sourceforge.net
+
+
+LICENSE TERMS
+
+STXXL is distributed under the Boost Software License, Version 1.0.
+(See accompanying file LICENSE_1_0.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
+
+
+BUGS AND QUESTIONS
+
+If you find any bugs or have any questions, please visit the forums at
+
+http://sourceforge.net/projects/stxxl/forums

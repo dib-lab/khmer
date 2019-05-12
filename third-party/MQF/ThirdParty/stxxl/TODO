@@ -1,0 +1,116 @@
+* asynchronous pipelining
+  (currently being developed in branch parallel_pipelining_integration)
+
+* if the stxxl disk files have been enlarged because more external memory
+  was requested by the program, resize them afterwards to
+  max(size_at_program_start, configured_size)
+  https://sourceforge.net/forum/message.php?msg_id=4925158
+
+* allocation strategies: provide a method get_num_disks()
+  and don't use stxxl::config::get_instance()->disks_number() inappropriately
+
+* implement recursion in stable_ksort and do not assume random key
+  distribution, do sampling instead
+  as a start, at least abort early if the expected size of a bucket is larger
+  than the memory available to sort it
+
+* debug stable_ksort in depth, there are still some crashing cases left
+
+* continue using the new approach for STXXL_VERBOSE:
+  $(CXX) -DSTXXL_VERBOSE_FOO=STXXL_VERBOSEx
+
+* check+fix all sorted_runs() calls to not cause write I/Os
+
+* on disk destruction, check whether all blocks had been deallocated before,
+  i.e. free_bytes == disk_size
+
+* implement an allocator which looks at the available free space on disks
+  when distributing blocks to disks, or does load-balancing depending
+  on the given speed of the disks
+
+* abstract away block manager so every container can attach to a file.
+
+* retry incomplete I/Os for all file types (currently only syscall)
+
+* iostats: add support for splitting I/Os and truncating reads at EOF
+
+* do not specify marginal properties such as allocation strategy as part of the template type.
+  instead, make such properties dynamically configurable using run-time polymorphism,
+  which would incur only a negligible running time overhead (one virtual function call per block).
+
+* If we get rid of the sentinels (at least for sorting), we can drop the
+  min_value()/max_value() requirement on the comparator and therefore
+  unmodified comparators could be used for stxxl.
+
+* Traditionally stxxl only supports PODs in external containers, e.g. nothing
+  that has non-trivial constructors, destructors or copy/assignemnt operators.
+  That is neccessary to allow fast operations by accessing the underlying
+  blocks directly without caring about copying/moving/otherwise manipulating
+  the content or uninitialized elements.
+
+  For some applications it could be helpful to have containers that take
+  non-POD elements, but you would probably lose the features you gain by having
+  direct access to the blocks.
+
+  Some discussion regarding using some shared_ptr<> in a stxxl::vector can be
+  found here: https://sourceforge.net/projects/stxxl/forums/forum/446474/topic/4099030
+
+* The following code is not correct:
+
+  file * f = create_file(..., RDONLY);
+  vector<> v(f);
+  v[42]; // non-const access, sets dirty flag
+
+  but the error message it produces is very unclear and may come very
+  asynchronous:
+
+  terminate called after throwing an instance of 'stxxl::io_error' what():
+  Error in function virtual void stxxl::mmap_file::serve(const
+  stxxl::request*): Info: Mapping failed. Page size: 4096 offset modulo page
+  size 0 Permission denied
+
+  Caused by stxxl::vector<> when swapping out a dirty page. Reproducible with
+  containers/test_vector_sizes.stxxl.bin
+
+  Possible solution: vector::write_page() should check if
+  vector-is-bound-to-a-file and file-is-opened-read-only throw "please use only
+  const access to a read only vector"
+
+* I've noticed that the destructor for stxxl::vector flushes any dirty data to
+  disk. Possibly that makes sense for a file-backed vector (I haven't looked at
+  how those work), but for a vector that uses the disks configured in .stxxl it
+  is wasted I/O as the data is immediately freed. For the moment I am working
+  around this by calling thevector.clear() immediately before destroying it,
+  which seems to prevent the writeback (based on querying the stats).
+
+* There should be a function like
+
+   bool supports_filetype(const char *)
+
+   that allows to check at runtime whether a file type (given as string) is
+   available. Useful for tests that take a file type as parameter - they
+   currently throw an exception "unsupported filetype".
+
+* Change the constructor
+  stxxl::vector<>::vector(stxxl::file*)
+  to
+  stxxl::vector<>::vector(shared_ptr<stxxl::file>)
+  so that ownership of the file can be transferred to the vector and cleanup
+  (closing etc.) of the file can happen automatically
+
+* materialize() that takes an empty vector as argument and grows it, including
+  allocating more blocks of fills the existing part of a vectorand once we came
+  to it's end automatically expands the vector (including proper resizes). This
+  approach should be more efficient (due to overlapping) than repeated
+  push_back()
+
+* streamop passthrough() useful if one wants to replace some streamop by a
+  no-op by just redefining one type needs peformance measurements, hopefully
+  has no impact on speed.
+
+* stream::discard() should not need to call in.operator*() - are there side
+  effects to be expected?
+  -> add a streamop "inspect" or so for this purpose
+  -> drop *in call from discard
+
+* add discard(StreamOp, unsigned_irgendwas n): discard at most n elements

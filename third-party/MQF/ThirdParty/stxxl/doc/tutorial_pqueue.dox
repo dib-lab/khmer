@@ -1,0 +1,128 @@
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/tutorial_pqueue.dox
+ *
+ *  Usage Tutorial for STXXL
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+namespace stxxl {
+
+/** \page tutorial_pqueue STXXL Priority Queue
+
+This page introduces into the stxxl::priority_queue container (to learn more about the structure of stxxl::priority_queue, see section \ref design_pqueue).
+
+Basically, the priority queue provides insertion of new elements as well as access and deletion of the element on top.
+The invariant guarantees that the top element is the largest (or smallest if desired) of all inserted elements identified by comparison realized by the customizable comparator class.
+
+### Creating a STXXL priority queue
+
+To manage the configuration of the priority queue type, we use the generator template stxxl::PRIORITY_QUEUE_GENERATOR. This generator template expects a value type (which is an integer in our example),
+a class which we name Comparator(a,b) to compare two given elements a and b, a internal memory limit in bytes and the number of elements to be stored (in 1024 units). See section \ref design_pqueue_generator for additional configuration parameters and information.
+
+Thus the definition may look as follows:
+
+\code
+// template parameter <value_type, CompareType, internal_memory_limit, number_of_elements>
+typedef stxxl::PRIORITY_QUEUE_GENERATOR<int, ComparatorGreater, 64*1024*1024, 1024*1024>::result pqueue_type;
+\endcode
+
+The ComparatorGreater(a,b) class is needed to compare two given elements a and b and has to be defined by hand (and before the priority queue definition above):
+
+\code
+struct ComparatorGreater
+{
+    bool operator () (const int &a, const int &b) const
+    { return (a > b); }
+
+    int min_value() const
+    { return std::numeric_limits<int>::max(); }
+};
+\endcode
+
+The compare-operator () of two elements a and b returns true, if a is larger than b, otherwise false. Consequently, this priority queue serves it's <b> smallest element on top </b>. The additional min_value() function ensures that Comparator(min_value(),x) is true for each and every x.
+
+iLikewise the minimum-on-top Comparator, we can easily define a <b> largest element on top </b> Comparator which stores the the largest contained integer on top as well:
+
+\code
+struct ComparatorLess
+{
+    bool operator () (const int & a, const int & b) const
+    { return a<b; }
+
+    int min_value() const
+    { return std::numeric_limits<int>::min(); }
+};
+\endcode
+
+Note that CompareType must define a strict weak ordering. These and some other details are available in the Notes part of \ref design_pqueue_generator
+
+To create a STXXL priority queue instance, a resizable buffered writing and prefetched reading pool (to overlap I/O and computation) is needed:
+
+\code
+  typedef pqueue_type::block_type block_type;
+  const unsigned int mem_for_pools = 16 * 1024 * 1024;  // restricts memory consumption of the pools
+
+  stxxl::read_write_pool<block_type> pool((mem_for_pools / 2) / block_type::raw_size, (mem_for_pools / 2) / block_type::raw_size);
+  pqueue_type my_pqueue(pool);  // creates priority queue object with read-write-pool
+\endcode
+
+
+### Insert / Access / Delete elements
+
+To insert a new element into the priority queue, call push():
+
+\code
+my_pqueue.push(5);
+\endcode
+
+The priority queue only allows to access the top element, which is the smallest or largest element (depending on the used comparator class) of all inserted elements.
+Calling top() on an instance returns this element:
+
+\code
+int x;
+x = my_pqueue.top();
+\endcode
+
+Erasing elements is only possible on the top of the priority queue by calling pop().
+Note that after removing the element on top, the priority queue still holds the above mentioned property.
+
+\code
+my_pqueue.pop();
+\endcode
+### Determine size / Check whether the priority queue is empty
+
+To determine the size (i.e. the number of elements) of an instance, call size():
+\code
+std::cout << "priority queue stores: " << my_pqueue.size() << " elements" << std::endl;
+\endcode
+
+To check if the priority queue is empty, call empty() which returns true in case:
+\code
+std::cout << "empty priority queue? " << my_pqueue.empty() << std::endl;
+\endcode
+
+### A minimal working example of STXXL's priority queue
+
+(See \ref examples/containers/pqueue1.cpp for the sourcecode of the following example).
+
+\snippet examples/containers/pqueue1.cpp example
+
+See \ref examples/containers/pqueue2.cpp for the sourcecode of another small example.
+
+\example examples/containers/pqueue1.cpp
+This example code is explained in the \ref tutorial_pqueue section
+
+\example examples/containers/pqueue2.cpp
+This example code is explained in the \ref tutorial_pqueue section
+
+*/
+
+} // namespace stxxl

@@ -1,0 +1,59 @@
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/tutorial_unordered_map.dox
+ *
+ *  Usage Tutorial for STXXL
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *  Copyright (C) 2013 Daniel Feist <daniel.feist@student.kit.edu>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+namespace stxxl {
+
+/** \page tutorial_unordered_map STXXL Unordered Map (Hash Map)
+
+This page introduces the **EXPERIMENTAL** stxxl::unordered_map which can be used in-lieu of std::unordered_map (for further information on the interface, refer to the API \ref stxxl::unordered_map).
+
+stxxl::unordered_map is an external memory hash map that stores elements formed by a combination of a unique key value and a data value, without any specific order. The main problem is that a hash map **ITSELF IS NOT VERY EFFICIENT** in external memory, since access to an element requires a random access to disk. **PLEASE CHECK** whether an ordered sequence, as provided by stxxl::map, may not be the better replacement for your application.  However, if you are willing to provide **a lot of buffer memory** then the hash map can cache many items in internal memory, and direct hash-based access will be very fast. Also, with SSDs one may be able to reduce the block size.
+
+The implementation of the unordered hash_map is experimental, and help for improving, fixing bugs and writing documentation in it is very welcome. If you have an application, please consider **THROUGHLY TESTING** the implementation and patching problems.
+
+### Creating a STXXL Unordered Map
+
+To create a stxxl::unordered_map object, several template parameters are required. The first two parameters KeyType and MappedType, which are combined into a std::pair<int, char> in this example, are self-explanatory, the third parameter is a *hasher class* and the fourth has to be a *comparator class* which is used to determine whether a key is smaller than another one, the fifth and sixth parameters define the subblock- and block size (in subblock items).
+\snippet examples/containers/unordered_map1.cpp construction
+
+The hash function follows the standard std::hash signature, and returns a size_t:
+\snippet examples/containers/unordered_map1.cpp hash
+
+Instead of the **equality comparator** as required by the C++ standard, we require a **less comparator**, because the unordered_map **sorts** bulk insertions by hash value. A simple comparator looks like:
+\snippet examples/containers/unordered_map1.cpp comparator
+
+After construction, the standard operations of an unordered map are available as one would think, see below for a short example of some function.
+
+### Additional Implementation Notes
+
+ * The implementation contains some TODO items very relevant to performance. A potential heavy user should consider fixing these.
+
+ * As the btree, the unordered_map must keep an iterator map for updating items when they are swapped out to disk.
+
+TODO: write more information.
+
+### A minimal working example on STXXL Unordered Map
+
+(See \ref examples/containers/unordered_map1.cpp for the sourcecode of the following example).
+
+\snippet examples/containers/unordered_map1.cpp example
+
+\example examples/containers/unordered_map1.cpp
+This example code is explained in the \ref tutorial_unordered_map section
+
+*/
+
+} // namespace stxxl

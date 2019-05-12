@@ -1,0 +1,566 @@
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/install.dox
+ *
+ *  Installation and Linking Instruction for STXXL using CMake
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+/** \page install Compilation and Configuration
+
+\subpage install_unix
+
+\subpage install_windows
+
+\subpage install_windows_boost
+
+\subpage install_build_options
+
+\subpage install_config
+
+*/
+
+/** \page install_unix Compiling and Installing STXXL on Linux/Unix Variants
+
+\author Timo Bingmann (2013)
+
+Precondition: Make sure GNU \c make, \c CMake >= 2.6.4, \c git and a C++ compiler are installed. See \ref faq_compilers which systems and compilers are currently supported.
+
+There are three methods to use STXXL:
+- The first is recommended for small <b>prototype projects</b> consisting of only a few source files. It uses the \c local/ directory within the STXXL directory tree.
+- For <b>larger development</b> projects, the STXXL library can be linked as a library inside a subdirectory.
+- For distributing <b>independent sources</b>, the STXXL library can be localed using CMake's \c find_package() mechanism.
+
+There are quite some \ref install_build_options, which you can use when building STXXL with CMake.
+
+\section install_unix_local First-Time Compile and Simple Projects in local/
+
+1. Clone the STXXL project repository as <tt>\b my-project</tt>.
+\verbatim
+$ git clone http://github.com/stxxl/stxxl.git my-project
+\endverbatim
+
+2. Compile the STXXL library in a \c build subdirectory, including the example in \c local/.
+\verbatim
+$ mkdir my-project/build
+$ cd my-project/build
+$ cmake ..
+<lots of output by cmake>
+$ make
+<lots of compilation messages>
+\endverbatim
+
+3. Run the example program \c test1 in \c local/
+\verbatim
+(inside my-project/build/)
+$ cd local
+$ ./test1
+<lots of output>
+\endverbatim
+
+For your own prototype project you can immediately start modifying \c test1.cpp or create a new .cpp in \c local/. The CMake scripts will automatically compile and link all .cpp files in \c local/ correctly with STXXL.
+
+The CMake file has many build options (see \ref install_build_options). Maybe the most important are \c BUILD_TESTS and \c BUILD_EXAMPLES. By setting them with <tt>"-DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON"</tt> on the CMake line, additional subprojects are added to the build.
+
+By default, STXXL compiles in <tt>Debug</tt> mode and includes many assertions and run-time checks, which typically slow down performance dramatically. To use STXXL at **full speed**, please set the build type to <tt>Release</tt> by adding <tt>-DCMAKE_BUILD_TYPE=Release</tt> to the cmake line. 
+
+\section install_unix_subproject Including STXXL as a CMake Subproject
+
+The second method is for including STXXL in a larger program as a subproject. This is particularly easy with CMake: one can just \c add_directory(stxxl) in a CMakeLists.txt. The following guide shows how to start a simple CMake project and use STXXL in a subdirectory.
+
+The advantage of this method is that the STXXL is a subproject of your's. Thereby it will always be compiled with the <b>same set</b> of CFLAGS or CMAKE_BUILD_TYPE as your project. This is most convenient for developing projects, as the STXXL has a lot of debug code. When running experiments or going into production, the whole project must be built with \c CMAKE_BUILD_TYPE=Release or similar to remove the debug code.
+
+1. Create an empty directory \c "my-project" and clone the STXXL inside it.
+\verbatim
+$ mkdir my-project
+$ cd my-project
+$ git clone http://github.com/stxxl/stxxl.git
+\endverbatim
+
+2. Create a file named \c CMakeLists.txt inside your \c my-project folder with the following sample content:
+\verbatim
+# CMakeLists.txt example for STXXL
+
+project(my-project)
+cmake_minimum_required(VERSION 2.8)
+
+# disallow in-source builds
+if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
+  message(SEND_ERROR "In-source builds are not allowed.")
+endif("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
+
+# enable warnings (always good)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall")
+
+# include the STXXL library in my-project
+add_subdirectory(stxxl)
+
+# apply STXXL CXXFLAGS to our configuration
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${STXXL_CXX_FLAGS}")
+
+# add STXXL includes path
+include_directories(${STXXL_INCLUDE_DIRS})
+
+# build a program and link it with STXXL.
+add_executable(project main.cpp)
+target_link_libraries(project ${STXXL_LIBRARIES})
+\endverbatim
+
+3. To show how that this build system works, we now copy the \c test1.cpp from STXXL to the new project as \c main.cpp and build it.
+\verbatim
+$ cp stxxl/local/test1.cpp main.cpp
+$ mkdir build
+$ cd build
+$ cmake ..
+<lots of output by cmake>
+$ make
+<lots of compilation messages>
+\endverbatim
+
+4. Test the compilation by running \c project
+\verbatim
+$ ./project
+\endverbatim
+
+\section install_unix_library Including STXXL as a Library
+
+STXXL compiles into a static (and optionally shared) library plus template include files, which may be included in binary distributions.
+
+If a binary STXXL package is installed, the following few CMake lines will automatically detect it and configure a program to build with the appropriate CXXFLAGS, include directories and libraries:
+\verbatim
+# search for stxxl-config.cmake which contains the library's configuration
+find_package(STXXL REQUIRED)
+
+# print some info (this can be removed)
+message(STATUS "STXXL_CXX_FLAGS: ${STXXL_CXX_FLAGS}")
+message(STATUS "STXXL_INCLUDE_DIRS: ${STXXL_INCLUDE_DIRS}")
+message(STATUS "STXXL_LIBRARIES: ${STXXL_LIBRARIES}")
+
+# apply CXXFLAGS to our configuration
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${STXXL_CXX_FLAGS}")
+
+# add STXXL include directory
+include_directories(${STXXL_INCLUDE_DIRS})
+
+# create and executable and linke with STXXL
+add_executable(your_program main.cpp)
+target_link_libraries(your_program ${STXXL_LIBRARIES})
+\endverbatim
+
+We have create a simple example project, which contains the lines above and an example program. The source is available via github:
+\verbatim
+git clone http://github.com/stxxl/myproject.git
+\endverbatim
+See the README at http://github.com/stxxl/myproject
+
+# Create a Disk Configuration File
+
+For STXXL to function beyond very simple examples, you must define the \link install_config disk configuration file \endlink. The simplest method is to create a file named <b><tt>'.stxxl'</tt></b> the same directory as you execute the program. A basic configuration might be:
+\verbatim
+# file path,maximum capacity of the disk,access method
+disk=/tmp/stxxl,1G,syscall unlink
+\endverbatim
+Please see \ref install_config for further available options.
+
+# Notes for Linux Distribution Package Maintainers
+
+Package maintainers should make sure that \b both Debug and Release static libraries are available via the distribution package system. We currently cannot keep a stable binary interface for the library, thus providing versioned shared libraries is not a good idea.
+
+- The CMake build scripts will generate static and exclude shared libraries when run with <tt>"-DBUILD_STATIC_LIBS=ON -DBUILD_SHARED_LIBS=OFF"</tt>.
+
+- Debug libraries are suffixed with "_debug". Due to CMake's system, the library must be compiled once in Debug mode and once in Release mode! (see below)
+
+- Running "make install" will correctly install the tree into \c CMAKE_INSTALL_PREFIX.
+
+- The binary package should only contain the \c stxxl_tool (since we do not provide shared libraries). Alternatively, the tool can packaged in an additional \c tools package, thus leaving the binary package empty. The \c test1 binary must not be included.
+
+- The development package must contain all installed headers, and both "libstxxl.a" and "libstxxl_debug.a". \n
+  The CMake script will also install CMake project files in \c lib/cmake/stxxl , which must be included in the development package. \n
+  We also provide a \c pkg-config file, which installs by default into \c lib/pkgconfig/ as \c stxxl.pc and \c stxxl_debug.pc
+
+- Binary Unix packages should not use Boost.
+
+A typical build sequence would be
+\verbatim
+mkdir debug; cd debug
+cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_STATIC_LIBS=ON $SRCDIR
+make -j4 && make install
+cd ..
+mkdir release; cd release
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_STATIC_LIBS=ON $SRCDIR
+make -j4 && make install
+\endverbatim
+When building in this order the \b stxxl_tool will be built twice, and the Debug binary will be overwritten with the Release binary.
+
+*/
+
+/** \page install_build_options Options for Build Configuration
+
+STXXL has some optional features and compile switches that can be changed at build time.
+
+- Maybe the most important one is switching between \b Debug and \b Release builds. Debug builds are <b>very slow</b>, as STXXL contains many assertions (which are a feature not a bug). With \c cmake the mode is easily defined by using
+\verbatim
+$ cmake -DCMAKE_BUILD_TYPE=Debug ...
+<or>
+$ cmake -DCMAKE_BUILD_TYPE=Release ...
+\endverbatim
+The mode mostly changes CXXFLAGS.
+
+- Some parts of STXXL have been parallelized using the __gnu_parallel (aka MCSTL) library. Currently, with CMake one can only use the newer __gnu_parallel library by defining
+\verbatim
+$ cmake -DUSE_GNU_PARALLEL=ON ...
+\endverbatim
+when building. <b>Parallel is now ON by default for gcc</b>, if it can be detected. The cmake script will check availability of the corresponding header files.
+
+- Use Boost for file I/O, multi-threading support and more. Boost is required on Windows for older MSVC versions and is CMake tries to automatically find it. On Linux/Unix it is optional <b>and not recommended</b>, but can be activated using
+\verbatim
+$ cmake -DUSE_BOOST=ON ...
+\endverbatim
+
+- STXXL contains many small example programs, which can be built by defining
+\verbatim
+$ cmake -DBUILD_EXAMPLES=ON ...
+\endverbatim
+
+- STXXL contains a set of unit tests in \c tests/, which verify most of the libraries functionality. These programs are not built by default, because this makes it easier for STXXL to be used as CMake subproject (\ref install_unix_subproject). The test suite can be built and run using
+\verbatim
+$ cmake -DBUILD_TESTS=ON ...
+<compile>
+$ make test
+\endverbatim
+Defining BUILD_TESTS also builds everything in \c examples/. There is also a \c BUILD_EXTRAS configuration flag to build even more, longer running tests. Be advised that the test suite need quite some space on your disks.
+
+- CMake can be instructed to use other compilers, by setting, for example
+\verbatim
+$ cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ ...
+\endverbatim
+
+- CMake can install the library and all public headers into a prefix by running:
+\verbatim
+$ cmake -DCMAKE_INSTALL_PREFIX=/some/dir ...
+<compile>
+$ make install
+\endverbatim
+Additionally, the installation subdirectories can be specified using the following options:
+\verbatim
+INSTALL_BIN_DIR=bin
+INSTALL_LIB_DIR=lib
+INSTALL_INCLUDE_DIR=include
+INSTALL_PKGCONFIG_DIR=lib/pkgconfig
+INSTALL_CMAKE_DIR=lib/cmake/stxxl
+\endverbatim
+
+- The CMake script by default only builds a static library. Shared libraries in Linux incur a <b>small overhead</b> for each library call, which should be insignificant for STXXL. However, keeping a stable binary interface for shared libraries is currently not planned. Nevertheless, you can build static and/or shared library via the following switches:
+\verbatim
+$ cmake -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=ON ..
+\endverbatim
+
+- On Unix the pthreads library is used for threading, on Windows the Boost or STL thread library is used. For testing compilation, the STL thread library can optionally also be used on Unix/Linux by setting the \c -DUSE_STD_THREADS=ON switch.
+
+- For build testing, the CMake script can check that all header files in \c include/ compile by themselves. This is required since each header must be self-sufficient and include other headers appropriately. These test compiles are trigged with \c -DTRY_COMPILE_HEADERS=ON.
+
+- Again for testing, the CMake script can be instructed to run all tests and examples
+\verbatim
+# with valgrind by setting
+$ cmake -DUSE_VALGRIND=ON ...
+# with gcov for test coverage analysis by setting
+$ cmake -DUSE_GCOV=ON ...
+\endverbatim
+The valgrind option also enables a few additional lines of code that clear memory areas that are intentionally uninitialized.
+The gcov coverage report can be automatically created using the additional targets \c test-coverage (runs everything) or \c lcov-html to generate the HTML report after running the test suite.
+
+*/
+
+/** \page install_windows Compiling and Installing STXXL with Visual Studio 2012 and newer (without Boost)
+
+\author Timo Bingmann (2013)
+
+## Prerequisites:
+
+- Microsoft <b>Visual Studio >= 2012 (VC11)</b>. \n
+  For older versions you need Boost, see \ref install_windows_boost.
+- CMake 2.8, visit http://www.cmake.org/
+- (a git client for development on the bleeding edge)
+
+## Unpack STXXL source code
+
+- Download the STXXL archive from http://stxxl.sourceforge.net <br>
+  or use your favorite git client to clone the development version: http://github.com/stxxl/stxxl.git
+- Unpack the archive at a convenient location.
+
+## Use CMake to Generate Visual Studio Projects
+
+- Open the CMake GUI.
+- Fill in the <b>source code</b> field with the place of the STXXL source and pick a <b>build</b> directory.
+- Pressing <b>"Configure"</b> brings up a dialog box: select your Visual Studio version (MSVC 11 here). <br>
+  Note that you must select between 32- and 64-bit building here.
+- Press <b>"Generate"</b> to run the CMake platform checks and to generate the Visual Studio project files.
+
+\image html install_windows_cmake.png
+
+- After generating the project, CMake presents a list of optional configuration switches. Maybe the most important are \c BUILD_TESTS and \c BUILD_EXAMPLES. By selecting them, additional subprojects are generated to build and run the unit tests for STXXL.
+
+## Use Visual Studio to Build STXXL
+
+- Afterwards, use Visual Studio to open the <b>stxxl.sln</b> STXXL "Solution" containing the projects.
+- Building the <b>ALL_BUILD</b> will first compile the STXXL library sources and then <b>stxxl_tool</b> and the <b>test1</b> program in \c local/
+
+\image html install_windows_msvc11.png
+
+- You can immediately start working with STXXL by modifying the <b>test1.cpp</b> code in the \c local/ directory.
+- Simply switch Visual Studio into <b>Release</b> mode for building without assertions and extra checks.
+- To build the examples and test suite open up CMake, enable the check-boxes <b><tt>BUILD_EXAMPLES</tt></b> or <b><tt>BUILD_EXAMPLES</tt></b> and press "Generate" again. This will create many sub-projects in the Visual Studio solution.
+
+\note For instruction on configuring disks on Windows, see \ref install_config
+
+## Using STXXL as a Library inside a Project
+
+TODO. If you are an experienced MSVC user, please contribute!
+
+*/
+
+/** \page install_windows_boost Compiling and Installing STXXL with Visual Studio 2010 and Boost
+
+\author Timo Bingmann (2013)
+
+## Prerequisites:
+
+- Microsoft Visual Studio <= 2010 (VC10). \n
+  For newer versions you \link install_windows don't need Boost \endlink anymore.
+- CMake 2.8, visit http://www.cmake.org/
+- (a git client for development on the bleeding edge)
+
+## Unpack STXXL source code
+
+- Download the STXXL archive from http://stxxl.sourceforge.net <br>
+  or use your favorite git client to clone the development version: http://github.com/stxxl/stxxl.git
+- Unpack the archive at a convenient location.
+
+## Download and Install Boost
+
+- We recommend the official binaries for MSVC. Visit http://sourceforge.net/projects/boost/files/boost-binaries/
+  and download the newest package for your compiler, e.g. <a href="http://sourceforge.net/projects/boost/files/boost-binaries/1.54.0/boost_1_54_0-msvc-10.0-64.exe/download">boost_1_54_0-msvc-10.0-64.exe</a>
+- When installing the package, make sure to install in directory \n
+  <b>C:\\Boost</b> \n
+  instead of the default location. This is the most easy way to enable the CMake auto-detection macros to find Boost.
+- The pre-compiled Boost libraries are then located at \n
+  <b>C:\\Boost\\lib64-msvc-10.0</b> or similar. \n
+  You must <b>rename</b> this directory to just <b>lib</b> for CMake to automatically find it.
+
+In summary, CMake only looks for Boost at a few locations: C:\\Boost for headers and C:\\Boost\\lib for library files. While it is possible to instruct CMake to look elsewhere for the necessary files, the easier way is to just rename the directories as required. Otherwise, the Boost location must be specified to CMake by setting the variables \c BOOST_ROOT, \c BOOST_INCLUDEDIR and \c BOOST_LIBRARYDIR in the dialog box each time.
+
+## Use CMake to Generate Visual Studio Projects
+
+- Open the CMake GUI.
+- Fill in the <b>source code</b> field with the place of the STXXL source and pick a <b>build</b> directory.
+- Pressing <b>"Configure"</b> brings up a dialog box: select your Visual Studio version (MSVC 10 here). <br>
+  Note that you must select between 32- and 64-bit building here.
+- Press <b>"Generate"</b> to run the CMake platform checks and to generate the Visual Studio project files.
+
+\image html install_windows_boost_cmake.png
+
+- If you get any error about CMake not being able to find Boost, refer to the previous section on the directories which CMake considers!
+
+- After generating the project, CMake presents a list of optional configuration switches. Maybe the most important are \c BUILD_TESTS and \c BUILD_EXAMPLES. By selecting them, additional subprojects are generated to build and run the unit tests for STXXL.
+
+## Use Visual Studio to Build STXXL
+
+- Afterwards, use Visual Studio to open the <b>stxxl.sln</b> STXXL "Solution" containing the projects.
+- Building the <b>ALL_BUILD</b> will first compile the STXXL library sources and then <b>stxxl_tool</b> and the <b>test1</b> program in \c local/
+
+\image html install_windows_boost_msvc10.png
+
+- You can immediately start working with STXXL by modifying the <b>test1.cpp</b> code in the \c local/ directory.
+- Simply switch Visual Studio into <b>Release</b> mode for building without assertions and extra checks.
+- To build the examples and test suite open up CMake, enable the check-boxes <b><tt>BUILD_EXAMPLES</tt></b> or <b><tt>BUILD_EXAMPLES</tt></b> and press "Generate" again. This will create many sub-projects in the Visual Studio solution.
+
+\note For instruction on configuring disks on Windows, see \ref install_config
+
+*/
+
+/** \page install_config Disk Configuration Files
+
+\author Timo Bingmann (2013-2014)
+
+A main feature of the STXXL is to take advantage of parallel access to <b>multiple disks</b>. For this, you must define the disk configuration in a text file, using the syntax described below. If no file is found at the locations below, STXXL will by default create a 1000 MiB file in \c /var/tmp/stxxl on Unix or in the user's temp directory on Windows.
+
+These are the locations STXXL will look for a disk configuration file on <b>Linux/Unix systems</b>, in order of precedence:
+- If the environment variable <b><tt>STXXLCFG</tt></b> specifies a file, this is used.
+- Then the current directory of the program is checked:
+  - first for <b><tt>.stxxl.$HOSTNAME</tt></b> (for host specific configuration),
+  - then for <b><tt>.stxxl</tt></b> (for general configuration).
+- Then the \c $HOME directory of the current user is checked (<b>usual method</b>):
+  - first for <b><tt>$HOME/.stxxl.$HOSTNAME</tt></b> (for host specific configuration),
+  - then for <b><tt>$HOME/.stxxl</tt></b> (for general configuration).
+
+\warning On many Linux distributions the \c $HOSTNAME variable is not exported. For the host specific configuration to work, you must add <tt>"export HOSTNAME"</tt> to your shell configuration (<tt>.bashrc</tt>).
+
+On <b>Windows systems</b>, STXXL looks for a disk configuration file in the following directories:
+- If the environment variable <b><tt>STXXLCFG</tt></b> specifies a file, this is used.
+- Then the current directory of the program is checked:
+  - first for <b><tt>.stxxl.\%COMPUTERNAME\%.txt</tt></b> (for host specific configuration),
+  - then for <b><tt>.stxxl.txt</tt></b> (for general configuration).
+- Then the \c \%APPDATA\% directory of the current user is checked (<b>usual method</b>):
+  - first for <b><tt>\%APPDATA\%/.stxxl.\%COMPUTERNAME\%.txt</tt></b> (for host specific configuration),
+  - then for <b><tt>\%APPDATA\%/.stxxl.txt</tt></b> (for general configuration).
+
+\note In a default Windows 7 installation, \%APPDATA\% is <b><tt>C:\\Users\\<i>\<username\></i>\\AppData\\Roaming</tt></b> \n
+You can visit your <tt>\%APPDATA%</tt> directory by simply entering <b><tt>"%APPDATA%"</tt></b> in the Windows Explorer address/location line.
+
+\section install_config_format Disk Configuration File Format
+
+Each line of the configuration file describes a disk. Lines starting with '#' are comments.
+
+A disk description uses the following format:
+\verbatim
+disk=<path>,<capacity>,<fileio> <options>
+\endverbatim
+
+Description of the parameters:
+
+- <b><tt>\<path></tt></b> : full disk filename.
+  - In order to access disks STXXL uses <i>file-based access methods</i> (see below). Each disk is represented as a file
+  - If you have a disk that is mounted in Unix to the path /mnt/disk0/, then the correct value for the \c full_disk_filename would be \c /mnt/disk0/some_file_name. \n
+  - If the string contains <tt>"###"</tt> (three '#'), then these symbols are replaced by the current process id.
+
+- <b><tt>\<capacity></tt></b> : maximum capacity of the disk
+
+  - the following size suffixes are recognized:
+    - \c K, \c M, \c G, \c T, \c P (powers of 10),
+    - \c Ki, \c Mi, \c Gi, \c Ti, \c Pi (powers of 2).
+    - if a number has no suffix, \c M (megabyte) is assumed.
+
+  - 0 means autogrow, and the file will be deleted afterwards.
+
+- <b><tt>\<fileio></tt></b> : \c STXXL has a number of different file access implementations, choose one of them (recommended ones in bold):
+
+  - \c **syscall** : use \c read and \c write system calls which perform disk transfers directly on user memory pages without superfluous copying (currently the fastest method)
+
+  - \c **wincall** : on Windows, use direct calls to the Windows API.
+
+  - \c **linuxaio** : on Linux, use direct syscalls to the native Linux AIO interface. \n
+  The Linux AIO interface has the advantage of keeping an asynchronous queue inside the kernel. Multiple I/O requests are submitted to the kernel at once, thus the kernel can sort then using its disk schedulers and also forward them to the actual disks as asynchronous operations using NCQ (native command queuing) or TCQ (tagged command queueing).
+
+  - \c memory : keeps all data in RAM, for quicker testing
+
+  - \c mmap : \c use \c mmap and \c munmap system calls
+
+  - \c boostfd : access the file using a Boost file descriptor
+
+  - \c fileperblock_syscall, \c fileperblock_mmap, \c fileperblock_boostfd : same as above, but take a single file per block, using full_disk_filename as file name prefix.  Usually provide worse performance than the standard variants, but release freed blocks to the file system immediately.
+
+  - \c simdisk : simulates timings of the IBM IC35L080AVVA07 disk, full_disk_filename must point to a file on a RAM disk partition with sufficient space
+
+  - \c wbtl : library-based write-combining (good for writing small blocks onto SSDs), based on \c syscall
+
+- <b><tt>\<options></tt></b> : additional options for file access implementation. Not all are available for every fileio method. The option order is unimportant.
+
+  - \c **autogrow**, \c noautogrow, \c autogrow=[off/on] : enables automatic growth of the file beyond the specified capacity, enabled by default except if raw_device.
+
+  - \c **direct**, \c nodirect, \c direct=[off/try/on] : disable buffering in system cache by passing O_DIRECT or similar flag to open. \n
+    This is \a recommended as it improves performance, however, not all filesystems support bypassing cache. With \c direct or \c direct=on, STXXL will fail without direct access. With \c nodirect or \c direct=off it is disabled. The default is \c direct=try , which first attempts to open with O_DIRECT and falls back to opening without if it fails.
+
+  - \c **unlink** (or \c unlink_on_open) : unlink the file from the fs immediately after creation. \n
+    This is possible on Unix system, as the file descriptor is kept open. This method is \b preferred, because even in the case of a program segfault, the file data is cleaned up by the kernel.
+
+  - \c **delete** (or \c delete_on_exit) : delete file \a after the STXXL program exists \n
+    This is the more conservative version of unlink, which also works on Windows. However, if the program crashes, the file is not deleted.
+
+  - \c **raw_device** : fail if the opened path is not a raw block device. \n
+    This flag is not required, raw devices are automatically detected.
+
+  - \c queue=# : assign the disk to a specific I/O request queue and thread. \n
+    Use this for multiple files that reside on the same physical disk.
+
+  - \c devid=# : assign the disk entry a specific physical device id. \n
+    Usually you can just omit the devid=# option, since disks are enumerated automatically. In sorting and other prefetched operations, the physical device id is used to schedule block transfers from independent devices. Thus you should label files/disks on the same physical devices with the same devid.
+
+  - \c queue_length=# : specify for linuxaio the desired queue inside the linux kernel using this option.
+
+Example:
+\verbatim
+disk=/data01/stxxl,500G,syscall unlink
+disk=/data02/stxxl,300G,syscall unlink
+\endverbatim
+
+On Windows, one usually uses different disk drives and \c wincall.
+\verbatim
+disk=c:\stxxl.tmp,700G,wincall delete
+disk=d:\stxxl.tmp,200G,wincall delete
+\endverbatim
+
+On Linux you can try to take advantage of NCQ + Kernel AIO queues:
+\verbatim
+disk=/data01/stxxl,500G,linuxaio unlink
+disk=/data02/stxxl,300G,linuxaio unlink
+\endverbatim
+
+\section install_config_filesystem Recommended: File System XFS or Raw Block Devices
+
+The library benefits from direct transfers from user memory to disk, which saves superfluous copies.  We recommend to use the <a href="http://xfs.org">XFS  file system</a>, which gives good read and write performance for large files. Note that file creation speed of \c XFS is a bit slower, so that disk files should be precreated for optimal performance.
+
+If the filesystems only use is to store one large STXXL disk file, we also recommend to add the following options to the \c mkfs.xfs command to gain maximum performance:
+\verbatim
+$ mkfs.xfs -d agcount=1 -l size=512b
+\endverbatim
+
+The following filesystems have been reported not to support direct I/O: \c tmpfs , \c glusterfs .  By default, STXXL will first try to use direct I/O (\c O_DIRECT open flag). If that fails, it will print a warning and open the file without \c O_DIRECT.
+
+\note It is also possible to use <b>raw disk devices</b> with \c syscall. \n
+Just use \c disk=/dev/sdb1 or similar. This will of course \b overwrite all data on the partitions! The I/O performance of raw disks is generally <b>more stable and slightly higher</b> than with file systems.
+\code
+disk=/dev/sdb1,0,syscall raw_device
+\endcode
+The \c raw_device flag is only for verification, STXXL will automatically detect raw block devices and also their size.
+
+\section install_config_logfiles Log Files
+
+STXXL produces two kinds of log files, a message and an error log. By setting the environment variables \c STXXLLOGFILE and \c STXXLERRLOGFILE, you can configure the location of these files. The default values are \c stxxl.log and \c stxxl.errlog, respectively.
+
+\section install_config_precreation Precreating External Memory Files
+
+In order to get the maximum performance one can precreate disk files described in the configuration file, before running STXXL applications. A precreation utility is included in the set of STXXL utilities in \c stxxl_tool. Run this utility for each disk you have defined in the disk configuration file:
+\verbatim
+$ stxxl_tool create_files <capacity> <full_disk_filename...>
+// for example:
+$ stxxl_tool create_files 1GiB /data01/stxxl
+\endverbatim
+
+\section install_config_user User-Supplied disk_config Structures
+
+With STXXL >= 1.4.0, the library can also be configured via the user application.
+
+All disk configuration is managed by the stxxl::config class, which contains a list of stxxl::disk_config objects. Each stxxl::disk_config object encapsulates one disk= lines from a config file, or one allocated disk.
+
+The disk configuration must be supplied to the STXXL library <b>before any other function calls</b>, because the stxxl::config object must be filled before any external memory blocks are allocated by stxxl::block_manager.
+
+\code
+int main()
+{
+    // get uninitialized config singleton
+    stxxl::config * cfg = stxxl::config::get_instance();
+
+    // create a disk_config structure.
+    stxxl::disk_config disk1("/tmp/stxxl.tmp", 100 * 1024 * 1024, "syscall unlink");
+    disk1.direct = stxxl::disk_config::DIRECT_ON; // force O_DIRECT
+
+    // add disk to config
+    cfg->add_disk(disk1);
+
+    // add another disk
+    cfg->add_disk( disk_config("disk=/tmp/stxxl-2.tmp, 10 GiB, syscall unlink") );
+
+    // ... add more disks
+
+    // use STXXL library as usual ...
+}
+\endcode
+
+*/

@@ -1,0 +1,102 @@
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/tutorial_matrix.dox
+ *
+ *  Usage Tutorial for STXXL
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2013 Daniel Feist <daniel.feist@student.kit.edu>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+namespace stxxl {
+
+/** \page tutorial_matrix STXXL Matrix
+
+This section introduces into the STXXL matrix container (to learn more about the structure of stxxl::matrix, see section \ref design_matrix).
+
+### Create a STXXL Matrix
+
+Before using a STXXL matrix, we initially have to define and then to instantiate a matrix object. Two template parameters are required to define a stxxl::matrix container. ValueType defines the type of the contained objects (must be a POD with no references to internal memory) and BlockSizeLength specifies the side length of the square submatrices (blocks). BlockSizeLength is given in bits and must be a multiple
+of k assuming a valueType of k bits. The block schedular is used for swapping of blocks and provide blocks for temporary storage and expects the type of swappable_blocks to manage as a parameter.
+Can be some specialized subclass. We used matrix_swappable_block as a subclass which holds the same template parameters as the aforementioned stxxl::matrix container.
+
+\code
+// Define integer matrix
+
+// template paramter <ValueType, BlockSideLength>
+typedef stxxl::block_scheduler<stxxl::matrix_swappable_block<int, 32> > block_schedular_type;
+
+// template paramter <ValueType, BlockSideLength>
+typedef stxxl::matrix<int, 32> matrix_type;
+
+// construct block schedular object which uses 64 MiB internal memory for caching
+block_schedular_type my_bs(64*1024*1024);
+\endcode
+
+Instanciate three new height x width (3 x 3 in this example) matrices A, B and C using a block schedular. \n
+Note that all values are initially set to zero.
+
+\code
+int height = 3;
+int width = 3;
+
+matrix_type A(my_bs, height, width);  // creates a new matrix A of given dimensions. Elements' values are set to zero.
+matrix_type B(my_bs, height, width);  //                      B
+matrix_type C(my_bs, height, width);  //                      C
+\endcode
+
+### Insert / Access elements
+
+To insert and access elements, the STXXL matrix container intends different iterators. Iterate for example row-by-row beginning with the top row can be done with the row_major_iterator.
+The operator * accesses a single element the iterator points to just now.
+\code
+typedef matrix_type::row_major_iterator row_iterator;
+
+// let it_A point to the first element of matrix A and advance till the very last element of matrix A is reached
+for (row_iterator it_A = A.begin(); it_A != A.end(); ++it_A)
+{
+  *it_A = 1; // set current matrix element to 1
+}
+\endcode
+
+
+### Determine size of matrix
+
+To detect the height and width of a given matrix C, we can call:
+
+\code
+std::cout << "height: " << C.get_height() << " - " << "width: " << C.get_width() << std::endl;
+\endcode
+
+
+### Matrix Operations
+
+The STXXL Matrix container provides the following arithmetic operations:
+
+- Addition, Substraction and Multiplication of two matrices A and B.
+   \code
+   C = A + B;
+   C = A - B;
+   C = A * B;
+   \endcode
+- Transposition and Zeroing of a matrix C.
+   \code
+   C.transpose();
+   C.set_zero();
+   \endcode
+
+### A minimal working example of STXXL's Matrix
+
+(See \ref examples/containers/matrix1.cpp for the sourcecode of the following example).
+
+\snippet examples/containers/matrix1.cpp example
+
+\example examples/containers/matrix1.cpp
+This example code is explained in the \ref tutorial_matrix section
+*/
+
+} // namespace stxxl

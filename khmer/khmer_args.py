@@ -538,6 +538,47 @@ def create_nodegraph(args, ksize=None, multiplier=1.0, fp_rate=0.01):
     return khmer.Nodegraph(ksize, tablesize, args.n_tables)
 
 
+def create_MQFGraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
+    if ksize is None:
+        ksize = args.ksize
+    if ksize > 31:
+        print_error("\n** ERROR: khmer only supports k-mer sizes <= 32.\n")
+        sys.exit(1)
+    if not args.unique_kmers:
+        print_error("\n** ERROR: please supply unique  number of kmers.\n")
+        sys.exit(1)
+
+
+    if args.unique_kmers:
+        size=int(math.ceil(math.log2(1.3*args.unique_kmers)))
+#    if args.max_tablesize:
+#        size=args.max_tablesize
+
+    if args.fp_rate:
+        log_info("*** INFO: Overriding default fp {def_fp} with new fp:"
+                 " {new_fp}", def_fp=fp_rate, new_fp=args.fp_rate)
+        fp_rate = args.fp_rate
+
+    p=int(math.ceil(math.log2(float(args.unique_kmers)/float(fp_rate))))
+    slotSize=p-size
+
+    if slotSize<2 :
+        print_error("\n** ERROR: too small slot size.\n")
+        sys.exit(1)
+
+    nslots=2**size
+    nslots+=10*math.sqrt(nslots)
+    nblocks=int(((nslots+63)/64))
+    blockSize=17
+    bitsPerSlot=slotSize+2
+    totalSize=nblocks*(blockSize+bitsPerSlot*8)
+    totalSize/=(1000.0 ** 3);
+    log_info("*** INFO: creating MQF of size {size} and slot {slotsize}. Total Size ={totalSize}G"
+             , size=size, slotsize=slotSize,totalSize=totalSize)
+
+    return khmer.QFCounttable(ksize,2**size,slotSize)
+
+
 def create_countgraph(args, ksize=None, multiplier=1.0, fp_rate=0.1):
     """Create and return a countgraph."""
     args = _check_fp_rate(args, fp_rate)

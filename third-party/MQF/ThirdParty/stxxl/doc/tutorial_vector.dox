@@ -1,0 +1,107 @@
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/tutorial_vector.dox
+ *
+ *  Usage Tutorial for STXXL
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *  Copyright (C) 2013 Daniel Feist <daniel.feist@student.kit.edu>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+namespace stxxl {
+
+/** \page tutorial_vector STXXL Vector
+
+This section introduces into the STXXL vector container (to learn more about the structure of stxxl::vector, see section \ref design_vector).
+
+### Creating a STXXL vector
+
+Before we can use a STXXL vector, we first have to define and then to instantiate a vector object.
+To manage the configuration of the vector type we use the generator template. A minimal configuration is shown below - as one can see the value_type (integer in our case) is the only only stricly neccessary
+parameter. See \ref design_vector_generator for additional configuration parameters and information.
+
+\code
+typedef stxxl::VECTOR_GENERATOR<int>::result vector;
+vector my_vector;  // creates empty vector object
+\endcode
+
+### Insert elements
+
+We can fill the vector by calling push_back() which appends a new value at the end:
+
+\code
+for (int i = 0; i < 1024*1024; i++)
+{
+    my_vector.push_back(i);
+}
+// my_vector stores: 0 1 2 3 4 5 6 [...] 1024*1024
+\endcode
+
+### Access elements
+
+To read and/or modify the values of a STXXL vector, simply use the []-operator:
+
+\code
+std::cout << "element at position 99: " << my_vector[99] << std::endl;
+my_vector[99] = 0;  // zeroing element at position 99
+\endcode
+
+In addition, the STXXL vector provides different iterators to advance the vector which can be used as follows:
+
+\code
+// create iterator which starts at the beginning of my_vector
+vector::iterator iter = my_vector.begin();
+// access an element
+std::cout << "first element: " << *iter << std::endl;
+// go to next element
+iter++;
+\endcode
+
+Alongside with the many advantages of iterators, there are several things which need to bear in mind when using them. Details are described in \ref design_vector_notes.
+
+### Delete elements
+
+The operation pop_back() removes the last element of the vector (without returning it). The following code snippet is emptying my_vector:
+
+\code
+// empty() returns true, if the vector is empty
+while (!my_vector.empty()) {
+    my_vector.pop_back();
+}
+\endcode
+
+### Determine size / Check whether vector is empty
+
+To determine the number of elements a vector currently stores, call size():
+\code
+std::cout << "size of vector: " << my_vector.size() << std::endl;
+\endcode
+
+To check if the vector is empty, call the empty() function which returns true in that case:
+\code
+std::cout << "vector empty? " << my_vector.empty() << std::endl;
+\endcode
+
+### A minimal working example of STXXL's vector
+
+(See \ref examples/containers/vector1.cpp for the sourcecode of the following example).
+
+\snippet examples/containers/vector1.cpp example
+
+See \ref examples/containers/vector2.cpp for the sourcecode of a more comprehensive example.
+
+\example examples/containers/vector1.cpp
+This example code is explained in the \ref tutorial_vector section.
+
+\example examples/containers/vector2.cpp
+This example code is explained in the \ref tutorial_vector section.
+
+*/
+
+} // namespace stxxl

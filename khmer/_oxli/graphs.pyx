@@ -25,7 +25,7 @@ from khmer._khmer import ReadParser
 
 CYTHON_TABLES = (Hashtable, Nodetable, Counttable, CyclicCounttable,
                  SmallCounttable,
-                 QFCounttable, Nodegraph, Countgraph, SmallCountgraph)
+                 QFCounttable,BufferedQFCounttable, Nodegraph, Countgraph, SmallCountgraph)
 
 
 cdef class Hashtable:
@@ -368,9 +368,10 @@ cdef class QFCounttable(Hashtable):
         Set the number of slots used by the counting quotient filter. This
         determines the amount of memory used and how many k-mers can be entered
         into the datastructure. Each slot uses roughly 1.3 bytes.
+    slot size: integer
     """
 
-    def __cinit__(self, int k, uint64_t size):
+    def __cinit__(self, int k, uint64_t size,uint64_t slotsize):
         # size has to be a power of two
         power_of_two = ((size & (size - 1) == 0) and
                         (size != 0))
@@ -378,16 +379,61 @@ cdef class QFCounttable(Hashtable):
             raise ValueError("size has to be a power of two, not"
                              " {}.".format(size))
         if type(self) is QFCounttable:
-            self._qf_this = make_shared[CpQFCounttable](k, <uint64_t>log(size, 2))
+            self._qf_this = make_shared[CpQFCounttable](k, <uint64_t>log(size, 2),slotsize)
             self._ht_this = <shared_ptr[CpHashtable]>self._qf_this
 
 
     @classmethod
     def load(cls, file_name):
         """Load the graph from the specified file."""
-        cdef QFCounttable table = cls(1, 1)
+        cdef QFCounttable table = cls(1, 1,1)
         deref(table._qf_this).load(_bstring(file_name))
         return table
+
+
+cdef class BufferedQFCounttable(Hashtable):
+    """Count kmers using a counting quotient filter.
+
+    The counting quotient filter (CQF) is an extension of the quotient filter
+    that supports counting in addition to simple membership testing. A CQF has
+    better cache locality compared to (Small)Counttable which increases
+    performance.
+
+    Each new k-mer uses one slot, and the number of slots used per k-mer
+    increases the more often the same k-mer is entered into the CQF. As a result
+    the CQF can be "full" and will stop accepting calls to `add` and `count`.
+
+    Parameters
+    ----------
+    k : integer
+        k-mer size
+
+    size : integer
+        Set the number of slots used by the counting quotient filter. This
+        determines the amount of memory used and how many k-mers can be entered
+        into the datastructure. Each slot uses roughly 1.3 bytes.
+    slot size: integer
+    """
+
+    def __cinit__(self, int k, uint64_t size,uint64_t slotsize):
+        # size has to be a power of two
+        power_of_two = ((size & (size - 1) == 0) and
+                        (size != 0))
+        if not power_of_two:
+            raise ValueError("size has to be a power of two, not"
+                             " {}.".format(size))
+        if type(self) is BufferedQFCounttable:
+            self._qf_this = make_shared[CpBufferedQFCounttable](k, <uint64_t>log(size, 2),slotsize)
+            self._ht_this = <shared_ptr[CpHashtable]>self._qf_this
+
+
+    @classmethod
+    def load(cls, file_name):
+        """Load the graph from the specified file."""
+        cdef BufferedQFCounttable table = cls(1, 1,1)
+        deref(table._qf_this).load(_bstring(file_name))
+        return table
+
 
 cdef class Counttable(Hashtable):
 

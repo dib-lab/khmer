@@ -1,0 +1,79 @@
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/coding_style.dox
+ *
+ *  Coding style guidelines of the STXXL.
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+namespace stxxl {
+
+/** \page coding_style Coding Style Guidelines
+
+\author Timo Bingmann (2013)
+
+STXXL coding style follows the current style of STL and Boost, as STXXL strives to provide STL compatible interfaces. Following these guidelines greatly shortens the maintainers' response time and increases their willingness to incorporate your code into STXXL.
+
+We cannot provide a full coding style document here, the source code itself must serve as a large example. As the STXXL has grown historically, not all parts of the STXXL library following this coding style. But we do put down the following list of rules:
+
+- Naming of classes, structs, functions and variables must follow STL naming conventions: no capital letters, use underscores between words.
+  - The exception are template parameters: use CamelCase for the parameters themselves, and the underscore version for the typedef.
+  - The smaller the scope of a variable is, the shorter its name should be.
+  - Member attributes of larger classes should be prefixed with \c m_ ! Attributes of smaller structs can omit \c m_.
+
+- Tabs should not use used, indentation width is 4 spaces.
+
+- The following code shows example of the rules above:
+\code
+//! A class that does something important.
+template <typename ValueType>
+class some_class
+{
+protected:
+    //! a class attribute, prefixed with m_
+    int m_used;
+
+public:
+    //! types are almost always suffixes with _type,
+    //! with _iterator being an exception.
+    typedef ValueType value_type;
+
+    //! \name Group of Functions
+    //! \{
+
+    //! Return current state of page in cache.
+    //! \param page please only document parameters when needed.
+    void get_state(int page) const
+    {
+        int ret = 0;
+        for (size_t i = 0; i < list.size(); ++i) {
+            if (list[i].page == page)
+                ret = list[i].state;
+        }
+        return ret;
+    }
+
+    //! \}
+};
+\endcode
+
+- Use of "using namespace" is absolutely prohibited.
+
+- All public interfaces must be documented using doxygen (see tags in example).
+
+- All containers and extensions must provide a simple tutorial and example. Design documentation is greatly recommended.
+
+- All extensions and subsystems must provide tests which sufficiently cover the functions.
+
+- All preprocessor macros should begin with \c STXXL_ .
+
+*/
+
+} // namespace stxxl

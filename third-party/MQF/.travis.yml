@@ -1,0 +1,23 @@
+language: cpp
+sudo: required
+dist: trusty
+compiler:
+- g++
+os:
+- linux
+
+
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y make automake autotools-dev
+script:
+  - make all test NH=1
+  - ./mqf_test
+  - gcov -n -o . gqf.c > /dev/null;
+branches:
+  only:
+  - mqfDevelopmenet
+  - master
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)

@@ -1,0 +1,109 @@
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/tutorial_sequence.dox
+ *
+ *  Usage Tutorial for STXXL
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2013 Daniel Feist <daniel.feist@student.kit.edu>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+namespace stxxl {
+/** \page tutorial_sequence STXXL Sequence
+
+This page introduces into the stxxl::sequence container (to learn more about the structure of stxxl::sequence, see section \ref stxxl::sequence).
+
+In reality, the STXXL sequence container is a STXXL deque container (see \ref design_deque) without random access. Deque stands for "double-ended-queue", that means elements can be accessed, inserted and deleted on both ends of the data structure. Consequently both containers are quite similar - however, the usage varies.
+
+### Create a STXXL sequence
+To create an empty stxxl::sequence object with own write and prefetch block pool, only the data value type must be specified:
+\code
+  typedef stxxl::sequence<int> sequence_type;
+  sequence_type my_sequence;
+\endcode
+
+### Insert elements 
+Inserting elements is possible at the start (by calling the push_front() function) as well as the end (by calling the push_back() function) of the deque (equal to \ref tutorial_deque)
+
+\code
+my_sequence.push_front(2);
+my_sequence.push_front(11);
+my_sequence.push_back(5);
+my_sequence.push_back(8);
+// sequence now stores: |11|2|5|8|
+\endcode
+
+### Access elements
+To return a reference to the element at the start of the sequence, call front(), to return a reference to the elemtent at the end of the sequence, call back() on a deque instance.
+\code
+std::cout << "return 'first' element: " << my_sequence.front() << std::endl;  // prints 11
+std::cout << "return 'last' element: " << my_sequence.back() << std::endl;  // prints 8
+\endcode
+
+Due to the fact that the sequence container does \b not support random access, the sequence can only be accessed in an I/O-efficient way by iterating using streams: either from front to back or in reverse. For this purpose, the sequence provides the public member functions get_stream() and get_reverse_stream(). 
+
+The preincrement operator ++ let the stream point to the next element in the sequence (depending on the stream direction). 
+Accessing an element the iterator points to is possible by using the prefixed * operator. 
+To check if the end of the sequence container is reached by the stream, the empty() function returns true in such a case. Note that the stream is immutable and therefore read-only, so you can't modify it's members. The subsequent examples illustrate the usage.
+
+The forward iterator moves from back to front and may be used as follows:
+\code
+// create stream which points to the front element of the sequence
+sequence_type::stream forward_stream = my_sequence.get_stream();
+
+// advance from front to back of sequence
+while (!forward_stream.empty())
+{
+  std::cout << *forward_stream << " ";  
+   ++forward_stream;  
+}
+\endcode
+
+The reverse iterator moves from back to front and may be used as follows:
+\code
+// create stream which points to the back element of the sequence
+sequence_type::reverse_stream reverse_stream = my_sequence.get_reverse_stream();
+
+// advance from back to front of sequence
+while (!reverse_stream.empty())
+{
+  std::cout << *reverse_stream << " ";
+  ++reverse_stream;
+}
+\endcode
+
+
+### Delete elements
+Removing elements is possible at both endings of the sequence by using pop_front() and pop_back():
+\code
+my_deque.pop_front(); // deque now stores: |2|5|8|
+my_deque.pop_back(); // deque now stores: |2|5|
+\endcode
+
+### Determine size / Check whether the sequence is empty
+To determine the size (i.e. the number of elements) of an instance, call size():
+\code
+std::cout << "sequence stores: " << my_sequence.size() << " elements" << std::endl;
+\endcode
+
+To check if the sequence is empty, call empty() which returns true if the sequence is empty:
+\code
+std::cout << "empty sequence? " << my_sequence.empty() << std::endl;
+\endcode
+
+
+### A minimal working example on STXXL's sequence
+(See \ref examples/containers/sequence1.cpp for the sourcecode of the following example).
+
+\snippet examples/containers/sequence1.cpp example
+
+\example examples/containers/sequence1.cpp
+This example code is explained in the \ref tutorial_sequence section.
+
+*/
+
+} // namespace stxxl
