@@ -67,7 +67,7 @@ def get_parser():
     parser.add_argument('-k', '--ksize', type=int, default=DEFAULT_K,
                         help="k-mer size (default: %d)" % DEFAULT_K)
     parser.add_argument('--keep-subsets', dest='remove_subsets',
-                        default=True, action='store_false',
+                        default=False, action='store_false',
                         help='Keep individual subsets (default: False)')
     parser.add_argument('graphbase', help='basename for input and output '
                         'files')
