@@ -55,6 +55,7 @@ C = 10
 
 MAX_SEQ_LEN = 65535
 MAX_READS = 1e8
+SKIP_READS = 1e6
 CHECK_EXIT = 25000
 
 
@@ -75,6 +76,9 @@ def main():
                         type=argparse.FileType('w'), default=None)
     parser.add_argument('--errors-per-read', dest='errors_per_read',
                         type=argparse.FileType('w'), default=None)
+    parser.add_argument('--skip-reads', dest='skip_reads',
+                        type=int, default=SKIP_READS,
+                        help="skip this many reads at beginning of each file")
 
     args = parser.parse_args()
 
@@ -112,6 +116,9 @@ def main():
         print('opening', filename, file=sys.stderr)
 
         for n, record in enumerate(screed.open(filename)):
+            if n < args.skip_reads:
+                continue
+
             total += 1
 
             if total % CHECK_EXIT == 0:
