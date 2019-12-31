@@ -3,7 +3,7 @@
    Copyright (C) 2014-2015 Michigan State University
    Copyright (C) 2015 The Regents of the University of California.
    It is licensed under the three-clause BSD license; see LICENSE.
-   Contact: khmer-project@idyll.org
+   Contact: khmer-retweett511@hotmail.com
    
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are
