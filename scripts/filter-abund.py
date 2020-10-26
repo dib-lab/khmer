@@ -130,7 +130,7 @@ def main():
     check_space(infiles, args.force)
 
     log_info('loading countgraph: {graph}', graph=args.input_graph)
-    countgraph = Countgraph.load(args.input_graph)
+    countgraph = khmer.load_countgraph(args.input_graph)
     ksize = countgraph.ksize()
 
     log_info("K: {ksize}", ksize=ksize)
