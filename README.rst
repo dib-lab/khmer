@@ -3,6 +3,8 @@
 |khmer build status|
 |Test coverage|
 |BSD-3 licensed|
+|Debian "Stable" Package|
+|Debian "Testing" Package|
 
 khmer
 =====
@@ -59,3 +61,7 @@ If you're interested in modifying khmer or contributing to its ongoing developme
    :target: https://codecov.io/github/dib-lab/khmer
 .. |BSD-3 licensed| image:: https://img.shields.io/badge/license-BSD%203--Clause-blue.svg
    :target: https://github.com/dib-lab/khmer/blob/master/LICENSE
+.. |Debian "Stable" Package| image:: https://badges.debian.net/badges/debian/stable/khmer/version.svg
+   :target: https://packages.debian.org/stable/khmer
+.. |Debian "Testing" Package| image:: https://badges.debian.net/badges/debian/testing/khmer/version.svg
+   :target: https://packages.debian.org/testing/khmer
