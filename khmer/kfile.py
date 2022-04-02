@@ -209,6 +209,12 @@ def is_block(fthing):
     """Take in a file object and checks to see if it's a block or fifo."""
     if fthing is sys.stdout or fthing is sys.stdin:
         return True
+    if hasattr(fthing, "iastty") and fthing.isatty():
+        return True
+    elif not hasattr(fthing, 'name'):
+        return True
+    if fthing.name == "<stdout>":
+        return True
     else:
         mode = os.stat(fthing.name).st_mode
         return S_ISBLK(mode) or S_ISCHR(mode)
