@@ -84,7 +84,7 @@ else
 endif
 
 MODEXT=$(shell python3 -c \
-       "import sysconfig;print(sysconfig.get_config_var('SO'))")
+       "import sysconfig;print(sysconfig.get_config_var('EXT_SUFFIX'))")
 EXTENSION_MODULE = khmer/_khmer$(MODEXT)
 CY_MODULES = $($(wildcard khmer/_oxli/*.pyx): .pyx=.$(MODEXT))
 
