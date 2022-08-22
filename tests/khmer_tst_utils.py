@@ -187,7 +187,7 @@ def runscript(scriptname, args, in_directory=None,
             status = _runscript(scriptname, sandbox=sandbox)
         except SystemExit as err:
             status = err.code
-        except:  # pylint: disable=bare-except
+        except (OSError, ValueError, TypeError):
             traceback.print_exc(file=sys.stderr)
             status = -1
     finally:
