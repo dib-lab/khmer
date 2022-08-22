@@ -156,14 +156,16 @@ class KhmerArgumentParser(argparse.ArgumentParser):
 
 # Temporary fix to argparse FileType which ignores the
 # binary mode flag. Upstream bug tracked in https://bugs.python.org/issue14156
+# Fixed in 3.9.12 and 3.10.3.
 # pylint: disable=too-few-public-methods,missing-docstring
 class FileType(argparse.FileType):
     def __call__(self, fname):
         # detect if stdout is being faked (StringIO during unit tests) in
         # which case we do not have to do anything
         if (fname == '-' and
-                sys.version_info.major == 3 and
-                not isinstance(sys.stdout, StringIO)):
+                not isinstance(sys.stdout, StringIO) and
+                (sys.version_info < (3, 9, 12) or
+                 (3, 10) < sys.version_info < (3, 10, 3))):
             if 'r' in self._mode:
                 fname = sys.stdin.fileno()
             elif 'w' in self._mode:

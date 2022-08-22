@@ -39,10 +39,10 @@ Contact: khmer-project@idyll.org
 // This file is used to test compilation with liboxli.a/liboxli.so, after
 // installation
 
-#include <oxli/hashtable.hh>
+#include <oxli/hashgraph.hh>
 
 int main()
 {
-    oxli::Countgraph test(1,1);
+    oxli::Countgraph test(1,{1});
     return 0;
 }

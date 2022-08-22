@@ -40,7 +40,7 @@ import sys
 import errno
 from stat import S_ISBLK, S_ISFIFO, S_ISCHR
 import gzip
-import bz2file
+import bz2
 
 
 def check_input_files(file_path, force):
@@ -209,6 +209,12 @@ def is_block(fthing):
     """Take in a file object and checks to see if it's a block or fifo."""
     if fthing is sys.stdout or fthing is sys.stdin:
         return True
+    if hasattr(fthing, "iastty") and fthing.isatty():
+        return True
+    elif not hasattr(fthing, 'name'):
+        return True
+    if fthing.name == "<stdout>":
+        return True
     else:
         mode = os.stat(fthing.name).st_mode
         return S_ISBLK(mode) or S_ISCHR(mode)
@@ -241,7 +247,7 @@ def get_file_writer(file_handle, do_gzip, do_bzip):
     if do_gzip:
         ofile = gzip.GzipFile(fileobj=file_handle, mode='w')
     elif do_bzip:
-        ofile = bz2file.open(file_handle, mode='w')
+        ofile = bz2.open(file_handle, mode='w')
     else:
         ofile = file_handle
 

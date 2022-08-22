@@ -41,6 +41,7 @@ Contact: khmer-project@idyll.org
 #include <algorithm>
 #include <string>
 #include <assert.h>
+#include <limits>
 
 #include "MurmurHash3.h"
 #include "oxli/oxli.hh"

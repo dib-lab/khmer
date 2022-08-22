@@ -167,7 +167,7 @@ def main():
     paired_fp.close()
 
     if n_pe == 0:
-        raise Exception("no paired reads!? check file formats...")
+        raise TypeError("no paired reads!? check file formats...")
 
     print('DONE; read %d sequences,'
           ' %d pairs and %d singletons' %

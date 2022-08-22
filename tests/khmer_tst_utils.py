@@ -43,17 +43,12 @@ from pkg_resources import Requirement, resource_filename, ResolutionError
 import sys
 import traceback
 import subprocess
-from io import open  # pylint: disable=redefined-builtin
+from io import BufferedWriter, BytesIO, StringIO, TextIOWrapper
 from hashlib import md5
 
 from khmer import reverse_complement as revcomp
 
 import pytest
-
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
 
 
 def _equals_rc(query, match):
@@ -150,6 +145,25 @@ def _runscript(scriptname, sandbox=False):
     return -1
 
 
+class StdIOBuffer(TextIOWrapper):
+    '''Replacement for writable io.StringIO that behaves more like real file
+    Unlike StringIO, provides a buffer attribute that holds the underlying
+    binary data, allowing it to replace sys.stdout/sys.stderr in more
+    contexts.
+    '''
+
+    name = 'StdIOBuffer'
+
+    def __init__(self, initial_value='', newline='\n'):
+        initial_value = initial_value.encode('utf-8')
+        super().__init__(BufferedWriter(BytesIO(initial_value)),
+                         'utf-8', newline=newline)
+
+    def getvalue(self):
+        self.flush()
+        return self.buffer.raw.getvalue().decode('utf-8')
+
+
 def runscript(scriptname, args, in_directory=None,
               fail_ok=False, sandbox=False):
     """Run a Python script using exec().
@@ -171,9 +185,8 @@ def runscript(scriptname, args, in_directory=None,
         sys.argv = sysargs
 
         oldout, olderr = sys.stdout, sys.stderr
-        sys.stdout = StringIO()
-        sys.stdout.name = "StringIO"
-        sys.stderr = StringIO()
+        sys.stdout = StdIOBuffer()
+        sys.stderr = StdIOBuffer()
 
         if in_directory:
             os.chdir(in_directory)
@@ -187,7 +200,7 @@ def runscript(scriptname, args, in_directory=None,
             status = _runscript(scriptname, sandbox=sandbox)
         except SystemExit as err:
             status = err.code
-        except:  # pylint: disable=bare-except
+        except (OSError, ValueError, TypeError):
             traceback.print_exc(file=sys.stderr)
             status = -1
     finally:

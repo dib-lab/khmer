@@ -514,7 +514,7 @@ def main():
 
     if args.output is None:
         log_info('output in *.abundtrim')
-    elif args.output.name == 1:
+    elif not hasattr(args.output, 'name') or args.output.name == 1:
         log_info('output streamed to stdout')
     elif args.output.name:
         log_info('output in {}'.format(args.output.name))
