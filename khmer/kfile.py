@@ -40,7 +40,7 @@ import sys
 import errno
 from stat import S_ISBLK, S_ISFIFO, S_ISCHR
 import gzip
-import bz2file
+import bz2
 
 
 def check_input_files(file_path, force):
@@ -241,7 +241,7 @@ def get_file_writer(file_handle, do_gzip, do_bzip):
     if do_gzip:
         ofile = gzip.GzipFile(fileobj=file_handle, mode='w')
     elif do_bzip:
-        ofile = bz2file.open(file_handle, mode='w')
+        ofile = bz2.open(file_handle, mode='w')
     else:
         ofile = file_handle
 

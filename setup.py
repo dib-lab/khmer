@@ -277,7 +277,7 @@ SETUP_METADATA = \
         "packages": ['khmer', 'khmer.tests', 'oxli', 'khmer._oxli'],
         "package_data": {'khmer/_oxli': ['*.pxd']},
         "package_dir": {'khmer.tests': 'tests'},
-        "install_requires": ['screed>=1.0', 'bz2file'],
+        "install_requires": ['screed>=1.0'],
         "setup_requires": ['setuptools>=18.0'],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
