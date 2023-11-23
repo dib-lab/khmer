@@ -42,7 +42,7 @@ import os.path
 from io import StringIO
 import traceback
 import glob
-import imp
+import importlib
 
 import pytest
 
@@ -77,7 +77,8 @@ def _sandbox_scripts():
 @pytest.mark.parametrize("filename", _sandbox_scripts())
 def test_import_succeeds(filename, tmpdir, capsys):
     try:
-        mod = imp.load_source('__zzz', filename)
+        loader = importlib.machinery.SourceFileLoader('__zzz', filename)
+        mod = loader.load_module()
     except:
         print(traceback.format_exc())
         raise AssertionError("%s cannot be imported" % (filename,))
