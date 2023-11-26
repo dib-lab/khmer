@@ -45,7 +45,7 @@ Use '-h' for parameter help.
 import sys
 import screed
 from khmer import __version__
-from khmer.kfile import (add_output_compression_type, get_file_writer,
+from khmer.kfile import (add_output_compression_type, FileWriter,
                          describe_file_handle)
 from khmer.utils import write_record
 from khmer.khmer_args import sanitize_help, KhmerArgumentParser
@@ -74,21 +74,21 @@ def main():
     args = sanitize_help(get_parser()).parse_args()
 
     print('fastq from ', args.input_sequence, file=sys.stderr)
-    outfp = get_file_writer(args.output, args.gzip, args.bzip)
-    n_count = 0
-    for n, record in enumerate(screed.open(args.input_sequence)):
-        if n % 10000 == 0:
-            print('...', n, file=sys.stderr)
+    with FileWriter(args.output, args.gzip, args.bzip) as outfp:
+        n_count = 0
+        for n, record in enumerate(screed.open(args.input_sequence)):
+            if n % 10000 == 0:
+                print('...', n, file=sys.stderr)
 
-        sequence = record['sequence']
+            sequence = record['sequence']
 
-        if 'N' in sequence:
-            if not args.n_keep:
-                n_count += 1
-                continue
+            if 'N' in sequence:
+                if not args.n_keep:
+                    n_count += 1
+                    continue
 
-        del record['quality']
-        write_record(record, outfp)
+            del record['quality']
+            write_record(record, outfp)
 
     print('\n' + 'lines from ' + args.input_sequence, file=sys.stderr)
 

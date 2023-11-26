@@ -218,6 +218,10 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
 
     log_info('wrote to: {output}', output=args.output_histogram_filename)
 
+    # Ensure that the output files are properly written. Python 3.12 seems to
+    # be less forgiving here ..
+    hist_fp.close()
+
 
 if __name__ == '__main__':
     main()

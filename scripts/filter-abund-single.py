@@ -60,7 +60,7 @@ from khmer.khmer_args import (build_counting_args, report_on_config,
 from khmer.kfile import (check_input_files, check_space,
                          check_space_for_graph,
                          add_output_compression_type,
-                         get_file_writer)
+                         FileWriter)
 from khmer.khmer_logger import (configure_logging, log_info, log_error,
                                 log_warn)
 from khmer.trimming import (trim_record)
@@ -160,22 +160,23 @@ def main():
         outfile = os.path.basename(args.datafile) + '.abundfilt'
     else:
         outfile = args.outfile
-    outfp = open(outfile, 'wb')
-    outfp = get_file_writer(outfp, args.gzip, args.bzip)
 
-    paired_iter = broken_paired_reader(ReadParser(args.datafile),
-                                       min_length=graph.ksize(),
-                                       force_single=True)
+    with FileWriter(open(outfile, 'wb'), args.gzip, args.bzip,
+                    steal_ownership=True) as outfp:
 
-    for n, is_pair, read1, read2 in paired_iter:
-        assert not is_pair
-        assert read2 is None
+        paired_iter = broken_paired_reader(ReadParser(args.datafile),
+                                           min_length=graph.ksize(),
+                                           force_single=True)
 
-        trimmed_record, _ = trim_record(graph, read1, args.cutoff,
-                                        args.variable_coverage,
-                                        args.normalize_to)
-        if trimmed_record:
-            write_record(trimmed_record, outfp)
+        for n, is_pair, read1, read2 in paired_iter:
+            assert not is_pair
+            assert read2 is None
+
+            trimmed_record, _ = trim_record(graph, read1, args.cutoff,
+                                            args.variable_coverage,
+                                            args.normalize_to)
+            if trimmed_record:
+                write_record(trimmed_record, outfp)
 
     log_info('output in {outfile}', outfile=outfile)
 

@@ -108,10 +108,9 @@ def main():
         print('filtering', infile, file=sys.stderr)
         outfile = os.path.basename(infile) + '.stopfilt'
 
-        outfp = open(outfile, 'w')
-
-        tsp = ThreadedSequenceProcessor(process_fn)
-        tsp.start(verbose_loader(infile), outfp)
+        with open(outfile, 'w') as outfp:
+            tsp = ThreadedSequenceProcessor(process_fn)
+            tsp.start(verbose_loader(infile), outfp)
 
         print('output in', outfile, file=sys.stderr)
 

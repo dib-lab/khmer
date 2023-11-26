@@ -168,8 +168,8 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
         worker_q.put((nodegraph, _, start, end))
 
     print('enqueued %d subset tasks' % n_subsets, file=sys.stderr)
-    open('%s.info' % args.graphbase, 'w').write('%d subsets total\n'
-                                                % (n_subsets))
+    with open('%s.info' % args.graphbase, 'w') as info_fp:
+        info_fp.write('%d subsets total\n' % (n_subsets))
 
     if n_subsets < args.threads:
         args.threads = n_subsets
