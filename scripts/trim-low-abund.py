@@ -43,6 +43,7 @@ Output sequences will be placed in 'infile.abundtrim'.
 
 Use -h for parameter help.
 """
+from contextlib import nullcontext
 import csv
 import sys
 import os
@@ -63,7 +64,7 @@ from khmer.khmer_args import FileType as khFileType
 from khmer.utils import write_record, broken_paired_reader, ReadBundle
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
-                         get_file_writer)
+                         get_file_writer, FileWriter)
 from khmer.khmer_logger import configure_logging, log_info, log_error
 from khmer.trimming import trim_record
 
@@ -374,108 +375,111 @@ def main():
     # only create the file writer once if outfp is specified; otherwise,
     # create it for each file.
     if args.output:
-        trimfp = get_file_writer(args.output, args.gzip, args.bzip)
+        trim_ctx = FileWriter(args.output, args.gzip, args.bzip)
+    else:
+        trim_ctx = nullcontext()
 
     pass2list = []
-    for filename in args.input_filenames:
-        # figure out temporary filename for 2nd pass
-        pass2filename = filename.replace(os.path.sep, '-') + '.pass2'
-        pass2filename = os.path.join(tempdir, pass2filename)
-        pass2fp = open(pass2filename, 'w')
+    with trim_ctx as trimfp:
+        for filename in args.input_filenames:
+            # figure out temporary filename for 2nd pass
+            pass2filename = filename.replace(os.path.sep, '-') + '.pass2'
+            pass2filename = os.path.join(tempdir, pass2filename)
+            pass2fp = open(pass2filename, 'w')
 
-        # construct output filenames
-        if args.output is None:
-            # note: this will be saved in trimfp.
-            outfp = open(os.path.basename(filename) + '.abundtrim', 'wb')
+            # construct output filenames
+            if args.output is None:
+                # note: this will be saved in trimfp.
+                outfp = open(os.path.basename(filename) + '.abundtrim', 'wb')
 
-            # get file handle w/gzip, bzip
-            trimfp = get_file_writer(outfp, args.gzip, args.bzip)
+                # get file handle w/gzip, bzip
+                trimfp = get_file_writer(outfp, args.gzip, args.bzip)
 
-        # record all this info
-        pass2list.append((filename, pass2filename, trimfp))
+            # record all this info
+            pass2list.append((filename, pass2filename, trimfp))
 
-        # input file stuff: get a broken_paired reader.
-        paired_iter = broken_paired_reader(ReadParser(filename), min_length=K,
-                                           force_single=args.ignore_pairs)
+            # input file stuff: get a broken_paired reader.
+            paired_iter = broken_paired_reader(ReadParser(filename), min_length=K,
+                                               force_single=args.ignore_pairs)
 
-        # main loop through the file.
-        n_start = trimmer.n_reads
-        save_start = trimmer.n_saved
+            # main loop through the file.
+            n_start = trimmer.n_reads
+            save_start = trimmer.n_saved
 
-        watermark = REPORT_EVERY_N_READS
-        for read in trimmer.pass1(paired_iter, pass2fp):
-            if (trimmer.n_reads - n_start) > watermark:
-                log_info("... {filename} {n_saved} {n_reads} {n_bp} "
-                         "{w_reads} {w_bp}", filename=filename,
-                         n_saved=trimmer.n_saved, n_reads=trimmer.n_reads,
-                         n_bp=trimmer.n_bp, w_reads=written_reads,
-                         w_bp=written_bp)
-                watermark += REPORT_EVERY_N_READS
+            watermark = REPORT_EVERY_N_READS
+            for read in trimmer.pass1(paired_iter, pass2fp):
+                if (trimmer.n_reads - n_start) > watermark:
+                    log_info("... {filename} {n_saved} {n_reads} {n_bp} "
+                             "{w_reads} {w_bp}", filename=filename,
+                             n_saved=trimmer.n_saved, n_reads=trimmer.n_reads,
+                             n_bp=trimmer.n_bp, w_reads=written_reads,
+                             w_bp=written_bp)
+                    watermark += REPORT_EVERY_N_READS
 
-            # write out the trimmed/etc sequences that AREN'T going to be
-            # revisited in a 2nd pass.
-            write_record(read, trimfp)
-            written_bp += len(read)
-            written_reads += 1
-        pass2fp.close()
+                # write out the trimmed/etc sequences that AREN'T going to be
+                # revisited in a 2nd pass.
+                write_record(read, trimfp)
+                written_bp += len(read)
+                written_reads += 1
+            pass2fp.close()
 
-        log_info("{filename}: kept aside {kept} of {total} from first pass",
-                 filename=filename, kept=trimmer.n_saved - save_start,
-                 total=trimmer.n_reads - n_start)
+            log_info("{filename}: kept aside {kept} of {total} from first pass",
+                     filename=filename, kept=trimmer.n_saved - save_start,
+                     total=trimmer.n_reads - n_start)
 
-    # first pass goes across all the data, so record relevant stats...
-    n_reads = trimmer.n_reads
-    n_bp = trimmer.n_bp
-    n_skipped = trimmer.n_skipped
-    bp_skipped = trimmer.bp_skipped
-    save_pass2_total = trimmer.n_saved
+        # first pass goes across all the data, so record relevant stats...
+        n_reads = trimmer.n_reads
+        n_bp = trimmer.n_bp
+        n_skipped = trimmer.n_skipped
+        bp_skipped = trimmer.bp_skipped
+        save_pass2_total = trimmer.n_saved
 
-    # ### SECOND PASS. ###
+        # ### SECOND PASS. ###
 
-    # nothing should have been skipped yet!
-    assert trimmer.n_skipped == 0
-    assert trimmer.bp_skipped == 0
+        # nothing should have been skipped yet!
+        assert trimmer.n_skipped == 0
+        assert trimmer.bp_skipped == 0
 
-    if args.single_pass:
-        pass2list = []
+        if args.single_pass:
+            pass2list = []
 
-    # go back through all the files again.
-    for _, pass2filename, trimfp in pass2list:
-        log_info('second pass: looking at sequences kept aside in {pass2}',
-                 pass2=pass2filename)
+        # go back through all the files again.
+        for _, pass2filename, trimfp in pass2list:
+            log_info('second pass: looking at sequences kept aside in {pass2}',
+                     pass2=pass2filename)
 
-        # note that for this second pass, we don't care about paired
-        # reads - they will be output in the same order they're read in,
-        # so pairs will stay together if not orphaned.  This is in contrast
-        # to the first loop.  Hence, force_single=True below.
+            # note that for this second pass, we don't care about paired
+            # reads - they will be output in the same order they're read in,
+            # so pairs will stay together if not orphaned.  This is in contrast
+            # to the first loop.  Hence, force_single=True below.
 
-        read_parser = ReadParser(pass2filename)
-        paired_iter = broken_paired_reader(read_parser,
-                                           min_length=K,
-                                           force_single=True)
+            read_parser = ReadParser(pass2filename)
+            paired_iter = broken_paired_reader(read_parser,
+                                               min_length=K,
+                                               force_single=True)
 
-        watermark = REPORT_EVERY_N_READS
-        for read in trimmer.pass2(paired_iter):
-            if (trimmer.n_reads - n_start) > watermark:
-                log_info('... x 2 {a} {b} {c} {d} {e} {f} {g}',
-                         a=trimmer.n_reads - n_start,
-                         b=pass2filename, c=trimmer.n_saved,
-                         d=trimmer.n_reads, e=trimmer.n_bp,
-                         f=written_reads, g=written_bp)
-                watermark += REPORT_EVERY_N_READS
+            watermark = REPORT_EVERY_N_READS
+            for read in trimmer.pass2(paired_iter):
+                if (trimmer.n_reads - n_start) > watermark:
+                    log_info('... x 2 {a} {b} {c} {d} {e} {f} {g}',
+                             a=trimmer.n_reads - n_start,
+                             b=pass2filename, c=trimmer.n_saved,
+                             d=trimmer.n_reads, e=trimmer.n_bp,
+                             f=written_reads, g=written_bp)
+                    watermark += REPORT_EVERY_N_READS
 
-            write_record(read, trimfp)
-            written_reads += 1
-            written_bp += len(read)
+                write_record(read, trimfp)
+                written_reads += 1
+                written_bp += len(read)
 
-        read_parser.close()
+            read_parser.close()
 
-        log_info('removing {pass2}', pass2=pass2filename)
-        os.unlink(pass2filename)
+            log_info('removing {pass2}', pass2=pass2filename)
+            os.unlink(pass2filename)
 
-        # if we created our own trimfps, close 'em.
-        if not args.output:
-            trimfp.close()
+            # if we created our own trimfps, close 'em.
+            if not args.output:
+                trimfp.close()
 
     try:
         log_info('removing temp directory & contents ({temp})', temp=tempdir)

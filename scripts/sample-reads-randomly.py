@@ -47,6 +47,7 @@ Reads FASTQ and FASTA input, retains format for output.
 """
 
 import argparse
+from contextlib import nullcontext
 import os.path
 import random
 import textwrap
@@ -55,7 +56,7 @@ import sys
 from khmer import __version__
 from khmer import ReadParser
 from khmer.kfile import (check_input_files, add_output_compression_type,
-                         get_file_writer)
+                         FileWriter)
 from khmer.khmer_args import sanitize_help, KhmerArgumentParser
 from khmer.utils import write_record, broken_paired_reader
 
@@ -201,27 +202,27 @@ def main():
         print('Writing %d sequences to %s' %
               (len(reads[0]), output_filename), file=sys.stderr)
 
-        output_file = args.output_file
-        if not output_file:
-            output_file = open(output_filename, 'wb')
+        output_back_ctx = nullcontext(args.output_file)
+        if not args.output_file:
+            output_back_ctx = open(output_filename, 'wb')
 
-        output_file = get_file_writer(output_file, args.gzip, args.bzip)
-
-        for records in reads[0]:
-            write_record(records[0], output_file)
-            if records[1] is not None:
-                write_record(records[1], output_file)
+        with output_back_ctx as output_back_fp:
+            with FileWriter(output_back_fp, args.gzip, args.bzip) as output_fp:
+                for records in reads[0]:
+                    write_record(records[0], output_fp)
+                    if records[1] is not None:
+                        write_record(records[1], output_fp)
     else:
         for n in range(num_samples):
             n_filename = output_filename + '.%d' % n
             print('Writing %d sequences to %s' %
                   (len(reads[n]), n_filename), file=sys.stderr)
-            output_file = get_file_writer(open(n_filename, 'wb'), args.gzip,
-                                          args.bzip)
-            for records in reads[n]:
-                write_record(records[0], output_file)
-                if records[1] is not None:
-                    write_record(records[1], output_file)
+            with FileWriter(open(n_filename, 'wb'), args.gzip, args.bzip,
+                            steal_ownership=True) as output_fp:
+                for records in reads[n]:
+                    write_record(records[0], output_fp)
+                    if records[1] is not None:
+                        write_record(records[1], output_fp)
 
 
 if __name__ == '__main__':

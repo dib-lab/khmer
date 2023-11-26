@@ -35,6 +35,7 @@
 """File handling/checking utilities for command-line scripts."""
 
 
+import contextlib
 import os
 import sys
 import errno
@@ -246,3 +247,37 @@ def get_file_writer(file_handle, do_gzip, do_bzip):
         ofile = file_handle
 
     return ofile
+
+
+@contextlib.contextmanager
+def FileWriter(file_handle, do_gzip, do_bzip, *, steal_ownership=False):
+    """Alternative to get_file_writer that requires the use of a with block.
+    The intent is to address an inherent problem with get_file_writer() that
+    makes it difficult to use as a context manager. When get_file_writer() is
+    called with both gzip=False and bzip=False, the underlying file handle is
+    returned. As a consequence, doing:
+    >  with get_file_writer(sys.stdout, bzip=False, gzip=False) as fh:
+    >      pass
+    ends up closing sys.stdout when the with block is exited. Using the
+    function without a context manager avoids the issue, but then it results in
+    leaked open files when either bzip=True or gzip=True.
+    FileWriter must be used as a context manager, but it ensures that resources
+    are closed upon exiting the with block. Furthermore, it can be explicitly
+    requested to close the underlying file_handle."""
+    ofile = None
+
+    if do_gzip and do_bzip:
+        raise ValueError("Cannot specify both bzip and gzip compression!")
+
+    if do_gzip:
+        ofile = gzip.GzipFile(fileobj=file_handle, mode='w')
+    elif do_bzip:
+        ofile = bz2.open(file_handle, mode='w')
+    else:
+        ofile = contextlib.nullcontext(enter_result=file_handle)
+
+    with ofile as x:
+        yield x
+
+    if steal_ownership:
+        file_handle.close()

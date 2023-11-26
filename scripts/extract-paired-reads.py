@@ -44,6 +44,7 @@ extract them into separate files (.pe and .se).
 
 Reads FASTQ and FASTA input, retains format for output.
 """
+from contextlib import nullcontext
 import sys
 import os.path
 import textwrap
@@ -53,7 +54,7 @@ from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import sanitize_help, KhmerArgumentParser
 from khmer.khmer_args import FileType as khFileType
 from khmer.kfile import add_output_compression_type
-from khmer.kfile import get_file_writer
+from khmer.kfile import FileWriter
 
 from khmer.utils import broken_paired_reader, write_record, write_record_pair
 
@@ -132,39 +133,40 @@ def main():
 
     # OVERRIDE default output file locations with -p, -s
     if args.output_paired:
-        paired_fp = get_file_writer(args.output_paired, args.gzip, args.bzip)
-        out2 = paired_fp.name
+        paired_ctx = FileWriter(args.output_paired, args.gzip, args.bzip)
+        out2 = args.output_paired.name
     else:
         # Don't override, just open the default filename from above
-        paired_fp = get_file_writer(open(out2, 'wb'), args.gzip, args.bzip)
+        paired_ctx = FileWriter(open(out2, 'wb'), args.gzip, args.bzip,
+                                steal_ownership=True)
     if args.output_single:
-        single_fp = get_file_writer(args.output_single, args.gzip, args.bzip)
+        single_ctx = FileWriter(args.output_single, args.gzip, args.bzip)
         out1 = args.output_single.name
     else:
         # Don't override, just open the default filename from above
-        single_fp = get_file_writer(open(out1, 'wb'), args.gzip, args.bzip)
+        single_ctx = FileWriter(open(out1, 'wb'), args.gzip, args.bzip,
+                                steal_ownership=True)
 
-    print('reading file "%s"' % infile, file=sys.stderr)
-    print('outputting interleaved pairs to "%s"' % out2, file=sys.stderr)
-    print('outputting orphans to "%s"' % out1, file=sys.stderr)
+    with paired_ctx as paired_fp, single_ctx as single_fp:
+        print('reading file "%s"' % infile, file=sys.stderr)
+        print('outputting interleaved pairs to "%s"' % out2,
+              file=sys.stderr)
+        print('outputting orphans to "%s"' % out1, file=sys.stderr)
 
-    n_pe = 0
-    n_se = 0
+        n_pe = 0
+        n_se = 0
 
-    reads = ReadParser(infile)
-    for index, is_pair, read1, read2 in broken_paired_reader(reads):
-        if index % 100000 == 0 and index > 0:
-            print('...', index, file=sys.stderr)
+        reads = ReadParser(infile)
+        for index, is_pair, read1, read2 in broken_paired_reader(reads):
+            if index % 100000 == 0 and index > 0:
+                print('...', index, file=sys.stderr)
 
-        if is_pair:
-            write_record_pair(read1, read2, paired_fp)
-            n_pe += 1
-        else:
-            write_record(read1, single_fp)
-            n_se += 1
-
-    single_fp.close()
-    paired_fp.close()
+            if is_pair:
+                write_record_pair(read1, read2, paired_fp)
+                n_pe += 1
+            else:
+                write_record(read1, single_fp)
+                n_se += 1
 
     if n_pe == 0:
         raise Exception("no paired reads!? check file formats...")

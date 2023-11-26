@@ -52,7 +52,7 @@ from khmer import __version__
 from khmer.kfile import check_input_files, check_space
 from khmer.khmer_args import sanitize_help, KhmerArgumentParser
 from khmer.khmer_args import FileType as khFileType
-from khmer.kfile import (add_output_compression_type, get_file_writer,
+from khmer.kfile import (add_output_compression_type, FileWriter,
                          describe_file_handle)
 from khmer.utils import (write_record_pair, check_is_left, check_is_right,
                          check_is_pair)
@@ -109,42 +109,41 @@ def main():
 
     print("Interleaving:\n\t%s\n\t%s" % (s1_file, s2_file), file=sys.stderr)
 
-    outfp = get_file_writer(args.output, args.gzip, args.bzip)
-
-    counter = 0
-    screed_iter_1 = screed.open(s1_file)
-    screed_iter_2 = screed.open(s2_file)
-    for read1, read2 in zip_longest(screed_iter_1, screed_iter_2):
-        if read1 is None or read2 is None:
-            print(("ERROR: Input files contain different number"
-                   " of records."), file=sys.stderr)
-            sys.exit(1)
-
-        if counter % 100000 == 0:
-            print('...', counter, 'pairs', file=sys.stderr)
-        counter += 1
-
-        name1 = read1.name
-        name2 = read2.name
-
-        if not args.no_reformat:
-            if not check_is_left(name1):
-                name1 += '/1'
-            if not check_is_right(name2):
-                name2 += '/2'
-
-            read1.name = name1
-            read2.name = name2
-
-            if not check_is_pair(read1, read2):
-                print("ERROR: This doesn't look like paired data! "
-                      "%s %s" % (read1.name, read2.name), file=sys.stderr)
+    with FileWriter(args.output, args.gzip, args.bzip) as outfp:
+        counter = 0
+        screed_iter_1 = screed.open(s1_file)
+        screed_iter_2 = screed.open(s2_file)
+        for read1, read2 in zip_longest(screed_iter_1, screed_iter_2):
+            if read1 is None or read2 is None:
+                print(("ERROR: Input files contain different number"
+                       " of records."), file=sys.stderr)
                 sys.exit(1)
 
-        write_record_pair(read1, read2, outfp)
+            if counter % 100000 == 0:
+                print('...', counter, 'pairs', file=sys.stderr)
+            counter += 1
 
-    print('final: interleaved %d pairs' % counter, file=sys.stderr)
-    print('output written to', describe_file_handle(outfp), file=sys.stderr)
+            name1 = read1.name
+            name2 = read2.name
+
+            if not args.no_reformat:
+                if not check_is_left(name1):
+                    name1 += '/1'
+                if not check_is_right(name2):
+                    name2 += '/2'
+
+                read1.name = name1
+                read2.name = name2
+
+                if not check_is_pair(read1, read2):
+                    print("ERROR: This doesn't look like paired data! "
+                          "%s %s" % (read1.name, read2.name), file=sys.stderr)
+                    sys.exit(1)
+
+            write_record_pair(read1, read2, outfp)
+
+        print('final: interleaved %d pairs' % counter, file=sys.stderr)
+        print('output written to', describe_file_handle(outfp), file=sys.stderr)
 
 
 if __name__ == '__main__':

@@ -143,7 +143,8 @@ def main():
         worker_q.put((nodegraph, _, start, end))
 
     print('enqueued %d subset tasks' % n_subsets, file=sys.stderr)
-    open('%s.info' % basename, 'w').write('%d subsets total\n' % (n_subsets))
+    with open('%s.info' % basename, 'w') as info_fp:
+        info_fp.write('%d subsets total\n' % (n_subsets))
 
     n_threads = args.threads
     if n_subsets < n_threads:

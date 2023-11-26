@@ -46,6 +46,7 @@ option to output to STDOUT.
 Use '-h' for parameter help.
 """
 
+from contextlib import nullcontext
 import sys
 import screed
 import os
@@ -60,7 +61,7 @@ from khmer.khmer_args import FileType as khFileType
 import argparse
 from khmer.kfile import (check_space, check_space_for_graph,
                          check_valid_file_exists, add_output_compression_type,
-                         get_file_writer, describe_file_handle)
+                         FileWriter, describe_file_handle)
 from khmer.utils import (write_record, broken_paired_reader, ReadBundle,
                          clean_input_reads)
 from khmer.khmer_logger import (configure_logging, log_info, log_error)
@@ -360,39 +361,43 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     output_name = None
 
     if args.single_output_file:
-        outfp = get_file_writer(args.single_output_file, args.gzip, args.bzip)
+        out_single_ctx = FileWriter(args.single_output_file, args.gzip, args.bzip)
     else:
+        out_single_ctx = nullcontext()
         if '-' in filenames or '/dev/stdin' in filenames:
             print("Accepting input from stdin; output filename must "
                   "be provided with '-o'.", file=sys.stderr)
             sys.exit(1)
 
-    #
-    # main loop: iterate over all files given, do diginorm.
-    #
-
-    for filename, require_paired in files:
-        if not args.single_output_file:
-            output_name = os.path.basename(filename) + '.keep'
-            outfp = open(output_name, 'wb')
-            outfp = get_file_writer(outfp, args.gzip, args.bzip)
-
-        # failsafe context manager in case an input file breaks
-        with catch_io_errors(filename, outfp, args.single_output_file,
-                             args.force, corrupt_files):
-            screed_iter = clean_input_reads(screed.open(filename))
-            reader = broken_paired_reader(screed_iter, min_length=args.ksize,
-                                          force_single=force_single,
-                                          require_paired=require_paired)
-
-            # actually do diginorm
-            for record in with_diagnostics(reader, filename):
-                if record is not None:
-                    write_record(record, outfp)
-
-            log_info('output in {name}', name=describe_file_handle(outfp))
+    with out_single_ctx as out_single_fp:
+        #
+        # main loop: iterate over all files given, do diginorm.
+        #
+        for filename, require_paired in files:
             if not args.single_output_file:
-                outfp.close()
+                output_name = os.path.basename(filename) + '.keep'
+                out_ctx = FileWriter(open(output_name, 'wb'), args.gzip,
+                                     args.bzip, steal_ownership=True)
+            else:
+                out_ctx = nullcontext(enter_result=out_single_fp)
+
+            with out_ctx as outfp:
+                # failsafe context manager in case an input file breaks
+                with catch_io_errors(filename, outfp, args.single_output_file,
+                                     args.force, corrupt_files):
+                    screed_iter = clean_input_reads(screed.open(filename))
+                    reader = broken_paired_reader(screed_iter,
+                                                  min_length=args.ksize,
+                                                  force_single=force_single,
+                                                  require_paired=require_paired)
+
+                    # actually do diginorm
+                    for record in with_diagnostics(reader, filename):
+                        if record is not None:
+                            write_record(record, outfp)
+
+                    log_info('output in {name}',
+                             name=describe_file_handle(outfp))
 
     # finished - print out some diagnostics.
 

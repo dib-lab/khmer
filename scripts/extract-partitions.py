@@ -301,10 +301,10 @@ def main():
                                    args.max_size)
 
     if args.output_unassigned:
-        ofile = open('%s.unassigned.%s' % (args.prefix, suffix), 'wb')
-        unassigned_fp = get_file_writer(ofile, args.gzip, args.bzip)
-        extractor.process_unassigned(unassigned_fp)
-        unassigned_fp.close()
+        with open('%s.unassigned.%s' % (args.prefix, suffix), 'wb') as ofile:
+            unassigned_fp = get_file_writer(ofile, args.gzip, args.bzip)
+            extractor.process_unassigned(unassigned_fp)
+            unassigned_fp.close()
     else:
         extractor.process_unassigned()
 
@@ -320,13 +320,21 @@ def main():
         print('nothing to output; exiting!', file=sys.stderr)
         return
 
+    to_close = []
     # open a bunch of output files for the different groups
     group_fps = {}
     for index in range(extractor.group_n):
         fname = '%s.group%04d.%s' % (args.prefix, index, suffix)
-        group_fp = get_file_writer(open(fname, 'wb'), args.gzip,
+        back_fp = open(fname, 'wb')
+        group_fp = get_file_writer(back_fp, args.gzip,
                                    args.bzip)
         group_fps[index] = group_fp
+        # It feels more natural to close the writer before closing the
+        # underlying file. fp.close() is theoretically idempotent, so it should
+        # be fine even though sometimes get_file_writer "steals" ownership of
+        # the underlying stream.
+        to_close.append(group_fp)
+        to_close.append(back_fp)
 
     # write 'em all out!
     # refresh the generator
@@ -350,6 +358,9 @@ def main():
           (len(group_fps),
            args.prefix,
            suffix), file=sys.stderr)
+
+    for fp in to_close:
+        fp.close()
 
 
 if __name__ == '__main__':

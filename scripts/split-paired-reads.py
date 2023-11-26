@@ -44,6 +44,7 @@ files (.1 and .2).
 
 Reads FASTQ and FASTA input, retains format for output.
 """
+from contextlib import nullcontext
 import sys
 import os
 import textwrap
@@ -56,7 +57,7 @@ from khmer.utils import (write_record, broken_paired_reader,
                          UnpairedReadsError)
 from khmer.kfile import (check_input_files, check_space,
                          add_output_compression_type,
-                         get_file_writer, describe_file_handle)
+                         FileWriter, describe_file_handle)
 
 
 def get_parser():
@@ -145,22 +146,26 @@ def main():
 
     # OVERRIDE output file locations with -1, -2
     if args.output_first:
-        fp_out1 = get_file_writer(args.output_first, args.gzip, args.bzip)
-        out1 = fp_out1.name
+        out1_ctx = FileWriter(args.output_first, args.gzip, args.bzip)
+        out1 = args.output_first.name
     else:
         # Use default filename created above
-        fp_out1 = get_file_writer(open(out1, 'wb'), args.gzip, args.bzip)
+        out1_ctx = FileWriter(open(out1, 'wb'), args.gzip, args.bzip,
+                              steal_ownership=True)
     if args.output_second:
-        fp_out2 = get_file_writer(args.output_second, args.gzip, args.bzip)
-        out2 = fp_out2.name
+        out2_ctx = FileWriter(args.output_second, args.gzip, args.bzip)
+        out2 = args.output_second.name
     else:
         # Use default filename created above
-        fp_out2 = get_file_writer(open(out2, 'wb'), args.gzip, args.bzip)
+        out2_ctx = FileWriter(open(out2, 'wb'), args.gzip, args.bzip,
+                              steal_ownership=True)
 
     # put orphaned reads here, if -0!
     if args.output_orphaned:
-        fp_out0 = get_file_writer(args.output_orphaned, args.gzip, args.bzip)
+        out0_ctx = FileWriter(args.output_orphaned, args.gzip, args.bzip)
         out0 = describe_file_handle(args.output_orphaned)
+    else:
+        out0_ctx = nullcontext()
 
     counter1 = 0
     counter2 = 0
@@ -171,23 +176,24 @@ def main():
     paired_iter = broken_paired_reader(ReadParser(infile),
                                        require_paired=not args.output_orphaned)
 
-    try:
-        for index, is_pair, record1, record2 in paired_iter:
-            if index % 10000 == 0:
-                print('...', index, file=sys.stderr)
+    with out0_ctx as fp_out0, out1_ctx as fp_out1, out2_ctx as fp_out2:
+        try:
+            for index, is_pair, record1, record2 in paired_iter:
+                if index % 10000 == 0:
+                    print('...', index, file=sys.stderr)
 
-            if is_pair:
-                write_record(record1, fp_out1)
-                counter1 += 1
-                write_record(record2, fp_out2)
-                counter2 += 1
-            elif args.output_orphaned:
-                write_record(record1, fp_out0)
-                counter3 += 1
-    except UnpairedReadsError as e:
-        print("Unpaired reads found starting at {name}; exiting".format(
-            name=e.read1.name), file=sys.stderr)
-        sys.exit(1)
+                if is_pair:
+                    write_record(record1, fp_out1)
+                    counter1 += 1
+                    write_record(record2, fp_out2)
+                    counter2 += 1
+                elif args.output_orphaned:
+                    write_record(record1, fp_out0)
+                    counter3 += 1
+        except UnpairedReadsError as e:
+            print("Unpaired reads found starting at {name}; exiting".format(
+                name=e.read1.name), file=sys.stderr)
+            sys.exit(1)
 
     print("DONE; split %d sequences (%d left, %d right, %d orphans)" %
           (counter1 + counter2, counter1, counter2, counter3), file=sys.stderr)

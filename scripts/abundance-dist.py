@@ -42,6 +42,7 @@ Produce the k-mer abundance distribution for the given file.
 Use '-h' for parameter help.
 """
 
+import contextlib
 import sys
 import csv
 import khmer
@@ -143,26 +144,28 @@ def main():
         sys.exit(1)
 
     if args.output_histogram_filename in ('-', '/dev/stdout'):
-        countgraph_fp = sys.stdout
+        countgraph_ctx = contextlib.nullcontext(enter_result=sys.stdout)
     else:
-        countgraph_fp = open(args.output_histogram_filename, 'w')
-    countgraph_fp_csv = csv.writer(countgraph_fp)
-    # write headers:
-    countgraph_fp_csv.writerow(['abundance', 'count', 'cumulative',
-                                'cumulative_fraction'])
+        countgraph_ctx = open(args.output_histogram_filename, 'w')
 
-    sofar = 0
-    for _, i in enumerate(abundances):
-        if i == 0 and not args.output_zero:
-            continue
+    with countgraph_ctx as countgraph_fp:
+        countgraph_fp_csv = csv.writer(countgraph_fp)
+        # write headers:
+        countgraph_fp_csv.writerow(['abundance', 'count', 'cumulative',
+                                    'cumulative_fraction'])
 
-        sofar += i
-        frac = sofar / float(total)
+        sofar = 0
+        for _, i in enumerate(abundances):
+            if i == 0 and not args.output_zero:
+                continue
 
-        countgraph_fp_csv.writerow([_, i, sofar, round(frac, 3)])
+            sofar += i
+            frac = sofar / float(total)
 
-        if sofar == total:
-            break
+            countgraph_fp_csv.writerow([_, i, sofar, round(frac, 3)])
+
+            if sofar == total:
+                break
 
 
 if __name__ == '__main__':

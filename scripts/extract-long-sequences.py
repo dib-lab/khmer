@@ -52,7 +52,7 @@ import textwrap
 import sys
 from khmer import __version__
 from khmer.utils import write_record
-from khmer.kfile import add_output_compression_type, get_file_writer
+from khmer.kfile import add_output_compression_type, FileWriter
 from khmer.khmer_args import sanitize_help, KhmerArgumentParser
 
 
@@ -81,12 +81,12 @@ def get_parser():
 
 def main():
     args = sanitize_help(get_parser()).parse_args()
-    outfp = get_file_writer(args.output, args.gzip, args.bzip)
-    for filename in args.input_filenames:
-        for record in screed.open(filename):
-            if len(record['sequence']) >= args.length:
-                write_record(record, outfp)
-    print('wrote to: ' + args.output.name, file=sys.stderr)
+    with FileWriter(args.output, args.gzip, args.bzip) as outfp:
+        for filename in args.input_filenames:
+            for record in screed.open(filename):
+                if len(record['sequence']) >= args.length:
+                    write_record(record, outfp)
+        print('wrote to: ' + args.output.name, file=sys.stderr)
 
 
 if __name__ == '__main__':
