@@ -329,7 +329,7 @@ def test_very_short_read():
 
 class Test_ConsumeString(object):
 
-    def setup(self):
+    def setup_method(self):
         self.kh = khmer.Countgraph(4, 1, 1, primes=[4 ** 4])
 
     def test_n_occupied(self):
@@ -374,7 +374,7 @@ class Test_ConsumeString(object):
 
 class Test_AbundanceDistribution(object):
 
-    def setup(self):
+    def setup_method(self):
         self.kh = khmer.Countgraph(4, 100, 1)
         A_filename = utils.get_test_data('all-A.fa')
         self.kh.consume_seqfile(A_filename)

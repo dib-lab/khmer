@@ -54,7 +54,7 @@ from .graph_features import *
 from .graph_features import K
 
 
-def teardown():
+def teardown_module():
     utils.cleanup()
 
 

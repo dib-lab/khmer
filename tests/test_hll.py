@@ -50,7 +50,7 @@ N_UNIQUE = 3960
 TRANSLATE = {'A': 'T', 'C': 'G', 'T': 'A', 'G': 'C'}
 
 
-def teardown():
+def teardown_module():
     utils.cleanup()
 
 
