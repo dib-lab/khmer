@@ -41,13 +41,13 @@ import screed
 from . import khmer_tst_utils as utils
 
 
-def teardown():
+def teardown_module():
     utils.cleanup()
 
 
 class Test_ExactGraphFu(object):
 
-    def setup(self):
+    def setup_method(self):
         self.ht = khmer.Nodegraph(12, 1e4, 2)
 
     def test_counts(self):
@@ -141,7 +141,7 @@ class Test_ExactGraphFu(object):
 
 class Test_InexactGraphFu(object):
 
-    def setup(self):
+    def setup_method(self):
         self.ht = khmer.Nodegraph(12, 4 ** 3 + 1, 2)
 
     def test_graph_links_next_a(self):

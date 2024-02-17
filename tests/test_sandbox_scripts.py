@@ -55,7 +55,7 @@ def scriptpath(script):
     return script
 
 
-def teardown():
+def teardown_module():
     utils.cleanup()
 
 

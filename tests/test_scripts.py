@@ -51,7 +51,7 @@ import khmer.kfile
 import screed
 
 
-def teardown():
+def teardown_module():
     utils.cleanup()
 
 

@@ -62,7 +62,7 @@ PRIMES_8b = [8000000011, 8000000051]
 DNA = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC"
 
 
-def teardown():
+def teardown_module():
     utils.cleanup()
 
 
@@ -116,7 +116,7 @@ def test_revhash_1():
 
 class Test_Countgraph(object):
 
-    def setup(self):
+    def setup_method(self):
         self.hi = khmer.Countgraph(12, 1, 1, primes=PRIMES_1m)
 
     def test_failed_get(self):
